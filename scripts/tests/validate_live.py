@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-LIVE = ROOT / "data" / "live"
+LIVE = ROOT / "docs" / "data" / "live"
 ALLOWED_RESULTS = {None, "yes", "no", "scalar", ""}
 CATEGORY_IDS = {"gas", "elections", "culture", "crypto", "golf"}
 REQUIRED_ROW_KEYS = {

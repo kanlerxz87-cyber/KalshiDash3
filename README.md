@@ -31,10 +31,10 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 
 ```
 docs/                 the published site (GitHub Pages artifact)
-data/categories.json  the five topics and their confirmed seed series
-data/verified_facts.json  every static claim + its official source
-data/findings.json    questions, suggestions, flagged irregularities
-data/live/            collected snapshots (written by scripts/collect.py)
+docs/data/categories.json  the five topics and their confirmed seed series
+docs/data/verified_facts.json  every static claim + its official source
+docs/data/findings.json    questions, suggestions, flagged irregularities
+docs/data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
@@ -48,7 +48,7 @@ scripts/tests/validate_live.py  refuses a fabricated snapshot
 Nothing here needs credentials. All market data comes from public demo endpoints.
 
 ```bash
-python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
+python3 scripts/collect.py            # writes docs/data/live/markets.json + price_history.json
 python3 scripts/tests/validate_live.py
 python3 scripts/check_site.py
 python3 -m http.server -d docs 8000   # then open http://localhost:8000

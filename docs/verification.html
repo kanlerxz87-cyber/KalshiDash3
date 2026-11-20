@@ -29,6 +29,15 @@
   </div>
   <div id="facts"></div>
 
+  <h2>Directly observed from the demo API</h2>
+  <p class="small mut">
+    These rows were read straight from the official demo API with the documented
+    <code>series_ticker</code> + <code>status</code> filter, one request per series, so the query URL can be re-run by hand.
+    This is a spot check, not a full scan: absence of a topic here proves nothing about whether it exists on the exchange.
+    Full snapshot method is on the <a href="index.html">home page</a>.
+  </p>
+  <div id="spotcheck"></div>
+
   <h2>What “verified” means here, and what it does not</h2>
   <div class="tw"><table>
     <thead><tr><th>Claim type</th><th>What we did</th><th>What we did not do</th></tr></thead>
@@ -89,9 +98,9 @@ function render() {
 }
 (async () => {
   try {
-    const d = await KD.json("data/verified_facts.json");
+    const d = await KD.json("docs/data/verified_facts.json");
     facts = d.facts || [];
-  } catch { KD.$("#facts").innerHTML = KD.empty("data/verified_facts.json missing."); return; }
+  } catch { KD.$("#facts").innerHTML = KD.empty("docs/data/verified_facts.json missing."); return; }
   const v = facts.filter(f => f.verified).length;
   KD.$("#summary").innerHTML = `<div class="grid">
     <div class="card"><div class="kpi">${facts.length}<small>claims checked</small></div></div>
@@ -101,6 +110,26 @@ function render() {
   </div>`;
   KD.$("#filt").addEventListener("change", render);
   render();
+  try {
+    const sc = await KD.json("data/live/spotcheck.json");
+    const obs = sc.observations || [];
+    KD.$("#spotcheck").innerHTML =
+      KD.table([
+        { key: "series", label: "Series queried" }, { key: "finding", label: "What came back" },
+        { key: "sample", label: "Sample market" }, { key: "url", label: "Query (re-runnable)" },
+      ], obs.map(o => ({
+        series: '<code>' + KD.esc(o.series_ticker) + '</code>' +
+          (o.category_id ? ' <span class="tag">' + KD.esc(KD.CAT_LABEL[o.category_id] || o.category_id) + '</span>' : ''),
+        finding: KD.esc(o.finding),
+        sample: (o.sample_markets && o.sample_markets[0])
+          ? '<code>' + KD.esc(o.sample_markets[0].ticker) + '</code><div class="small mut">' + KD.esc(o.sample_markets[0].title || "") + '</div>'
+          : '<span class="na">—</span>',
+        url: KD.srcLink(o.query_url, "open query"),
+      }))) +
+      `<p class="small mut">Limitations recorded with the data: ${(sc.limitations || []).map(KD.esc).join(" · ")}</p>`;
+  } catch (e) {
+    KD.$("#spotcheck").innerHTML = KD.empty("No spot-check file present.");
+  }
 })();
 </script>
 </body></html>

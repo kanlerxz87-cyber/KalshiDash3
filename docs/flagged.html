@@ -35,8 +35,8 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 KD.nav("flagged.html");
 (async () => {
   let f, facts;
-  try { f = await KD.json("data/findings.json"); } catch { KD.$("#flags").innerHTML = KD.empty("data/findings.json missing."); return; }
-  try { facts = (await KD.json("data/verified_facts.json")).facts || []; } catch { facts = []; }
+  try { f = await KD.json("docs/data/findings.json"); } catch { KD.$("#flags").innerHTML = KD.empty("docs/data/findings.json missing."); return; }
+  try { facts = (await KD.json("docs/data/verified_facts.json")).facts || []; } catch { facts = []; }
 
   const sev = id => f.flagged.find(x => x.id === id)?.severity;
   KD.$("#summary").innerHTML = `<div class="grid">

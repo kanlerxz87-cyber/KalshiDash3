@@ -94,11 +94,11 @@ def check_page(page: Path) -> None:
 
 
 def check_data() -> None:
-    for rel in ("data/live/markets.json", "data/live/price_history.json",
-                "data/verified_facts.json", "data/findings.json", "data/categories.json"):
+    for rel in ("docs/data/live/markets.json", "docs/data/live/price_history.json",
+                "docs/data/verified_facts.json", "docs/data/findings.json", "docs/data/categories.json"):
         path = ROOT / rel
         if not path.exists():
-            if rel.startswith("data/live/"):
+            if rel.startswith("docs/data/live/"):
                 warnings.append(f"{rel} not present yet (collector has not run)")
             else:
                 errors.append(f"{rel} missing")
