@@ -77,6 +77,9 @@ canvas{width:100%;background:var(--panel);border:1px solid var(--line);border-ra
 .alert-item .alert-move.up{color:var(--ok)}
 .alert-item .alert-move.down{color:var(--bad)}
 .alert-item a{font-size:11px}
+.alert-cause{margin-top:5px;padding-top:5px;border-top:1px dashed var(--line)}
+.alert-cause .badge{font-size:10px;letter-spacing:.03em;text-transform:uppercase}
+.alert-cause a{font-size:11px}
 .alert-empty{padding:14px;color:var(--mut);font-size:12.5px}
 .liq{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}
 .book{font-family:var(--mono);font-size:12px}

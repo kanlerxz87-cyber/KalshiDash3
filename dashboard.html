@@ -22,7 +22,7 @@
 
   <section aria-labelledby="alertsTitle">
     <h2 id="alertsTitle">Price-swing alert feeds</h2>
-    <p class="small mut">Triggers when consecutive collected last-trade observations differ by at least $0.10. New observations are checked as the committed snapshot refreshes; this is not tick-level streaming. Each source opens the official Kalshi demo API market record. No external news source is attached unless causation is independently verified.</p>
+    <p class="small mut">Triggers when consecutive collected last-trade observations differ by at least $0.10. These panels read the append-only alert archive, so a move stays listed after its market leaves the open scan; new observations are checked as the committed snapshot refreshes, and this is not tick-level streaming. Each alert opens the official Kalshi market record and the official event record. Where the event publishes official settlement sources (AAA, CF Benchmarks, the PGA Tour, news wires), they are listed as <b>candidates to check</b> and labelled unverified: Kalshi publishes no news feed, so no source is ever asserted as the cause of a move.</p>
     <div class="alert-grid">
       <section class="card alert-card" aria-labelledby="allAlertsTitle">
         <div class="alert-heading"><h3 id="allAlertsTitle">All qualifying events</h3><span id="allAlertCount" class="badge">0</span></div>
@@ -63,6 +63,7 @@
     <p class="small mut" id="chartMeta">Pick a market from the tables below.</p>
     <canvas id="priceChart" height="340" aria-label="Chart of contract price over time"></canvas>
     <p class="small mut" id="chartFoot"></p>
+    <p class="small mut">Amber markers on the chart are the recorded jumps of at least $0.10 for the selected market, taken from the same alert archive that feeds the panels above.</p>
   </div>
 
   <h2>Liquidity — contracts available at each price</h2>
@@ -94,7 +95,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/site.js"></script>
 <script>
 KD.nav("dashboard.html");
-const state = { snap: null, hist: null, sel: null, cat: "" };
+const state = { snap: null, hist: null, alerts: null, alertSource: "", alertMeta: null, sel: null, cat: "" };
 
 const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
 
@@ -105,13 +106,39 @@ function pickInitialTicker() {
   return open.length ? open[0].ticker : null;
 }
 
-function renderAlerts() {
+function alertRows() {
+  // R-1: the feeds read the canonical archive/feed, not the retained history.
+  // The archive keeps every swing that was ever detected, so an alert stays
+  // listed after its market leaves the open scan. The history recompute is
+  // only a fallback for a tree that has no archive file yet.
+  if (state.alerts) {
+    return state.alerts.map(a => ({
+      ticker: a.ticker,
+      title: a.title,
+      category_id: a.category_id,
+      category_basis: a.category_basis,
+      time: a.to_time,
+      previousTime: a.from_time,
+      before: Number(a.from_price),
+      after: Number(a.to_price),
+      change: Number(a.delta),
+      volume_24h_fp: a.volume_24h_fp,
+      source: a.market_source,
+      cause_link: a.cause_link,
+      cause_status: a.cause_status,
+      cause_candidates: a.cause_candidates || [],
+      cause_public_url: a.cause_public_url,
+      high_roi: a.high_roi !== undefined
+        ? !!a.high_roi
+        : (a.category_basis === "seed" && Number(a.volume_24h_fp) > 0),
+    }));
+  }
   const marketRows = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || []);
   const byTicker = new Map(marketRows.map(row => [row.ticker, row]));
   const alerts = [];
   for (const [ticker, data] of Object.entries(state.hist?.series || {})) {
     const market = byTicker.get(ticker);
-    if (!market || (state.cat && market.category_id !== state.cat)) continue;
+    if (!market) continue;
     const points = (data.observations || [])
       .filter(p => Number.isFinite(Date.parse(p.t)) && p.last !== null && p.last !== undefined && Number.isFinite(Number(p.last)))
       .slice().sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
@@ -119,34 +146,65 @@ function renderAlerts() {
       const before = Number(points[i - 1].last), after = Number(points[i].last);
       const change = after - before;
       if (Math.abs(change) + 1e-9 < 0.10) continue;
-      alerts.push({ ticker, market, before, after, change, time: points[i].t, previousTime: points[i - 1].t });
+      alerts.push({
+        ticker, title: market.title, category_id: market.category_id, category_basis: market.category_basis,
+        before, after, change, time: points[i].t, previousTime: points[i - 1].t,
+        volume_24h_fp: market.volume_24h_fp, source: market.source,
+        cause_link: null, cause_candidates: [], high_roi: false,
+      });
     }
   }
   alerts.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
-  const all = alerts.slice(0, 100);
-  const screen = alerts.filter(a => a.market.category_basis === "seed" && Number(a.market.volume_24h_fp) > 0)
-    .sort((a, b) => Number(b.market.volume_24h_fp) - Number(a.market.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
+  return alerts;
+}
+
+function renderAlerts() {
+  const alerts = alertRows();
+  const inCat = alerts.filter(a => !state.cat || a.category_id === state.cat);
+  const all = inCat.slice(0, 100);
+  const screen = inCat.filter(a => a.high_roi)
+    .sort((a, b) => Number(b.volume_24h_fp) - Number(a.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
     .slice(0, 100);
   const renderFeed = (items, emptyText) => items.length ? items.map(a => {
-    const sign = a.change > 0 ? "+" : "−";
+    const sign = a.change > 0 ? "+" : "\u2212";
     const direction = a.change > 0 ? "up" : "down";
-    const title = `${a.market.title} · ${a.ticker}`;
+    const title = `${a.title || a.ticker} \u00b7 ${a.ticker}`;
+    const cands = a.cause_candidates || [];
+    const causeLinks = cands.map(c =>
+      `<a href="${KD.esc(c.url)}" target="_blank" rel="noopener">${KD.esc(c.name || c.url)}</a>`).join(" \u00b7 ");
+    const causeBlock = causeLinks
+      ? `<div class="alert-cause"><span class="badge warn">unverified cause</span>
+           <div class="small">Official settlement source${cands.length > 1 ? "s" : ""} to check: ${causeLinks}</div>
+           <div class="small mut">Not a confirmed cause: Kalshi publishes no news feed, so nothing links these sources to this move.</div></div>`
+      : `<div class="alert-cause small mut">No official event reference was collected for this market, so no cause candidate is shown.</div>`;
+    const eventLink = a.cause_link
+      ? `<a href="${KD.esc(a.cause_link)}" target="_blank" rel="noopener">Official Kalshi event record</a>`
+      : "";
+    const marketLink = a.source
+      ? `<a href="${KD.esc(a.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a>`
+      : "";
     return `<article class="alert-item">
-      <div class="alert-top"><time datetime="${KD.esc(a.time)}">${KD.esc(a.time.replace("T", " ").replace("Z", " UTC"))}</time><span>${KD.esc(KD.CAT_LABEL[a.market.category_id] || "")}</span></div>
+      <div class="alert-top"><time datetime="${KD.esc(a.time)}">${KD.esc(a.time.replace("T", " ").replace("Z", " UTC"))}</time><span>${KD.esc(KD.CAT_LABEL[a.category_id] || "")}</span></div>
       <span class="alert-market">${KD.esc(title)}</span>
-      <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
-      <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
-      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+      <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}\u00a2</span>
+      <span class="small mut"> ${(a.before * 100).toFixed(1)}\u00a2 \u2192 ${(a.after * 100).toFixed(1)}\u00a2</span>
+      <div>${marketLink}${eventLink ? " \u00b7 " + eventLink : ""}</div>
+      ${causeBlock}
     </article>`;
   }).join("") : `<div class="alert-empty">${emptyText}</div>`;
-  KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");
+  KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings are recorded yet.");
   KD.$("#modelAlerts").innerHTML = renderFeed(screen, "No qualifying alerts meet the experimental screen.");
   KD.$("#allAlertCount").textContent = `${all.length} shown`;
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
+  const source = state.alertSource === "archive"
+    ? "the append-only alert archive (data/live/alerts_archive.json)"
+    : state.alertSource === "feed"
+      ? "the rendered alert feed (data/live/alerts.json)"
+      : "the retained open-market price history (no archive file is committed yet)";
   KD.$("#alertFreshness").textContent = fetched
-    ? `Alert scan uses consecutive snapshots through ${fetched} UTC. The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
-    : "Alert feeds are empty until a sourced snapshot is available.";
+    ? `Feeds read ${source}, so a move stays listed after its market leaves the open scan. The snapshot in view was collected ${fetched} UTC; the collector runs on a scheduled cadence and this page checks for a newer committed snapshot once per minute.`
+    : `Feeds read ${source}. Alert feeds are empty until a sourced snapshot is available.`;
 }
 
 function renderTables() {
@@ -315,6 +373,36 @@ function drawChart() {
   ctx.stroke();
   ctx.fillStyle = key === "ask" ? bad : green;
   pts.forEach(p => { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.4, 0, 7); ctx.fill(); });
+  // Jump markers: every >= $0.10 move recorded for this market in the alert
+  // archive is marked on the chart, so a swing cannot hide between two dots.
+  const jumps = (state.alerts || [])
+    .filter(a => a.ticker === row.ticker && Math.abs(Number(a.delta)) + 1e-9 >= 0.10)
+    .filter(a => {
+      const t = Date.parse(a.to_time);
+      return Number.isFinite(t) && t >= t0 && t <= t1;
+    })
+    .sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time));
+  const warn = css.getPropertyValue("--warn") || "#f0b429";
+  jumps.forEach(j => {
+    const t = Date.parse(j.to_time);
+    const x = X(t);
+    const y = Y(Number(j.to_price));
+    ctx.save();
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = warn;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ih); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = warn;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 6); ctx.lineTo(x + 5, y); ctx.lineTo(x, y + 6); ctx.lineTo(x - 5, y);
+    ctx.closePath(); ctx.fill();
+    ctx.font = "10px ui-monospace,monospace";
+    ctx.fillText((Number(j.delta) > 0 ? "+" : "\u2212") + (Math.abs(Number(j.delta)) * 100).toFixed(0) + "\u00a2",
+      Math.min(x + 7, W - 40), Math.max(y - 8, pad.t + 10));
+    ctx.restore();
+  });
+
   // last point callout
   const lastP = pts[pts.length - 1];
   ctx.fillStyle = css.getPropertyValue("--txt");
@@ -322,10 +410,13 @@ function drawChart() {
   ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
     Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
 
+  const jumpNote = jumps.length
+    ? ` ${jumps.length} jump${jumps.length === 1 ? "" : "s"} of at least $0.10 are marked on this chart (amber line and diamond); they are the same records that feed the alert panels.`
+    : " No jump of at least $0.10 is recorded for this market in the current window.";
   foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
     ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
     Y axis is the contract price in dollars, bounded 0–1. Collected by
-    <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
+    <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.${jumpNote}`;
 }
 
 function drawLiq() {
@@ -357,12 +448,41 @@ function drawLiq() {
 }
 
 let loading = false;
+
+// R-1: the alert panels read the canonical archive (append-only) so a swing
+// stays listed after its market leaves the open scan, then the rendered feed.
+// The retained price history is only a fallback for a tree with neither file.
+async function loadAlerts(refresh) {
+  try {
+    const archive = await KD.json(`data/live/alerts_archive.json?refresh=${refresh}`);
+    if (archive && Array.isArray(archive.alerts)) {
+      state.alerts = archive.alerts;
+      state.alertSource = "archive";
+      state.alertMeta = { counts: { archive_total: archive.alerts.length } };
+      return;
+    }
+  } catch { /* try the rendered feed */ }
+  try {
+    const feed = await KD.json(`data/live/alerts.json?refresh=${refresh}`);
+    if (feed && Array.isArray(feed.all_events)) {
+      state.alerts = feed.all_events;
+      state.alertSource = "feed";
+      state.alertMeta = feed;
+      return;
+    }
+  } catch { /* fall back to the retained history */ }
+  state.alerts = null;
+  state.alertSource = "";
+  state.alertMeta = null;
+}
+
 async function load() {
   if (loading) return;
   loading = true;
   const refresh = Date.now();
   try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
   try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
+  await loadAlerts(refresh);
   KD.snapshotBanner(state.snap);
   renderAlerts();
   if (!state.snap) {

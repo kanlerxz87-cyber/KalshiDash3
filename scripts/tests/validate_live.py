@@ -107,6 +107,90 @@ def check_simulation() -> None:
         )
 
 
+def check_event_refs() -> None:
+    """Official event references: only what the API returned may be published.
+
+    Runs only when data/live/event_refs.json exists. A settlement source is a
+    place to look, never a proven cause, so nothing here may claim otherwise.
+    """
+    path = LIVE / "event_refs.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    check(doc.get("schema") == 1, "event_refs.json schema must be 1")
+    check(bool(doc.get("generated_at")), "event_refs.json generated_at missing")
+    check(bool(doc.get("disclaimers")), "event_refs.json disclaimers missing")
+    events = doc.get("events")
+    check(isinstance(events, list), "event_refs.json events must be a list")
+    for ev in events or []:
+        tag = f"event_refs:{ev.get('event_ticker')}"
+        check(bool(ev.get("event_ticker")), f"{tag} missing event_ticker")
+        check(ev.get("status") in ("ok", "unavailable"), f"{tag} bad status {ev.get('status')!r}")
+        check(str(ev.get("source", "")).startswith("https://"), f"{tag} source must be an https URL")
+        for s in ev.get("settlement_sources") or []:
+            check(bool(s.get("name")), f"{tag} settlement source without a name")
+            check(str(s.get("url", "")).startswith("https://"), f"{tag} settlement source must be an https URL")
+        # A public page link is only published when the request for it worked.
+        if ev.get("kalshi_public_url"):
+            check(
+                ev.get("kalshi_public_http_status") == 200,
+                f"{tag} publishes a public Kalshi link that was not verified with HTTP 200",
+            )
+
+
+def check_alert_causes() -> None:
+    """Alert cause fields: official candidates only, always labelled unverified.
+
+    Runs on the archive and on the rendered feed. This is the guard against
+    the failure mode the whole feature is about: a cause that cannot be
+    checked, or a "verified cause" claim that the API never supports.
+    """
+    refs: dict[str, dict] = {}
+    refs_path = LIVE / "event_refs.json"
+    if refs_path.exists():
+        for ev in json.loads(refs_path.read_text()).get("events") or []:
+            if ev.get("event_ticker"):
+                refs[ev["event_ticker"]] = ev
+
+    sources = []
+    archive_path = LIVE / "alerts_archive.json"
+    if archive_path.exists():
+        sources.append(("archive", json.loads(archive_path.read_text()).get("alerts") or []))
+    feed_path = LIVE / "alerts.json"
+    if feed_path.exists():
+        sources.append(("feed", json.loads(feed_path.read_text()).get("all_events") or []))
+
+    for where, alerts in sources:
+        for a in alerts:
+            tag = f"{where}:{a.get('ticker')}@{a.get('to_time')}"
+            status = str(a.get("cause_status") or "")
+            check("unverified" in status.lower(), f"{tag} cause_status does not say the cause is unverified")
+            link = a.get("cause_link")
+            if link:
+                check(
+                    str(link).startswith("https://external-api.demo.kalshi.co/trade-api/v2/events/"),
+                    f"{tag} cause_link is not an official Kalshi event record URL",
+                )
+            cands = a.get("cause_candidates") or []
+            check(isinstance(cands, list), f"{tag} cause_candidates must be a list")
+            official = {
+                (s.get("name"), s.get("url"))
+                for s in (refs.get(a.get("event_ticker"), {}).get("settlement_sources") or [])
+            }
+            official_urls = {u for _, u in official}
+            for c in cands:
+                check(bool(c.get("url")), f"{tag} cause candidate without a URL")
+                check(
+                    str(c.get("url", "")).startswith("https://"),
+                    f"{tag} cause candidate must be an https URL",
+                )
+                if refs:
+                    check(
+                        c.get("url") in official_urls,
+                        f"{tag} cause candidate is not an official settlement source of its event",
+                    )
+
+
 def main() -> int:
     path = LIVE / "markets.json"
     if not path.exists():
@@ -175,6 +259,8 @@ def main() -> int:
             check(prices == sorted(prices), f"{liq.get('ticker')} {side} not ascending")
 
     check_simulation()
+    check_event_refs()
+    check_alert_causes()
 
     if errors:
         print("INVALID live snapshot:", file=sys.stderr)

@@ -32,6 +32,8 @@ jobs:
           test "$code" = "200"
       - name: Collect
         run: python3 scripts/collect.py --orderbooks 4
+      - name: Collect official event references (settlement sources)
+        run: python3 scripts/collect_event_refs.py
       - name: Build live alert feed (>= $0.10 swings)
         run: python3 scripts/build_alerts.py
       - name: Paper-trade fixed strategies on the alert archive (no orders, no account)

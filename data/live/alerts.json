@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-20T13:32:25Z",
+ "generated_at": "2026-11-20T13:41:36Z",
  "snapshot_collected_at": "2026-11-20T13:32:25Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
@@ -9,11 +9,14 @@
   "require_category_basis": "seed",
   "require_volume_24h_gt": 0
  },
+ "event_refs_generated_at": null,
  "counts": {
   "all_events": 5,
   "high_roi": 0,
   "archive_total": 5,
-  "new_this_run": 1
+  "new_this_run": 0,
+  "alerts_with_cause_candidates": 0,
+  "cause_fields_refreshed": 0
  },
  "all_events": [
   {
@@ -32,9 +35,12 @@
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
    "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
+   "cause_status": "unverified: no official event reference was collected for this market",
    "first_seen_at": "2026-11-20T13:32:25Z",
-   "high_roi": false
+   "high_roi": false,
+   "cause_candidates": [],
+   "cause_kind": "none",
+   "cause_attached_at": "2026-11-20T13:38:05Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -52,9 +58,12 @@
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
+   "cause_status": "unverified: no official event reference was collected for this market",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "cause_candidates": [],
+   "cause_kind": "none",
+   "cause_attached_at": "2026-11-20T13:38:05Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -72,9 +81,12 @@
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
+   "cause_status": "unverified: no official event reference was collected for this market",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "cause_candidates": [],
+   "cause_kind": "none",
+   "cause_attached_at": "2026-11-20T13:38:05Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -92,9 +104,12 @@
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
+   "cause_status": "unverified: no official event reference was collected for this market",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "cause_candidates": [],
+   "cause_kind": "none",
+   "cause_attached_at": "2026-11-20T13:38:05Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -112,9 +127,12 @@
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
+   "cause_status": "unverified: no official event reference was collected for this market",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "cause_candidates": [],
+   "cause_kind": "none",
+   "cause_attached_at": "2026-11-20T13:38:05Z"
   }
  ],
  "high_roi": [],
@@ -122,7 +140,8 @@
   "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
   "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
-  "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
+  "cause_candidates are the official settlement_sources published for the event (AAA, CF Benchmarks, PGA Tour, news wires, ...). They are places to check, not a proven cause: the Kalshi API publishes no news feed, so every cause_status stays 'unverified'.",
+  "cause_link points at the official Kalshi event record for the market; it is a reference link, not an attribution.",
   "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model."
  ]
 }
