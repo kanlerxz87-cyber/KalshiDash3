@@ -125,6 +125,66 @@
     </tbody>
   </table></div>
 
+  <h2>4 · Automated simulated trading — the strategies run themselves</h2>
+  <p class="small mut">
+    The engine below replays the <b>collected price history</b> — real observations from the official demo API — through the
+    strategy rules defined on <a href="strategies.html">Strategies</a>, with <b>no manual input</b>: it decides every entry and
+    exit, models the taker fee on every fill, categorises every trade by strategy, category and price band, and reports
+    performance. Fills happen <b>only at collected observation timestamps</b>: entries at that observation's best ask,
+    exits at its best bid. Nothing between observations is invented.
+  </p>
+  <div class="notice bad">
+    <b>AUTOMATED PAPER SIMULATION — not a demo-account record, not advice.</b> Every number in this section is computed in
+    your browser from committed snapshots. No demo credentials exist (F-07), so nothing here touched the exchange.
+    Per-series fee multipliers are not applied (the general rate is), fills assume zero slippage within the displayed depth,
+    and the replay is a pure function of the current snapshot: a market that settles later resolves only on the run that
+    first sees its <code>result</code>.
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Engine rule</th><th>Exact behaviour in this build</th></tr></thead>
+    <tbody>
+      <tr><td><b>S1 momentum</b></td>
+          <td>Universe: top <b>3</b> open markets per category by dollars-traded estimate with ≥2 collected observations (the selector widens this for exploration only). Enter YES at an observation's best ask when the price moved ≥5¢ <b>between two consecutive observations</b> and 24h-window volume grew. Exit when price retraces 5¢ from the position's peak, or hold to the end of collected history (marked to market).</td></tr>
+      <tr><td><b>S2 = S1 + liquidity floor</b></td>
+          <td>Identical to S1, but an entry is only allowed when the snapshot order book shows ≥100 contracts resting at the best ask. Comparing S2 against S1 isolates what the liquidity filter is worth.</td></tr>
+      <tr><td><b>S3 = S1 + fee-aware band</b></td>
+          <td>Identical to S1, but entries priced inside the 25–75¢ band (where the modelled fee is largest) are skipped unless the triggering move was ≥10¢.</td></tr>
+      <tr><td><b>S4 resolution fade</b></td>
+          <td>At a market's final collected observation: if the price is ≤10¢ (or ≥90¢) and the favoured side has <b>zero resting bid contracts</b> in the snapshot book, take the faded side at ≤20¢. Held until the market settles; the payoff is the literal API <code>result</code> applied as $1 per winning contract, no settlement fee (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).</td></tr>
+      <tr><td><b>Fees</b></td>
+          <td><code>ceil(0.07 × C × P × (1−P) × 100) / 100</code> per fill — the general taker rate from the <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>, ceiling to the cent, applied on entry <i>and</i> exit. Identical to the manual ledger above.</td></tr>
+      <tr><td><b>Position size</b></td>
+          <td>$100 of paper cash per entry at the observed fill price; $10,000 starting cash; YES side for S1–S3, either side for S4.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="controls">
+    <label>Universe per category
+      <select id="aUniverse">
+        <option value="3" selected>Top 3 (S1's stated rule)</option>
+        <option value="5">Top 5</option>
+        <option value="10">Top 10</option>
+        <option value="0">All in-scope open markets (exploration only — wider than the stated rules)</option>
+      </select>
+    </label>
+    <button id="aRun">Run automated session (replay of collected prices)</button>
+    <button class="ghost" id="aReset">Reset simulated ledger</button>
+    <span class="small mut" id="aMeta"></span>
+  </div>
+  <div class="grid" id="aKpis"></div>
+  <h3>Performance by strategy</h3>
+  <div id="aByStrategy"></div>
+  <h3>Performance by strategy × category</h3>
+  <div id="aByCatStrat"></div>
+  <div class="card">
+    <h3>Equity curve (paper cash + open positions, marked to collected prices)</h3>
+    <canvas id="aEquity" height="260" aria-label="Equity curve of the automated simulated session"></canvas>
+    <p class="small mut" id="aEquityFoot"></p>
+  </div>
+  <h3>Open paper positions — marked to the last collected observation</h3>
+  <div id="aOpen"></div>
+  <h3>Automated trade log</h3>
+  <div id="aLog"></div>
+
 </main>
 <footer><div class="wrap">
 KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
@@ -264,5 +324,236 @@ KD.$("#tReset").addEventListener("click", () => {
   fillTickerSelect();
   render();
 })();
+</script>
+<script src="assets/alerts.js"></script>
+<script>
+/* Section 4 — automated simulated trading (session arena-f068786c).
+ * Pure function of the committed snapshot + collected history; persisted so the
+ * latest session survives reloads. S4 positions resolve against the literal API
+ * `result` the first time a run sees the market settled. */
+const AKEY = "kalshidash3.autosim.v1";
+const CATS = Object.keys(KD.CAT_LABEL);
+let auto = null;
+
+function loadAuto() { try { return JSON.parse(localStorage.getItem(AKEY)) || null; } catch { return null; } }
+function saveAuto(o) { localStorage.setItem(AKEY, JSON.stringify(o)); }
+
+function drawEquity(curve) {
+  const cv = KD.$("#aEquity");
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth || 900, H = 260;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const css = getComputedStyle(document.body);
+  const line = css.getPropertyValue("--line"), mut = css.getPropertyValue("--mut"), green = "#00b67a";
+  ctx.strokeStyle = line; ctx.fillStyle = mut; ctx.font = "11px ui-monospace,monospace"; ctx.lineWidth = 1;
+  if (!curve || curve.length < 2) {
+    ctx.font = "13px system-ui";
+    ctx.fillText("Run an automated session to draw the equity curve.", 20, 40);
+    return;
+  }
+  const vs = curve.map(p => p.equity);
+  const lo = Math.min(...vs), hi = Math.max(...vs);
+  const span = Math.max(1, hi - lo);
+  const pad = { l: 62, r: 14, t: 14, b: 30 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ih * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText("$" + (hi - span * i / 4).toFixed(2), 8, y + 4);
+  }
+  const t0 = Date.parse(curve[0].t), t1 = Date.parse(curve[curve.length - 1].t) || t0 + 1;
+  const X = t => pad.l + iw * (t - t0) / Math.max(1, t1 - t0);
+  const Y = v => pad.t + ih * (1 - (v - lo) / span);
+  for (let i = 0; i <= 4; i++) {
+    const t = t0 + (t1 - t0) * i / 4;
+    const d = new Date(t);
+    ctx.fillText(d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }), X(t) - 24, H - 10);
+  }
+  ctx.strokeStyle = green; ctx.lineWidth = 2;
+  ctx.beginPath();
+  curve.forEach((p, i) => i ? ctx.lineTo(X(Date.parse(p.t)), Y(p.equity)) : ctx.moveTo(X(Date.parse(p.t)), Y(p.equity)));
+  ctx.stroke();
+}
+
+function renderAuto() {
+  auto = loadAuto();
+  const host = KD.$("#aKpis");
+  if (!auto) {
+    KD.$("#aMeta").textContent = "";
+    host.innerHTML = `<div class="card"><div class="kpi">—<small>no automated session yet</small></div></div>`;
+    KD.$("#aByStrategy").innerHTML = KD.empty("Press “Run automated session” — the engine decides every trade itself. Nothing is invented between collector observations.");
+    KD.$("#aByCatStrat").innerHTML = "";
+    KD.$("#aOpen").innerHTML = "";
+    KD.$("#aLog").innerHTML = "";
+    drawEquity(null);
+    KD.$("#aEquityFoot").textContent = "";
+    return;
+  }
+  const r = auto.result, closed = r.trades, open = r.open;
+  const realized = closed.reduce((s, t) => s + t.pnl, 0);
+  const unreal = open.reduce((s, t) => s + t.unrealized, 0);
+  const fees = closed.reduce((s, t) => s + t.fees, 0) + open.reduce((s, t) => s + (t.fees || 0), 0);
+  const settled = closed.filter(t => t.status === "settled");
+  const wins = closed.filter(t => t.pnl > 0).length;
+  const equityNow = r.ending_cash + open.reduce((s, t) => s + t.contracts * t.mark_price, 0);
+  KD.$("#aMeta").innerHTML = `ran ${KD.esc(auto.ran_at)} over snapshot ${KD.esc(auto.snapshot_at)} · universe: ${KD.esc(auto.universe === "0" ? "all in-scope open markets" : "top " + auto.universe + " per category")} · ${KD.num(r.events)} collected observations · ${KD.num(r.universe_size)} markets in universe`;
+  host.innerHTML = [
+    ["$" + equityNow.toFixed(2), "paper equity (cash + marks)"],
+    [(closed.length ? (100 * wins / closed.length).toFixed(1) + "%" : "—"), "win rate of closed trades"],
+    ["$" + realized.toFixed(2), "realised P&L, net of fees"],
+    ["$" + unreal.toFixed(2), "unrealised P&L (open marks)"],
+    ["$" + fees.toFixed(2), "modelled fees paid"],
+    ["$" + (r.max_drawdown_portfolio || 0).toFixed(2), "max drawdown of the curve"],
+  ].map(([v, l]) => `<div class="card"><div class="kpi">${v}<small>${l}</small></div></div>`).join("");
+
+  KD.$("#aByStrategy").innerHTML = KD.table([
+    { key: "s", label: "Strategy" }, { key: "tr", label: "Trades", num: true }, { key: "cl", label: "Closed", num: true },
+    { key: "op", label: "Open", num: true }, { key: "wr", label: "Win rate (closed)", num: true },
+    { key: "rp", label: "Realised net P&L", num: true }, { key: "up", label: "Unrealised P&L", num: true },
+    { key: "fe", label: "Fees", num: true },
+  ], r.stats.map(s => ({
+    s: `<b>${KD.esc(s.name)}</b>`,
+    tr: KD.num(s.trades), cl: KD.num(s.closed), op: KD.num(s.open),
+    wr: s.win_rate === null ? '<span class="na">—</span>' : KD.pct(s.win_rate, 1),
+    rp: (s.realized_pnl >= 0 ? "+$" : "−$") + Math.abs(s.realized_pnl).toFixed(2),
+    up: (s.unrealized_pnl >= 0 ? "+$" : "−$") + Math.abs(s.unrealized_pnl).toFixed(2),
+    fe: "$" + s.fees.toFixed(2),
+  })));
+
+  // strategy × category matrix
+  const matrix = {};
+  for (const t of closed.concat(open)) {
+    const k = t.strategy + "|" + (t.category_id || "unknown");
+    matrix[k] ||= { n: 0, pnl: 0, fees: 0 };
+    matrix[k].n++;
+    matrix[k].pnl += t.pnl !== null && t.pnl !== undefined ? t.pnl : (t.unrealized || 0);
+    matrix[k].fees += t.fees || 0;
+  }
+  const stratIds = r.stats.map(s => s.strategy);
+  KD.$("#aByCatStrat").innerHTML = KD.table(
+    [{ key: "s", label: "Strategy" }].concat(CATS.map(c => ({ key: c, label: KD.CAT_LABEL[c], num: true }))),
+    stratIds.map(id => {
+      const row = { s: `<b>${KD.esc(id)}</b>` };
+      for (const c of CATS) {
+        const m = matrix[id + "|" + c];
+        row[c] = m ? `${KD.num(m.n)} trades · <span style="color:${m.pnl >= 0 ? "var(--ok)" : "var(--bad)"}">${m.pnl >= 0 ? "+$" : "−$"}${Math.abs(m.pnl).toFixed(2)}</span> · fees $${m.fees.toFixed(2)}` : '<span class="na">—</span>';
+      }
+      return row;
+    }),
+    { empty: "No automated trades yet." });
+
+  KD.$("#aOpen").innerHTML = KD.table([
+    { key: "tk", label: "Ticker" }, { key: "ti", label: "Market" }, { key: "s", label: "Strategy" },
+    { key: "cat", label: "Category" }, { key: "side", label: "Side" }, { key: "c", label: "Contracts", num: true },
+    { key: "ef", label: "Entry fill", num: true }, { key: "mk", label: "Mark", num: true },
+    { key: "u", label: "Unrealised", num: true }, { key: "src", label: "Source" },
+  ], open.map(t => ({
+    tk: `<span class="mono">${KD.esc(t.ticker)}</span>`, ti: KD.esc((t.title || "").replace(/\*\*/g, "").slice(0, 70)),
+    s: KD.esc(t.strategy), cat: KD.CAT_LABEL[t.category_id] || KD.esc(t.category_id || "—"),
+    side: t.side === "yes" ? '<span class="badge ok">YES</span>' : '<span class="badge bad">NO</span>',
+    c: KD.num(t.contracts), ef: KD.cents(t.entry_fill), mk: KD.cents(t.mark_price),
+    u: (t.unrealized >= 0 ? "+$" : "−$") + Math.abs(t.unrealized).toFixed(2),
+    src: KD.srcLink(t.source, "API query"),
+  })), { empty: "No open paper positions." });
+
+  KD.$("#aLog").innerHTML = KD.table([
+    { key: "id", label: "#" }, { key: "s", label: "Strategy" }, { key: "tk", label: "Ticker" },
+    { key: "side", label: "Side" }, { key: "cat", label: "Category" }, { key: "band", label: "Entry band", num: true },
+    { key: "ef", label: "Entry fill", num: true }, { key: "xf", label: "Exit fill", num: true },
+    { key: "c", label: "Contracts", num: true }, { key: "fe", label: "Fees", num: true },
+    { key: "pnl", label: "P&L", num: true }, { key: "st", label: "Status" }, { key: "src", label: "Source" },
+  ], closed.slice().reverse().map(t => ({
+    id: KD.num(t.id), s: KD.esc(t.strategy), tk: `<span class="mono">${KD.esc(t.ticker)}</span>`,
+    side: t.side === "yes" ? '<span class="badge ok">YES</span>' : '<span class="badge bad">NO</span>',
+    cat: KD.CAT_LABEL[t.category_id] || KD.esc(t.category_id || "—"),
+    band: KD.esc(bandOf(t.entry_fill)), ef: KD.cents(t.entry_fill),
+    xf: t.exit_fill === null || t.exit_fill === undefined ? '<span class="na">—</span>' : KD.cents(t.exit_fill),
+    c: KD.num(t.contracts), fe: "$" + (t.fees || 0).toFixed(2),
+    pnl: t.pnl === null || t.pnl === undefined ? '<span class="na">—</span>' : (t.pnl >= 0 ? "+$" : "−$") + Math.abs(t.pnl).toFixed(2),
+    st: t.status === "settled" ? '<span class="badge ok">settled</span>' : '<span class="badge warn">closed</span>',
+    src: KD.srcLink(t.source, "API query"),
+  })), { empty: "No closed trades in the latest session." });
+
+  drawEquity(r.equity);
+  KD.$("#aEquityFoot").innerHTML =
+    `${KD.num(r.equity.length)} points — one per collected observation event, X = observation time, Y = paper equity in dollars. ` +
+    `${settled.length} S4 position${settled.length === 1 ? "" : "s"} resolved against the literal API result. ` +
+    `Unrealised marks use the last collected price; nothing is extrapolated past it.`;
+}
+
+async function runAuto() {
+  const meta = KD.$("#aMeta");
+  meta.textContent = "running…";
+  try {
+    const [snapL, hist] = await Promise.all([
+      KDA.loadJSON("data/live/markets.json"),
+      KDA.loadJSON("data/live/price_history.json"),
+    ]);
+    if (!hist || !hist.series || !Object.keys(hist.series).length) {
+      meta.textContent = "no collected price history yet — the collector needs ≥2 runs";
+      return;
+    }
+    const liq = KDA.indexLiquidity(snapL);
+    const sel = KD.$("#aUniverse").value;
+    const topPerCat = sel === "0" ? Infinity : Number(sel);
+    const result = KDA.replayStrategies({ markets: snapL.open_markets || [], hist, liq, topPerCat });
+
+    // Resolve persisted S4 positions against the literal API result.
+    // Settled S4 trades live in result.trades (append-only); still-open S4 in result.open.
+    const settledIdx = {};
+    for (const m of snapL.settled_markets || []) settledIdx[m.ticker] = m;
+    const prev = loadAuto();
+    const prevS4Open = (prev && prev.result.open || []).filter(t => t.strategy === "S4");
+    const prevS4Settled = (prev && prev.result.trades || []).filter(t => t.strategy === "S4");
+    const settledS4 = [], carriedOpen = [];
+    let settledNowPayout = 0;
+    for (const t of prevS4Settled) settledS4.push(t); // resolved outcomes are kept forever
+    const seenKeys = new Set();
+    for (const t of prevS4Open) {
+      const sm = settledIdx[t.ticker];
+      const key = t.ticker + "|" + t.entry_ts;
+      if (sm && (sm.result === "yes" || sm.result === "no")) {
+        const won = (t.side === "yes" && sm.result === "yes") || (t.side === "no" && sm.result === "no");
+        const payout = won ? t.contracts * 1 : 0;
+        settledNowPayout += payout; // the payout hits the ledger on the run that first sees the result
+        settledS4.push({ ...t, status: "closed", exit_fill: won ? 1 : 0,
+          pnl: payout - t.contracts * t.entry_fill - (t.fees || 0),
+          note: `settled ${sm.result} (literal API result) — payoff $1 per winning contract, no settlement fee`,
+          source: sm.source || t.source });
+        seenKeys.add(key);
+      } else if (sm) {
+        carriedOpen.push({ ...t, note: `settled without a yes/no result (literal result: ${JSON.stringify(sm.result)}) — payoff not computable, never coerced` });
+        seenKeys.add(key);
+      } else if (!result.open.some(x => x.strategy === "S4" && x.ticker === t.ticker && x.entry_ts === t.entry_ts)) {
+        carriedOpen.push(t); // still open on the exchange; next run re-checks
+        seenKeys.add(key);
+      }
+    }
+    const newS4 = result.open.filter(t => t.strategy === "S4" && !seenKeys.has(t.ticker + "|" + t.entry_ts));
+    result.open = result.open.filter(t => t.strategy !== "S4").concat(carriedOpen, newS4);
+    result.trades = result.trades.filter(t => t.strategy !== "S4").concat(settledS4);
+    result.ending_cash += settledNowPayout;
+
+    auto = { ran_at: new Date().toISOString().replace(/\.\d+Z$/, "Z"), snapshot_at: snapL.collected_at, universe: sel, result };
+    saveAuto(auto);
+    renderAuto();
+    meta.textContent = result.trades.length + result.open.length === 0
+      ? `session complete: no rule triggered in ${result.events} collected observations yet — an honest zero, not an error; history accumulates every 20 minutes`
+      : `session complete: ${result.trades.length} closed, ${result.open.length} open`;
+  } catch (e) {
+    meta.textContent = "could not run: " + (e && e.message ? e.message : e);
+  }
+}
+
+KD.$("#aRun").addEventListener("click", runAuto);
+KD.$("#aReset").addEventListener("click", () => {
+  localStorage.removeItem(AKEY);
+  auto = null;
+  renderAuto();
+});
+renderAuto();
 </script>
 </body></html>

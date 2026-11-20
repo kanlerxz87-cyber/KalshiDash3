@@ -48,6 +48,7 @@ scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the s
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
+scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
@@ -61,6 +62,8 @@ python3 scripts/collect.py            # writes data/live/markets.json + price_hi
 python3 scripts/build_alerts.py       # writes data/live/alerts_archive.json + alerts.json
 python3 scripts/simulate.py           # writes data/live/simulation.json (paper only)
 python3 scripts/tests/validate_live.py
+python3 scripts/tests/validate_alerts.py
+python3 scripts/tests/test_alerts.py
 python3 scripts/tests/test_simulate.py
 python3 scripts/check_site.py
 python3 -m http.server 8000           # then open http://localhost:8000
@@ -124,9 +127,3 @@ and in the repository's `COORDINATION.md`. The primary ones are
 the [demo environment page](https://docs.kalshi.com/getting_started/demo_env) and the
 [fee schedule](https://kalshi.com/docs/kalshi-fee-schedule.pdf).
 
-## Session 9b246e37: verified dashboard subsite (`9b246e37/`)
-
-- **Page:** https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/
-- Pages: overview, category tables (gas, elections, culture, crypto, golf), live chart and liquidity from the public demo endpoints, portfolio (blocked: no demo API key), analysis, questions, suggestions (nothing implemented), flagged, sources.
-- Data: `9b246e37/data/dashboard.json`. Values copied from Kalshi DEMO API responses fetched 2026-11-20 UTC, each row with its source URL. Blanks are unverified.
-- Details and the post-merge record are in `COORDINATION.md`.
