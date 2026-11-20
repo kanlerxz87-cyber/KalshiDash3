@@ -1,0 +1,25 @@
+name: Validate dashboard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Parse dashboard JavaScript
+        run: node --check app.js
+      - name: Run smoke checks
+        run: node tests/smoke.mjs
+      - name: Check static assets and deployment config
+        run: test -s index.html && test -s app.js && test -s styles.css && test -s .github/workflows/pages.yml && test -f .nojekyll

@@ -2,13 +2,17 @@
 
 | Task | Status | Owner session | File scope |
 |---|---|---|---|
-| Build and verify the Kalshi demo dashboard, requirements analysis, and GitHub Pages site | in progress | arena/ae6178ec-kalshidash3 | all repository files (single active session) |
+| Build and verify the Kalshi demo dashboard, requirements analysis, and GitHub Pages site | needs review | arena/ae6178ec-kalshidash3 | all repository files (single active session) |
 
 ## Task log
 
 ### Kalshi demo dashboard and site
 - **Claimed:** 2026-11-20
 - **Owner:** `arena/ae6178ec-kalshidash3`
-- **Scope:** all repository files. The checkout contains only `README.md`; no other task claims or existing site implementation were present at claim time.
-- **Verification and sources:** pending implementation. Only mark facts verified after checking a first-party Kalshi source; otherwise leave values blank and flag them.
-- **Irregularities:** none recorded yet.
+- **Scope:** all repository files. Initial checkout contained only the 13-byte `README.md`; no app, other claims, source data, credentials, tests, or deployment config were present.
+- **Implemented:** responsive static dashboard with topic routes, market listings, resolved-market view, client-session price snapshots, full YES/NO bid-level liquidity, portfolio and trade-analysis limitations, decision checklist, suggestions review queue, flagged-review page, source list, smoke checks, and GitHub Pages workflows.
+- **First-party sources checked:** [API environments](https://docs.kalshi.com/getting_started/api_environments), [market-data quick start](https://docs.kalshi.com/getting_started/quick_start_market_data), [market listing schema](https://docs.kalshi.com/api-reference/market/get-markets), [market orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook), [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks), [WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets), [market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [settlement](https://docs.kalshi.com/getting_started/market_settlement), [balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), [positions](https://docs.kalshi.com/api-reference/portfolio/get-positions), [fills](https://docs.kalshi.com/api-reference/portfolio/get-fills), [API keys/signing](https://docs.kalshi.com/getting_started/api_keys), and current [Create Order (V2)](https://docs.kalshi.com/api-reference/orders/create-order-v2). These docs confirm demo hosts, public market-data examples, endpoint response fields/statuses/pagination, book levels, candle intervals, lifecycle semantics, private auth headers, and current order-write docs.
+- **Verification performed:** `node --check app.js`; `node tests/smoke.mjs`; Python `HTMLParser` parse; local HTTP server started successfully on port 8080. The static smoke test checks required app assets/routes/topics, demo host, links, safety disclosures, and no legacy order-write link.
+- **Data verification boundary:** the sandbox could fetch and read the cited first-party documentation. An attempted request to the official demo REST host failed at TLS connection (`curl` error 35) because the host is outside the sandbox's outbound allowlist. Therefore no current demo market inventory, category membership, live quotes, orderbook, or current browser CORS behavior has been verified in this environment. The site requests the official API at runtime and reports errors; no market fixtures or fabricated values were added.
+- **Irregularities published on Flagged for Review:** dollar-activity metric ambiguous (the API schema includes `notional_value_dollars`, whose event traded-volume meaning is not confirmed); topic grouping uses title/ticker keywords, not official taxonomy; account balance/positions/fills are unavailable without a private key and secure server; static site cannot safely sign requests or submit trades; chart history is browser-session-only and candlestick docs specify 1/60/1440-minute intervals; no current contract rules were reviewed; legacy order-write docs were removed and the current V2 docs are linked instead.
+- **Publication:** PR and deployment results pending.

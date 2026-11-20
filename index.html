@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101c2c">
+  <meta name="description" content="A source-linked Kalshi demo market research dashboard. Live market fields come from Kalshi's demo API; unavailable values remain blank.">
+  <title>Kalshi Demo — Market Research</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#/dashboard" aria-label="Kalshi demo dashboard home"><span class="brand-mark">K</span><span>kalshi<span class="brand-light"> / demo</span></span></a>
+      <div class="environment"><i></i><span>DEMO ENVIRONMENT</span></div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a href="#/dashboard" data-route="dashboard"><span class="nav-icon">▦</span> Overview</a>
+        <a href="#/markets" data-route="markets"><span class="nav-icon">◫</span> Live markets</a>
+        <a href="#/portfolio" data-route="portfolio"><span class="nav-icon">◉</span> Portfolio</a>
+        <a href="#/analysis" data-route="analysis"><span class="nav-icon">⌁</span> Trade analysis</a>
+      </nav>
+      <div class="nav-label category-label">TOPIC CATEGORIES</div>
+      <nav class="category-nav" aria-label="Market topics">
+        <a href="#/markets/gas" data-route="markets/gas"><span class="cat-dot gas"></span> Gas prices</a>
+        <a href="#/markets/elections" data-route="markets/elections"><span class="cat-dot elections"></span> Elections</a>
+        <a href="#/markets/culture" data-route="markets/culture"><span class="cat-dot culture"></span> Culture</a>
+        <a href="#/markets/crypto" data-route="markets/crypto"><span class="cat-dot crypto"></span> Crypto</a>
+        <a href="#/markets/golf" data-route="markets/golf"><span class="cat-dot golf"></span> Golf</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <nav class="secondary-nav" aria-label="Research navigation">
+          <a href="#/questions" data-route="questions"><span class="nav-icon">?</span> Decision checklist</a>
+          <a href="#/suggestions" data-route="suggestions"><span class="nav-icon">✧</span> Suggestions</a>
+          <a href="#/review" data-route="review"><span class="nav-icon">⚑</span> Flagged for review <span class="flag-count">5</span></a>
+          <a href="#/sources" data-route="sources"><span class="nav-icon">↗</span> Sources & method</a>
+        </nav>
+        <div class="user-card"><div class="avatar">D</div><div><b>Demo workspace</b><small>Account not connected</small></div><span class="more">···</span></div>
+      </div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><b>/</b><strong id="crumb-current">Overview</strong></div>
+        <div class="top-actions"><span class="updated"><i class="pulse-dot"></i><span id="sync-state">Waiting for demo API</span></span><button id="refresh-btn" class="icon-button" aria-label="Refresh market data" title="Refresh market data">↻</button><a class="docs-link" href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API status ↗</a></div>
+      </header>
+      <div id="app" class="content" aria-live="polite"></div>
+      <footer class="page-footer"><span>Research tool · Not financial advice · Demo environment only</span><span>Data shown only when returned by Kalshi's API</span></footer>
+    </main>
+  </div>
+  <script src="app.js" defer></script>
+</body>
+</html>
