@@ -84,6 +84,12 @@ def main() -> int:
                     f"{r.get('category_basis')!r}",
                 )
             check(r.get("result") in ALLOWED_RESULTS, f"{tag} illegal result {r.get('result')!r}")
+            if bucket == "open_markets":
+                # A market that has finished must never be presented as open.
+                check(
+                    str(r.get("status")) not in ("finalized", "determined", "closed", "settled"),
+                    f"{tag} is in open_markets with terminal status {r.get('status')!r}",
+                )
             check(str(r.get("source", "")).startswith("https://"), f"{tag} source must be an https URL")
             # Never invent a price.
             check(

@@ -109,3 +109,20 @@ repository was publishing from the branch root (`build_type: legacy`, `source: m
 while a root publisher is active would have published the now-empty root. The canonical site therefore lives at the
 **repository root**, which is byte-identical to what the `pages.yml` workflow uploads (`path: .`), so both possible
 publishers serve exactly the same files. Flagged as F-05 with the exact reason.
+
+### What the live collector run proved (2026-11-20, runs 44727301069 – latest)
+
+The first real runs found four defects that no amount of documentation reading would have caught. All are fixed,
+and three of them are now guarded by the validator so they cannot silently return:
+
+| Defect | Symptom in real data | Fix |
+|---|---|---|
+| Substring keyword match | A sports combo titled *"yes Vegas,yes Tie"* was ranked under **Gas Prices** because "vegas" contains "gas" | Word-boundary matching |
+| Multivariate combos in scope | 175 of the scanned open markets were `KXMVE*` combos combining unrelated legs | Excluded from every category |
+| Capped scan starved the confirmed series | The 4,000-market page cap was full of combos, so fee-schedule series never appeared and *every* row was labelled `keyword` | Seed series queried by name; `series_ticker` is null in practice, so the series is derived from the ticker prefix — and the validator now fails if a seed market is not reported `seed` |
+| Finalized market listed as open | A golf market with `status=finalized` and 37M contracts sat in the open ranking | Seed results bucketed per status; every row re-checked against its lifecycle status; validator rejects a terminal status in the open bucket |
+
+Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `finalized`), 17 order books,
+200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
+Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
+exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).

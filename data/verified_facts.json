@@ -1,6 +1,6 @@
 {
   "generated": "2026-11-20",
-  "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows that could not be confirmed are left blank and listed on the Flagged for Review page. Live market values are NOT stored here; they are produced by scripts/collect.py.",
+  "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
   "facts": [
     {
       "id": "F-01",
@@ -322,11 +322,51 @@
       "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
       "verified": true,
       "note": "Explains why out-of-scope markets are counted and excluded instead of being keyword-matched into a topic."
+    },
+    {
+      "id": "F-45",
+      "claim": "GET /markets returns series_ticker: null on the demo environment (observed 2026-11-20)",
+      "value": "series_ticker is null on every sampled row, so the series must be derived from the ticker prefix",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+      "verified": true,
+      "note": "The field exists in the schema but was empty in practice. Collector now derives the series from the part of the ticker before the first hyphen (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM) and keeps the raw API value alongside, so a wrong derivation fails to match rather than silently misclassifying."
+    },
+    {
+      "id": "F-46",
+      "claim": "The demo exchange is dominated by multivariate combo markets and demo-only futures-style series",
+      "value": "A capped scan saw 5,825 open and 3,825 settled markets, of which 175 open and 202 settled were KXMVE* combos",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=1000",
+      "verified": true,
+      "note": "Combos are excluded from every category because they combine unrelated legs; they have their own lifecycle channel (market_lifecycle_v2 excludes KXMVE*, which has multivariate_market_lifecycle)."
+    },
+    {
+      "id": "F-47",
+      "claim": "A finalized market can still be returned with a large volume, so a status filter alone does not make a page of 'open' markets",
+      "value": "Observed: a golf market with status=finalized showed 37,084,522 contracts traded",
+      "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "verified": true,
+      "note": "Found by this project's own data check, not by reading the docs: the collector had merged the open and settled seed results into one dict. Fixed; the validator now also checks that no open row carries a terminal status."
+    },
+    {
+      "id": "F-48",
+      "claim": "Volume and open interest are large real numbers on the demo env, and notional_value_dollars is always 1.0000",
+      "value": "Observed BTC series row: volume_fp 80,178,706, open_interest_fp 26,587,877, last_price_dollars 0.98, notional_value_dollars 1.0000",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=100",
+      "verified": true,
+      "note": "Confirms in data what F-22 states from the schema: notional_value_dollars is 1 for a binary market at any size, so it is useless for ranking. The site uses volume x last price and labels it an estimate."
+    },
+    {
+      "id": "F-49",
+      "claim": "Demo prices reach 0.98 and 0.94 on large-volume markets",
+      "value": "KXBTCY-27JAN0100-B47500 last 0.98; KXAAAGASM-26MAR31-4.00 last 0.94",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+      "verified": true,
+      "note": "Relevant to fee modelling: at 0.94 the taker fee is 0.07 x 0.94 x 0.06 = 0.0039 per contract, far below the ~0.0175 at 50 cents, so fee drag is not uniform across the ranking."
     }
   ],
   "counts": {
-    "total": 44,
-    "verified": 43,
+    "total": 49,
+    "verified": 48,
     "unverified": 1
   }
 }

@@ -115,10 +115,12 @@ KD.nav("");
     const r = top[id];
     return {
       cat: live[id],
-      title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc(r.title)}</a>` : '<span class="na">none open in scope</span>',
+      title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 68))}</a>` +
+                 `<div class="small mut mono">${KD.esc(r.ticker)}</div>` : '<span class="na">none open in scope</span>',
       dollars: r ? KD.money(r.dollars_traded_estimate, 0) : '<span class="na">—</span>',
       price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
       vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
+      oi: r ? KD.num(r.open_interest_fp) : '<span class="na">—</span>',
       basis: r ? KD.basisBadge(r.category_basis) : '<span class="na">—</span>',
       src: r ? KD.srcLink(r.source, "API") : '<span class="na">—</span>',
     };
@@ -126,7 +128,8 @@ KD.nav("");
   KD.$("#today").innerHTML = KD.table(
     [{ key: "cat", label: "Category" }, { key: "title", label: "Largest live market" },
      { key: "dollars", label: "Dollars traded (est.)", num: true }, { key: "price", label: "Last price", num: true },
-     { key: "vol", label: "Contracts traded", num: true }, { key: "basis", label: "Category basis" },
+     { key: "vol", label: "Contracts", num: true }, { key: "oi", label: "Open int.", num: true },
+     { key: "basis", label: "Category basis" },
      { key: "src", label: "Source" }],
     rows
   ) + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
