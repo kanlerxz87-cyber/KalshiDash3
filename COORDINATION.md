@@ -265,3 +265,8 @@ internal cross-checks; that limitation is stated rather than papered over.
   T11/T12; withdrew the duplicate alerts page and kept the chart jump markers + alert-feed tests.
 - 2026-11-20: Merged `origin/main` (advanced by PRs #16/#18/#20/#21); resolved the conflict by adopting
   main's canonical architecture and re-applying only the non-duplicative additions. PR #22 opened for merge.
+- 2026-11-20: **PR #22 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/22 , merge commit
+  `c37aad297abcc8ee85533a5dab23e46cde1384c9` (merged 2026-11-20T13:46:25Z). GitHub Pages rebuild completed
+  successfully (run 44747260546, conclusion `success`); Pages API reports `status=built`, live site
+  https://kanlerxz87-cyber.github.io/KalshiDash3/ (source `main /`). No irregularities were introduced by this
+  session; prior sessions' flagged items (F-14, F-15, etc.) remain on the Flagged for Review page.
