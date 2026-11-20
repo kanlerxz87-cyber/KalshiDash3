@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live alert chats — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .chats { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width: 900px){ .chats{ grid-template-columns:1fr; } }
+  .chat { background:var(--card); border:1px solid var(--line); border-radius:10px; display:flex; flex-direction:column; height:520px; }
+  .chat h3 { margin:0; padding:10px 14px; border-bottom:1px solid var(--line); font-size:14.5px; display:flex; align-items:center; gap:8px; }
+  .chat .body { flex:1; overflow-y:auto; padding:10px 12px; display:flex; flex-direction:column; gap:8px; scrollbar-width:thin; }
+  .chat-msg { border:1px solid var(--line); border-radius:8px; padding:7px 10px; font-size:13px; background:var(--bg); }
+  .chat-msg.up { border-left:3px solid #00b67a; }
+  .chat-msg.down { border-left:3px solid #f2695c; }
+  .chat-head { display:flex; flex-wrap:wrap; align-items:center; gap:7px; }
+  .chat-time { color:var(--mut); font:11px ui-monospace,monospace; }
+  .chat-ticker { font-size:12px; }
+  .chat-title { margin-top:3px; font-size:13.5px; }
+  .chat-why { margin-top:3px; font-size:11.5px; color:var(--mut); }
+  .chat-links { margin-top:4px; display:flex; gap:10px; flex-wrap:wrap; }
+  .chat-links a { font-size:11.5px; }
+  .chat-empty { color:var(--mut); font-size:13px; margin:auto; text-align:center; padding:20px; }
+  .badge.dim { background:transparent; color:var(--mut); border:1px solid var(--line); }
+  .badge.live { background:#0f4d3a; color:#7ce8bb; }
+  .badge.ok { background:#0f4d3a; color:#7ce8bb; }
+  .badge.bad { background:#5b2620; color:#ffb3a7; }
+  .badge { display:inline-block; padding:1px 7px; border-radius:20px; font-size:11px; }
+  .alertbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:8px 0; }
+  .kchip { font:12px ui-monospace,monospace; padding:3px 9px; border:1px solid var(--line); border-radius:20px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Live alert chats — swings ≥ $0.10 in either direction</h1>
+  <p class="lede">
+    Two scrolling chats of real-time contract-price alerts on the Kalshi <b>demo</b> exchange:
+    <b>all events</b> and a filtered feed of events the model likes as high-ROI candidates.
+    An alert fires whenever a watched contract moves <b>≥ $0.10 between two consecutive observations</b>,
+    up or down. The engine polls the public demo API from your browser and, when that is not possible,
+    falls back to the collector's committed price history — every alert is labelled with its origin.
+  </p>
+
+  <div class="alertbar">
+    <span class="kchip" id="liveStatus">probing…</span>
+    <label>Watched markets <input id="watchN" type="number" min="5" max="60" step="5" value="40" style="width:5em"></label>
+    <label>Poll every
+      <select id="interval">
+        <option value="5000">5 s</option>
+        <option value="10000" selected>10 s</option>
+        <option value="30000">30 s</option>
+        <option value="60000">60 s</option>
+      </select>
+    </label>
+    <button id="btnStart">Start live feed</button>
+    <button class="ghost" id="btnPause">Pause</button>
+    <span class="kchip" id="tickInfo">no ticks yet</span>
+    <span class="kchip" id="counts">▲ 0 · ▼ 0</span>
+    <button class="ghost" id="btnClear" style="margin-left:auto">Clear chats</button>
+    <button class="ghost" id="btnExport">Export JSON</button>
+  </div>
+  <p class="small mut" id="srcNote">
+    Alert threshold ($0.10, both directions): this project's stated requirement — it is not an API field.
+    Live detection polls <code>GET /markets?tickers=…</code>, which returns every matching market in one
+    response when <code>tickers</code> is the only filter
+    (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).
+    Kalshi documents that REST responses are cached briefly, so prices can lag the exchange by seconds — polling
+    faster than that cannot add information. Unauthenticated requests have separate rate limits; the engine backs
+    off exponentially on HTTP 429 (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>).
+    "News leads" links are search queries, not verified causes — causality is never asserted (see <a href="flagged.html">F-15</a>).
+  </p>
+
+  <div class="chats">
+    <div class="chat">
+      <h3>💬 All events — every ≥ $0.10 swing <span class="kchip" id="allCount">0</span></h3>
+      <div class="body" id="feedAll"></div>
+    </div>
+    <div class="chat">
+      <h3>🎯 Model picks — high-ROI screen <span class="kchip" id="modelCount">0</span></h3>
+      <div class="body" id="feedModel"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>How the model pick is computed (fully disclosed)</h3>
+    <p class="small mut">
+      Score = <code>0.30×liquidity + 0.25×price-band + 0.30×momentum + 0.15×spread</code>, each component 0–1.
+      Picks are alerts whose score ≥ <b>0.55</b>. Components: liquidity from 24h contracts traded and the
+      dollars-traded estimate (log-scaled); price-band peaks at 50¢ where the binary payout profile and the
+      taker fee <code>ceil(M×0.07×C×P×(1−P))</code>
+      (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>) are both maximal;
+      momentum from the swing size (capped at 30¢); spread from the API bid/ask gap.
+      <b>This is a heuristic screen, not a backtested strategy and not advice</b> — it is flagged for review
+      (<a href="flagged.html">F-16</a>).
+    </p>
+    <p class="small mut">Category tabs filter both chats. Categories stay separate — a market is attributed to one
+      topic only, either by a fee-schedule-confirmed series (<span class="badge ok">confirmed</span>) or a flagged
+      keyword match (<span class="badge warn">keyword</span>).</p>
+    <div class="controls" id="catTabs"></div>
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+KD.nav("alerts.html");
+
+const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40 };
+
+function catFilter(a) { return !state.cat || a.category_id === state.cat; }
+
+function render() {
+  const all = KDL.feedAlerts().filter(catFilter);
+  const model = all.filter((a) => a.model && a.model.score >= KDL.MODEL.threshold);
+  KDL.renderFeed(KD.$("#feedAll"), all.slice(-120).reverse(), { catLabels: KD.CAT_LABEL });
+  KDL.renderFeed(KD.$("#feedModel"), model.slice(-120).reverse(), { catLabels: KD.CAT_LABEL, showWhy: true });
+  KD.$("#allCount").textContent = all.length + " in view";
+  KD.$("#modelCount").textContent = model.length + " in view";
+  const c = (KDL.feedAlerts().length && JSON.parse(localStorage.getItem("kalshidash3.alerts.v1")).counters) || { up: 0, down: 0 };
+  KD.$("#counts").textContent = `▲ ${c.up || 0} · ▼ ${c.down || 0}`;
+}
+
+function statusChip(st) {
+  const el = KD.$("#liveStatus");
+  if (!st) { el.textContent = "idle"; return; }
+  if (st.probing) { el.textContent = "probing demo API…"; return; }
+  if (st.corsOk === true) {
+    el.textContent = `live · REST OK${st.paused ? " · paused" : ""}`;
+    el.style.color = "#7ce8bb";
+  } else if (st.corsOk === false) {
+    el.textContent = "live REST blocked (CORS) · collector history only";
+    el.style.color = "#ffb3a7";
+  } else el.textContent = "idle";
+  const t = KD.$("#tickInfo");
+  t.textContent = st.lastTickAt ? `${st.tickCount} ticks · last ${new Date(st.lastTickAt).toLocaleTimeString()}${st.backoff ? " · backing off (429)" : ""}${st.lastError ? " · " + st.lastError : ""}` : "no ticks yet";
+}
+
+async function pickWatchlist() {
+  if (!state.snap) return;
+  const rows = (state.snap.open_markets || [])
+    .filter((r) => r.last_price_dollars !== null)
+    .sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.dollars_traded_estimate || 0) - (a.dollars_traded_estimate || 0));
+  const n = Math.max(5, Math.min(60, Number(KD.$("#watchN").value) || 40));
+  KDL.setWatch(rows.slice(0, n).map((r) => r.ticker));
+}
+
+async function boot() {
+  // Collector layer first so the chats have history even before/without live REST.
+  state.snap = await KDL.loadSnapshot();
+  KDL.ingest((state.snap?.open_markets || []).concat(state.snap?.settled_markets || []), "collector", { silent: true });
+  await KDL.loadCollectorAlerts();
+  await pickWatchlist();
+  KDL.onAlert(() => render());
+  KDL.onStatus(statusChip);
+  render();
+  // Probe + auto-start: "no manual input" — live mode turns itself on when CORS allows.
+  const ok = await KDL.probe();
+  if (ok) { startLive(); } else { statusChip({ corsOk: false, probing: false, paused: false }); }
+}
+
+function startLive() {
+  KDL.setWatch([]);
+  pickWatchlist().then(() => {
+    KDL.start(Number(KD.$("#interval").value) || 10000);
+    state.started = true;
+    KD.$("#btnStart").textContent = "Restart live feed";
+  });
+}
+
+KD.$("#btnStart").addEventListener("click", async () => {
+  const ok = await KDL.probe(true);
+  if (ok) startLive();
+  else alert("The browser could not reach the demo API (CORS or network). The chats keep running on collector history.");
+});
+KD.$("#btnPause").addEventListener("click", () => {
+  state.paused = !state.paused;
+  KDL.setPaused(state.paused);
+  KD.$("#btnPause").textContent = state.paused ? "Resume" : "Pause";
+});
+KD.$("#btnClear").addEventListener("click", () => { KDL.clearFeed(); render(); });
+KD.$("#btnExport").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(KDL.feedAlerts(), null, 1)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kalshidash3-alerts.json";
+  a.click();
+});
+KD.$("#interval").addEventListener("change", () => { if (state.started) KDL.start(Number(KD.$("#interval").value)); });
+KD.$("#watchN").addEventListener("change", pickWatchlist);
+
+// category tabs
+const tabs = [["", "All five"]].concat(Object.entries(KD.CAT_LABEL));
+KD.$("#catTabs").innerHTML = tabs.map(([id, label]) =>
+  `<button class="ghost tabbtn" data-c="${id}">${label}</button>`).join("");
+KD.$$("#catTabs .tabbtn").forEach((b) => b.addEventListener("click", () => {
+  state.cat = b.dataset.c;
+  $$("#catTabs .tabbtn").forEach((x) => x.style.borderColor = "");
+  b.style.borderColor = "var(--acc, #00b67a)";
+  render();
+}));
+
+function $$(s, r = document) { return Array.from(r.querySelectorAll(s)); }
+boot();
+</script>
+</body></html>

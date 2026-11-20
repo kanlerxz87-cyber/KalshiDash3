@@ -113,6 +113,27 @@ def main() -> int:
             prices = [x["price"] for x in rows]
             check(prices == sorted(prices), f"{liq.get('ticker')} {side} not ascending")
 
+    # Optional companion files: alert history and the CORS header probe.
+    alerts_path = LIVE / "alerts.json"
+    if alerts_path.exists():
+        adoc = json.loads(alerts_path.read_text())
+        check(adoc.get("schema") == 1, "alerts.json schema must be 1")
+        check(float(adoc.get("threshold_dollars") or 0) == 0.10, "alerts.json threshold_dollars must be 0.10")
+        for a in adoc.get("alerts") or []:
+            d = a.get("delta")
+            if d is not None:
+                check(abs(float(d)) >= 0.10 - 1e-9, f"alert {a.get('id')} delta {d} is below the $0.10 requirement")
+                check((float(d) > 0) == (a.get("dir") == "up"), f"alert {a.get('id')} direction contradicts its delta")
+            check(str((a.get("links") or {}).get("api_query", "")).startswith("https://"),
+                  f"alert {a.get('id')} api_query link must be https")
+            check(a.get("origin") == "collector", f"alert {a.get('id')} must carry origin=collector in the committed file")
+    cors_path = LIVE / "cors.json"
+    if cors_path.exists():
+        cdoc = json.loads(cors_path.read_text())
+        check(bool(cdoc.get("checked_at")), "cors.json checked_at missing")
+        check(str(cdoc.get("origin_tested", "")).startswith("https://"), "cors.json origin_tested must be https")
+        check("access_control_allow_origin" in cdoc, "cors.json must record allow-origin (or null) — never assume it")
+
     if errors:
         print("INVALID live snapshot:", file=sys.stderr)
         for e in errors[:40]:
