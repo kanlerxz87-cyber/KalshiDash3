@@ -504,3 +504,23 @@ Log:
 - 2026-11-20 ~14:41 UTC: T17 — **R-2 done**: `scripts/build_alerts.py` stores `to_yes_bid`/`to_yes_ask` from the observation at `to_time` on every new archive entry (null when the observation carried no quote — never invented). Proven with a synthetic history: quotes land on the entry, `simulate.quote_for_signal` returns `(0.54, 0.56, "archive")`, and a no-quote observation stores nulls. Existing 8 entries unchanged (append-only). Regenerated `alerts.json` byte-identical apart from `generated_at`/counts; `simulation.json` re-run (8 signals processed; S2's historical 99c-spread fill stays VOID per F-23). G9/F-14/F-17/F-19 updated in `data/findings.json`.
 - 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `<<<<<<< HEAD … >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
 - 2026-11-20 ~14:50 UTC: T17 done — full suite green on the integrated tree (21 pages OK; 506 open/200 settled/17 orderbooks; 8 alerts provenance-checked; 13 alert tests; simulate suite OK; 42 fee-table numbers; 15 parity cases; engine tests ALL PASSED; `node --check` clean). Remaining for T18: final verification pass, PR -> main -> merge, Pages deploy confirm, dispatch `collect.yml`/`desk.yml` so the new pages get live data, record PR link here.
+
+---
+
+## Session `arena-d243bfa7` — repair + final verification (branch `arena/d243bfa7-kalshidash3`)
+
+Started from `9a90947d35f9572976f572b617ab4fff89104ece` (= `main` at claim time; no other session had an open PR or a
+live claim: `gh pr list --state open` returned nothing, and every board entry above was `done` except T18, whose owning
+session's PR #30 was already merged and whose claim is >60 min old with no commits — taken over per the stale-claim rule).
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T19 | Fix the crash that has kept `data/live/roi.json` from ever being written: the fee-aware ROI model divides by a zero-cost side, which the demo book produces constantly (`yes_ask_dollars = 0.0000` / `yes_bid_dollars = 1.0000`). Guard it identically in the Python model, the browser mirror and the out-of-sample replay; add regression cases to the shared parity fixture; add an offline end-to-end scan test over the committed real API payload. | in progress | arena-d243bfa7 | `scripts/roi_model.py`, `scripts/roi_scan.py`, `assets/live.js`, `scripts/tests/fixtures_roi_parity.json`, `scripts/tests/test_roi_parity.py`, `scripts/tests/test_roi_scan_snapshot.py` (new), `data/roi_model.json`, `roi.html`, `data/findings.json`, `.github/workflows/desk.yml` (test wiring only) | `python3 scripts/tests/test_roi_parity.py`, `test_fees.py`, `test_roi_scan_offline.py`, `test_roi_scan_snapshot.py`, `node scripts/tests/test_engine_node.js`, `python3 scripts/tests/validate_roi.py`, mutation-check the new guard | **Found by this session:** `desk.yml` run 44762120780 failed at "Scan the demo API" (exit 1) — the only run of that workflow, so the fee-aware ROI half of the site (F-14's answer) has never had published output. `roi.json` absent; `live.html`/`roi.html` fall back to "no scan committed yet". |
+| T20 | Take over T18's remaining steps: dispatch the repaired desk scan + the collector on `main`, confirm `roi.json` is committed and validator-clean, confirm Pages deploy, re-verify the live site page by page, record results. | in progress | arena-d243bfa7 | `COORDINATION.md`, `README.md` (integration only) | live `gh run` conclusions, `validate_roi.py` on the committed file, and a page-by-page fetch of the deployed site | Scheduled `cron` runs still not observed (F-16, unchanged) |
+
+### Claim log
+- 2026-11-20 ~19:15 UTC: claim written and pushed before any code change. Scopes above are files no other session
+  currently owns; `data/live/roi.json` is written only by `desk.yml` (this session edits that workflow's test step,
+  not its data contract). `collect.yml`, `build_alerts.py`, `dashboard.html`, `alerts.html` are NOT in scope.
