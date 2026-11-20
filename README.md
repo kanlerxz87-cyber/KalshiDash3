@@ -6,8 +6,10 @@ A source-linked dashboard for the **Kalshi demo** environment, limited to five t
 **Live site:** https://kanlerxz87-cyber.github.io/KalshiDash3/
 
 Every market number on the site is produced by a scheduled, credential-free collector that reads the official
-demo Trade API and commits a timestamped snapshot. Nothing is typed by hand, and anything that cannot be
-confirmed against an official Kalshi page is left blank and listed on the *Flagged for Review* page.
+demo Trade API and commits a timestamped snapshot. On top of that snapshot layer, the browser can poll the same
+public demo API directly (with a CORS self-test and automatic fallback), so the alert chats and dashboard tick in
+near-real time. Nothing is typed by hand, and anything that cannot be confirmed against an official Kalshi page is
+left blank and listed on the *Flagged for Review* page.
 
 ---
 
@@ -18,35 +20,36 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, ≥$0.10 swing markers, resolution tracker, 60-second live poll |
-| `alerts.html` | Two scrolling alert chats: every ≥$0.10 swing in either direction, plus the swings the high-ROI model likes (on-page formula, provenance-validated alerts, optional labelled SIM stream) |
-| `portfolio.html` | Real demo-account endpoints, the working executor, a labelled paper ledger, and an automated simulated trader that runs the S1–S4 strategies over collected prices with fee modelling |
+| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, optional in-browser live polling |
+| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
+| `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
-| `suggestions.html` | Thirteen proposals; each with its effort, risk and success metric |
+| `suggestions.html` | Ten proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 54 claims, each with the official page it was checked against |
-| `flagged.html` | 25 irregularities found, plus every value deliberately left blank |
-| `sources.html` | The complete source list, including the official per-category research sites used for alert causes |
+| `verification.html` | 53 claims, each with the official page it was checked against |
+| `flagged.html` | 21 irregularities found, plus every value deliberately left blank |
+| `sources.html` | The complete source list |
 
 ## Repository layout
 
 ```
 *.html                the published site — one page per topic, shared shell in assets/
-assets/               site.css + site.js + alerts.js (no build step, no dependencies)
+assets/               site.css + site.js (no build step, no dependencies)
 data/categories.json  the five topics and their confirmed seed series
 data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
-data/live/            collected snapshots (written by scripts/collect.py) + derived alerts.json
+data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
 scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
 scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
 scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
-scripts/tests/validate_live.py    refuses a fabricated snapshot
-scripts/tests/validate_alerts.py  re-derives every alert from the observations (provenance check)
-.github/workflows/collect.yml   scheduled collection + alert derivation
+scripts/tests/validate_live.py  refuses a fabricated snapshot
+scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
+.github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
 
@@ -56,10 +59,11 @@ Nothing here needs credentials. All market data comes from public demo endpoints
 
 ```bash
 python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
-python3 scripts/build_alerts.py       # writes data/live/alerts_archive.json + alerts.json (≥$0.10 swings)
+python3 scripts/build_alerts.py       # writes data/live/alerts_archive.json + alerts.json
 python3 scripts/simulate.py           # writes data/live/simulation.json (paper only)
 python3 scripts/tests/validate_live.py
 python3 scripts/tests/validate_alerts.py
+python3 scripts/tests/test_alerts.py
 python3 scripts/tests/test_simulate.py
 python3 scripts/check_site.py
 python3 -m http.server 8000           # then open http://localhost:8000
@@ -94,35 +98,26 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 3. **Results are never coerced.** `result` may be `yes`, `no`, `scalar` or empty, and is displayed exactly as returned.
 4. **Provenance on every row.** Each row carries the query URL and each snapshot carries its fetch time.
 5. **Demo is labelled demo.** Kalshi warns demo prices may not reflect real markets.
-6. **Simulations are labelled simulations.** The optional simulated tick stream and the automated paper trader are
-   badged as such everywhere, are never persisted into `data/`, and are never shown as market values.
 
 ## Known limitations
 
 - The collector cannot run in the environment that built this repository (no network route to Kalshi), so collection
   runs on GitHub Actions. Scheduled workflows can be delayed or skipped; the site shows the snapshot age for that reason.
+- In-browser live polling depends on CORS headers the demo API returns but Kalshi does not document. The engine probes
+  the API at runtime, records the observed headers per collector run into `data/live/cors.json`, and falls back to
+  committed snapshots automatically (flagged as F-14).
+- Unauthenticated request limits are undocumented; the poller is conservative (default 10 s, back-off on 429).
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
-  intervals only — so it is accumulated one observation per collector run.
-- WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks; alerts are therefore
-  bounded by the collector cadence (F-24), and the alerts page offers a clearly-labelled simulated stream for previewing
-  the real-time path (never persisted, off by default).
-- Portfolio performance is a labelled paper simulation until demo credentials exist; the automated trader on
-  `portfolio.html` replays collected prices deterministically and can only fill at collected observation timestamps.
+  intervals only — so it is accumulated one observation per collector run (plus live poll points in the browser session).
+- WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
+<<<<<<< HEAD
+- Portfolio performance and the auto-sim engine are labelled paper simulations until demo credentials exist.
+  Kalshi states a demo account "does not come with funds preloaded" and must be created by a person.
+=======
+- Portfolio performance is a labelled paper simulation until demo credentials exist.
 - Paper results need a stored bid and ask at the alert time. Today's archive stores only last-trade prices, so most swings cannot be filled and the simulation page shows zero fills until the archive stores quotes (Flagged F-19, request R-2).
 - Paper results on demo prices are not evidence that a strategy would make money in real markets (Kalshi: demo prices may not reflect real markets).
-
-## Session arena-f068786c (2026-11-20): alerting system + automated simulated trading
-
-- Built the live alerting system the brief requires: `alerts.html` with two scrolling chats (all ≥$0.10 swings and the
-  high-ROI model picks), a transparent on-page scoring model (`assets/alerts.js`), 60-second polling of committed
-  snapshots, and a default-off simulated tick stream that is badged `SIM` everywhere and never persisted.
-- Alerts come from the persistent archive built by `scripts/build_alerts.py` and are provenance-checked by
-  `scripts/tests/validate_alerts.py` (every current-history alert must re-derive from the raw observations; feeds and
-  counts must reproduce from the archive and `data/alert_rules.json`).
-- Automated simulated trading on `portfolio.html` §4: the S1–S4 strategy rules run themselves over collected price
-  history with fee modelling, a strategy × category ledger, equity curve and settlement against the literal API result.
-  (`simulation.html` from session arena-e5adea9d runs the archive-based simulator; both are labelled paper.)
-- Removed the stale README section that still advertised the `9b246e37/` subsite removed by PR #15 (flag F-26).
+>>>>>>> origin/main
 
 ## Sources
 
@@ -131,3 +126,4 @@ and in the repository's `COORDINATION.md`. The primary ones are
 [docs.kalshi.com](https://docs.kalshi.com/welcome),
 the [demo environment page](https://docs.kalshi.com/getting_started/demo_env) and the
 [fee schedule](https://kalshi.com/docs/kalshi-fee-schedule.pdf).
+

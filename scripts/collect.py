@@ -30,6 +30,7 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -402,8 +403,12 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             hist = {}
     update_price_history(hist, raw["open"])
     # Only keep history for markets that are actually shown, so the file stays small.
+    # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
+    # which the collect workflow runs right after this script. This file deliberately
+    # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
     hist = {k: v for k, v in hist.items() if k in watch}
+
 
     payload = {
         "schema": 1,
@@ -447,19 +452,67 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     (LIVE / "price_history.json").write_text(
         json.dumps({"schema": 1, "note": "Observations accumulated from GET /markets last_price_dollars on each collector run. Seconds resolution is only possible by accumulation because candlesticks support 1/60/1440-minute intervals only.", "series": hist}, indent=1)
     )
+
     print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets)")
     return payload
+
+
+def probe_cors(origin="https://kanlerxz87-cyber.github.io"):
+    """Record what CORS headers the demo API actually returns for our origin.
+
+    Kalshi does not document CORS for this API, so the header set is measured,
+    never assumed: a real GET with the site's Origin is sent to the public
+    /exchange/status endpoint (the same probe the collect workflow curls) and
+    only OBSERVED headers are recorded. A missing header is recorded as null.
+    """
+    url = f"{BASE}/exchange/status"
+    req = urllib.request.Request(url, headers={
+        "Accept": "application/json",
+        "User-Agent": UA,
+        "Origin": origin,
+    })
+    result = {
+        "checked_at": utcnow(),
+        "origin_tested": origin,
+        "request_url": url,
+        "status_code": None,
+        "access_control_allow_origin": None,
+        "access_control_allow_methods": None,
+        "access_control_allow_headers": None,
+        "note": "Only headers actually observed on the response are recorded; absent headers stay null. CORS behaviour is undocumented (see flagged.html F-24).",
+    }
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            result["status_code"] = r.status
+            for h in ("access-control-allow-origin", "access-control-allow-methods", "access-control-allow-headers"):
+                v = r.headers.get(h)
+                key = "access_control_allow_" + h.split("allow-")[1]
+                if v is not None:
+                    result[key] = v
+    except urllib.error.HTTPError as e:
+        result["status_code"] = e.code
+    except Exception as e:  # network unreachable — recorded honestly, nothing inferred
+        result["error"] = f"{type(e).__name__}: {e}"
+    (LIVE / "cors.json").write_text(json.dumps(result, indent=1))
+    print(f"  wrote {LIVE/'cors.json'} (status={result['status_code']}, allow-origin={result['access_control_allow_origin']})")
+    return result
 
 
 def main():
     ap = argparse.ArgumentParser(description="Collect Kalshi demo public data for the dashboard.")
     ap.add_argument("--orderbooks", type=int, default=4, help="orderbooks per category")
+    ap.add_argument("--no-cors-probe", action="store_true", help="skip the CORS header probe")
     args = ap.parse_args()
     try:
         build(include_orderbooks=args.orderbooks)
     except RuntimeError as e:
         print(f"COLLECT_FAILED: {e}", file=sys.stderr)
         return 2
+    if not args.no_cors_probe:
+        try:
+            probe_cors()
+        except Exception as e:
+            print(f"  ! cors probe failed: {e}", file=sys.stderr)
     return 0
 
 

@@ -33,6 +33,9 @@ jobs:
           python3 scripts/tests/validate_live.py
           python3 scripts/tests/validate_alerts.py
 
+      - name: Run alert-feed tests
+        run: python3 scripts/tests/test_alerts.py
+
       - name: Check links, HTML and data files (fails the build on a broken page)
         run: python3 scripts/check_site.py
 

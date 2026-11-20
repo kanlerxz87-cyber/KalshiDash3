@@ -40,7 +40,10 @@ jobs:
         run: |
           python3 scripts/tests/validate_live.py
           python3 scripts/tests/validate_alerts.py
+          python3 scripts/tests/test_alerts.py
           python3 scripts/tests/test_simulate.py
+      - name: Run alert-feed tests
+        run: python3 scripts/tests/test_alerts.py
       - name: Commit snapshot
         run: |
           set -euo pipefail

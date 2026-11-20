@@ -55,7 +55,18 @@
       </select>
     </label>
     <button class="ghost" id="reload">Reload snapshot</button>
-    <span id="pollNote" class="small mut"></span>
+    <span class="vr"></span>
+    <button id="liveToggle">Start live</button>
+    <label>Poll every
+      <select id="liveInterval">
+        <option value="5000">5 s</option>
+        <option value="10000" selected>10 s</option>
+        <option value="30000">30 s</option>
+        <option value="60000">60 s</option>
+      </select>
+    </label>
+    <span class="small mut" id="liveChip">idle</span>
+    <button class="ghost" id="alertsLink" onclick="location.href='alerts.html'">Alert chats ↗</button>
     <span id="chartNote" class="small mut"></span>
   </div>
 
@@ -63,7 +74,9 @@
     <h3 id="chartTitle">Price chart — X = time, Y = contract price ($)</h3>
     <p class="small mut" id="chartMeta">Pick a market from the tables below.</p>
     <canvas id="priceChart" height="340" aria-label="Chart of contract price over time"></canvas>
+    <div class="swinglist" id="swings"></div>
     <p class="small mut" id="chartFoot"></p>
+    <div id="causeBox"></div>
   </div>
 
   <h2>Liquidity — contracts available at each price</h2>
@@ -93,9 +106,11 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <a href="flagged.html">flagged for review</a>
 </div></footer>
 <script src="assets/site.js"></script>
+<script src="assets/engine.js"></script>
 <script>
 KD.nav("dashboard.html");
 const state = { snap: null, hist: null, alerts: null, sel: null, cat: "" };
+const live = { obs: new Map(), markers: new Map(), on: false };
 
 const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
 
@@ -160,11 +175,16 @@ function renderTables() {
     const rows = (byCat[id] || []).slice(0, 8);
     const liqByTicker = {};
     for (const l of state.snap?.liquidity || []) liqByTicker[l.ticker] = l.orderbook || {};
-    const trs = rows.map(r => {
+    const trs = rows.map(r0 => {
+      // merge the newest live tick (if any) over the snapshot row, so the
+      // tables tick in real time; the snapshot value stays the fallback.
+      const lm = KDL.markets.get(r0.ticker) || {};
+      const r = Object.assign({}, r0, lm._origin === "live" ? lm : {});
+      const liveTag = lm._origin === "live" ? ' <span class="badge live">live</span>' : "";
       const ob = liqByTicker[r.ticker] || {};
       return {
         ticker: `<button class="ghost" data-t="${KD.esc(r.ticker)}" style="padding:2px 8px;font-size:11.5px">chart</button>`,
-        title: `<a href="${KD.esc(r.source)}" target="_blank" rel="noopener" title="${KD.esc(r.title)}">${KD.esc(r.title)}</a>
+        title: `<a href="${KD.esc(r0.source)}" target="_blank" rel="noopener" title="${KD.esc(r.title)}">${KD.esc(r.title)}</a>${liveTag}
                 <div class="small mut mono">${KD.esc(r.ticker)}</div>`,
         dollars: KD.money(r.dollars_traded_estimate, 0),
         vol: KD.num(r.volume_fp),
@@ -175,7 +195,7 @@ function renderTables() {
         atAsk: ob.contracts_at_best_yes_ask === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_ask),
         atBid: ob.contracts_at_best_yes_bid === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_bid),
         status: KD.statusBadge(r.status),
-        basis: KD.basisBadge(r.category_basis),
+        basis: KD.basisBadge(r0.category_basis),
       };
     });
     return `<div class="card"><h3>${KD.CAT_LABEL[id]} <span class="small mut">${rows.length} of ${(byCat[id] || []).length} open in scope</span></h3>` +
@@ -263,7 +283,9 @@ function drawChart() {
     foot.textContent = "";
     return;
   }
-  const series = (state.hist?.series?.[row.ticker]?.observations) || [];
+  const histObs = (state.hist?.series?.[row.ticker]?.observations) || [];
+  const liveObs = live.obs.get(row.ticker) || [];
+  const series = histObs.concat(liveObs);
   const key = KD.$("#seriesSel").value;
   const win = WINDOWS[KD.$("#window").value] || Infinity;
   const now = Date.now();
@@ -297,6 +319,7 @@ function drawChart() {
       1, 60 and 1440-minute intervals (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>).
       This chart therefore plots <b>one observation per collector run</b> from
       <code>data/live/price_history.json</code>; widen the window or wait for more runs.`;
+    KD.$("#swings").innerHTML = "";
     return;
   }
   const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
@@ -316,6 +339,18 @@ function drawChart() {
   ctx.stroke();
   ctx.fillStyle = key === "ask" ? bad : green;
   pts.forEach(p => { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.4, 0, 7); ctx.fill(); });
+  // swing markers: ≥ $0.10 alerts on this market (from the live engine)
+  const markers = live.markers.get(row.ticker) || [];
+  ctx.setLineDash([3, 3]);
+  for (const m of markers) {
+    if (win !== Infinity && now - m.t > win) continue;
+    const x = X(Math.min(Math.max(m.t, t0), t1));
+    ctx.strokeStyle = m.dir === "up" ? "#00b67a" : "#f2695c";
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ih); ctx.stroke();
+    ctx.fillStyle = m.dir === "up" ? "#00b67a" : "#f2695c";
+    ctx.fillText((m.dir === "up" ? "▲+" : "▼−") + (Math.abs(m.delta) * 100).toFixed(0) + "¢", x + 3, pad.t + 10);
+  }
+  ctx.setLineDash([]);
   // last point callout
   const lastP = pts[pts.length - 1];
   ctx.fillStyle = css.getPropertyValue("--txt");
@@ -323,35 +358,61 @@ function drawChart() {
   ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
     Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
 
+  // Swing markers: |Δ last price| >= $0.10 between consecutive observations.
+  // Uses the `last` field (the alert rule) and is independent of the series
+  // selector, so a swing is marked even when the chart plots bid/ask. Event and
+  // market links come from the canonical alert feed (data/live/alerts.json);
+  // the cause is left blank and flagged because Kalshi has no official cause feed.
+  const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
+    .map(o => ({ t: Date.parse(o.t), v: o.last }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+  const swings = [];
+  for (let i = 1; i < obsLast.length; i++) {
+    const delta = obsLast[i].v - obsLast[i - 1].v;
+    if (Math.abs(delta) >= 0.10 - 1e-9) {
+      swings.push({ t: obsLast[i].t, v: obsLast[i].v, prior: obsLast[i - 1].v, delta, mag: Math.abs(delta) });
+    }
+  }
+  if (key === "last") {
+    swings.filter(s => s.t >= t0 && s.t <= t1).forEach(s => {
+      ctx.fillStyle = s.delta > 0 ? "#f0b429" : "#f2695c";
+      ctx.beginPath(); ctx.arc(X(s.t), Y(s.v), 4, 0, 7); ctx.fill();
+      ctx.strokeStyle = css.getPropertyValue("--panel"); ctx.lineWidth = 1.2; ctx.stroke();
+    });
+  }
+  const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
+  const alertFor = (t) => allAlerts.find(
+    a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
+    || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
+  const swingHost = KD.$("#swings");
+  if (!swings.length) {
+    swingHost.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between collected observations for this market. Sharp jumps (≥ $0.10) are marked on the chart when it plots the last price.</p>';
+  } else {
+    swingHost.innerHTML = swings.map(s => {
+      const a = alertFor(s.t);
+      const at = new Date(s.t);
+      const time = at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const dir = s.delta > 0 ? "up" : "down";
+      const deltaTxt = (s.delta > 0 ? "+" : "−") + KD.cents(Math.abs(s.delta));
+      const ev = a && a.event_ticker
+        ? " · " + KD.srcLink(String(a.market_source || a.source || "").replace(/\/markets\/.*$/, "") + "/events/" + a.event_ticker, "event")
+        : "";
+      return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
+        `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
+        `<span>${KD.esc(time)}${ev} <span class="cause">cause blank — flagged</span></span></div>`;
+    }).join("");
+  }
+
   foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
     ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
     Y axis is the contract price in dollars, bounded 0–1. Collected by
     <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
-
-  // ≥$0.10 swing markers, at the exact observation timestamps where they were observed.
-  const marks = (state.alerts?.all_events || []).filter(a => a.ticker === row.ticker);
-  if (marks.length) {
-    ctx.save();
-    for (const a of marks) {
-      const mt = Date.parse(a.to_time);
-      if (!Number.isFinite(mt) || mt < t0 || mt > t1) continue;
-      ctx.translate(X(mt), Y(a.to_price));
-      ctx.rotate(Math.PI / 4);
-      ctx.fillStyle = a.direction === "up" ? "#45d483" : "#f2695c";
-      ctx.fillRect(-4, -4, 8, 8);
-      ctx.restore();
-      ctx.save();
-    }
-    ctx.restore();
-    foot.innerHTML += ` · <b>${marks.length}</b> ≥$0.10 swing marker${marks.length === 1 ? "" : "s"} on this market
-      (<a href="alerts.html#t=${encodeURIComponent(row.ticker)}">see them in the alert chats</a>) — diamonds sit at the
-      exact collected observation where the swing completed.`;
-  }
 }
 
 function drawLiq() {
   const host = KD.$("#liq"), head = KD.$("#liqHead");
-  const ob = (state.snap?.liquidity || []).find(l => l.ticker === state.sel)?.orderbook;
+  const liveBook = KDL.state.selectedBooks.get(state.sel);
+  const ob = liveBook || (state.snap?.liquidity || []).find(l => l.ticker === state.sel)?.orderbook;
   if (!state.sel) { head.textContent = "Pick a market to see its order book."; host.innerHTML = ""; return; }
   if (!ob) {
     head.innerHTML = `No order book snapshot was collected for <code>${KD.esc(state.sel)}</code> in this run.
@@ -366,7 +427,7 @@ function drawLiq() {
     `<div class="row"><span>$${r.price.toFixed(4)}</span>
      <span class="bar ${side === "ask" ? "ask" : ""}"><i style="width:${(r.contracts / maxC * 100).toFixed(1)}%"></i></span>
      <span class="r">${KD.num(r.contracts)}</span></div>`).join("") || '<p class="empty">No resting orders on this side.</p>';
-  head.innerHTML = `Order book for <code>${KD.esc(state.sel)}</code>, collected ${KD.esc(ob.fetched_at || "")}.
+  head.innerHTML = `Order book for <code>${KD.esc(state.sel)}</code>${liveBook ? ' <span class="badge live">live poll</span>' : ' <span class="small mut">(collector snapshot)</span>'}, collected ${KD.esc(ob.fetched_at || "")}.
     Best YES bid <b>${KD.cents(ob.best_yes_bid?.price)}</b> (${KD.num(ob.contracts_at_best_yes_bid)} contracts) ·
     best YES ask <b>${KD.cents(ob.best_yes_ask_derived)}</b> (${KD.num(ob.contracts_at_best_yes_ask)} contracts) ·
     visible depth ${KD.num(ob.visible_contracts_total)} contracts ·
@@ -384,8 +445,7 @@ async function load() {
   const refresh = Date.now();
   try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
   try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
-  // Canonical alert feed (server-built by scripts/build_alerts.py, provenance-validated)
-  try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { state.alerts = null; }
+  try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { /* swings still render from history */ }
   KD.snapshotBanner(state.snap);
   renderAlerts();
   if (!state.snap) {
@@ -414,32 +474,96 @@ KD.$("#window").addEventListener("change", drawChart);
 KD.$("#seriesSel").addEventListener("change", drawChart);
 KD.$("#reload").addEventListener("click", load);
 window.addEventListener("resize", () => { drawChart(); });
-load();
 
-/* Live poll — re-fetch the committed snapshot every 60 s (paused while the tab is
- * hidden) so a new collector run appears without a manual reload. GitHub Pages
- * serves static files, so this only ever sees committed data; nothing is invented
- * between runs. */
-let lastAlertsSig = null;
-async function pollLive() {
-  const note = KD.$("#pollNote");
-  try {
-    const fresh = await KD.json(`data/live/markets.json?poll=${Date.now()}`);
-    const freshAlerts = await KD.json(`data/live/alerts.json?poll=${Date.now()}`).catch(() => null);
-    const sig = freshAlerts ? freshAlerts.generated_at + ":" + freshAlerts.counts.all_events : null;
-    const changed = (state.snap && fresh.collected_at !== state.snap.collected_at) || (lastAlertsSig !== null && sig !== lastAlertsSig);
-    lastAlertsSig = sig;
-    if (changed) {
-      load();
-      note.innerHTML = `<span class="badge ok">new snapshot</span> committed ${KD.esc(fresh.collected_at)} — reloaded automatically`;
-    } else {
-      note.innerHTML = `live poll OK ${new Date().toLocaleTimeString()} · latest commit ${KD.esc(fresh.collected_at)}`;
-    }
-  } catch {
-    note.innerHTML = `live poll failed ${new Date().toLocaleTimeString()} (offline or no snapshot yet)`;
-  }
+/* ---- live mode: poll the public demo API from the browser ---------------- */
+/* tickers as the only filter returns every matching market in one response:
+   https://docs.kalshi.com/api-reference/market/get-markets. Unauthenticated
+   requests have separate limits; the engine backs off on 429:
+   https://docs.kalshi.com/getting_started/rate_limits */
+
+function liveWatchlist() {
+  const rows = (state.snap?.open_markets || [])
+    .filter(r => r.last_price_dollars !== null)
+    .sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.dollars_traded_estimate || 0) - (a.dollars_traded_estimate || 0));
+  const set = new Set(rows.slice(0, 60).map(r => r.ticker));
+  if (state.sel) set.add(state.sel);
+  KDL.setWatch([...set]);
 }
-window.setInterval(() => { if (!document.hidden) pollLive(); }, 60_000);
-pollLive();
+
+function onLiveRows(rows) {
+  const nowMs = Date.now();
+  const touched = new Set();
+  for (const r of rows) {
+    const p = KDL.num(r.last_price_dollars);
+    if (r.ticker && p !== null) {
+      const arr = live.obs.get(r.ticker) || [];
+      arr.push({ t: nowMs, last: p, yes_bid: KDL.num(r.yes_bid_dollars), yes_ask: KDL.num(r.yes_ask_dollars), volume_fp: r.volume_fp });
+      live.obs.set(r.ticker, arr.slice(-600));
+      touched.add(r.ticker);
+    }
+  }
+  if (state.sel && touched.has(state.sel)) { drawChart(); KDL.fetchOrderbook(state.sel).then(() => drawLiq()); }
+}
+
+function onLiveAlert(a) {
+  const arr = live.markers.get(a.ticker) || [];
+  arr.push({ t: a.ts, dir: a.dir, delta: a.delta, to: a.to });
+  live.markers.set(a.ticker, arr.slice(-30));
+  if (a.ticker === state.sel) showCause(a);
+}
+
+function showCause(a) {
+  const l = a.links || {};
+  KD.$("#causeBox").innerHTML =
+    `<div class="notice ${a.dir === "up" ? "ok" : "bad"}"><b>${a.dir === "up" ? "▲" : "▼"} ${KD.cents(a.from)} → ${KD.cents(a.to)}
+      (${a.dir === "up" ? "+" : "−"}${(Math.abs(a.delta) * 100).toFixed(1)}¢ at ${new Date(a.ts).toLocaleTimeString()})</b> —
+      possible-cause leads (search links, never verified causes — <a href="flagged.html">F-25</a>):
+      <a href="${KD.esc(l.news_google || "#")}" target="_blank" rel="noopener">Google News</a> ·
+      <a href="${KD.esc(l.news_bing || "#")}" target="_blank" rel="noopener">Bing News</a> ·
+      <a href="${KD.esc(l.news_ddg || "#")}" target="_blank" rel="noopener">DuckDuckGo</a> ·
+      <a href="${KD.esc(l.api_orderbook || "#")}" target="_blank" rel="noopener">order book</a> ·
+      <a href="alerts.html">alert chat</a></div>`;
+}
+
+function liveChip(st) {
+  const el = KD.$("#liveChip");
+  if (!st) { el.textContent = "idle"; return; }
+  if (st.probing) { el.textContent = "probing demo API…"; return; }
+  if (st.corsOk === true && live.on) {
+    el.textContent = `live · ${st.tickCount} ticks${st.lastTickAt ? " · last " + new Date(st.lastTickAt).toLocaleTimeString() : ""}${st.backoff ? " · backing off (429)" : ""}`;
+    KD.$("#liveToggle").textContent = "Stop live";
+  } else if (st.corsOk === false) {
+    el.textContent = "live REST blocked (CORS) — snapshot mode";
+    KD.$("#liveToggle").textContent = "Retry live";
+  } else { el.textContent = "idle"; KD.$("#liveToggle").textContent = "Start live"; }
+}
+
+function startLive() {
+  KDL.setWatch([]); liveWatchlist();
+  KDL.start(Number(KD.$("#liveInterval").value) || 10000);
+  live.on = true;
+}
+
+KD.$("#liveToggle").addEventListener("click", async () => {
+  if (live.on) { KDL.stop(); live.on = false; liveChip({ corsOk: true }); return; }
+  const ok = await KDL.probe(true);
+  if (ok) startLive(); else liveChip({ corsOk: false, probing: false });
+});
+KD.$("#liveInterval").addEventListener("change", () => { if (live.on) startLive(); });
+
+const _select = select;
+select = function (t) { _select(t); if (live.on) { liveWatchlist(); KDL.fetchOrderbook(t).then(() => drawLiq()); } };
+
+(async () => {
+  KDL.onStatus(liveChip);
+  KDL.onRows(onLiveRows);
+  KDL.onAlert(onLiveAlert);
+  const ok = await KDL.probe();
+  if (ok) { startLive(); }
+  else { liveChip({ corsOk: false, probing: false }); }
+})();
+
+load();
+window.setInterval(() => { if (!document.hidden) load(); }, 60_000);
 </script>
 </body></html>

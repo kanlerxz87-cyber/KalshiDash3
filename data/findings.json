@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-20T13:20:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path.",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series.",
  "questions": [
   {
    "id": "Q1",
@@ -237,39 +237,97 @@
   },
   {
    "id": "G11",
-   "suggestion": "Make the \u2265$0.10 alerting system a first-class page: two scrolling chats (all swings + high-ROI model picks) fed by a provenance-validated alert file.",
-   "why_it_helps_decisions": "A trader sees every material repricing the moment a snapshot lands, without re-reading 489 rows; the picks chat applies the same filter a human would apply by eye.",
-   "effort": "Done in this session",
-   "risk": "Alerts are only as fresh as the collector cadence (F-14).",
-   "success_metric": "alerts.json exists on every collect run and validate_alerts.py re-derives 100% of its rows from the observations.",
-   "status": "implemented",
+   "suggestion": "SHIPPED: in-browser live polling of the demo API with a CORS self-test and automatic snapshot fallback.",
+   "why_it_helps_decisions": "Prices on the dashboard tick in near-real time (default 10s poll, 5s minimum) instead of only when the collector commits. The page says plainly which layer each number came from.",
+   "effort": "Done",
+   "risk": "Unauthenticated request limits are undocumented; the engine polls conservatively and backs off exponentially on 429.",
+   "success_metric": "Live chip shows connected ticks; charts update within one poll interval.",
+   "status": "shipped",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/rate_limits"
+   ]
+  },
+  {
+   "id": "G12",
+   "suggestion": "SHIPPED: two scrolling alert chats (all events + model picks) for swings >= $0.10 in both directions.",
+   "why_it_helps_decisions": "The alert stream is the site's pulse: every >= $0.10 move lands in the All Events chat, and model-scored candidates land in the Model Picks chat with their score reasons and modeled ROI.",
+   "effort": "Done",
+   "risk": "Alert quality depends on poll interval; documented cache lag means faster polling cannot add information.",
+   "success_metric": "Alerts appear within one poll interval of the move; every alert carries API + book + news-lead links.",
+   "status": "shipped",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   },
   {
-   "id": "G12",
-   "suggestion": "Automate the simulated trader: run the S1\u2013S4 rules over collected price history with fee modelling and a categorised ledger, so strategies produce measurable paper results without manual input.",
-   "why_it_helps_decisions": "Turns the strategy page from prose into numbers: trades, win rate, fee drag and drawdown per strategy and per category, computed identically on every run.",
-   "effort": "Done in this session",
-   "risk": "Replay fills only at collected observations; thin demo books make exit slippage visible (by design). Per-series fee multipliers not applied.",
-   "success_metric": "Deterministic replay: the same snapshot always produces the identical trade list; every fill timestamp is a collected observation.",
-   "status": "implemented",
+   "id": "G13",
+   "suggestion": "SHIPPED: auto-sim engine that opens/closes paper trades on 3 disclosed strategies and categorises performance by strategy, topic and price band.",
+   "why_it_helps_decisions": "The brief asks for automated simulated trades to test strategies and categorise results. trading.html runs the loop automatically: entries on qualifying swings, exits at +/- $0.10 or settlement, and per-strategy/topic/band/exit-reason tables.",
+   "effort": "Done",
+   "risk": "Paper fills at quoted sizes may overstate real fills; fee multipliers per series are not modelled (G5).",
+   "success_metric": "Strategy leaderboard with resolved trades and net-of-fees ROI per strategy.",
+   "status": "shipped",
    "sources": [
-    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/getting_started/market_settlement"
    ]
   },
   {
-   "id": "G13",
-   "suggestion": "Close the real-time gap: connect the authenticated demo WebSocket (orderbook + ticker channels) using a demo API key you supply, so alerts fire on ticks instead of 20-minute snapshots.",
-   "why_it_helps_decisions": "Seconds-level alerting, live order-book depth between collector runs, and true fill reporting for the simulated strategies.",
-   "effort": "Needs your demo API key (create at demo.kalshi.co \u2192 Account Settings \u2192 API Keys); the client-side code change is small.",
-   "risk": "A key in a browser is exposed to anyone using that browser; better to run a small local proxy. Keys must never be committed.",
-   "success_metric": "Alert latency drops from \u226420 minutes to seconds, measured from tick timestamp to bubble render.",
+   "id": "G14",
+   "suggestion": "Toast + optional sound notification when a Model Picks alert fires.",
+   "why_it_helps_decisions": "A trader watching another tab should not miss a model pick. Toasts need no permissions; sound must stay opt-in.",
+   "effort": "Low",
+   "risk": "Noise; keep to model picks only, off by default.",
+   "success_metric": "A pick while unfocused surfaces within 1s.",
+   "status": "proposed",
+   "sources": []
+  },
+  {
+   "id": "G15",
+   "suggestion": "WebSocket market/orderbook streaming once demo API keys exist.",
+   "why_it_helps_decisions": "REST responses are cached and can lag by seconds; the docs say to use WebSockets when you need current state. WS needs a key (F-31), so this stays blocked on credentials.",
+   "effort": "Medium",
+   "risk": "Key in the browser; demo keys only.",
+   "success_metric": "Order book refresh < 1s without extra REST load.",
    "status": "proposed",
    "sources": [
-    "https://docs.kalshi.com/getting_started/quick_start_websockets",
-    "https://demo.kalshi.co/"
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/quick_start_websockets"
+   ]
+  },
+  {
+   "id": "G16",
+   "suggestion": "Watchlist pinning and one-click 'chart this alert' deep links between the alert chats and the dashboard.",
+   "why_it_helps_decisions": "A trader reacting to an alert wants the price chart and book in one click, with the alert marker on the chart. Dashboard already marks swings for the selected market; extend it to deep-link from each chat bubble.",
+   "effort": "Low",
+   "risk": "None beyond URL plumbing.",
+   "success_metric": "Alert -> chart in one click with the marker visible.",
+   "status": "proposed",
+   "sources": []
+  },
+  {
+   "id": "G17",
+   "suggestion": "Add 1/60/1440-minute candlestick charts from GET /markets/{ticker}/candlesticks once the collector accumulates history.",
+   "why_it_helps_decisions": "Seconds-resolution history cannot be requested from Kalshi; candlesticks support 1, 60 and 1440-minute intervals only. Today's chart is one-observation-per-collector-run; once enough runs exist, candlesticks add OHLC structure for free.",
+   "effort": "Medium",
+   "risk": "Rate budget for historical queries on the collector.",
+   "success_metric": "OHLC view toggles per market without breaking the seconds view.",
+   "status": "proposed",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
+  },
+  {
+   "id": "G18",
+   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html \u00a74 \u2014 a deterministic S1\u2013S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy \u00d7 category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
+   "why_it_helps_decisions": "Tests the strategy page's stated rules against collected history with no manual input, and shows real thin-book exit slippage that a live alert trader would face.",
+   "effort": "Done in this session",
+   "risk": "Replay fills only at collected observation timestamps; per-series fee multipliers not applied; demo prices only.",
+   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07\u00d7C\u00d7P\u00d7(1\u2212P)) to the cent.",
+   "status": "implemented",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
    ]
   }
  ],
@@ -507,31 +565,66 @@
   },
   {
    "id": "F-24",
-   "item": "Real-time (second-level) alerting is not possible on a static site without credentials",
-   "why": "The brief asks for a live alerting system. REST polling only sees changes between collector runs (20-minute cadence), and every Kalshi WebSocket session \u2014 even public channels \u2014 requires an API key at the handshake, which a static GitHub Pages site cannot hold.",
-   "action": "Implemented the honest version: alerts are derived from consecutive collected observations, the page polls the committed snapshot every 60 s, and a clearly-labelled SIMULATED tick stream (default off, never persisted) demonstrates the real-time path. A user-supplied demo key would close the gap (see G11).",
+   "item": "Browser CORS access to the demo API is undocumented by Kalshi; live mode relies on it",
+   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json \u2014 it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
+   "action": "Runtime self-test with automatic fallback; observed headers committed per run; third-party header capture (another project's Pages origin) kept as circumstantial evidence only. Coexists with F-15: the server-side archive keeps cause_link null (no cause data collected), while the alert chats render news SEARCH links computed from the market title and label them unverified leads.",
    "severity": "medium",
    "sources": [
-    "https://docs.kalshi.com/getting_started/quick_start_websockets",
-    "https://docs.kalshi.com/getting_started/api_environments"
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://raw.githubusercontent.com/karagemop466-tech/Demo1/main/data/cors.json",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/cors.json"
    ]
   },
   {
    "id": "F-25",
-   "item": "Alert 'cause' links are research starting points, not verified causes",
-   "why": "The brief asks for website links that may have caused a \u2265$0.10 jump. No official source attributes a price move to an event, and automatic news attribution would be unverifiable guesswork.",
-   "action": "Each alert links the exact API query that produced the prices, and each category links the official bodies that publish the underlying facts (EIA, FEC/EAC, Oscars/Grammys/Emmys academies, CME/Coinbase, PGA Tour). The pages state explicitly that these are starting points, not verified causes.",
-   "severity": "low",
+   "item": "Alert 'possible-cause' links are news search leads, never verified causes",
+   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand \u2014 the site never asserts a cause, because asserting one without a source would be fabrication.",
+   "action": "Search links labelled 'possible-cause leads \u2014 unverified' on every alert bubble; no causal claim is ever rendered.",
+   "severity": "medium",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
-    "https://www.eia.gov/petroleum/gas/"
+    "https://docs.kalshi.com/getting_started/quick_start_market_data"
    ]
   },
   {
    "id": "F-26",
+   "item": "The 'model picks' scorer is a disclosed heuristic, not a backtested strategy",
+   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask \u2014 a conditional figure, not an expected return.",
+   "action": "Formula, weights, threshold and per-alert component values are all rendered on alerts.html; the disclaimer is on every pick. The auto-sim (trading.html) exists precisely to gather the evidence the model still needs.",
+   "severity": "medium",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-27",
+   "item": "The auto-sim trading engine cannot execute on the real demo account",
+   "why": "Demo order placement requires an API key, which requires a human to create the demo account and funds (help.kalshi.com). No credentials exist in this environment, so the engine only opens PAPER positions and stores them in localStorage. It never places orders and never will until keys are supplied outside the repository.",
+   "action": "Every page shows the AUTO-SIM / PAPER ONLY label; fills are recorded with their price basis (yes_ask, no_ask, derived, settlement) so the ledger can be audited.",
+   "severity": "low",
+   "sources": [
+    "https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account",
+    "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+    "https://docs.kalshi.com/getting_started/api_keys"
+   ]
+  },
+  {
+   "id": "F-28",
+   "item": "Auto-sim leaves scalar-result markets open and does not model settlement floors",
+   "why": "Settlement pays $1 to the winning side for simple yes/no determinations, but some markets settle to a scalar value, and settlement bounds can pay partial amounts before settlement. The engine settles only result=yes / result=no and deliberately leaves scalar markets open rather than guessing a payout.",
+   "action": "Scalar-result positions stay visible in the open table with no fabricated exit; flagged here so the number is never quietly wrong.",
+   "severity": "low",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "https://docs.kalshi.com/getting_started/settlement_bounds"
+   ]
+  },
+  {
+   "id": "F-29",
    "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
    "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
-   "action": "Fixed in this session: the README now describes only the canonical tree plus the alerting/automated-trading features added by session arena-f068786c.",
+   "action": "Fixed during the arena-f068786c integration merge: the README now describes only the canonical tree plus the features shipped by the parallel sessions and this session.",
    "severity": "low",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/13",

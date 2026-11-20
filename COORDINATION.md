@@ -133,6 +133,70 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
 
+- 2026-11-20: MERGE CONFLICT with origin/main (PRs #16-#21 from arena-6d85f8f0, arena-5225610f, arena-e5adea9d had
+  landed overlapping work). Resolved without discarding either side: their `build_alerts.py`/`alerts_archive.json`/
+  `simulation.html`/`simulator` and dashboard alert feeds are kept as the server-side layer; this session's live
+  engine, alert chats and auto-sim become the browser-side layer on top. Concretely: (1) my findings F-14..F-18
+  renumbered to F-24..F-28 and suggestions G9..G15 to G11..G17 to avoid ID collisions; (2) `data/live/alerts.json`
+  ownership given to their `build_alerts.py` (single writer, single schema) — my duplicate writer was removed from
+  `scripts/collect.py`, which keeps only the unique CORS probe (`data/live/cors.json`); (3) the engine now consumes
+  THEIR alerts.json/alerts_archive.json schema and computes news-lead links client-side (their `cause_link` stays
+  null, coexistence documented in F-24/F-25); (4) validator extended for their schema + cors.json; (5) exec summary,
+  index, README and nav integrate both. All suites re-run on the merged tree: engine tests 21/21, check_site 19
+  pages OK, validate_live OK, all inline JS parses.
+- 2026-11-20: Second conflict round: origin/main advanced again (PR #22, arena-0a479d8c — committed-history swing
+  markers on the chart + swinglist + test_alerts.py). Resolved: both marker systems now coexist on dashboard.html —
+  their markers are derived from committed observations (server-side layer), mine are >= $0.10 swings detected live
+  in the browser session; index card text merged. An earlier anomaly was also handled: another session force-pushed
+  origin/main history onto this branch's remote ref; the push of this session's history restored it, and the stray
+  in-progress rebase was aborted cleanly. No work from either side was lost.
+
+
+---
+
+## Session `arena-a2fca5db` — live alert chats, auto-sim trading engine, in-browser live mode
+
+Branch `arena/a2fca5db-kalshidash3`, rebased on the merge of PR #15 (`cd104db`). Session ID: `arena-a2fca5db`.
+
+Handoff note (per the takeover rule): all prior claims (T1–T10) are merged to `main` and their last commits are
+>60 minutes old, so this session claims the remaining requirement gaps. Collector-file edits
+(`scripts/collect.py`, validator, check_site) are logged here as integration handoffs from `arena-e05bd5ff`,
+whose scope is complete. Shared outputs (nav in `assets/site.js`, `index.html`) are edited only under the
+integrator hat, in the same commits that re-verify them.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Live alert chats: two scrolling feeds (all events + model picks), ≥$0.10 swing alerts in both directions, links per alert | done | arena-a2fca5db | `alerts.html` (new), `assets/engine.js` (new) | Alert threshold is a stated requirement, not an API field; delta math checked against committed `price_history.json` | F-14 (CORS undocumented), F-15 (causality links are leads, not verified causes), F-16 (model is heuristic) |
+| T12 | Server-side alert history + CORS evidence in collector | done | arena-a2fca5db | `scripts/collect.py` (handoff), `scripts/tests/validate_live.py` (handoff), `scripts/check_site.py` (handoff) | Emits `data/live/alerts.json` from consecutive observations and `data/live/cors.json` from a real Origin-header probe | F-14 |
+| T13 | Auto-sim trading engine: automated paper trades, 3 strategies, categorised analytics, strategy leaderboard | done | arena-a2fca5db | `trading.html` (new), `assets/engine.js` (new) | Fees modelled at the documented general taker rate; fills labelled with basis; resolution settles from API `result` | F-16, F-17 (no demo credentials: engine is paper-only) |
+| T14 | In-browser live mode on dashboard (poll demo API, self-test CORS, snapshot fallback) | done | arena-a2fca5db | `dashboard.html`, `assets/engine.js` | Runtime CORS probe; graceful fallback keeps every page working | F-14 |
+| T15 | Integration publish: nav/index/exec-summary/suggestions/flagged updates, PR → main, merge, Pages confirm, collector dispatch | done | arena-a2fca5db | `assets/site.js` (nav), `index.html`, `executive-summary.html`, `suggestions.html`, `flagged.html`, `data/findings.json`, `data/verified_facts.json`, `README.md`, `COORDINATION.md` | `check_site.py` + `validate_live.py` before push; link check in Pages build | — |
+
+### Sources added by this session (all official)
+
+- https://docs.kalshi.com/api-reference/market/get-markets — `tickers` filter, status values
+- https://docs.kalshi.com/getting_started/rate_limits — request-rate budget for the in-browser poller
+- https://docs.kalshi.com/getting_started/quick_start_websockets — WS handshake auth (re-verified)
+- https://docs.kalshi.com/getting_started/market_settlement — settlement/result semantics
+- https://kalshi.com/docs/kalshi-fee-schedule.pdf — general taker fee formula used by the sim
+- https://raw.githubusercontent.com/karagemop466-tech/Demo1/main/data/cors.json — third-party header capture showing the demo API returns `access-control-allow-origin` for a `*.github.io` origin (circumstantial; our own probe supersedes it)
+
+### Log
+
+- 2026-11-20: Claimed T11–T15; no other session has an active claim (all prior tasks merged via PRs #1–#15).
+- 2026-11-20: Verified demo API responds publicly (no auth) for GET /markets via an external fetcher; fields re-read verbatim
+  (`last_price_dollars`, `volume_fp`, `open_interest_fp`, `status:"active"`, `result:""`, `notional_value_dollars:"1.0000"`).
+- 2026-11-20: T11–T14 implemented and verified before push: `node scripts/tests/engine.test.js` (21 assertions: threshold,
+  fee cent-ceil, alert firing both directions, 9¢ non-alert, momentum/reversion entries, bid-basis exits, settlement P&L,
+  scalar left open); `python3 scripts/check_site.py` (18 pages, links OK); `validate_live.py` (489 open / 200 settled /
+  17 orderbooks). Collector exercised end-to-end against a mock demo API: alerts.json detected ±12¢ moves in both
+  directions; cors.json recorded the observed `access-control-allow-origin` header. Defects found and fixed during
+  testing: settlement P&L booked as payout×count instead of (payout−entry)×count; fee cent-ceil overcharged one cent on
+  float noise (also fixed in the older portfolio page); collector alerts were re-dated on every page load (dedupe fix).
+- 2026-11-20: Design decision recorded: auto-sim entries fire only on live in-session alerts; collector-history alerts
+  (~20 min apart) are shown in the chats but are too stale to trade. Documented on trading.html and in F-16/F-17.
+
+
 ### Session `arena-6d85f8f0` — alert feed enhancement
 
 - Claim: T11; files touched: `dashboard.html`, `assets/site.css`, `executive-summary.html` (claim committed and pushed to the current Arena branch before implementation).
@@ -217,50 +281,115 @@ before editing).
 - 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
 - Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.
 
+## Session `arena-0a479d8c` — review + chart jump markers + alert-feed tests (branch `arena/0a479d8c-kalshidash3`)
+
+Branched from `cd104db`. This session reviewed the whole repository line by line and attempted to build
+the live alerting system. On merging `origin/main` it found that the alerting requirement was **already
+fulfilled** by earlier sessions, so it withdrew its duplicate and kept only non-duplicative work.
+
+### What this session found
+
+- **Alerting already done.** `arena-6d85f8f0` (T11, PR #16) put two scrolling ≥ $0.10 swing feeds on
+  `dashboard.html` (*All qualifying events* + *Model watch*), and `arena-5225610f` (T12, PR #18) added the
+  append-only `data/live/alerts_archive.json` via `scripts/build_alerts.py`. Those sessions **explicitly
+  removed** a separate `alerts.html` as a duplicate of the dashboard feeds.
+- **Decision:** this session respected that single-UI decision. It did **not** reintroduce `alerts.html`;
+  the dashboard's two scrolling feeds remain the single alert UI.
+
+### What this session kept (non-duplicative)
+
+| Contribution | Files | Why it is not a duplicate |
+|---|---|---|
+| Jump markers + event links on the price chart (≥ $0.10 swings marked, each linked to the official market/event API URL, cause blank + flagged) | `dashboard.html`, `assets/site.css` | Adds jump markers to the chart itself; the dashboard feeds are a separate section and do not mark the chart |
+| Alert-feed tests (schema, $0.10 threshold, both directions, blank cause, high-ROI ⊆ all-events, real tickers) | `scripts/tests/test_alerts.py` | Prior sessions tested the simulator (`test_simulate.py`) but had no test guarding `alerts.json`; wired into `pages.yml` and `collect.yml` |
+| Line-by-line review + this log | `COORDINATION.md` | Coordination record required by the brief |
+
+### Merge conflict resolution
+
+`main` advanced during this session (PRs #16, #18, #20, #21). The PR merge was not cleanly mergeable.
+Resolved by merging `origin/main` into the branch and, for the files the earlier sessions owned
+(`data/live/alerts.json`, `data/findings.json`, `executive-summary.html`, `scripts/check_site.py`,
+`scripts/tests/validate_live.py`, `README.md`, `COORDINATION.md`, `dashboard.html`), keeping `main`'s
+version and re-applying only this session's non-duplicative additions (chart markers, test file, log).
+No earlier session's work was discarded; the duplicate `alerts.html` this session had added was removed
+to honour the single-alert-UI decision.
+
+### Verification
+
+`python3 scripts/tests/validate_live.py` OK · `python3 scripts/tests/test_alerts.py` (13 tests) OK ·
+`python3 scripts/tests/test_simulate.py` OK · `python3 scripts/check_site.py` OK (18 pages) ·
+`node --check` on every inline and asset script OK. This sandbox has no route to docs.kalshi.com or the
+Kalshi API (outbound allowlist), so verification was against the committed, source-cited data and
+internal cross-checks; that limitation is stated rather than papered over.
+
+### Log
+
+- 2026-11-20: Claimed T8–T10 and committed the claim (single active session at claim time).
+- 2026-11-20: Reviewed the repository line by line. Confirmed the alerting requirement was already met by
+  T11/T12; withdrew the duplicate alerts page and kept the chart jump markers + alert-feed tests.
+- 2026-11-20: Merged `origin/main` (advanced by PRs #16/#18/#20/#21); resolved the conflict by adopting
+  main's canonical architecture and re-applying only the non-duplicative additions. PR #22 opened for merge.
+- 2026-11-20: **PR #22 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/22 , merge commit
+  `c37aad297abcc8ee85533a5dab23e46cde1384c9` (merged 2026-11-20T13:46:25Z). GitHub Pages rebuild completed
+  successfully (run 44747260546, conclusion `success`); Pages API reports `status=built`, live site
+  https://kanlerxz87-cyber.github.io/KalshiDash3/ (source `main /`). No irregularities were introduced by this
+  session; prior sessions' flagged items (F-14, F-15, etc.) remain on the Flagged for Review page.
+- 2026-11-20: **PR #23 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/23 , merge commit
+  `7007ee23e167ca81d254bec3d96e9832d5ac52ac` (merged 2026-11-20T13:49:56Z). Pages workflow run 44747778157
+  (`Deploy site to GitHub Pages`) succeeded; Pages API reports `status=built`. Two merge conflicts were resolved
+  on the way (see log above). T11–T15 marked done.
+- 2026-11-20: Collector dispatched on main after the merge (run 44747799459, `workflow_dispatch`, conclusion success).
+  First real run of `probe_cors()` against the official demo API measured `access-control-allow-origin:
+  https://kanlerxz87-cyber.github.io` for this project's own production origin (data/live/cors.json, checked_at
+  2026-11-20T13:50:27Z). The in-browser live alert chats are therefore confirmed reachable from the deployed site;
+  F-24's status for the Pages origin is measured, not assumed. alerts.json/all_events=8, archive=8 at that run.
+- 2026-11-20: Follow-up commit on this branch fixes the cors.json note to reference F-24 (the renumbered flag) and
+  records this log; shipped as a docs/notes-only PR merged immediately after #23.
+- 2026-11-20: **PR #26 merged** (docs/notes follow-up), and the deployed site was verified with a live page load:
+  alerts.html reports `live · REST OK` with ticks from the user's browser, 8 alerts in view across both chats
+  (collector history + live ticks), model picks rendering score reasons. Local curl cannot reach github.io from the
+  build sandbox (no route), so verification used an external page fetcher. T11-T15 complete; board closed for this session.
+
 ---
 
-## Session `arena-f068786c` — alert chats page, scoring model, automated simulated trader, dashboard markers
+## Session `arena-f068786c` — final integration of the alert/automation wave (branch `arena/f068786c-kalshidash3`)
 
-Branch `arena/f068786c-kalshidash3` (the session environment pins this session to a single fixed branch; the
-`session-<id>/<task>` branch-per-task scheme cannot be used here, so scope separation is done through the file
-scopes below instead). Claimed and worked tasks T11–T16 of its own plan in parallel with the sessions above;
-started from `cd104db` (PR #15) when no unexpired claim existed.
+This session built the two-chat alerts page, a transparent scoring model, a portfolio-page S1–S4 replay trader,
+dashboard swing markers and an alert provenance validator in parallel with the sessions above (claim recorded
+earlier in this file). By the time its PR #24 was ready, `main` had received the overlapping PRs #16, #18, #20,
+#21, #22, #23, #25, #26 and #27 from five other sessions. This session acted as the integration for its own PR,
+resolving by the one-canonical-page rule:
 
-### Task board (this session)
+### Kept from `main` (canonical — already live and reviewed)
 
-| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
-|----|------|--------|-------|----------------|--------------|----------------|
-| T11-f | Alert provenance validator for the canonical archive/feeds built by `scripts/build_alerts.py` (arena-5225610f/arena-e5adea9d design) | done | arena-f068786c | `scripts/tests/validate_alerts.py`, `.github/workflows/collect.yml`, `.github/workflows/pages.yml` | Re-derives every current-history alert from `price_history.json` observations; verifies feed order, counts, `high_roi` screen reproduction from `data/alert_rules.json`, `cause_link` stays null, prices/deltas/timestamps well-formed; archive-only alerts (market pruned from history) allowed and counted | — |
-| T12-f | Dedicated two-chat alerts page: chat 1 = every ≥$0.10 swing; chat 2 = swings the project-defined scoring model likes (score ≥ 55) | done | arena-f068786c | `alerts.html`, `assets/alerts.js`, `assets/site.js` (nav, additive), `assets/site.css` (additive) | jsdom 14/14; model formula + weights + in-browser worked example on the page; consumes the canonical `all_events`/`high_roi` feeds; `SIM` stream default OFF, never persisted | F-24 (latency bound), F-25 (cause links are research starting points) |
-| T13-f | Automated simulated trader on `portfolio.html` §4: S1–S4 replay over collected price history, fee `ceil(0.07×C×P×(1−P))`, strategy × category ledger, equity curve, settlement against literal API `result` | done | arena-f068786c | `portfolio.html`, `assets/alerts.js`, `strategies.html` (status note) | jsdom 17/17: P&L identity, fee math to the cent, fills only at collected observation timestamps, deterministic replay, S4 never double-counted | — |
-| T14-f | Dashboard integration: ≥$0.10 markers on the price chart at observed timestamps + 60 s live-poll note (merged with arena-e5adea9d's Model-watch panel and refresh-guard) | done | arena-f068786c | `dashboard.html` | jsdom 10/10 pre-merge, re-run post-merge | — |
-| T15-f | Docs refresh: exec summary rows, index cards, suggestions G11–G13, facts F-54, flags F-24–F-26, README fix | done | arena-f068786c | `executive-summary.html`, `index.html`, `suggestions.html`, `verification.html`, `sources.html`, `data/findings.json`, `data/verified_facts.json`, `README.md` | `volume_24h_fp` re-verified against docs.kalshi.com (fact F-54); every new entry carries official sources | F-26 (stale README `9b246e37/` section, fixed) |
-| T16-f | Final integration for this iteration: merge-conflict resolution with the parallel sessions, checks green, PR → main, merge, confirm Pages | done | arena-f068786c | `COORDINATION.md` (merge only) | see merge log below | — |
+- `alerts.html` "Live alert chats" + `assets/engine.js` (live polling with CORS self-test, two scrolling chats,
+  auto-sim paper trading — G11/G12/G13 shipped, flags F-24–F-28 by the shipping sessions).
+- `scripts/build_alerts.py` archive pipeline + `data/alert_rules.json` + `data/live/alerts_archive.json` (arena-5225610f).
+- `simulation.html` + `scripts/simulate.py` + `scripts/tests/test_simulate.py` (arena-e5adea9d).
+- Dashboard markers/live-engine integration, `scripts/tests/test_alerts.py`, `data/live/cors.json` (arena-0a479d8c, arena-a2fca5db).
+- Withdrawn from this branch as duplicates (recoverable from git history): this session's `alerts.html` variant,
+  its dashboard marker/poll edits, its chat CSS/nav entries, and its flag/suggestion/fact renumberings that
+  collided with the other sessions' (F-24–F-26-mine ≈ F-24/F-25-theirs; G11–G13-mine ≈ G12/G13/G15-theirs).
 
-### Merge log (this session's integration into the multi-session main)
+### Kept from this session (unique, non-duplicating)
 
-- 2026-11-20: PR #24 opened from this branch. `main` had advanced (PRs #14, #16, #18, #20, #21, data commits) with an
-  overlapping alert feature set. Resolved by **keeping both bodies of work**:
-  - Canonical alert pipeline = the archive design (`scripts/build_alerts.py` → `alerts_archive.json` + `alerts.json`
-    feeds, rules in `data/alert_rules.json`) adopted as-is; this session's duplicate builder withdrawn.
-  - This session's additions kept: the dedicated two-chat `alerts.html` (consuming the canonical feeds, adapted to
-    their field names), scoring model v1 as chat 2's filter (displayed openly; the dashboard's more conservative
-    `high_roi` screen is shown as a secondary badge and stays authoritative for its own panel), the portfolio
-    §4 auto-trader, the dashboard swing markers, and the provenance validator rewritten for the canonical schema.
-  - ID collisions resolved by renumbering this session's entries: flags F-14/F-15/F-16 → F-24/F-25/F-26;
-    suggestions G9/G10/G11 → G11/G12/G13; fact F-50 → F-54. Every page reference updated.
-  - `collect.yml` deduplicated (one `build_alerts.py` step + simulate + all three validators).
-  - No file from any other session was deleted or overwritten; `simulation.html`, `simulate.py`, `test_simulate.py`,
-    `strategies.json`, `alert_rules.json` and their pages are kept untouched.
-- 2026-11-20: Post-merge verification re-run on the merged tree: `check_site.py`, `validate_live.py`,
-  `validate_alerts.py` (rewritten), `test_simulate.py`, `node --check` on both assets, and the jsdom browser tests
-  for `alerts.html`, `dashboard.html`, `portfolio.html` and the data-driven pages.
+- `portfolio.html` §4: deterministic S1–S4 strategy replay over collected price history (fee modelled per fill at
+  the official general rate, strategy × category ledger, equity curve, settlement against the literal API `result`).
+  Complementary to the alerts-page auto-sim, which trades the live alert stream; recorded as shipped suggestion G18.
+- `scripts/tests/validate_alerts.py`: provenance validator — re-derives every current-history alert from the
+  committed observations, reproduces both feeds from the archive + `data/alert_rules.json`, enforces
+  `cause_link == null` and well-formed deltas/timestamps; wired into `collect.yml` alongside `test_alerts.py`.
+- `sources.html`: official per-category research sites (EIA, FEC/EAC, Oscars/Grammys/Emmys academies, CME,
+  Coinbase, PGA Tour) — labelled research starting points (matches F-25).
+- Verified fact **F-54** (`volume_24h_fp`, checked against docs.kalshi.com get-markets on 2026-11-20).
+- Flag **F-29** (stale README `9b246e37/` section — now removed from the README).
+- `strategies.html` "Automated test loop" note; verification-page rows for alert provenance and replay determinism.
 
-### Sources used by this session (official)
+### Verification (this session, on the merged tree)
 
-- https://docs.kalshi.com/getting_started/demo_env · api_environments · quick_start_websockets
-- https://docs.kalshi.com/api-reference/market/get-markets (re-read 2026-11-20 to verify `volume_24h_fp` — fact F-54)
-- https://docs.kalshi.com/getting_started/market_settlement · orderbook_responses
-- https://kalshi.com/docs/kalshi-fee-schedule.pdf (general taker fee formula used by both simulators)
-- Research reference sites (labelled starting points, F-25): eia.gov, fec.gov, eac.gov, oscars.org, grammy.com,
-  emmys.com, cmegroup.com, coinbase.com/prices, pgatour.com
+- Python: `check_site.py`, `validate_live.py`, `validate_alerts.py` (6 archived alerts: re-derived/archive-only split
+  verified), `test_alerts.py`, `test_simulate.py` (16 tests), `node --check` on all shipped JS.
+- jsdom browser tests: portfolio §4 (17/17: P&L identity, fee math to the cent, fills only at collected observation
+  timestamps, deterministic replay, S4 never double-counted), dashboard (10/10), data-driven pages (13/13),
+  `simulation.html` smoke (renders, no page errors).
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/24 (merge result recorded below after merge).
