@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T13:20:00Z",
+ "generated": "2026-11-20T14:50:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series.",
  "questions": [
   {
@@ -218,7 +218,7 @@
    "effort": "Low",
    "risk": "Adds two fields to an append-only archive. Existing entries stay unchanged; old entries stay unfilled.",
    "success_metric": "Every new archive entry has a stored to_yes_bid and to_yes_ask.",
-   "status": "proposed (request R-2, see COORDINATION.md)",
+   "status": "implemented 2026-11-20 (request R-2): scripts/build_alerts.py now stores to_yes_bid / to_yes_ask from the observation at to_time on every NEW archive entry; entries written before that are unchanged (append-only) and stay unfilled unless price_history still holds their quote.",
    "sources": [
     "https://docs.kalshi.com/getting_started/orderbook_responses"
    ]
@@ -320,11 +320,11 @@
   },
   {
    "id": "G18",
-   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html \u00a74 \u2014 a deterministic S1\u2013S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy \u00d7 category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
+   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html §4 — a deterministic S1–S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy × category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
    "why_it_helps_decisions": "Tests the strategy page's stated rules against collected history with no manual input, and shows real thin-book exit slippage that a live alert trader would face.",
    "effort": "Done in this session",
    "risk": "Replay fills only at collected observation timestamps; per-series fee multipliers not applied; demo prices only.",
-   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07\u00d7C\u00d7P\u00d7(1\u2212P)) to the cent.",
+   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07×C×P×(1−P)) to the cent.",
    "status": "implemented",
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
@@ -472,8 +472,8 @@
   {
    "id": "F-14",
    "item": "High-ROI model not supplied: the dashboard's 'Model watch' feed is an experimental screen, not an ROI model",
-   "why": "The brief asks for events 'our model likes as high ROI', but no model, criteria or weights were provided. The dashboard (PR #16, arena-6d85f8f0) shows an experimental screen: seed-series alerts with positive volume_24h only, ordered by volume. It is labelled 'not an ROI prediction'. This session's archive mirrors that screen exactly (data/alert_rules.json) and computes no return figure.",
-   "action": "Owner to supply the model or confirm the screen. Replace the rule in data/alert_rules.json and the dashboard filter together.",
+   "why": "The brief asks for events 'our model likes as high ROI', but no model, criteria or weights were provided. The dashboard (PR #16, arena-6d85f8f0) shows an experimental screen: seed-series alerts with positive volume_24h only, ordered by volume. It is labelled 'not an ROI prediction'. This session's archive mirrors that screen exactly (data/alert_rules.json) and computes no return figure. UPDATE 2026-11-20 (PR #28): the site now ships a session-built fee-aware net-ROI screen (data/roi_model.json, model id roi-screen-v1, page roi.html) with the official fee schedule, browser/CI parity tests and out-of-sample candlestick validation. It is this project's model, explicitly not a Kalshi product and not owner-supplied or owner-confirmed; the dashboard's 'Model watch' feed is still the original experimental screen.",
+   "action": "Owner to confirm roi-screen-v1 as the model behind 'events our model likes as high ROI' (or supply their own parameters). Until then both the ROI Model page and the dashboard screen stay labelled as this project's screens, not owner-approved.",
    "severity": "high",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -505,7 +505,7 @@
    "id": "F-17",
    "item": "Price history is pruned to open markets, so swings are archived separately; four early alerts were seeded from git history",
    "why": "scripts/collect.py keeps price observations only for markets that are open in scope (it drops the rest on each run). The first alert feed (commit b95bebb) therefore lost a market's history as soon as it closed; a fresh snapshot showed 0 alerts for the same window. To stop alerts disappearing, scripts/build_alerts.py now keeps an append-only archive (data/live/alerts_archive.json). Its first four entries were produced by running the same builder on the observations committed in b95bebb; their first_seen_at value is the seeding time (2026-11-20T13:19Z), not the time the swing was first observed. Their to_time values are the original observation times.",
-   "action": "Dashboard does not read the archive yet (request R-1 on COORDINATION.md). Owner to decide whether price_history should retain closed markets (collector change). The archive is capped at 5,000 alerts (oldest trimmed).",
+   "action": "Done 2026-11-20 (request R-1): dashboard.html now renders its alert feeds from data/live/alerts.json (built from the append-only archive), falling back to a price_history recompute only if the feed is missing, so a swing stays listed after its market leaves the open scan. Owner still to decide whether price_history should retain closed markets (collector change). The archive is capped at 5,000 alerts (oldest trimmed).",
    "severity": "medium",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -525,8 +525,8 @@
   {
    "id": "F-19",
    "item": "The paper simulator has no fills on the current alert archive, so no strategy result exists yet",
-   "why": "Each archived swing stores only the last-trade prices. It does not store the bid and ask at the alert time. All four current swings come from KXDEMOFUTHOURLY-26NOV20H12-UP, which settled 'no' (finalized) and has left the open scan, so price_history holds no quote for it (F-17). scripts/simulate.py therefore marks all four signals not filled for every strategy. Filling from the last-trade price would invent an entry, so it is not done.",
-   "action": "Request R-2 (T12 owner, scripts/build_alerts.py): store to_yes_bid and to_yes_ask from the observation at to_time on each new archive entry. simulate.py already reads those fields when present. Until then the simulation page shows 0 fills and says why.",
+   "why": "Each archived swing originally stored only last-trade prices, so simulate.py could not fill it without inventing an entry. Request R-2 is now implemented: every NEW archive entry carries to_yes_bid / to_yes_ask from the observation at to_time. The 8 entries written before R-2 are unchanged: 4 (KXDEMOFUTHOURLY-26NOV20H12-UP) were pruned from price_history and have no quote anywhere; the other 4 have quotes but none is tradable under data/strategies.json (spread > max_quote_spread_dollars 0.10, or an ask outside 0.01-0.99). S2's one historical fill on a 99c-spread quote is VOID, not settled (F-23). No strategy has a realised result yet.",
+   "action": "R-2 implemented 2026-11-20 (scripts/build_alerts.py stores to_yes_bid/to_yes_ask on new entries; simulate.py already reads them). Fills resume when the next >= $0.10 swing occurs on a market whose observation at to_time carries a tradable quote (spread <= 0.10, entry 0.01-0.99). Until then simulation.html shows the unfilled counters and the VOID position, and says why.",
    "severity": "high",
    "sources": [
     "https://docs.kalshi.com/getting_started/orderbook_responses",
@@ -566,7 +566,7 @@
   {
    "id": "F-24",
    "item": "Browser CORS access to the demo API is undocumented by Kalshi; live mode relies on it",
-   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json \u2014 it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
+   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json — it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
    "action": "Runtime self-test with automatic fallback; observed headers committed per run; third-party header capture (another project's Pages origin) kept as circumstantial evidence only. Coexists with F-15: the server-side archive keeps cause_link null (no cause data collected), while the alert chats render news SEARCH links computed from the market title and label them unverified leads.",
    "severity": "medium",
    "sources": [
@@ -578,8 +578,8 @@
   {
    "id": "F-25",
    "item": "Alert 'possible-cause' links are news search leads, never verified causes",
-   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand \u2014 the site never asserts a cause, because asserting one without a source would be fabrication.",
-   "action": "Search links labelled 'possible-cause leads \u2014 unverified' on every alert bubble; no causal claim is ever rendered.",
+   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand — the site never asserts a cause, because asserting one without a source would be fabrication.",
+   "action": "Search links labelled 'possible-cause leads — unverified' on every alert bubble; no causal claim is ever rendered.",
    "severity": "medium",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -589,7 +589,7 @@
   {
    "id": "F-26",
    "item": "The 'model picks' scorer is a disclosed heuristic, not a backtested strategy",
-   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask \u2014 a conditional figure, not an expected return.",
+   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask — a conditional figure, not an expected return.",
    "action": "Formula, weights, threshold and per-alert component values are all rendered on alerts.html; the disclaimer is on every pick. The auto-sim (trading.html) exists precisely to gather the evidence the model still needs.",
    "severity": "medium",
    "sources": [
@@ -623,7 +623,7 @@
   {
    "id": "F-29",
    "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
-   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
+   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists — a stale reference that contradicts the one-tree rule.",
    "action": "Fixed during the arena-f068786c integration merge: the README now describes only the canonical tree plus the features shipped by the parallel sessions and this session.",
    "severity": "low",
    "sources": [

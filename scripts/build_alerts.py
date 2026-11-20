@@ -90,6 +90,12 @@ def main() -> int:
                 "direction": "up" if delta > 0 else "down",
                 "volume_24h_fp": (m or {}).get("volume_24h_fp"),
                 "market_source": (m or {}).get("source"),
+                # R-2: quotes carried at the swing's to_time so simulate.py can
+                # fill the signal later even after the market leaves the open
+                # scan (its price_history fallback stops working then). Null
+                # when the observation carried no bid/ask — never invented.
+                "to_yes_bid": cur.get("yes_bid"),
+                "to_yes_ask": cur.get("yes_ask"),
                 "cause_link": None,
                 "cause_status": "unverified: no official cause source collected",
             }

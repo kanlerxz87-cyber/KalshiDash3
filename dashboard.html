@@ -122,25 +122,54 @@ function pickInitialTicker() {
 }
 
 function renderAlerts() {
-  const marketRows = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || []);
-  const byTicker = new Map(marketRows.map(row => [row.ticker, row]));
+  // R-1: prefer the canonical archive-backed feed (data/live/alerts.json,
+  // built by scripts/build_alerts.py from data/live/alerts_archive.json) —
+  // the same source alerts.html uses — so a swing stays listed after its
+  // market leaves the open scan. Recompute from price_history only when the
+  // feed is unavailable.
+  const feed = state.alerts?.all_events || state.alerts?.alerts || null;
   const alerts = [];
-  for (const [ticker, data] of Object.entries(state.hist?.series || {})) {
-    const market = byTicker.get(ticker);
-    if (!market || (state.cat && market.category_id !== state.cat)) continue;
-    const points = (data.observations || [])
-      .filter(p => Number.isFinite(Date.parse(p.t)) && p.last !== null && p.last !== undefined && Number.isFinite(Number(p.last)))
-      .slice().sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
-    for (let i = 1; i < points.length; i++) {
-      const before = Number(points[i - 1].last), after = Number(points[i].last);
-      const change = after - before;
-      if (Math.abs(change) + 1e-9 < 0.10) continue;
-      alerts.push({ ticker, market, before, after, change, time: points[i].t, previousTime: points[i - 1].t });
+  if (Array.isArray(feed)) {
+    for (const a of feed) {
+      if (state.cat && a.category_id !== state.cat) continue;
+      alerts.push({
+        ticker: a.ticker,
+        market: {
+          title: a.title || a.ticker,
+          category_id: a.category_id,
+          volume_24h_fp: a.volume_24h_fp,
+          source: a.market_source,
+        },
+        before: Number(a.from_price),
+        after: Number(a.to_price),
+        change: Number(a.delta),
+        time: a.to_time,
+        screened: Boolean(a.high_roi),
+      });
+    }
+  } else {
+    const marketRows = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || []);
+    const byTicker = new Map(marketRows.map(row => [row.ticker, row]));
+    for (const [ticker, data] of Object.entries(state.hist?.series || {})) {
+      const market = byTicker.get(ticker);
+      if (!market || (state.cat && market.category_id !== state.cat)) continue;
+      const points = (data.observations || [])
+        .filter(p => Number.isFinite(Date.parse(p.t)) && p.last !== null && p.last !== undefined && Number.isFinite(Number(p.last)))
+        .slice().sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
+      for (let i = 1; i < points.length; i++) {
+        const before = Number(points[i - 1].last), after = Number(points[i].last);
+        const change = after - before;
+        if (Math.abs(change) + 1e-9 < 0.10) continue;
+        alerts.push({
+          ticker, market, before, after, change, time: points[i].t, previousTime: points[i - 1].t,
+          screened: market.category_basis === "seed" && Number(market.volume_24h_fp) > 0,
+        });
+      }
     }
   }
   alerts.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
   const all = alerts.slice(0, 100);
-  const screen = alerts.filter(a => a.market.category_basis === "seed" && Number(a.market.volume_24h_fp) > 0)
+  const screen = alerts.filter(a => a.screened)
     .sort((a, b) => Number(b.market.volume_24h_fp) - Number(a.market.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
     .slice(0, 100);
   const renderFeed = (items, emptyText) => items.length ? items.map(a => {
@@ -160,9 +189,12 @@ function renderAlerts() {
   KD.$("#allAlertCount").textContent = `${all.length} shown`;
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
-  KD.$("#alertFreshness").textContent = fetched
-    ? `Alert scan uses consecutive snapshots through ${fetched} UTC. The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
-    : "Alert feeds are empty until a sourced snapshot is available.";
+  const feedGen = state.alerts?.generated_at;
+  KD.$("#alertFreshness").textContent = feedGen
+    ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record. Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`
+    : fetched
+      ? `Alert scan uses consecutive snapshots through ${fetched} UTC (archive feed unavailable — recomputed from retained history). The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
+      : "Alert feeds are empty until a sourced snapshot is available.";
 }
 
 function renderTables() {
