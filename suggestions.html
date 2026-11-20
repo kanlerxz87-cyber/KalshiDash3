@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suggestions — KalshiDash3</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <a class="site-name" href="index.html">KalshiDash3</a>
+    <span class="tagline">Review suggestions &bull; choose the best path before implementing</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-inner"></div>
+</nav>
+<main>
+  <section class="section">
+    <h2>Suggestions — Site &amp; Decision-Making Improvements</h2>
+    <p>This section lists suggestions for improving the site and for improving decision making. Review each suggestion and choose the best path before implementing any changes. None of these are implemented until reviewed.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Suggestion</th>
+          <th>Area</th>
+          <th>Expected benefit</th>
+          <th>Review status</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Connect a Kalshi demo API key and back the portfolio table with real trade fills from the demo trade API v2.</td>
+          <td>Portfolio / live data</td>
+          <td>Real P&amp;L and trade results instead of blank unverified placeholders.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Enable the price graph to stream live market ticks via the Kalshi WebSocket API (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2) so price movements update in real time.</td>
+          <td>Price graph</td>
+          <td>Live price movement tracking on the graph as events progress toward resolution.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Add a liquidity depth table showing how many contracts are available at each price level (bid/ask ladder) per market.</td>
+          <td>Price graph / liquidity</td>
+          <td>See current liquidity amounts and contracts available at a given price before trading.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Populate category tables from the official Kalshi events endpoint once reachable; mark every row verified/unverified per the verification rules.</td>
+          <td>Category tables</td>
+          <td>Complete, source-linked inventory of tracked events by category.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Add per-trade notes and outcome coding (why the trade was taken, what happened, lessons) to improve future decisions.</td>
+          <td>Portfolio / analysis</td>
+          <td>Better trade-result analysis and strategy refinement by trade type.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Add email/alert notification when a tracked event resolves (Yes or No).</td>
+          <td>Event tracking</td>
+          <td>Know immediately when live events have resolved and how.</td>
+          <td>Proposed — not reviewed</td>
+          <td>Pending review</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Review process.</strong> For each suggestion: assess benefit, effort, and risk; choose the best path; record the decision in the "Decision" column; implement only after review. Record outcomes in <a href="flagged-for-review.html">Flagged for Review</a> if any irregularity is found.
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  KalshiDash3 &middot; <a href="index.html">Home</a> &middot; <a href="questions.html">Questions / Info / Answers</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a> &middot; Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

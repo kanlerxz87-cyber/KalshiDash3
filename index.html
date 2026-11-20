@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KalshiDash3 — Kalshi Demo Dashboard</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <a class="site-name" href="index.html">KalshiDash3</a>
+    <span class="tagline">Kalshi demo event dashboard &bull; gas prices &bull; elections &bull; culture &bull; crypto &bull; golf</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-inner"></div>
+</nav>
+<main>
+  <section class="hero">
+    <h1>KalshiDash3 — Executive Summary</h1>
+    <p><strong>Purpose.</strong> Collect, organize, and analyze live Kalshi demo trade-api v2 events, focused on five topics: gas prices, elections, culture, crypto, and golf.</p>
+    <p><strong>Surface.</strong> Official recommended demo endpoint: <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also supported: <code>https://demo-api.kalshi.co/trade-api/v2</code>). WebSocket API: <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> (also: <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>).</p>
+    <p><strong>Scope.</strong> Track live events until they resolve (resolution: Yes or No); track portfolio performance using the Kalshi demo account; analyze trade results, categorize trades, and build strategies by trade type; view price movements on a time graph (X axis = time in seconds/minutes/hours; Y axis = current contract price); view current liquidity (contracts available at a given price).</p>
+    <p><strong>Decision support.</strong> A suggestions section lets someone review suggestions and choose the best path before implementing changes. A questions/information/answers section lists what must be addressed before any decision can be reasonably made, plus suggestions to discover missing information.</p>
+    <div class="callout warn">
+      <strong>Verification status.</strong> This sandbox cannot reach the Kalshi hosts (outbound network is limited to GitHub hosts and package registries). Every value on this site is therefore <strong>blank and flagged unverified</strong> until confirmed against an official Kalshi source. No values are inferred or filled in. See <a href="flagged-for-review.html">Flagged for Review</a> for the full list.
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Track by category</h2>
+    <p>Each category page lists Kalshi events/markets in a simple table with source links to the official Kalshi trade API v2. Values are blank/unverified until confirmed from an official source.</p>
+    <div class="grid-cards">
+      <a class="card" href="gas-prices.html">
+        <div class="card-title">Gas Prices</div>
+        <div class="card-desc">Energy / natural gas price events on the Kalshi demo exchange.</div>
+      </a>
+      <a class="card" href="elections.html">
+        <div class="card-title">Elections</div>
+        <div class="card-desc">Election events (resolution: Yes or No) until resolved.</div>
+      </a>
+      <a class="card" href="culture.html">
+        <div class="card-title">Culture</div>
+        <div class="card-desc">Culture and entertainment events.</div>
+      </a>
+      <a class="card" href="crypto.html">
+        <div class="card-title">Crypto</div>
+        <div class="card-desc">Cryptocurrency price and market events.</div>
+      </a>
+      <a class="card" href="golf.html">
+        <div class="card-title">Golf</div>
+        <div class="card-desc">Golf tournament and player events.</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Dashboard features</h2>
+    <ul>
+      <li><a href="graph.html">Price movement graph</a> — current contract price (Y axis) over time (X axis), selectable seconds/minutes/hours window, with current liquidity (contracts available at a given price).</li>
+      <li><a href="portfolio.html">Portfolio performance</a> — Kalshi demo account tracking, trade results analysis, categorization.</li>
+      <li><a href="strategies.html">Trade categorization &amp; strategies</a> — strategies based on type of trade.</li>
+      <li><a href="suggestions.html">Suggestions</a> — review suggestions and choose the best path before implementing changes.</li>
+      <li><a href="questions.html">Questions / information / answers</a> — preconditions for decisions and missing-information discovery.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>How to read this site</h2>
+    <ul>
+      <li><strong>—</strong> means the value could not be confirmed from an official source and is intentionally left blank.</li>
+      <li><span class="badge badge-unverified">unverified</span> means the row is flagged for review against an official Kalshi source.</li>
+      <li>Every table row carries a source link to an official Kalshi site for manual review.</li>
+      <li>There is no manual input required to use the site; all entries, findings, and analysis are pre-populated as verified/unverified.</li>
+    </ul>
+  </section>
+</main>
+<footer class="footer">
+  KalshiDash3 &middot; Source links: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">external-api.demo.kalshi.co/trade-api/v2</a> &middot; <a href="https://demo-api.kalshi.co/trade-api/v2" target="_blank" rel="noopener">demo-api.kalshi.co/trade-api/v2</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>

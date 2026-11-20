@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Performance — KalshiDash3</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <a class="site-name" href="index.html">KalshiDash3</a>
+    <span class="tagline">Portfolio &bull; Kalshi demo account &bull; trade results &bull; P&amp;L</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-inner"></div>
+</nav>
+<main>
+  <section class="section">
+    <h2>Portfolio Performance — Kalshi Demo Account</h2>
+    <p>Tracks trades executed on Kalshi demo events and their performance until the events resolve (resolution: Yes or No). Trade results are analyzed, trades are categorized, and strategies are created based on the type of trade (see <a href="strategies.html">Strategies</a>).</p>
+    <div class="callout warn">
+      <strong>Unverified / template only.</strong> No API keys or demo-account credentials are available to this sandbox, and the Kalshi hosts cannot be reached. No portfolio balances, trade history, fills, or P&L figures have been confirmed from an official Kalshi source. All figures are blank and flagged unverified. Enter demo-account data only through your own Kalshi demo account; this page is a reporting template.
+    </div>
+    <div class="kv" style="max-width:520px;">
+      <div><b>Demo account balance</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Total realized P&amp;L</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Unrealized P&amp;L (open contracts)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Win rate</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Total trades</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Resolved trades (Yes)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Resolved trades (No)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+      <div><b>Open trades</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Trade log</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Trade ID</th>
+          <th>Event Ticker</th>
+          <th>Market Ticker</th>
+          <th>Category</th>
+          <th>Side (Yes/No)</th>
+          <th>Entry Price</th>
+          <th>Exit Price</th>
+          <th>Quantity (contracts)</th>
+          <th>P&amp;L</th>
+          <th>Status</th>
+          <th>Trade date</th>
+          <th>Resolution date</th>
+          <th>Resolution (Yes/No)</th>
+          <th>Source</th>
+          <th>Verified</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
+          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
+          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
+          <td class="source-cell"><a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a></td>
+          <td><span class="badge badge-unverified">unverified</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small">Each row must carry a source link to an official Kalshi site. Never infer P&L, prices, or quantities; leave blank and mark unverified.</p>
+  </section>
+</main>
+<footer class="footer">
+  KalshiDash3 &middot; <a href="index.html">Home</a> &middot; <a href="strategies.html">Strategies</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a> &middot; Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
