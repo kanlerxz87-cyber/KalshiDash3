@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-20T19:48:19Z",
- "snapshot_collected_at": "2026-11-20T19:48:19Z",
+ "generated_at": "2026-11-20T20:01:29Z",
+ "snapshot_collected_at": "2026-11-20T20:01:29Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -10,12 +10,34 @@
   "require_volume_24h_gt": 0
  },
  "counts": {
-  "all_events": 13,
-  "high_roi": 2,
-  "archive_total": 13,
-  "new_this_run": 2
+  "all_events": 14,
+  "high_roi": 3,
+  "archive_total": 14,
+  "new_this_run": 1
  },
  "all_events": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-20T19:48:19Z",
+   "to_time": "2026-11-20T20:01:29Z",
+   "from_price": 0.99,
+   "to_price": 0.02,
+   "delta": -0.97,
+   "direction": "down",
+   "volume_24h_fp": 14612.71,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.02,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-20T20:01:29Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -288,6 +310,28 @@
   }
  ],
  "high_roi": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-20T19:48:19Z",
+   "to_time": "2026-11-20T20:01:29Z",
+   "from_price": 0.99,
+   "to_price": 0.02,
+   "delta": -0.97,
+   "direction": "down",
+   "volume_24h_fp": 14612.71,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.02,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-20T20:01:29Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
    "event_ticker": "KXBTCY-27JAN0100",
