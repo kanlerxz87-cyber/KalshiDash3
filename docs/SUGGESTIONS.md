@@ -9,7 +9,7 @@ proposed change, the information needed to decide, and the risk.
 
 - **Problem:** The mapping of Kalshi `series_ticker`s to the five topics (gas, elections,
   culture, crypto, golf) is currently a *proposed* keyword mapping and is unverified.
-- **Proposed change:** Publish the confirmed mapping to `site/data/categories.json` after
+- **Proposed change:** Publish the confirmed mapping to `data/categories.json` after
   pulling the live series list. Until then, clearly badge any auto-assigned category as
   "proposed".
 - **Information needed:** The authoritative series list per topic (see
