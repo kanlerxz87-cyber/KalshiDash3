@@ -487,7 +487,7 @@ Log:
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T16 | Take over stale log-only claim (PR #14, arena-9b246e37, >60 min no commits): resolve COORDINATION.md conflict, merge | done | arena-d879c640 | `COORDINATION.md` (conflict resolution only) | Both sides kept verbatim; subsite-drop fact checked against `git show cd104db` (PR #15 removed `9b246e37/`) | None |
-| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed `<<<<<<< HEAD` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
+| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed ` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
 | T18 | Re-verify combined data line by line against official sources; confirm build + no broken links; PR → main → merge → Pages deploy confirm; record PR link and merge result here | in progress | arena-d789c640 → arena-d879c640 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_simulate.py`, `node --check` on all scripts, `node scripts/tests/engine.test.js` / `test_alerts.py` as present after merge | — |
 
 ### Log (this session)
@@ -505,6 +505,7 @@ Log:
 - 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `<<<<<<< HEAD … >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
 - 2026-11-20 ~14:50 UTC: T17 done — full suite green on the integrated tree (21 pages OK; 506 open/200 settled/17 orderbooks; 8 alerts provenance-checked; 13 alert tests; simulate suite OK; 42 fee-table numbers; 15 parity cases; engine tests ALL PASSED; `node --check` clean). Remaining for T18: final verification pass, PR -> main -> merge, Pages deploy confirm, dispatch `collect.yml`/`desk.yml` so the new pages get live data, record PR link here.
 
+<<<<<<< HEAD
 ## Session `arena-2a36471a` — repair + final publish (branch `arena/2a36471a-kalshidash3`)
 
 ### Task board (this session)
@@ -517,3 +518,29 @@ Log:
 
 Note: this session works on its own Arena branch `arena/2a36471a-kalshidash3` (Arena tracks one branch
 per session; no `session-<id>/<task>` branch is created) and touches only the files listed above.
+
+## Session `arena-0f71797f` — final integration session (branch `arena/0f71797f-kalshidash3`)
+
+Started from `main@9a90947` ("data: demo snapshot 2026-11-20T15:19Z"). The repo had been squashed to a single
+commit by the platform before this session began, so the only surviving record of earlier work is this board plus
+the code. **T18 (owned by `arena-d879c640`, left `in progress` with its last commit at 15:18Z, more than 60 minutes
+before this session started, and never closed) is taken over here** under the stale-claim rule; the takeover is
+recorded in the log below and the earlier session's PR (#30) was already merged.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-----------------|----------------|------------------------|----------------|
+| T18 | Final integration: re-verify combined data line by line, confirm build + no broken links, PR → main → merge → Pages deploy confirm, record PR link | in progress | arena-0f71797f (took over from arena-d879c640) | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/*`, `node --check`, live Pages fetch after deploy | — |
+| T19 | Repo review, line by line, against official Kalshi sources; every static claim re-checked and re-dated; irregularities recorded | in progress | arena-0f71797f | `data/verified_facts.json`, `verification.html`, `flagged.html`, `sources.html`, `data/findings.json` | docs.kalshi.com pages (linked per row), fee-schedule PDF, live demo API responses fetched during the review | see log |
+| T20 | **Defect fix**: `GET /markets/orderbooks?tickers=` must send the array as repeated query parameters; the comma-joined form silently returns ONE book keyed by the whole comma string, so every order-book depth in the ROI screen and in the browser live ladder was missing | in progress | arena-0f71797f | `scripts/roi_scan.py`, `assets/live.js` | https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks ("string[]", 1–100 elements); measured live: comma form → 1 book keyed `"A,B"`, repeated form → 2 books | new finding (F-25) |
+| T21 | Repair the live-desk scan (workflow `desk.yml` failed at "Scan the demo API", exit 1) and make the failure self-diagnosing | in progress | arena-0f71797f | `.github/workflows/desk.yml`, `scripts/roi_scan.py`, `scripts/tests/validate_roi.py` | run evidence from `gh run view 44762120780` (step "Scan the demo API" failed) | see log |
+| T22 | Live-ness: browser-side live polling on every page, honest freshness state, no manual step | in progress | arena-0f71797f | `assets/site.js`, `assets/engine.js`, `assets/live.js`, `dashboard.html`, `index.html`, `*.html` category pages | CORS probe committed in `data/live/cors.json` (observed header, not an assumption) | see log |
+| T23 | ≥ $0.10 swing rows must carry official links (market record, event record, Kalshi market page) without ever asserting a cause | in progress | arena-0f71797f | `assets/alerts.js`, `dashboard.html`, `alerts.html`, `scripts/build_alerts.py`, `data/live/alerts*.json` | https://docs.kalshi.com/api-reference/market/get-markets (no news field exists) | see log |
+| T24 | Scheduled collection never fires in this repository (0 `schedule` events in 75 runs) — establish why and make the site live without it | in progress | arena-0f71797f | `.github/workflows/collect.yml`, `.github/workflows/desk.yml`, `README.md` | `gh run list` evidence; https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows | F-16 open, root cause now narrower |
+
+### Log (this session)
+
+- 2026-11-20 ~19:30 UTC: session start. Read `COORDINATION.md` in full, reviewed the tree (22 pages, 8 scripts +
+  12 test files, 3 workflows, 11 JSON data files) and the live site at https://kanlerxz87-cyber.github.io/KalshiDash3/.
+  Claimed T18–T24 and pushed this claim before implementing anything.
