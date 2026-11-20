@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live alerts — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .feeds{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+  .feed{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-height:0}
+  .feed h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--line);font-size:15px}
+  .feed .sub{padding:0 14px 10px;font-size:12.5px;color:var(--mut);border-bottom:1px solid var(--line)}
+  .chat{height:68vh;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+  .msg{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px}
+  .msg.up{border-left:3px solid var(--ok)}
+  .msg.down{border-left:3px solid var(--bad)}
+  .msg .top{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--mut)}
+  .msg .ttl{font-weight:600;margin:4px 0 2px;word-break:break-word}
+  .msg .move{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .msg .cause{font-size:11.5px;color:var(--mut);margin-top:3px}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  @media(max-width:860px){.feeds{grid-template-columns:1fr}.chat{height:55vh}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Live alerts — contract price swings ≥ $0.10</h1>
+  <p class="lede">
+    Two feeds, newest first. <b>All events</b> lists every in-scope move of $0.10 or more in either direction.
+    <b>High-ROI filter</b> lists only the moves that pass the screen in
+    <code>data/alert_rules.json</code>. That screen is a <b>placeholder</b>: the owner's ROI model has not been supplied,
+    so it is not a recommendation.
+  </p>
+
+  <div id="snapshotBanner"></div>
+
+  <div class="controls">
+    <label>Category <select id="catFilter"><option value="">All five</option></select></label>
+    <span class="small mut"><span class="live-dot"></span><span id="liveNote">loading…</span></span>
+    <button class="ghost" id="reload">Reload now</button>
+  </div>
+
+  <div class="feeds">
+    <section class="feed" aria-labelledby="hAll">
+      <h3 id="hAll">All events <span class="badge" id="cAll">0</span></h3>
+      <div class="sub">Every swing ≥ $0.10 between consecutive collector observations.</div>
+      <div class="chat" id="chatAll" aria-live="polite"></div>
+    </section>
+    <section class="feed" aria-labelledby="hRoi">
+      <h3 id="hRoi">High-ROI filter <span class="badge warn" id="cRoi">0</span></h3>
+      <div class="sub">Placeholder screen (not the owner's model): post-move price $0.05–$0.50, active, traded in last 24h. Implied return = (1−p)/p before fees.</div>
+      <div class="chat" id="chatRoi" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <div class="notice warn">
+    <b>Causes are not shown.</b> Every alert carries <code>cause_link = null</code>: no official source for a news or
+    website cause has been collected, so none is listed. Each alert is labelled <i>unverified</i> until one is.
+    Source for the price data: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>
+    and <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>.
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · alerts are derived from Kalshi <b>demo</b> observations (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("alerts.html");
+const CAT_OPTS = KD.CAT_LABEL;
+const $ = KD.$;
+
+function fmtTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleString(undefined, { hour12: false }) + " · " + KD.ago(iso);
+}
+
+function msg(a) {
+  const dir = a.direction === "up" ? "▲" : "▼";
+  const d = Math.abs(a.delta).toFixed(2);
+  const cat = KD.CAT_LABEL[a.category_id] || "—";
+  const title = a.title ? KD.esc(a.title) : `<span class="na">title not in snapshot</span>`;
+  const src = a.market_source ? KD.srcLink(a.market_source, "market data") : "";
+  const roi = a.implied_return !== undefined && a.implied_return !== null
+    ? ` · implied return ${(a.implied_return * 100).toFixed(0)}% (placeholder)` : "";
+  return `<div class="msg ${a.direction}">
+    <div class="top"><span>${KD.esc(fmtTime(a.to_time))}</span><span class="badge">${KD.esc(cat)}</span>
+      ${a.status ? KD.statusBadge(a.status) : ""}</div>
+    <div class="ttl">${title}</div>
+    <div class="move">${dir} ${d} · $${a.from_price.toFixed(2)} → $${a.to_price.toFixed(2)}${roi}</div>
+    <div class="cause">cause: <span class="badge warn">unverified</span> no official cause link · ${src}</div>
+    <div class="small mut mono">${KD.esc(a.ticker)}</div>
+  </div>`;
+}
+
+function render(host, rows, emptyMsg) {
+  host.innerHTML = rows.length ? rows.map(msg).join("") : KD.empty(emptyMsg);
+}
+
+let data = null;
+async function load() {
+  try {
+    data = await KD.json("data/live/alerts.json");
+  } catch (e) {
+    $("#liveNote").textContent = "alerts file unavailable: " + e.message;
+    $("#chatAll").innerHTML = KD.empty("No alert file yet. It is written by scripts/build_alerts.py.");
+    return;
+  }
+  KD.snapshotBanner(data.snapshot ? data.snapshot : { collected_at: data.snapshot_collected_at, environment: "demo", base_url: "https://external-api.demo.kalshi.co/trade-api/v2", counts: {} });
+  $("#liveNote").textContent = `updated ${KD.ago(data.generated_at)} · reloads every 60s`;
+  draw();
+}
+
+function draw() {
+  if (!data) return;
+  const cat = $("#catFilter").value;
+  const keep = (r) => !cat || r.category_id === cat;
+  const all = data.all_events.filter(keep);
+  const roi = data.high_roi.filter(keep);
+  $("#cAll").textContent = all.length;
+  $("#cRoi").textContent = roi.length;
+  render($("#chatAll"), all, "No swing of $0.10 or more recorded yet. Observations accumulate every collector run (about every 20 minutes).");
+  render($("#chatRoi"), roi, "No move passes the placeholder screen yet.");
+}
+
+(function init() {
+  const sel = $("#catFilter");
+  Object.entries(CAT_OPTS).forEach(([k, v]) => sel.insertAdjacentHTML("beforeend", `<option value="${k}">${v}</option>`));
+  sel.addEventListener("change", draw);
+  $("#reload").addEventListener("click", load);
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>

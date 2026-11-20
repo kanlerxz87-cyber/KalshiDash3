@@ -1,0 +1,142 @@
+{
+ "schema": 1,
+ "generated_at": "2026-11-20T13:16:30Z",
+ "snapshot_collected_at": "2026-11-20T11:33:33Z",
+ "threshold_dollars": 0.1,
+ "high_roi_status": "placeholder",
+ "high_roi_rule": {
+  "description": "PLACEHOLDER. The owner's 'high ROI' model was not supplied. Until it is, this filter uses the rule below, which is a mechanical screen and NOT a prediction or recommendation. Replace this block when the owner's model is available (see Flagged for Review, F-14).",
+  "min_abs_swing_dollars": 0.1,
+  "post_move_price_band_dollars": [
+   0.05,
+   0.5
+  ],
+  "require_status": "active",
+  "require_volume_24h_gt": 0,
+  "implied_return_formula": "(1 - p) / p, where p is the post-move last price. Arithmetic only: the return if a YES contract bought at p settles YES, before fees."
+ },
+ "counts": {
+  "all_events": 4,
+  "high_roi": 2
+ },
+ "all_events": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:31:35Z",
+   "to_time": "2026-11-20T11:33:33Z",
+   "from_price": 0.35,
+   "to_price": 0.45,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:28:31Z",
+   "to_time": "2026-11-20T11:31:35Z",
+   "from_price": 0.55,
+   "to_price": 0.35,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:26:21Z",
+   "to_time": "2026-11-20T11:28:31Z",
+   "from_price": 0.65,
+   "to_price": 0.55,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:24:20Z",
+   "to_time": "2026-11-20T11:26:21Z",
+   "from_price": 0.45,
+   "to_price": 0.65,
+   "delta": 0.2,
+   "direction": "up",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected"
+  }
+ ],
+ "high_roi": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:31:35Z",
+   "to_time": "2026-11-20T11:33:33Z",
+   "from_price": 0.35,
+   "to_price": 0.45,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "implied_return": 1.2222
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T11:28:31Z",
+   "to_time": "2026-11-20T11:31:35Z",
+   "from_price": 0.55,
+   "to_price": 0.35,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "implied_return": 1.8571
+  }
+ ],
+ "disclaimers": [
+  "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
+  "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
+  "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
+  "The high_roi feed uses a placeholder screen (data/alert_rules.json, status=placeholder); it is not an owner-approved model."
+ ]
+}

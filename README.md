@@ -18,6 +18,7 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
+| `alerts.html` | Live feed of contract-price swings ≥ $0.10 (both directions): an *all events* chat and a *high-ROI* chat (placeholder screen, see F-14) |
 | `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
@@ -37,6 +38,7 @@ data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
+scripts/build_alerts.py   builds data/live/alerts.json (≥ $0.10 swings) from the snapshot; rules in data/alert_rules.json
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot

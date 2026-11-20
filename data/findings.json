@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-20",
+  "generated": "2026-11-20T13:20:00Z",
   "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path.",
   "questions": [
     {
@@ -337,6 +337,38 @@
       "severity": "medium",
       "sources": [
         "https://docs.kalshi.com/getting_started/demo_env"
+      ]
+    },
+    {
+      "id": "F-14",
+      "item": "High-ROI model not supplied: the high-ROI chat uses a placeholder screen",
+      "why": "The brief asks for a chat of events 'our model likes as high ROI', but no model, criteria or weights were provided. Inventing one would be a hallucinated strategy. The alerts page therefore filters with a transparent, mechanical screen (post-move last price $0.05–$0.50, status active, volume_24h > 0, swing >= $0.10) and labels it placeholder. Implied return = (1-p)/p is arithmetic before fees, not a forecast.",
+      "action": "Owner to supply the model or accept/replace the screen in data/alert_rules.json (status field). No change to the page is needed; the feed re-computes on the next collector run.",
+      "severity": "high",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-markets",
+        "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+      ]
+    },
+    {
+      "id": "F-15",
+      "item": "Causes of sharp price jumps (news / website links) are not collected",
+      "why": "The brief asks for events and website links that may have caused a move of $0.10 or more. Kalshi's official API returns price fields but no cause or news field, and no official source links causes to specific price moves. Every alert therefore has cause_link = null and is labelled 'unverified'. Linking news sites would be a guess, so none was added.",
+      "action": "Left blank by design. A cause can be added only with a source that can be checked (e.g. the market's own rules page or an official Kalshi announcement) for the specific ticker and time.",
+      "severity": "medium",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-markets"
+      ]
+    },
+    {
+      "id": "F-16",
+      "item": "Scheduled collector has not run: all recent runs were manual, so the snapshot is stale",
+      "why": "collect.yml declares a '*/20 * * * *' schedule, but the last five runs of the workflow were all workflow_dispatch; none were scheduled. At the time of the check (2026-11-20 13:17 UTC) the newest committed snapshot was collected_at 11:33:33Z, about 1h44m old, so the swing feed cannot show live moves. The site's banner shows this as stale.",
+      "action": "Dispatch the collector manually (done on this branch) and confirm that scheduled runs start on main after merge. Scheduled workflows run only from the default branch, so the schedule can only fire once collect.yml is on main.",
+      "severity": "high",
+      "sources": [
+        "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
+        "https://docs.kalshi.com/api-reference/market/get-markets"
       ]
     }
   ]

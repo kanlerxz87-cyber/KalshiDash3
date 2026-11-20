@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "placeholder",
+  "swing_threshold_dollars": 0.10,
+  "all_feed": {
+    "description": "Every consecutive pair of collected last-traded-price observations for an in-scope market whose absolute change is greater than or equal to swing_threshold_dollars, in either direction."
+  },
+  "high_roi": {
+    "description": "PLACEHOLDER. The owner's 'high ROI' model was not supplied. Until it is, this filter uses the rule below, which is a mechanical screen and NOT a prediction or recommendation. Replace this block when the owner's model is available (see Flagged for Review, F-14).",
+    "min_abs_swing_dollars": 0.10,
+    "post_move_price_band_dollars": [0.05, 0.50],
+    "require_status": "active",
+    "require_volume_24h_gt": 0,
+    "implied_return_formula": "(1 - p) / p, where p is the post-move last price. Arithmetic only: the return if a YES contract bought at p settles YES, before fees."
+  },
+  "sources": {
+    "price_observations": "data/live/price_history.json (written by scripts/collect.py from GET /markets last_price_dollars)",
+    "market_fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+    "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "fees": "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+  }
+}
