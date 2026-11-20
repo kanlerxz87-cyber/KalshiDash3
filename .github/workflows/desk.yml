@@ -65,13 +65,44 @@ jobs:
         env:
           VALIDATE: ${{ github.event.inputs.validate }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           n="${VALIDATE:-24}"
           case "$n" in ''|*[!0-9]*) n=24 ;; esac
-          python3 scripts/roi_scan.py --validate "$n" --out data/live/roi.json
+          # The scan output (and any traceback) is captured into a file that is
+          # committed even when the scan fails, so a broken run is diagnosable from
+          # the repository instead of only from the Actions log.
+          set +e
+          python3 scripts/roi_scan.py --validate "$n" --out data/live/roi.json \
+            > /tmp/scan.out 2>&1
+          rc=$?
+          set -e
+          {
+            echo "exit_code: $rc"
+            echo "command: python3 scripts/roi_scan.py --validate $n --out data/live/roi.json"
+            echo "--- output ---"
+            cat /tmp/scan.out
+          } > data/live/roi_scan_log.txt
+          cat /tmp/scan.out
+          if [ "$rc" -ne 0 ]; then
+            echo "::warning::scan failed (exit $rc); the output is committed to data/live/roi_scan_log.txt"
+          fi
+          exit "$rc"
 
       - name: Refuse to commit an unsourced or inconsistent scan
+        if: success()
         run: python3 scripts/tests/validate_roi.py
+
+      - name: Commit the scan log (runs even when the scan failed)
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshi-desk-bot"
+          git config user.email "kalshi-desk-bot@users.noreply.github.com"
+          git add data/live/roi_scan_log.txt
+          if git diff --cached --quiet; then echo "no log change"; exit 0; fi
+          git commit -m "chore: live-desk scan log $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Commit the scan
         run: |
