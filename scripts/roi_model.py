@@ -279,13 +279,38 @@ def detect_swings(observations: list[dict], threshold: float) -> list[dict]:
     return out
 
 
+def series_prefix(ticker) -> str:
+    """The series part of a market ticker (KXAAAGASM-26DEC31-3.30 -> KXAAAGASM).
+
+    Kalshi series tickers carry no hyphen, so the part before the first hyphen is the
+    series. The same derivation is used by scripts/collect.py.
+    """
+    t = str(ticker or "").strip().upper()
+    return t.split("-")[0] if "-" in t else ""
+
+
+def market_page_url(ticker) -> str | None:
+    """Kalshi's own web page for the market's series, or None when there is no series.
+
+    Verified 2026-11-20 against the live site: https://kalshi.com/markets/kxaaagasm
+    redirects to https://kalshi.com/markets/kxaaagasm/us-gas-price/kxaaagasm-26nov30,
+    and the same scheme works for kxpgatour and kxbtcy. That page carries Kalshi's own
+    news digest for the series. It is the PRODUCTION site: the prices on this dashboard
+    come from the DEMO environment, so the link is labelled accordingly and never
+    presented as the cause of a move.
+    """
+    s = series_prefix(ticker)
+    return f"https://kalshi.com/markets/{s.lower()}" if s else None
+
+
 def catalyst_links(market: dict) -> list[dict]:
-    """URLs that appear literally in the market's own official text fields.
+    """URLs that appear literally in the market's own official text fields, plus the
+    market's own Kalshi web page.
 
     GET /markets has no news/URL field (see the response schema at
     https://docs.kalshi.com/api-reference/market/get-markets), so anything shown here is
-    copied out of the record verbatim and is labelled "the source this market settles on"
-    — never "the news that moved it".
+    either copied out of the record verbatim and labelled "the source this market settles
+    on", or is Kalshi's own page for the series — never "the news that moved it".
     """
     found: dict[str, str] = {}
     for k in TEXT_FIELDS:
@@ -295,4 +320,7 @@ def catalyst_links(market: dict) -> list[dict]:
         for raw in URL_RE.findall(v):
             url = raw.rstrip(".,;:")
             found.setdefault(url, k)
+    page = market_page_url(market.get("ticker"))
+    if page:
+        found.setdefault(page, "kalshi market page")
     return [{"url": u, "field": k} for u, k in found.items()]

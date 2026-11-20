@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-20T15:19:53Z",
+ "generated_at": "2026-11-20T19:19:50Z",
  "snapshot_collected_at": "2026-11-20T15:19:53Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
@@ -13,7 +13,7 @@
   "all_events": 9,
   "high_roi": 1,
   "archive_total": 9,
-  "new_this_run": 1
+  "new_this_run": 0
  },
  "all_events": [
   {
@@ -36,7 +36,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T15:19:53Z",
-   "high_roi": true
+   "high_roi": true,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxaaagasm",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxaaagasm"
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -56,7 +69,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxaaagasd",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxaaagasd"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -76,7 +102,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -96,7 +135,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:35:54Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -116,7 +168,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:32:25Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -136,7 +201,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -156,7 +234,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -176,7 +267,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -196,7 +300,20 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxdemofuthourly",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxdemofuthourly"
   }
  ],
  "high_roi": [
@@ -220,14 +337,28 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T15:19:53Z",
-   "high_roi": true
+   "high_roi": true,
+   "official_links": [
+    {
+     "label": "Official Kalshi demo API market record",
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+     "kind": "api"
+    },
+    {
+     "label": "Kalshi's own page for this series (carries Kalshi's news digest)",
+     "url": "https://kalshi.com/markets/kxaaagasm",
+     "kind": "kalshi_page"
+    }
+   ],
+   "market_page": "https://kalshi.com/markets/kxaaagasm"
   }
  ],
  "disclaimers": [
   "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
   "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
-  "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
+  "cause_link is null on every alert: no official source states what moved a price, so no cause is ever asserted.",
+  "official_links point at the market's own records: the demo API market record and Kalshi's own web page for the series (production site), which carries Kalshi's news digest for that series.",
   "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model."
  ]
 }

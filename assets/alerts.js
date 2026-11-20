@@ -113,6 +113,8 @@ const KDA = (() => {
       source: a.market_source,
       screen: !!a.high_roi,               // the dashboard's experimental screen (alert_rules.json)
       cause_status: a.cause_status || null,
+      market_page: a.market_page || null, // Kalshi's own page for this series
+      official_links: a.official_links || [],
     };
   }
   function normalizeFeed(doc) {
@@ -161,11 +163,16 @@ const KDA = (() => {
       const head = sys || (sim && !a.from_ts)
         ? `<div class="bubline">${badge} <b>${esc(a.ticker)}</b></div>`
         : `<div class="bubline">${badge} <b class="${up ? "g" : "r"}">${up ? "▲" : "▼"} ${esc(d)}</b> <code>${esc(a.ticker)}</code></div>`;
+      const extraLinks = (a.official_links || [])
+        .filter((l) => l && l.url && l.url !== a.source)
+        .map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener" title="${esc(l.label || "")}">${esc((l.label || l.url).replace(/^Kalshi's own page for this series.*/, "Kalshi page"))}</a>`)
+        .join(" ");
       return `<div class="bub ${up ? "up" : "down"}${sim ? " simb" : ""}">` +
         head +
         `<div class="small">${esc(titleShort)}</div>` +
         `<div class="small mut">${cat} ${sys || (sim && !a.from_ts) ? esc(t) : `${cents(a.from_price_dollars)} → <b>${cents(a.to_price_dollars)}</b> · ` + esc(t)}${scChip}${screenChip}</div>` +
         `<div class="small"><a href="${esc(a.source || "#")}" target="_blank" rel="noopener">${sys ? "workflow" : sim ? "about (flagged page)" : "API query"}</a>` +
+        (extraLinks ? ` · ${extraLinks}` : ``) +
         (sim ? ` <span class="mut">· simulated tick (not market data)</span>` : ``) +
         `</div></div>`;
     }

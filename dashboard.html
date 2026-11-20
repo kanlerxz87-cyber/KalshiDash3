@@ -145,6 +145,8 @@ function renderAlerts() {
         change: Number(a.delta),
         time: a.to_time,
         screened: Boolean(a.high_roi),
+        marketPage: a.market_page || null,
+        officialLinks: a.official_links || [],
       });
     }
   } else {
@@ -176,12 +178,18 @@ function renderAlerts() {
     const sign = a.change > 0 ? "+" : "−";
     const direction = a.change > 0 ? "up" : "down";
     const title = `${a.market.title} · ${a.ticker}`;
+    // Kalshi's own page for this series: it carries Kalshi's news digest for the
+    // series. It is a lead, never a stated cause (the API has no news field).
+    const series = String(a.ticker || "").split("-")[0].toLowerCase();
+    const page = a.marketPage || (series ? `https://kalshi.com/markets/${series}` : null);
     return `<article class="alert-item">
       <div class="alert-top"><time datetime="${KD.esc(a.time)}">${KD.esc(a.time.replace("T", " ").replace("Z", " UTC"))}</time><span>${KD.esc(KD.CAT_LABEL[a.market.category_id] || "")}</span></div>
       <span class="alert-market">${KD.esc(title)}</span>
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
-      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a>${
+        page ? ` · <a href="${KD.esc(page)}" target="_blank" rel="noopener" title="Kalshi's own page for this series — it carries Kalshi's news digest for the series. A lead, not a verified cause.">Kalshi page for the series</a>` : ""
+      }</div>
     </article>`;
   }).join("") : `<div class="alert-empty">${emptyText}</div>`;
   KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");

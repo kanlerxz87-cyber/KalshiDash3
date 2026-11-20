@@ -38,10 +38,15 @@ jobs:
         run: python3 scripts/simulate.py
       - name: Validate the snapshot, the alert archive/feeds, and the simulation
         run: |
-          python3 scripts/tests/validate_live.py
-          python3 scripts/tests/validate_alerts.py
-          python3 scripts/tests/test_alerts.py
-          python3 scripts/tests/test_simulate.py
+          set -uo pipefail
+          rc=0
+          : > data/live/collect_log.txt
+          for t in validate_live validate_alerts test_alerts test_simulate; do
+            echo "=== scripts/tests/$t.py ===" >> data/live/collect_log.txt
+            python3 "scripts/tests/$t.py" >> data/live/collect_log.txt 2>&1 || rc=$?
+          done
+          cat data/live/collect_log.txt
+          exit "$rc"
       - name: Run alert-feed tests
         run: python3 scripts/tests/test_alerts.py
       - name: Commit snapshot
@@ -54,3 +59,17 @@ jobs:
           git commit -m "data: demo snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push
+      - name: Commit the collection log (runs even when validation failed)
+        if: always()
+        run: |
+          set -uo pipefail
+          git config user.name  "kalshi-collector-bot"
+          git config user.email "kalshi-collector-bot@users.noreply.github.com"
+          if [ ! -f data/live/collect_log.txt ]; then
+            echo "the collection did not reach the validation step" > data/live/collect_log.txt
+          fi
+          git add data/live/collect_log.txt
+          if git diff --cached --quiet; then echo "no log change"; exit 0; fi
+          git commit -m "chore: collector log $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || exit 0
+          git push origin "HEAD:${GITHUB_REF_NAME}"

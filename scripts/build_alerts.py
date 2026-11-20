@@ -47,6 +47,33 @@ def load(path: Path):
         sys.exit(1)
 
 
+def market_page_url(ticker) -> str | None:
+    """Kalshi's own web page for the market's series, or None when there is no series.
+
+    Verified 2026-11-20 against the live site: https://kalshi.com/markets/kxaaagasm
+    redirects to https://kalshi.com/markets/kxaaagasm/us-gas-price/kxaaagasm-26nov30,
+    and the same scheme works for kxpgatour and kxbtcy. That page carries Kalshi's own
+    news digest for the series. It is the PRODUCTION site (this dashboard's prices come
+    from the DEMO environment), so it is labelled as such and is never presented as the
+    cause of a move.
+    """
+    t = str(ticker or "").strip().upper()
+    if "-" not in t:
+        return None
+    return "https://kalshi.com/markets/" + t.split("-")[0].lower()
+
+
+def official_links(ticker, api_source) -> list[dict]:
+    """The official sources a swing row can point at. Never invents a URL."""
+    links = []
+    if api_source:
+        links.append({"label": "Official Kalshi demo API market record", "url": api_source, "kind": "api"})
+    page = market_page_url(ticker)
+    if page:
+        links.append({"label": "Kalshi's own page for this series (carries Kalshi's news digest)", "url": page, "kind": "kalshi_page"})
+    return links
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
     ap.add_argument("--history", default=str(LIVE / "price_history.json"))
@@ -98,6 +125,11 @@ def main() -> int:
                 "to_yes_ask": cur.get("yes_ask"),
                 "cause_link": None,
                 "cause_status": "unverified: no official cause source collected",
+                # Official links a reader can follow for this swing. cause_link stays
+                # null: no source in the API states what moved the price, so nothing
+                # is ever presented as the cause. These are the market's own records.
+                "market_page": market_page_url(ticker),
+                "official_links": official_links(ticker, (m or {}).get("source")),
             }
             key = (ticker, prev["t"], cur["t"])
             if key in known:
@@ -115,6 +147,15 @@ def main() -> int:
 
     archive["alerts"].sort(key=lambda r: (r["to_time"], abs(r["delta"])), reverse=True)
     archive["alerts"] = archive["alerts"][:ARCHIVE_LIMIT]
+    # Backfill the official-link fields on entries written before they existed. This
+    # only ADDS derived links (nothing is removed, no alert is dropped), so the archive
+    # stays append-only in content while every row can be followed to its sources.
+    backfilled = 0
+    for a in archive["alerts"]:
+        if "official_links" not in a:
+            a["official_links"] = official_links(a.get("ticker"), a.get("market_source"))
+            a["market_page"] = market_page_url(a.get("ticker"))
+            backfilled += 1
     archive_path.write_text(json.dumps(archive, indent=1) + "\n", encoding="utf-8")
 
     if args.no_write_feed:
@@ -141,7 +182,8 @@ def main() -> int:
             "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
             "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
             "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
-            "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
+            "cause_link is null on every alert: no official source states what moved a price, so no cause is ever asserted.",
+            "official_links point at the market's own records: the demo API market record and Kalshi's own web page for the series (production site), which carries Kalshi's news digest for that series.",
             "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
         ],
     }

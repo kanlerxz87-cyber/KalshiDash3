@@ -246,6 +246,16 @@ const KDLIVE = (() => {
         if (!found.has(url)) found.set(url, k);
       }
     }
+    // Kalshi's own web page for the market's series. Verified 2026-11-20:
+    // https://kalshi.com/markets/kxaaagasm redirects to the series page (same scheme
+    // for kxpgatour and kxbtcy). It carries Kalshi's own news digest for the series.
+    // It is the PRODUCTION site — this dashboard's prices come from the demo
+    // environment — and it is never presented as the cause of a move.
+    const series = String((m && m.ticker) || "").trim().toUpperCase().split("-")[0];
+    if (series) {
+      const page = `https://kalshi.com/markets/${series.toLowerCase()}`;
+      if (!found.has(page)) found.set(page, "kalshi market page");
+    }
     return Array.from(found, ([url, field]) => ({ url, field }));
   }
 
