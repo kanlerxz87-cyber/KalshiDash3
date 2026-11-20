@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live alerts — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Live alerts — swings of ≥ $0.10 in either direction</h1>
+  <p class="lede">
+    Two scrolling chats. The left one shows <b>every observed swing</b> of at least $0.10 in contract price;
+    the right one shows only the swings the <b>high-ROI model</b> likes (score ≥ 55). Every alert is a diff between
+    two <b>consecutive observations collected from the official demo API</b> — nothing is interpolated.
+    The ≥$0.10 threshold is a <b>requirement of this project</b>, not an official Kalshi number.
+  </p>
+
+  <div id="snapshotBanner"></div>
+
+  <div class="card">
+    <div class="livestat">
+      <span><span class="livedot" id="dot"></span><b>Live poll:</b> re-fetches the committed snapshot every 60&nbsp;s</span>
+      <span class="mut">last checked: <span id="lastCheck">—</span></span>
+      <span class="mut">alerts in snapshot: <b id="alertCount">—</b> (up <span id="alertUp">—</span> / down <span id="alertDown">—</span>)</span>
+      <span class="mut">collector cadence: every 20 min via <a href="https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml" target="_blank" rel="noopener">scheduled workflow</a></span>
+      <label style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <input type="checkbox" id="simToggle">
+        <span>Simulated tick stream <span class="badge sim" title="Generated in this browser for testing the real-time path. Not market data; never persisted.">SIM</span></span>
+      </label>
+    </div>
+    <p class="small mut" style="margin:8px 0 0">
+      REST polling can only see what the collector saw: changes <b>between</b> runs. Between runs nothing can move on this page —
+      that gap needs the authenticated WebSocket (see <a href="flagged.html">F-14</a>). Turn the SIM stream on to watch the
+      chats behave in real time with clearly-marked simulated ticks seeded from real last prices; it never writes anywhere.
+    </p>
+  </div>
+
+  <div class="chats">
+    <div id="chatAll"></div>
+    <div id="chatPicks"></div>
+  </div>
+
+  <h2>The high-ROI model — formula, weights, threshold</h2>
+  <p class="small mut">
+    Version <b id="modelVersion">v1.0</b> · a swing enters the picks chat when its score is ≥ <b>55</b> / 100.
+    This model is a project-defined heuristic for ranking swing alerts by tradability — it is <b>not</b> an official
+    Kalshi metric and not investment advice. Every input below is either the alert itself or a field of the
+    <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a> response.
+  </p>
+  <div class="tw"><table>
+    <thead><tr><th>Factor</th><th>Formula</th><th>Why</th><th class="r">Weight</th></tr></thead>
+    <tbody id="modelRows"></tbody>
+  </table></div>
+  <div id="workedExample"></div>
+
+  <h2>Where a cause would first appear</h2>
+  <p class="small mut">
+    The brief asks for website links that <b>may</b> have caused a sharp jump. Per-alert cause attribution cannot be verified
+    from an official source automatically, so instead of guessing causes, every category carries links to the official bodies
+    that publish the underlying facts (flagged as <a href="flagged.html">F-15</a>). Each alert row also links the exact API
+    query so you can pull the market up while checking the news.
+  </p>
+  <div class="tw"><table>
+    <thead><tr><th>Category</th><th>Official starting points</th></tr></thead>
+    <tbody id="researchRows"></tbody>
+  </table></div>
+
+  <h2>Alert log — every ≥$0.10 swing in the current snapshot</h2>
+  <p class="small mut">One row per consecutive observation pair. <code>API query</code> is the official endpoint call that produced both prices.
+     Sorted by observation time, newest first.</p>
+  <div id="logTable"></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script src="assets/alerts.js"></script>
+<script>
+KD.nav("alerts.html");
+
+const state = {
+  snap: null, alerts: null, byTicker: {}, byLiq: {},
+  seen: new Set(),       // real alert keys already pushed into the chats
+  sim: null,
+};
+
+function alertKey(a) { return a.ticker + "|" + a.from_ts + "|" + a.to_ts; }
+
+function renderModel() {
+  KD.$("#modelVersion").textContent = KDA.MODEL.version;
+  KD.$("#modelRows").innerHTML = KDA.MODEL.doc.map(([f, formula, why], i) => {
+    const w = Object.values(KDA.MODEL.weights)[i];
+    return `<tr><td><b>${KD.esc(f)}</b></td><td><code>${KD.esc(formula)}</code></td><td class="small mut">${KD.esc(why)}</td><td class="r num">${Math.round(w * 100)}%</td></tr>`;
+  }).join("");
+  KD.$("#researchRows").innerHTML = Object.entries(KDA.RESEARCH).map(([id, links]) =>
+    `<tr><td><b>${KD.esc(KD.CAT_LABEL[id] || id)}</b></td><td>${links.map(l => `<a href="${KD.esc(l.url)}" target="_blank" rel="noopener">${KD.esc(l.label)}</a>`).join(" · ")}</td></tr>`).join("");
+}
+
+function renderWorkedExample() {
+  const host = KD.$("#workedExample");
+  const a = (state.alerts && state.alerts.alerts || [])[0];
+  if (!a) { host.innerHTML = ""; return; }
+  const sc = KDA.scoreAlert(a, state.byTicker[a.ticker], state.byLiq[a.ticker]);
+  host.innerHTML = `<div class="notice blue"><b>Worked example</b> (computed in your browser from the top alert in this snapshot):
+    <code>${KD.esc(a.ticker)}</code> moved ${KD.cents(a.from_price_dollars)} → ${KD.cents(a.to_price_dollars)}
+    (${a.direction === "up" ? "▲" : "▼"} $${Math.abs(a.delta_dollars).toFixed(2)}).
+    Factor points: magnitude ${sc.parts.magnitude} + relative ${sc.parts.relative} + liquidity ${sc.parts.liquidity}
+    (${sc.liqKnown ? "depth known from the snapshot order book" : "depth unknown → neutral 0.5"}) + volume ${sc.parts.volume}
+    (${sc.volKnown ? "24h volume known" : "24h volume unknown → neutral 0.5"}) = <b>score ${sc.score}</b>
+    → ${sc.score >= KDA.MODEL.threshold_score ? "<b>enters</b>" : "does <b>not</b> enter"} the picks chat (threshold ${KDA.MODEL.threshold_score}).</div>`;
+}
+
+function pushAlert(a, { silent } = {}) {
+  const key = alertKey(a);
+  if (!a.sim && state.seen.has(key)) return false;
+  if (!a.sim) state.seen.add(key);
+  const market = state.byTicker[a.ticker];
+  const sc = KDA.scoreAlert(a, market, state.byLiq[a.ticker]);
+  state.chatAll.push(a, sc, { silent });
+  if (sc.score >= KDA.MODEL.threshold_score) state.chatPicks.push(a, sc, { silent });
+  return true;
+}
+
+function renderLog() {
+  const rows = (state.alerts && state.alerts.alerts || [])
+    .slice()
+    .sort((x, y) => (x.to_ts < y.to_ts ? 1 : -1))
+    .slice(0, 200)
+    .map(a => {
+      const sc = KDA.scoreAlert(a, state.byTicker[a.ticker], state.byLiq[a.ticker]);
+      const research = (KDA.RESEARCH[a.category_id] || []).map(l => `<a class="srclink" href="${KD.esc(l.url)}" target="_blank" rel="noopener" title="Official starting point for causes — not a verified per-alert cause">${KD.esc(l.label.split(" — ")[0])}</a>`).join(" ");
+      return {
+        time: KD.esc((a.to_ts || "").replace("T", " ").replace("Z", "") + "Z"),
+        dir: a.direction === "up" ? '<span class="badge ok">▲ up</span>' : '<span class="badge bad">▼ down</span>',
+        delta: `<b class="${a.direction === "up" ? "g" : "r"}" style="color:${a.direction === "up" ? "var(--ok)" : "var(--bad)"}">${a.delta_dollars >= 0 ? "+" : "−"}$${Math.abs(a.delta_dollars).toFixed(2)}</b>`,
+        move: `${KD.cents(a.from_price_dollars)} → <b>${KD.cents(a.to_price_dollars)}</b>`,
+        ticker: `<a href="${KD.esc(a.source)}" target="_blank" rel="noopener" class="mono">${KD.esc(a.ticker)}</a>`,
+        title: KD.esc((a.title || "— market not in current snapshot —").replace(/\*\*/g, "")),
+        cat: a.category_id ? KD.esc(KD.CAT_LABEL[a.category_id]) : '<span class="na">—</span>',
+        basis: KD.basisBadge(a.category_basis || "keyword"),
+        score: `<span class="chip score" title="model ${KDA.MODEL.version}">score ${sc.score}</span>`,
+        src: `${KD.srcLink(a.source, "API query")} ${research}`,
+      };
+    });
+  KD.$("#logTable").innerHTML = KD.table([
+    { key: "time", label: "Observed (UTC)" }, { key: "dir", label: "Dir" }, { key: "delta", label: "Δ price", num: true },
+    { key: "move", label: "From → to", num: true }, { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
+    { key: "cat", label: "Category" }, { key: "basis", label: "Basis" }, { key: "score", label: "Model" }, { key: "src", label: "Sources" },
+  ], rows, { empty: "No ≥$0.10 swing has been observed between consecutive collector runs yet. The chats fill as runs accumulate (or turn on the SIM stream to preview behaviour)." });
+}
+
+function renderCounts() {
+  const c = state.alerts && state.alerts.counts;
+  KD.$("#alertCount").textContent = c ? c.alerts : "0";
+  KD.$("#alertUp").textContent = c ? c.up : "0";
+  KD.$("#alertDown").textContent = c ? c.down : "0";
+}
+
+async function poll(first) {
+  try {
+    const [snap, alerts, hist] = await Promise.all([
+      KDA.loadJSON("data/live/markets.json"),
+      KDA.loadJSON("data/live/alerts.json"),
+      KDA.loadJSON("data/live/price_history.json").catch(() => null),
+    ]);
+    const prevSnap = state.snap, prevAlerts = state.alerts;
+    state.snap = snap; state.alerts = alerts; state.hist = hist;
+    state.byTicker = KDA.indexMarkets(snap);
+    state.byLiq = KDA.indexLiquidity(snap);
+    KD.snapshotBanner(snap);
+    renderCounts(); renderLog(); renderWorkedExample();
+    KD.$("#lastCheck").textContent = new Date().toLocaleTimeString();
+
+    const fresh = (alerts.alerts || []).filter(a => !state.seen.has(alertKey(a)));
+    if (first) {
+      // chronological fill: oldest first so the chat reads bottom-up
+      for (const a of (alerts.alerts || []).slice().sort((x, y) => (x.to_ts < y.to_ts ? -1 : 1))) pushAlert(a, { silent: false });
+      KD.$("#dot").className = "livedot";
+    } else {
+      let added = 0;
+      for (const a of fresh.slice().sort((x, y) => (x.to_ts < y.to_ts ? -1 : 1))) { if (pushAlert(a)) added++; }
+      if (added) KD.$("#dot").className = "livedot";
+      if (prevSnap && snap.collected_at !== prevSnap.collected_at) {
+        KD.$("#dot").className = "livedot";
+        for (const c of [state.chatAll, state.chatPicks]) c.push({
+          ticker: "SNAPSHOT", direction: "up", delta_dollars: 0, from_price_dollars: 0, to_price_dollars: 0,
+          to_ts: snap.collected_at, title: `New collector snapshot committed: ${snap.collected_at} (${added} new swing alert${added === 1 ? "" : "s"})`,
+          category_id: null, source: "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml", sim: false, sys: true,
+        }, null);
+      }
+    }
+  } catch (e) {
+    KD.$("#dot").className = "livedot stale";
+    if (first) {
+      KD.$("#logTable").innerHTML = KD.empty("No committed snapshot could be loaded — the collector has not run yet. Nothing is shown rather than inventing an alert.");
+    }
+  }
+}
+
+function setSim(on) {
+  if (state.sim) { state.sim.stop(); state.sim = null; }
+  if (!on) return;
+  const open = (state.snap && state.snap.open_markets || []).filter(r => Number(r.last_price_dollars) > 0.01 && Number(r.last_price_dollars) < 0.99);
+  state.sim = KDA.makeSim({
+    markets: open,
+    hist: state.hist, // per-market volatility is taken from that market's own collected diffs
+    onAlert: (a) => pushAlert(a),
+    intervalMs: 1400,
+  });
+  state.sim.start();
+  for (const c of [state.chatAll, state.chatPicks]) c.push({
+    ticker: "SIM-ENGINE", direction: "up", delta_dollars: 0, from_price_dollars: 0, to_price_dollars: 0,
+    to_ts: new Date().toISOString().replace(/\.\d+Z$/, "Z"), title: "Simulated tick stream enabled — bubbles marked SIM are generated in this browser and are NOT market data.",
+    category_id: null, source: "flagged.html", sim: true,
+  }, null);
+}
+
+KD.$("#simToggle").addEventListener("change", e => setSim(e.target.checked));
+
+renderModel();
+state.chatAll = KDA.makeChat(KD.$("#chatAll"), { title: "Chat 1 — All alerts (≥ $0.10, either direction)", emptyText: "waiting for alerts" });
+state.chatPicks = KDA.makeChat(KD.$("#chatPicks"), { title: "Chat 2 — Model picks (high-ROI filter, score ≥ 55)", emptyText: "waiting for picks" });
+poll(true);
+setInterval(() => poll(false), 60000);
+</script>
+</body></html>
