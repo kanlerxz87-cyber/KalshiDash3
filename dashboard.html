@@ -38,6 +38,7 @@
       </select>
     </label>
     <button class="ghost" id="reload">Reload snapshot</button>
+    <span id="pollNote" class="small mut"></span>
     <span id="chartNote" class="small mut"></span>
   </div>
 
@@ -77,7 +78,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/site.js"></script>
 <script>
 KD.nav("dashboard.html");
-const state = { snap: null, hist: null, sel: null, cat: "" };
+const state = { snap: null, hist: null, alerts: null, sel: null, cat: "" };
 
 const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
 
@@ -265,6 +266,26 @@ function drawChart() {
     ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
     Y axis is the contract price in dollars, bounded 0–1. Collected by
     <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
+
+  // ≥$0.10 swing markers, at the exact observation timestamps where they were observed.
+  const marks = (state.alerts?.alerts || []).filter(a => a.ticker === row.ticker);
+  if (marks.length) {
+    ctx.save();
+    for (const a of marks) {
+      const mt = Date.parse(a.to_ts);
+      if (!Number.isFinite(mt) || mt < t0 || mt > t1) continue;
+      ctx.translate(X(mt), Y(a.to_price_dollars));
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = a.direction === "up" ? "#45d483" : "#f2695c";
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.restore();
+      ctx.save();
+    }
+    ctx.restore();
+    foot.innerHTML += ` · <b>${marks.length}</b> ≥$0.10 swing marker${marks.length === 1 ? "" : "s"} on this market
+      (<a href="alerts.html#t=${encodeURIComponent(row.ticker)}">see them in the alert chats</a>) — diamonds sit at the
+      exact collected observation where the swing completed.`;
+  }
 }
 
 function drawLiq() {
@@ -298,6 +319,7 @@ function drawLiq() {
 async function load() {
   try { state.snap = await KD.json("data/live/markets.json"); } catch { state.snap = null; }
   try { state.hist = await KD.json("data/live/price_history.json"); } catch { state.hist = null; }
+  try { state.alerts = await KD.json("data/live/alerts.json"); } catch { state.alerts = null; }
   KD.snapshotBanner(state.snap);
   if (!state.snap) {
     KD.$("#tables").innerHTML = KD.empty("No snapshot committed yet.");
@@ -321,5 +343,31 @@ KD.$("#seriesSel").addEventListener("change", drawChart);
 KD.$("#reload").addEventListener("click", load);
 window.addEventListener("resize", () => { drawChart(); });
 load();
+
+/* Live poll — re-fetch the committed snapshot every 60 s so a new collector run
+ * appears on the page without a manual reload. GitHub Pages serves static files,
+ * so this only ever sees data the collector has committed; nothing is invented
+ * between runs. */
+let lastAlertsSig = null;
+async function pollLive() {
+  const note = KD.$("#pollNote");
+  try {
+    const fresh = await KD.json("data/live/markets.json");
+    const freshAlerts = await KD.json("data/live/alerts.json").catch(() => null);
+    const sig = freshAlerts ? freshAlerts.generated_at + ":" + freshAlerts.counts.alerts : null;
+    const changed = (state.snap && fresh.collected_at !== state.snap.collected_at) || (lastAlertsSig !== null && sig !== lastAlertsSig);
+    lastAlertsSig = sig;
+    if (changed) {
+      load();
+      note.innerHTML = `<span class="badge ok">new snapshot</span> committed ${KD.esc(fresh.collected_at)} — reloaded automatically`;
+    } else {
+      note.innerHTML = `live poll OK ${new Date().toLocaleTimeString()} · latest commit ${KD.esc(fresh.collected_at)}`;
+    }
+  } catch {
+    note.innerHTML = `live poll failed ${new Date().toLocaleTimeString()} (offline or no snapshot yet)`;
+  }
+}
+setInterval(pollLive, 60000);
+pollLive();
 </script>
 </body></html>

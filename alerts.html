@@ -229,5 +229,19 @@ state.chatAll = KDA.makeChat(KD.$("#chatAll"), { title: "Chat 1 — All alerts (
 state.chatPicks = KDA.makeChat(KD.$("#chatPicks"), { title: "Chat 2 — Model picks (high-ROI filter, score ≥ 55)", emptyText: "waiting for picks" });
 poll(true);
 setInterval(() => poll(false), 60000);
+
+// Deep link from the dashboard chart markers: alerts.html#t=<TICKER> highlights and scrolls to that market's rows.
+window.addEventListener("load", () => {
+  const h = decodeURIComponent(location.hash.replace(/^#t=/, ""));
+  if (!h || location.hash.indexOf("#t=") !== 0) return;
+  setTimeout(() => {
+    for (const tr of KD.$$("#logTable tbody tr")) {
+      if (tr.textContent.includes(h)) {
+        tr.style.outline = "2px solid var(--warn)";
+        tr.scrollIntoView({ block: "center" });
+      }
+    }
+  }, 600);
+});
 </script>
 </body></html>
