@@ -105,6 +105,16 @@
     <div class="controls" id="catTabs"></div>
   </div>
 
+  <section class="panel" id="leadsPanel">
+    <h2>Fetched source leads beside each recorded swing</h2>
+    <p class="small mut">One row per swing in the persistent archive (<code>data/live/alerts_archive.json</code>,
+    threshold $0.10). A "lead" is the reference the market itself settles on — quoted from its own record —
+    next to the published numbers that reference carried when it was fetched. No link here is a proven cause:
+    Kalshi has no cause feed, and a public quote cannot see the trade that printed a price. Where the reference
+    did not move in the same minutes, the row says so. Built by <code>scripts/catalysts.py</code> from the
+    review ledger <code>data/catalyst_review.json</code>; each link was fetched and read, with its fetch time.</p>
+    <div id="leads"></div>
+  </section>
 </main>
 <footer><div class="wrap">
 KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
@@ -117,7 +127,62 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script>
 KD.nav("alerts.html");
 
-const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40 };
+const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null };
+
+const LEAD_STATE_LABEL = {
+  external_move_coincides: "the index this market settles on crossed its strike in the same minutes",
+  external_move_coincides_in_direction: "the index moved the same way, without reaching the strike",
+  no_external_move_supporting_this_swing: "the index moved the other way — nothing external supports this swing",
+  no_external_move_in_window: "no move in the settlement reference inside the window",
+  published_reference_on_the_same_side_as_the_move: "the published figure sits on the side the price moved to",
+  published_reference_on_the_other_side_of_the_strike: "the published figure sits against the side the price moved to",
+  not_reviewed: "not reviewed yet — this market's reference has not been read for this minute",
+};
+
+function leadHost(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return "source"; } }
+
+async function loadLeads() {
+  try { state.leads = await KD.json(`data/live/catalysts.json?refresh=${Date.now()}`); }
+  catch { state.leads = null; }
+  renderLeads();
+}
+
+function renderLeads() {
+  const box = KD.$("#leads");
+  if (!box) return;
+  if (!state.leads || !(state.leads.alerts || []).length) {
+    box.innerHTML = KD.empty("No lead file has been published yet (data/live/catalysts.json). Swings are still "
+      + "alerted; nothing is inferred in the meantime.");
+    return;
+  }
+  const rows = state.leads.alerts.filter(r => !state.cat || r.category_id === state.cat);
+  box.innerHTML = `<table class="tbl"><thead><tr><th>Swing recorded at</th><th>Market</th><th>Move</th>`
+    + `<th>What the record says</th><th>Links fetched (not assumed)</th></tr></thead><tbody>`
+    + rows.map(r => {
+      const links = (r.links || []).map(l => `<a href="${KD.esc(l.url)}" target="_blank" rel="noopener">${KD.esc(leadHost(l.url))}</a>`
+        + `<span class="small mut"> · fetched ${KD.esc(l.fetched_at || "?")}</span>`).join("<br>");
+      const rel = r.relation || {};
+      const numbers = (rel.after === undefined || rel.after === null) ? ""
+        : `<div class="small mut">reference ${KD.esc(String(rel.before))} → ${KD.esc(String(rel.after))}`
+          + ` · strike ${KD.esc(String(rel.strike))}`
+          + (rel.crossed ? ` · crossed ${KD.esc(rel.crossed)}` : " · strike not crossed") + `</div>`;
+      const ref = r.settlement_reference_text
+        ? `<details><summary>settlement reference, verbatim</summary><p class="small">${KD.esc(r.settlement_reference_text)}`
+          + ` <a href="${KD.esc(r.settlement_reference_source || r.market_source || "#")}" target="_blank" rel="noopener">the market's own record</a></p></details>`
+        : `<span class="small mut">not carried in the collected record for this market</span>`;
+      return `<tr><td>${KD.esc(r.to_time || "")}</td>`
+        + `<td><a href="${KD.esc(r.market_source || "#")}" target="_blank" rel="noopener">${KD.esc(r.ticker)}</a>`
+        + `<div class="small mut">${KD.esc(r.title || "")}</div></td>`
+        + `<td>${r.direction === "up" ? "▲" : "▼"} ${KD.esc(String(r.from_price))} → ${KD.esc(String(r.to_price))}`
+        + ` <b>${(r.delta || 0) > 0 ? "+" : "−"}${(Math.abs(r.delta || 0) * 100).toFixed(0)}¢</b></td>`
+        + `<td><b>${KD.esc(LEAD_STATE_LABEL[r.state] || r.state || "")}</b>${numbers}${ref}</td>`
+        + `<td>${links || '<span class="small mut">none</span>'}`
+        + `<div class="small">${KD.esc(r.note || "")}</div></td></tr>`;
+    }).join("") + `</tbody></table>`
+    + `<p class="small mut">Built ${KD.esc(state.leads.generated_at || "")} · ledger <code>${KD.esc(state.leads.ledger || "")}</code>`
+    + ` · reviewed by ${KD.esc(state.leads.ledger_reviewed_by || "")}</p>`
+    + (state.leads.disclaimers || []).map(d => `<p class="small mut">${KD.esc(d)}</p>`).join("");
+}
 
 function catFilter(a) { return !state.cat || a.category_id === state.cat; }
 
@@ -165,6 +230,9 @@ async function boot() {
   await KDL.loadCollectorAlerts();
   await pickWatchlist();
   KDL.onAlert(() => render());
+  loadLeads();
+  // the category tabs filter both chats; they filter the lead table the same way
+  KD.$("#catTabs").addEventListener("click", () => setTimeout(renderLeads, 0));
   KDL.onStatus(statusChip);
   render();
   // Probe + auto-start: "no manual input" — live mode turns itself on when CORS allows.

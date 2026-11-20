@@ -695,3 +695,66 @@ Two further overlaps were resolved the same way on the second `origin/main` merg
   published as a second id for one defect. `data/findings.json` was rebuilt as a real merge, and this session's
   severity label was left as `main`'s. Nothing from PR #31/#34/#36 was overwritten.
 
+---
+
+## Session `arena-6f158ab7` — collector + live-desk data-quality repair, catalyst layer, final verification
+
+Branch `arena/6f158ab7-kalshidash3`, base `9a90947`. Claimed 2026-11-20 19:09Z.
+
+**Concurrent-session note (read before my board below):** I claimed T19 (desk scan) and T20 (catalyst
+layer) at 19:09Z, when `main` was `9a90947` and no PR was open. `arena-2a36471a` claimed the *same*
+divide-by-zero at 19:11Z (`b1c4148`) and merged PR #31/#32 at 19:17Z while I was mid-fix. No files from
+that session were discarded: I rebased onto `origin/main` and **adopted their guard** in
+`scripts/roi_model.py` + `assets/live.js` + `scripts/tests/fixtures_roi_parity.json` and their dynamic
+close-times in `scripts/tests/test_roi_scan_offline.py`, and dropped my duplicate versions of those three
+edits. What their fix could not cover, and what I still fix here, is the reason the desk feed is empty
+rather than merely non-crashing, plus the collector failure:
+
+| Still broken on `main@ee0cc44` (evidence) | Fix in this session |
+|---|---|
+| `data/live/roi.json` counts say `"orderbooks": 0`, `"unscoreable": 212`, `"picks": 0`. `books_for()` sends `?tickers=A,B,C`; the demo host does not split commas (verified live 2026-11-20: a ≤200-char join returns ONE echoed entry with an empty book, a >200-char join returns HTTP 400 — the `! orderbooks chunk failed: HTTP 400` line in Actions run 44762120780) | `books_for()` sends one ticker per repeated `tickers=` parameter (documented `string[]`, 1–100 elements), drops any response entry whose ticker was not requested, and the offline fixture now refuses a comma-joined call |
+| `counts.open_scanned` is exactly `4000` = the safety cap, while `data/live/markets.json` counts say `open_total_scanned: 4369`; newest-first paging on a capped scan is why the scan sees 214 in scope where the collector sees 387 | `paged_markets()` pages to exhaustion, keeps the cap as a safety stop, and publishes `paging.open_truncated_at_safety_cap` so a partial universe can never be presented as the whole one |
+| `collect.yml` still fails: Actions run 44799627492 (19:10:48Z) died in "Validate the snapshot…" on `test_alerts_reference_real_tickers`, so the 19:10Z snapshot was thrown away and the site stayed on 15:19Z data. The test asserts every archived alert ticker is in *today's* snapshot — the one thing the archive exists to survive | the test asserts traceability instead (snapshot ∪ observation history ∪ the row's own per-market URL + `first_seen_at`), reproduced by deleting the alert tickers from a copy of the snapshot: old assertion fails on 9/9 rows, new passes |
+| an alert whose market has been pruned from the snapshot loses `market_source` (set from `(m or {}).get("source")`), so its provenance URL disappears with the row | `build_alerts.py` keeps the endpoint that recorded the swing, derived from the snapshot's own `base_url` + ticker |
+| `replay_settled()` still divides by `cost` for a 0c candle (`(q - cost) / cost`), the same crash shape the session just fixed in `score()` | the replay path is guarded the same way |
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|----------------|----------------|
+| T18 | Takeover of the stale `arena-d879c640` claim: final verification pass, Pages confirm, record PR + merge | this PR — final pass re-run on the merged tree immediately after merge | arena-6f158ab7 | `COORDINATION.md`, `README.md` | full suite on the merged tree + live URL fetch | F-16 (cron never fires) still open |
+| T19 | Desk-scan data-quality repair (order-book params, paging truncation, replay guard) | done — desk run 44801234891 on this branch published `orderbooks: 10342`, `open_scanned: 20000` | arena-6f158ab7 | `scripts/roi_scan.py`, `scripts/tests/test_roi_scan_offline.py`, `scripts/tests/fixtures_roi_parity.json` | offline fixture suite + a real `desk.yml` run on this branch must publish a `roi.json` with `orderbooks > 0` and `in_scope` matching the collector | duplicate of `arena-2a36471a` T19 for the crash only; their crash fix kept, mine is the empty-feed half |
+| T20 | Catalyst layer for ≥$0.10 swings: source links fetched in-session, never invented | done — `scripts/catalysts.py` + `validate_catalysts.py` gate + alerts/dashboard render; 9/9 swings, 18 fetched links, causal wording refused (mutation-checked) | arena-6f158ab7 | `data/live/catalysts.json`, `scripts/catalysts.py`, `alerts.html`, `dashboard.html`, `flagged.html` | every link fetched; publication time compared with the swing time | attribution is proximity, not causation |
+| T21 | Collector freshness: fix the failing gate so a fresh snapshot is actually committed | done locally (reproduced + fixed); needs a `collect.yml` run on `main` to confirm | arena-6f158ab7 | `scripts/tests/test_alerts.py`, `scripts/build_alerts.py` | reproduced the CI failure locally, then a `collect.yml` run on `main` must commit | the collector's cron (`*/20`) still never fires (F-16) |
+| T22 | Collector scan completeness: paged-to-exhaustion universe + per-series cursor paging + rules text kept | done on this branch — needs next `collect.yml` run to show it | arena-6f158ab7 | `scripts/collect.py` | F-32/F-33 closed by a published snapshot with `open_total_scanned` > 4,000 and `markets_with_catalyst_url` > 0 | snapshot size bounded by published keep-caps; truncation flags in `counts` |
+
+- 2026-11-20 ~19:21 UTC: `desk.yml` run **44801234891 succeeded on this branch** — first end-to-end green:
+  `data/live/roi.json` `collected_at 2026-11-20T19:21:33Z`, counts `open_scanned 20000 / open_in_scope 10342 /
+  orderbooks 10342 / alerts 1 / scoring_errors 0`, `paging.open_truncated_at_safety_cap: true` published, 8 named
+  near-misses (each with the gate that stopped it: depth < 50 at touch, or 94–98c spread). The earlier failure at
+  "Commit the scan" (run 44800883802) did not reproduce; the 6m line in `gh run list` is the whole job incl. queue.
+- 2026-11-20 19:25–19:45 UTC (T20, catalyst layer): `data/catalyst_review.json` ledger (7 fetched sources incl.
+  `GET /markets/KXDEMOFUTHOURLY-26NOV20H12-UP`, re-read this session: strike 61985.83, settled NO at
+  `settlement_ts 2026-11-20T12:01:19Z`) + 9 per-swing review rows covering **every** archived alert.
+  `scripts/catalysts.py` renders `data/live/catalysts.json`: a link appears only if the ledger lists the fetched
+  source that carries it, each number in `relation` must appear in a cited response (tolerance ≤0.05), and causal
+  vocabulary is refused at build time. `scripts/tests/validate_catalysts.py` re-checks the published artefact —
+  mutation-checked: fabricated link / doctored note / uncited number / dropped row / missing fetch time are each
+  refused with the right reason; `not_reviewed` rows must carry no links. `alerts.html` gained a per-swing lead
+  table; `dashboard.html`'s "cause blank — flagged" placeholder is replaced by the lead (or an explicit
+  "no fetched source lead" state). `test_pages_dom.js` modes D+E render both pages over the committed data and
+  assert no causal wording reaches the page.
+- 2026-11-20 19:30–19:50 UTC (T22, found while checking why the landing page said culture $0): `collect.py`
+  capped its universe scan at 4,000 open / 1,200 settled rows — newest-first, and the newest demo markets are
+  zero-volume multivariate listings — while the same API paged to exhaustion holds 20,000+ open markets with
+  10,342 in scope. Ranking by dollars over that window was structurally biased. Fixed: page to exhaustion behind a
+  25,000 published safety cap per status, cursor-paginate each seed series, publish truncation/trim counts, bound
+  snapshot size with keep-caps (400 seed + 120 keyword per category; 1,600 most-recent settled). Also kept
+  `rules_primary/secondary/subtitle` for open rows (F-33) so the ROI scan's `catalyst_links()` and the swing leads
+  can cite the market's own settlement text. **F-34 (thin-book swings), F-35 (capped biased ranking), F-36 (rules text discarded) added to `data/findings.json`** — renumbered from the drafted F-31..F-33 because `arena-da07bb44` took those IDs on `main` first; the three defects stand as described.
+- 2026-11-20 20:35-20:45 UTC (post-rebase onto `351080f`, which brought PRs #34/#35/#36): lead coverage taken to
+  11/11 of the 19:30Z archive — fetched `GET /markets/KXDEMOFUTHOURLY-26NOV20H20-UP` (strike 58337.51; window
+  19:05-19:35 Coinbase closes 58249.98→58079.56, max HIGH 58310.32, so the 30c up-print sits under the strike
+  across the whole window → `no_external_move_supporting_this_swing`) and
+  `GET /markets/KXBTCY-27JAN0100-B47500` (settles on CF Benchmarks' BRTI, no free public series — recorded as an
+  explicit `not_reviewed` reason: 0.98→0.06 on `volume_24h_fp 0.00` with `updated_time 2026-04-28T02:27:21Z`,
+  consistent with F-34 rather than news). `validate_catalysts.py` catches the stale-lead gap by itself (it
+  refused the 9-row file against the 11-row archive before anything was rebuilt).

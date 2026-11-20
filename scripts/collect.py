@@ -44,7 +44,10 @@ UA = "KalshiDash3-collector/1.0 (+https://github.com/kanlerxz87-cyber/KalshiDash
 
 # Documented reference: https://docs.kalshi.com/api-reference/market/get-markets
 PRICE_HISTORY_LIMIT = 120  # points kept per market
-PER_CATEGORY_KEEP = 120    # rows kept per category in the committed snapshot
+PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
+SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
+SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
+SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 
 def utcnow() -> str:
@@ -168,18 +171,34 @@ def scan_markets():
     limit max 1000; cursor pagination; a cursor that cannot be decoded is
     ignored and page 1 is returned, so we stop on an empty cursor only.
     https://docs.kalshi.com/getting_started/pagination
+
+    The cap used to be 4000/1200, and it mattered: the demo exchange now holds
+    tens of thousands of open markets, returned newest-first, and the newest
+    ones are zero-volume multivariate listings (verified against
+    https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=2
+    on 2026-11-20). A capped window therefore ranked "highest dollar amount"
+    events over a biased subset — data/live/roi.json from a paged-to-exhaustion
+    scan found 10,342 in-scope open markets where the 4,000-row window saw 387.
+    Paging now runs to exhaustion at a 25,000-row safety stop, and truncation is
+    published in counts rather than hidden.
     """
     out = {"open": [], "settled": []}
-    for status, cap in (("open", 4000), ("settled", 1200)):
+    out["_truncated"] = {}
+    for status, cap in (("open", SAFETY_SCAN_CAP), ("settled", SAFETY_SCAN_CAP)):
         cursor, seen = "", 0
+        truncated = False
         while True:
             d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None})
             batch = d.get("markets") or []
             out[status].extend(batch)
             seen += len(batch)
             cursor = d.get("cursor") or ""
-            if not cursor or not batch or seen >= cap:
+            if not cursor or not batch:
                 break
+            if seen >= cap:
+                truncated = True
+                break
+        out["_truncated"][status] = truncated
         # Deduplicate by ticker: documented as required when paging by close time.
         dedup = {m["ticker"]: m for m in out[status] if m.get("ticker")}
         out[status] = list(dedup.values())
@@ -277,8 +296,8 @@ def update_price_history(hist, rows):
     return hist
 
 
-def public_market_row(m, cat_id, basis):
-    return {
+def public_market_row(m, cat_id, basis, keep_rules=False):
+    row = {
         "ticker": m.get("ticker"),
         "event_ticker": m.get("event_ticker"),
         "series_ticker": series_of(m),
@@ -304,6 +323,21 @@ def public_market_row(m, cat_id, basis):
         "notional_value_dollars": fnum(m.get("notional_value_dollars")),
         "source": f"{BASE}/markets/{m.get('ticker')}",
     }
+    # `rules_primary` / `rules_secondary` are where Kalshi records what a market settles on,
+    # and they are the ONLY honest source of a "what could have moved this" link: the catalyst
+    # extraction in scripts/roi_model.py (catalyst_links) reads URLs out of exactly these
+    # fields, so a snapshot that drops them publishes zero catalyst links (data/live/roi.json
+    # on main reported markets_with_catalyst_url: 0 while GET /markets returns the text —
+    # compare https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.7300
+    # which carries "…according to AAA…"). Kept verbatim, for open rows only: settled rows are
+    # retained for their settlement record, and doubling the committed snapshot with text no
+    # page links to is not worth it. A field the API did not return stays absent — never filled.
+    if keep_rules:
+        for k in ("rules_primary", "rules_secondary", "subtitle"):
+            v = m.get(k)
+            if v:
+                row[k] = v
+    return row
 
 
 def build(include_orderbooks: int = 4, candlestick_points: int = 0):
@@ -322,17 +356,25 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     for c in cats["categories"]:
         for seed in c["seed_series"]:
             for status in ("open", "settled"):
-                try:
-                    d, _ = get("/markets", {"series_ticker": seed["ticker"], "status": status, "limit": 1000})
-                except RuntimeError as e:
-                    print(f"  ! seed {seed['ticker']} {status}: {e}", file=sys.stderr)
-                    continue
-                for m in d.get("markets") or []:
-                    # Keep the buckets separate: a finalized market must never
-                    # appear in the open list. The status filter is authoritative
-                    # (https://docs.kalshi.com/getting_started/market_lifecycle).
-                    seeded[status][m.get("ticker")] = m
-                print(f"  seed {seed['ticker']:<16} {status:<8} -> {len(d.get('markets') or [])} market(s)")
+                # One page per series was another quiet truncation: hourly crypto
+                # series exceed the documented 1000-row page, so a single GET /markets
+                # call per series could not see the whole series. Page to exhaustion.
+                cursor, got = "", 0
+                while True:
+                    try:
+                        d, _ = get("/markets", {"series_ticker": seed["ticker"], "status": status,
+                                                "limit": 1000, "cursor": cursor or None})
+                    except RuntimeError as e:
+                        print(f"  ! seed {seed['ticker']} {status}: {e}", file=sys.stderr)
+                        break
+                    batch = d.get("markets") or []
+                    for m in batch:
+                        seeded[status][m.get("ticker")] = m
+                    got += len(batch)
+                    cursor = d.get("cursor") or ""
+                    if not cursor or not batch or got >= 5000:
+                        break
+                print(f"  seed {seed['ticker']:<16} {status:<8} -> {got} market(s)")
     print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
@@ -365,23 +407,32 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             if status == "open" and st_status in ("finalized", "determined", "closed", "settled"):
                 wrong_bucket += 1
                 continue
-            rows[status].append(public_market_row(m, cat_id, basis))
+            rows[status].append(public_market_row(m, cat_id, basis, keep_rules=(status == "open")))
 
     # Rank open markets by the labelled estimate so the page leads with the
     # biggest live markets in each category, then keep a bounded window per
     # category so the committed snapshot stays small enough to load in a browser.
     # Confirmed (seed) markets are always kept, even if small.
     rows["open"].sort(key=lambda r: (r["dollars_traded_estimate"] or 0), reverse=True)
-    kept, per_cat_kept = [], {}
+    kept, per_cat_kept, per_cat_seed = [], {}, {}
     for r in rows["open"]:
         c = r["category_id"]
-        if r["category_basis"] == "seed" or per_cat_kept.get(c, 0) < PER_CATEGORY_KEEP:
-            if r["category_basis"] != "seed":
-                per_cat_kept[c] = per_cat_kept.get(c, 0) + 1
-            kept.append(r)
+        if r["category_basis"] == "seed":
+            # Confirmed markets are kept generously, but a universe-wide scan can
+            # return thousands of them; keep the largest first and say so.
+            if per_cat_seed.get(c, 0) >= SEED_KEEP:
+                continue
+            per_cat_seed[c] = per_cat_seed.get(c, 0) + 1
+        elif per_cat_kept.get(c, 0) >= PER_CATEGORY_KEEP:
+            continue
+        else:
+            per_cat_kept[c] = per_cat_kept.get(c, 0) + 1
+        kept.append(r)
     trimmed = len(rows["open"]) - len(kept)
     rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
+    settled_trimmed = max(0, len(rows["settled"]) - SETTLED_KEEP)
+    rows["settled"] = rows["settled"][:SETTLED_KEEP]
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -433,6 +484,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "open_excluded_multivariate": excluded_mve["open"],
             "settled_excluded_multivariate": excluded_mve["settled"],
             "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
+            # Scan completeness, published: what the ranking below could see at all.
+            "open_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("open")),
+            "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
+            "safety_scan_cap": SAFETY_SCAN_CAP,
+            "settled_rows_trimmed_for_size": settled_trimmed,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
         },

@@ -1,0 +1,596 @@
+{
+ "schema": 1,
+ "generated_at": "2026-11-20T19:39:45Z",
+ "snapshot_collected_at": "2026-11-20T19:30:14Z",
+ "ledger": "data/catalyst_review.json",
+ "ledger_reviewed_by": "arena-6f158ab7",
+ "threshold_dollars": 0.1,
+ "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
+ "counts": {
+  "archive_total": 11,
+  "reviewed": 10,
+  "not_reviewed": 1,
+  "external_move_coincides": 3,
+  "no_external_move_supporting": 4,
+  "links_shown": 20
+ },
+ "alerts": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B47500",
+   "to_time": "2026-11-20T19:30:14Z",
+   "from_time": "2026-11-20T19:22:42Z",
+   "from_price": 0.98,
+   "to_price": 0.06,
+   "delta": -0.92,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "BTC price  on Jan 1, 2027?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": null,
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
+   "reviewed_at": null
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "to_time": "2026-11-20T19:30:14Z",
+   "from_time": "2026-11-20T19:22:42Z",
+   "from_price": 0.35,
+   "to_price": 0.65,
+   "delta": 0.3,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 58337.51 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T20:00:00+00:00 closes at or above 58337.51 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T19:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
+     "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
+     "source_id": "COINBASE_BTCUSD_1MIN_1905_1935",
+     "fetched_at": "2026-11-20T20:38Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
+     "fetched_at": "2026-11-20T20:38Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "index_below_strike_all_window",
+    "strike": 58337.51,
+    "before": 58249.98,
+    "before_at": "2026-11-20T19:06:00Z",
+    "after": 58079.56,
+    "after_at": "2026-11-20T19:35:00Z",
+    "reference_side": "yes",
+    "change": -170.42,
+    "distance_to_strike_before": -87.53,
+    "distance_to_strike_after": -257.95,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The collector recorded this market printing up to 0.55 during its 19:30:14Z run. Across the fetched 19:05-19:35 candles the Coinbase index the rules name fell (close 58249.98 to 58079.56) and stayed under the 58337.51 strike the whole window - the highest candle HIGH was 58310.32, 27.19 short. The market's own record shows last_price 0.5500 against yes_ask 0.9900 / yes_bid 0.0100 on 70.00 open interest: the print sits in a spread, not near a book. Recorded as unexplained by the reference.",
+   "reviewed_at": "2026-11-20T20:38Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1905_1935",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T19:05:00Z",
+    "to": "2026-11-20T19:34:00Z"
+   }
+  },
+  {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "to_time": "2026-11-20T15:19:53Z",
+   "from_time": "2026-11-20T13:50:26Z",
+   "from_price": 0.29,
+   "to_price": 0.71,
+   "delta": 0.42,
+   "direction": "up",
+   "category_id": "gas",
+   "title": "Will average **gas prices** be above $3.30?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+     "source_id": "AAA_NATIONAL_AVERAGE",
+     "fetched_at": "2026-11-20T19:25Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
+     "fetched_at": "2026-11-20T19:33Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.3,
+    "before": 3.6898,
+    "before_at": "2026-11-20",
+    "after": 3.6898,
+    "after_at": "2026-11-20",
+    "reference_side": "yes",
+    "change": 0.0,
+    "distance_to_strike_before": 0.3898,
+    "distance_to_strike_after": 0.3898,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "The largest swing in the archive: 0.29 to 0.71. AAA's current national average (3.6898) is 0.3898 above the 3.30 strike, so the YES side was already in the money on the published figure; the size of the print says more about the book than about the news, because 24h volume on this market is 20.14 contracts and the yes bid stayed at 0.2900 while the last traded price is 0.7100. Flagged as F-31: a 10c rule on last_price_dollars can be moved by one small trade in a demo book.",
+   "reviewed_at": "2026-11-20T19:33Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+   ],
+   "window": {
+    "from": "2026-11-20T13:50:26Z",
+    "to": "2026-11-20T15:19:53Z"
+   }
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "to_time": "2026-11-20T13:50:26Z",
+   "from_time": "2026-11-20T13:35:54Z",
+   "from_price": 0.0,
+   "to_price": 0.34,
+   "delta": 0.34,
+   "direction": "up",
+   "category_id": "gas",
+   "title": "Will average **gas prices** be above $3.6600?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+     "source_id": "AAA_NATIONAL_AVERAGE",
+     "fetched_at": "2026-11-20T19:25Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "before": 3.6898,
+    "before_at": "2026-11-20",
+    "after": 3.6898,
+    "after_at": "2026-11-20",
+    "reference_side": "yes",
+    "change": 0.0,
+    "distance_to_strike_before": 0.0298,
+    "distance_to_strike_after": 0.0298,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "This market settles on AAA's US average regular price for Nov 21, 2026; the published national average at the time of the swing was 3.6898, which is 0.0298 above the 3.6600 strike. AAA also printed a falling trend on the same page (yesterday 3.7212, week ago 3.8724). The market itself stayed thinly traded: 48 contracts in 24h, and a 1.0000 yes ask against a 0.1900 yes bid when re-read at 19:25Z.",
+   "reviewed_at": "2026-11-20T19:25Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window": {
+    "from": "2026-11-20T13:35:00Z",
+    "to": "2026-11-20T13:50:26Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "to_time": "2026-11-20T13:50:26Z",
+   "from_time": "2026-11-20T13:35:54Z",
+   "from_price": 0.35,
+   "to_price": 0.55,
+   "delta": 0.2,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61498.92 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "market_status": "finalized",
+   "result_as_returned": "yes",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T13:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1320_1405",
+     "fetched_at": "2026-11-20T19:25Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "external_move_coincides",
+   "relation": {
+    "kind": "index_crosses_strike_up",
+    "strike": 61498.92,
+    "before": 61404.25,
+    "before_at": "2026-11-20T13:45:00Z",
+    "after": 61867.99,
+    "after_at": "2026-11-20T13:50:00Z",
+    "reference_side": "yes",
+    "change": 463.74,
+    "distance_to_strike_before": -94.67,
+    "distance_to_strike_after": 369.07,
+    "crossed": "up",
+    "strike_side_after": "at_or_above"
+   },
+   "note": "The market's own rules settle on the Coinbase BTC-USD one-minute candle. In the four minutes before this collector observation, the candle close passed from below the 61498.92 strike to above it. The market's price moved up in the same minute. Reported as a coincidence in time between a published number and a printed price, which is all that can be shown from outside the exchange.",
+   "reviewed_at": "2026-11-20T19:25Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T13:20:00Z",
+    "to": "2026-11-20T13:50:00Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "to_time": "2026-11-20T13:35:54Z",
+   "from_time": "2026-11-20T13:32:25Z",
+   "from_price": 0.55,
+   "to_price": 0.35,
+   "delta": -0.2,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61498.92 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "market_status": "finalized",
+   "result_as_returned": "yes",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T13:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1320_1405",
+     "fetched_at": "2026-11-20T19:25Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "index_window_low",
+    "strike": 61498.92,
+    "before": 61433.33,
+    "before_at": "2026-11-20T13:29:00Z",
+    "after": 61290.76,
+    "after_at": "2026-11-20T13:35:00Z",
+    "reference_side": "yes",
+    "change": -142.57,
+    "distance_to_strike_before": -65.59,
+    "distance_to_strike_after": -208.16,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The window low printed on this candle while the market price fell in the same minutes; the strike stayed above the index the whole window.",
+   "reviewed_at": "2026-11-20T19:25Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T13:29:00Z",
+    "to": "2026-11-20T13:35:00Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "to_time": "2026-11-20T13:32:25Z",
+   "from_time": "2026-11-20T13:18:28Z",
+   "from_price": 0.35,
+   "to_price": 0.55,
+   "delta": 0.2,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61498.92 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "market_status": "finalized",
+   "result_as_returned": "yes",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T13:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1320_1405",
+     "fetched_at": "2026-11-20T19:25Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "index_moved_against_signal",
+    "strike": 61498.92,
+    "before": 61425.88,
+    "before_at": "2026-11-20T13:30:00Z",
+    "after": 61380.22,
+    "after_at": "2026-11-20T13:32:00Z",
+    "reference_side": "yes",
+    "change": -45.66,
+    "distance_to_strike_before": -73.04,
+    "distance_to_strike_after": -118.7,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The market printed up 20c while the index it settles on printed down in the same minutes. Recorded as an unexplained swing, which is the honest answer: no external move supports it, and the trade that set it cannot be seen from a public quote. The 61498.92 strike is read from the market's own record, which is also cited.",
+   "reviewed_at": "2026-11-20T19:25Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T13:30:00Z",
+    "to": "2026-11-20T13:32:00Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "to_time": "2026-11-20T11:33:33Z",
+   "from_time": "2026-11-20T11:31:35Z",
+   "from_price": 0.35,
+   "to_price": 0.45,
+   "delta": 0.1,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "market_status": "finalized",
+   "result_as_returned": "no",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1120_1145",
+     "fetched_at": "2026-11-20T19:33Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "fetched_at": "2026-11-20T19:38Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "index_moved_against_signal",
+    "strike": 61985.83,
+    "before": 61713.54,
+    "before_at": "2026-11-20T11:32:00Z",
+    "after": 61701.37,
+    "after_at": "2026-11-20T11:33:00Z",
+    "reference_side": "yes",
+    "change": -12.17,
+    "distance_to_strike_before": -272.29,
+    "distance_to_strike_after": -284.46,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The market printed up 10c while the index kept falling away from the strike. Recorded as unexplained.",
+   "reviewed_at": "2026-11-20T19:38Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T11:25:00Z",
+    "to": "2026-11-20T11:33:33Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "to_time": "2026-11-20T11:31:35Z",
+   "from_time": "2026-11-20T11:28:31Z",
+   "from_price": 0.55,
+   "to_price": 0.35,
+   "delta": -0.2,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "market_status": "finalized",
+   "result_as_returned": "no",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1120_1145",
+     "fetched_at": "2026-11-20T19:33Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "fetched_at": "2026-11-20T19:38Z"
+    }
+   ],
+   "state": "external_move_coincides",
+   "relation": {
+    "kind": "index_moved_away_from_strike",
+    "strike": 61985.83,
+    "before": 61804.87,
+    "before_at": "2026-11-20T11:29:00Z",
+    "after": 61725.09,
+    "after_at": "2026-11-20T11:31:00Z",
+    "reference_side": "yes",
+    "change": -79.78,
+    "distance_to_strike_before": -180.96,
+    "distance_to_strike_after": -260.74,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "A 20c fall in the market over the three minutes in which the index fell 79.78 USD away from the strike. This is the one H12 swing the published reference actually supports, and the market settled NO in the end (settlement_ts 2026-11-20T12:01:19Z, settlement_value_dollars 0.0000).",
+   "reviewed_at": "2026-11-20T19:38Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T11:25:00Z",
+    "to": "2026-11-20T11:31:35Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "to_time": "2026-11-20T11:28:31Z",
+   "from_time": "2026-11-20T11:26:21Z",
+   "from_price": 0.65,
+   "to_price": 0.55,
+   "delta": -0.1,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "market_status": "finalized",
+   "result_as_returned": "no",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1120_1145",
+     "fetched_at": "2026-11-20T19:33Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "fetched_at": "2026-11-20T19:38Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "index_moved_against_signal",
+    "strike": 61985.83,
+    "before": 61785.4,
+    "before_at": "2026-11-20T11:27:00Z",
+    "after": 61804.0,
+    "after_at": "2026-11-20T11:28:00Z",
+    "reference_side": "yes",
+    "change": 18.6,
+    "distance_to_strike_before": -200.43,
+    "distance_to_strike_after": -181.83,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The market fell 10c on the candle that printed the window high for the index (61804.00 at 11:28, 61804.87 at 11:29). No move in the settlement reference supports a fall; recorded as unexplained.",
+   "reviewed_at": "2026-11-20T19:38Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T11:25:00Z",
+    "to": "2026-11-20T11:28:31Z"
+   }
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "to_time": "2026-11-20T11:26:21Z",
+   "from_time": "2026-11-20T11:24:20Z",
+   "from_price": 0.45,
+   "to_price": 0.65,
+   "delta": 0.2,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "market_status": "finalized",
+   "result_as_returned": "no",
+   "settlement_reference_text": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "links": [
+    {
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+     "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+     "source_id": "COINBASE_BTCUSD_1MIN_1120_1145",
+     "fetched_at": "2026-11-20T19:33Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
+     "fetched_at": "2026-11-20T19:38Z"
+    }
+   ],
+   "state": "external_move_coincides_in_direction",
+   "relation": {
+    "kind": "index_moved_toward_strike_not_crossing",
+    "strike": 61985.83,
+    "before": 61737.57,
+    "before_at": "2026-11-20T11:25:00Z",
+    "after": 61764.74,
+    "after_at": "2026-11-20T11:26:00Z",
+    "reference_side": "yes",
+    "change": 27.17,
+    "distance_to_strike_before": -248.26,
+    "distance_to_strike_after": -221.09,
+    "crossed": null,
+    "strike_side_after": "below"
+   },
+   "note": "The market printed up 20c while the index it settles on rose 27.17 USD toward the 61985.83 strike; the strike was never reached. The market later settled NO, so this print was wrong on the reference.",
+   "reviewed_at": "2026-11-20T19:38Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window": {
+    "from": "2026-11-20T11:25:00Z",
+    "to": "2026-11-20T11:26:21Z"
+   }
+  }
+ ],
+ "disclaimers": [
+  "A link here is a fetched reading of the reference a market settles on, next to the minute the swing was recorded. It does not explain why the price moved, and this project does not claim that it does.",
+  "Prices are last-traded prices from the Kalshi DEMO environment, where Kalshi states prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
+  "A swing can be one small print in a thin book. Where the ledger records 24h volume and the bid/ask around the print, they are shown so the size of the move can be weighed against the size of the trade.",
+  "not_reviewed means nobody in this project has read that market's reference for that minute yet. It is not a statement that no news existed."
+ ]
+}
