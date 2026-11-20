@@ -110,14 +110,12 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
   intervals only — so it is accumulated one observation per collector run (plus live poll points in the browser session).
 - WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
-<<<<<<< HEAD
 - Portfolio performance and the auto-sim engine are labelled paper simulations until demo credentials exist.
   Kalshi states a demo account "does not come with funds preloaded" and must be created by a person.
-=======
-- Portfolio performance is a labelled paper simulation until demo credentials exist.
-- Paper results need a stored bid and ask at the alert time. Today's archive stores only last-trade prices, so most swings cannot be filled and the simulation page shows zero fills until the archive stores quotes (Flagged F-19, request R-2).
+- Paper results need a stored bid and ask at the alert time. New archive entries now carry `to_yes_bid` /
+  `to_yes_ask` (request R-2, implemented 2026-11-20); entries written before that still have no quote and
+  stay unfilled, as do quotes whose spread exceeds the 0.10 cap (Flagged F-19, F-23).
 - Paper results on demo prices are not evidence that a strategy would make money in real markets (Kalshi: demo prices may not reflect real markets).
->>>>>>> origin/main
 
 ## Sources
 
