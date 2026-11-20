@@ -317,7 +317,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # The paged scan is capped, and the demo exchange is full of multivariate
     # combos, so a confirmed fee-schedule series can fall outside the window.
     # Query every seed series explicitly so "confirmed" data is never lost.
-    seeded = {}
+    seeded = {"open": {}, "settled": {}}
     for c in cats["categories"]:
         for seed in c["seed_series"]:
             for status in ("open", "settled"):
@@ -327,16 +327,20 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                     print(f"  ! seed {seed['ticker']} {status}: {e}", file=sys.stderr)
                     continue
                 for m in d.get("markets") or []:
-                    seeded[m.get("ticker")] = m
+                    # Keep the buckets separate: a finalized market must never
+                    # appear in the open list. The status filter is authoritative
+                    # (https://docs.kalshi.com/getting_started/market_lifecycle).
+                    seeded[status][m.get("ticker")] = m
                 print(f"  seed {seed['ticker']:<16} {status:<8} -> {len(d.get('markets') or [])} market(s)")
-    print(f"  seed markets collected: {len(seeded)}")
+    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
-        raw[status].extend([m for t, m in seeded.items() if t not in have])
+        raw[status].extend([m for t, m in seeded[status].items() if t not in have])
 
     rows = {"open": [], "settled": []}
     unclassified = {"open": 0, "settled": 0}
     excluded_mve = {"open": 0, "settled": 0}
+    wrong_bucket = 0
     for status in ("open", "settled"):
         for m in raw[status]:
             if is_multivariate(m):
@@ -353,6 +357,12 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             )
             if not cat_id:
                 unclassified[status] += 1
+                continue
+            # Final safety check on the lifecycle status rather than trusting the
+            # bucket: 'finalized', 'determined' and 'closed' are not open markets.
+            st_status = str(m.get("status") or "").lower()
+            if status == "open" and st_status in ("finalized", "determined", "closed", "settled"):
+                wrong_bucket += 1
                 continue
             rows[status].append(public_market_row(m, cat_id, basis))
 
@@ -417,8 +427,9 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],
             "settled_excluded_multivariate": excluded_mve["settled"],
-            "seed_markets_found": len(seeded),
+            "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
             "open_rows_trimmed_for_size": trimmed,
+            "rows_dropped_wrong_status": wrong_bucket,
         },
         "open_markets": rows["open"],
         "settled_markets": rows["settled"][:200],
