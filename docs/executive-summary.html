@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Executive Summary — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
+<a href="index.html">Home</a><a class="on" href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<div class="wrap">
+<h1>Executive summary</h1>
+<p class="mut">Last verified: 2026-11-20 · Every factual claim below links to an official source. Anything not confirmable is left blank and listed on the <a href="flagged.html">Flagged for Review</a> page.</p>
+
+<h2>1. What this project is</h2>
+<table><thead><tr><th>Item</th><th>Detail</th><th>Official source</th></tr></thead><tbody>
+<tr><td>Purpose</td><td>Collect, organize, and analyze live Kalshi demo events in 5 categories (Gas Prices, Elections, Culture, Crypto, Golf), rank by highest dollar amount, track until resolution (yes/no), chart price + liquidity, and analyze trade performance.</td><td><a href="https://docs.kalshi.com/welcome">Kalshi API Documentation</a></td></tr>
+<tr><td>Recommended demo REST root</td><td class="mono">https://external-api.demo.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+<tr><td>Also-supported demo REST root</td><td class="mono">https://demo-api.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+<tr><td>Demo WebSocket</td><td class="mono">wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+<tr><td>Demo portal</td><td class="mono">https://demo.kalshi.co/</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+<tr><td>Credentials</td><td>Demo and production credentials are <b>not shared</b>. Demo uses mock funds; demo prices/behavior may not reflect real markets.</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+</tbody></table>
+
+<h2>2. How "highest dollar amount" is defined</h2>
+<p>For each open market the dashboard computes <b>notional ≈ volume_fp × last_price_dollars</b> (dollars traded at the last price). This is an estimate, not an official Kalshi field — Kalshi returns <span class="mono">volume_fp</span> and <span class="mono">last_price_dollars</span> separately. Source: <a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a> / live demo API. See <a href="questions.html">Open Questions Q1</a> for the open decision on whether to use volume, open interest, or notional.</p>
+
+<h2>3. How resolution tracking works</h2>
+<p>Each market carries a <span class="mono">result</span> field: empty while open, then <b>yes</b> or <b>no</b> after settlement. The dashboard polls live markets and lists settled markets with their result. Source: <a href="https://docs.kalshi.com/getting_started/market_settlement">Market Settlement</a>.</p>
+
+<h2>4. Trading &amp; portfolio</h2>
+<p>Public market data needs no key. Orders, balance, and positions require a signed demo API key (Ed25519 or RSA-PSS, 30-second timestamp tolerance). Source: <a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a>. Because no keys were provided, this build runs a clearly-labeled <b>paper ledger</b> in the browser and ships a Python executor (<span class="mono">scripts/kalshi_client.py</span>) that trades for real on demo once keys are supplied via environment variables — never committed to the repo.</p>
+
+<h2>5. Rate limits &amp; reliability</h2>
+<p>Authenticated requests cost tokens (default 10) against Read/Write budgets; unauthenticated public requests have separate limits. The dashboard polls every 5s per selected market and backs off on 429. Source: <a href="https://docs.kalshi.com/getting_started/rate_limits">Rate Limits and Tiers</a>.</p>
+
+<h2>6. Key risks &amp; limits</h2>
+<table><thead><tr><th>Risk</th><th>Mitigation in this build</th><th>Source</th></tr></thead><tbody>
+<tr><td>Demo prices ≠ production prices</td><td>All pages labeled "demo"; never present demo values as real-market truth.</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td></tr>
+<tr><td>Category mapping is keyword-based</td><td>Series discovery is live; matched series are listed on Verification page for review.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-series-list">Get Series List</a></td></tr>
+<tr><td>No API keys → no real portfolio</td><td>Paper ledger + executor script ready; see Open Questions Q3.</td><td><a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a></td></tr>
+<tr><td>Orderbook shows bids only (binary markets)</td><td>Ask derived as 1 − best opposing bid; labeled as derived.</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses">Orderbook Responses</a></td></tr>
+</tbody></table>
+<p><a class="btn" href="dashboard.html">Open live dashboard</a> <a class="btn ghost" href="suggestions.html">Review suggestions</a></p>
+</div>
+<footer><div class="wrap">KalshiDash3 · <a href="sources.html">Sources</a> · <a href="flagged.html">Flagged for Review</a></div></footer>
+</body></html>

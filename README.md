@@ -1,44 +1,30 @@
-# KalshiDash3 — Live Kalshi Demo Dashboard
+# KalshiDash3
 
-Tracks the highest-dollar live Kalshi demo events in **gas prices, elections, culture, crypto, and golf only**, follows each tracked market until it resolves **yes/no**, charts price over time (seconds/minutes/hours) with order-book liquidity, and — with your own demo key — tracks portfolio performance, executes demo trades, and analyzes fills by category/strategy.
+Live Kalshi **demo** dashboard: highest-dollar events in **Gas Prices, Elections, Culture, Crypto, Golf** — tracked until resolution (yes/no), with price charts, liquidity, paper-trading performance, strategies, suggestions, and open questions.
 
-**Live site:** https://kanlerxz87-cyber.github.io/KalshiDash3/ (after Pages deploy)
+> **Integration note (2026-11-20):** Two parallel sessions built this repo. The live GitHub Pages site is the `docs/` implementation (merged to `main` via PR #1). This branch (`arena/1c0d1fc0-kalshidash3`) adds a second root-level implementation (`index.html`, `dashboard.html`, `gas.html`, …) plus `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md`, and `scripts/kalshi_tracker.py`. Both fetch live data from the official demo API; neither hardcodes market values. See `COORDINATION.md` for the merge log and `INTEGRATION.md` for the recommended next step (pick one implementation as canonical).
 
-## Official endpoints (verified)
+- **Site (GitHub Pages):** `docs/` — landing + subpages by category. Open `docs/index.html` locally or via Pages.
+- **Live data:** browser fetches `https://external-api.demo.kalshi.co/trade-api/v2` directly (public endpoints need no key). Docs: https://docs.kalshi.com/getting_started/demo_env
+- **Trading:** paper ledger in-browser + `scripts/kalshi_client.py` executor (needs `KALSHI_KEY_ID` + `KALSHI_PRIVATE_KEY_PATH` env vars; never commit keys).
+- **Coordination:** see `COORDINATION.md`. **Verification:** `docs/verification.html`. **Flagged items:** `docs/flagged.html`.
 
-| Surface | Recommended (demo) | Also supported | Source |
-|---|---|---|---|
-| REST | `https://external-api.demo.kalshi.co/trade-api/v2` | `https://demo-api.kalshi.co/trade-api/v2` | [Demo env](https://docs.kalshi.com/getting_started/demo_env) |
-| WebSocket | `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` | `wss://demo-api.kalshi.co/trade-api/ws/v2` | [Demo env](https://docs.kalshi.com/getting_started/demo_env) |
-
-Production: `https://external-api.kalshi.com/trade-api/v2` — [Environments](https://docs.kalshi.com/getting_started/api_environments). Public market data needs no key; trading/portfolio need a signed demo key.
-
-## Pages
-
-- `index.html` — landing + top 5
-- `dashboard.html` — live ranking, price graph, liquidity, track-until-resolved
-- `gas.html` / `elections.html` / `culture.html` / `crypto.html` / `golf.html` — category subpages
-- `resolved.html` — yes/no resolutions
-- `portfolio.html` — demo balance/positions/fills/settlements + trade form + analysis
-- `suggestions.html` — improvement proposals + Questions/Info/Answers
-- `sources.html` — verified facts + Flagged for Review
-
-## Run
-
-Static site — open `index.html` via any static server (e.g. `python3 -m http.server`). Live data is fetched in the browser from the demo API.
-
-Headless tracker/trader (needs `cryptography` + demo key env vars):
-
+## Quick start
 ```bash
-pip install cryptography
-python3 scripts/kalshi_tracker.py --rank
-KALSHI_API_KEY_ID=... KALSHI_PRIVATE_KEY_PATH=./demo.key python3 scripts/kalshi_tracker.py --balance
+python3 scripts/kalshi_client.py scan        # public scan, no keys
+# or just open docs/dashboard.html in a browser
 ```
 
-## Verification
-
-- Static claims: `data/verified_facts.json` (each row links to an official source; unconfirmed = blank + unverified).
-- Live values: never hardcoded; fetched client-side.
-- Executive summary: `EXECUTIVE_SUMMARY.md`. Coordination: `COORDINATION.md`.
-
-> Demo warning: demo prices “may not be reflective of those in real markets.” See [demo_env](https://docs.kalshi.com/getting_started/demo_env).
+## Pages
+| Page | Purpose |
+|---|---|
+| `docs/index.html` | Landing |
+| `docs/executive-summary.html` | Executive summary |
+| `docs/dashboard.html` | Live dashboard (charts, liquidity, resolution) |
+| `docs/portfolio.html` | Portfolio + trade execution + categorization |
+| `docs/strategies.html` | Strategy hypotheses |
+| `docs/suggestions.html` | Improvement proposals (pick a path) |
+| `docs/questions.html` | Open questions + discovery plan |
+| `docs/verification.html` | Line-by-line verification |
+| `docs/flagged.html` | Flagged for Review |
+| `docs/sources.html` | Official sources |

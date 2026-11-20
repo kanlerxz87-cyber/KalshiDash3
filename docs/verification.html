@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verification — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
+<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a class="on" href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<div class="wrap">
+<h1>Verification — line by line</h1>
+<p class="mut">Rule: every static value links to an official source. If a value can't be confirmed, it stays <b>blank</b> and is flagged. Live market values are fetched at runtime from the demo API and are never hand-typed.</p>
+<h2>Static claims</h2>
+<table><thead><tr><th>#</th><th>Claim</th><th>Value</th><th>Official source</th><th>Status</th></tr></thead><tbody>
+<tr><td>V1</td><td>Recommended demo REST root</td><td class="mono">https://external-api.demo.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V2</td><td>Also-supported demo REST root</td><td class="mono">https://demo-api.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V3</td><td>Demo WebSocket</td><td class="mono">wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V4</td><td>Demo uses mock funds; credentials not shared with production</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V5</td><td>Public market data needs no auth</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data">Market Data Quick Start</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V6</td><td>Orderbook returns bids only (binary)</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses">Orderbook Responses</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V7</td><td>Default request cost 10 tokens</td><td>10</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits">Rate Limits</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V8</td><td>Timestamp tolerance 30s</td><td>30s</td><td><a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a></td><td><span class="badge ok">verified</span></td></tr>
+<tr><td>V9</td><td>Gas Prices series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
+<tr><td>V10</td><td>Elections series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
+<tr><td>V11</td><td>Culture series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
+<tr><td>V12</td><td>Crypto series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
+<tr><td>V13</td><td>Golf series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
+<tr><td>V14</td><td>Demo account balance</td><td></td><td>—</td><td><span class="badge warn">unverified — no keys</span></td></tr>
+</tbody></table>
+<h2>Live verification (runtime)</h2>
+<p>Open the <a href="dashboard.html">Live Dashboard</a>: it fetches <span class="mono">/series</span>, <span class="mono">/markets</span>, <span class="mono">/markets/{ticker}/orderbook</span> directly from the demo API. Cross-check any ticker at <span class="mono">https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}</span>.</p>
+</div>
+<footer><div class="wrap">KalshiDash3 · <a href="sources.html">Sources</a></div></footer>
+</body></html>
