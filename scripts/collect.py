@@ -42,7 +42,8 @@ BASE = os.environ.get("KALSHI_BASE", "https://external-api.demo.kalshi.co/trade-
 UA = "KalshiDash3-collector/1.0 (+https://github.com/kanlerxz87-cyber/KalshiDash3)"
 
 # Documented reference: https://docs.kalshi.com/api-reference/market/get-markets
-PRICE_HISTORY_LIMIT = 240  # points kept per market
+PRICE_HISTORY_LIMIT = 120  # points kept per market
+PER_CATEGORY_KEEP = 120    # rows kept per category in the committed snapshot
 
 
 def utcnow() -> str:
@@ -356,8 +357,19 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             rows[status].append(public_market_row(m, cat_id, basis))
 
     # Rank open markets by the labelled estimate so the page leads with the
-    # biggest live markets in each category.
+    # biggest live markets in each category, then keep a bounded window per
+    # category so the committed snapshot stays small enough to load in a browser.
+    # Confirmed (seed) markets are always kept, even if small.
     rows["open"].sort(key=lambda r: (r["dollars_traded_estimate"] or 0), reverse=True)
+    kept, per_cat_kept = [], {}
+    for r in rows["open"]:
+        c = r["category_id"]
+        if r["category_basis"] == "seed" or per_cat_kept.get(c, 0) < PER_CATEGORY_KEEP:
+            if r["category_basis"] != "seed":
+                per_cat_kept[c] = per_cat_kept.get(c, 0) + 1
+            kept.append(r)
+    trimmed = len(rows["open"]) - len(kept)
+    rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
 
     # Liquidity depth for the top few open markets per category.
@@ -378,9 +390,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             hist = json.loads(hist_path.read_text()).get("series", {})
         except json.JSONDecodeError:
             hist = {}
-    watch = [r["ticker"] for r in rows["open"][:120]]
     update_price_history(hist, raw["open"])
-    hist = {k: v for k, v in hist.items() if k in set(watch) | set(hist.keys())}
+    # Only keep history for markets that are actually shown, so the file stays small.
+    watch = {r["ticker"] for r in rows["open"]}
+    hist = {k: v for k, v in hist.items() if k in watch}
 
     payload = {
         "schema": 1,
@@ -405,6 +418,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "open_excluded_multivariate": excluded_mve["open"],
             "settled_excluded_multivariate": excluded_mve["settled"],
             "seed_markets_found": len(seeded),
+            "open_rows_trimmed_for_size": trimmed,
         },
         "open_markets": rows["open"],
         "settled_markets": rows["settled"][:200],
