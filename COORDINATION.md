@@ -334,3 +334,18 @@ internal cross-checks; that limitation is stated rather than papered over.
   successfully (run 44747260546, conclusion `success`); Pages API reports `status=built`, live site
   https://kanlerxz87-cyber.github.io/KalshiDash3/ (source `main /`). No irregularities were introduced by this
   session; prior sessions' flagged items (F-14, F-15, etc.) remain on the Flagged for Review page.
+- 2026-11-20: **PR #23 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/23 , merge commit
+  `7007ee23e167ca81d254bec3d96e9832d5ac52ac` (merged 2026-11-20T13:49:56Z). Pages workflow run 44747778157
+  (`Deploy site to GitHub Pages`) succeeded; Pages API reports `status=built`. Two merge conflicts were resolved
+  on the way (see log above). T11–T15 marked done.
+- 2026-11-20: Collector dispatched on main after the merge (run 44747799459, `workflow_dispatch`, conclusion success).
+  First real run of `probe_cors()` against the official demo API measured `access-control-allow-origin:
+  https://kanlerxz87-cyber.github.io` for this project's own production origin (data/live/cors.json, checked_at
+  2026-11-20T13:50:27Z). The in-browser live alert chats are therefore confirmed reachable from the deployed site;
+  F-24's status for the Pages origin is measured, not assumed. alerts.json/all_events=8, archive=8 at that run.
+- 2026-11-20: Follow-up commit on this branch fixes the cors.json note to reference F-24 (the renumbered flag) and
+  records this log; shipped as a docs/notes-only PR merged immediately after #23.
+- 2026-11-20: **PR #26 merged** (docs/notes follow-up), and the deployed site was verified with a live page load:
+  alerts.html reports `live · REST OK` with ticks from the user's browser, 8 alerts in view across both chats
+  (collector history + live ticks), model picks rendering score reasons. Local curl cannot reach github.io from the
+  build sandbox (no route), so verification used an external page fetcher. T11-T15 complete; board closed for this session.
