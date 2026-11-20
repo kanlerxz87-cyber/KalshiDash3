@@ -479,7 +479,7 @@ def probe_cors(origin="https://kanlerxz87-cyber.github.io"):
         "access_control_allow_origin": None,
         "access_control_allow_methods": None,
         "access_control_allow_headers": None,
-        "note": "Only headers actually observed on the response are recorded; absent headers stay null. CORS behaviour is undocumented (see flagged.html F-14).",
+        "note": "Only headers actually observed on the response are recorded; absent headers stay null. CORS behaviour is undocumented (see flagged.html F-24).",
     }
     try:
         with urllib.request.urlopen(req, timeout=25) as r:
