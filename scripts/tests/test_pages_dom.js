@@ -219,11 +219,53 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- D. alerts.html: two chats + the fetched-lead table (the page this repo's brief cares
+          most about getting right: nothing rendered may read as a proven cause) --- */
+  {
+    const r = await loadPage("alerts.html", "snapshot");
+    commonAsserts("alerts.html", r);
+    check(r.doc.querySelectorAll("#feedAll").length === 1 && r.doc.querySelectorAll("#feedModel").length === 1,
+      "alerts page must render both chat feeds");
+    const box = r.doc.querySelector("#leads");
+    check(!!box, "the lead panel must exist on the alerts page");
+    const leadsRows = r.doc.querySelectorAll("#leads tbody tr").length;
+    if (leadsRows) {
+      const archived = (() => { try {
+        return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8")).alerts.length;
+      } catch (e) { return -1; } })();
+      check(leadsRows === archived, `the lead table must show one row per archived swing (table ${leadsRows}, archive ${archived})`);
+      r.doc.querySelectorAll("#leads tbody tr").forEach((tr, i) => {
+        tr.querySelectorAll("a").forEach(a => {
+          check(/^https:\/\//.test(a.getAttribute("href") || ""), `lead row ${i}: every link must be an absolute https URL`);
+          check(a.getAttribute("rel") === "noopener" && a.getAttribute("target") === "_blank",
+            `lead row ${i}: links must carry target=_blank rel=noopener`);
+        });
+      });
+    } else {
+      check(/No lead file has been published yet|could not be loaded/i.test(r.text),
+        "with no lead file the page must say so instead of rendering nothing");
+    }
+    check(!/\bcaused\b|\btriggered by\b|\bdue to\b/i.test(r.text),
+      "the rendered alerts page must not use causal wording — a public quote cannot see why a price moved");
+    console.log(`  D alerts page   ok  (${leadsRows} lead rows rendered, both feeds present, no causal wording)`);
+    r.close();
+  }
+
+  /* --- E. dashboard.html: the page with the live chart + per-swing lead rows --- */
+  {
+    const r = await loadPage("dashboard.html", "snapshot");
+    commonAsserts("dashboard.html", r);
+    check(/cause blank/.test(r.text) === false,
+      "the old 'cause blank — flagged' placeholder must be replaced by the fetched lead (or an explicit 'no lead' state)");
+    console.log("  E dashboard     ok  (chart + swing list render with the lead column wired)");
+    r.close();
+  }
+
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);
     process.exit(1);
   }
-  console.log("OK: live desk and model page render without errors in every data state available locally.");
+  console.log("OK: live desk, model page, alerts chats + lead table and dashboard render without errors in every data state available locally.");
   process.exit(0);
 })().catch((e) => { console.error("FAILED:", e && e.stack || e); process.exit(1); });

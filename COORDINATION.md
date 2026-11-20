@@ -720,7 +720,33 @@ rather than merely non-crashing, plus the collector failure:
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|----------------|----------------|
-| T18 | Takeover of the stale `arena-d879c640` claim: final verification pass, Pages confirm, record PR + merge | in progress | arena-6f158ab7 | `COORDINATION.md`, `README.md` | full suite on the merged tree + live URL fetch | F-16 (cron never fires) still open |
-| T19 | Desk-scan data-quality repair (order-book params, paging truncation, replay guard) | in progress | arena-6f158ab7 | `scripts/roi_scan.py`, `scripts/tests/test_roi_scan_offline.py`, `scripts/tests/fixtures_roi_parity.json` | offline fixture suite + a real `desk.yml` run on this branch must publish a `roi.json` with `orderbooks > 0` and `in_scope` matching the collector | duplicate of `arena-2a36471a` T19 for the crash only; their crash fix kept, mine is the empty-feed half |
-| T20 | Catalyst layer for ≥$0.10 swings: source links fetched in-session, never invented | in progress | arena-6f158ab7 | `data/live/catalysts.json`, `scripts/catalysts.py`, `alerts.html`, `dashboard.html`, `flagged.html` | every link fetched; publication time compared with the swing time | attribution is proximity, not causation |
-| T21 | Collector freshness: fix the failing gate so a fresh snapshot is actually committed | in progress | arena-6f158ab7 | `scripts/tests/test_alerts.py`, `scripts/build_alerts.py` | reproduced the CI failure locally, then a `collect.yml` run on `main` must commit | the collector's cron (`*/20`) still never fires (F-16) |
+| T18 | Takeover of the stale `arena-d879c640` claim: final verification pass, Pages confirm, record PR + merge | this PR — final pass re-run on the merged tree immediately after merge | arena-6f158ab7 | `COORDINATION.md`, `README.md` | full suite on the merged tree + live URL fetch | F-16 (cron never fires) still open |
+| T19 | Desk-scan data-quality repair (order-book params, paging truncation, replay guard) | done — desk run 44801234891 on this branch published `orderbooks: 10342`, `open_scanned: 20000` | arena-6f158ab7 | `scripts/roi_scan.py`, `scripts/tests/test_roi_scan_offline.py`, `scripts/tests/fixtures_roi_parity.json` | offline fixture suite + a real `desk.yml` run on this branch must publish a `roi.json` with `orderbooks > 0` and `in_scope` matching the collector | duplicate of `arena-2a36471a` T19 for the crash only; their crash fix kept, mine is the empty-feed half |
+| T20 | Catalyst layer for ≥$0.10 swings: source links fetched in-session, never invented | done — `scripts/catalysts.py` + `validate_catalysts.py` gate + alerts/dashboard render; 9/9 swings, 18 fetched links, causal wording refused (mutation-checked) | arena-6f158ab7 | `data/live/catalysts.json`, `scripts/catalysts.py`, `alerts.html`, `dashboard.html`, `flagged.html` | every link fetched; publication time compared with the swing time | attribution is proximity, not causation |
+| T21 | Collector freshness: fix the failing gate so a fresh snapshot is actually committed | done locally (reproduced + fixed); needs a `collect.yml` run on `main` to confirm | arena-6f158ab7 | `scripts/tests/test_alerts.py`, `scripts/build_alerts.py` | reproduced the CI failure locally, then a `collect.yml` run on `main` must commit | the collector's cron (`*/20`) still never fires (F-16) |
+| T22 | Collector scan completeness: paged-to-exhaustion universe + per-series cursor paging + rules text kept | done on this branch — needs next `collect.yml` run to show it | arena-6f158ab7 | `scripts/collect.py` | F-32/F-33 closed by a published snapshot with `open_total_scanned` > 4,000 and `markets_with_catalyst_url` > 0 | snapshot size bounded by published keep-caps; truncation flags in `counts` |
+
+- 2026-11-20 ~19:21 UTC: `desk.yml` run **44801234891 succeeded on this branch** — first end-to-end green:
+  `data/live/roi.json` `collected_at 2026-11-20T19:21:33Z`, counts `open_scanned 20000 / open_in_scope 10342 /
+  orderbooks 10342 / alerts 1 / scoring_errors 0`, `paging.open_truncated_at_safety_cap: true` published, 8 named
+  near-misses (each with the gate that stopped it: depth < 50 at touch, or 94–98c spread). The earlier failure at
+  "Commit the scan" (run 44800883802) did not reproduce; the 6m line in `gh run list` is the whole job incl. queue.
+- 2026-11-20 19:25–19:45 UTC (T20, catalyst layer): `data/catalyst_review.json` ledger (7 fetched sources incl.
+  `GET /markets/KXDEMOFUTHOURLY-26NOV20H12-UP`, re-read this session: strike 61985.83, settled NO at
+  `settlement_ts 2026-11-20T12:01:19Z`) + 9 per-swing review rows covering **every** archived alert.
+  `scripts/catalysts.py` renders `data/live/catalysts.json`: a link appears only if the ledger lists the fetched
+  source that carries it, each number in `relation` must appear in a cited response (tolerance ≤0.05), and causal
+  vocabulary is refused at build time. `scripts/tests/validate_catalysts.py` re-checks the published artefact —
+  mutation-checked: fabricated link / doctored note / uncited number / dropped row / missing fetch time are each
+  refused with the right reason; `not_reviewed` rows must carry no links. `alerts.html` gained a per-swing lead
+  table; `dashboard.html`'s "cause blank — flagged" placeholder is replaced by the lead (or an explicit
+  "no fetched source lead" state). `test_pages_dom.js` modes D+E render both pages over the committed data and
+  assert no causal wording reaches the page.
+- 2026-11-20 19:30–19:50 UTC (T22, found while checking why the landing page said culture $0): `collect.py`
+  capped its universe scan at 4,000 open / 1,200 settled rows — newest-first, and the newest demo markets are
+  zero-volume multivariate listings — while the same API paged to exhaustion holds 20,000+ open markets with
+  10,342 in scope. Ranking by dollars over that window was structurally biased. Fixed: page to exhaustion behind a
+  25,000 published safety cap per status, cursor-paginate each seed series, publish truncation/trim counts, bound
+  snapshot size with keep-caps (400 seed + 120 keyword per category; 1,600 most-recent settled). Also kept
+  `rules_primary/secondary/subtitle` for open rows (F-33) so the ROI scan's `catalyst_links()` and the swing leads
+  can cite the market's own settlement text. **F-34 (thin-book swings), F-35 (capped biased ranking), F-36 (rules text discarded) added to `data/findings.json`** — renumbered from the drafted F-31..F-33 because `arena-da07bb44` took those IDs on `main` first; the three defects stand as described.

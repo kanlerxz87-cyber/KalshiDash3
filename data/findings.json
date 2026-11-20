@@ -683,6 +683,41 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30%2CKXBTCY-27JAN0100-B47500",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/35"
    ]
+  },
+  {
+   "severity": "medium",
+   "item": "A \u226510c swing in this demo can be one small trade, so swing alerts are not evidence of conviction",
+   "why": "Both alerted gas markets move on tiny 24h volume: KXAAAGASD-26NOV21-3.6600 printed its 100c move on 48.00 contracts/24h (yes_ask_dollars 1.0000 vs yes_bid_dollars 0.1900), and KXAAAGASM-26DEC31-3.30 printed 0.29\u21920.71 on 20.14 contracts/24h \u2014 read from the markets' own API records on 2026-11-20T19:33Z. The alert rule watches last_price_dollars, which is the last trade, not the book.",
+   "action": "Kept as designed \u2014 the brief asks for swings of \u2265$0.10 in price \u2014 but every swing row now shows the market's 24h volume and status next to it, and the lead table quotes the settlement reference so the print can be weighed. No threshold change was invented on our side.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+    "https://docs.kalshi.com/getting_started/demo_env"
+   ],
+   "id": "F-34"
+  },
+  {
+   "severity": "high",
+   "item": "The collector ranked 'highest dollar amount' events over a capped, newest-first window \u2014 fixed on this branch",
+   "why": "scan_markets() stopped at 4,000 open and 1,200 settled rows, and GET /markets returns newest-first; the demo exchange is now full of freshly created zero-volume multivariate listings (the 4000-row window found 387 in-scope open markets, while the desk scan's paged-to-exhaustion run over the same API found 10,342 in-scope of 20,000 \u2014 data/live/roi.json collected_at 2026-11-20T19:21:33Z, paging.open_truncated_at_safety_cap true even at a 20,000 cap). The per-series seed queries also took one 1,000-row page with no cursor loop, so any series larger than a page was silently cut. Landing-page 'largest per category' figures (culture $0, elections $3) were computed from that biased subset.",
+   "action": "collect.py now pages both statuses to exhaustion behind a 25,000-row published safety stop, pages each seed series with the documented cursor, and publishes open/settled_paging_truncated_at_safety_cap and settled_rows_trimmed_for_size in counts. Snapshot size stays browser-bounded (400 seed + 120 keyword rows per category, 1,600 most-recent settled). Needs the next collect.yml run to show the new numbers.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/pagination",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44801234891"
+   ],
+   "id": "F-35"
+  },
+  {
+   "severity": "high",
+   "item": "The collector discarded the rules text every market links back to \u2014 so the site could never show a source link on a swing",
+   "why": "public_market_row() kept only display fields, so rules_primary/subtitle were null in data/live/markets.json for all 4 alerted markets (verified with python on the committed snapshot at 19:40Z) even though GET /markets/{ticker} returns full text. roi_model.catalyst_links() reads exactly that field, so every published scan had markets_with_catalyst_url: 0 and every feed link fell back to the bare market URL. The per-market URL is still traceable, but 'the site links the source that may explain the move' was structurally impossible.",
+   "action": "collect.py now copies rules_primary/rules_secondary/subtitle verbatim for open rows only (settled rows stay small), and the swing-lead layer (scripts/catalysts.py) renders only links a session actually fetched and recorded in data/catalyst_review.json, refusing causal wording. The next collect run must show markets_with_catalyst_url > 0 \u2014 until then this stays open.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "id": "F-36"
   }
  ]
 }

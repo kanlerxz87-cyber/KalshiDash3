@@ -394,7 +394,9 @@ function drawChart() {
   // Uses the `last` field (the alert rule) and is independent of the series
   // selector, so a swing is marked even when the chart plots bid/ask. Event and
   // market links come from the canonical alert feed (data/live/alerts.json);
-  // the cause is left blank and flagged because Kalshi has no official cause feed.
+  // what sits beside each swing is the market's OWN settlement reference and a fetched reading of it
+  // (data/live/catalysts.json). Kalshi has no cause feed, so a link is never called a cause: the
+  // state word comes from the file, whose builder refuses causal wording (scripts/catalysts.py).
   const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
     .map(o => ({ t: Date.parse(o.t), v: o.last }))
     .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
@@ -431,7 +433,7 @@ function drawChart() {
         : "";
       return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
         `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
-        `<span>${KD.esc(time)}${ev} <span class="cause">cause blank — flagged</span></span></div>`;
+        `<span>${KD.esc(time)}${ev} ${leadHtml(row.ticker, s.t)}</span></div>`;
     }).join("");
   }
 
@@ -440,6 +442,28 @@ function drawChart() {
     Y axis is the contract price in dollars, bounded 0–1. Collected by
     <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
 }
+
+// One lead row per swing: the reference the market settles on, and the published numbers beside
+// it at the time it was fetched. Never a claim about why a price moved.
+function leadHtml(ticker, tMs) {
+  const rows = (state.leads || {})[ticker];
+  if (!rows || !rows.length) {
+    const why = state.leads === null ? "data/live/catalysts.json could not be loaded"
+                                     : "no review entry for this market yet";
+    return `<span class="cause">no fetched source lead — ${KD.esc(why)}</span>`;
+  }
+  const hit = rows.find(r => r.to_time && Math.abs(Date.parse(r.to_time) - tMs) <= 1500) || rows[0];
+  const links = (hit.links || []).map(l => KD.srcLink(l.url, leadHost(l.url))).join(" · ");
+  const rel = hit.relation || {};
+  const nums = (rel.after === undefined || rel.after === null || rel.strike === undefined || rel.strike === null)
+    ? "" : ` · reference ${KD.esc(String(rel.after))} vs strike ${KD.esc(String(rel.strike))}${rel.crossed ? " · crossed " + KD.esc(rel.crossed) : " · strike not crossed"}`;
+  return `<span class="cause lead"><b>${KD.esc(hit.state || "")}</b>${nums}</span>` +
+    (links ? `<span class="cause links">${links}</span>` : "") +
+    (hit.settlement_reference_text
+      ? `<span class="cause rules">settlement reference: ${KD.srcLink(hit.settlement_reference_source || hit.market_source || "", "the market's own record")}</span>` : "");
+}
+
+function leadHost(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return "source"; } }
 
 function drawLiq() {
   const host = KD.$("#liq"), head = KD.$("#liqHead");
@@ -478,6 +502,14 @@ async function load() {
   try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
   try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
   try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { /* swings still render from history */ }
+  // Fetched source leads (scripts/catalysts.py, from the review ledger data/catalyst_review.json).
+  // A missing file is not an error and is not papered over: the swing list says so.
+  try {
+    const leadsDoc = await KD.json(`data/live/catalysts.json?refresh=${refresh}`);
+    state.leads = {};
+    for (const r of (leadsDoc.alerts || [])) (state.leads[r.ticker] = state.leads[r.ticker] || []).push(r);
+    state.leads_at = leadsDoc.generated_at || null;
+  } catch { state.leads = null; }
   KD.snapshotBanner(state.snap);
   renderAlerts();
   if (!state.snap) {
