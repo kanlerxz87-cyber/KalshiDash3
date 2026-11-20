@@ -68,8 +68,11 @@ window.KDL = (() => {
   function takerFee(count, price, mult = 1) {
     // Documented general taker rate: fee = ceil(M x 0.07 x C x P x (1-P)) in cents.
     // https://kalshi.com/docs/kalshi-fee-schedule.pdf — per-series multipliers can differ.
+    // The product is rounded to 6 decimals BEFORE the cent-ceil so float noise
+    // (0.07*100*0.5*0.5*100 = 175.00000000000003) cannot overcharge a cent.
     if (!(count > 0) || !(price > 0) || price >= 1) return null;
-    return Math.ceil(mult * 0.07 * count * price * (1 - price) * 100) / 100;
+    const centsRaw = mult * 0.07 * count * price * (1 - price) * 100;
+    return Math.ceil(Number(centsRaw.toFixed(6))) / 100;
   }
 
   function marketPageLinks(row) {
@@ -423,6 +426,11 @@ window.KDL = (() => {
       if (known.has(a.id)) continue;
       const r = S.markets.get(a.ticker) || a;
       const full = makeAlert(Object.assign({}, r, a), a.from, a.to, a.delta, "collector", a.note || null);
+      // Preserve the collector's own identity so reloading the page never
+      // duplicates or re-dates committed alerts.
+      full.id = a.id || full.id;
+      const parsed = Date.parse(a.ts || "");
+      if (!Number.isNaN(parsed)) full.ts = parsed;
       scoreAlert(full);
       pushAlert(full);
       revived.push(full);
@@ -539,16 +547,14 @@ window.KDL = (() => {
       const idx = this.state.positions.indexOf(pos);
       if (idx < 0) return null;
       const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)));
-      let gross;
-      if (reason === "settlement") {
-        // Documented: YES outcome -> YES holders receive $1/contract; NO outcome
-        // -> NO holders receive $1/contract. Settlement fees zero for yes/no.
-        // https://docs.kalshi.com/getting_started/market_settlement
-        const won = (pos.dir === 1 && pos.settle_result === "yes") || (pos.dir === -1 && pos.settle_result === "no");
-        gross = (won ? 1 : 0) * pos.count;
-      } else {
-        gross = (exitPrice - pos.entry_price) * pos.count;
-      }
+      // Economic P&L in the traded side's price terms: (exit - entry) x count.
+      // For settlements exitPrice IS the per-contract payout ($1 winner / $0
+      // loser), so a losing settled position books gross = -entry x count —
+      // the stake was already paid at entry. Settlement semantics:
+      // YES outcome pays YES holders $1/contract, NO outcome pays NO holders
+      // $1/contract; settlement fees are zero for simple yes/no determinations.
+      // https://docs.kalshi.com/getting_started/market_settlement
+      const gross = (exitPrice - pos.entry_price) * pos.count;
       const net = gross - pos.fee_entry - (feeOut || 0);
       const rec = {
         ...pos, exit_ts: Date.now(), exit_price: Math.round(exitPrice * 10000) / 10000,
@@ -558,8 +564,8 @@ window.KDL = (() => {
       };
       this.state.positions.splice(idx, 1);
       this.state.closed.push(rec);
-      this.state.cash += pos.count * exitPrice * (reason === "settlement" ? 1 : 1) - (feeOut || 0);
-      // ^ payout: settlement pays $1 per winning contract; a price exit sells at exitPrice.
+      this.state.cash += pos.count * exitPrice - (feeOut || 0);
+      // ^ settlement pays $1 per winning contract; a price exit sells at exitPrice.
       this.save();
       return rec;
     },

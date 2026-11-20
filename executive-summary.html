@@ -36,19 +36,28 @@
           <td>Executor targets the current V2 endpoint and is unexercised because keys do not exist. The old endpoint it used to target is gone (<a href="flagged.html">F-01</a>).</td></tr>
       <tr><td>Live interactive dashboard with a price graph, time on X, price on Y, seconds/minutes/hours window</td>
           <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Live dashboard</a></td>
-          <td>Seconds resolution must be accumulated from live reads: candlesticks only go down to one minute (<a href="flagged.html">F-06</a>).</td></tr>
+          <td>Seconds resolution must be accumulated from live reads: candlesticks only go down to one minute (<a href="flagged.html">F-06</a>). The dashboard now also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-14</a>).</td></tr>
+      <tr><td>Live alerting on swings ≥ $0.10 in either direction, as a simplified scrolling chat viewable in real time</td>
+          <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
+          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between its runs (~20 min) (<a href="flagged.html">F-14</a>).</td></tr>
+      <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
+          <td><span class="badge ok">done, labelled as leads</span></td><td>Alert bubbles + chart markers on the dashboard</td>
+          <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-15</a>).</td></tr>
+      <tr><td>Automate simulated trades to test different strategies</td>
+          <td><span class="badge ok">done — paper only</span></td><td><a href="trading.html">Auto-sim</a></td>
+          <td>Three disclosed strategies run automatically on live prices, settle from the API's literal <code>result</code>, and report net-of-fee P&amp;L by strategy/topic/band. Paper fills only: no demo credentials exist (<a href="flagged.html">F-17</a>; model unbacktested <a href="flagged.html">F-16</a>).</td></tr>
       <tr><td>Show current liquidity — how many contracts are available at a given price</td>
           <td><span class="badge ok">done</span></td><td>Liquidity ladder on the dashboard</td>
-          <td>Depth is a point-in-time read and goes stale between collector runs.</td></tr>
+          <td>Depth is a point-in-time read; with live mode on, the selected market's book refreshes each poll.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
-          <td>Four implemented because they removed a correctness risk; four are awaiting your decision.</td></tr>
+          <td>Fifteen suggestions; seven shipped (correctness fixes and the live/alert/auto-sim layer), eight awaiting your decision.</td></tr>
       <tr><td>A clear list of questions, information and answers needed before a decision</td>
           <td><span class="badge ok">done</span></td><td><a href="questions.html">Questions</a></td>
           <td>Eight questions; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>39 claims checked; 1 deliberately blank. Nine irregularities found and listed.</td></tr>
+          <td>53 claims checked; 1 deliberately blank. Eighteen irregularities found and listed, including four about this session's own live layer (<a href="flagged.html">F-14–F-18</a>).</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>
@@ -75,22 +84,28 @@
     <div class="card"><h3>Demo ≠ real</h3>
       <p>Kalshi states demo prices “may not be reflective of those in real markets”. Every ranking here is a demo ranking.
          <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Source</a></p></div>
-    <div class="card"><h3>There is no anonymous real-time feed</h3>
-      <p>Every WebSocket session is key-authenticated, even for public channels, so a static site cannot stream ticks.
-         <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Source</a></p></div>
+    <div class="card"><h3>Anonymous REST polling works; WebSocket still needs a key</h3>
+      <p>The site polls public REST endpoints from the browser (subject to CORS and undocumented unauthenticated limits), while every
+         WebSocket session remains key-authenticated — so tick streaming is still blocked on credentials.
+         <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Source</a> ·
+         <a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate limits</a></p></div>
     <div class="card"><h3>Fees decide marginal strategies</h3>
-      <p>The general taker fee is 0.07 × C × P × (1−P), about 2¢ per contract at 50¢ — roughly 4% of stake, and it is not
-         yet in the performance numbers. <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Source</a></p></div>
+      <p>The general taker fee is 0.07 × C × P × (1−P), about 2¢ per contract at 50¢ — roughly 4% of stake. The auto-sim charges this
+         fee on every paper fill, so its P&amp;L is net of the general rate (per-series multipliers still vary).
+         <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Source</a></p></div>
     <div class="card"><h3>One step needs you</h3>
-      <p>A demo account and API key must be created by a person. That is the only blocker to real demo performance reporting.
+      <p>A demo account and API key must be created by a person. That is the only blocker to real demo performance reporting and to
+         placing the auto-sim's trades for real. Until then everything trades in labelled simulation.
          <a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">Source</a></p></div>
   </div>
 
   <h2>4 · How the numbers stay honest</h2>
   <p>
     A scheduled, credential-free collector reads public demo endpoints and commits a timestamped snapshot. A validator refuses
-    a snapshot that invents a price, coerces a result to yes/no, or lacks provenance. The site renders that snapshot
-    statically, so every figure is tied to one fetch time and one query URL. The pipeline is described on the
+    a snapshot that invents a price, coerces a result to yes/no, or lacks provenance — and now also refuses any committed
+    alert whose delta is smaller than the required $0.10, in either direction. On top of the snapshot layer, the browser can
+    poll the same public endpoints directly (with a CORS self-test and automatic fallback), and the auto-sim ledger records
+    every fill's price basis so the simulation can be audited. The pipeline is described on the
     <a href="index.html">home page</a>, the rules on <a href="verification.html">Verification</a>, and everything that
     failed or is unresolved on <a href="flagged.html">Flagged for Review</a>.
   </p>

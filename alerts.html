@@ -121,12 +121,14 @@ function catFilter(a) { return !state.cat || a.category_id === state.cat; }
 function render() {
   const all = KDL.feedAlerts().filter(catFilter);
   const model = all.filter((a) => a.model && a.model.score >= KDL.MODEL.threshold);
-  KDL.renderFeed(KD.$("#feedAll"), all.slice(-120).reverse(), { catLabels: KD.CAT_LABEL });
-  KDL.renderFeed(KD.$("#feedModel"), model.slice(-120).reverse(), { catLabels: KD.CAT_LABEL, showWhy: true });
+  // chronological order, newest at the BOTTOM: renderFeed auto-scrolls there.
+  KDL.renderFeed(KD.$("#feedAll"), all.slice(-120), { catLabels: KD.CAT_LABEL });
+  KDL.renderFeed(KD.$("#feedModel"), model.slice(-120), { catLabels: KD.CAT_LABEL, showWhy: true });
   KD.$("#allCount").textContent = all.length + " in view";
   KD.$("#modelCount").textContent = model.length + " in view";
-  const c = (KDL.feedAlerts().length && JSON.parse(localStorage.getItem("kalshidash3.alerts.v1")).counters) || { up: 0, down: 0 };
-  KD.$("#counts").textContent = `▲ ${c.up || 0} · ▼ ${c.down || 0}`;
+  const f = KDL.feedAlerts();
+  const up = f.filter((a) => a.dir === "up").length, down = f.length - up;
+  KD.$("#counts").textContent = `▲ ${up} · ▼ ${down}`;
 }
 
 function statusChip(st) {

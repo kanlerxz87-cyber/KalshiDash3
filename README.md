@@ -6,8 +6,10 @@ A source-linked dashboard for the **Kalshi demo** environment, limited to five t
 **Live site:** https://kanlerxz87-cyber.github.io/KalshiDash3/
 
 Every market number on the site is produced by a scheduled, credential-free collector that reads the official
-demo Trade API and commits a timestamped snapshot. Nothing is typed by hand, and anything that cannot be
-confirmed against an official Kalshi page is left blank and listed on the *Flagged for Review* page.
+demo Trade API and commits a timestamped snapshot. On top of that snapshot layer, the browser can poll the same
+public demo API directly (with a CORS self-test and automatic fallback), so the alert chats and dashboard tick in
+near-real time. Nothing is typed by hand, and anything that cannot be confirmed against an official Kalshi page is
+left blank and listed on the *Flagged for Review* page.
 
 ---
 
@@ -18,7 +20,9 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
+| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, optional in-browser live polling |
+| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
 | `suggestions.html` | Eight proposals; four shipped to remove a correctness risk, four awaiting your decision |
@@ -89,10 +93,15 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 
 - The collector cannot run in the environment that built this repository (no network route to Kalshi), so collection
   runs on GitHub Actions. Scheduled workflows can be delayed or skipped; the site shows the snapshot age for that reason.
+- In-browser live polling depends on CORS headers the demo API returns but Kalshi does not document. The engine probes
+  the API at runtime, records the observed headers per collector run into `data/live/cors.json`, and falls back to
+  committed snapshots automatically (flagged as F-14).
+- Unauthenticated request limits are undocumented; the poller is conservative (default 10 s, back-off on 429).
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
-  intervals only — so it is accumulated one observation per collector run.
+  intervals only — so it is accumulated one observation per collector run (plus live poll points in the browser session).
 - WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
-- Portfolio performance is a labelled paper simulation until demo credentials exist.
+- Portfolio performance and the auto-sim engine are labelled paper simulations until demo credentials exist.
+  Kalshi states a demo account "does not come with funds preloaded" and must be created by a person.
 
 ## Sources
 
