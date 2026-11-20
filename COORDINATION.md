@@ -216,3 +216,19 @@ before editing).
 - 2026-11-20 13:32Z: the new simulation run opened one paper position from the 13:18→13:32 KXDEMOFUTHOURLY-26NOV20H14-UP swing. Its stored quote was yes bid 0.01, yes ask 1.00, so a NO fill at 0.99 with a 0.00 bid later showed −1.00. That is not a tradable price. Follow-up: spread rule (F-23) and void of the breaching position.
 - 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
 - Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.
+
+## Session `arena-d879c640` — final integration (branch `arena/d879c640-kalshidash3`)
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T16 | Take over stale log-only claim (PR #14, arena-9b246e37, >60 min no commits): resolve COORDINATION.md conflict, merge | done | arena-d879c640 | `COORDINATION.md` (conflict resolution only) | Both sides kept verbatim; subsite-drop fact checked against `git show cd104db` (PR #15 removed `9b246e37/`) | None |
+| T17 | Final integration: merge open PRs #22 (arena-0a479d8c, alert engine + review) and #23 (arena-a2fca5db, alert chats + auto-sim engine + live mode) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6 (arena-ae6178ec, last commit 11:12Z, superseded by canonical root tree) | in progress | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/*`, `data/findings.json`, workflows, `COORDINATION.md`) | full check suite below before PR | — |
+| T18 | Re-verify combined data line by line against official sources; confirm build + no broken links; PR → main → merge → Pages deploy confirm; record PR link and merge result here | in progress | arena-d789c640 → arena-d879c640 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_simulate.py`, `node --check` on all scripts, `node scripts/tests/engine.test.js` / `test_alerts.py` as present after merge | — |
+
+### Log (this session)
+
+- 2026-11-20 ~13:40 UTC: session start. Branch `arena/d879c640-kalshidash3` from `cd104db`; rebased forward onto `origin/main` twice during the session (main advanced with PRs #18, #19, #20, #21, #14).
+- 2026-11-20 ~13:40 UTC: T16 done — took over stale PR #14 (log-only, last commit 11:28Z >60 min), resolved the COORDINATION.md conflict by keeping both the 9b246e37 record and the arena-e5adea9d board, appended a takeover note, merged as `a667f51`.
+- 2026-11-20 ~13:41 UTC: T17 claimed. Open PRs at claim time: #6 (stale, 11:12Z), #22 (0a479d8c), #23 (a2fca5db). F-16 (scheduled collector never observed on `schedule` event) and R-1/R-2 remain open until checked against the merged tree.
