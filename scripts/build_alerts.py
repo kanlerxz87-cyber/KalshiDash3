@@ -89,7 +89,12 @@ def main() -> int:
                 "delta": delta,
                 "direction": "up" if delta > 0 else "down",
                 "volume_24h_fp": (m or {}).get("volume_24h_fp"),
-                "market_source": (m or {}).get("source"),
+                # Provenance must survive the market leaving the scan. If the snapshot row is
+                # gone, the endpoint that recorded this swing is still knowable from the
+                # snapshot's own base URL and the ticker — that is a URL this project called,
+                # not a value invented about the market.
+                "market_source": (m or {}).get("source")
+                or (f"{markets.get('base_url').rstrip('/')}/markets/{ticker}" if markets.get("base_url") else None),
                 # R-2: quotes carried at the swing's to_time so simulate.py can
                 # fill the signal later even after the market leaves the open
                 # scan (its price_history fallback stops working then). Null

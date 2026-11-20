@@ -52,6 +52,10 @@ class FeedTests(unittest.TestCase):
         cls.feed = json.loads((LIVE / "alerts.json").read_text())
         markets = json.loads((LIVE / "markets.json").read_text())
         cls.tickers = {r["ticker"] for r in markets["open_markets"] + markets["settled_markets"]}
+        hist_path = LIVE / "price_history.json"
+        cls.history_tickers = set()
+        if hist_path.exists():
+            cls.history_tickers = set(json.loads(hist_path.read_text()).get("series") or {})
 
     def test_schema_and_threshold(self):
         self.assertEqual(self.feed.get("schema"), 1)

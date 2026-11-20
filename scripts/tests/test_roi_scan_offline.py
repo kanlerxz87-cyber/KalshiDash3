@@ -62,6 +62,13 @@ OPEN = [
     mkt("KXAAAGASM-26DEC31-4.00", 0.48, 0.48, 0.48, 5000.0, "US average gas price on Dec 31?"),
     # gated: one-sided quote, so the spread cannot be measured
     mkt("KXPGATOUR-26NOV22-T60", 0.20, None, None, 30000.0, "The RSM Classic: winner?"),
+    # Observed demo shape, not a synthetic one: an illiquid market quoted "0.0000" on both
+    # sides (e.g. KXAAAGASD-26NOV21-3.7300 on
+    # https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASD&status=open,
+    # 2026-11-20). Both sides then have a zero cost basis, the model must refuse them and the
+    # scan must survive: a ZeroDivisionError in this path is what left data/live/roi.json
+    # unpublished (Actions run 44762120780 at 15:19:59Z).
+    mkt("KXAAAGASM-26DEC31-5.50", 0.0, 0.0, 0.0, 5000.0, "US average gas price on Dec 31 (0c book)?"),
     # must be excluded entirely: a multivariate combo mentioning gas
     {"ticker": "KXMVE-26NOV20-A", "event_ticker": "KXMVE-26NOV20", "title": "yes gas,yes tie",
      "mve_collection_ticker": "KXMVE-26NOV20", "status": "active", "yes_bid_dollars": "0.3000",
@@ -84,25 +91,42 @@ SETTLED = [
 
 BOOKS = {
     "KXAAAGASM-26DEC31-4.00": {"yes": [["0.4800", "900.00"]], "no": [["0.5100", "800.00"]]},
+    # a two-sided 0c book: depth passes, so nothing but the degenerate quote stops it
+    "KXAAAGASM-26DEC31-5.50": {"yes": [["0.0000", "900.00"]], "no": [["1.0000", "800.00"]]},
     "KXPGATOUR-26NOV22-T60": {"yes": [["0.2000", "20.00"]], "no": []},
     "KXMVE-26NOV20-A": {"yes": [], "no": []},
 }
 
 
 def fake_get(path, params=None, retries=3):
-    params = params or {}
+    pairs = list(params.items()) if isinstance(params, dict) else list(params or [])
+    params = dict(pairs)
+
+    def getall(key):
+        return [v for k, v in pairs if k == key]
+
     url = f"{roi_scan.BASE}{path}"
     if path == "/series":
         return {"series": []}, url
     if path == "/historical/cutoff":
         return {"market_settled_ts": "2026-09-01T00:00:00Z", "trades_created_ts": "2026-10-01T00:00:00Z"}, url
     if path.startswith("/markets/orderbooks"):
-        # The endpoint takes `tickers` as a repeated string[] (1-100); scripts/roi_scan.py
-        # therefore passes a list. The comma-string branch below is kept only so a regression
-        # to the old encoding still returns a shaped answer that the scan rejects as unrequested
-        # (which is precisely how the bug hid: 200 + empty arrays, not an error).
-        raw = params.get("tickers") or []
-        tickers = list(raw) if isinstance(raw, (list, tuple)) else [t for t in str(raw).split(",") if t]
+        # `tickers` is a repeated string[] (1-100) per
+        # https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks, and the demo
+        # host does not split a comma-joined value: observed 2026-11-20, `?tickers=A,B,C` answered
+        # 200 with ONE entry whose ticker was the literal "A,B,C" and empty arrays, and a joined
+        # value over the documented 200-char limit answered 400 — the "order books: 0" line in
+        # Actions run 44762120780. This fixture accepts the repeated form in either calling
+        # convention (a dict with a list value, as roi_scan.py sends it with urlencode(doseq), or a
+        # raw list of pairs) and REFUSES any comma, so a regression cannot slip through as a
+        # successful-looking empty answer.
+        raw = []
+        for v in getall("tickers"):
+            raw.extend(v if isinstance(v, (list, tuple)) else [v])
+        assert raw, "the order-book call must send at least one tickers= value"
+        assert not any("," in str(v) for v in raw), \
+            f"tickers must be repeated one per parameter, not comma-joined: {raw}"
+        tickers = [str(v) for v in raw if v]
         obs = []
         for t in tickers:
             b = BOOKS.get(t)
@@ -163,14 +187,21 @@ def main() -> int:
         if not cond:
             problems.append(msg)
 
-    yes(doc["counts"]["open_scanned"] == 3, f"scanned {doc['counts']['open_scanned']} open markets, expected 3")
-    yes(doc["counts"]["open_in_scope"] == 2, f"in scope {doc['counts']['open_in_scope']}, expected 2 (the combo must be excluded)")
+    yes(doc["counts"]["open_scanned"] == 4, f"scanned {doc['counts']['open_scanned']} open markets, expected 4")
+    yes(doc["counts"]["open_in_scope"] == 3, f"in scope {doc['counts']['open_in_scope']}, expected 3 (the combo must be excluded)")
     tickers = [p["ticker"] for p in doc["picks"]]
     yes("KXAAAGASM-26DEC31-4.00" in tickers, f"the qualifying gas market must be a pick, got {tickers}")
     yes("KXMVE-26NOV20-A" not in tickers, "a combo must never be picked")
     yes("KXMVE-26NOV20-A" not in [p["ticker"] for p in doc["alerts"]], "a combo must never raise an alert")
     unsc = {p["ticker"]: p for p in doc["unscoreable"]}
-    yes(doc["counts"]["unscoreable"] == 1, f"exactly one market has no two-sided quote, got {doc['counts']['unscoreable']}")
+    yes(doc["counts"]["unscoreable"] == 2, f"two markets have no price to buy (one one-sided, one quoted 0c), got {doc['counts']['unscoreable']}")
+    zero = unsc.get("KXAAAGASM-26DEC31-5.50")
+    yes(zero is not None, "the 0c-quote market must be listed as unscoreable, not dropped")
+    yes(bool(zero) and any("degenerate" in r or "no buyable side" in str(f) for r in (zero.get("reasons") or []) for f in (zero.get("fails") or [None])) or
+        bool(zero) and (any("degenerate" in r for r in (zero.get("reasons") or [])) or any("no buyable side" in str(f) for f in (zero.get("fails") or []))),
+        f"the 0c-quote market must say why it cannot be priced, got reasons={((zero or {}).get('reasons'))} fails={((zero or {}).get('fails'))}")
+    yes(bool(zero) and zero.get("entry") is None, "a degenerate quote must never carry a modelled entry")
+    yes("KXAAAGASM-26DEC31-5.50" not in tickers, "a market with no buyable price can never be a pick")
     yes("KXPGATOUR-26NOV22-T60" in unsc, f"the one-sided market must be listed as unscoreable, got {list(unsc)}")
     yes("no quoted price" in " ".join(unsc.get("KXPGATOUR-26NOV22-T60", {}).get("reasons", [])),
         "its reason must be the missing quote, not an invented price")

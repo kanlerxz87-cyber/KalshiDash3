@@ -49,7 +49,7 @@ def utcnow() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def get(path: str, params: dict | None = None, retries: int = 3):
+def get(path: str, params: dict | list | None = None, retries: int = 3):
     """One GET against the demo API. List-valued params are REPEATED, not comma-joined.
 
     That is not a style choice, it is what the endpoints require, and the difference is
@@ -67,7 +67,8 @@ def get(path: str, params: dict | None = None, retries: int = 3):
     url = BASE + path
     if params:
         from urllib.parse import urlencode
-        pairs = [(k, v) for k, v in params.items() if v not in (None, "")]
+        items = params.items() if isinstance(params, dict) else list(params)
+        pairs = [(k, v) for k, v in items if v not in (None, "")]
         if pairs:
             url += "?" + urlencode(pairs, doseq=True)
     last = None
@@ -90,8 +91,17 @@ def get(path: str, params: dict | None = None, retries: int = 3):
 
 
 def paged_markets(params: dict, cap: int):
-    """Page GET /markets with the documented cursor, deduplicated by ticker."""
-    out, cursor, seen = {}, "", 0
+    """Page GET /markets with the documented cursor, deduplicated by ticker.
+
+    `cap` is a safety stop, not the normal end: the scan keeps paging while the API
+    returns a cursor. A fixed cap was a real bug here — the demo host carries more
+    open markets than 4000 (4369 open at the 2026-11-20T15:19Z collection, see
+    data/live/markets.json counts) and returns them newest-first, so a 4000 cut
+    dropped the older in-scope markets and the scan reported "18 in scope" where the
+    collector saw 387. The truncation is now returned as a flag so a page can say so
+    out loud instead of presenting a partial universe as the whole one.
+    """
+    out, cursor, seen, truncated = {}, "", 0, False
     while True:
         d, _ = get("/markets", {**params, "limit": 1000, "cursor": cursor or None})
         batch = d.get("markets") or []
@@ -100,9 +110,12 @@ def paged_markets(params: dict, cap: int):
                 out[m["ticker"]] = m
         seen += len(batch)
         cursor = d.get("cursor") or ""
-        if not cursor or not batch or seen >= cap:
+        if not cursor or not batch:
             break
-    return list(out.values())
+        if seen >= cap:
+            truncated = True
+            break
+    return list(out.values()), truncated
 
 
 def books_for(tickers: list[str], depth_source_note: str) -> tuple[dict, dict]:
@@ -331,8 +344,8 @@ def build(validate_n: int, out_path: Path) -> dict:
     print(f"desk: {BASE}  model={model['id']}")
 
     # 1. open markets, combos excluded by the documented filter as well as by the local guard
-    open_ms = paged_markets({"status": "open", "mve_filter": "exclude"}, cap=4000)
-    print(f"  open markets: {len(open_ms)}")
+    open_ms, open_trunc = paged_markets({"status": "open", "mve_filter": "exclude"}, cap=20000)
+    print(f"  open markets: {len(open_ms)}" + (" (safety cap reached)" if open_trunc else ""))
 
     series_idx = COLLECT.fetch_series_index()
     rows, seen_combo = [], 0
@@ -437,8 +450,8 @@ def build(validate_n: int, out_path: Path) -> dict:
     print(f"  swings >= ${thr:.2f}: {len(alerts)}")
 
     # 6. out-of-sample validation on markets that have already settled
-    settled = paged_markets({"status": "settled"}, cap=1500)
-    settled.sort(key=lambda m: m.get("settlement_ts") or "", reverse=True)
+    settled, settled_trunc = paged_markets({"status": "settled"}, cap=20000)
+    settled.sort(key=lambda m: m.get("settlement_ts") or m.get("close_time") or "", reverse=True)
     validation = replay_settled(model, [m for m in settled if _maybe_in_scope(cats, series_idx, m)], validate_n) \
         if validate_n else {"skipped": {"--validate": "0"}}
     print(f"  validation: {validation.get('markets_tested', 0)} markets, {validation.get('signals', 0)} signals, hit rate {validation.get('hit_rate')}")
@@ -471,6 +484,11 @@ def build(validate_n: int, out_path: Path) -> dict:
             "settlement": "https://docs.kalshi.com/getting_started/market_settlement",
             "historical_partition": "https://docs.kalshi.com/getting_started/historical_data",
             "demo_environment": "https://docs.kalshi.com/getting_started/demo_env",
+        },
+        "paging": {
+            "open_truncated_at_safety_cap": bool(open_trunc),
+            "settled_truncated_at_safety_cap": bool(settled_trunc),
+            "note": "GET /markets is paged to exhaustion with the documented cursor; the cap is a safety stop. Truncation is reported, never hidden.",
         },
         "counts": {
             "open_scanned": len(open_ms),
