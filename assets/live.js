@@ -151,13 +151,21 @@ const KDLIVE = (() => {
     if (ask !== null && ask > 0 && ask < 1) {
       const fee = takerFeeUnit(ask, mult.taker);
       const cost = ask + fee;
-      sides.push({ side: "YES", entry: ask, fee_unit: fee, cost, ev: q - cost, roi: (q - cost) / cost });
+      if (cost > 0) {
+        sides.push({ side: "YES", entry: ask, fee_unit: fee, cost, ev: q - cost, roi: (q - cost) / cost });
+      } else {
+        reasons.push("YES ask $0.00: cost zero, so ROI divides by zero — side left unpriced");
+      }
     }
     if (bid !== null && 1 - bid > 0 && 1 - bid < 1) {
       const pno = 1 - bid;
       const fee = takerFeeUnit(pno, mult.taker);
       const cost = pno + fee;
-      sides.push({ side: "NO", entry: pno, fee_unit: fee, cost, ev: 1 - q - cost, roi: (1 - q - cost) / cost });
+      if (cost > 0) {
+        sides.push({ side: "NO", entry: pno, fee_unit: fee, cost, ev: 1 - q - cost, roi: (1 - q - cost) / cost });
+      } else {
+        reasons.push("NO price $0.00 (YES bid $1.00): cost zero, so ROI divides by zero — side left unpriced");
+      }
     }
     if (!sides.length && (ask !== null || bid !== null)) {
       reasons.push("quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced");
@@ -468,14 +476,28 @@ const KDLIVE = (() => {
       return seen.size;
     }
 
+    // Book coverage is reported, not assumed: a request that returns nothing must be visible
+    // as "0 of N books" rather than silently becoming "no liquidity anywhere".
+    S.bookStats = null;
+
     async function pollBooks(tickers) {
-      // GET /markets/orderbooks takes 1-100 tickers in one request.
+      // GET /markets/orderbooks takes 1-100 tickers per request (documented max), and
+      // `tickers` is a string[] there — NOT a comma-separated list like GET /markets wants.
+      // The API answers an unrecognised ticker with 200 + empty arrays instead of an error, so
+      // the comma form reads as "no liquidity" rather than as a bad request: measured on the demo
+      // API, ?tickers=A%2CB returns one entry whose ticker is literally "A,B" with both arrays
+      // empty, while ?tickers=A&tickers=B returns both books. Repeated params, therefore.
+      const bookStats = { requested: tickers.length, returned: 0, unexpected: 0, failed: 0 };
       for (let i = 0; i < tickers.length; i += 100) {
         const c = tickers.slice(i, i + 100);
+        const want = new Set(c);
+        const q = new URLSearchParams();
+        for (const t of c) q.append("tickers", t);
         let d;
-        try { d = await api(`/markets/orderbooks?tickers=${encodeURIComponent(c.join(","))}`); }
-        catch (e) { return; }
+        try { d = await api(`/markets/orderbooks?${q.toString()}`); }
+        catch (e) { bookStats.failed++; continue; }
         for (const ob of d.orderbooks || []) {
+          if (!want.has(ob.ticker)) { bookStats.unexpected++; continue; }
           const yes = (ob.orderbook_fp && ob.orderbook_fp.yes_dollars) || [];
           const no = (ob.orderbook_fp && ob.orderbook_fp.no_dollars) || [];
           const bestYesBid = yes.length ? yes[yes.length - 1] : null;
@@ -491,6 +513,7 @@ const KDLIVE = (() => {
           });
         }
       }
+      S.bookStats = bookStats;
     }
 
     async function candles(seriesTicker, ticker, minutes) {

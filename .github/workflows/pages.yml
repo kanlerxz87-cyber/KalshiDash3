@@ -36,6 +36,12 @@ jobs:
       - name: Run alert-feed tests
         run: python3 scripts/tests/test_alerts.py
 
+      - name: Run the ROI model tests (fee table, browser/CI parity, scan over the real snapshot)
+        run: |
+          python3 scripts/tests/test_fees.py
+          python3 scripts/tests/test_roi_parity.py
+          python3 scripts/tests/test_roi_scan_snapshot.py
+
       - name: Check links, HTML and data files (fails the build on a broken page)
         run: python3 scripts/check_site.py
 

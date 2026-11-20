@@ -50,12 +50,26 @@ def utcnow() -> str:
 
 
 def get(path: str, params: dict | None = None, retries: int = 3):
+    """One GET against the demo API. List-valued params are REPEATED, not comma-joined.
+
+    That is not a style choice, it is what the endpoints require, and the difference is
+    silent rather than loud:
+      * GET /markets?tickers=A,B            -> both markets (documented comma-separated list)
+      * GET /markets/orderbooks?tickers=A,B -> ONE entry, ticker "A,B", empty arrays
+    The order-book endpoint declares `tickers` as string[] with 1-100 elements and a 200-char
+    maximum per element (https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks),
+    and a market with no resting order — or a ticker it does not recognise — answers 200 with
+    empty arrays instead of an error (https://docs.kalshi.com/getting_started/orderbook_responses).
+    So a comma-joined chunk looks like a successful request that found no liquidity, which is
+    exactly what it was before: the published scan reported orderbooks: 0 and every depth gate
+    silently fell back to "not applied".
+    """
     url = BASE + path
     if params:
         from urllib.parse import urlencode
-        clean = {k: v for k, v in params.items() if v not in (None, "")}
-        if clean:
-            url += "?" + urlencode(clean)
+        pairs = [(k, v) for k, v in params.items() if v not in (None, "")]
+        if pairs:
+            url += "?" + urlencode(pairs, doseq=True)
     last = None
     for attempt in range(retries):
         time.sleep(INTERVAL)
@@ -91,22 +105,37 @@ def paged_markets(params: dict, cap: int):
     return list(out.values())
 
 
-def books_for(tickers: list[str], depth_source_note: str) -> dict:
-    """GET /markets/orderbooks takes 1-100 tickers per call. Bids only, ascending, best last."""
+def books_for(tickers: list[str], depth_source_note: str) -> tuple[dict, dict]:
+    """GET /markets/orderbooks, 1-100 tickers per call (documented max), tickers REPEATED.
+
+    Returns (books_by_ticker, stats). Bids only, ascending, best bid last; a NO bid at Y is a
+    YES ask at 1-Y — https://docs.kalshi.com/getting_started/orderbook_responses.
+    Only tickers that were actually asked for are kept: an entry for anything else (the shape a
+    comma-joined query produces) is counted and dropped, never published as a market's book.
+    """
     out: dict[str, dict] = {}
+    stats = {"requested": len(tickers), "returned": 0, "unexpected_tickers": 0, "failed_chunks": 0,
+             "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
+             "docs": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks"}
     for i in range(0, len(tickers), 100):
         chunk = tickers[i:i + 100]
+        want = set(chunk)
         try:
-            d, url = get("/markets/orderbooks", {"tickers": ",".join(chunk)})
+            d, url = get("/markets/orderbooks", {"tickers": chunk})
         except RuntimeError as e:
+            stats["failed_chunks"] += 1
             print(f"  ! orderbooks chunk failed: {e}", file=sys.stderr)
             continue
         for ob in d.get("orderbooks") or []:
+            tk = ob.get("ticker")
+            if tk not in want:
+                stats["unexpected_tickers"] += 1
+                continue
             yes = (ob.get("orderbook_fp") or {}).get("yes_dollars") or []
             no = (ob.get("orderbook_fp") or {}).get("no_dollars") or []
             best_yes = yes[-1] if yes else None
             best_no = no[-1] if no else None
-            out[ob.get("ticker")] = {
+            out[tk] = {
                 "depth_at_bid": RM.num(best_yes[1]) if best_yes else 0.0,
                 "depth_at_ask": RM.num(best_no[1]) if best_no else 0.0,
                 "bid_price": RM.num(best_yes[0]) if best_yes else None,
@@ -115,9 +144,15 @@ def books_for(tickers: list[str], depth_source_note: str) -> dict:
                 "no_ladder": [{"price": RM.num(r[0]), "contracts": RM.num(r[1])} for r in no if isinstance(r, list)],
                 "source": url,
             }
+            stats["returned"] += 1
     for v in out.values():
         v["note"] = depth_source_note
-    return out
+    if stats["requested"] and not out:
+        # Loud, because the failure mode is a 200 with empty arrays: the request "succeeded".
+        print(f"  ! 0 of {stats['requested']} order books returned ({stats['failed_chunks']} chunk(s) "
+              f"failed, {stats['unexpected_tickers']} unexpected ticker(s) in the responses) — depth "
+              f"gates will report 'not applied' rather than treat it as zero liquidity", file=sys.stderr)
+    return out, stats
 
 
 def load_history(path: Path) -> dict:
@@ -227,15 +262,26 @@ def replay_settled(model: dict, markets: list[dict], max_markets: int) -> dict:
         q = RM.clip((w["mid"] + w["micro"]) * mid + w["last"] * last, *model["parameters"]["clip_q"])
         mult = RM.series_mult(series_ticker, model)
         sides = []
+        zero_cost_sides = 0
         if ask is not None:
             fee = RM.taker_fee_unit(ask, mult["taker"])
             cost = ask + fee
-            sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
+            else:
+                zero_cost_sides += 1
         if bid is not None:
             pno = 1 - bid
             fee = RM.taker_fee_unit(pno, mult["taker"])
             cost = pno + fee
-            sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
+            else:
+                zero_cost_sides += 1
+        if zero_cost_sides:
+            # Counted, not silently dropped: a pinned $0.00/$1.00 candle is a fact about the
+            # market's quote, and the replay must say how many sides it refused to price.
+            skip["side pinned at $0.00 (ROI undefined)"] = skip.get("side pinned at $0.00 (ROI undefined)", 0) + zero_cost_sides
         # Only the price-side gates the replay can honestly apply.
         sides = [s for s in sides
                  if f["min_entry_price"] <= s["entry"] <= f["max_entry_price"] and s["roi"] > f["min_net_roi"]]
@@ -320,9 +366,11 @@ def build(validate_n: int, out_path: Path) -> dict:
     #    maximum per request). Depth is a safety gate, so it is not fair to apply it only
     #    to the biggest names and leave the rest unscored.
     rows.sort(key=lambda r: -(r["dollars"] or 0))
-    books = books_for([r["m"]["ticker"] for r in rows],
-                      "order book depth from GET /markets/orderbooks (bids only; a NO bid at Y is a YES ask at 1-Y)")
-    print(f"  order books: {len(books)}")
+    books, book_stats = books_for([r["m"]["ticker"] for r in rows],
+                                  "order book depth from GET /markets/orderbooks (bids only; a NO bid at Y is a YES ask at 1-Y)")
+    print(f"  order books: {len(books)} of {book_stats['requested']} requested"
+          + (f" ({book_stats['failed_chunks']} chunk(s) failed, {book_stats['unexpected_tickers']} unexpected)"
+             if (book_stats['failed_chunks'] or book_stats['unexpected_tickers']) else ""))
 
     # 4. score with the shared model
     hist = load_history(LIVE / "price_history.json")
@@ -432,12 +480,14 @@ def build(validate_n: int, out_path: Path) -> dict:
             "near_misses": len(near_misses),
             "unscoreable": sum(1 for s in scored if not s["eligible"] and s.get("score") is None),
             "orderbooks": len(books),
+            "orderbooks_requested": book_stats["requested"],
             "alerts": len(alerts),
             "markets_with_momentum": sum(1 for s in scored if s.get("momentum") is not None),
             "markets_with_catalyst_url": sum(1 for s in scored if s.get("catalysts")),
             "scoring_errors": len(scoring_errors),
         },
         "scoring_errors": scoring_errors[:50],
+        "orderbook_fetch": book_stats,
         "historical_cutoff": cutoff,
         "picks": picks,
         "near_misses": near_misses,

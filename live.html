@@ -96,6 +96,11 @@
     lift (<a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">order-book
     responses</a>). Empty arrays mean an empty book, not a missing value
     (<a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">documented</a>).
+    <code>tickers</code> is sent as a <b>repeated</b> parameter (<code>?tickers=A&amp;tickers=B</code>), which is what this
+    endpoint declares — <a href="https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks" target="_blank" rel="noopener">1–100
+    of them, 1–100 per request</a> — and not as a comma-separated list the way <code>GET /markets</code> wants: a comma-joined
+    list is treated as one unrecognised ticker and answered with empty arrays, which is indistinguishable from an empty book.
+    "Book coverage N of M requested" below says which of the two happened.
   </p>
   <div class="card">
     <div id="liqHead" class="small mut">Pick a market above.</div>
@@ -431,15 +436,22 @@ function renderPicker() {
 function renderLadder() {
   const head = KD.$("#liqHead"), host = KD.$("#ladder");
   const b = S.sel ? eng.S.books.get(S.sel) : null;
+  // Coverage, not confidence: a request that returns nothing is a fact about the request, and
+  // the empty-book case is exactly the one this project got wrong once (a comma-joined tickers
+  // list is answered with 200 + empty arrays, which looks identical to "no liquidity").
+  const st = eng.S.bookStats;
+  const cov = st ? ` <span class="mut">· book coverage ${st.returned} of ${st.requested} requested` +
+      (st.failed ? `, ${st.failed} request(s) failed` : "") +
+      (st.unexpected ? `, ${st.unexpected} unrequested ticker(s) ignored` : "") + `</span>` : "";
   if (!b) {
     head.innerHTML = S.sel ? `No order book in this poll for <code>${KD.esc(S.sel)}</code>. Books are read for the
       watchlist (up to 100 tickers per request); the endpoint is public
       (<a href="https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks" target="_blank" rel="noopener">GET /markets/orderbooks</a>).`
-      : "Pick a market to see its depth.";
+      : "Pick a market to see its depth." + cov;
     host.innerHTML = ""; return;
   }
   head.innerHTML = `<code>${KD.esc(S.sel)}</code> · best YES bid ${KD.cents(b.bid_price)} (${KD.num(b.depth_at_bid)} c) ·
-    best YES ask ${KD.cents(b.ask_price)} (${KD.num(b.depth_at_ask)} c) · read at ${fmt.hhmmss(b.at)}`;
+    best YES ask ${KD.cents(b.ask_price)} (${KD.num(b.depth_at_ask)} c) · read at ${fmt.hhmmss(b.at)}${cov}`;
   const max = Math.max(1, ...b.yes_ladder.map(x => x.contracts || 0), ...b.no_ladder.map(x => x.contracts || 0));
   const col = (rows, cls) => rows.slice().reverse().slice(0, 12).map(r =>
     `<div class="lvl ${cls}"><span>$${r.price.toFixed(4)}</span><span class="g"><i style="width:${((r.contracts || 0) / max * 100).toFixed(1)}%"></i></span><span>${KD.num(r.contracts)}</span></div>`).join("")

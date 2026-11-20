@@ -41,6 +41,23 @@
     <span id="paramStamp"></span></p>
   <div id="params"></div>
 
+  <div class="card">
+    <h3 style="margin-top:0">A side quoted at $0.00 or $1.00 is refused, not priced</h3>
+    <p class="small">Measured, not assumed: <b>127 of the 387</b> open markets in scope in
+      <code>data/live/markets.json</code> (collected <span class="mono">2026-11-20T15:19:53Z</span>) carry
+      <code>yes_ask_dollars = 0.0000</code> — the answer the API gives when that side has no resting order,
+      instead of omitting the field. The band runs from 0.0000 to 1.0000 in one-cent steps, so a quote can
+      legitimately sit on either edge. At a cost of exactly $0.00 the ratio (win − cost) / cost has no value:
+      a division by zero in the scheduled scan (which is why the scan that publishes this page never
+      completed) and <code>+Infinity</code> in the browser, which would rank a pinned quote as the best edge
+      on the board. Both implementations therefore price a side only when its level sits strictly inside
+      (0, 1), refuse the degenerate one with a stated reason, and never reprice it — so a market with
+      nothing buyable reads as "no buyable side" rather than as a number.
+      <code>scripts/tests/test_roi_scan_snapshot.py</code> re-runs the whole scan over that snapshot on every
+      build, and the two zero-level cases in <code>scripts/tests/fixtures_roi_parity.json</code> pin
+      browser/CI agreement on the branch.</p>
+  </div>
+
   <h2>Fees, transcribed from the published schedule</h2>
   <p class="small mut">
     Source: <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule
@@ -239,7 +256,7 @@ alert = |Δlast between consecutive observations| ≥ $${model.swing_alert.thres
   KD.$("#thrInline").textContent = "$"+model.swing_alert.threshold_dollars;
 
   if(!scan){
-    KD.$("#scanStamp").innerHTML = '<span class="badge warn">no scan committed yet</span> the desk workflow writes <code>data/live/roi.json</code> on a schedule; until then this page shows the model only, never an example number.';
+    KD.$("#scanStamp").innerHTML = '<span class="badge warn">no scan committed yet</span> <code>data/live/roi.json</code> is written by <code>.github/workflows/desk.yml</code> (a 10-minute schedule, plus a dispatch on each merge: cron events have not been observed firing on this repo — F-16). Until a run lands, this page shows the model only, never an example number.';
     KD.$("#picks").innerHTML=KD.empty("nothing scored yet");
     return;
   }

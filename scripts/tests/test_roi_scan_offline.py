@@ -24,6 +24,8 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "scripts" / "tests"))
 
+import datetime as _dt
+
 import roi_scan  # noqa: E402
 import collect  # noqa: E402
 
@@ -70,6 +72,9 @@ OPEN = [
 OPEN[1]["yes_bid_size_fp"] = "20.00"
 OPEN[1]["yes_ask_size_fp"] = "0.00"
 
+# A settled market must sit in the PAST, so both are derived from the clock too (an earlier
+# revision had the golf one closing 2026-11-21T23:00Z — "settled" with a future close_time,
+# which is a state the API cannot return).
 SETTLED = [
     mkt("KXAAAGASM-26NOV19-4.00", 0.60, 0.62, 0.61, 1200.0, "US average gas price on Nov 19?",
         close=_future(-20), status="finalized", result="no"),
@@ -92,7 +97,12 @@ def fake_get(path, params=None, retries=3):
     if path == "/historical/cutoff":
         return {"market_settled_ts": "2026-09-01T00:00:00Z", "trades_created_ts": "2026-10-01T00:00:00Z"}, url
     if path.startswith("/markets/orderbooks"):
-        tickers = [t for t in (params.get("tickers") or "").split(",") if t]
+        # The endpoint takes `tickers` as a repeated string[] (1-100); scripts/roi_scan.py
+        # therefore passes a list. The comma-string branch below is kept only so a regression
+        # to the old encoding still returns a shaped answer that the scan rejects as unrequested
+        # (which is precisely how the bug hid: 200 + empty arrays, not an error).
+        raw = params.get("tickers") or []
+        tickers = list(raw) if isinstance(raw, (list, tuple)) else [t for t in str(raw).split(",") if t]
         obs = []
         for t in tickers:
             b = BOOKS.get(t)
