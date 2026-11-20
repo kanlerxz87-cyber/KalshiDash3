@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "id": "roi-screen-v1",
+  "name": "KalshiDash3 fee-aware ROI screen, v1",
+  "owner_session": "arena-d022c8de",
+  "generated": "2026-11-20",
+  "what_this_is": "A deterministic screen that ranks a market by the modelled RETURN ON CAPITAL of crossing the spread right now, after fees. It is this project's model, not a Kalshi product. Two implementations read this one file: assets/live.js (browser, tick-level) and scripts/roi_scan.py (GitHub Actions, committed snapshot). scripts/tests/test_roi_parity.mjs asserts both produce the same numbers on the same fixture.",
+  "what_this_is_not": "Not a price forecast and not advice. The model reads the current book, so its 'edge' is the difference between a blended quote and the price you must actually pay. If the book is already right, the edge is zero. Demo prices may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
+  "swing_alert": {
+    "threshold_dollars": 0.1,
+    "rule": "Alert when |last_price − last_price_at_previous_observation| >= threshold_dollars, in EITHER direction. Comparison is between consecutive observations of the same market ticker, never between a bid and an ask.",
+    "why": "This is the threshold the project brief specified.",
+    "verified_against": "no API field: this is a project rule, stated here so the number is not buried in code"
+  },
+  "inputs": {
+    "note": "Every input is a documented field of the public, unauthenticated demo API. No input is estimated from anything outside the API.",
+    "fields": [
+      {"name": "bid", "from": "yes_bid_dollars", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+      {"name": "ask", "from": "yes_ask_dollars", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+      {"name": "last", "from": "last_price_dollars", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+      {"name": "volume_24h", "from": "volume_24h_fp (contract count, not dollars)", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+      {"name": "depth_at_bid", "from": "last element of orderbook_fp.yes_dollars [price_dollars, count_fp]; arrays are ascending, best bid last", "source": "https://docs.kalshi.com/getting_started/orderbook_responses"},
+      {"name": "depth_at_ask", "from": "last element of orderbook_fp.no_dollars: a NO bid at Y is a YES ask at 1-Y, so that count is the size a YES buyer can lift", "source": "https://docs.kalshi.com/getting_started/orderbook_responses"},
+      {"name": "ttc_hours", "from": "close_time minus fetch time", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+      {"name": "momentum_dollars", "from": "last − last price N minutes ago, from this project's own observation series (browser ticks or data/live/price_history.json); candlesticks cannot supply it for a settled window shorter than 1 minute", "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"}
+    ]
+  },
+  "parameters": {
+    "weights": {"mid": 0.45, "micro": 0.35, "last": 0.2},
+    "weights_note": "Fair estimate q = 0.45*mid + 0.35*microprice + 0.20*last, then a momentum tilt is added. The three weights sum to 1.0, so q stays inside the quoted range before the tilt. mid = (bid+ask)/2; microprice = (bid*ask_size + ask*bid_size)/(ask_size+bid_size), i.e. the side with more resting size pulls the estimate. 'microprice' is a standard order-book statistic defined here; it is not a Kalshi field.",
+    "trend": {"weight_dollars": 0.02, "reference_move_dollars": 0.1, "rule": "tilt = weight * clip(momentum / reference_move, -1, 1). A 10c move in the lookback window shifts q by at most 2c."},
+    "lookback_minutes": 30,
+    "clip_q": [0.01, 0.99],
+    "filters": {
+      "max_spread": 0.1,
+      "min_depth_contracts": 50,
+      "min_volume_24h_contracts": 100,
+      "min_entry_price": 0.05,
+      "max_entry_price": 0.95,
+      "min_ttc_hours": 0.25,
+      "max_ttc_hours": 2160,
+      "require_seed_category": true,
+      "min_net_roi": 0.0
+    },
+    "filters_note": "Hard gates, applied before ranking. max_entry_price keeps the screen out of the 95c-99c region where a cent of rounding dominates the answer. require_seed_category means only markets whose series ticker appears in the official fee schedule (https://kalshi.com/docs/kalshi-fee-schedule.pdf) can be picked; keyword-only topic matches are excluded from the picks feed and still appear in the all-events feed."
+  },
+  "fees": {
+    "taker_formula": "fee = round up (M_taker x 0.07 x C x P x (1 - P))",
+    "maker_formula": "fee = round up (M_maker x 0.0175 x C x P x (1 - P))",
+    "round_up_definition": "rounded up such that the fee + positionCost is rounded to a centicent; implemented here as rounding the total fee up to the next cent, which reproduces every row of the schedule's general table exactly (see scripts/tests/test_fees.py)",
+    "defaults": {"M_taker": 1, "M_maker": 0},
+    "settlement_fee": "zero for simple yes/no determinations; may apply for sub-cent scalar settlement",
+    "payout": "YES holders receive $1 per contract on a yes outcome; NO holders receive $1 per contract on a no outcome",
+    "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (last updated and effective: July 7, 2026) and https://docs.kalshi.com/getting_started/market_settlement",
+    "series_multipliers": {
+      "note": "Transcribed ONLY from the fee schedule's Non-Standard Fees table for series this project can put in scope. Absent series use the general default (taker 1, maker 0). The PDF does not publish a complete machine-readable list, so any series not listed here is treated as general and is flagged as such rather than guessed.",
+      "verified_on": "2026-11-20",
+      "table": {
+        "KXAAAGASM": {"maker": 1, "taker": 1, "description_in_pdf": "US gas price"},
+        "KXBTCMAX150": {"maker": 1, "taker": 1, "description_in_pdf": "When will bitcoin hit 150k?"},
+        "KXBTCY": {"maker": 0, "taker": 0, "description_in_pdf": "BTC price range EOY"},
+        "KXETHY": {"maker": 0, "taker": 0, "description_in_pdf": "ETH price EOY"},
+        "KXNASDAQ100Y": {"maker": 1, "taker": 1, "description_in_pdf": "Nasdaq yearly range"},
+        "KXPGATOUR": {"maker": 1, "taker": 1, "description_in_pdf": "PGA Tour"},
+        "KXPGARYDER": {"maker": 1, "taker": 1, "description_in_pdf": "Ryder Cup"},
+        "KXPGASOLHEIM": {"maker": 1, "taker": 1, "description_in_pdf": "Solheim Cup"},
+        "KXCPI": {"maker": 1, "taker": 1, "description_in_pdf": "CPI"},
+        "KXCPIYOY": {"maker": 1, "taker": 1, "description_in_pdf": "Inflation"},
+        "KXFED": {"maker": 1, "taker": 1, "description_in_pdf": "Fed funds rate"},
+        "KXFEDDECISION": {"maker": 1, "taker": 1, "description_in_pdf": "Fed meeting"},
+        "KXELECTIRAN": {"maker": 0, "taker": 0, "description_in_pdf": "Will Iran hold a presidential election?"}
+      }
+    }
+  },
+  "scoring": {
+    "steps": [
+      "1. q = clip(w_mid*mid + w_micro*micro + w_last*last, 0, 1) + trend tilt, then clipped to [0.01, 0.99].",
+      "2. YES entry: pay the ask. unit_fee_yes = M_taker*0.07*ask*(1-ask). cost_yes = ask + unit_fee_yes. ev_yes = q - cost_yes. roi_yes = ev_yes / cost_yes.",
+      "3. NO entry: pay (1 - bid) for a NO contract whose price is P_no = 1 - bid. unit_fee_no = M_taker*0.07*P_no*(1-P_no). cost_no = P_no + unit_fee_no. ev_no = (1 - q) - cost_no. roi_no = ev_no / cost_no.",
+      "4. side = whichever of roi_yes / roi_no is larger; score = that roi. A pick therefore means: after paying the spread and the documented taker fee, the modelled payout still exceeds the cost by this fraction of the cost.",
+      "5. Drop the market if any hard filter fails. Rank by score desc, keep top_k."
+    ],
+    "top_k": 12,
+    "why_roi_not_edge": "The brief asks for 'high ROI', so the ranking quantity is return-on-capital (profit / capital at risk), not raw cents of edge. A 3c edge on a 6c contract is a bigger ROI than a 6c edge on a 90c contract; near the extremes the capital at risk is small but so is the probability, which is why the hit-rate measurement below is published next to the score."
+  },
+  "validation": {
+    "method": "Out-of-sample replay on markets that have already settled, using only information available before close. For each settled market the collector fetches 1-minute candlesticks covering the 120 minutes before close_time, forms the signal from that candle's yes_bid/yes_ask/price close only, and scores it with the same parameters. The entry price is the candle's best ask (buy YES) or 1 - best bid (buy NO). The bet settles at $1 for the winning side and $0 for the losing side, per the settlement doc.",
+    "reported": ["n_signals", "hit_rate_yes_side", "mean_net_roi", "median_net_roi", "total_pnl_per_100_contracts", "by_category"],
+    "honest_limits": [
+      "The replay cannot see the order-book depth or the momentum at signal time (candlesticks carry price aggregates only), so the validation runs a REDUCED feature set: mid and last only, micro weight reallocated to mid. The live score is therefore not identical to the validated score, and the page says so.",
+      "Only markets still inside the live window are readable: settled markets and their candlesticks move to GET /historical/* once the cutoff advances (https://docs.kalshi.com/getting_started/historical_data).",
+      "Sample is whatever the demo exchange happens to have settled; it is small and it is demo data. A measured hit rate is not a promise about real markets.",
+      "The result field is used exactly as returned: yes, no or scalar. Scalar settlements are excluded from a yes/no hit-rate claim rather than coerced into one."
+    ]
+  },
+  "catalyst_links": {
+    "rule": "For a >=10c move, the site may show links ONLY if a URL appears literally in that market's own official text fields (rules_primary, rules_secondary, subtitle, yes_sub_title, no_sub_title) as returned by GET /markets, or the market/event record link. The GET /markets response schema has no news field.",
+    "label_shown": "source this market settles on (from its own rules text)",
+    "never_shown": "any claim that a given article caused the move",
+    "empty_case": "no URL in the official record -> the cell is left blank and labelled 'no source URL in the market record', never filled by guesswork",
+    "source": "https://docs.kalshi.com/api-reference/market/get-markets"
+  }
+}
