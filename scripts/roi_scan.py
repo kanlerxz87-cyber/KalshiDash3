@@ -305,6 +305,31 @@ def build(validate_n: int, out_path: Path) -> dict:
     print(f"  open markets: {len(open_ms)}")
 
     series_idx = COLLECT.fetch_series_index()
+
+    # The paged scan is capped, and the demo exchange is full of multivariate combos and
+    # long-dated event series, so a fee-schedule-confirmed series can fall OUTSIDE the
+    # window entirely. Measured 2026-11-20: with the 4000-market cap the scan's in-scope
+    # set held 214 markets and contained NO market of the confirmed gas, golf, elections
+    # or crypto seed series - only zero-volume crypto event contracts - so every score
+    # was "no quoted price at all" and no pick could be produced. Querying each seed
+    # series explicitly (the same method scripts/collect.py uses) makes the confirmed
+    # data reachable no matter where the paged window ends.
+    seeded: dict[str, dict] = {}
+    for c in cats["categories"]:
+        for seed in c.get("seed_series", []):
+            try:
+                d, _ = get("/markets", {"series_ticker": seed["ticker"], "status": "open", "limit": 1000})
+            except RuntimeError as e:
+                print(f"  ! seed {seed['ticker']}: {e}", file=sys.stderr)
+                continue
+            for m in d.get("markets") or []:
+                if m.get("ticker"):
+                    seeded[m["ticker"]] = m
+    have = {m.get("ticker") for m in open_ms}
+    added = [t for t in seeded if t not in have]
+    open_ms.extend(seeded[t] for t in added)
+    print(f"  seed series: {len(seeded)} market(s), {len(added)} outside the paged window")
+
     rows, seen_combo = [], 0
     # NOTE: `category_id`/`category_basis` are NOT API fields — GET /markets has no topic
     # field. They are this project's classification, attached to the market object here so
@@ -406,6 +431,22 @@ def build(validate_n: int, out_path: Path) -> dict:
 
     # 6. out-of-sample validation on markets that have already settled
     settled = paged_markets({"status": "settled"}, cap=1500)
+    # Same truncation risk as the open scan: query the confirmed seed series explicitly
+    # so the out-of-sample replay covers settled markets of the five topics rather than
+    # only whatever the paged window happened to reach.
+    seeded_settled: dict[str, dict] = {}
+    for c in cats["categories"]:
+        for seed in c.get("seed_series", []):
+            try:
+                d, _ = get("/markets", {"series_ticker": seed["ticker"], "status": "settled", "limit": 1000})
+            except RuntimeError as e:
+                print(f"  ! seed {seed['ticker']} (settled): {e}", file=sys.stderr)
+                continue
+            for m in d.get("markets") or []:
+                if m.get("ticker"):
+                    seeded_settled[m["ticker"]] = m
+    have_s = {m.get("ticker") for m in settled}
+    settled.extend(seeded_settled[t] for t in seeded_settled if t not in have_s)
     settled.sort(key=lambda m: m.get("settlement_ts") or "", reverse=True)
     validation = replay_settled(model, [m for m in settled if _maybe_in_scope(cats, series_idx, m)], validate_n) \
         if validate_n else {"skipped": {"--validate": "0"}}
