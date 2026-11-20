@@ -1,0 +1,65 @@
+name: Diagnose collector validation on fresh data
+
+# Diagnostic-only workflow (this session's claim: T25). The scheduled
+# collect.yml pipeline collects and builds fine but its "Validate the
+# snapshot..." step exits 1 on fresh data, and the step log is not retrievable
+# from the build sandbox (the run-log host is outside the outbound allowlist).
+# This workflow re-runs the exact same pipeline on a fresh snapshot and writes
+# every command's stdout+stderr + exit code to data/live/collect_diag.log, then
+# commits only that log, so the precise failing check and message are readable
+# from the repository. It commits NO market data: a snapshot that fails
+# validation is never published.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Probe the official demo REST root
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -m 30 -o /tmp/status.json -w '%{http_code}' \
+            https://external-api.demo.kalshi.co/trade-api/v2/exchange/status)
+          echo "HTTP $code"; test "$code" = "200"
+
+      - name: Run the collector pipeline and capture every validator's output
+        run: |
+          set +e
+          {
+            echo "# collector diagnostic $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "## collect.py"
+            python3 scripts/collect.py --orderbooks 4 2>&1; echo "collect_exit=$?"
+            echo "## build_alerts.py"
+            python3 scripts/build_alerts.py 2>&1; echo "build_alerts_exit=$?"
+            echo "## simulate.py"
+            python3 scripts/simulate.py 2>&1; echo "simulate_exit=$?"
+            echo "## validate_live.py"
+            python3 scripts/tests/validate_live.py 2>&1; echo "validate_live_exit=$?"
+            echo "## validate_alerts.py"
+            python3 scripts/tests/validate_alerts.py 2>&1; echo "validate_alerts_exit=$?"
+            echo "## test_alerts.py"
+            python3 scripts/tests/test_alerts.py 2>&1; echo "test_alerts_exit=$?"
+            echo "## test_simulate.py"
+            python3 scripts/tests/test_simulate.py 2>&1; echo "test_simulate_exit=$?"
+          } | tee data/live/collect_diag.log
+
+      - name: Commit the diagnostic log only
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshi-diag-bot"
+          git config user.email "kalshi-diag-bot@users.noreply.github.com"
+          git add data/live/collect_diag.log
+          if git diff --cached --quiet; then echo "no log to commit"; exit 0; fi
+          git commit -m "diag: collector validation capture $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin "HEAD:${GITHUB_REF_NAME}"

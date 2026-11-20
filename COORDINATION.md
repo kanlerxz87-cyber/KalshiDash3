@@ -504,3 +504,33 @@ Log:
 - 2026-11-20 ~14:41 UTC: T17 — **R-2 done**: `scripts/build_alerts.py` stores `to_yes_bid`/`to_yes_ask` from the observation at `to_time` on every new archive entry (null when the observation carried no quote — never invented). Proven with a synthetic history: quotes land on the entry, `simulate.quote_for_signal` returns `(0.54, 0.56, "archive")`, and a no-quote observation stores nulls. Existing 8 entries unchanged (append-only). Regenerated `alerts.json` byte-identical apart from `generated_at`/counts; `simulation.json` re-run (8 signals processed; S2's historical 99c-spread fill stays VOID per F-23). G9/F-14/F-17/F-19 updated in `data/findings.json`.
 - 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `<<<<<<< HEAD … >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
 - 2026-11-20 ~14:50 UTC: T17 done — full suite green on the integrated tree (21 pages OK; 506 open/200 settled/17 orderbooks; 8 alerts provenance-checked; 13 alert tests; simulate suite OK; 42 fee-table numbers; 15 parity cases; engine tests ALL PASSED; `node --check` clean). Remaining for T18: final verification pass, PR -> main -> merge, Pages deploy confirm, dispatch `collect.yml`/`desk.yml` so the new pages get live data, record PR link here.
+
+---
+
+## Session `arena/3c5135aa` — collector validation defect (T25)
+
+Branch `arena/3c5135aa-kalshidash3`, branched from `main@9a90947`. This session read the board first. The
+final-integration work (T18–T24) is actively claimed and being committed by `arena-0f71797f` (its branch
+`arena/0f71797f-kalshidash3` is live and its last commit is well under 60 minutes old), so **this session does
+not touch T18–T24 or any file in their scope**. It found one additional, currently-failing defect that those
+tasks do not cover and claimed it here.
+
+| ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-----------------|----------------|------------------------|----------------|
+| T25 | Diagnose + fix the scheduled collector's validation failure: `collect.yml` runs Collect/Build-alerts/Paper-trade successfully but its **"Validate the snapshot, the alert archive/feeds, and the simulation"** step exits 1 on a fresh snapshot (run 44799627492, 2026-11-20 ~19:10Z), so no fresh snapshot is committed and the site is stale. Capture the exact failing check, fix the root cause, add a regression test. | in progress | arena/3c5135aa | `.github/workflows/diag-collect.yml` (new, diagnostic only), and after root-cause: the offending validator/builder + a test. Does NOT touch `collect.yml` (owned by T24), `roi_scan.py`/`live.js` (T20/T21), `COORDINATION.md` rows of other sessions, or shared nav/index. | Kalshi demo API (public GET, re-verified reachable); the four validators run on a fresh snapshot via the diagnostic workflow; the exact CI error is captured in `data/live/collect_diag.log` | see log |
+
+### Log (this session)
+
+- 2026-11-20 ~19:2x UTC: session start. Read `COORDINATION.md` in full. Observed that `arena-0f71797f` holds an
+  active claim on T18–T24 (final integration) and is committing, so this session claims only the non-overlapping
+  collector-validation defect (T25) and leaves the final-integration scope to it.
+- 2026-11-20 ~19:2x UTC: confirmed `origin/main` is at `9a90947` (the 15:19Z snapshot) and that the four
+  validators (`validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`) all pass (exit 0)
+  on that committed snapshot at this moment — so the `collect.yml` validation failure is triggered by a **fresh**
+  snapshot, not by the committed data. The step log is not retrievable from this sandbox (the run-log host is
+  outside the outbound allowlist), so a diagnostic workflow (`diag-collect.yml`) re-runs the exact pipeline and
+  commits the captured output to `data/live/collect_diag.log` for line-by-line reading.
+- 2026-11-20 ~19:2x UTC: noted (for the record, not claimed) that the desk-scan failure is already owned by
+  `arena-0f71797f` (T20 orderbook `tickers` array encoding → HTTP 400; T21 `ZeroDivisionError` in
+  `roi_model.score()` when `yes_ask == 0`), and that `arena-0f71797f` independently fixed the same
+  `test_roi_scan_offline.py` time-bomb this session found and reverted rather than duplicate.
