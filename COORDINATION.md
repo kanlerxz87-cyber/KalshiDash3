@@ -77,7 +77,7 @@ Claim: this session started on the same brief (T1–T5) on its own branch. It fo
 
 ## Session e1b4fe16 (branch `arena/e1b4fe16-kalshidash3`, from `49ba7bc` of `main`)
 
-Claim: this session built a separate, self-contained subsite and namespaced every file it adds, so no file owned by another session is replaced. Pages are served at `/e1b4fe16/` by the existing `pages.yml` workflow (it deploys the whole `docs/` folder).
+Claim: this session built a separate, self-contained subsite and namespaced every file it adds, so no file owned by another session is replaced. Pages (legacy, branch `main`, path `/`) publishes the `docs/` folder at `/docs/`, so this subsite is at `/docs/e1b4fe16/`. (Corrected from `/e1b4fe16/` after the first deploy.)
 
 Branch naming: the task rules ask for `session-<id>/<task>`. Arena fixes the branch name for each session, so this session keeps `arena/e1b4fe16-kalshidash3` and records the deviation here.
 
@@ -98,9 +98,10 @@ Branch naming: the task rules ask for `session-<id>/<task>`. Arena fixes the bra
 - Decide the canonical implementation (see `INTEGRATION.md`).
 
 ### Integration log (this session)
-- PR: _recorded below after `gh pr create`_
-- Merge result: _recorded below after merge_
-- Pages deploy: _recorded below after check_
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/8 (`arena/e1b4fe16-kalshidash3` to `main`)
+- Merge result: merged as `843be97` at 2026-11-20 11:14:55Z (`gh pr merge 8 --merge`; mergeable, no conflicts)
+- Pages deploy: legacy build of `843be97` status `built`; `pages.yml` run 44726027274 success. Live check: https://kanlerxz87-cyber.github.io/KalshiDash3/docs/e1b4fe16/index.html serves the subsite landing page. The PR body says `/e1b4fe16/`; the correct URL is `/docs/e1b4fe16/`.
+- This log update: separate PR (see below).
 
 ---
 
@@ -133,7 +134,7 @@ Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-le
 
 ### Conflict and handoff record
 - 2026-11-20 ~11:30 UTC: PR #7 (`arena/9b246e37-kalshidash3` → `main`) was reported not mergeable. Cause: `main` had moved (PRs #5 and #8 merged). Resolution: my site files were moved into the `docs/9b246e37/` namespace, and `origin/main` was merged into this branch. Conflicts (`README.md`, `COORDINATION.md`) were resolved by keeping main's full text and appending this section. No other session's file was changed.
-- Pages note (for the integration owner): `pages.yml` deploys `docs/` through the workflow, while the Pages config reports `build_type: legacy` from `main` `/`. Which tree the live site serves should be confirmed after each merge (see INTEGRATION.md item 1). This session checked the live URL with the fetch tool after merge.
+- Pages note: legacy Pages (`main`, path `/`) publishes the `docs/` folder at `/docs/…`, so this subsite is at `/docs/9b246e37/` (same pattern as `/docs/e1b4fe16/`).
 
 ### PR and merge log
 - PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/7

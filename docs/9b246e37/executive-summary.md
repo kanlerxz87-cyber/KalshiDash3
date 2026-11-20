@@ -1,6 +1,6 @@
 # Executive summary — Kalshi demo dashboard (snapshot 2026-11-20 UTC)
 
-**Live site:** https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/ (GitHub Pages via `pages.yml`, folder `docs/9b246e37/`)
+**Live site:** https://kanlerxz87-cyber.github.io/KalshiDash3/docs/9b246e37/ (GitHub Pages, legacy build from `main` `/`; folder `docs/9b246e37/`)
 **Data source:** Kalshi DEMO Trade API, `https://external-api.demo.kalshi.co/trade-api/v2` (recommended demo endpoint in the [demo environment docs](https://docs.kalshi.com/getting_started/demo_env.md)).
 
 ## 1. What was built
