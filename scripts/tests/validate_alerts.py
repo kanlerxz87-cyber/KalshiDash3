@@ -14,8 +14,10 @@ Checks
      direction sign, from_time < to_time, ISO-8601 Z stamps, https market_source
   3. no invented causes: cause_link must be null and cause_status must state unverified
   4. feeds reproduce exactly from the archive (order + membership + counts)
-  5. the high_roi screen reproduces from the rules against the current markets.json
-     for every alert whose market is still in the snapshot
+  5. the high_roi screen reproduces from the rules against each archive row's OWN
+     recorded category_basis/volume_24h_fp (detection-time values), so the check does
+     not depend on which snapshot happens to be on disk; the snapshot is a fallback
+     for legacy rows without those fields
   6. provenance: every alert whose market still has both observations in
      price_history.json must match the recomputed diff exactly; every re-derivable
      swing must be present in the archive. Alerts whose market was pruned from the
@@ -123,19 +125,29 @@ def main() -> int:
     check(bool(alerts_doc.get("disclaimers")), "alerts.json disclaimers missing")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
-    # ---- high_roi screen reproduces from the rules against the CURRENT snapshot ----
+    # ---- high_roi screen reproduces from the rules against the ROW ITSELF ----
+    # The flag records the screen AT DETECTION TIME. The snapshot rolls every run
+    # (markets enter, leave, and their volumes change), so re-deriving against the
+    # CURRENT markets.json made this check clock-dependent: the collect run at
+    # 2026-11-20T19:42Z failed on KXBTCY-27JAN0100-B47500@19:30:14Z — archived
+    # False (volume_24h_fp 0.0 recorded on the row), derived True from a later
+    # snapshot. The archive rows carry category_basis and volume_24h_fp precisely
+    # so the screen can be reproduced deterministically; the snapshot is consulted
+    # only for legacy rows that carry neither field.
     markets_path = LIVE / "markets.json"
     snap = load(markets_path)
     roi_rules = rules.get("high_roi") or {}
     if snap and roi_rules:
         by_ticker = {m["ticker"]: m for m in (snap.get("open_markets") or [])}
         for a in archive:
-            m = by_ticker.get(a.get("ticker", ""))
-            if m is None:
-                continue  # detection-time screen; market left the snapshot
+            m = by_ticker.get(a.get("ticker", "")) or {}
+            basis = a.get("category_basis") if a.get("category_basis") is not None else m.get("category_basis")
+            vol = a.get("volume_24h_fp") if a.get("volume_24h_fp") is not None else m.get("volume_24h_fp")
+            if basis is None and vol is None:
+                continue  # no recorded fields and not in the snapshot: nothing to reproduce
             expected = bool(
-                m.get("category_basis") == roi_rules.get("require_category_basis")
-                and (m.get("volume_24h_fp") or 0) > roi_rules.get("require_volume_24h_gt", -1)
+                basis == roi_rules.get("require_category_basis")
+                and (vol or 0) > roi_rules.get("require_volume_24h_gt", -1)
             )
             check(a.get("high_roi") == expected,
                   f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} != rules-derived {expected}")

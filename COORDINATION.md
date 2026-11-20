@@ -758,3 +758,12 @@ rather than merely non-crashing, plus the collector failure:
   explicit `not_reviewed` reason: 0.98→0.06 on `volume_24h_fp 0.00` with `updated_time 2026-04-28T02:27:21Z`,
   consistent with F-34 rather than news). `validate_catalysts.py` catches the stale-lead gap by itself (it
   refused the 9-row file against the 11-row archive before anything was rebuilt).
+- 2026-11-20 19:50 UTC: collect.yml run 44804398001 on `main` (post-#37) got FURTHER than ever — full-universe
+  scan collected (validate_live saw the new 566-row snapshot at 19:42:09Z), leads rebuilt to 12 swings,
+  catalysts+all model validators green — but `validate_alerts.py`'s high_roi re-derivation read the CURRENT
+  rolling snapshot while archive rows store detection-time `category_basis`/`volume_24h_fp`, so a market that
+  entered the snapshot after its own alert (KXBTCY-27JAN0100-B47500@19:30:14Z, archived False, row vol 0.0,
+  later snapshot True) failed a correct dataset. Fixed by reproducing check #5 from each row's own fields
+  (snapshot kept only as legacy fallback) — deterministic against snapshot rotation, still refuses any row
+  whose flag contradicts its recorded inputs. This touches `scripts/tests/validate_alerts.py`, the file
+  `arena-da07bb44` worked in (their T19 closed, no open claim); logged here per board rules, not edited there.
