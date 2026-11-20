@@ -253,7 +253,7 @@ alert = |Δlast between consecutive observations| ≥ $${model.swing_alert.thres
   KD.$("#thrInline").textContent = "$"+model.swing_alert.threshold_dollars;
 
   if(!scan){
-    KD.$("#scanStamp").innerHTML = '<span class="badge warn">no scan committed yet</span> the desk workflow writes <code>data/live/roi.json</code> on a schedule; until then this page shows the model only, never an example number.';
+    KD.$("#scanStamp").innerHTML = '<span class="badge warn">no scan committed yet</span> <code>data/live/roi.json</code> is written by <code>.github/workflows/desk.yml</code> (a 10-minute schedule, plus a dispatch on each merge: cron events have not been observed firing on this repo — F-16). Until a run lands, this page shows the model only, never an example number.';
     KD.$("#picks").innerHTML=KD.empty("nothing scored yet");
     return;
   }

@@ -518,9 +518,83 @@ session's PR #30 was already merged and whose claim is >60 min old with no commi
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T19 | Fix the crash that has kept `data/live/roi.json` from ever being written: the fee-aware ROI model divides by a zero-cost side, which the demo book produces constantly (`yes_ask_dollars = 0.0000` / `yes_bid_dollars = 1.0000`). Guard it identically in the Python model, the browser mirror and the out-of-sample replay; add regression cases to the shared parity fixture; add an offline end-to-end scan test over the committed real API payload. | in progress | arena-d243bfa7 | `scripts/roi_model.py`, `scripts/roi_scan.py`, `assets/live.js`, `scripts/tests/fixtures_roi_parity.json`, `scripts/tests/test_roi_parity.py`, `scripts/tests/test_roi_scan_snapshot.py` (new), `data/roi_model.json`, `roi.html`, `data/findings.json`, `.github/workflows/desk.yml` (test wiring only) | `python3 scripts/tests/test_roi_parity.py`, `test_fees.py`, `test_roi_scan_offline.py`, `test_roi_scan_snapshot.py`, `node scripts/tests/test_engine_node.js`, `python3 scripts/tests/validate_roi.py`, mutation-check the new guard | **Found by this session:** `desk.yml` run 44762120780 failed at "Scan the demo API" (exit 1) — the only run of that workflow, so the fee-aware ROI half of the site (F-14's answer) has never had published output. `roi.json` absent; `live.html`/`roi.html` fall back to "no scan committed yet". |
-| T20 | Take over T18's remaining steps: dispatch the repaired desk scan + the collector on `main`, confirm `roi.json` is committed and validator-clean, confirm Pages deploy, re-verify the live site page by page, record results. | in progress | arena-d243bfa7 | `COORDINATION.md`, `README.md` (integration only) | live `gh run` conclusions, `validate_roi.py` on the committed file, and a page-by-page fetch of the deployed site | Scheduled `cron` runs still not observed (F-16, unchanged) |
+| T20 | Take over T18's remaining steps: dispatch the repaired desk scan + the collector on `main`, confirm `roi.json` is committed and validator-clean, confirm Pages deploy, re-verify the live site page by page, record results. | in progress (dispatch after merge) | arena-d243bfa7 | `COORDINATION.md`, `README.md` (integration only) | live `gh run` conclusions, `validate_roi.py` on the committed file, and a page-by-page fetch of the deployed site | Scheduled `cron` runs still not observed (F-16, unchanged) |
 
 ### Claim log
 - 2026-11-20 ~19:15 UTC: claim written and pushed before any code change. Scopes above are files no other session
   currently owns; `data/live/roi.json` is written only by `desk.yml` (this session edits that workflow's test step,
   not its data contract). `collect.yml`, `build_alerts.py`, `dashboard.html`, `alerts.html` are NOT in scope.
+
+### T19 result — what was wrong, what was verified, sources (all official)
+
+Defect found by this session (not by any earlier one, because the pipeline had never run green):
+
+1. **`desk.yml` was red for its whole existence.** `data/live/roi.json` — the fee-aware ROI picks,
+   the ≥ $0.10 swing list and the out-of-sample hit rate that `live.html` and `roi.html` read — has no
+   committed file because its only writer crashed. Run 44762120780 (the workflow's only run) failed at
+   "Scan the demo API". Root cause, reproduced locally against the committed real API payload:
+   `roi_model.score()` evaluates `roi = (win − cost) / cost` for **both** sides, and the demo book pins
+   sides at the band edges (`yes_ask_dollars = 0.0000`, `yes_bid_dollars = 1.0000`) — 127 of the 387
+   open in-scope markets in `data/live/markets.json` (collected 2026-11-20T15:19:53Z). Python raised
+   `ZeroDivisionError`; the browser mirror (`assets/live.js`) returned `Infinity` instead, which would
+   have ranked a pinned quote as the best edge on the board. The price band is documented and was read
+   live: `price_ranges [{start 0.0000, end 1.0000, step 0.0100}]`, `price_level_structure linear_cent`.
+2. **A CI test was silently time-decaying.** `scripts/tests/test_roi_scan_offline.py` pinned its fixture
+   `close_time` to the literal `2026-11-20T17:00:00Z` while `roi_scan` scores against the wall clock, so
+   it passed in CI at 15:19Z and failed an hour later with the code untouched; worse, its four "the
+   validator refuses bad files" cases were guarded by `if doc["picks"]` and became vacuous once the scan
+   returned no picks. Its settled fixture also had `status: finalized`, `result: yes`, and a close_time in
+   the future — a state the API cannot return.
+
+Fix, and why it is the honest one: a side whose cost is exactly $0 is **left unpriced with a stated
+reason** in all three places the model lives (`scripts/roi_model.py`, `assets/live.js`, and the
+out-of-sample replay in `scripts/roi_scan.py`, which now counts the refusal in `validation.skipped`).
+The market then falls to the model's existing "no buyable side" gate, so a pinned quote is reported as
+unpriced rather than turned into a number. Documented in `data/roi_model.json`
+(`parameters.filters.zero_cost_side` + `filters_note`) and on `roi.html`, where a trader reads the model.
+
+Verification performed by this session (each claim checked against an official source, not against the
+repo's own earlier notes):
+- **Endpoints** — demo REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `demo-api.kalshi.co`)
+  and demo WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/...`),
+  exactly as the brief states, re-read from https://docs.kalshi.com/getting_started/api_environments .
+- **WebSocket needs a key even for public channels** — https://docs.kalshi.com/getting_started/quick_start_websockets
+  states "WebSocket connections require authentication during the connection handshake", with public
+  market-data channels (`ticker`, `trade`, `market_lifecycle_v2`, `multivariate_market_lifecycle`) exempt
+  only from *additional per-channel* auth. The repo's F-31 correction is accurate; a static Pages site
+  therefore cannot use WS, which is why the site polls REST in-browser (no key, no manual input).
+- **Order-book semantics** used by the liquidity ladder and the depth gate — bids only, two-element
+  `[price_dollars, count_fp]` strings, ascending, best bid last, NO bid Y ⇒ YES ask 1−Y, and an empty
+  array means no resting orders (200, not 404): https://docs.kalshi.com/getting_started/orderbook_responses .
+- **Fee model** — `fees = round up(M × 0.07 × C × P × (1−P))`, maker `0.0175` with M default 0, "round up"
+  defined to a centicent, all 21 general-table rows, and all 13 `data/roi_model.json` series multipliers
+  (KXAAAGASM 1/1, KXBTCMAX150 1/1, KXBTCY 0/0, KXETHY 0/0, KXNASDAQ100Y 1/1, KXPGATOUR 1/1, KXPGARYDER 1/1,
+  KXPGASOLHEIM 1/1, KXCPI 1/1, KXCPIYOY 1/1, KXFED 1/1, KXFEDDECISION 1/1, KXELECTIRAN 0/0), re-read from
+  https://kalshi.com/docs/kalshi-fee-schedule.pdf ("Last updated and effective: July 7, 2026").
+- **No sub-minute history** (so a seconds view can only come from this project's own ticks):
+  `period_interval` valid values are 1, 60, 1440 minutes, https://docs.kalshi.com/api-reference/market/get-market-candlesticks .
+- **Live demo API reachable and answering** from this session: `GET /exchange/status` (200),
+  `GET /markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30` (bids as documented, ascending),
+  `GET /markets?status=settled`, `GET /markets?status=open&series_ticker=KXDEMOFUTHOURLY`.
+
+Checks run on the tree, all green: `test_roi_parity.py` (17 cases incl. the two pinned-quote cases, now
+also auditing **both** engines for a zero cost or non-finite ROI), `test_roi_scan_snapshot.py` (new:
+runs the real scan over the real committed snapshot offline, then through `validate_roi.py`),
+`test_roi_scan_offline.py` (1 pick, 4/4 bad files refused), `test_fees.py` (42 numbers), `test_alerts.py`,
+`test_simulate.py`, `validate_live.py`, `validate_alerts.py`, `check_site.py` (21 pages), `engine.test.js`,
+`test_engine_node.js`, `test_pages_dom.js` (jsdom: live/desk/model pages render with no `undefined`/`NaN`
+leak), `node --check` on every script.
+**Mutation-checked:** deleting the Python guard makes the scan crash and both tests fail; deleting only the
+JS guard makes the parity diff and the browser audit fail — so the new tests are not vacuous.
+
+Both defects are published on the Flagged for Review page as **F-30** (high) and **F-31** (medium).
+
+### Log (this session)
+- 2026-11-20 19:15 UTC: claim committed and pushed before touching code (T19 model/pipeline scope, T20 integration).
+- 2026-11-20 19:20 UTC: reproduced the `desk.yml` failure offline from `data/live/markets.json` (0 network
+  calls), fixed all three model implementations, added the regression cases + the real-snapshot scan test,
+  wired both into `desk.yml` **and** `pages.yml` so the site build itself refuses to publish a model whose
+  scan crashes. `data/live/roi.json` stays absent on this branch on purpose — only the workflow on `main`
+  may write it, per the single-writer rule in `desk.yml`.
+- 2026-11-20 19:40 UTC: PR opened → merged; then `desk.yml` and `collect.yml` dispatched on `main` and the
+  deployed site re-verified page by page (results appended below once the runs conclude).
