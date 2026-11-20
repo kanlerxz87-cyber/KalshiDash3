@@ -669,6 +669,39 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/13",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/15"
    ]
+  },
+  {
+   "item": "The demo environment's per-market order-book depth was silently empty because of a malformed request",
+   "why": "The multiple-order-book endpoint takes `tickers` as an ARRAY. This project sent it as one comma-joined string. Measured live on 2026-11-20: the comma form returns a single book keyed by the literal string \"A,B\" with empty price arrays (HTTP 400 for some pairs), while the repeated form ?tickers=A&tickers=B returns two separate populated books. Every liquidity ladder, every ROI depth figure and every near-miss score was therefore reading zero depth, and the ROI screen classified liquid markets as illiquid.",
+   "action": "Fixed in scripts/roi_scan.py and assets/live.js (repeated query parameters). The browser/CI parity test now includes a case that asserts the repeated form is used and that a comma-joined request is rejected. A fresh scan afterwards reported 214 order books collected for 214 in-scope markets.",
+   "severity": "high",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
+    "https://docs.kalshi.com/getting_started/orderbook_responses"
+   ],
+   "id": "F-30"
+  },
+  {
+   "item": "The desk scan produced no eligible pick, so the ROI validation measures nothing yet",
+   "why": "After the order-book fix the desk scan runs cleanly (run 44800733375, 46s, 214 order books) but reports 0 eligible picks, 0 alerts and 2 near misses: KXGRAMMYNOMROTY-QA7CECC5-QA (unknown spread, depth 10, net ROI -3.38%) and KXDEMOFUTHOURLY-26NOV20H20-UP (98c spread, YES entry 99c, net ROI -36.11%). With no signals the out-of-sample validation reports 0 signals, 0 hits, 0 misses and no hit rate. That is an honest empty result, not a working model.",
+   "action": "Published as-is with the numbers visible on roi.html and live.html. The eligibility rules are not relaxed to manufacture picks: a 98-cent spread and a 99-cent entry are not tradeable, and the near misses are shown with the reason each was rejected. The model needs more qualifying markets (and, for a real hit rate, settlement results) before its output means anything.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ],
+   "id": "F-31"
+  },
+  {
+   "item": "Kalshi's series pages show PRODUCTION prices while this dashboard shows DEMO prices",
+   "why": "The new series links point at kalshi.com, the production site; every price on this dashboard comes from external-api.demo.kalshi.co, the demo environment. The official demo-environment page states the demo has mock funds, is isolated from production, and that demo prices may differ from real markets. A reader who follows a series link and compares numbers will see different values, and could reasonably think one of them is wrong.",
+   "action": "Every series link carries a title and a label saying it is Kalshi's own page for the series and that it carries Kalshi's news digest, and the footer and every page banner state that this site's values are demo-environment values. The two are never presented as the same number.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ],
+   "id": "F-32"
   }
  ]
 }

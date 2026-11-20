@@ -130,7 +130,8 @@ def main() -> int:
     for fid, patch in UPDATES.items():
         f = by_id.get(fid)
         if not f:
-            print(f"note: {fid} not present, skipped")
+            # A flag this session raises for the first time is appended, not dropped.
+            doc["flagged"].append(dict(patch, id=fid))
             continue
         f.update(patch)
 
