@@ -320,11 +320,11 @@
   },
   {
    "id": "G18",
-   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html §4 — a deterministic S1–S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy × category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
+   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html \u00a74 \u2014 a deterministic S1\u2013S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy \u00d7 category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
    "why_it_helps_decisions": "Tests the strategy page's stated rules against collected history with no manual input, and shows real thin-book exit slippage that a live alert trader would face.",
    "effort": "Done in this session",
    "risk": "Replay fills only at collected observation timestamps; per-series fee multipliers not applied; demo prices only.",
-   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07×C×P×(1−P)) to the cent.",
+   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07\u00d7C\u00d7P\u00d7(1\u2212P)) to the cent.",
    "status": "implemented",
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
@@ -492,9 +492,9 @@
   },
   {
    "id": "F-16",
-   "item": "Scheduled collector has not run: all recent runs were manual, so the snapshot is stale",
-   "why": "collect.yml declares a '*/20 * * * *' schedule, but the last five runs of the workflow were all workflow_dispatch; none were scheduled. At the time of the check (2026-11-20 13:17 UTC) the newest committed snapshot was collected_at 11:33:33Z, about 1h44m old, so the swing feed cannot show live moves. The site's banner shows this as stale.",
-   "action": "Dispatch the collector manually (done on this branch) and confirm that scheduled runs start on main after merge. Scheduled workflows run only from the default branch, so the schedule can only fire once collect.yml is on main.",
+   "item": "Scheduled collector did not run for most of 2026-11-20; first scheduled event observed at 19:19Z but failed on a now-fixed test",
+   "why": "collect.yml declares a '*/20 * * * *' schedule. Checked at 13:17 UTC, the last five runs were all workflow_dispatch and the newest snapshot (11:33:33Z) was ~1h44m old. UPDATE 2026-11-20 ~19:2x UTC (session arena-da07bb44): run 44800299801 on main is the FIRST observed run triggered by the 'schedule' event (checked with gh run view: 'Triggered via schedule'), i.e. scheduled collection does fire now. That run FAILED at the validation step \u2014 root cause F-31, fixed the same session; the workflows now also surface validator output as check annotations (readable via `gh run view`) because the sandbox cannot download Actions log archives (blocked hosts), so a failure's cause is visible in annotations.",
+   "action": "Manual dispatches keep data fresh (multiple sessions). Scheduled runs are now observed on main; after the F-31 fix merges, scheduled runs are expected green \u2014 session arena-da07bb44 confirmed the identical pipeline green on its branch in run 44801502297 (all steps passed, snapshot 2026-11-20T19:22:42Z committed).",
    "severity": "high",
    "sources": [
     "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
@@ -566,7 +566,7 @@
   {
    "id": "F-24",
    "item": "Browser CORS access to the demo API is undocumented by Kalshi; live mode relies on it",
-   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json — it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
+   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json \u2014 it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
    "action": "Runtime self-test with automatic fallback; observed headers committed per run; third-party header capture (another project's Pages origin) kept as circumstantial evidence only. Coexists with F-15: the server-side archive keeps cause_link null (no cause data collected), while the alert chats render news SEARCH links computed from the market title and label them unverified leads.",
    "severity": "medium",
    "sources": [
@@ -578,8 +578,8 @@
   {
    "id": "F-25",
    "item": "Alert 'possible-cause' links are news search leads, never verified causes",
-   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand — the site never asserts a cause, because asserting one without a source would be fabrication.",
-   "action": "Search links labelled 'possible-cause leads — unverified' on every alert bubble; no causal claim is ever rendered.",
+   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand \u2014 the site never asserts a cause, because asserting one without a source would be fabrication.",
+   "action": "Search links labelled 'possible-cause leads \u2014 unverified' on every alert bubble; no causal claim is ever rendered.",
    "severity": "medium",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -589,7 +589,7 @@
   {
    "id": "F-26",
    "item": "The 'model picks' scorer is a disclosed heuristic, not a backtested strategy",
-   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask — a conditional figure, not an expected return.",
+   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask \u2014 a conditional figure, not an expected return.",
    "action": "Formula, weights, threshold and per-alert component values are all rendered on alerts.html; the disclaimer is on every pick. The auto-sim (trading.html) exists precisely to gather the evidence the model still needs.",
    "severity": "medium",
    "sources": [
@@ -623,7 +623,7 @@
   {
    "id": "F-29",
    "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
-   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists — a stale reference that contradicts the one-tree rule.",
+   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
    "action": "Fixed during the arena-f068786c integration merge: the README now describes only the canonical tree plus the features shipped by the parallel sessions and this session.",
    "severity": "low",
    "sources": [
@@ -642,6 +642,30 @@
     "https://docs.kalshi.com/getting_started/market_lifecycle",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205"
+   ]
+  },
+  {
+   "id": "F-31",
+   "item": "test_alerts.py required every archived alert to still sit in the CURRENT snapshot, contradicting the archive's documented persistence design (T12/R-1) \u2014 broke the scheduled collector",
+   "why": "The >= $0.10 alert archive exists precisely so a swing survives its market leaving the collector's snapshot ('archive-only \u2014 market pruned from history' is a first-class state in scripts/tests/validate_alerts.py, and the dashboard renders archive-backed feeds after request R-1). But FeedTests.test_alerts_reference_real_tickers asserted every all_events ticker \u2208 open_markets + settled_markets of the current snapshot. Hourly demo markets (KXDEMOFUTHOURLY-*, e.g. 6 of the 9 archive entries at 2026-11-20T15:19Z) rotate out of the snapshot within hours, so failure was inevitable: CI runs 44799627492 (19:1xZ, workflow_dispatch), 44800299801 (19:19Z, schedule) and 44800908243 (annotated rerun) all failed at exactly that test.",
+   "action": "Fixed by session arena-da07bb44 (T19): the test now requires every feed entry to be an exact archived detection (ticker, from_time, to_time), checks the alert's market_source names its market when the market is still in the snapshot, and counts archive-only survivors instead of failing on them. Synthetic proof recorded: a fabricated row is still refused; the survivor case is accepted and counted; the old assertion fails on exactly the 7 hourly rows. Full collect pipeline verified green in run 44801502297.",
+   "severity": "high",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800299801",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800908243",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44801502297",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-32",
+   "item": "Offline ROI-scan test carried a hard-coded fixture close time (2026-11-20T17:00:00Z) \u2014 a time bomb that started failing all desk.yml runs once real time passed it",
+   "why": "scripts/tests/test_roi_scan_offline.py pinned its open-market fixtures to a fixed close_time; the model's own 'already past close_time' gate then rejected them and 6 assertions failed with zero picks from 17:00Z onward. Found INDEPENDENTLY by two sessions within minutes (arena-2a36471a 19:11:21Z, arena-da07bb44 19:11:25Z); arena-2a36471a's relative-time fix was merged first (PR #31, commit 0639c40) and kept; this session's duplicate was withdrawn during rebase.",
+   "action": "Fixed on main by arena-2a36471a (close times relative to run time). Not a data or model bug: the model behaved exactly as specified; the fixture was wrong. desk.yml confirmed green after the merge (scan committed 2026-11-20T19:15:11Z, see F-30's record).",
+   "severity": "low",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44762120780"
    ]
   }
  ]
