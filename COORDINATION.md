@@ -695,3 +695,32 @@ Two further overlaps were resolved the same way on the second `origin/main` merg
   published as a second id for one defect. `data/findings.json` was rebuilt as a real merge, and this session's
   severity label was left as `main`'s. Nothing from PR #31/#34/#36 was overwritten.
 
+---
+
+## Session `arena-6f158ab7` — collector + live-desk data-quality repair, catalyst layer, final verification
+
+Branch `arena/6f158ab7-kalshidash3`, base `9a90947`. Claimed 2026-11-20 19:09Z.
+
+**Concurrent-session note (read before my board below):** I claimed T19 (desk scan) and T20 (catalyst
+layer) at 19:09Z, when `main` was `9a90947` and no PR was open. `arena-2a36471a` claimed the *same*
+divide-by-zero at 19:11Z (`b1c4148`) and merged PR #31/#32 at 19:17Z while I was mid-fix. No files from
+that session were discarded: I rebased onto `origin/main` and **adopted their guard** in
+`scripts/roi_model.py` + `assets/live.js` + `scripts/tests/fixtures_roi_parity.json` and their dynamic
+close-times in `scripts/tests/test_roi_scan_offline.py`, and dropped my duplicate versions of those three
+edits. What their fix could not cover, and what I still fix here, is the reason the desk feed is empty
+rather than merely non-crashing, plus the collector failure:
+
+| Still broken on `main@ee0cc44` (evidence) | Fix in this session |
+|---|---|
+| `data/live/roi.json` counts say `"orderbooks": 0`, `"unscoreable": 212`, `"picks": 0`. `books_for()` sends `?tickers=A,B,C`; the demo host does not split commas (verified live 2026-11-20: a ≤200-char join returns ONE echoed entry with an empty book, a >200-char join returns HTTP 400 — the `! orderbooks chunk failed: HTTP 400` line in Actions run 44762120780) | `books_for()` sends one ticker per repeated `tickers=` parameter (documented `string[]`, 1–100 elements), drops any response entry whose ticker was not requested, and the offline fixture now refuses a comma-joined call |
+| `counts.open_scanned` is exactly `4000` = the safety cap, while `data/live/markets.json` counts say `open_total_scanned: 4369`; newest-first paging on a capped scan is why the scan sees 214 in scope where the collector sees 387 | `paged_markets()` pages to exhaustion, keeps the cap as a safety stop, and publishes `paging.open_truncated_at_safety_cap` so a partial universe can never be presented as the whole one |
+| `collect.yml` still fails: Actions run 44799627492 (19:10:48Z) died in "Validate the snapshot…" on `test_alerts_reference_real_tickers`, so the 19:10Z snapshot was thrown away and the site stayed on 15:19Z data. The test asserts every archived alert ticker is in *today's* snapshot — the one thing the archive exists to survive | the test asserts traceability instead (snapshot ∪ observation history ∪ the row's own per-market URL + `first_seen_at`), reproduced by deleting the alert tickers from a copy of the snapshot: old assertion fails on 9/9 rows, new passes |
+| an alert whose market has been pruned from the snapshot loses `market_source` (set from `(m or {}).get("source")`), so its provenance URL disappears with the row | `build_alerts.py` keeps the endpoint that recorded the swing, derived from the snapshot's own `base_url` + ticker |
+| `replay_settled()` still divides by `cost` for a 0c candle (`(q - cost) / cost`), the same crash shape the session just fixed in `score()` | the replay path is guarded the same way |
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|----------------|----------------|
+| T18 | Takeover of the stale `arena-d879c640` claim: final verification pass, Pages confirm, record PR + merge | in progress | arena-6f158ab7 | `COORDINATION.md`, `README.md` | full suite on the merged tree + live URL fetch | F-16 (cron never fires) still open |
+| T19 | Desk-scan data-quality repair (order-book params, paging truncation, replay guard) | in progress | arena-6f158ab7 | `scripts/roi_scan.py`, `scripts/tests/test_roi_scan_offline.py`, `scripts/tests/fixtures_roi_parity.json` | offline fixture suite + a real `desk.yml` run on this branch must publish a `roi.json` with `orderbooks > 0` and `in_scope` matching the collector | duplicate of `arena-2a36471a` T19 for the crash only; their crash fix kept, mine is the empty-feed half |
+| T20 | Catalyst layer for ≥$0.10 swings: source links fetched in-session, never invented | in progress | arena-6f158ab7 | `data/live/catalysts.json`, `scripts/catalysts.py`, `alerts.html`, `dashboard.html`, `flagged.html` | every link fetched; publication time compared with the swing time | attribution is proximity, not causation |
+| T21 | Collector freshness: fix the failing gate so a fresh snapshot is actually committed | in progress | arena-6f158ab7 | `scripts/tests/test_alerts.py`, `scripts/build_alerts.py` | reproduced the CI failure locally, then a `collect.yml` run on `main` must commit | the collector's cron (`*/20`) still never fires (F-16) |
