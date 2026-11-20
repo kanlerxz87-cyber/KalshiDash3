@@ -1,0 +1,85 @@
+name: Live desk scan (ROI screen + swing alerts)
+
+# Writes data/live/roi.json — the ROI picks, the >=10c swing list and the out-of-sample
+# hit-rate measurement that live.html and roi.html render. Credential-free: only public
+# demo endpoints are called, so no secret is needed and nothing can be executed against
+# an account by this workflow.
+#
+# Deliberately separate from collect.yml (owned by another task): collect.yml commits the
+# market snapshot + price history, this one commits only data/live/roi.json, and it is the
+# only writer of that file. Both run on a schedule, so the page always has a recent
+# fallback even when a browser cannot reach the API itself.
+on:
+  workflow_dispatch:
+    inputs:
+      validate:
+        description: "how many settled markets to replay out-of-sample (0 disables)"
+        required: false
+        default: "24"
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desk
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Model tests (fee table, browser/CI parity, engine behaviour)
+        run: |
+          python3 scripts/tests/test_fees.py
+          python3 scripts/tests/test_roi_parity.py
+          node scripts/tests/test_engine_node.js
+          python3 scripts/tests/test_roi_scan_offline.py
+
+      - name: Page render smoke test (jsdom, no network)
+        run: |
+          set -euo pipefail
+          if npm install --no-save --silent --no-audit --no-fund jsdom >/dev/null 2>&1; then
+            node scripts/tests/test_pages_dom.js
+          else
+            echo "::warning::jsdom could not be installed on this runner; the DOM render test was skipped."
+            node scripts/tests/test_engine_node.js   # still exercises the engine without a DOM
+          fi
+
+      - name: Probe the official demo REST root
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -m 30 -o /tmp/status.json -w '%{http_code}' \
+            https://external-api.demo.kalshi.co/trade-api/v2/exchange/status)
+          echo "HTTP $code"; head -c 300 /tmp/status.json || true
+          test "$code" = "200"
+
+      - name: Scan the demo API
+        env:
+          VALIDATE: ${{ github.event.inputs.validate }}
+        run: |
+          set -euo pipefail
+          n="${VALIDATE:-24}"
+          case "$n" in ''|*[!0-9]*) n=24 ;; esac
+          python3 scripts/roi_scan.py --validate "$n" --out data/live/roi.json
+
+      - name: Refuse to commit an unsourced or inconsistent scan
+        run: python3 scripts/tests/validate_roi.py
+
+      - name: Commit the scan
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshi-desk-bot"
+          git config user.email "kalshi-desk-bot@users.noreply.github.com"
+          git add data/live/roi.json
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -m "data: live-desk scan $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
