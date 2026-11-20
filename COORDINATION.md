@@ -11,12 +11,12 @@ Started: 2026-11-20
 
 | ID | Task | Status | Owner | Files touched |
 |----|------|--------|-------|---------------|
-| T1 | Repo review + executive summary + verified facts dataset | in progress | session-1c0d1fc0 | `README.md`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md` |
-| T2 | Live dashboard (highest-dollar events, 5 categories, price graph, liquidity) | in progress | session-1c0d1fc0 | `index.html`, `dashboard.html`, `assets/css/style.css`, `assets/js/kalshi.js`, `assets/js/dashboard.js`, `assets/js/charts.js` |
-| T3 | Category subpages (gas, elections, culture, crypto, golf) + resolved tracker | in progress | session-1c0d1fc0 | `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `assets/js/category.js` |
-| T4 | Portfolio + trading + trade analysis/strategies (demo account) | in progress | session-1c0d1fc0 | `portfolio.html`, `assets/js/portfolio.js`, `scripts/kalshi_tracker.py` |
-| T5 | Suggestions + Questions/Info/Answers + Sources/Flagged-for-Review | in progress | session-1c0d1fc0 | `suggestions.html`, `sources.html` |
-| T6 | GitHub Pages deploy + final integration, PR to main, merge | unclaimed | session-1c0d1fc0 (integration) | `.github/workflows/pages.yml`, `COORDINATION.md` |
+| T1 | Repo review + executive summary + verified facts dataset | done | session-1c0d1fc0 | `README.md`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md` |
+| T2 | Live dashboard (highest-dollar events, 5 categories, price graph, liquidity) | done | session-1c0d1fc0 | `index.html`, `dashboard.html`, `assets/css/style.css`, `assets/js/kalshi.js`, `assets/js/dashboard.js`, `assets/js/charts.js` |
+| T3 | Category subpages (gas, elections, culture, crypto, golf) + resolved tracker | done | session-1c0d1fc0 | `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `assets/js/category.js` |
+| T4 | Portfolio + trading + trade analysis/strategies (demo account) | done | session-1c0d1fc0 | `portfolio.html`, `assets/js/portfolio.js`, `scripts/kalshi_tracker.py` |
+| T5 | Suggestions + Questions/Info/Answers + Sources/Flagged-for-Review | done | session-1c0d1fc0 | `suggestions.html`, `sources.html` |
+| T6 | GitHub Pages deploy + final integration, PR to main, merge | in progress | session-1c0d1fc0 (integration) | `.github/workflows/pages.yml`, `COORDINATION.md` |
 
 ## Verification log
 
@@ -41,3 +41,4 @@ Started: 2026-11-20
 ## Handoff / conflict log
 
 - 2026-11-20: session-1c0d1fc0 created this board and claimed T1–T5. T6 will be claimed at integration time.
+- 2026-11-20: T1–T5 done (static site + JS + Python script, JS/py syntax checked, internal links checked, preview server 200s). T6 claimed for integration: PR to main, merge, Pages deploy.
