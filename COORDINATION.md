@@ -72,3 +72,32 @@ Claim: this session started on the same brief (T1–T5) on its own branch. It fo
 - Decide whether `docs/verified/` (this session's page) stays as a separate reference page or is folded into `docs/verified.html`-style navigation. This session did not edit `docs/index.html`, nav, or Pages config.
 - Decide canonical implementation between `docs/` and root-level, as already recommended in `INTEGRATION.md`.
 - Trading and portfolio execution are still blocked by missing demo API credentials (see `docs/portfolio.html` on `main`). Not attempted here.
+
+---
+
+## Session e1b4fe16 (branch `arena/e1b4fe16-kalshidash3`, from `49ba7bc` of `main`)
+
+Claim: this session built a separate, self-contained subsite and namespaced every file it adds, so no file owned by another session is replaced. Pages are served at `/e1b4fe16/` by the existing `pages.yml` workflow (it deploys the whole `docs/` folder).
+
+Branch naming: the task rules ask for `session-<id>/<task>`. Arena fixes the branch name for each session, so this session keeps `arena/e1b4fe16-kalshidash3` and records the deviation here.
+
+| ID | Task | Status | Owner | Files in scope (this session only) |
+|----|------|--------|-------|-------------------------------------|
+| E1 | Verified manual snapshot with source link per row | done (manual; runtime re-check pending) | e1b4fe16 | `data/e1b4fe16/snapshot.json`, `data/e1b4fe16/sources.json` |
+| E2 | Irregularities and unverified items (32 flags) | needs review | e1b4fe16 | `data/e1b4fe16/flagged.json`, `docs/e1b4fe16/flagged.html` |
+| E3 | Questions and eight-plus suggestions (not implemented; user chooses) | needs review | e1b4fe16 | `data/e1b4fe16/questions.json`, `data/e1b4fe16/suggestions.json`, `docs/e1b4fe16/questions.html`, `docs/e1b4fe16/suggestions.html` |
+| E4 | Static generator, checker, stylesheet | done | e1b4fe16 | `scripts/e1b4fe16/*`, `docs/e1b4fe16/assets/style.css` |
+| E5 | Live dashboard (browser calls to the demo API; price graph with seconds/minutes/hours; liquidity ladder; resolved list) | done (code); not exercised from sandbox | e1b4fe16 | `docs/e1b4fe16/live.html`, `docs/e1b4fe16/assets/live.js` |
+| E6 | Runtime enumeration script | written, not run (sandbox cannot reach Kalshi hosts) | e1b4fe16 | `scripts/e1b4fe16/enumerate.mjs` |
+
+### Conflict and handoff record
+- Rebase of this branch onto `main` (28ec0c8) conflicted on `data/snapshot.json` (add/add) and would have overwritten `docs/index.html`, `docs/assets/style.css` and `docs/flagged.html` from other sessions. The rebase was aborted, nothing was pushed to `main`, and the session's files were re-placed under `e1b4fe16/` paths. Nothing from other sessions was modified.
+
+### Requests for the integration owner (not done here)
+- Decide whether `/e1b4fe16/` stays as a separate subsite or is linked from the main landing page's navigation. This session did not edit `docs/index.html` or any navigation.
+- Decide the canonical implementation (see `INTEGRATION.md`).
+
+### Integration log (this session)
+- PR: _recorded below after `gh pr create`_
+- Merge result: _recorded below after merge_
+- Pages deploy: _recorded below after check_

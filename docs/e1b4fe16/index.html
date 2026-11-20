@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home · Kalshi Demo Dashboard</title>
+<meta name="description" content="Verified demo-market snapshot for Kalshi with sources, analysis, open questions and items flagged for review.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <div class="brand">
+      <a class="name" href="index.html">Kalshi Demo Dashboard</a>
+      <span class="small muted">Kalshi DEMO environment · snapshot 2026-11-20 · not financial advice</span>
+    </div>
+    <nav class="main" aria-label="Main"><a href="index.html" class="active">Home</a><a href="live.html">Live dashboard</a><a href="categories/gas-prices.html">Gas prices</a><a href="categories/elections.html">Elections</a><a href="categories/culture.html">Culture</a><a href="categories/crypto.html">Crypto</a><a href="categories/golf.html">Golf</a><a href="analysis.html">Analysis</a><a href="portfolio.html">Portfolio</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Questions</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a></nav>
+  </div>
+</header>
+<main class="wrap" id="content">
+
+<h1>Kalshi demo dashboard: verified snapshot</h1>
+<p class="lead">A plain-English view of the Kalshi demo markets in five categories (gas prices, elections, culture, crypto, golf). Every number links to the Kalshi API response it came from. Items that could not be confirmed are marked unverified and listed on <a href="flagged.html">Flagged for Review</a>.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Executive summary</h2>
+  <ul>
+    <li><strong>Data source:</strong> the Kalshi <em>demo</em> Trade API responded on 2026-11-20 (exchange and trading active at check time). Demo prices may not match real markets (<a href="https://docs.kalshi.com/getting_started/demo_env.md">Kalshi demo docs</a>).</li>
+    <li><strong>Snapshot size:</strong> 19 market rows and 18 series rows across five categories. This is a verified sample. The full list is too large to pull in one session, so the <a href="live.html">live dashboard</a> loads it in your browser.</li>
+    <li><strong>Resolved outcomes so far:</strong> 10 sampled markets have a result (10 NO, 0 YES). All are Alabama or Alaska gas markets settled 2026-11-13. No crypto, election, culture or golf market in the sample has resolved.</li>
+    <li><strong>Portfolio and trading: blocked.</strong> Both need a Kalshi demo account and API key, which the sandbox does not have. See <a href="portfolio.html">Portfolio</a> and question Q4.</li>
+    <li><strong>Flags for review:</strong> 32 items (6 repo review, 18 data irregularities, 8 unverified or blocked). Flags do not block publishing.</li>
+    <li><strong>Decisions needed from you:</strong> 12 suggestions to approve, defer or reject, and 10 questions to answer. See <a href="suggestions.html">Suggestions</a> and <a href="questions.html">Questions</a>.</li>
+  </ul>
+</div>
+
+<h2>Categories</h2>
+<div class="grid">
+  <div class="card">
+    <h3><a href="categories/gas-prices.html" class="big">Gas prices</a></h3>
+    <div class="small muted">Daily AAA average gas-price markets (Alabama, Alaska). Primary category Economics, tag &#39;Oil and energy&#39;.</div>
+    <p class="small" style="margin:10px 0 0">10 market rows · 2 series rows · 10 resolved · 12 with flags</p>
+  </div>
+  <div class="card">
+    <h3><a href="categories/elections.html" class="big">Elections</a></h3>
+    <div class="small muted">Ballot measures, nominee, debate and Secretary-General markets. Primary category Elections.</div>
+    <p class="small" style="margin:10px 0 0">3 market rows · 4 series rows · 0 resolved · 7 with flags</p>
+  </div>
+  <div class="card">
+    <h3><a href="categories/culture.html" class="big">Culture</a></h3>
+    <div class="small muted">Account-ban markets on X. Primary category Culture.</div>
+    <p class="small" style="margin:10px 0 0">0 market rows · 2 series rows · 0 resolved · 2 with flags</p>
+  </div>
+  <div class="card">
+    <h3><a href="categories/crypto.html" class="big">Crypto</a></h3>
+    <div class="small muted">Bitcoin, Chainlink, Avalanche and related markets. Primary category Crypto.</div>
+    <p class="small" style="margin:10px 0 0">3 market rows · 5 series rows · 0 resolved · 7 with flags</p>
+  </div>
+  <div class="card">
+    <h3><a href="categories/golf.html" class="big">Golf</a></h3>
+    <div class="small muted">Golf-tagged series (PGA). Primary category Sports, tag &#39;Golf&#39;.</div>
+    <p class="small" style="margin:10px 0 0">3 market rows · 5 series rows · 0 resolved · 8 with flags</p>
+  </div></div>
+
+<h2>Tools</h2>
+<div class="grid">
+  <div class="card"><h3><a class="big" href="live.html">Live dashboard</a></h3><div class="small muted">Price chart (1 min, 1 hour, 1 day), orderbook depth (contracts available at each price), volume ranking and resolved markets. Loads from the Kalshi demo API in your browser.</div></div>
+  <div class="card"><h3><a class="big" href="analysis.html">Analysis</a></h3><div class="small muted">Counts, resolved outcomes, quote quality, highest volume in the sample, and fee formula.</div></div>
+  <div class="card"><h3><a class="big" href="flagged.html">Flagged for Review</a></h3><div class="small muted">Repo irregularities, data irregularities and unverified items, each with source links.</div></div>
+  <div class="card"><h3><a class="big" href="sources.html">Sources</a></h3><div class="small muted">Every official page or API endpoint used, and whether it was opened.</div></div>
+</div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    Data: Kalshi demo Trade API (<a href="https://external-api.demo.kalshi.co/trade-api/v2/exchange/status">exchange status</a>) and Kalshi documentation (<a href="https://docs.kalshi.com/llms.txt">docs index</a>).
+    Demo prices may not reflect real markets. Every table row links to its source; rows that could not be confirmed are marked unverified.
+    Source list: <a href="sources.html">sources.html</a> · Repo: <a href="https://github.com/kanlerxz87-cyber/KalshiDash3">KalshiDash3</a>
+  </div>
+</footer>
+
+</body>
+</html>
