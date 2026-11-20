@@ -126,3 +126,28 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+---
+
+## Session `arena-f068786c` — alerting system, automated simulated trading, final integration
+
+Branch `arena/f068786c-kalshidash3` (the session environment pins this session to a single fixed branch; the
+`session-<id>/<task>` branch-per-task scheme cannot be used here, so scope separation is done through the file
+scopes below instead). Based on `cd104db` (PR #15). No other session held an unexpired claim at start.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Alert data engine: derive ≥$0.10 price-swing alerts by diffing consecutive real collected observations; emit `data/live/alerts.json`; wire into the collect workflow | in progress | arena-f068786c | `scripts/build_alerts.py`, `data/live/alerts.json`, `.github/workflows/collect.yml` | Diffs are computed from committed API observations only (no invention); validated by `scripts/tests/validate_alerts.py` | — |
+| T12 | Live alerting UI: two scrolling chats (all ≥$0.10 swings + model high-ROI picks), transparent scoring model v1, optional labelled SIM stream, live poll of committed snapshots | in progress | arena-f068786c | `alerts.html`, `assets/alerts.js`, `assets/site.js` (nav only, additive), `assets/site.css` (additive) | Model formula displayed on-page; every alert row carries the API query URL; sim stream default OFF and badge-marked | F-14, F-15 on Flagged |
+| T13 | Automated simulated trading: strategies S1–S4 run automatically over collected price history (real-price replay), fee model per official schedule, categorised ledger, performance metrics + equity curve | in progress | arena-f068786c | `portfolio.html`, `assets/alerts.js`, `strategies.html` (status note) | Fills modelled at the collected best bid/ask; fee formula 0.07×C×P×(1−P) from the official fee schedule; ledger labelled paper | — |
+| T14 | Dashboard integration: alert markers on the price chart + 60-second live-poll indicator | in progress | arena-f068786c | `dashboard.html` | Markers only at timestamps that exist in the collected history | — |
+| T15 | Docs refresh: executive summary rows, index cards, suggestions G9–G11, new verified facts, new flagged items F-14–F-16, README fix (stale `9b246e37/` section) | in progress | arena-f068786c | `executive-summary.html`, `index.html`, `suggestions.html`, `verification.html`, `data/findings.json`, `data/verified_facts.json`, `README.md` | Each new fact has an official source; the $0.10 threshold and the model weights are labelled project requirements/spec, not API facts | F-16 (stale README section from the PR #13/#15 churn) |
+| T16 | Final integration for this iteration: checks green, sandbox preview, PR → main, merge, confirm Pages deploy, record results | in progress | arena-f068786c | `COORDINATION.md` | `scripts/check_site.py` + `scripts/tests/validate_live.py` + `scripts/tests/validate_alerts.py` all pass before push | — |
+
+### Log
+
+- 2026-11-20: Claimed T11–T16. Observed two OPEN PRs from superseded sessions (#6 `arena/ae6178ec`, #14 `arena/9b246e37` board record) — left untouched; recorded here so the integration session after this one can decide.
+- 2026-11-20: README still advertises a `9b246e37/` subsite that PR #15's integration removed; tracked as F-16 and fixed in T15.
+- 2026-11-20: The ≥$0.10 swing threshold and the high-ROI model weights are requirements/spec from the project brief, not facts about the API; they are displayed as such and never presented as verified API facts.
