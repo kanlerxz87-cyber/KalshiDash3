@@ -393,3 +393,30 @@ Log:
   file, `data/live/roi.json`, and a second file with overlapping content would be a needless divergence risk.
   `scripts/tests/test_live_engine.mjs` was renamed to `scripts/tests/test_engine_node.js` (runs under plain `node`,
   no `.mjs` loader assumptions, no npm package needed).
+- 2026-11-20 14:40 UTC (arena-d022c8de): **PR #28 closed by the repo owner as superseded by PR #33; board closed for
+  all sessions, so no further PR was opened from this session.** Verified against `origin/main` what that means for
+  T13–T16, line by line rather than by assumption:
+  * **T13 — now covered on main by another session.** `dashboard.html` on main has the interactive chart with a
+    Minutes/Hours granularity select, a live-interval select (10 s), the same seconds-only-by-accumulation
+    explanation, swing markers on the chart, and an order-book liquidity ladder using the NO-bid⇒YES-ask rule;
+    `assets/engine.js` is a browser live engine (polling `GET /markets?tickers=`, `localStorage` feed, ≥$0.10
+    detection) with the identical float-cent fee-rounding fix. My `live.html`/`assets/live.js` are therefore a
+    second, overlapping implementation and were not re-submitted.
+  * **Still not on main (this branch is the only place it exists):** a *fee-aware net-ROI* screen as the model
+    itself — `data/roi_model.json` (grep of main: `roi_model` 0 hits, `net_roi` 0 hits, `swing_alert` 0 hits);
+    main's model is a heuristic score with a 0.55 threshold and a "modeled ROI if YES at ask" annotation.
+    Also unique here: `roi.html` (parameters rendered from the same file the code reads), the out-of-sample
+    candlestick replay with hit rate vs an always-buy-YES baseline, P&L per 100 contracts and an explicit
+    `not_measured` list; `scripts/roi_scan.py` + `scripts/tests/validate_roi.py` (refuses sub-threshold alerts,
+    ineligible picks, keyword-only rows presented as picks, provenance-less scans); `.github/workflows/desk.yml`
+    (10-min cadence, only writer of `data/live/roi.json`); and the test set — 42 published fee-table numbers,
+    browser↔CI parity on 15 cases (mutation-checked), engine behaviour in four modes, an offline end-to-end scan
+    test with 4 negative validator cases, and a jsdom render test.
+  * One input my page had that main's does not: `data/live/cors.json` (committed by another session at 13:50:27Z)
+    records `access-control-allow-origin` echoing the Pages origin for a simple GET on the demo host — the runtime
+    mode detection in my layer stays correct, and that probe is the evidence that browser polling can work here.
+  Everything on `arena/d022c8de-kalshidash3` (tip `965fb82`, rebased on `main@88307e1`) is green locally:
+  `check_site.py`, `validate_live.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`,
+  `test_engine_node.js`, `test_pages_dom.js`. To take the non-overlapping parts later: `gh pr reopen 28` (whole
+  branch), or `git checkout arena/d022c8de-kalshidash3 -- data/roi_model.json roi.html scripts/roi_model.py
+  scripts/roi_scan.py scripts/tests .github/workflows/desk.yml` for the model+validation half alone.
