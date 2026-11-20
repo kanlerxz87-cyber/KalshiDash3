@@ -55,7 +55,7 @@ and publishes only the repository root.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | in progress | arena-6d85f8f0 | `dashboard.html`, `assets/site.css` | Use only observed consecutive snapshot prices from `data/live/price_history.json`; validate via local test fixtures and `scripts/check_site.py` | GitHub Pages snapshot cadence is not tick-level live; ROI cannot be claimed without validated model/outcome data. |
+| T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | done | arena-6d85f8f0 | `dashboard.html`, `assets/site.css`, `executive-summary.html` | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `node --check`, and a Node fixture smoke test covering the exact 10¢ threshold, sub-threshold rejection, screen criteria, category filter, and source output all passed | GitHub Pages snapshot cadence is not tick-level live; the experimental shortlist is not a validated ROI model and no causal news links are claimed. |
 
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
@@ -131,3 +131,13 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+### Session `arena-6d85f8f0` — alert feed enhancement
+
+- Claim: T11; files touched: `dashboard.html`, `assets/site.css`, `executive-summary.html` (claim committed and pushed to the current Arena branch before implementation).
+- Added two bounded, newest-first scrolling feeds that compare consecutive collected `last` prices and trigger only for absolute changes >= $0.10. Each alert links to the official Kalshi demo market API record. Category selection filters both feeds.
+- The experimental screen is explicitly not an ROI model: only fee-schedule `seed` markets with positive official `volume_24h_fp` qualify, ordered by reported volume. No predicted-return or profitability claim is displayed.
+- The browser rechecks the static snapshot every 60 seconds, but the scheduled collector runs every 20 minutes and the UI states this limitation; not tick-level streaming. No news-event causal links are asserted.
+- Official sources used: https://docs.kalshi.com/api-reference/market/get-markets ; https://docs.kalshi.com/getting_started/quick_start_websockets ; https://docs.kalshi.com/api-reference/market/get-market-orderbook . Existing dashboard history provenance: GET /markets source above.
+- Verification: `python3 scripts/check_site.py`, `python3 scripts/tests/validate_live.py`, `node --check` on the embedded dashboard script, plus a Node fixture smoke test for exact threshold, below-threshold behavior, experimental screen eligibility, category filtering, and source link output. All passed.
+- Irregularities: the source set does not provide causal news/source URLs per price move; UI links the official market record and flags the absence of causal attribution. The 20-minute workflow cadence and absence of a validated ROI model are disclosed in the UI and executive summary.
