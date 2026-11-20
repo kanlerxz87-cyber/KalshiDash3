@@ -370,6 +370,17 @@
         "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
         "https://docs.kalshi.com/api-reference/market/get-markets"
       ]
+    },
+    {
+      "id": "F-17",
+      "item": "Price history is pruned to open markets, so swings are archived separately; four early alerts were seeded from git history",
+      "why": "scripts/collect.py keeps price observations only for markets that are open in scope (it drops the rest on each run). The first alert feed (commit b95bebb) therefore lost a market's history as soon as it closed; a fresh snapshot showed 0 alerts for the same window. To stop alerts disappearing, scripts/build_alerts.py now keeps an append-only archive (data/live/alerts_archive.json). Its first four entries were produced by running the same builder on the observations committed in b95bebb; their first_seen_at value is the seeding time (2026-11-20T13:19Z), not the time the swing was first observed. Their to_time values are the original observation times.",
+      "action": "Owner to decide whether price_history should retain closed markets (collector change, out of this task's scope). The archive is capped at 5,000 alerts (oldest trimmed).",
+      "severity": "medium",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-markets",
+        "https://docs.kalshi.com/getting_started/market_lifecycle"
+      ]
     }
   ]
 }
