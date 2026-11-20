@@ -81,8 +81,21 @@ class FeedTests(unittest.TestCase):
             self.assertIn("/markets/", a["market_source"])
 
     def test_alerts_reference_real_tickers(self):
+        # The archive deliberately keeps a swing after its market leaves the open
+        # scan (F-17), so a ticker that is no longer in the snapshot is still a
+        # legitimate row — PROVIDED it carries the official API record for exactly
+        # that ticker. A ticker that is in neither the snapshot nor a matching
+        # official record is a fabricated row and fails here.
         for a in self.feed["all_events"]:
-            self.assertIn(a["ticker"], self.tickers)
+            if a["ticker"] in self.tickers:
+                continue
+            src = str(a.get("market_source", ""))
+            self.assertTrue(
+                src.startswith("https://external-api.demo.kalshi.co/trade-api/v2/markets/")
+                and src.rsplit("/", 1)[-1] == a["ticker"],
+                f"{a['ticker']} is not in the snapshot and has no matching official "
+                f"market record: {src}",
+            )
 
     def test_high_roi_is_subset_of_all_events(self):
         all_keys = {(a["ticker"], a["to_time"]) for a in self.feed["all_events"]}
