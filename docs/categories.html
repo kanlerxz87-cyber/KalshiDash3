@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Categories — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+  <h1>Category subpages</h1>
+  <p class="lede">The five categories in scope. Each page shows only its own category, so a ranking is never mixed across
+     incomparable markets.</p>
+  <div id="snapshotBanner"></div>
+  <div id="cards" class="grid"></div>
+  <h2>Everything else is deliberately excluded</h2>
+  <p class="small mut">Markets outside these five categories are scanned but excluded from every ranking, as the brief
+     requires. The counts below make that boundary auditable instead of implied.</p>
+  <div id="outside"></div>
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("categories.html");
+(async () => {
+  let snap = null;
+  try { snap = await KD.json("data/live/markets.json"); } catch (e) { snap = null; }
+  KD.snapshotBanner(snap);
+  const files = { gas: "gas.html", elections: "elections.html", culture: "culture.html", crypto: "crypto.html", golf: "golf.html" };
+  const open = (snap && snap.open_markets) || [];
+  const settled = (snap && snap.settled_markets) || [];
+  KD.$("#cards").innerHTML = Object.keys(KD.CAT_LABEL).map(function (id) {
+    const label = KD.CAT_LABEL[id];
+    const o = open.filter(function (r) { return r.category_id === id; }).length;
+    const s = settled.filter(function (r) { return r.category_id === id; }).length;
+    return '<div class="card"><h3>' + label + '</h3>' +
+      '<p>' + KD.num(o) + ' open · ' + KD.num(s) + ' settled in the current snapshot</p>' +
+      '<a href="' + files[id] + '">Open ' + label + ' →</a></div>';
+  }).join("");
+  if (!snap) { KD.$("#outside").innerHTML = KD.empty("No snapshot yet."); return; }
+  KD.$("#outside").innerHTML = KD.table(
+    [{ key: "k", label: "Bucket" }, { key: "v", label: "Count", num: true }],
+    [
+      { k: "Open markets scanned", v: KD.num(snap.counts.open_total_scanned) },
+      { k: "Open markets inside the five categories", v: KD.num(snap.counts.open_in_scope) },
+      { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
+      { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
+      { k: "Settled markets inside the five categories", v: KD.num(snap.counts.settled_in_scope) },
+      { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) }
+    ]);
+})();
+</script>
+</body></html>

@@ -1,30 +1,106 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Verification — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a class="on" href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Verification — line by line</h1>
-<p class="mut">Rule: every static value links to an official source. If a value can't be confirmed, it stays <b>blank</b> and is flagged. Live market values are fetched at runtime from the demo API and are never hand-typed.</p>
-<h2>Static claims</h2>
-<table><thead><tr><th>#</th><th>Claim</th><th>Value</th><th>Official source</th><th>Status</th></tr></thead><tbody>
-<tr><td>V1</td><td>Recommended demo REST root</td><td class="mono">https://external-api.demo.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V2</td><td>Also-supported demo REST root</td><td class="mono">https://demo-api.kalshi.co/trade-api/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V3</td><td>Demo WebSocket</td><td class="mono">wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V4</td><td>Demo uses mock funds; credentials not shared with production</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V5</td><td>Public market data needs no auth</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data">Market Data Quick Start</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V6</td><td>Orderbook returns bids only (binary)</td><td>Yes</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses">Orderbook Responses</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V7</td><td>Default request cost 10 tokens</td><td>10</td><td><a href="https://docs.kalshi.com/getting_started/rate_limits">Rate Limits</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V8</td><td>Timestamp tolerance 30s</td><td>30s</td><td><a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a></td><td><span class="badge ok">verified</span></td></tr>
-<tr><td>V9</td><td>Gas Prices series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
-<tr><td>V10</td><td>Elections series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
-<tr><td>V11</td><td>Culture series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
-<tr><td>V12</td><td>Crypto series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
-<tr><td>V13</td><td>Golf series ticker</td><td></td><td>—</td><td><span class="badge warn">unverified — blank</span></td></tr>
-<tr><td>V14</td><td>Demo account balance</td><td></td><td>—</td><td><span class="badge warn">unverified — no keys</span></td></tr>
-</tbody></table>
-<h2>Live verification (runtime)</h2>
-<p>Open the <a href="dashboard.html">Live Dashboard</a>: it fetches <span class="mono">/series</span>, <span class="mono">/markets</span>, <span class="mono">/markets/{ticker}/orderbook</span> directly from the demo API. Cross-check any ticker at <span class="mono">https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}</span>.</p>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="sources.html">Sources</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verification — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Verification — line by line</h1>
+  <p class="lede">
+    Every static claim in this project is a row below, with the official page it was checked against and the date it was
+    checked. A value that could not be confirmed is <b>left blank</b> and appears on
+    <a href="flagged.html">Flagged for Review</a>. Nothing is inferred, and no row says “verified” unless the wording
+    can be pointed at in the source.
+  </p>
+
+  <div id="summary"></div>
+  <div class="controls">
+    <label>Filter <select id="filt">
+      <option value="all">All rows</option>
+      <option value="verified">Verified only</option>
+      <option value="unverified">Unverified only</option>
+    </select></label>
+    <span class="small mut" id="count"></span>
+  </div>
+  <div id="facts"></div>
+
+  <h2>What “verified” means here, and what it does not</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Claim type</th><th>What we did</th><th>What we did not do</th></tr></thead>
+    <tbody>
+      <tr><td>Endpoints, field names, enums, limits</td>
+          <td>Read the official OpenAPI schema text on docs.kalshi.com and the matching guide page; copied the wording.</td>
+          <td>We did not call the endpoint in this build environment for most rows, so a live 200 was not observed here.</td></tr>
+      <tr><td>Fees</td>
+          <td>Read the published fee schedule PDF, including its “last updated and effective” date.</td>
+          <td>We did not verify a fee against an actual fill, because no demo credentials exist (F-07).</td></tr>
+      <tr><td>Category membership</td>
+          <td>Accepted only series tickers that appear verbatim in the fee schedule’s non-standard fees table.</td>
+          <td>We did not infer series from naming patterns such as <code>KXGOLF</code> or <code>KXGAS</code>; those were removed.</td></tr>
+      <tr><td>Live prices, volumes, results</td>
+          <td>Never hardcoded. Produced by <code>scripts/collect.py</code> and rendered with the query URL and fetch time attached.</td>
+          <td>We did not type a single market number into the HTML.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Data integrity checks that run automatically</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Check</th><th>Rule</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td>No invented prices</td><td>A price must be null or inside 0–1; the validator rejects anything else.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>No coerced results</td><td><code>result</code> may only be one of <code>yes</code>, <code>no</code>, <code>scalar</code>, or empty.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>Provenance present</td><td>Every row carries an https source URL; the snapshot carries a fetch time and a disclaimer block.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>Book ordering</td><td>Order book price levels must be ascending, matching the documented response shape.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>No broken links</td><td>Every internal link and asset must resolve before deploy.</td><td><code>scripts/check_site.py</code></td></tr>
+    </tbody>
+  </table></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("verification.html");
+let facts = [];
+function render() {
+  const mode = KD.$("#filt").value;
+  const rows = facts.filter(f => mode === "all" || (mode === "verified" ? f.verified : !f.verified)).map(f => ({
+    id: `<b>${KD.esc(f.id)}</b>`,
+    claim: KD.esc(f.claim),
+    value: f.value ? `<span class="mono">${KD.esc(f.value)}</span>` : '<span class="na">blank — not confirmable</span>',
+    src: KD.srcLink(f.source, "official source"),
+    st: f.verified ? '<span class="badge ok">verified</span>' : '<span class="badge bad">unverified</span>',
+    note: KD.esc(f.note || ""),
+  }));
+  KD.$("#count").textContent = `${rows.length} of ${facts.length} rows shown`;
+  KD.$("#facts").innerHTML = KD.table([
+    { key: "id", label: "ID" }, { key: "claim", label: "Claim" }, { key: "value", label: "Value" },
+    { key: "src", label: "Official source" }, { key: "st", label: "Status" }, { key: "note", label: "Note / correction" },
+  ], rows);
+}
+(async () => {
+  try {
+    const d = await KD.json("data/verified_facts.json");
+    facts = d.facts || [];
+  } catch { KD.$("#facts").innerHTML = KD.empty("data/verified_facts.json missing."); return; }
+  const v = facts.filter(f => f.verified).length;
+  KD.$("#summary").innerHTML = `<div class="grid">
+    <div class="card"><div class="kpi">${facts.length}<small>claims checked</small></div></div>
+    <div class="card"><div class="kpi">${v}<small>confirmed against an official page</small></div></div>
+    <div class="card"><div class="kpi">${facts.length - v}<small>left blank and flagged</small></div></div>
+    <div class="card"><div class="kpi">0<small>values typed by hand into the HTML</small></div></div>
+  </div>`;
+  KD.$("#filt").addEventListener("change", render);
+  render();
+})();
+</script>
 </body></html>

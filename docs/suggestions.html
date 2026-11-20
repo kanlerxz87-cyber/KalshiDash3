@@ -1,20 +1,73 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Suggestions — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a class="on" href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Suggestions — pick a path before anything is implemented</h1>
-<p class="mut">Each suggestion states expected benefit, effort, risk, and what to measure. Vote by replying with the ID (e.g. "implement G2"). No suggestion is implemented until chosen.</p>
-<table><thead><tr><th>ID</th><th>Suggestion</th><th>Why it helps decisions</th><th>Effort / Risk</th><th>Success metric</th></tr></thead><tbody>
-<tr><td>G1</td><td>WebSocket live ticks (ticker channel) instead of 5s polling</td><td>True real-time price; removes polling lag.</td><td>Medium / Auth required for WS</td><td>Tick latency &lt;1s; no missed moves</td></tr>
-<tr><td>G2</td><td>Candlestick history (1m/60m) from <span class="mono">/markets/candlesticks</span> for full-day charts</td><td>Backtest + longer context than live poll buffer.</td><td>Low / None</td><td>Chart shows full market life</td></tr>
-<tr><td>G3</td><td>Real demo portfolio wiring (balance/positions/fills) once keys supplied</td><td>True P&amp;L instead of paper ledger.</td><td>Low / Key security</td><td>Balance matches demo.kalshi.co</td></tr>
-<tr><td>G4</td><td>Alerting: price-move + resolution alerts (email/Telegram)</td><td>Never miss a resolution or spike.</td><td>Medium / Spam risk</td><td>Alert precision/recall logged</td></tr>
-<tr><td>G5</td><td>Backtest harness: replay settled markets with yes/no outcomes</td><td>Test strategies before risking demo funds.</td><td>High / Overfitting</td><td>Out-of-sample win rate reported</td></tr>
-<tr><td>G6</td><td>Category mapping review UI (approve/reject keyword matches)</td><td>Fix misclassified series with one click.</td><td>Low / None</td><td>Zero misclassified in top-10</td></tr>
-</tbody></table>
-<p>Sources: WebSocket <a href="https://docs.kalshi.com/websockets/overview">WebSockets</a> · Candlesticks <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a> · Portfolio <a href="https://docs.kalshi.com/api-reference/portfolio/get-balance">Get Balance</a>.</p>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="questions.html">Open Questions</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suggestions — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Suggestions — review before anything is built</h1>
+  <p class="lede">
+    Each proposal states what it improves, what it costs, how it can hurt, and the metric that would prove it worked.
+    Four are already implemented because they remove a correctness risk; four are proposals that need your decision.
+    Nothing in the second group changes behaviour until you choose it.
+  </p>
+
+  <div class="notice blue">
+    <b>How to choose.</b> Reply with an ID (for example “do G5, skip G8”). Each row ends in a status badge:
+    <span class="badge ok">implemented</span> means it is live on this site and you are reviewing it after the fact;
+    <span class="badge warn">proposed</span> means it is waiting on your decision. Nothing moves from proposed to implemented without that reply.
+  </div>
+
+  <h2>Implemented in this session — review these</h2>
+  <div id="impl"></div>
+
+  <h2>Proposed — awaiting your decision</h2>
+  <div id="prop"></div>
+
+  <h2>The decision that unlocks the most</h2>
+  <div class="notice warn">
+    <b>G5 (fees) is the highest-value open decision.</b> Every performance number on this site is currently gross of
+    per-series fee differences. At a 50¢ entry the general taker fee is about 2¢ per contract — roughly 4% of the stake —
+    so a strategy that looks break-even gross is a loser net. Until fees are settled, treat any P&amp;L comparison as a
+    ranking of ideas, not of outcomes. Source:
+    <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule</a>.
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("suggestions.html");
+(async () => {
+  let f;
+  try { f = await KD.json("data/findings.json"); } catch { KD.$("#impl").innerHTML = KD.empty("data/findings.json missing."); return; }
+  const rows = f.suggestions.map(s => ({
+    id: `<b>${KD.esc(s.id)}</b>`,
+    s: KD.esc(s.suggestion),
+    why: KD.esc(s.why_it_helps_decisions),
+    effort: KD.esc(s.effort),
+    risk: KD.esc(s.risk),
+    metric: KD.esc(s.success_metric),
+    status: s.status === "implemented" ? '<span class="badge ok">implemented</span>' : '<span class="badge warn">proposed</span>',
+    src: (s.sources || []).map(u => KD.srcLink(u, u.includes("docs.kalshi") ? "Kalshi docs" : "source")).join(" "),
+  }));
+  const headers = [
+    { key: "id", label: "ID" }, { key: "s", label: "Suggestion" }, { key: "why", label: "Why it improves decisions" },
+    { key: "effort", label: "Effort" }, { key: "risk", label: "Risk" }, { key: "metric", label: "How you would know it worked" },
+    { key: "status", label: "Status" }, { key: "src", label: "Source" },
+  ];
+  KD.$("#impl").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("implemented")));
+  KD.$("#prop").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("proposed")));
+})();
+</script>
 </body></html>

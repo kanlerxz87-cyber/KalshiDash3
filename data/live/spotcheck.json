@@ -1,0 +1,46 @@
+{
+  "note": "A handful of markets observed directly and individually through the documented per-series filter, used to prove that (a) the official demo API answers these queries and (b) each confirmed seed series maps to markets that really are in the requested topic. This is NOT a full market scan and is NOT used for any ranking. Rankings come only from data/live/markets.json. Every row carries the exact query URL it came from so it can be re-run by hand.",
+  "method": "GET with the documented series_ticker + status filter (https://docs.kalshi.com/api-reference/market/get-markets). One request per series.",
+  "observed_at": "2026-11-20",
+  "observations": [
+    {
+      "series_ticker": "KXAAAGASM",
+      "category_id": "gas",
+      "category_basis": "seed",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "query_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+      "finding": "Returns US average gas price markets with settlement rules citing AAA, e.g. \"If average regular gas prices for United States are strictly greater than $4.80 on Nov 30, 2026 according to AAA, then the market resolves to Yes.\" Strikes run in $0.10 steps from $4.50 upward. The series is therefore a genuine gas-price series, not a name collision.",
+      "sample_markets": [
+        {"ticker": "KXAAAGASM-26NOV30-4.80", "title": "Will average **gas prices** be above $4.80?", "yes_sub_title": "Above 4.80", "last_price_dollars": 0.03, "volume_fp": 55571.52, "open_interest_fp": 55567.52, "yes_ask_dollars": 1.0, "status": "active", "result": ""},
+        {"ticker": "KXAAAGASM-26NOV30-4.70", "title": "Will average **gas prices** be above $4.70?", "yes_sub_title": "Above 4.70", "last_price_dollars": 0.02, "volume_fp": 58071.52, "open_interest_fp": 58062.52, "yes_ask_dollars": 1.0, "status": "active", "result": ""},
+        {"ticker": "KXAAAGASM-26NOV30-4.60", "title": "Will average **gas prices** be above $4.60?", "yes_sub_title": "Above 4.60", "last_price_dollars": 0.03, "volume_fp": 41680.64, "open_interest_fp": 41680.64, "yes_ask_dollars": 1.0, "status": "active", "result": ""}
+      ]
+    },
+    {
+      "series_ticker": "KXPGATOUR",
+      "category_id": "golf",
+      "category_basis": "seed",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "query_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
+      "finding": "Returns outright tournament-winner markets, e.g. \"The RSM Classic: Bill Haas wins\", with the rule \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\" and a documented withdrawal clause. Confirms the golf seed maps to real golf markets.",
+      "sample_markets": [
+        {"ticker": "KXPGATOUR-THRC26-BHAA", "title": "The RSM Classic: Bill Haas wins", "yes_sub_title": "Bill Haas", "last_price_dollars": 0.0, "volume_fp": 0.0, "open_interest_fp": 0.0, "no_bid_dollars": 1.0, "status": "active", "result": "", "expected_expiration_time": "2026-11-22T00:00:00Z"},
+        {"ticker": "KXPGATOUR-THRC26-RSTR", "title": "The RSM Classic: Robert Streb wins", "yes_sub_title": "Robert Streb", "last_price_dollars": 0.0, "volume_fp": 0.0, "open_interest_fp": 0.0, "no_bid_dollars": 1.0, "status": "active", "result": "", "expected_expiration_time": "2026-11-22T00:00:00Z"},
+        {"ticker": "KXPGATOUR-THRC26-MLAI", "title": "The RSM Classic: Martin Laird wins", "yes_sub_title": "Martin Laird", "last_price_dollars": 0.0, "volume_fp": 0.0, "open_interest_fp": 0.0, "no_bid_dollars": 1.0, "status": "active", "result": "", "expected_expiration_time": "2026-11-22T00:00:00Z"}
+      ]
+    },
+    {
+      "series_ticker": "(unfiltered)",
+      "category_id": null,
+      "category_basis": null,
+      "query_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+      "finding": "The newest open markets on the demo exchange when sampled were multivariate sports combo markets (ticker prefix KXMVECROSS*, e.g. KXMVECROSSCATEGORY-S2026...). None belong to the five requested topics, which is why out-of-scope markets are counted and excluded rather than matched by a loose keyword.",
+      "sample_markets": []
+    }
+  ],
+  "limitations": [
+    "Three requests, not a full scan: absence of a topic here proves nothing about whether that topic exists on the exchange.",
+    "Values are point-in-time demo values and are not used in any ranking or chart.",
+    "A market priced 0.03 with 55k contracts traded illustrates why price alone is a bad size metric and why both volume and open interest are shown separately."
+  ]
+}

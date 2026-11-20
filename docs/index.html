@@ -1,21 +1,140 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KalshiDash3 — Live Demo Dashboard</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a class="on" href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<div class="hero"><h1>Kalshi demo dashboard — highest-dollar live events</h1>
-<p>Tracks live demo markets in <b>Gas Prices, Elections, Culture, Crypto, and Golf only</b>, ranks them by dollar notional, follows each event until it resolves <b>yes/no</b>, charts price over time with liquidity, and analyzes paper-trading performance. All live numbers come from the official demo API at runtime — nothing is hand-typed.</p>
-<p><a class="btn" href="dashboard.html">Open live dashboard</a> <a class="btn ghost" href="executive-summary.html">Read executive summary</a></p></div>
-<div class="grid">
-<div class="card"><h3>Live dashboard</h3><p>Highest-dollar events per category, price graph (X=time, Y=contract price), orderbook liquidity, resolution tracking.</p><a href="dashboard.html">Go →</a></div>
-<div class="card"><h3>Portfolio &amp; trading</h3><p>Demo-account performance, trade execution (paper until keys supplied), categorized trade analysis.</p><a href="portfolio.html">Go →</a></div>
-<div class="card"><h3>Strategies</h3><p>Strategy hypotheses derived from categorized trade data — each labeled with evidence and risk.</p><a href="strategies.html">Go →</a></div>
-<div class="card"><h3>Suggestions</h3><p>Decision-ready improvement proposals. Nothing is implemented until you pick a path.</p><a href="suggestions.html">Go →</a></div>
-<div class="card"><h3>Open questions</h3><p>What we know, what we don't, and how to discover the missing information.</p><a href="questions.html">Go →</a></div>
-<div class="card"><h3>Verification &amp; sources</h3><p>Every static claim links to an official source. Unverified values stay blank and flagged.</p><a href="verification.html">Go →</a></div>
-</div>
-<div class="notice blue"><b>Demo environment.</b> This site uses the Kalshi <b>demo</b> API (<span class="mono">https://external-api.demo.kalshi.co/trade-api/v2</span>) with mock funds. Demo prices/behavior may not reflect production. Source: <a href="https://docs.kalshi.com/getting_started/demo_env">Test In The Demo Environment</a>.</div>
-</div>
-<footer><div class="wrap">KalshiDash3 · Demo data only · Verify anything important against <a href="https://docs.kalshi.com/welcome">docs.kalshi.com</a> · <a href="sources.html">Full source list</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KalshiDash3 — Kalshi demo dashboard</title>
+<meta name="description" content="Live Kalshi demo market dashboard for Gas Prices, Elections, Culture, Crypto and Golf, with source-linked verification.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Kalshi demo dashboard — highest-dollar live events in five categories</h1>
+  <p class="lede">
+    Tracks open Kalshi <b>demo</b> markets in <b>Gas Prices, Elections, Culture, Crypto and Golf</b> only,
+    ranks them by an explicitly labelled dollars-traded estimate, follows each market until it resolves,
+    charts contract price over time with the contracts available at each price, and analyses a
+    clearly-labelled paper portfolio. Every live number comes from a committed snapshot of the official
+    demo API, so it can be audited and re-run. Nothing here is hand-typed.
+  </p>
+
+  <div id="snapshotBanner"></div>
+
+  <div class="grid" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card"><h3>Live dashboard</h3>
+      <p>Top markets per category with liquidity depth, a price chart (X = time, Y = contract price) and a resolution tracker.</p>
+      <a href="dashboard.html">Open →</a></div>
+    <div class="card"><h3>Portfolio &amp; trading</h3>
+      <p>Demo-account performance, trade execution, and value-at-risk style categorisation. Paper until demo keys exist.</p>
+      <a href="portfolio.html">Open →</a></div>
+    <div class="card"><h3>Strategies</h3>
+      <p>Four strategy hypotheses, each with the evidence it still needs and its failure mode.</p>
+      <a href="strategies.html">Open →</a></div>
+    <div class="card"><h3>Suggestions</h3>
+      <p>Decision-ready proposals with benefit, effort, risk and a success metric. Nothing is implemented until you pick.</p>
+      <a href="suggestions.html">Open →</a></div>
+    <div class="card"><h3>Questions</h3>
+      <p>What is established, what is missing, and exactly how to obtain the missing information.</p>
+      <a href="questions.html">Open →</a></div>
+    <div class="card"><h3>Verification &amp; sources</h3>
+      <p>Every static claim links to an official source. Unconfirmable values are blank, never inferred.</p>
+      <a href="verification.html">Open →</a></div>
+  </div>
+
+  <h2>What is live right now</h2>
+  <div id="today"></div>
+
+  <h2>How a number gets onto this page</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Step</th><th>What happens</th><th>Why it matters</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>scripts/collect.py</code> reads public demo endpoints on a GitHub Actions schedule</td>
+          <td>No credentials, no manual input, and the same call can be re-run by anyone</td>
+          <td><a href="https://docs.kalshi.com/getting_started/quick_start_market_data" target="_blank" rel="noopener">Quick Start: Market Data</a></td></tr>
+      <tr><td>2</td><td>The result is committed to <code>data/live/markets.json</code> with a fetch timestamp and the exact query URL per row</td>
+          <td>A screenshot can be tied to one timestamp and one query</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td></tr>
+      <tr><td>3</td><td><code>scripts/tests/validate_live.py</code> rejects a snapshot that invents a price or coerces a result to yes/no</td>
+          <td>Fabrication fails the build instead of reaching the page</td>
+          <td><a href="verification.html">Verification page</a></td></tr>
+      <tr><td>4</td><td>This site renders that snapshot statically</td>
+          <td>What you read is what was collected, not what your browser happened to get</td>
+          <td><a href="https://docs.github.com/en/pages" target="_blank" rel="noopener">GitHub Pages</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="notice warn">
+    <b>Read this before acting on any number.</b> These are <b>demo</b> markets with mock funds. Kalshi states that
+    “the price and behavior of markets in the demo environment may not be reflective of those in real markets”
+    (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Environment</a>).
+    Demo data is for building and testing, not for real trading decisions.
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("");
+(async () => {
+  let snap = null;
+  try { snap = await KD.json("data/live/markets.json"); } catch (e) { snap = null; }
+  KD.snapshotBanner(snap);
+  const k = KD.$("#kpis");
+  if (!snap) {
+    k.innerHTML = `<div class="card"><div class="kpi">—<small>awaiting first snapshot</small></div></div>`;
+    KD.$("#today").innerHTML = KD.empty("No snapshot yet. See the notice above.");
+    return;
+  }
+  const open = snap.open_markets || [], settled = snap.settled_markets || [];
+  const confirmed = open.filter(r => r.category_basis === "seed").length;
+  const resolved = settled.filter(r => r.result === "yes" || r.result === "no").length;
+  const live = KD.CAT_LABEL;
+  k.innerHTML = [
+    ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
+    ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled markets in scope"],
+    ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
+  ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("");
+
+  // Highest dollars-traded estimate per category, 1 row each.
+  const top = {};
+  for (const r of open) {
+    if (r.dollars_traded_estimate === null || r.dollars_traded_estimate === undefined) continue;
+    if (!top[r.category_id] || r.dollars_traded_estimate > top[r.category_id].dollars_traded_estimate) top[r.category_id] = r;
+  }
+  const rows = Object.keys(live).map(id => {
+    const r = top[id];
+    return {
+      cat: live[id],
+      title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc(r.title)}</a>` : '<span class="na">none open in scope</span>',
+      dollars: r ? KD.money(r.dollars_traded_estimate, 0) : '<span class="na">—</span>',
+      price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
+      vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
+      basis: r ? KD.basisBadge(r.category_basis) : '<span class="na">—</span>',
+      src: r ? KD.srcLink(r.source, "API") : '<span class="na">—</span>',
+    };
+  });
+  KD.$("#today").innerHTML = KD.table(
+    [{ key: "cat", label: "Category" }, { key: "title", label: "Largest live market" },
+     { key: "dollars", label: "Dollars traded (est.)", num: true }, { key: "price", label: "Last price", num: true },
+     { key: "vol", label: "Contracts traded", num: true }, { key: "basis", label: "Category basis" },
+     { key: "src", label: "Source" }],
+    rows
+  ) + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
+     Kalshi has no official “dollars traded” field — see
+     <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
+     “Confirmed” means the series ticker appears in the
+     <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
+     “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.</p>`;
+})();
+</script>
 </body></html>

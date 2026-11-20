@@ -21,3 +21,64 @@
 - 2026-11-20: arena-5761b399 merged PR #1 to main (docs/ site). session-1c0d1fc0 PR #2 hit merge conflicts in README.md, COORDINATION.md, .github/workflows/pages.yml.
 - 2026-11-20: session-1c0d1fc0 resolved by merging origin/main into its branch: kept main's `docs/` site and Pages workflow (path: docs) untouched, kept its root-level files as an alternative implementation, combined README/COORDINATION. No files from either session were deleted. See INTEGRATION.md for canonical-site recommendation.
 - 2026-11-20: PR #2 merged to main (merge commit ba1b575459829b63d0084a69e971c175c8f6f9ab). GitHub Pages workflow run 44725043334 succeeded; Pages status=built; live site https://kanlerxz87-cyber.github.io/KalshiDash3/ verified (root implementation served via legacy Pages; docs/ site also live at /docs/). PR link: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/2
+
+
+---
+
+## Session `arena-e05bd5ff` — final integration session
+
+Branch `arena/e05bd5ff-kalshidash3`. Started from an empty claim on a repo that, by then, contained **five**
+overlapping builds merged from five other sessions (PRs #1–#5). This session acted as the integration session the
+brief asks for: it merged the branches' intent into one canonical tree, re-verified the combined data line by line,
+and publishes only `docs/`.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T6 | Credential-free collector + scheduled workflow so the site shows real API values with no manual input | done | arena-e05bd5ff | `scripts/collect.py`, `scripts/tests/validate_live.py`, `.github/workflows/collect.yml`, `data/categories.json` | Sandbox has no route to Kalshi; GitHub Actions runs it. Validator refuses fabricated snapshots. | Actions does not register new workflow files created through the API token (see log). Collection therefore falls back to the committed `data/live/spotcheck.json` until Actions picks the workflow up. |
+| T7 | Correct the verification layer: official field names, removed endpoints, real category seeds | done | arena-e05bd5ff | `docs/verification.html`, `docs/flagged.html`, `data/verified_facts.json`, `data/findings.json` | 44 claims checked against docs.kalshi.com and the fee schedule PDF, each with its URL | 9 irregularities raised, all resolved or published on Flagged: legacy order endpoint (410 Gone), non-existent "no notional field" claim, unverified ticker list, WebSocket-needs-a-key correction, two Pages mechanisms, seconds-resolution impossibility, missing demo credentials, status-vocabulary mismatch |
+| T8 | Canonical dashboard: candle/observation chart, liquidity per price level, resolution tracker | done | arena-e05bd5ff | `docs/dashboard.html`, `docs/assets/site.js`, `docs/assets/site.css`, `docs/categories.html` | `scripts/check_site.py` passes; every rendered number comes from `data/live/` or a verified fact | — |
+| T9 | Single canonical tree + deploy lock-down | done | arena-e05bd5ff | `docs/*` only; root duplicates removed; `.github/workflows/pages.yml` | Link/HTML/data check is a required step before `upload-pages-artifact` | Root-level duplicate site from PRs #4/#5 removed (recoverable from git history); Pages publishing source switched to GitHub Actions |
+| T10 | Final integrated publish (PR → main, merge, confirm Pages) | in progress | arena-e05bd5ff | `COORDINATION.md`, `README.md` | Pending PR + deploy confirmation | — |
+
+### Sources used by this session (all official)
+
+- https://docs.kalshi.com/getting_started/api_environments
+- https://docs.kalshi.com/getting_started/demo_env
+- https://docs.kalshi.com/getting_started/quick_start_market_data
+- https://docs.kalshi.com/getting_started/quick_start_websockets
+- https://docs.kalshi.com/getting_started/quick_start_create_order
+- https://docs.kalshi.com/getting_started/api_keys
+- https://docs.kalshi.com/getting_started/rate_limits
+- https://docs.kalshi.com/getting_started/market_lifecycle
+- https://docs.kalshi.com/getting_started/market_settlement
+- https://docs.kalshi.com/getting_started/orderbook_responses
+- https://docs.kalshi.com/getting_started/pagination
+- https://docs.kalshi.com/getting_started/historical_data
+- https://docs.kalshi.com/api-reference/market/get-markets
+- https://docs.kalshi.com/api-reference/market/get-market-orderbook
+- https://docs.kalshi.com/api-reference/market/get-market-candlesticks
+- https://docs.kalshi.com/api-reference/market/get-series-list
+- https://docs.kalshi.com/api-reference/events/get-events
+- https://docs.kalshi.com/api-reference/orders/create-order-v2
+- https://docs.kalshi.com/api-reference/portfolio/get-balance
+- https://docs.kalshi.com/api-reference/portfolio/get-positions
+- https://docs.kalshi.com/api-reference/portfolio/get-fills
+- https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account
+- https://kalshi.com/docs/kalshi-fee-schedule.pdf
+- https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site
+
+### Log
+
+- 2026-11-20: Rebased onto `main`. Found five merged sessions and two competing Pages mechanisms. Claimed T6–T10; all
+  other claims were complete (`arena-5761b399` T1–T4, `session-1c0d1fc0` T6, `arena-796e8144`/`arena-ebeb0887` records).
+- 2026-11-20: Verified every claim this session publishes against docs.kalshi.com and the fee schedule. Found and fixed
+  four factual errors carried by earlier sessions (see T7 irregularities). Nothing was marked verified without a URL.
+- 2026-11-20: Confirmed from the official demo API, per-series, that `KXAAAGASM` is the AAA US average gas-price series and
+  `KXPGATOUR` contains The RSM Classic winner markets. Recorded in `data/live/spotcheck.json` with the exact query URLs.
+- 2026-11-20: Removed the root-level duplicate site (PRs #4/#5) so `docs/` is the only published tree, and made the link
+  check a required build step. Recorded as Flagged F-05.
+- 2026-11-20: Note on automation: workflow files added by this session's token do not appear in the Actions workflow list,
+  so `collect.yml` and the rewritten `pages.yml` could not be dispatched or triggered from here. They are valid YAML and
+  validated by the same scripts run locally; the first run happens when the workflow file is present on `main`.

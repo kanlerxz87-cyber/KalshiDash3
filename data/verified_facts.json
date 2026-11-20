@@ -284,11 +284,49 @@
       "claim": "Unauthenticated public requests are rate limited separately from token budgets; authenticated requests cost 10 tokens by default; 429 returns too_many_requests with X-RateLimit-* headers and no Retry-After",
       "source": "https://docs.kalshi.com/getting_started/rate_limits",
       "verified": true
+    },
+    {
+      "id": "F-40",
+      "claim": "The demo API answers the documented series filter and returns markets for gas and golf seed series",
+      "value": "GET /markets?series_ticker=KXAAAGASM and ?series_ticker=KXPGATOUR both returned markets",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+      "verified": true,
+      "note": "Observed 2026-11-20. Sample rows and a second golf query are recorded in data/live/spotcheck.json. This proves the seed series exist; it is not a full scan."
+    },
+    {
+      "id": "F-41",
+      "claim": "KXAAAGASM is a US average gas-price series settled against AAA",
+      "value": "Settlement rule observed: \"If average regular gas prices for United States are strictly greater than $4.80 on Nov 30, 2026 according to AAA, then the market resolves to Yes.\"",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+      "verified": true
+    },
+    {
+      "id": "F-42",
+      "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
+      "value": "\"The RSM Classic: Bill Haas wins\" \u2014 \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
+      "verified": true
+    },
+    {
+      "id": "F-43",
+      "claim": "Real market rows carry the fixed-point and result fields this site relies on",
+      "value": "Observed: volume_fp \"55571.52\", open_interest_fp \"55567.52\", last_price_dollars \"0.0300\", result \"\", status \"active\", notional_value_dollars \"1.0000\"",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+      "verified": true,
+      "note": "Confirms F-22 in practice: notional_value_dollars is 1.0000 on every row regardless of size, so it cannot rank markets."
+    },
+    {
+      "id": "F-44",
+      "claim": "Unfiltered GET /markets?status=open is dominated by multivariate sports combo markets",
+      "value": "Sampled page contained KXMVECROSSCATEGORY-* markets (multi-leg NCAA basketball and football combos)",
+      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+      "verified": true,
+      "note": "Explains why out-of-scope markets are counted and excluded instead of being keyword-matched into a topic."
     }
   ],
   "counts": {
-    "total": 39,
-    "verified": 38,
+    "total": 44,
+    "verified": 43,
     "unverified": 1
   }
 }
