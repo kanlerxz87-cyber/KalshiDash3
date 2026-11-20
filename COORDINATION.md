@@ -126,3 +126,20 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+## Session `arena-e5adea9d` — live alerts, paper strategies, integration (branch `arena/e5adea9d-kalshidash3`, base `cd104db`)
+
+Only one session is active on the board (the others are merged). This session claims the open items from the brief.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Live price-swing alerts (≥ $0.10 either direction) as two scrolling feeds: all events, and a labelled high-ROI filter | in progress | arena-e5adea9d | `scripts/alerts.py`, `data/alert_rules.json`, `data/live/alerts.json` (generated), `alerts.html`, `assets/site.js` (nav), `assets/site.css` (feed styles) | pending | pending |
+| T12 | Automated paper trading of defined strategies, settlement from official `result`, categorised results | in progress | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html` | pending | pending |
+| T13 | Verification + Flagged for Review updates for T11/T12 and for repo irregularities found this session | in progress | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json`, `scripts/tests/validate_live.py` | pending | pending |
+| T14 | Integration: README, index card, check_site, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress | arena-e5adea9d | `README.md`, `index.html`, `COORDINATION.md`, `.github/workflows/collect.yml` | pending | pending |
+
+### Log
+
+- 2026-11-20 13:20 UTC: arena-e5adea9d claimed T11–T14. Checked before claiming: `origin/main` = `cd104db`; no other open session branch; the latest collector snapshot is 11:33 UTC and the scheduled (`*/20`) collector has not fired since merge (all recent runs are `workflow_dispatch` from the old branch). The sandbox cannot reach `external-api.demo.kalshi.co` (TLS fails), so live data comes only from the Actions collector.
