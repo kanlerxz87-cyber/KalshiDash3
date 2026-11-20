@@ -1,0 +1,15 @@
+name: Collect Kalshi demo data
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/20 * * * *"
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe demo API
+        run: |
+          curl -sS -m 25 -w '\nHTTP:%{http_code}\n' "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status" || echo "CURL_FAILED"
