@@ -55,6 +55,11 @@ and publishes only the repository root.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | in progress | arena-6d85f8f0 | `dashboard.html`, `assets/site.css` | Use only observed consecutive snapshot prices from `data/live/price_history.json`; validate via local test fixtures and `scripts/check_site.py` | GitHub Pages snapshot cadence is not tick-level live; ROI cannot be claimed without validated model/outcome data. |
+
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
 | T6 | Credential-free collector + scheduled workflow so the site shows real API values with no manual input | done | arena-e05bd5ff | `scripts/collect.py`, `scripts/tests/validate_live.py`, `.github/workflows/collect.yml`, `data/categories.json` | Sandbox has no route to Kalshi; GitHub Actions runs it. Validator refuses fabricated snapshots. | Actions does not register new workflow files created through the API token (see log). Collection therefore falls back to the committed `data/live/spotcheck.json` until Actions picks the workflow up. |
 | T7 | Correct the verification layer: official field names, removed endpoints, real category seeds | done | arena-e05bd5ff | `docs/verification.html`, `docs/flagged.html`, `data/verified_facts.json`, `data/findings.json` | 44 claims checked against docs.kalshi.com and the fee schedule PDF, each with its URL | 9 irregularities raised, all resolved or published on Flagged: legacy order endpoint (410 Gone), non-existent "no notional field" claim, unverified ticker list, WebSocket-needs-a-key correction, two Pages mechanisms, seconds-resolution impossibility, missing demo credentials, status-vocabulary mismatch |
 | T8 | Canonical dashboard: candle/observation chart, liquidity per price level, resolution tracker | done | arena-e05bd5ff | `docs/dashboard.html`, `docs/assets/site.js`, `docs/assets/site.css`, `docs/categories.html` | `scripts/check_site.py` passes; every rendered number comes from `data/live/` or a verified fact | — |
