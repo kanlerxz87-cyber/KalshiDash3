@@ -18,7 +18,8 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
+| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, swing markers |
+| `alerts.html` | Live swing alerts: every ≥ $0.10 move in two scrolling chats (all events + a high-ROI model filter) |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
 | `suggestions.html` | Eight proposals; four shipped to remove a correctness risk, four awaiting your decision |
@@ -36,10 +37,12 @@ data/categories.json  the five topics and their confirmed seed series
 data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py)
-scripts/collect.py    credential-free demo data collector
+scripts/collect.py    credential-free demo data collector (also writes alerts.json)
+scripts/alerts.py     swing-alert engine: |Δ last| ≥ $0.10 + the project ROI model
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
+scripts/tests/test_alerts.py    alert-engine tests (rule, ROI, real snapshot)
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
@@ -49,7 +52,9 @@ scripts/tests/validate_live.py  refuses a fabricated snapshot
 Nothing here needs credentials. All market data comes from public demo endpoints.
 
 ```bash
-python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
+python3 scripts/collect.py            # writes data/live/markets.json + price_history.json + alerts.json
+python3 scripts/alerts.py             # regenerate data/live/alerts.json on its own
+python3 scripts/tests/test_alerts.py  # alert-engine tests (no network)
 python3 scripts/tests/validate_live.py
 python3 scripts/check_site.py
 python3 -m http.server 8000           # then open http://localhost:8000

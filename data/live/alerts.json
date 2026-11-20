@@ -1,0 +1,105 @@
+{
+ "collected_at": "2026-11-20T11:33:33Z",
+ "observation_source": "data/live/price_history.json",
+ "schema": 1,
+ "model": "swing-alert-v1",
+ "model_note": "swing_roi = |\u0394last| / entry_price_on_moving_side; moving side is YES for an UP move (entry = prior price) and NO for a DOWN move (entry = 1 \u2212 prior price). high_roi is a project-local heuristic. Kalshi returns no ROI field, so this is labelled a model, not data.",
+ "swing_threshold_dollars": 0.1,
+ "roi_threshold": 0.4,
+ "generated_at": "2026-11-20T13:24:49Z",
+ "counts": {
+  "total": 4,
+  "high_roi": 2,
+  "by_category": {
+   "crypto": 4
+  }
+ },
+ "sources": {
+  "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
+  "events": "https://docs.kalshi.com/api-reference/events/get-events",
+  "candlesticks": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+ },
+ "disclaimers": [
+  "Alerts are computed from accumulated REST observations (one per collector run), not from a live WebSocket. Kalshi WebSocket sessions require an API key.",
+  "swing_roi / high_roi are a project-local heuristic model, not a Kalshi field.",
+  "cause is blank because Kalshi publishes no official feed of why a price moved; nothing is inferred."
+ ],
+ "alerts": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "direction": "up",
+   "prior_price": 0.35,
+   "new_price": 0.45,
+   "delta": 0.1,
+   "swing_cents": 10.0,
+   "swing_roi": 0.2857,
+   "high_roi": false,
+   "observed_at": "2026-11-20T11:33:33Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause": null,
+   "cause_flag": "no official cause feed \u2014 left blank, not inferred"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "direction": "down",
+   "prior_price": 0.55,
+   "new_price": 0.35,
+   "delta": -0.2,
+   "swing_cents": 20.0,
+   "swing_roi": 0.4444,
+   "high_roi": true,
+   "observed_at": "2026-11-20T11:31:35Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause": null,
+   "cause_flag": "no official cause feed \u2014 left blank, not inferred"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "direction": "down",
+   "prior_price": 0.65,
+   "new_price": 0.55,
+   "delta": -0.1,
+   "swing_cents": 10.0,
+   "swing_roi": 0.2857,
+   "high_roi": false,
+   "observed_at": "2026-11-20T11:28:31Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause": null,
+   "cause_flag": "no official cause feed \u2014 left blank, not inferred"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "direction": "up",
+   "prior_price": 0.45,
+   "new_price": 0.65,
+   "delta": 0.2,
+   "swing_cents": 20.0,
+   "swing_roi": 0.4444,
+   "high_roi": true,
+   "observed_at": "2026-11-20T11:26:21Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause": null,
+   "cause_flag": "no official cause feed \u2014 left blank, not inferred"
+  }
+ ]
+}

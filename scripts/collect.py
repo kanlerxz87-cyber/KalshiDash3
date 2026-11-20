@@ -447,6 +447,28 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     (LIVE / "price_history.json").write_text(
         json.dumps({"schema": 1, "note": "Observations accumulated from GET /markets last_price_dollars on each collector run. Seconds resolution is only possible by accumulation because candlesticks support 1/60/1440-minute intervals only.", "series": hist}, indent=1)
     )
+
+    # Swing alerts are derived from the observations written just above, so they
+    # are regenerated on every run and carry the same provenance and timestamp as
+    # the markets snapshot. The engine is pure; a failure here must not discard a
+    # good market snapshot, so it is reported and the snapshot is still written.
+    try:
+        import alerts as alert_engine
+        alert_alerts, alert_meta = alert_engine.compute_alerts(
+            rows["open"], rows["settled"], hist,
+            alert_engine.SWING_THRESHOLD_DOLLARS, alert_engine.DEFAULT_ROI_THRESHOLD,
+        )
+        alert_payload = {
+            "collected_at": payload["collected_at"],
+            "observation_source": "data/live/price_history.json",
+            **alert_meta,
+            "alerts": alert_alerts,
+        }
+        (LIVE / "alerts.json").write_text(json.dumps(alert_payload, indent=1))
+        print(f"  wrote {LIVE/'alerts.json'} ({alert_payload['counts']['total']} alerts, {alert_payload['counts']['high_roi']} high-ROI)")
+    except Exception as e:  # pragma: no cover - defensive
+        print(f"  ! alerts: {e}", file=sys.stderr)
+
     print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets)")
     return payload
 

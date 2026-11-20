@@ -97,6 +97,18 @@
       "sources": [
         "https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"
       ]
+    },
+    {
+      "id": "Q9",
+      "question": "What caused a sharp price jump, and where is the link to the event or news behind it?",
+      "known": "A swing alert fires on |Δ last price| ≥ $0.10 between two collected observations. Kalshi exposes the market and its event, and the event's markets, through official API endpoints.",
+      "unknown": "Kalshi publishes no official feed of *why* a price moved, and this environment cannot reach external news sources to verify a cause. Any specific cause link would be unverifiable.",
+      "answer_if_forced": "Link the official Kalshi market and event API URLs (verifiable) and leave the cause blank and flagged. Never infer a cause or invent a news link.",
+      "decision_needed": "If a verified cause feed is supplied later, it can be wired into the alert's cause column; until then the cell stays blank.",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/events/get-events",
+        "https://docs.kalshi.com/api-reference/market/get-markets"
+      ]
     }
   ],
   "suggestions": [
@@ -198,6 +210,20 @@
       "sources": [
         "https://docs.kalshi.com/getting_started/quick_start_websockets",
         "https://docs.kalshi.com/getting_started/api_keys"
+      ]
+    },
+    {
+      "id": "G9",
+      "suggestion": "Add a live swing-alerting system with two scrolling chats (all events + a high-ROI model filter) and mark sharp jumps on the price chart.",
+      "why_it_helps_decisions": "A trader needs to see a ≥ $0.10 move the moment it is captured, separated into 'everything' and 'what the model likes', without reading a table. Marking the jump on the chart connects the alert to the price move.",
+      "effort": "Done in this session",
+      "risk": "The alert is snapshot-polling, not a WebSocket stream; and the ROI score is a project heuristic, so it is labelled a model. The cause of a jump is left blank because no official cause feed exists.",
+      "success_metric": "scripts/tests/test_alerts.py passes (16 tests); every alert carries a source URL and a blank, flagged cause; the alerts page renders both chats from data/live/alerts.json.",
+      "status": "implemented",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+        "https://docs.kalshi.com/api-reference/market/get-markets",
+        "https://docs.kalshi.com/api-reference/events/get-events"
       ]
     }
   ],
@@ -337,6 +363,27 @@
       "severity": "medium",
       "sources": [
         "https://docs.kalshi.com/getting_started/demo_env"
+      ]
+    },
+    {
+      "id": "F-14",
+      "item": "No official source for the cause of a price jump",
+      "why": "The brief asks for website links that may have caused a sharp jump (≥ $0.10). Kalshi exposes the market and its event through official API endpoints, but publishes no official feed of *why* a price moved, and this environment cannot reach external news sources to verify one.",
+      "action": "Each alert links the verifiable official Kalshi market and event API URLs and leaves the cause blank and flagged. No cause is inferred and no news link is invented. Flagged rather than filled.",
+      "severity": "medium",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/events/get-events",
+        "https://docs.kalshi.com/api-reference/market/get-markets"
+      ]
+    },
+    {
+      "id": "F-15",
+      "item": "The alert ROI score is a project heuristic, not Kalshi data",
+      "why": "'High ROI' is defined here as swing_roi = |Δ| / entry price on the moving side, with high_roi when swing_roi ≥ a threshold. Kalshi returns no ROI field, so any such number is computed by this project, not read from the API.",
+      "action": "The model and its formula are stated on the alerts page and in data/live/alerts.json, and the score is labelled a heuristic wherever it is shown. It is never presented as a Kalshi-provided value.",
+      "severity": "low",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-markets"
       ]
     }
   ]

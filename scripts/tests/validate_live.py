@@ -113,6 +113,27 @@ def main() -> int:
             prices = [x["price"] for x in rows]
             check(prices == sorted(prices), f"{liq.get('ticker')} {side} not ascending")
 
+    # The alert snapshot is derived from the market + history snapshots. Validate
+    # its shape so a malformed alerts.json cannot be rendered as silent noise.
+    alerts_path = LIVE / "alerts.json"
+    if not alerts_path.exists():
+        errors.append("data/live/alerts.json missing (run scripts/alerts.py or scripts/collect.py)")
+    else:
+        al = json.loads(alerts_path.read_text())
+        check(al.get("schema") == 1, "alerts.json schema must be 1")
+        check(al.get("swing_threshold_dollars") == 0.10, "alerts.json swing threshold must be $0.10")
+        check(bool(al.get("model_note")), "alerts.json model_note missing")
+        check(isinstance(al.get("alerts"), list), "alerts.json alerts must be a list")
+        for a in al.get("alerts") or []:
+            tag = f"alert:{a.get('ticker')}@{a.get('observed_at')}"
+            check(a.get("direction") in ("up", "down"), f"{tag} bad direction")
+            check(a.get("cause") is None, f"{tag} cause must be blank (no official cause feed)")
+            check(str(a.get("source", "")).startswith("https://"), f"{tag} source must be an https URL")
+            check(
+                a.get("swing_cents") is not None and a["swing_cents"] >= 10.0,
+                f"{tag} swing below the $0.10 threshold",
+            )
+
     if errors:
         print("INVALID live snapshot:", file=sys.stderr)
         for e in errors[:40]:

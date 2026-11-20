@@ -40,6 +40,12 @@
       <tr><td>Show current liquidity — how many contracts are available at a given price</td>
           <td><span class="badge ok">done</span></td><td>Liquidity ladder on the dashboard</td>
           <td>Depth is a point-in-time read and goes stale between collector runs.</td></tr>
+      <tr><td>Live alerting of sudden swings ≥ $0.10 in either direction, as two scrolling chats (all events + a high-ROI model filter)</td>
+          <td><span class="badge ok">done</span></td><td><a href="alerts.html">Live alerts</a></td>
+          <td>Snapshot polling, not a WebSocket stream (a stream needs an API key). The ROI score is a labelled project heuristic, and a jump's <i>cause</i> is left blank + flagged because Kalshi has no official cause feed (<a href="flagged.html">F-14</a>, <a href="flagged.html">F-15</a>).</td></tr>
+      <tr><td>Live charts should link the event behind a sharp jump (≥ $0.10)</td>
+          <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Dashboard chart</a></td>
+          <td>Each swing on the chart links the official Kalshi market and event API URLs; the cause itself is blank + flagged (<a href="flagged.html">F-14</a>).</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
           <td>Four implemented because they removed a correctness risk; four are awaiting your decision.</td></tr>
@@ -48,7 +54,7 @@
           <td>Eight questions; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>39 claims checked; 1 deliberately blank. Nine irregularities found and listed.</td></tr>
+          <td>49 claims checked; 1 deliberately blank. Fifteen irregularities found and listed.</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>
