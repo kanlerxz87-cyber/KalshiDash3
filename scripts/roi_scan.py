@@ -328,11 +328,18 @@ def build(validate_n: int, out_path: Path) -> dict:
     hist = load_history(LIVE / "price_history.json")
     look = model["parameters"].get("lookback_minutes", 30)
     scored = []
+    scoring_errors = []
     for r in rows:
         m = r["m"]
         series = (hist.get(m["ticker"]) or {}).get("observations") or []
         mom = momentum_from(series, look, now_ms)
-        sc = RM.score(m, model, books.get(m["ticker"]), {"now_ms": now_ms, "momentum_dollars": mom, "series_ticker": r["series"]})
+        try:
+            sc = RM.score(m, model, books.get(m["ticker"]), {"now_ms": now_ms, "momentum_dollars": mom, "series_ticker": r["series"]})
+        except Exception as e:  # noqa: BLE001
+            # One malformed market must never discard the whole scan. The failure is counted
+            # and named rather than swallowed; the market simply does not appear in the feeds.
+            scoring_errors.append({"ticker": m.get("ticker"), "error": f"{type(e).__name__}: {e}"})
+            continue
         sc.update({"title": m.get("title") or m.get("yes_sub_title") or "", "category_id": r["cid"],
                    "category_basis": r["basis"], "close_time": m.get("close_time"),
                    "event_ticker": m.get("event_ticker"), "status": m.get("status"),
@@ -349,6 +356,9 @@ def build(validate_n: int, out_path: Path) -> dict:
     eligible.sort(key=lambda s: -(s["score"] or -9e9))
     picks = eligible[: model["scoring"]["top_k"]]
     print(f"  eligible: {len(eligible)}  picks: {len(picks)}")
+    if scoring_errors:
+        print(f"  ! {len(scoring_errors)} market(s) could not be scored and were left out of the feeds: "
+              + ", ".join(f"{e['ticker']} ({e['error']})" for e in scoring_errors[:5]), file=sys.stderr)
 
     # The screen is strict on purpose, so the empty case must still be useful: show what
     # came closest and exactly which gate stopped it, instead of pretending there are picks.
@@ -425,7 +435,9 @@ def build(validate_n: int, out_path: Path) -> dict:
             "alerts": len(alerts),
             "markets_with_momentum": sum(1 for s in scored if s.get("momentum") is not None),
             "markets_with_catalyst_url": sum(1 for s in scored if s.get("catalysts")),
+            "scoring_errors": len(scoring_errors),
         },
+        "scoring_errors": scoring_errors[:50],
         "historical_cutoff": cutoff,
         "picks": picks,
         "near_misses": near_misses,

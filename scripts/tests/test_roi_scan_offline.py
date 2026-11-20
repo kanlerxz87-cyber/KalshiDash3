@@ -27,7 +27,17 @@ sys.path.insert(0, str(ROOT / "scripts" / "tests"))
 import roi_scan  # noqa: E402
 import collect  # noqa: E402
 
-CLOSE = "2026-11-20T17:00:00Z"
+# Open fixtures must close in the FUTURE relative to whenever this runs, otherwise the
+# model's own "already past close_time" gate rejects them and the assertions below fail for
+# a reason that has nothing to do with the code under test (this happened on main: the
+# hard-coded 2026-11-20T17:00:00Z became the past and three checks went red).
+import datetime as _d
+
+def _future(hours=2):
+    return (_d.datetime.now(_d.timezone.utc) + _d.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+CLOSE = _future(2)
 
 
 def mkt(t, bid, ask, last, vol24, title, close=CLOSE, status="active", result=None, vb="900.00", va="800.00"):
@@ -62,9 +72,9 @@ OPEN[1]["yes_ask_size_fp"] = "0.00"
 
 SETTLED = [
     mkt("KXAAAGASM-26NOV19-4.00", 0.60, 0.62, 0.61, 1200.0, "US average gas price on Nov 19?",
-        close="2026-11-19T22:00:00Z", status="finalized", result="no"),
+        close=_future(-20), status="finalized", result="no"),
     mkt("KXPGATOUR-26NOV21-T1", 0.55, 0.57, 0.56, 8000.0, "The RSM Classic: winner 1?",
-        close="2026-11-21T23:00:00Z", status="finalized", result="yes"),
+        close=_future(-2), status="finalized", result="yes"),
 ]
 
 BOOKS = {
