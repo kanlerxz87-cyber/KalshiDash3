@@ -98,7 +98,14 @@ def fake_get(path, params=None, retries=3):
     if path == "/historical/cutoff":
         return {"market_settled_ts": "2026-09-01T00:00:00Z", "trades_created_ts": "2026-10-01T00:00:00Z"}, url
     if path.startswith("/markets/orderbooks"):
-        tickers = [t for t in (params.get("tickers") or "").split(",") if t]
+        # `tickers` is an array and must arrive as repeated parameters; the fixture
+        # accepts the list form and refuses a comma-joined string, exactly like the
+        # live API does (a comma-joined value is parsed as ONE unknown ticker and
+        # comes back as an empty book).
+        raw = params.get("tickers")
+        if isinstance(raw, str):
+            raise AssertionError("orderbooks tickers must be sent as a list, not a comma-joined string")
+        tickers = [t for t in (raw or []) if t]
         obs = []
         for t in tickers:
             b = BOOKS.get(t)

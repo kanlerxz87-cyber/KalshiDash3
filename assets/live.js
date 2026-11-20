@@ -103,9 +103,15 @@ const KDLIVE = (() => {
    */
   function score(m, model, book, ctx) {
     const p = model.parameters;
-    const bid = num(m.yes_bid_dollars ?? m.bid);
-    const ask = num(m.yes_ask_dollars ?? m.ask);
-    const last = num(m.last_price_dollars ?? m.last);
+    // A quote of exactly $0.00 or exactly $1.00 is the API's "nothing resting on
+    // that side" sentinel, not a tradable price: the order book of such a market is
+    // empty (https://docs.kalshi.com/getting_started/orderbook_responses).
+    // Mirrors roi_model.quote() exactly (parity: scripts/tests/test_roi_parity.py).
+    const quote = (v) => (v === null ? null : (v > 0 && v < 1 ? v : null));
+    const bid = quote(num(m.yes_bid_dollars ?? m.bid));
+    const ask = quote(num(m.yes_ask_dollars ?? m.ask));
+    const last0 = num(m.last_price_dollars ?? m.last);
+    const last = last0 !== null && last0 <= 0 ? null : last0;   // a $0.00 last print means "no trade"
     const sb = book ? num(book.depth_at_bid) : num(m.yes_bid_size_fp);
     const sa = book ? num(book.depth_at_ask) : num(m.yes_ask_size_fp);
     const micro = microprice(bid, ask, sb, sa);
@@ -470,10 +476,17 @@ const KDLIVE = (() => {
 
     async function pollBooks(tickers) {
       // GET /markets/orderbooks takes 1-100 tickers in one request.
+      // `tickers` is an ARRAY and this endpoint does NOT split a comma-joined value:
+      // "?tickers=A,B" is parsed as ONE ticker named "A,B" and comes back as a single
+      // EMPTY book (measured against the live demo API; the order-book guide documents
+      // that an unknown ticker returns an empty entry instead of an error —
+      // https://docs.kalshi.com/getting_started/orderbook_responses).
+      // The array is therefore sent as REPEATED parameters: "?tickers=A&tickers=B".
       for (let i = 0; i < tickers.length; i += 100) {
         const c = tickers.slice(i, i + 100);
+        const q = c.map((t) => `tickers=${encodeURIComponent(t)}`).join("&");
         let d;
-        try { d = await api(`/markets/orderbooks?tickers=${encodeURIComponent(c.join(","))}`); }
+        try { d = await api(`/markets/orderbooks?${q}`); }
         catch (e) { return; }
         for (const ob of d.orderbooks || []) {
           const yes = (ob.orderbook_fp && ob.orderbook_fp.yes_dollars) || [];

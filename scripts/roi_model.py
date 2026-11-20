@@ -78,6 +78,23 @@ def clip(x: float, lo: float, hi: float) -> float:
     return min(hi, max(lo, x))
 
 
+def quote(v):
+    """A tradable quote, or None.
+
+    The API reports a side with no resting orders with the boundary value
+    0.0000 (and the opposite side with 1.0000): the order book of such a market
+    is empty — "A market with no resting orders returns empty yes_dollars and
+    no_dollars arrays" (https://docs.kalshi.com/getting_started/orderbook_responses).
+    $0.00 and $1.00 are therefore "no quote", not a price you can trade at.
+    Treating them as quotes made the model price a YES entry at $0.00 and then
+    divide by a zero cost (ZeroDivisionError), and it reported a 0c spread for a
+    market with no orders at all.
+    """
+    if v is None:
+        return None
+    return v if 0.0 < v < 1.0 else None
+
+
 def microprice(bid, ask, size_at_bid, size_at_ask):
     """Depth-weighted mid. Inputs are official; the formula is this project's."""
     if bid is None or ask is None:
@@ -101,9 +118,14 @@ def series_mult(series_ticker: str, model: dict) -> dict:
 def score(market: dict, model: dict, book: dict | None, ctx: dict) -> dict:
     """Return the full audit trail for one market. Mirrors KDLIVE.score() exactly."""
     p = model["parameters"]
-    bid = num(market.get("yes_bid_dollars", market.get("bid")))
-    ask = num(market.get("yes_ask_dollars", market.get("ask")))
+    # A quote of exactly $0.00 or exactly $1.00 is the API's "nothing resting on
+    # that side" sentinel, not a tradable price: the order book of such a market
+    # is empty (https://docs.kalshi.com/getting_started/orderbook_responses).
+    bid = quote(num(market.get("yes_bid_dollars", market.get("bid"))))
+    ask = quote(num(market.get("yes_ask_dollars", market.get("ask"))))
     last = num(market.get("last_price_dollars", market.get("last")))
+    if last is not None and last <= 0.0:
+        last = None                      # a $0.00 last print means "no trade"
     sb = num(book.get("depth_at_bid")) if book else num(market.get("yes_bid_size_fp"))
     sa = num(book.get("depth_at_ask")) if book else num(market.get("yes_ask_size_fp"))
     micro = microprice(bid, ask, sb, sa)

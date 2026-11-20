@@ -148,7 +148,38 @@ async function scenarioD() {
   console.log("  D missing model file refuses to guess  ok");
 }
 
+async function scenarioE() {
+  // The multi-orderbook endpoint takes `tickers` as an ARRAY. It does NOT split a
+  // comma-joined value: "?tickers=A,B" is parsed as ONE ticker named "A,B" and comes
+  // back as a single EMPTY book (measured against the live demo API; the order-book
+  // guide documents that an unknown ticker yields an empty entry, not an error —
+  // https://docs.kalshi.com/getting_started/orderbook_responses).
+  // The request must therefore use REPEATED parameters: "?tickers=A&tickers=B".
+  const calls = withFetch(async (url) => {
+    if (url.includes("/exchange/status")) return { body: { trading_open: true } };
+    if (url.includes("/historical/cutoff")) return { body: { market_settled_ts: "2026-10-01T00:00:00Z" } };
+    if (url.includes("/markets/orderbooks")) return { body: { orderbooks: [] } };
+    if (url.includes("data/roi_model.json")) return { body: model };
+    if (url.includes("/markets?tickers=")) return { body: { markets: [] } };
+    return { body: {} };
+  });
+  delete require.cache[require.resolve(path.join(ROOT, "assets", "live.js"))];
+  const KDLIVE = require(path.join(ROOT, "assets", "live.js"));
+  const eng = KDLIVE.create({ pollMs: 10, bookMs: 0, snapshotMs: 10, storage: null });
+  await eng.start({ modelUrl: "data/roi_model.json", seedMarkets: false });
+  eng.stop();
+  eng.setWatch(["KXAAAGASM-27JAN01-T4.00", "KXPGATOUR-26NOV22-T1"]);
+  eng.S.lastSnapshotAt = Infinity;
+  await eng.tick();
+  const ob = calls.filter((u) => u.includes("/markets/orderbooks"));
+  assert.ok(ob.length >= 1, "an order-book request was made");
+  assert.ok(!ob.some((u) => u.includes("%2C")), "order-book tickers must not be comma-joined");
+  assert.ok(ob.some((u) => (u.match(/tickers=/g) || []).length === 2),
+    "both tickers must be sent as repeated parameters");
+  console.log("  E order-book tickers are sent as repeated parameters  ok");
+}
+
 (async () => {
-  await scenarioA(); await scenarioB(); await scenarioC(); await scenarioD();
-  console.log("OK: live engine behaviour verified in four modes.");
+  await scenarioA(); await scenarioB(); await scenarioC(); await scenarioD(); await scenarioE();
+  console.log("OK: live engine behaviour verified in five modes.");
 })().catch((e) => { console.error("FAILED:", e.message); process.exit(1); });

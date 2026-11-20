@@ -55,7 +55,9 @@ def get(path: str, params: dict | None = None, retries: int = 3):
         from urllib.parse import urlencode
         clean = {k: v for k, v in params.items() if v not in (None, "")}
         if clean:
-            url += "?" + urlencode(clean)
+            # doseq=True: a list value becomes REPEATED parameters
+            # (?tickers=A&tickers=B), which is how Kalshi expects array arguments.
+            url += "?" + urlencode(clean, doseq=True)
     last = None
     for attempt in range(retries):
         time.sleep(INTERVAL)
@@ -92,12 +94,22 @@ def paged_markets(params: dict, cap: int):
 
 
 def books_for(tickers: list[str], depth_source_note: str) -> dict:
-    """GET /markets/orderbooks takes 1-100 tickers per call. Bids only, ascending, best last."""
+    """GET /markets/orderbooks takes 1-100 tickers per call. Bids only, ascending, best last.
+
+    The `tickers` argument is an ARRAY and the API does not split a comma-joined
+    value: `?tickers=A,B` is parsed as ONE ticker literally named "A,B" and the
+    endpoint answers with a single EMPTY book for it (measured against the live
+    demo API, and consistent with the order-book guide, which says an unknown
+    ticker returns an empty entry rather than an error:
+    https://docs.kalshi.com/getting_started/orderbook_responses).
+    The array therefore has to be sent as repeated parameters
+    (`?tickers=A&tickers=B`), which is what `get()` does for a list value.
+    """
     out: dict[str, dict] = {}
     for i in range(0, len(tickers), 100):
         chunk = tickers[i:i + 100]
         try:
-            d, url = get("/markets/orderbooks", {"tickers": ",".join(chunk)})
+            d, url = get("/markets/orderbooks", {"tickers": chunk})
         except RuntimeError as e:
             print(f"  ! orderbooks chunk failed: {e}", file=sys.stderr)
             continue
@@ -213,9 +225,11 @@ def replay_settled(model: dict, markets: list[dict], max_markets: int) -> dict:
         res["markets_tested"] += 1
         res["candles_used"] += len(cs)
         c = cs[-1]
-        bid = RM.num((c.get("yes_bid") or {}).get("close_dollars"))
-        ask = RM.num((c.get("yes_ask") or {}).get("close_dollars"))
+        bid = RM.quote(RM.num((c.get("yes_bid") or {}).get("close_dollars")))
+        ask = RM.quote(RM.num((c.get("yes_ask") or {}).get("close_dollars")))
         last = RM.num((c.get("price") or {}).get("close_dollars"))
+        if last is not None and last <= 0.0:
+            last = None
         if bid is None and ask is None:
             skip["candle without quotes"] = skip.get("candle without quotes", 0) + 1
             continue
@@ -230,12 +244,14 @@ def replay_settled(model: dict, markets: list[dict], max_markets: int) -> dict:
         if ask is not None:
             fee = RM.taker_fee_unit(ask, mult["taker"])
             cost = ask + fee
-            sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
         if bid is not None:
             pno = 1 - bid
             fee = RM.taker_fee_unit(pno, mult["taker"])
             cost = pno + fee
-            sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
         # Only the price-side gates the replay can honestly apply.
         sides = [s for s in sides
                  if f["min_entry_price"] <= s["entry"] <= f["max_entry_price"] and s["roi"] > f["min_net_roi"]]
