@@ -28,3 +28,8 @@ python3 scripts/kalshi_client.py scan        # public scan, no keys
 | `docs/verification.html` | Line-by-line verification |
 | `docs/flagged.html` | Flagged for Review |
 | `docs/sources.html` | Official sources |
+
+## Verified snapshot page (session arena-ebeb0887)
+
+- `docs/verified/index.html`: every open and settled row from the official Kalshi demo API snapshot, each linked to its query, plus questions, flagged items, and sources.
+- Data: `data/snapshot.json`, `data/findings.json`. Rebuild: `python3 scripts/build_verified.py`; check links: `python3 scripts/check_links.py`.

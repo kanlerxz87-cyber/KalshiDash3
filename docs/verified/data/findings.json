@@ -1,0 +1,131 @@
+{
+  "executive_summary": {
+    "headline": "A read-only Kalshi demo dashboard is built and verified against official Kalshi API data. Trading and portfolio tracking are blocked until demo API credentials are supplied.",
+    "bullets": [
+      "Scope: five topics (gas prices, elections, culture, crypto, golf). Each topic maps to one or more Kalshi series tickers. Each ticker was checked against the official Kalshi Trade API series endpoint (see Sources).",
+      "Data in the snapshot: 23 market rows (18 open, 5 finalized). Every row links to the exact API query it came from. Values that were cut off or missing are left blank and flagged.",
+      "Resolved outcomes: the five finalized gas strikes for Oct 31, 2026 (Oct 31 AAA national average) all show result = yes. The sample is tiny, so it says nothing about accuracy in general.",
+      "Liquidity: the verified snapshot is thin outside a few contracts. Golf (RSM Classic) has the largest open volume: Christiaan Bezuidenhout 167,904.76 contracts and Zachary Bauchou 77,510.07 contracts. Elections (Senate Majority Leader) show Elissa Slotkin at 102,833.08 contracts. Crypto (BTC daily) rows show zero volume and no two-sided quotes.",
+      "Ranking metric: Kalshi's API returns contract counts, not dollar volume. The site ranks by contract volume and says so. A dollar figure is not shown because the API does not provide one.",
+      "Demo caveat: Kalshi states that demo prices and behaviour 'may not be reflective of those in real markets'. Every number on this site is demo data.",
+      "Blocked: placing trades and reading the demo portfolio require an authenticated API key from the Kalshi demo account. The sandbox has no credentials, so no trades were placed and no portfolio performance is reported.",
+      "Flagged: one settled market (4.28 strike) resolved YES while the API's last_price_dollars shows $0.0200. This needs a check before any conclusion is drawn. See Flagged for Review."
+    ]
+  },
+  "analysis": [
+    {
+      "topic": "Gas prices",
+      "observations": [
+        "Kalshi lists a strike ladder ('Above $X on the last day of the month, per AAA'). Open November strikes at $2.50–$2.90 show a last price of $0.0100 and zero bid. The $3.00 strike shows last price $0.9800 and open interest 341.90 contracts.",
+        "Each finalized October strike (4.16–4.28) resolved YES. Settlement time was 2026-10-31T14:10:30Z, but trading closed at 2026-10-31T03:59Z, about ten hours earlier."
+      ],
+      "decision_relevance": "Settlement is tied to a single AAA print on a single date. Before using a price as a signal, confirm the AAA data date and the close time versus the settlement time."
+    },
+    {
+      "topic": "Golf",
+      "observations": [
+        "The RSM Classic winner market is the most actively traded verified set. Bezuidenhout and Bauchou have the largest open interest and two-sided quotes.",
+        "Ludvig Aberg shows a last price of $0.0720 but a bid of $0.0100 and an ask of $1.0000. That is a one-sided quote and the last price is not a reliable mid.",
+        "Daniel Berger has no volume and no quotes."
+      ],
+      "decision_relevance": "Verify quote depth through the orderbook endpoint before reading any probability from the last price."
+    },
+    {
+      "topic": "Crypto",
+      "observations": [
+        "The four BTC daily 'above $X' strikes for 2026-11-21 at 1 AM EST show zero volume, zero open interest, and no bids or asks.",
+        "Settlement uses the simple average of 60 seconds of the CF Benchmarks BRTI index before the stated time (per the market rules_primary and series product_metadata fields in the API)."
+      ],
+      "decision_relevance": "No market activity was visible at capture time. Crypto analysis requires a live feed, not this snapshot."
+    },
+    {
+      "topic": "Elections",
+      "observations": [
+        "Within the elections series, Elissa Slotkin (Senate Majority Leader, 120th Congress) has the highest verified volume: 102,833.08 contracts. (The golf market for Bezuidenhout is larger in the snapshot, at 167,904.76.), with yes bid $0.0100 and ask $1.0000.",
+        "Tom Cotton's market shows last price $0.9000 but volume of only 0.01 contracts.",
+        "A Kalshi news article dated 2026-11-18 reports Schumer at 91% for the same question. The API snapshot shows Schumer at last price $0.9600. The two figures are from different times and were not reconciled."
+      ],
+      "decision_relevance": "Last price on thinly traded contracts is not a probability estimate. Use two-sided depth and time-aligned data."
+    },
+    {
+      "topic": "Culture",
+      "observations": [
+        "The KXRTCOMPARISON (Highest rated movie, Rotten Tomatoes) series exists under Kalshi category 'Entertainment'. At capture time its open-market query returned zero markets.",
+        "'Culture' is not a Kalshi category name in what was verified. It is mapped to Entertainment in this site."
+      ],
+      "decision_relevance": "No culture rows can be analysed until open markets exist or another series is verified."
+    }
+  ],
+  "trade_categories_framework": {
+    "note": "Framework only. No trades were placed, so no trade performance exists to categorise. These are the categories the dashboard will use once demo trade data is connected.",
+    "categories": [
+      {"name": "Directional (single-market view)", "description": "Buy YES or NO on one contract, with a stated reason."},
+      {"name": "Spread / strike-ladder", "description": "Positions across several strikes of one series (e.g. the gas strike ladder)."},
+      {"name": "Liquidity provision", "description": "Resting limit orders that earn the spread. Requires depth and fill tracking."},
+      {"name": "Resolution-timing", "description": "Positions held into a known settlement time, with the settlement source checked."}
+    ]
+  },
+  "questions": [
+    {"id": "Q1", "question": "Which metric counts as 'highest dollar amount'? The API returns contract counts (volume_fp, open_interest_fp), not dollars.", "why_it_matters": "The ranking on the live dashboard depends on this choice.", "current_answer": "The site ranks by contract volume. Dollar value is not computed.", "how_to_resolve": "Confirm with Kalshi docs or support whether a dollar-volume field exists. Otherwise define the calculation explicitly (e.g. trade-level price × size from the trades endpoint)."},
+    {"id": "Q2", "question": "Do demo prices and volumes behave like production markets?", "why_it_matters": "Kalshi's own demo docs say they may not reflect real markets.", "current_answer": "Unknown. All numbers are demo numbers.", "how_to_resolve": "Compare the same series on the production API (external-api.kalshi.com, read-only) for the same timestamps."},
+    {"id": "Q3", "question": "Can trades be placed and the portfolio read without manual steps?", "why_it_matters": "Trade execution and portfolio performance are two of the stated requirements.", "current_answer": "No. Authenticated access needs demo API credentials, which the sandbox does not have.", "how_to_resolve": "Needs a manual step: an API key created in the Kalshi demo account. This is the only item that cannot be done without you."},
+    {"id": "Q4", "question": "Which series count as 'Culture'?", "why_it_matters": "There is no verified Kalshi category named Culture.", "current_answer": "Mapped to Entertainment (KXRTCOMPARISON), which has no open markets at capture time.", "how_to_resolve": "Confirm the desired series list. Verify each ticker through the series endpoint."},
+    {"id": "Q5", "question": "Does Kalshi's API provide historical price data for the price-history chart?", "why_it_matters": "The required chart needs past prices, not only the current quote.", "current_answer": "Not verified. The live dashboard records its own history from periodic polls while the page is open.", "how_to_resolve": "Check the candlestick/trade-history endpoints in the official API reference."},
+    {"id": "Q6", "question": "Can a browser on the GitHub Pages site call the Kalshi API directly (CORS)?", "why_it_matters": "The live dashboard depends on browser-side requests.", "current_answer": "Not verified. The sandbox cannot reach Kalshi hosts to test headers. The dashboard falls back to the snapshot if the call fails.", "how_to_resolve": "Open the live page in a browser and check whether the data loads."},
+    {"id": "Q7", "question": "What are the API rate limits?", "why_it_matters": "Polling many markets could hit limits.", "current_answer": "Not verified. The rate-limits page was not read.", "how_to_resolve": "Read https://docs.kalshi.com/getting_started/rate_limits and keep polling within the stated budget."},
+    {"id": "Q8", "question": "Why does a market close about ten hours before its settlement timestamp?", "why_it_matters": "Last price before close may not reflect information available at settlement.", "current_answer": "Observed: close_time 03:59Z, settlement_ts 14:10Z on the Oct 31 gas markets. The reason is not documented in what was read.", "how_to_resolve": "Read the market rules and settlement documentation (contract_terms PDFs and the rules_primary field)."}
+  ],
+  "information_discovery": [
+    "Read the Kalshi contract terms PDF for each series used (linked on each category page) and record the settlement source and timing.",
+    "Pull the orderbook for each open market (GET /markets/{ticker}/orderbook) at several times of day to measure depth at each price.",
+    "Run the live dashboard for at least one settlement cycle (monthly gas, daily BTC) and save the time series for later analysis.",
+    "Compare each finalized market's last pre-close price with its settlement result, across a full set of settled series, to measure calibration (needs more settled history than the first page provides).",
+    "Ask Kalshi support (or search the official help centre) whether a dollar-volume field exists in the API."
+  ],
+  "suggestions": [
+    {"id": "S1", "title": "Show dollar-denominated volume beside contract volume", "detail": "Requires confirming the calculation (Q1). Adds the 'dollar amount' view the brief asks for.", "effort": "Low–medium", "risk": "Low"},
+    {"id": "S2", "title": "Switch the live feed from polling to the WebSocket API", "detail": "The docs list a demo WebSocket endpoint (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2). Verify its message format before use.", "effort": "Medium", "risk": "Medium (needs auth for some channels)"},
+    {"id": "S3", "title": "Add a liquidity warning on each row", "detail": "Flag rows where the bid or ask is missing or one-sided, so last price is not read as a probability.", "effort": "Low", "risk": "Low"},
+    {"id": "S4", "title": "Record a time-stamped price history per market and store it in the repo", "detail": "Makes the required time-series chart possible for dates before the dashboard was opened.", "effort": "Medium", "risk": "Storage growth; keep it out of Git if large"},
+    {"id": "S5", "title": "Calibration page for settled markets", "detail": "Compare last pre-close price with the settled result across many markets to test whether prices are informative.", "effort": "Medium", "risk": "Sample size may be too small at first"},
+    {"id": "S6", "title": "Trade journal with the category tags from this site", "detail": "Tag each future trade (directional, ladder, liquidity, resolution-timing) and record the reason before entry.", "effort": "Medium", "risk": "Needs trade data first (blocked on credentials)"},
+    {"id": "S7", "title": "Stop-loss and position-size rules set before any trade", "detail": "Write the rules down so they can be reviewed later. The dashboard would only check adherence.", "effort": "Low", "risk": "Low"},
+    {"id": "S8", "title": "Source and freshness stamp on every row", "detail": "Show the capture time and source link next to each value so stale data is visible.", "effort": "Low", "risk": "Low"}
+  ],
+  "sources": [
+    {"label": "Kalshi docs: Demo environment (demo base URLs; 'prices may not reflect real markets')", "url": "https://docs.kalshi.com/getting_started/demo_env"},
+    {"label": "Kalshi docs: Get Markets (fields incl. result, volume_fp, open_interest_fp)", "url": "https://docs.kalshi.com/api-reference/market/get-markets"},
+    {"label": "Kalshi docs: Get Market Orderbook (depth parameter, orderbook_fp)", "url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook"},
+    {"label": "Kalshi docs: Welcome / API index", "url": "https://docs.kalshi.com/welcome"},
+    {"label": "Kalshi Demo API: series list (first page)", "url": "https://external-api.demo.kalshi.co/trade-api/v2/series?limit=200"},
+    {"label": "Kalshi Demo API: series KXAAAGASM", "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"},
+    {"label": "Kalshi Demo API: series KXPGATOUR", "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"},
+    {"label": "Kalshi Demo API: series KXBTCD", "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCD"},
+    {"label": "Kalshi Demo API: series KXSENMAJ", "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSENMAJ"},
+    {"label": "Kalshi contract terms: AAA gas (AAAGAS.pdf)", "url": "https://assets.kalshi.com/contract_terms/AAAGAS.pdf"},
+    {"label": "Kalshi contract terms: PGA Tour (PGATOUR.pdf)", "url": "https://assets.kalshi.com/contract_terms/PGATOUR.pdf"},
+    {"label": "Kalshi contract terms: Bitcoin (BTC.pdf)", "url": "https://assets.kalshi.com/contract_terms/BTC.pdf"},
+    {"label": "Kalshi contract terms: US election (USELECTION.pdf)", "url": "https://assets.kalshi.com/contract_terms/USELECTION.pdf"},
+    {"label": "Kalshi contract terms: Rotten Tomatoes comparison (RTCOMPARISON.pdf)", "url": "https://assets.kalshi.com/contract_terms/RTCOMPARISON.pdf"},
+    {"label": "AAA gas prices (settlement source for KXAAAGASM)", "url": "https://gasprices.aaa.com/"},
+    {"label": "CF Benchmarks BRTI (settlement source for KXBTCD)", "url": "https://www.cfbenchmarks.com/data/indices/BRTI"},
+    {"label": "Kalshi news: Senate majority leader odds (dated 2026-11-18; secondary context only)", "url": "https://news.kalshi.com/p/senate-majority-leader-odds-schumer-91-van-hollen"}
+  ],
+  "flagged": [
+    {"id": "F1", "type": "Data irregularity", "item": "Settled strike 4.28 (KXAAAGASM-26OCT31-4.28) shows last_price_dollars $0.0200, but result = yes.", "detail": "Possible causes: last_price is stale, trading was thin, or demo behaviour differs. Not resolved.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=settled&limit=12"},
+    {"id": "F2", "type": "Data irregularity", "item": "Settled gas markets close at 03:59Z on Oct 31 but settle at 14:10Z the same day.", "detail": "A ten-hour gap between close and settlement. The reason is not documented in what was read.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=settled&limit=12"},
+    {"id": "F3", "type": "Data irregularity", "item": "Golf: Ludvig Aberg (KXPGATOUR-THRC26-LABE) has last price $0.0720 but yes bid $0.0100 and yes ask $1.0000.", "detail": "One-sided quote. Last price is not a reliable reference.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&status=open&with_nested_markets=true&limit=10"},
+    {"id": "F4", "type": "Data irregularity", "item": "Elections: Schumer last price $0.9600 in the API vs. 91% in a Kalshi news article dated 2026-11-18.", "detail": "Different timestamps. Not reconciled.", "source": "https://news.kalshi.com/p/senate-majority-leader-odds-schumer-91-van-hollen"},
+    {"id": "F5", "type": "Platform caveat", "item": "Kalshi docs say demo prices may not reflect real markets.", "detail": "All snapshot values are demo values.", "source": "https://docs.kalshi.com/getting_started/demo_env"},
+    {"id": "F6", "type": "Unverified", "item": "Gas strike 3.00 (KXAAAGASM-26NOV30-3.00): bid, ask, sizes and volume are blank.", "detail": "Cut off in the fetched page. Not estimated.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=10"},
+    {"id": "F7", "type": "Unverified", "item": "Elections: Schumer market row omitted (ticker not visible in fetched page).", "detail": "Last price 0.9600 seen, but no ticker to link.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXSENMAJ&status=open&limit=12"},
+    {"id": "F8", "type": "Unverified", "item": "Culture: KXRTCOMPARISON returned zero open markets; 'Culture' is not a verified Kalshi category.", "detail": "Mapping to Entertainment is our decision.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXRTCOMPARISON&status=open&limit=12"},
+    {"id": "F9", "type": "Unverified", "item": "Other crypto series (ETH daily, BTC 15-minute, etc.) named in third-party articles were not checked against the official series endpoint.", "detail": "Excluded until verified.", "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCD"},
+    {"id": "F10", "type": "Unverified", "item": "Kalshi API rate limits, CORS policy, and historical price endpoints were not verified.", "detail": "See Questions Q5–Q7.", "source": "https://docs.kalshi.com/getting_started/rate_limits"},
+    {"id": "F11", "type": "Unverified", "item": "Dollar-volume values: none in the API; not computed. volume_fp is treated as a contract count; its definition was not separately confirmed.", "detail": "See Question Q1.", "source": "https://docs.kalshi.com/api-reference/market/get-markets"},
+    {"id": "F12", "type": "Repo irregularity", "item": "Repository had one commit ('Initial commit', 49ba7bc) and a 13-byte README ('# KalshiDash3'). No LICENSE, .gitignore, or package manifest.", "detail": "Checked with git ls-files on branch arena/ebeb0887-kalshidash3 and main.", "source": "https://github.com/kanlerxz87-cyber/KalshiDash3"},
+    {"id": "F13", "type": "Repo irregularity", "item": "COORDINATION.md did not exist. Created by this session.", "detail": "The brief expected it to exist.", "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md"},
+    {"id": "F14", "type": "Repo irregularity", "item": "The brief asks for session-<id>/<task> branches; the session's branch rule requires the single assigned branch.", "detail": "Followed the session rule. Flagged for your review.", "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/tree/arena/ebeb0887-kalshidash3"},
+    {"id": "F15", "type": "Repo setting", "item": "GitHub Pages was configured as a legacy build from main at '/'. Site moved to '/docs' on merge.", "detail": "Pages config at repo settings. Public repo.", "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/settings/pages"}
+  ]
+}
