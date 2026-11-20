@@ -14,6 +14,7 @@
 | T5 | GitHub Pages publish + final integration (build check, link check, PR to main, merge, deploy confirm) | in progress | arena-5761b399 | `.github/workflows/pages.yml`, `docs/*` (integration only) | Link check passed; JS/Python syntax passed | — |
 | T6 | Second implementation (root-level site) + verified facts + tracker script | done | session-1c0d1fc0 | `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `portfolio.html`, `suggestions.html`, `sources.html`, `assets/*`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md`, `scripts/kalshi_tracker.py` | Official docs: demo_env, api_environments, market_lifecycle, market_settlement, orderbook_responses, quick_start_create_order, candlesticks, fee schedule | F1–F6 on `sources.html`; no demo keys so trading unexercised |
 | T7 | Integration merge (PR #2 → main), Pages deploy confirm | done | session-1c0d1fc0 | `README.md`, `COORDINATION.md`, `.github/workflows/pages.yml`, `INTEGRATION.md` | — | Merge conflict with PR #1 resolved without discarding either implementation (see Log) |
+| T11 | Live ≥$0.10 swing alert feed: two scrolling chats (all events + high-ROI filter), unverified cause links left blank | in progress | arena-5225610f | `scripts/build_alerts.py`, `data/alert_rules.json`, `data/live/alerts.json`, `alerts.html`, `assets/site.js` (nav entry only), `assets/site.css` (chat styles), `.github/workflows/collect.yml` (one build step) | Derived from `data/live/price_history.json` (official demo API observations) | Owner's ROI model not supplied — rule set is a labelled placeholder; cause links not collected (no official source) |
 
 ## Log
 - 2026-11-20: arena-5761b399 claimed T1–T5 (single-session build; no other sessions active). Repo was empty except README. Starting build.
@@ -126,3 +127,5 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+- 2026-11-20: arena-5225610f claimed T11 (live ≥$0.10 alert feed). Branch `arena/5225610f-kalshidash3` (session branch name fixed by Arena; all work on it).
