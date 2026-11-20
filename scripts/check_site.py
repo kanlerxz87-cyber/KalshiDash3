@@ -22,7 +22,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DOCS = ROOT / "docs"
+DOCS = ROOT
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"}
 
 errors: list[str] = []
@@ -65,7 +65,7 @@ def check_links(page: Path) -> None:
             continue
         resolved = (page.parent / target).resolve()
         try:
-            resolved.relative_to(DOCS.resolve())
+            resolved.relative_to(ROOT.resolve())
         except ValueError:
             errors.append(f"{page.name}: link escapes docs/: {url}")
             continue
@@ -94,11 +94,11 @@ def check_page(page: Path) -> None:
 
 
 def check_data() -> None:
-    for rel in ("docs/data/live/markets.json", "docs/data/live/price_history.json",
-                "docs/data/verified_facts.json", "docs/data/findings.json", "docs/data/categories.json"):
+    for rel in ("data/live/markets.json", "data/live/price_history.json",
+                "data/verified_facts.json", "data/findings.json", "data/categories.json"):
         path = ROOT / rel
         if not path.exists():
-            if rel.startswith("docs/data/live/"):
+            if rel.startswith("data/live/"):
                 warnings.append(f"{rel} not present yet (collector has not run)")
             else:
                 errors.append(f"{rel} missing")
