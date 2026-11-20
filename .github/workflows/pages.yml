@@ -31,7 +31,7 @@ jobs:
       - name: Validate the committed snapshot
         run: python3 scripts/tests/validate_live.py
 
-      - name: Run alert-engine tests
+      - name: Run alert-feed tests
         run: python3 scripts/tests/test_alerts.py
 
       - name: Check links, HTML and data files (fails the build on a broken page)

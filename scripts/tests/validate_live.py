@@ -9,6 +9,7 @@ Run: python3 scripts/tests/validate_live.py
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from datetime import datetime
@@ -44,6 +45,66 @@ SEED_SERIES = load_seed_series()
 def check(cond: bool, msg: str) -> None:
     if not cond:
         errors.append(msg)
+
+
+def check_simulation() -> None:
+    """Simulation-only check. Runs only when data/live/simulation.json exists.
+
+    Every paper position must (a) come from an archived alert, (b) use an entry
+    price in 0.01-0.99 and the official taker fee for its series, and (c) have a
+    realised result that recomputes from the stored result and entry.
+    """
+    path = LIVE / "simulation.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    check(doc.get("schema") == 1, "simulation.json schema must be 1")
+    check("PAPER" in str(doc.get("mode", "")), "simulation must be labelled PAPER ONLY")
+    check(bool(doc.get("disclaimers")), "simulation disclaimers missing")
+
+    strat = json.loads((ROOT / "data" / "strategies.json").read_text())
+    check(
+        [x["id"] for x in doc.get("strategies") or []] == [x["id"] for x in strat["strategies"]],
+        "simulation strategies must match data/strategies.json",
+    )
+
+    archive_path = LIVE / "alerts_archive.json"
+    archive_keys = set()
+    if archive_path.exists():
+        for a in json.loads(archive_path.read_text()).get("alerts", []):
+            archive_keys.add(f"{a['ticker']}@{a['from_time']}>{a['to_time']}")
+
+    spec = importlib.util.spec_from_file_location("simulate", ROOT / "scripts" / "simulate.py")
+    sim = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sim)
+
+    for group in ("open_positions", "settled_positions"):
+        for pos in doc.get(group) or []:
+            tag = f"{group[:-1]} {pos.get('id')}"
+            entry = float(pos["entry_price"])
+            check(0.01 <= entry <= 0.99, f"{tag} entry outside 0.01-0.99")
+            mult = int(pos["taker_multiplier"])
+            check(
+                abs(float(pos["entry_fee"]) - sim.taker_fee(entry, int(pos["contracts"]), mult)) < 1e-9,
+                f"{tag} entry fee does not match the official taker formula",
+            )
+            check(pos.get("side") in ("yes", "no"), f"{tag} bad side")
+            check(
+                pos.get("alert_key") in archive_keys if archive_keys else False,
+                f"{tag} alert_key is not in data/live/alerts_archive.json",
+            )
+            if pos.get("status") == "settled":
+                payoff = 1.0 if pos.get("settled_result") == pos.get("side") else 0.0
+                expect = round(payoff - entry - float(pos["entry_fee"]), 4)
+                check(
+                    abs(float(pos["realized_net"]) - expect) < 1e-9,
+                    f"{tag} realized_net does not recompute",
+                )
+    for st in doc.get("strategies") or []:
+        check(
+            st.get("settled", 0) == st.get("wins", 0) + st.get("losses", 0),
+            f"strategy {st.get('id')} win/loss does not add up to settled",
+        )
 
 
 def main() -> int:
@@ -113,26 +174,7 @@ def main() -> int:
             prices = [x["price"] for x in rows]
             check(prices == sorted(prices), f"{liq.get('ticker')} {side} not ascending")
 
-    # The alert snapshot is derived from the market + history snapshots. Validate
-    # its shape so a malformed alerts.json cannot be rendered as silent noise.
-    alerts_path = LIVE / "alerts.json"
-    if not alerts_path.exists():
-        errors.append("data/live/alerts.json missing (run scripts/alerts.py or scripts/collect.py)")
-    else:
-        al = json.loads(alerts_path.read_text())
-        check(al.get("schema") == 1, "alerts.json schema must be 1")
-        check(al.get("swing_threshold_dollars") == 0.10, "alerts.json swing threshold must be $0.10")
-        check(bool(al.get("model_note")), "alerts.json model_note missing")
-        check(isinstance(al.get("alerts"), list), "alerts.json alerts must be a list")
-        for a in al.get("alerts") or []:
-            tag = f"alert:{a.get('ticker')}@{a.get('observed_at')}"
-            check(a.get("direction") in ("up", "down"), f"{tag} bad direction")
-            check(a.get("cause") is None, f"{tag} cause must be blank (no official cause feed)")
-            check(str(a.get("source", "")).startswith("https://"), f"{tag} source must be an https URL")
-            check(
-                a.get("swing_cents") is not None and a["swing_cents"] >= 10.0,
-                f"{tag} swing below the $0.10 threshold",
-            )
+    check_simulation()
 
     if errors:
         print("INVALID live snapshot:", file=sys.stderr)

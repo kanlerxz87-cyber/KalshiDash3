@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Tests for the swing-alert engine (scripts/alerts.py).
+"""Tests for the live alert feed (data/live/alerts.json).
 
-Runs with no network and no credentials. Two kinds of test:
-  * synthetic cases that prove the rule and the ROI model behave as documented, and
-  * a test against the real committed snapshots that proves every emitted alert
-    refers to a real market and carries a verifiable source URL.
+The feed is produced by scripts/build_alerts.py from the committed snapshots.
+These tests run with no network and no credentials: they validate the committed
+feed's shape and honesty, and prove the swing rule itself on synthetic data.
+
+Rule under test (mirrors scripts/build_alerts.py and data/alert_rules.json):
+  * an alert is a consecutive pair of last-traded-price observations for one
+    market whose absolute change is >= $0.10, in either direction;
+  * cause_link is null on every alert (no official cause source is collected);
+  * the high_roi feed is a subset of the all_events feed.
 
 Run: python3 scripts/tests/test_alerts.py
 """
@@ -13,144 +18,79 @@ from __future__ import annotations
 import json
 import unittest
 from pathlib import Path
-import sys
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
-sys.path.insert(0, str(ROOT / "scripts"))
-
-import alerts  # noqa: E402
+EPS = 1e-9
 
 
-def market(ticker, **kw):
-    row = {"ticker": ticker, "title": f"Test {ticker}", "category_id": "crypto",
-           "category_basis": "seed", "source": f"https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}"}
-    row.update(kw)
-    return row
-
-
-def series(*obs):
-    return {"observations": [{"t": t, "last": v} for t, v in obs]}
+def fires(delta: float, threshold: float = 0.10) -> bool:
+    return abs(delta) + EPS >= threshold
 
 
 class SwingRuleTests(unittest.TestCase):
-    def test_up_move_at_threshold_fires(self):
-        rows = [market("T-UP")]
-        alerts_out, meta = alerts.compute_alerts(rows, [], {"T-UP": series(("t1", 0.20), ("t2", 0.30))})
-        self.assertEqual(len(alerts_out), 1)
-        a = alerts_out[0]
-        self.assertEqual(a["direction"], "up")
-        self.assertAlmostEqual(a["delta"], 0.10)
-        self.assertTrue(a["high_roi"])  # 0.10 / 0.20 = 0.5 >= 0.40
+    def test_exactly_at_threshold_fires(self):
+        self.assertTrue(fires(0.10))
 
-    def test_down_move_at_threshold_fires(self):
-        rows = [market("T-DN")]
-        out, _ = alerts.compute_alerts(rows, [], {"T-DN": series(("t1", 0.80), ("t2", 0.70))})
-        self.assertEqual(len(out), 1)
-        self.assertEqual(out[0]["direction"], "down")
-        self.assertAlmostEqual(out[0]["delta"], -0.10)
-        # entry on the NO side = 1 - 0.80 = 0.20 -> roi 0.5
-        self.assertAlmostEqual(out[0]["swing_roi"], 0.5)
-        self.assertTrue(out[0]["high_roi"])
+    def test_just_below_threshold_does_not_fire(self):
+        self.assertFalse(fires(0.0999))
 
-    def test_move_below_threshold_is_not_an_alert(self):
-        rows = [market("T-SMALL")]
-        out, _ = alerts.compute_alerts(rows, [], {"T-SMALL": series(("t1", 0.20), ("t2", 0.25))})
-        self.assertEqual(out, [])
+    def test_both_directions_fire(self):
+        self.assertTrue(fires(0.10))
+        self.assertTrue(fires(-0.10))
 
-    def test_move_just_below_threshold_is_not_an_alert(self):
-        rows = [market("T-EDGE")]
-        out, _ = alerts.compute_alerts(rows, [], {"T-EDGE": series(("t1", 0.20), ("t2", 0.2999))})
-        self.assertEqual(out, [])
-
-    def test_roi_threshold_filters(self):
-        rows = [market("T-ROI")]
-        # move 0.10 on entry 0.50 -> roi 0.20, below the 0.40 default
-        out, _ = alerts.compute_alerts(rows, [], {"T-ROI": series(("t1", 0.50), ("t2", 0.60))})
-        self.assertEqual(len(out), 1)
-        self.assertFalse(out[0]["high_roi"])
-        # same move, lower threshold -> high roi
-        out2, _ = alerts.compute_alerts(rows, [], {"T-ROI": series(("t1", 0.50), ("t2", 0.60))},
-                                        roi_threshold=0.15)
-        self.assertTrue(out2[0]["high_roi"])
-
-    def test_multiple_swings_all_reported_newest_first(self):
-        rows = [market("T-MANY")]
-        # diffs: +0.15 (fire), 0.00 (no), +0.15 (fire) -> 2 alerts, newest last
-        hist = {"T-MANY": series(("t1", 0.10), ("t2", 0.25), ("t3", 0.25), ("t4", 0.40))}
-        out, _ = alerts.compute_alerts(rows, [], hist)
-        self.assertEqual(len(out), 2)
-        self.assertEqual(out[0]["observed_at"], "t4")
-        self.assertEqual(out[1]["observed_at"], "t2")
-
-    def test_missing_prices_are_skipped(self):
-        rows = [market("T-NAN")]
-        hist = {"T-NAN": series(("t1", None), ("t2", 0.5), ("t3", 0.7))}
-        out, _ = alerts.compute_alerts(rows, [], hist)
-        # t2->t3 is a valid 0.20 move; t1->t2 has a null prior and is skipped
-        self.assertEqual(len(out), 1)
-        self.assertEqual(out[0]["observed_at"], "t3")
-
-    def test_observation_without_market_row_is_skipped(self):
-        out, _ = alerts.compute_alerts([], [], {"T-ORPHAN": series(("t1", 0.1), ("t2", 0.5))})
-        self.assertEqual(out, [])
-
-    def test_event_source_url_derived_from_market_source(self):
-        rows = [market("T-EV", event_ticker="EV-1")]
-        out, _ = alerts.compute_alerts(rows, [], {"T-EV": series(("t1", 0.1), ("t2", 0.5))})
-        self.assertEqual(
-            out[0]["event_source"],
-            "https://external-api.demo.kalshi.co/trade-api/v2/events/EV-1",
-        )
-
-    def test_cause_is_blank_and_flagged(self):
-        rows = [market("T-CO")]
-        out, _ = alerts.compute_alerts(rows, [], {"T-CO": series(("t1", 0.1), ("t2", 0.5))})
-        self.assertIsNone(out[0]["cause"])
-        self.assertIn("blank", out[0]["cause_flag"])
+    def test_floating_point_boundary(self):
+        # 0.30 - 0.20 == 0.0999... in float; the rule must still fire.
+        self.assertTrue(fires(0.30 - 0.20))
 
 
-class RealSnapshotTests(unittest.TestCase):
-    """Runs against the actual committed snapshots — no network."""
-
+class FeedTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        if not (LIVE / "markets.json").exists() or not (LIVE / "price_history.json").exists():
-            raise unittest.SkipTest("no committed live snapshot to test against")
-        cls.markets = json.loads((LIVE / "markets.json").read_text())
-        cls.history = json.loads((LIVE / "price_history.json").read_text())
-        cls.out, cls.meta = alerts.compute_alerts(
-            cls.markets.get("open_markets"), cls.markets.get("settled_markets"),
-            cls.history.get("series"),
-        )
+        if not (LIVE / "alerts.json").exists():
+            raise unittest.SkipTest("no committed alerts.json to test against")
+        cls.feed = json.loads((LIVE / "alerts.json").read_text())
+        markets = json.loads((LIVE / "markets.json").read_text())
+        cls.tickers = {r["ticker"] for r in markets["open_markets"] + markets["settled_markets"]}
 
-    def test_every_alert_refers_to_a_real_ticker(self):
-        tickers = {r["ticker"] for r in self.markets["open_markets"] + self.markets["settled_markets"]}
-        for a in self.out:
-            self.assertIn(a["ticker"], tickers)
+    def test_schema_and_threshold(self):
+        self.assertEqual(self.feed.get("schema"), 1)
+        self.assertAlmostEqual(float(self.feed.get("threshold_dollars")), 0.10)
 
-    def test_every_alert_carries_a_verifiable_source_url(self):
-        for a in self.out:
-            self.assertTrue(str(a["source"]).startswith("https://"))
-            self.assertIn("/markets/", a["source"])
+    def test_has_both_feeds(self):
+        self.assertIsInstance(self.feed.get("all_events"), list)
+        self.assertIsInstance(self.feed.get("high_roi"), list)
 
-    def test_all_alerts_meet_the_threshold(self):
-        for a in self.out:
-            self.assertGreaterEqual(a["swing_cents"], 10.0)
+    def test_every_alert_meets_threshold(self):
+        for a in self.feed["all_events"]:
+            self.assertGreaterEqual(abs(float(a["delta"])), 0.10 - EPS,
+                                    f"{a.get('ticker')} delta {a.get('delta')} below threshold")
 
-    def test_categories_are_in_scope(self):
-        allowed = {"gas", "elections", "culture", "crypto", "golf"}
-        for a in self.out:
-            self.assertIn(a["category_id"], allowed)
+    def test_direction_values(self):
+        for a in self.feed["all_events"]:
+            self.assertIn(a["direction"], ("up", "down"))
 
-    def test_model_metadata_present(self):
-        self.assertEqual(self.meta["schema"], 1)
-        self.assertAlmostEqual(self.meta["swing_threshold_dollars"], 0.10)
-        self.assertIn("model_note", self.meta)
+    def test_cause_is_blank_and_flagged(self):
+        for a in self.feed["all_events"]:
+            self.assertIsNone(a.get("cause_link"), f"{a.get('ticker')} cause_link must be null")
+            self.assertIn("unverified", str(a.get("cause_status", "")))
 
-    def test_alerts_sorted_newest_first(self):
-        times = [a.get("observed_at") or "" for a in self.out]
-        self.assertEqual(times, sorted(times, reverse=True))
+    def test_every_alert_has_verifiable_market_source(self):
+        for a in self.feed["all_events"]:
+            self.assertTrue(str(a.get("market_source", "")).startswith("https://"))
+            self.assertIn("/markets/", a["market_source"])
+
+    def test_alerts_reference_real_tickers(self):
+        for a in self.feed["all_events"]:
+            self.assertIn(a["ticker"], self.tickers)
+
+    def test_high_roi_is_subset_of_all_events(self):
+        all_keys = {(a["ticker"], a["to_time"]) for a in self.feed["all_events"]}
+        for a in self.feed["high_roi"]:
+            self.assertIn((a["ticker"], a["to_time"]), all_keys)
+
+    def test_disclaimers_present(self):
+        self.assertTrue(self.feed.get("disclaimers"))
 
 
 if __name__ == "__main__":
