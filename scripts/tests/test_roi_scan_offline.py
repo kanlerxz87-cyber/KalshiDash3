@@ -18,6 +18,7 @@ import json
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -27,17 +28,22 @@ sys.path.insert(0, str(ROOT / "scripts" / "tests"))
 import roi_scan  # noqa: E402
 import collect  # noqa: E402
 
-# Open fixtures must close in the FUTURE relative to whenever this runs, otherwise the
-# model's own "already past close_time" gate rejects them and the assertions below fail for
-# a reason that has nothing to do with the code under test (this happened on main: the
-# hard-coded 2026-11-20T17:00:00Z became the past and three checks went red).
-import datetime as _d
+# The fixtures' close times are RELATIVE to the moment this file is imported.
+# They used to be hard-coded calendar dates, which made the whole check a time bomb:
+# once the wall clock passed the fixture's close_time the model's "already past
+# close_time" gate started rejecting the qualifying market and the test failed for
+# a reason that had nothing to do with the code under test.
+# (arena-2a36471a fixed the same time bomb on main with an equivalent helper.)
+_NOW = datetime.now(timezone.utc)
 
-def _future(hours=2):
-    return (_d.datetime.now(_d.timezone.utc) + _d.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def _iso(dt: datetime) -> str:
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-CLOSE = _future(2)
+CLOSE = _iso(_NOW + timedelta(hours=6))            # open market: closes in 6 h
+CLOSED_1 = _iso(_NOW - timedelta(hours=1))         # settled market: closed 1 h ago
+CLOSED_2 = _iso(_NOW - timedelta(hours=2))         # settled market: closed 2 h ago
 
 
 def mkt(t, bid, ask, last, vol24, title, close=CLOSE, status="active", result=None, vb="900.00", va="800.00"):
@@ -72,9 +78,9 @@ OPEN[1]["yes_ask_size_fp"] = "0.00"
 
 SETTLED = [
     mkt("KXAAAGASM-26NOV19-4.00", 0.60, 0.62, 0.61, 1200.0, "US average gas price on Nov 19?",
-        close=_future(-20), status="finalized", result="no"),
+        close=CLOSED_1, status="finalized", result="no"),
     mkt("KXPGATOUR-26NOV21-T1", 0.55, 0.57, 0.56, 8000.0, "The RSM Classic: winner 1?",
-        close=_future(-2), status="finalized", result="yes"),
+        close=CLOSED_2, status="finalized", result="yes"),
 ]
 
 BOOKS = {
