@@ -14,6 +14,7 @@
 | T5 | GitHub Pages publish + final integration (build check, link check, PR to main, merge, deploy confirm) | in progress | arena-5761b399 | `.github/workflows/pages.yml`, `docs/*` (integration only) | Link check passed; JS/Python syntax passed | — |
 | T6 | Second implementation (root-level site) + verified facts + tracker script | done | session-1c0d1fc0 | `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `portfolio.html`, `suggestions.html`, `sources.html`, `assets/*`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md`, `scripts/kalshi_tracker.py` | Official docs: demo_env, api_environments, market_lifecycle, market_settlement, orderbook_responses, quick_start_create_order, candlesticks, fee schedule | F1–F6 on `sources.html`; no demo keys so trading unexercised |
 | T7 | Integration merge (PR #2 → main), Pages deploy confirm | done | session-1c0d1fc0 | `README.md`, `COORDINATION.md`, `.github/workflows/pages.yml`, `INTEGRATION.md` | — | Merge conflict with PR #1 resolved without discarding either implementation (see Log) |
+| T12 | Persistent alert archive (`data/live/alerts_archive.json`, built by `scripts/build_alerts.py`) so swings survive market close; feeds the T11 alert streams | done | arena-5225610f | `scripts/build_alerts.py`, `data/alert_rules.json`, `data/live/alerts*.json`, `.github/workflows/collect.yml` (build step) | Derived only from `data/live/price_history.json` + `markets.json` (official demo API observations); `validate_live.py`, `check_site.py` | Dashboard does not yet read the archive (request R-1, see log). Causal news links not collected (F-15). ROI model not supplied (F-14). Scheduled collector had not fired (F-16). |
 
 ## Log
 - 2026-11-20: arena-5761b399 claimed T1–T5 (single-session build; no other sessions active). Repo was empty except README. Starting build.
@@ -52,6 +53,11 @@ brief asks for: it merged the branches' intent into one canonical tree, re-verif
 and publishes only the repository root.
 
 ### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | done | arena-6d85f8f0 | `dashboard.html`, `assets/site.css`, `executive-summary.html` | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `node --check`, and a Node fixture smoke test covering the exact 10¢ threshold, sub-threshold rejection, screen criteria, category filter, and source output all passed | GitHub Pages snapshot cadence is not tick-level live; the experimental shortlist is not a validated ROI model and no causal news links are claimed. |
+
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
@@ -110,52 +116,54 @@ while a root publisher is active would have published the now-empty root. The ca
 **repository root**, which is byte-identical to what the `pages.yml` workflow uploads (`path: .`), so both possible
 publishers serve exactly the same files. Flagged as F-05 with the exact reason.
 
----
+### What the live collector run proved (2026-11-20, runs 44727301069 – latest)
 
-## Session 9b246e37 (branch `arena/9b246e37-kalshidash3`, from `49ba7bc` of `main`)
+The first real runs found four defects that no amount of documentation reading would have caught. All are fixed,
+and three of them are now guarded by the validator so they cannot silently return:
 
-Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-level dashboard in its own namespace `9b246e37/` (data in `9b246e37/data/dashboard.json`). This session did not edit `docs/index.html`, the root site, `docs/assets/`, or any other session's files. Session IDs and branch names: the Arena branch rule applies (`arena/9b246e37-kalshidash3`).
+| Defect | Symptom in real data | Fix |
+|---|---|---|
+| Substring keyword match | A sports combo titled *"yes Vegas,yes Tie"* was ranked under **Gas Prices** because "vegas" contains "gas" | Word-boundary matching |
+| Multivariate combos in scope | 175 of the scanned open markets were `KXMVE*` combos combining unrelated legs | Excluded from every category |
+| Capped scan starved the confirmed series | The 4,000-market page cap was full of combos, so fee-schedule series never appeared and *every* row was labelled `keyword` | Seed series queried by name; `series_ticker` is null in practice, so the series is derived from the ticker prefix — and the validator now fails if a seed market is not reported `seed` |
+| Finalized market listed as open | A golf market with `status=finalized` and 37M contracts sat in the open ranking | Seed results bucketed per status; every row re-checked against its lifecycle status; validator rejects a terminal status in the open bucket |
 
-| ID | Task | Status | Owner | Files in scope (this session only) |
-|----|------|--------|-------|-------------------------------------|
-| T1 | Repo review | done | 9b246e37 | this section (F-13, F-14) |
-| T2 | Executive summary | done | 9b246e37 | `9b246e37/executive-summary.md` |
-| T3 | Verified market snapshot (5 topics) | needs review | 9b246e37 | `9b246e37/data/dashboard.json` |
-| T4 | Static site (landing + category pages) | done | 9b246e37 | `9b246e37/index.html`, `9b246e37/categories/*.html`, `9b246e37/assets/{style.css,app.js}` |
-| T5 | Live chart + liquidity (browser-side, public endpoints) | done (code); CORS unverified | 9b246e37 | `9b246e37/live.html`, `9b246e37/assets/live.js` |
-| T6 | Portfolio / trades / strategies | **blocked** (no demo API key; no trades) | 9b246e37 | `9b246e37/portfolio.html`, `9b246e37/analysis.html` |
-| T7 | Questions and information gaps (12) | done | 9b246e37 | `9b246e37/questions.html` |
-| T8 | Suggestions (10), awaiting user choice | done | 9b246e37 | `9b246e37/suggestions.html` |
-| T9 | Flagged for Review (19 flags, source link each) | done | 9b246e37 | `9b246e37/flagged.html` |
-| T10 | Integration: merge, check, PR, Pages | in progress | 9b246e37 | PR #7 log below |
+Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `finalized`), 17 order books,
+200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
+Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
+exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
 
-### Sources and verification (T1–T9)
-- Kalshi docs (official): https://docs.kalshi.com/llms.txt · /getting_started/demo_env.md · /getting_started/quick_start_authenticated_requests.md · /getting_started/market_settlement.md · /api-reference/market/get-series-list.md · /api-reference/market/get-market-candlesticks.md · /api-reference/market/get-market-orderbook.md
-- Kalshi DEMO API (read-only GET, no auth): `https://external-api.demo.kalshi.co/trade-api/v2/` — exchange status; `series?category=` for Crypto, Elections, Culture, Sports (golf); `events?series_ticker=KXAAAGASM` and `KXPGAMAJOR`; `markets?status=settled`; orderbook and candlestick examples.
-- AAA national average (official): https://gasprices.aaa.com/ — regular $3.6898 as of 11/20/26.
-- Method: values copied field by field from responses; any field missing from a response (truncated) is left blank and flagged. The sandbox cannot reach Kalshi hosts directly (SSL error), so every value came through the fetch tool.
-- Check: all 13 pages render from the JSON with no JS errors and no broken local links (jsdom, run outside the repo).
+### Session `arena-6d85f8f0` — alert feed enhancement
 
-### Irregularities (flagged; detail on `flagged.html`)
-- F-01 demo prices may not match production (Kalshi docs). F-02 demo test markets in settled results. F-03 thin or empty liquidity. F-04 stale timestamps. F-05 culture settlement-source placeholders. F-06 staging contract URLs. F-07 generic terms PDF name for KXBNBMINY. F-08 KXDOGEPERP no settlement source. F-09 election volume low. F-10 demo gas quotes do not match AAA's current average (open question). F-11 volume is contracts, not dollars. F-12 portfolio/trading not connected. F-15 golf coverage thin. F-16 browser CORS to demo API untested. F-17 partial snapshot. F-18 one partly captured row. F-19 AAA highest-recorded figure conflicts with third-party reporting.
+- Claim: T11; files touched: `dashboard.html`, `assets/site.css`, `executive-summary.html` (claim committed and pushed to the current Arena branch before implementation).
+- Added two bounded, newest-first scrolling feeds that compare consecutive collected `last` prices and trigger only for absolute changes >= $0.10. Each alert links to the official Kalshi demo market API record. Category selection filters both feeds.
+- The experimental screen is explicitly not an ROI model: only fee-schedule `seed` markets with positive official `volume_24h_fp` qualify, ordered by reported volume. No predicted-return or profitability claim is displayed.
+- The browser rechecks the static snapshot every 60 seconds, but the scheduled collector runs every 20 minutes and the UI states this limitation; not tick-level streaming. No news-event causal links are asserted.
+- Official sources used: https://docs.kalshi.com/api-reference/market/get-markets ; https://docs.kalshi.com/getting_started/quick_start_websockets ; https://docs.kalshi.com/api-reference/market/get-market-orderbook . Existing dashboard history provenance: GET /markets source above.
+- Verification: `python3 scripts/check_site.py`, `python3 scripts/tests/validate_live.py`, `node --check` on the embedded dashboard script, plus a Node fixture smoke test for exact threshold, below-threshold behavior, experimental screen eligibility, category filtering, and source link output. All passed.
+- Irregularities: the source set does not provide causal news/source URLs per price move; UI links the official market record and flags the absence of causal attribution. The 20-minute workflow cadence and absence of a validated ROI model are disclosed in the UI and executive summary.
+- Pull request: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/16 — merged by squash on 2026-11-20 13:18 UTC; merge commit `0a7067d3670489a1ec70415d1f23756722f75a7b`.
+- Pages workflow: https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44743119261 — completed successfully (build + deploy). GitHub Pages API reports `status=built`, public URL https://kanlerxz87-cyber.github.io/KalshiDash3/ (publishing source `main /`). The deployed dashboard was fetched and verified to include both alert feeds and sources. The snapshot shown was 2026-11-20T11:33:33Z and correctly marked stale at verification time.
+- Workflow warning: GitHub reports Node.js 20 action deprecation annotations for pinned `@v4/@v5` actions; run still succeeded and this did not block deployment.
 
-### Conflict and handoff record
-- 2026-11-20 ~11:30 UTC: PR #7 (`arena/9b246e37-kalshidash3` → `main`) was reported not mergeable. Cause: `main` had moved (PRs #5 and #8 merged). Resolution: my site files were moved into the `9b246e37/` namespace, and `origin/main` was merged into this branch. Conflicts (`README.md`, `COORDINATION.md`) were resolved by keeping main's full text and appending this section. No other session's file was changed.
-- Pages note: legacy Pages (`main`, path `/`) publishes the `docs/` folder at `/docs/…`, so this subsite is at `/9b246e37/` (same pattern as `/docs/e1b4fe16/`).
+### Session `arena-5225610f` — overlap with T11 (resolved, see note)
 
-### PR and merge log
-- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/7
-- Merge result: PR #7 merged as `3ea66d5` at 2026-11-20 11:20:17Z (`gh pr merge 7 --merge`, MERGEABLE/CLEAN).
-- Pages deploy: `pages.yml` run 44726780017 success; legacy build of `a91983e` built.
+- 2026-11-20: arena-5225610f claimed T11 (live ≥$0.10 alert feed) on branch `arena/5225610f-kalshidash3`.
+- 2026-11-20: OVERLAP. While this branch was in progress, `main` received PR #16 (arena-6d85f8f0, T11 'Add sourced price-swing alert streams', merged 13:18 UTC) with the same ≥$0.10 feeds on `dashboard.html`. Resolution: this session did NOT keep a second alert UI. The `alerts.html` page was removed; the dashboard feeds remain the single UI. This session's contribution is re-scoped as T12 (persistent archive, data layer) and the branch merges `origin/main` without discarding either side.
+- 2026-11-20: Request R-1 (to the dashboard owner / integration session): point the dashboard's alert feeds at `data/live/alerts_archive.json` (or `alerts.json`) instead of recomputing from `price_history.json`, so alerts survive a market leaving the open scan (F-17). Not done in this branch because `dashboard.html` belongs to the done T11 task.
+- 2026-11-20: arena-5225610f T12 (superseded wording, kept for the record). Built `scripts/build_alerts.py` → `data/live/alerts.json` (consecutive last-price observations with |Δ| ≥ $0.10, both directions) and `alerts.html` — this page was REMOVED during the merge because it duplicated the dashboard feeds from arena-6d85f8f0 (T11, PR #16). Sources: https://docs.kalshi.com/api-reference/market/get-markets (verified fields `last_price_dollars`, `volume_24h_fp`, `status`), https://docs.kalshi.com/getting_started/market_lifecycle. Irregularities F-14 (ROI model not supplied), F-15 (cause links not collected; left null), F-16 (scheduled collector never fired: last 5 runs all manual; snapshot stale ~1h44m at 13:17 UTC; source https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows). Added alert build step to `collect.yml`.
+- 2026-11-20: arena-5225610f T11 follow-up: the fresh snapshot dropped the closed market that produced the first 4 alerts (collector prunes history to open markets). Added append-only `data/live/alerts_archive.json` in `build_alerts.py` and seeded it from commit b95bebb. Irregularity F-17.
+- 2026-11-20: arena-5225610f T12 merged. PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/18 — merge commit `a0a8862c7328374ced662d4d36c7162461a14f70` (merge, mergeable CLEAN). Pages run 44743562211 (Deploy site to GitHub Pages) and pages-build-deployment 44743561977: success. Live `flagged.html` lists 17 irregularities (F-01..F-17), confirmed by fetch. Still open: R-1 (dashboard should read `data/live/alerts_archive.json`), F-14 (owner ROI model), F-16 (scheduled collector not yet observed on main).
 
-### Post-merge record (9b246e37), 2026-11-20 ~11:25 UTC
+## Session `arena-e5adea9d` — paper-trading simulator, verification, integration (branch `arena/e5adea9d-kalshidash3`)
 
-- Merge `3ea66d5` (PR #7) landed on `main`. Then `8b1824e` (session arena-e05bd5ff, "keep one published tree") removed `9b246e37/` (19 files) from `main`, together with `docs/e1b4fe16/`, `docs/verified/`, and the root-level site. Their decision, recorded on this board, was one canonical tree under `docs/`.
-- Result observed on the live canonical site (`/docs/index.html`, fetched 2026-11-20): it shows "No live snapshot committed yet" and no market rows. The only verified market rows on the live site were in the subsite removed above.
-- Action taken here (additive only): the subsite is restored from `3ea66d5`, byte for byte, and moved to `9b246e37/` at the repo root (matching the root-published canonical site after `811f320`). No shared file was changed: `docs/index.html`, navigation, `docs/assets/*`, `docs/data/*`, and `scripts/*` are as on `main`. `scripts/check_site.py` passes on the combined tree (16 pages, all internal links resolve).
-- Request to the integration owner (not done here): (1) link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; (2) fold the 30 verified rows (`9b246e37/data/dashboard.json`), 12 questions, 10 suggestions and 19 flags into the canonical tree, or confirm they stay in the subsite; (3) restore or re-link `docs/e1b4fe16/` and `docs/verified/` if they were not meant to be dropped. Their content is recoverable at `843be97` (pre-removal).
+### Coordination note (read first)
 
-### Post-merge update (9b246e37), 2026-11-20 ~11:35 UTC
+This session's first claim (T11–T14, commit `8d5833e`) was pushed at 13:20 UTC. Within minutes `main` received
+PR #16 (T11, `arena-6d85f8f0`, dashboard alert feeds) and PR #18 (T12, `arena-5225610f`, alert archive and
+`scripts/build_alerts.py`). Those two tasks were already done and are **not** repeated here. The duplicate
+`alerts.py`, `alerts.html`, and a second `alert_rules.json` built by this session were withdrawn before merge, so the
+repo keeps one alert pipeline and one alert UI. No `main` file owned by another session was overwritten or deleted.
 
 - `811f320` moved the canonical site to the repository root and the workflow now uploads `.`. The subsite is therefore at `/9b246e37/` (root), and the earlier `/docs/9b246e37/` placement is superseded.
 - The request to the integration owner stands: link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; fold or confirm the verified rows, questions, suggestions, and flags.
@@ -167,3 +175,44 @@ Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-le
 - Pages: `Deploy site to GitHub Pages` run success; legacy build of `e6e2970` status `built`.
 - Live check (fetch tool, 2026-11-20): `https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/index.html` renders (30 tracked rows, 26 verified, 4 partial, 19 flags); `…/9b246e37/data/dashboard.json` serves.
 - Still open for the integration owner: link the subsite from canonical navigation, or record it as dropped (see the post-merge update above).
+
+Resolution note (arena-d879c640, taking over this stale log-only claim >60 min with no commits):
+both sides kept verbatim. The subsite question above is closed: `9b246e37/` was dropped from `main` by the
+PR #15 merge (`cd104db`, integration session arena-e05bd5ff, "keep one published tree"), recoverable from git
+history. No navigation link was added, and no verified rows were discarded — the canonical pages carry them.
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Live ≥ $0.10 swing feeds | **done by arena-6d85f8f0 (PR #16)**; this session withdrew its duplicate | arena-6d85f8f0 | — | — | F-14 (ROI model not supplied) |
+| T12 | Persistent alert archive | **done by arena-5225610f (PR #18)**; this session withdrew its duplicate | arena-5225610f | — | — | F-15 to F-17; request R-1 open |
+| T15 | Paper simulator: fixed rules applied to `data/live/alerts_archive.json` (main's T12 output), official taker fee, settlement from the official `result`, results by rule, topic and trade type | in progress (pending PR) | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html`, `scripts/tests/test_simulate.py`, `scripts/tests/validate_live.py` (`check_simulation` block only), `.github/workflows/collect.yml` (one step after the alert build) | `python3 scripts/tests/test_simulate.py` (14 tests OK); `validate_live.py` OK; a synthetic-data render test of `simulation.html` in a temp copy (not committed) | F-19, F-20, F-21 |
+| T13 | Verification and Flagged updates for T15 (facts F-50 to F-53; flagged F-18 to F-21; question Q9; suggestions G9, G10) | in progress (pending PR) | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json` | Each new fact read from its official page this session (demo_env, market_lifecycle, market_settlement, orderbook_responses, GitHub Pages publishing source) | F-18 (Pages source discrepancy) |
+| T14 | Integration: nav entry, index card and pipeline row, README, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress (pending PR) | arena-e5adea9d | `assets/site.js` (nav entry only), `index.html` (one card, one pipeline row), `README.md`, `COORDINATION.md` | `check_site.py` OK; `node --check` on every inline and asset script OK; jsdom render of simulation, index, strategies and dashboard with no errors; YAML parsed with js-yaml | — |
+
+Sources were not changed: every official URL used by this session is already listed on `sources.html` (checked
+before editing).
+
+### Requests logged by this session
+
+- **R-1 (still open, from arena-5225610f):** point the dashboard alert feeds at `data/live/alerts_archive.json`.
+  Owner: dashboard. Not implemented here.
+- **R-2 (new, to arena-5225610f / T12 owner):** in `scripts/build_alerts.py`, store `to_yes_bid` and `to_yes_ask`
+  (taken from the observation at `to_time`) on each new archive entry. `scripts/simulate.py` already reads those
+  fields when present; until they exist, most swings cannot be filled and the simulation page shows that. Flagged F-19.
+  Not implemented here, because `build_alerts.py` belongs to T12.
+
+### Log
+
+- 2026-11-20 13:20 UTC: claimed T11–T14 (commit `8d5833e`). Checked before claiming: `main` = `cd104db`; no other open session branch.
+- 2026-11-20 ~13:21 UTC: `main` advanced by PR #16 (T11) and PR #18 (T12). The T11/T12 claim overlapped that work. Withdrawn; kept only as a record. The merge conflict in this file was resolved by keeping every existing row and log line.
+- 2026-11-20 13:26 UTC: re-claimed the remaining scope as T15 (simulator and page) and T13 and T14 (verification and integration), with the rows above. Re-read `origin/main` before the claim: T11 and T12 done; T13 and T14 not claimed.
+- 2026-11-20 13:26–13:31 UTC: rebuilt on `origin/main` (merge). Kept only: strategy definitions, simulator, simulation page, fee and settlement tests (`test_simulate.py`), and one simulation check in `validate_live.py`. Dropped: the duplicate alert page, alert script, alert rules, and alert tests.
+- 2026-11-20 13:30 UTC: observed on `main`: the collector ran again (snapshot 13:18:28Z, 506 open and 200 settled in scope). The archive holds 4 swings; all 4 are from one market that settled `no` and left the open scan, so none can be filled (F-19, R-2).
+- 2026-11-20 13:31 UTC: branch pushed (`3b324cb`). The first `git pull --rebase` attempt was aborted: a branch that merges `main` cannot be rebased onto its own old tip without replaying `main`'s commits. A plain push was used instead, after checking that the remote tip is an ancestor of HEAD.
+- 2026-11-20 13:31:55Z: PR #20 (`arena/e5adea9d-kalshidash3` → `main`, merge commit `ca10d37`) merged with a merge commit. `mergeable: MERGEABLE`, `mergeStateStatus: CLEAN` before merge.
+- 2026-11-20 13:31:56Z: `pages.yml` for `ca10d37` succeeded (run 44745119805). The branch-based Pages build (`pages-build-deployment`) built the collector snapshot `82218d3` at 13:32:28Z. See F-18.
+- 2026-11-20 13:32Z: `collect.yml` dispatched on `main` (run 44745135044): success, all steps including the new simulate step. The collector committed `82218d3` (`data: demo snapshot 2026-11-20T13:32Z`). Snapshot 13:32:25Z, 506 open and 200 settled in scope.
+- 2026-11-20 13:32Z: the new simulation run opened one paper position from the 13:18→13:32 KXDEMOFUTHOURLY-26NOV20H14-UP swing. Its stored quote was yes bid 0.01, yes ask 1.00, so a NO fill at 0.99 with a 0.00 bid later showed −1.00. That is not a tradable price. Follow-up: spread rule (F-23) and void of the breaching position.
+- 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
+- Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.

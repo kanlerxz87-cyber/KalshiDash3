@@ -29,6 +29,9 @@
   </div>
   <div id="facts"></div>
 
+  <h2>Data quality of the committed snapshot</h2>
+  <div id="dataQuality"></div>
+
   <h2>Directly observed from the demo API</h2>
   <p class="small mut">
     These rows were read straight from the official demo API with the documented
@@ -98,9 +101,9 @@ function render() {
 }
 (async () => {
   try {
-    const d = await KD.json("docs/data/verified_facts.json");
+    const d = await KD.json("data/verified_facts.json");
     facts = d.facts || [];
-  } catch { KD.$("#facts").innerHTML = KD.empty("docs/data/verified_facts.json missing."); return; }
+  } catch { KD.$("#facts").innerHTML = KD.empty("data/verified_facts.json missing."); return; }
   const v = facts.filter(f => f.verified).length;
   KD.$("#summary").innerHTML = `<div class="grid">
     <div class="card"><div class="kpi">${facts.length}<small>claims checked</small></div></div>
@@ -108,6 +111,27 @@ function render() {
     <div class="card"><div class="kpi">${facts.length - v}<small>left blank and flagged</small></div></div>
     <div class="card"><div class="kpi">0<small>values typed by hand into the HTML</small></div></div>
   </div>`;
+  try {
+    const snap = await KD.json("data/live/markets.json");
+    const open = snap.open_markets || [], settled = snap.settled_markets || [];
+    const seed = open.filter(r => r.category_basis === "seed").length;
+    KD.$("#dataQuality").innerHTML =
+      `<div class="grid">` +
+      `<div class="card"><div class="kpi">${KD.esc(snap.collected_at)}<small>snapshot fetched (UTC)</small></div></div>` +
+      `<div class="card"><div class="kpi">${KD.num(open.length)}<small>open rows, all status=active</small></div></div>` +
+      `<div class="card"><div class="kpi">${KD.num(seed)}<small>confirmed against the fee schedule</small></div></div>` +
+      `<div class="card"><div class="kpi">${KD.num(settled.length)}<small>settled rows, all status=finalized</small></div></div>` +
+      `</div>` +
+      KD.table([{ key: "k", label: "Bucket" }, { key: "v", label: "Count", num: true }], [
+        { k: "Open markets scanned (capped scan)", v: KD.num(snap.counts.open_total_scanned) },
+        { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
+        { k: "Open rows kept in scope", v: KD.num(snap.counts.open_in_scope) },
+        { k: "Open rows dropped for size (top 120 per category plus all confirmed)", v: KD.num(snap.counts.open_rows_trimmed_for_size) },
+        { k: "Rows dropped for a terminal status in the open bucket", v: KD.num(snap.counts.rows_dropped_wrong_status) },
+        { k: "Multivariate combos excluded (open)", v: KD.num(snap.counts.open_excluded_multivariate) },
+        { k: "Markets found by the confirmed seed-series pass", v: KD.num(snap.counts.seed_markets_found) }
+      ]);
+  } catch (e) { KD.$("#dataQuality").innerHTML = KD.empty("No snapshot committed yet."); }
   KD.$("#filt").addEventListener("change", render);
   render();
   try {
