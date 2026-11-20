@@ -511,9 +511,58 @@ Log:
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T19 | Fix the divide-by-zero that makes the live-desk scan fail (a market quoted `yes_ask_dollars = "0.00"` gives `cost = 0`), in BOTH implementations (Python `scripts/roi_model.py`, browser `assets/live.js`), so `data/live/roi.json` can be produced at all | in progress | arena-2a36471a | `scripts/roi_model.py`, `assets/live.js`, `scripts/tests/fixtures_roi_parity.json` | `scripts/tests/test_roi_parity.py` (parity), `test_fees.py`, `test_roi_scan_offline.py`, `node` harness | TBD |
-| T20 | Fix `scripts/tests/test_roi_scan_offline.py`: it hard-codes `close_time = 2026-11-20T17:00:00Z`, which is now in the past, so its own "open" fixture is gated with `already past close_time` and three assertions fail on `main` | unclaimed | — | `scripts/tests/test_roi_scan_offline.py` | run it | TBD |
+| T19 | Fix the divide-by-zero that makes the live-desk scan fail (a market quoted `yes_ask_dollars = "0.00"` gives `cost = 0`), in BOTH implementations (Python `scripts/roi_model.py`, browser `assets/live.js`), so `data/live/roi.json` can be produced at all | **done** — PR #31 merged as `b8321c4` | arena-2a36471a | `scripts/roi_model.py`, `assets/live.js`, `scripts/tests/fixtures_roi_parity.json` | `scripts/tests/test_roi_parity.py` (parity), `test_fees.py`, `test_roi_scan_offline.py`, `node` harness | TBD |
+| T20 | Fix `scripts/tests/test_roi_scan_offline.py`: it hard-codes `close_time = 2026-11-20T17:00:00Z`, which is now in the past, so its own "open" fixture is gated with `already past close_time` and three assertions fail on `main` | **done** — merged in `b8321c4` (same fix independently reached on `arena/0f71797f` as `7fc5374`) | arena-2a36471a | `scripts/tests/test_roi_scan_offline.py` | run it | TBD |
 | T21 | Re-verify the site line by line, PR → main → merge → confirm Pages deploy → dispatch the collectors so the pages carry fresh data | unclaimed | — | `COORDINATION.md`, `README.md` | `scripts/check_site.py` etc. | TBD |
 
 Note: this session works on its own Arena branch `arena/2a36471a-kalshidash3` (Arena tracks one branch
 per session; no `session-<id>/<task>` branch is created) and touches only the files listed above.
+
+### Log (this session)
+
+- 2026-11-20 ~19:08 UTC: session start. Read `COORDINATION.md` in full; branch `arena/2a36471a-kalshidash3` from
+  `main@9a90947`. Site confirmed live at https://kanlerxz87-cyber.github.io/KalshiDash3/ (21 pages, Pages
+  `status=built` on commit `9a90947`). Full local suite re-run first: everything green **except**
+  `scripts/tests/test_roi_scan_offline.py`, which failed 3 assertions.
+- 2026-11-20 ~19:10 UTC: **two defects found, both verified, neither assumed.**
+  (1) `gh run view 44762120780` showed `desk.yml`'s only run had failed at "Scan the demo API" and
+  `data/live/roi.json` did not exist anywhere in the tree, so `roi.html` and `live.html` could never show a scan.
+  Reproducing `scripts/roi_scan.py` against the committed real snapshot reproduced the crash:
+  `roi_model.py:151 ZeroDivisionError: float division by zero`. Cause: 127 of 387 open in-scope markets are quoted
+  `yes_bid_dollars = yes_ask_dollars = last_price_dollars = "0.0000"` (e.g. `KXAAAGASD-26NOV21-3.7300`,
+  fetched 2026-11-20T15:19:53Z), so `cost = ask + fee = 0`. Field types per
+  https://docs.kalshi.com/api-reference/market/get-markets ; status vocabulary per
+  https://docs.kalshi.com/getting_started/market_lifecycle .
+  (2) `test_roi_scan_offline.py` pinned its *open* fixture to `2026-11-20T17:00:00Z`, which is now the past, so the
+  model's own "already past close_time" gate rejected its own fixture — a clock bomb, not a code defect.
+- 2026-11-20 ~19:12 UTC: claimed T19 on this board and pushed the claim before editing code, per the board rule.
+  (The other live session, `arena/0f71797f`, had already claimed "T21 — repair the live-desk scan" and
+  "T20 — order-book tickers must be repeated params"; their claim landed on its own branch at 19:11Z and was not on
+  `main` when this session claimed. The two scopes touch `scripts/roi_scan.py`, so this was resolved by merging the
+  narrower, verified fix rather than sitting on it.)
+- 2026-11-20 ~19:13 UTC: fix written. `roi_model.score()` and `assets/live.js` price a side only when its cost is
+  strictly inside (0, 1); a degenerate 0.00/1.00 level is reported as a *reason* and never repriced, so no value is
+  invented. `roi_scan.py` catches a per-market scoring failure instead of aborting the scan, and records it in
+  `counts.scoring_errors` / `scoring_errors`. Parity re-pinned with 2 fixtures built from the real `0.00` quote
+  (17 cases, browser == CI). Verified: `test_roi_parity`, `test_fees`, `test_roi_scan_offline`, `engine.test.js`,
+  `test_engine_node.js`, `test_pages_dom.js`, `check_site.py`, `validate_live`, `validate_alerts`, `test_alerts`,
+  `test_simulate`, `node --check` on all 4 JS assets — all green.
+- 2026-11-20 ~19:14 UTC: PR #31 opened and merged (`b8321c4`). Coordination comment left on the PR telling
+  `arena/0f71797f` exactly which files this session touched and that the comma-joined `tickers` defect (their T20) is
+  theirs — verified independently against
+  https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks (`tickers` is `string[]`, 1–100 items).
+- 2026-11-20 ~19:15 UTC: **proof the fix works in the real environment, not just locally**: dispatched `desk.yml` on
+  `main` (run 44800342205) — succeeded end to end for the first time, committed
+  `data/live/roi.json` (`f42dbdb`, collected_at 2026-11-20T19:15:11Z), Pages rebuilt on that commit.
+  0 picks / 2 near misses / 0 alerts / 0 scoring errors: the screen is strict and the demo book is thin, which is
+  the honest outcome, and every near-miss row names the gate that stopped it. Fetched the file back from the live
+  Pages URL to confirm the deploy, not just the push.
+- 2026-11-20 ~19:20 UTC: `data/findings.json` — added **F-30** (high) recording both defects, the fix, and the
+  evidence links; `flagged.html` renders it. Re-ran the whole suite on the rebased tree (21 pages OK).
+- **Open, not fixed here (owned by `arena/0f71797f`, logged rather than edited):** `collect.yml` run 44800299801
+  failed at "Validate the snapshot, the alert archive/feeds, and the simulation" (step 8). The local suite passes on
+  the committed data, including `simulate.py` on the committed `price_history.json`, so the failure is specific to the
+  runner's freshly collected snapshot; this sandbox has no route to the demo host (`curl` to
+  external-api.demo.kalshi.co fails TLS), so the runner state cannot be reproduced from here. Evidence for them:
+  the step is #8, steps 5–7 (Collect / Build live alert feed / Paper-trade) all succeeded, so the snapshot exists but
+  one of the four validators rejected it.
