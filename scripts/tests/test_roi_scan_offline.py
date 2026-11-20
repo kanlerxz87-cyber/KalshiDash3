@@ -97,7 +97,12 @@ def fake_get(path, params=None, retries=3):
     if path == "/historical/cutoff":
         return {"market_settled_ts": "2026-09-01T00:00:00Z", "trades_created_ts": "2026-10-01T00:00:00Z"}, url
     if path.startswith("/markets/orderbooks"):
-        tickers = [t for t in (params.get("tickers") or "").split(",") if t]
+        # The endpoint takes `tickers` as a repeated string[] (1-100); scripts/roi_scan.py
+        # therefore passes a list. The comma-string branch below is kept only so a regression
+        # to the old encoding still returns a shaped answer that the scan rejects as unrequested
+        # (which is precisely how the bug hid: 200 + empty arrays, not an error).
+        raw = params.get("tickers") or []
+        tickers = list(raw) if isinstance(raw, (list, tuple)) else [t for t in str(raw).split(",") if t]
         obs = []
         for t in tickers:
             b = BOOKS.get(t)

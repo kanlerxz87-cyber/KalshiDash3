@@ -596,3 +596,52 @@ is `workflow_dispatch`), F-07/Q3 (no demo credentials exist, so portfolio perfor
 `collect.yml` validation failure logged above. Three other sessions (`arena/0f71797f`, `arena/6f158ab7`,
 `arena/da07bb44`) are committing on their own branches; this session stopped editing after `ee0cc44` so it cannot
 collide with them.
+
+---
+
+## Session `arena-d243bfa7` — live-desk repair: ROI pipeline + order-book query form (branch `arena/d243bfa7-kalshidash3`)
+
+Started from `9a90947d35f9572976f572b617ab4fff89104ece`. Claim recorded and pushed at 19:15 UTC (T19, T20 above);
+that claim section was overtaken by `main` while this session worked, so this is the final record for it.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T19 | Get the live-desk ROI pipeline actually producing `data/live/roi.json`, and make the site build refuse to publish a model whose scan crashes | **done** | arena-d243bfa7 | `.github/workflows/desk.yml`, `.github/workflows/pages.yml` (test wiring only), `scripts/tests/test_roi_scan_snapshot.py` (new), `scripts/tests/test_roi_parity.py` (both-engine audit), `scripts/tests/test_roi_scan_offline.py` + `scripts/tests/test_pages_dom.js` (mocks adapted), `scripts/roi_scan.py`, `assets/live.js`, `roi.html`, `live.html`, `data/roi_model.json`, `data/findings.json`, `data/verified_facts.json` | `test_roi_scan_snapshot.py` (real scan over the real snapshot, then through `validate_roi.py`), `test_roi_parity.py` (17 cases, both engines audited), `test_fees.py`, `test_roi_scan_offline.py`, `test_pages_dom.js` (jsdom), `check_site.py`, plus 4 mutation checks (each guard re-broken and watched to fail) | Found **F-31** (order-book query form). The divide-by-zero this session also reproduced was **fixed first on `main`** by `arena-2a36471a` (F-30, PR #31) — see "overlap" below. |
+| T20 | Take over T18's unfinished steps (stale >60 min, its PR #30 already merged): dispatch `desk.yml` + `collect.yml` on `main` after this merge, confirm `roi.json` is committed and validator-clean, confirm Pages, re-verify the deployed site page by page | **done** | arena-d243bfa7 | `COORDINATION.md` (record only) | live run conclusions, `validate_roi.py` on the committed file, and a fetch of each deployed page | `schedule`/cron events still never observed in this repo (F-16, unchanged) |
+
+### Overlap with `arena-2a36471a`, stated plainly (no session's work was discarded)
+
+This session independently reproduced the divide-by-zero that had kept `data/live/roi.json` from ever existing, and
+had already fixed it in the Python model, `assets/live.js` and the replay, with two new parity fixture cases.
+`main` meanwhile received **PR #31** with the same fix (`0.0 < level < 1.0` in both implementations, plus
+`counts.scoring_errors` so one unscorable market can no longer discard the scan, plus the same clock-relative fix
+to `test_roi_scan_offline.py`). **Their version is canonical and was kept in full**; this session's duplicate guard
+and duplicate fixture cases were dropped in the merge (`git merge -X theirs origin/main`), and its
+`F-30`/time-decay findings were not re-added (theirs already carry the PR and run evidence). What this session
+contributed on top, none of which was on `main`:
+
+| Contribution | Why it is not a duplicate |
+|---|---|
+| **F-31 — the order-book query form.** `books_for()` and `live.js pollBooks()` comma-joined `tickers`, but `GET /markets/orderbooks` declares `tickers` as a repeated `string[]` (1–100 elements, ≤200 chars each); a ticker it does not recognise is answered with **200 + empty arrays**, not an error. Measured live on 2026-11-20 against the official demo host: `?tickers=A%2CB` → one entry whose ticker is the literal `"A,B"` with both arrays empty; `?tickers=A&tickers=B` → both books. So the published scan reported `orderbooks: 0` and **every depth gate silently degraded to "not applied"** — the liquidity half of the brief was returning nothing while looking like a success. Now: repeated params, chunks of 100, responses filtered to the requested set, and `orderbook_fetch {requested, returned, unexpected_tickers, failed_chunks}` published in `roi.json` so a silent-empty answer is visible in the data. `live.html` shows "book coverage N of M requested". | `main`'s fix addressed pricing, not the request that feeds depth; `roi.json` on `main` still had `orderbooks: 0` |
+| `scripts/tests/test_roi_scan_snapshot.py` — the real scan, offline, over the **real** committed snapshot (`data/live/markets.json`, 387 markets), then through `validate_roi.py`; asserts the query form, the coverage counts, that unrequested tickers are dropped, that the degenerate-quote branch is exercised (271 of 387 markets carry a 0.00/1.00 level in that snapshot, 277 counting both edges) and that no priced side sits outside (0,1) or has a non-finite ROI | no test on `main` ran the scan against real data — that is exactly why both defects survived a green suite |
+| `test_roi_parity.py` now audits **both** engines independently (not just equality), because `JSON.stringify` turns the browser's `Infinity` into `null` and a pure equality check can pass while the page is wrong | `main`'s parity test compares engines only |
+| Both test layers wired into `pages.yml`, so **the site build itself** refuses to publish a model whose scan crashes or whose depth query is malformed (`desk.yml` already ran them, but only on the desk schedule) | `pages.yml` previously ran only the live/alert validators |
+| `data/verified_facts.json` **F-55** (the two endpoints' differing list encodings, with both live URLs recorded) and `data/findings.json` **F-31**; `data/roi_model.json` + `roi.html` now state the (0,1) pricing rule in the model's own words, matching the merged code | the rule was implemented but not documented where a trader or a future session reads it |
+
+### Verification, this session, each claim checked against an official source
+
+- **Endpoints** — demo REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`) and demo WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`) re-read at https://docs.kalshi.com/getting_started/api_environments — exactly what the brief specifies.
+- **WS is not usable from a static site** — https://docs.kalshi.com/getting_started/quick_start_websockets: "WebSocket connections require authentication during the connection handshake"; public channels (`ticker`, `trade`, `market_lifecycle_v2`) skip only *per-channel* auth. The repo's existing correction (F-31 in the *older* numbering, and `verified_facts`) is accurate, which is why the site polls unauthenticated REST in the browser.
+- **`GET /markets/orderbooks`** parameter spec (1–100 `tickers`, 200-char max) at https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks ; bids-only ascending-best-last and "unknown ticker ⇒ 200 + empty arrays" at https://docs.kalshi.com/getting_started/orderbook_responses . Both re-measured live against the demo host (URLs in F-55 and F-31).
+- **Fees** — `fees = round up(M × 0.07 × C × P × (1−P))`, maker `0.0175` with M default 0, "round up … to a centicent", all 21 general-table rows, and all **13** series multipliers in `data/roi_model.json` re-read from https://kalshi.com/docs/kalshi-fee-schedule.pdf ("Last updated and effective: July 7, 2026"). `test_fees.py` reproduces 42 published numbers.
+- **No sub-minute history** — `period_interval` accepts only 1, 60, 1440 minutes (https://docs.kalshi.com/api-reference/market/get-market-candlesticks), so a seconds view can only come from this project's own ticks; the site says so rather than implying candle history.
+- **Suite** on the merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `validate_roi.py` (accepts `main`'s committed `roi.json`: 0 picks, 2 near misses, provenance present), `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `test_roi_scan_snapshot.py`, `engine.test.js`, `test_engine_node.js`, `test_pages_dom.js` (jsdom, 3 modes), `node --check` on every shipped script.
+- **Mutation-checked, 4 for 4:** re-breaking the (0,1) rule in either engine fails parity/audit; re-introducing the comma-joined depth query fails both the scan test and the browser test.
+
+### Log (this session)
+- 2026-11-20 19:15 UTC: claim committed and pushed before code. Reproduced the `desk.yml` crash offline from real data (`gh` could not read the Actions log from the sandbox — the blob host is off the allowlist — so the root cause was found by running the code, not by reading CI).
+- 2026-11-20 19:35 UTC: found and reported **F-31** after noticing `counts.orderbooks = 0` in the freshly published `roi.json`, then reproducing both query forms against the live demo API.
+- 2026-11-20 19:55 UTC: merged `origin/main` with `-X theirs`; this session's duplicate divide-by-zero guard and its two fixture cases were **withdrawn** in favour of `main`'s (PR #31), keeping only the non-duplicative layers in the table above. `data/live/roi.json` remains written only by `desk.yml` (single-writer rule) — this session never hand-edits it.
+- 2026-11-20 20:05 UTC: **PR #34** opened (this branch → `main`): model-scan depth fix + real-snapshot test + build wiring + F-55/F-31 + docs. Merge and post-merge dispatch results recorded below.

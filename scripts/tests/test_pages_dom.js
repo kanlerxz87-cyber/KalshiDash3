@@ -52,7 +52,15 @@ function mkFetch(mode, state) {
       if (u.includes("/exchange/status")) return send({ trading_open: true });
       if (u.includes("/historical/cutoff")) return send({ market_settled_ts: "2026-10-01T00:00:00Z" });
       if (u.includes("/markets/orderbooks")) {
-        const tickers = decodeURIComponent((u.match(/tickers=([^&]+)/) || [])[1] || "").split(",").filter(Boolean);
+        // Parse it the way the endpoint does: `tickers` is a repeated string[] (1-100), NOT a
+        // comma-separated list. A comma-joined query is answered with one entry whose ticker is
+        // the whole joined string and both arrays empty — see the assertion below.
+        const tickers = [...u.matchAll(/[?&]tickers=([^&]+)/g)].map((m) => decodeURIComponent(m[1]));
+        if (/tickers=[^&]*%2C|tickers=[^&]*,/.test(u)) {
+          state.badBookQuery = u;
+          return send({ orderbooks: [{ ticker: decodeURIComponent(u.match(/tickers=([^&]+)/)[1]),
+                                       orderbook_fp: { yes_dollars: [], no_dollars: [] } }] });
+        }
         return send({ orderbooks: tickers.map(t => ({ ticker: t, orderbook_fp: { yes_dollars: [["0.4700", "900.00"]], no_dollars: [["0.5100", "800.00"]] } })) });
       }
       if (u.includes("status=open")) {
@@ -108,7 +116,7 @@ function inlineAssets(html) {
 
 async function loadPage(file, mode) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0 };
+  const state = { calls: [], blocked: 0, badBookQuery: null };
   const errors = [];
   const dom = new JSDOM(html, {
     url: "https://kalshidash3.invalid/" + file,
@@ -175,6 +183,8 @@ function commonAsserts(label, r) {
     check(/LIVE · direct demo API/.test(r.text), "live mode must be announced in the status bar");
     check(r.state.calls.some(u => u.includes("status=open")), "the desk must discover markets itself, not wait for input");
     check(r.state.calls.some(u => u.includes("/markets/orderbooks")), "order-book depth must be requested");
+    check(!r.state.badBookQuery, "GET /markets/orderbooks must repeat tickers=A&tickers=B — the comma form "
+          + "returns 200 with empty arrays and reads as 'no liquidity': " + (r.state.badBookQuery || "").slice(0, 140));
     const msgs = r.doc.querySelectorAll("#feedAll .msg").length;
     check(msgs >= 1, `a 13c jump between polls must appear in the all-events chat (got ${msgs})`);
     const roiMsgs = r.doc.querySelectorAll("#feedRoi .msg").length;

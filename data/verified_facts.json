@@ -440,11 +440,20 @@
    "verified": true,
    "checked_on": "2026-11-20",
    "how": "Read the Get Markets response schema on docs.kalshi.com; the field appears in the documented response body."
+  },
+  {
+   "id": "F-55",
+   "claim": "GET /markets/orderbooks takes `tickers` as a REPEATED query parameter (string[], 1-100 elements, max 200 chars each), unlike GET /markets, which takes a comma-separated list",
+   "value": "GET /markets/orderbooks?tickers=A&tickers=B  (NOT ?tickers=A%2CB)",
+   "source": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
+   "verified": true,
+   "checked_on": "2026-11-20",
+   "how": "Read the parameter spec on the official endpoint page (Required array length 1-100; Maximum string length 200), then both forms were issued against the official demo API on 2026-11-20: https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30&tickers=KXBTCY-27JAN0100-B47500 returned both books, while https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30%2CKXBTCY-27JAN0100-B47500 returned HTTP 200 with ONE entry whose ticker was the whole joined string and both arrays empty. GET /markets?tickers=A%2CB by contrast returned both markets, so the two endpoints genuinely differ. Empty-vs-unknown behaviour is documented at https://docs.kalshi.com/getting_started/orderbook_responses (a ticker that does not match any market returns 200 with empty arrays, not 404)."
   }
  ],
  "counts": {
-  "total": 59,
-  "verified": 58,
+  "total": 60,
+  "verified": 59,
   "unverified": 1
  }
 }

@@ -11,9 +11,10 @@ a qualifying pick, a wide spread, a thin book, a missing book (size fields inste
 zero-fee series, a keyword-only topic, a market past its close, a market with no close
 time, an extreme price, low volume, a downward tilt, a catalyst URL inside the market's
 own rules text, a one-sided quote, a market with no price at all, a market with no depth
-information (the depth gate is skipped, not zeroed), and the two pinned-quote cases the
-demo book actually produces (YES ask $0.00 observed verbatim in the committed snapshot;
-YES bid $1.00 as its labelled mirror) where ROI is undefined and must stay unpriced.
+information (the depth gate is skipped, not zeroed), and the two degenerate-quote cases the
+demo book actually produces (zero-level-quote-reject, from the observed 0.0000 quote, and
+zero-ask-only-buy-no-side-reject, where only the YES side is degenerate) — a side outside
+(0, 1) must be refused, never priced, in both implementations.
 
 Beyond parity this test also audits both outputs: no priced side may have a zero/negative
 cost or a non-finite ROI. That matters because JSON turns JavaScript's `Infinity` into
