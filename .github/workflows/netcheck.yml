@@ -1,0 +1,9 @@
+name: netcheck
+on: [workflow_dispatch]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: probe kalshi demo
+        run: |
+          curl -sS -m 20 -w "\nHTTP:%{http_code}\n" https://external-api.demo.kalshi.co/trade-api/v2/exchange/status
