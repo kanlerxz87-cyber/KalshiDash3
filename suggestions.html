@@ -13,7 +13,7 @@
   <h1>Suggestions — review before anything is built</h1>
   <p class="lede">
     Each proposal states what it improves, what it costs, how it can hurt, and the metric that would prove it worked.
-    Four are already implemented because they remove a correctness risk; four are proposals that need your decision.
+    Items marked <b>implemented</b> or <b>shipped</b> are live on this site; items marked <b>proposed</b> need your decision. Statuses come verbatim from `data/findings.json`, so several sessions' wordings appear here unchanged.
     Nothing in the second group changes behaviour until you choose it.
   </p>
 
@@ -58,7 +58,7 @@ KD.nav("suggestions.html");
     effort: KD.esc(s.effort),
     risk: KD.esc(s.risk),
     metric: KD.esc(s.success_metric),
-    status: s.status === "implemented" ? '<span class="badge ok">implemented</span>' : '<span class="badge warn">proposed</span>',
+    status: (s.status === "implemented" || s.status.startsWith("shipped")) ? '<span class="badge ok">' + KD.esc(s.status.startsWith("shipped") ? "shipped" : "implemented") + '</span>' : '<span class="badge warn">proposed</span>',
     src: (s.sources || []).map(u => KD.srcLink(u, u.includes("docs.kalshi") ? "Kalshi docs" : "source")).join(" "),
   }));
   const headers = [
@@ -66,7 +66,7 @@ KD.nav("suggestions.html");
     { key: "effort", label: "Effort" }, { key: "risk", label: "Risk" }, { key: "metric", label: "How you would know it worked" },
     { key: "status", label: "Status" }, { key: "src", label: "Source" },
   ];
-  KD.$("#impl").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("implemented")));
+  KD.$("#impl").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("implemented") || r.status.includes("shipped")));
   KD.$("#prop").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("proposed")));
 })();
 </script>

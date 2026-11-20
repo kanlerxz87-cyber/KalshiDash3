@@ -36,8 +36,12 @@ jobs:
         run: python3 scripts/build_alerts.py
       - name: Paper-trade fixed strategies on the alert archive (no orders, no account)
         run: python3 scripts/simulate.py
-      - name: Validate snapshot
-        run: python3 scripts/tests/validate_live.py
+      - name: Validate the snapshot, the alert archive/feeds, and the simulation
+        run: |
+          python3 scripts/tests/validate_live.py
+          python3 scripts/tests/validate_alerts.py
+          python3 scripts/tests/test_alerts.py
+          python3 scripts/tests/test_simulate.py
       - name: Run alert-feed tests
         run: python3 scripts/tests/test_alerts.py
       - name: Commit snapshot
