@@ -201,3 +201,43 @@ before editing).
 - 2026-11-20 13:32Z: the new simulation run opened one paper position from the 13:18→13:32 KXDEMOFUTHOURLY-26NOV20H14-UP swing. Its stored quote was yes bid 0.01, yes ask 1.00, so a NO fill at 0.99 with a 0.00 bid later showed −1.00. That is not a tradable price. Follow-up: spread rule (F-23) and void of the breaching position.
 - 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
 - Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.
+
+## Session `arena-6a3c4e55` — official cause candidates, chart jump markers, R-1 (archive-backed feeds)
+
+Branch `arena/6a3c4e55-kalshidash3`. This session is the integration session for the brief's remaining gaps. It keeps
+the single canonical alert UI on `dashboard.html` and the single canonical data layer (`scripts/build_alerts.py` →
+`data/live/alerts_archive.json` → `data/live/alerts.json`). It does **not** ship a second alert page, a second
+detector, or a second simulator.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Official cause candidates for every alert (event settlement sources, labelled unverified) + >=$0.10 chart jump markers + implement open request R-1 (feeds read the archive/feed, not raw retained history) | in progress | arena-6a3c4e55 | `scripts/collect_event_refs.py`, `data/live/event_refs.json` (generated), `scripts/build_alerts.py` (cause fields only), `dashboard.html` (feeds + markers), `assets/site.css`, `.github/workflows/collect.yml`, `scripts/tests/validate_live.py` (cause checks), `data/findings.json` (F-15), `COORDINATION.md` | `python3 scripts/check_site.py`, `python3 scripts/tests/validate_live.py`, `node --check` on the inline dashboard script, plus a Node fixture smoke test for feed source, category filter, cause labelling and jump markers | F-15 answered with **checkable official settlement-source candidates**, never a news attribution; causation stays `unverified` |
+| T12 | Automated S1-S4 paper simulation | **withdrawn** — superseded by `arena-e5adea9d` (PR #20 merged, PR #21 follow-up). `scripts/simulate.py`, `data/live/simulation.json`, `simulation.html`, `scripts/tests/test_simulate.py` are the canonical implementation. This session's local duplicate (`scripts/simulate_strategies.py`, `data/live/simulations.json`) was deleted, not shipped. | arena-e5adea9d | — | — | — |
+
+### Requests
+
+- **R-1 (open since 2026-11-20, from arena-5225610f):** point the dashboard alert feeds at
+  `data/live/alerts_archive.json` / `data/live/alerts.json` instead of recomputing from `price_history.json`.
+  Owner: dashboard. **Implemented in this branch.**
+- **R-3 (new, to arena-5225610f / T12 owner):** `scripts/build_alerts.py` should also store the bid/ask observed at
+  `to_time` on each new archive entry. `scripts/simulate.py` reads `to_yes_bid` / `to_yes_ask` when present (R-2);
+  this session's cause-field change does not touch them, so R-2/R-3 stay open for the archive owner.
+
+### Log
+
+- 2026-11-20 13:0x UTC: claimed T11-T12 on branch `arena/6a3c4e55-kalshidash3` (commit `001c4ff`), after checking
+  `main` = `cd104db`. Work in progress: local `alerts.html` + `scripts/detect_alerts.py` + `scripts/simulate_strategies.py`.
+- 2026-11-20: OVERLAP found on rebase. `main` had received PR #16 (arena-6d85f8f0, dashboard alert feeds) and PR #18
+  (arena-5225610f, `scripts/build_alerts.py` + append-only `data/live/alerts_archive.json`), and later PR #20 / #21
+  (arena-e5adea9d, paper simulator `scripts/simulate.py` + `simulation.html`). Resolution: this session ships **no**
+  second alert page, **no** second detector and **no** second simulator. The local duplicates were deleted. The
+  canonical `dashboard.html` feeds, the canonical archive pipeline and the canonical simulator are the ones that ship.
+- 2026-11-20: rebased onto `main` repeatedly (`4dc9ee2` -> `82218d3` -> `9d3faeb`); each `COORDINATION.md` conflict was
+  resolved by keeping every existing row and log line and appending this section.
+- 2026-11-20: **Correction.** The first conflict resolution in this session (onto `4dc9ee2`) was written by slicing
+  the conflicted working file, which silently dropped the first 135 lines of this board - the header, the task table
+  and the log of sessions `arena-5761b399`, `session-1c0d1fc0`, `arena-e05bd5ff` and `arena-6d85f8f0`. The board is
+  restored in full here from `origin/main` (`9d3faeb`) and this session appends to it instead of replacing it. No other
+  file was affected: the truncation was confined to `COORDINATION.md`.
