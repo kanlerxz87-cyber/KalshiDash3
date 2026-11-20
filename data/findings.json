@@ -667,6 +667,18 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44762120780"
    ]
+  },
+  {
+   "id": "F-33",
+   "item": "The desk scan's order-book fetch returns zero books on the demo environment (both scans on main), while small order-book requests succeed \u2014 cause unverified",
+   "why": "data/live/roi.json from the desk runs committed at 2026-11-20T19:15:11Z and 2026-11-20T19:30:16Z both record counts.orderbooks = 0 for all 214 in-scope markets (3 chunks of up to 100 tickers per the documented maximum), yet scripts/collect.py's small order-book requests (4 tickers) returned 17 valid books in the 19:30:14Z snapshot the same hour, and GET /exchange/status reports the exchange active. The scan is built to degrade: it falls back to the market-level yes_bid_size_fp / yes_ask_size_fp sizes, marks depth as unknown in the reasons, and still writes a validated scan. The exact chunk failure mode is NOT directly observed \u2014 Actions logs cannot be downloaded from this build sandbox (blocked host), so the cause (rate limit, chunk-size rejection, or transient demo-side behaviour) is left unverified rather than guessed.",
+   "action": "Rows whose depth is unknown carry an explicit reason instead of an invented number, per the no-invention rule. To verify the cause: read the 'orderbooks chunk failed' lines in a desk.yml run log from a network that can reach GitHub Actions logs, or bisect the chunk size (100 -> 50 -> 10). Not blocking: scoring continues with market-level sizes and the ROI page explains every gated market.",
+   "severity": "low",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44802657829",
+    "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/roi.json"
+   ]
   }
  ]
 }
