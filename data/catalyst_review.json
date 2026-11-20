@@ -194,7 +194,7 @@
       "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
       "publisher": "Kalshi demo Trade API (the market's own official record)",
       "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-      "fetched_at": "2026-11-20T20:38Z",
+      "fetched_at": "2026-11-20T19:47Z",
       "observed": {
         "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T20:00:00+00:00 closes at or above 58337.51 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T19:00:00+00:00. Missing data delays determination.",
         "title": "Demo BTC at or above 58337.51 USD",
@@ -211,7 +211,7 @@
       "id": "COINBASE_BTCUSD_1MIN_1905_1935",
       "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
       "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
-      "fetched_at": "2026-11-20T20:38Z",
+      "fetched_at": "2026-11-20T19:47Z",
       "observed": {
         "candle_closes_by_minute_UTC": {
           "19:05": 58249.98,
@@ -253,7 +253,7 @@
       "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
       "publisher": "Kalshi demo Trade API (the market's own official record)",
       "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-      "fetched_at": "2026-11-20T20:38Z",
+      "fetched_at": "2026-11-20T19:47Z",
       "observed": {
         "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
         "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",

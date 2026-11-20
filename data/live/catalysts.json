@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-20T19:39:45Z",
+ "generated_at": "2026-11-20T19:46:17Z",
  "snapshot_collected_at": "2026-11-20T19:30:14Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-6f158ab7",
@@ -56,13 +56,13 @@
      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
      "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
      "source_id": "COINBASE_BTCUSD_1MIN_1905_1935",
-     "fetched_at": "2026-11-20T20:38Z"
+     "fetched_at": "2026-11-20T19:47Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
      "source_id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
-     "fetched_at": "2026-11-20T20:38Z"
+     "fetched_at": "2026-11-20T19:47Z"
     }
    ],
    "state": "no_external_move_supporting_this_swing",
@@ -81,7 +81,7 @@
     "strike_side_after": "below"
    },
    "note": "The collector recorded this market printing up to 0.55 during its 19:30:14Z run. Across the fetched 19:05-19:35 candles the Coinbase index the rules name fell (close 58249.98 to 58079.56) and stayed under the 58337.51 strike the whole window - the highest candle HIGH was 58310.32, 27.19 short. The market's own record shows last_price 0.5500 against yes_ask 0.9900 / yes_bid 0.0100 on 70.00 open interest: the print sits in a spread, not near a book. Recorded as unexplained by the reference.",
-   "reviewed_at": "2026-11-20T20:38Z",
+   "reviewed_at": "2026-11-20T19:47Z",
    "source_ids": [
     "COINBASE_BTCUSD_1MIN_1905_1935",
     "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
