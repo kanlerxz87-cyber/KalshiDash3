@@ -1,0 +1,113 @@
+{
+ "schema": 1,
+ "environment": "demo",
+ "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
+ "generated_at": "2026-11-20T13:23:57Z",
+ "threshold_dollars": 0.1,
+ "threshold_note": "The >= $0.10 swing threshold is a requirement of this project (the brief), not an official Kalshi number. Alerts are diffs between two CONSECUTIVE observations collected by scripts/collect.py from the official demo API; nothing is interpolated.",
+ "note": "One alert per consecutive observation pair with |delta| >= threshold, on the `last` traded price series. Between collector runs no prices are visible to this method; see Flagged F-14 for the WebSocket that would close that gap.",
+ "counts": {
+  "alerts": 4,
+  "up": 2,
+  "down": 2,
+  "pairs_compared": 1587,
+  "markets_with_history": 489
+ },
+ "coverage": {
+  "first_observation": "2026-11-20T11:24:20Z",
+  "last_observation": "2026-11-20T11:33:33Z",
+  "distinct_observation_runs": 5
+ },
+ "sources": {
+  "markets_endpoint": "https://external-api.demo.kalshi.co/trade-api/v2/markets",
+  "markets_docs": "https://docs.kalshi.com/api-reference/market/get-markets",
+  "candlesticks_docs": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+  "websocket_docs": "https://docs.kalshi.com/getting_started/quick_start_websockets"
+ },
+ "disclaimers": [
+  "Demo environment: mock funds; prices may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
+  "A >= $0.10 diff between two observations is an observed swing, not a verified cause; per-alert cause attribution is out of scope (see flagged F-15)."
+ ],
+ "alerts": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "direction": "up",
+   "delta_dollars": 0.2,
+   "from_price_dollars": 0.45,
+   "to_price_dollars": 0.65,
+   "from_ts": "2026-11-20T11:24:20Z",
+   "to_ts": "2026-11-20T11:26:21Z",
+   "from_bid_dollars": 0.01,
+   "to_bid_dollars": 0.01,
+   "from_ask_dollars": 1.0,
+   "to_ask_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "observed_basis": "api_diff",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "result": null
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "direction": "down",
+   "delta_dollars": -0.2,
+   "from_price_dollars": 0.55,
+   "to_price_dollars": 0.35,
+   "from_ts": "2026-11-20T11:28:31Z",
+   "to_ts": "2026-11-20T11:31:35Z",
+   "from_bid_dollars": 0.01,
+   "to_bid_dollars": 0.01,
+   "from_ask_dollars": 1.0,
+   "to_ask_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "observed_basis": "api_diff",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "result": null
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "direction": "down",
+   "delta_dollars": -0.1,
+   "from_price_dollars": 0.65,
+   "to_price_dollars": 0.55,
+   "from_ts": "2026-11-20T11:26:21Z",
+   "to_ts": "2026-11-20T11:28:31Z",
+   "from_bid_dollars": 0.01,
+   "to_bid_dollars": 0.01,
+   "from_ask_dollars": 1.0,
+   "to_ask_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "observed_basis": "api_diff",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "result": null
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "direction": "up",
+   "delta_dollars": 0.1,
+   "from_price_dollars": 0.35,
+   "to_price_dollars": 0.45,
+   "from_ts": "2026-11-20T11:31:35Z",
+   "to_ts": "2026-11-20T11:33:33Z",
+   "from_bid_dollars": 0.01,
+   "to_bid_dollars": 0.01,
+   "from_ask_dollars": 1.0,
+   "to_ask_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "observed_basis": "api_diff",
+   "title": "Demo BTC at or above 61985.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "result": null
+  }
+ ]
+}

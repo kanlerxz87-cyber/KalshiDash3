@@ -34,6 +34,10 @@ jobs:
         run: python3 scripts/collect.py --orderbooks 4
       - name: Validate snapshot
         run: python3 scripts/tests/validate_live.py
+      - name: Build >= $0.10 swing alerts (and validate them against the observations)
+        run: |
+          python3 scripts/build_alerts.py
+          python3 scripts/tests/validate_alerts.py
       - name: Commit snapshot
         run: |
           set -euo pipefail
