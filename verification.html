@@ -98,9 +98,9 @@ function render() {
 }
 (async () => {
   try {
-    const d = await KD.json("docs/data/verified_facts.json");
+    const d = await KD.json("data/verified_facts.json");
     facts = d.facts || [];
-  } catch { KD.$("#facts").innerHTML = KD.empty("docs/data/verified_facts.json missing."); return; }
+  } catch { KD.$("#facts").innerHTML = KD.empty("data/verified_facts.json missing."); return; }
   const v = facts.filter(f => f.verified).length;
   KD.$("#summary").innerHTML = `<div class="grid">
     <div class="card"><div class="kpi">${facts.length}<small>claims checked</small></div></div>
