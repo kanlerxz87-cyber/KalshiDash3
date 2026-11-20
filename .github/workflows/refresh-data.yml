@@ -1,0 +1,74 @@
+name: Refresh market snapshot
+
+# Collects the Kalshi DEMO market snapshot that backs the published dashboard.
+# Unauthenticated public reads only - no API keys, no orders, no credentials.
+# Runs on a schedule and can be started by hand from the Actions tab.
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Event pages to scan (200 events each)"
+        required: false
+        default: "8"
+      lookback_days:
+        description: "Days of settled markets to include in the resolution log"
+        required: false
+        default: "7"
+  push:
+    branches: [main]
+    paths:
+      - "tools/**"
+      - ".github/workflows/refresh-data.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    name: Collect demo snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Offline logic tests
+        run: node --test tools/selftest.mjs
+
+      - name: Collect from the demo API
+        continue-on-error: true
+        run: |
+          node tools/collect.mjs \
+            --env demo \
+            --out data/snapshot.json \
+            --pages "${{ github.event.inputs.pages || '8' }}" \
+            --lookback-days "${{ github.event.inputs.lookback_days || '7' }}"
+
+      - name: Validate the JSON
+        run: node -e "const s=require('./data/snapshot.json'); if(!s||s.kind!=='kalshidash3-snapshot') throw new Error('bad snapshot kind'); console.log('events='+s.events.length, 'topics='+s.topics.map(t=>t.id+':'+t.event_count).join(' '), 'resolutions='+s.resolutions.length)"
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "kalshidash3-bot"
+          git config user.email "kalshidash3-bot@users.noreply.github.com"
+          git add data/snapshot.json
+          if git diff --cached --quiet; then
+            echo "no data change"
+          else
+            git commit -m "chore(data): refresh demo snapshot ($(date -u +%Y-%m-%dT%H:%MZ))"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
