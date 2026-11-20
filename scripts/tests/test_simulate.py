@@ -184,6 +184,39 @@ class SimulateTest(unittest.TestCase):
         self.assertEqual(self._strat(first, "S1")["filled"], self._strat(second, "S1")["filled"])
         self.assertEqual(second["counts"]["new_signals_this_run"], 0)
 
+    def test_wide_spread_quote_is_not_filled(self):
+        # A 99-cent spread (yes bid 0.01, yes ask 1.00) is not a tradable price.
+        # S2 fades an up-swing: it buys NO at 1 - 0.01 = 0.99, which passes the price check and hits the spread rule.
+        self._write([self._alert("up")], {"KXAAAGASM-X-1": self._obs(0.01, 1.00)})
+        doc = self._run()
+        s2 = self._strat(doc, "S2")
+        self.assertEqual(s2["filled"], 0)
+        self.assertEqual(s2["not_filled_wide_spread"], 1)
+        # S1 buys YES at 1.00, which is outside 0.01-0.99 and is counted as a bad price, not a spread.
+        s1 = self._strat(doc, "S1")
+        self.assertEqual(s1["not_filled_bad_price"], 1)
+        self.assertEqual(s1["not_filled_wide_spread"], 0)
+
+    def test_open_position_with_wide_entry_quote_is_voided_not_settled(self):
+        # A position created before the spread rule existed is voided on the next run.
+        self._write([], {}, settled_rows=[{"ticker": "KXAAAGASM-X-1", "result": "no", "settlement_ts": T_NEXT}])
+        legacy = {"id": "S1|legacy|yes", "strategy": "S1", "alert_key": "legacy", "ticker": "KXAAAGASM-X-1",
+                  "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "yes",
+                  "trade_type": "gas | move up | entry mid", "band": "mid", "entry_price": 0.99, "entry_fee": 0.01,
+                  "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
+                  "status": "open", "outcome": None, "settled_at": None, "settled_result": None,
+                  "realized_net": None, "bid_now": None, "unrealized_net": None, "mark_note": None, "source": None}
+        simulate.OUT.write_text(json.dumps({"state": {"processed_alert_ids": [], "open": [legacy], "closed": [],
+                                                      "counters": {}}}))
+        doc = self._run()
+        self.assertEqual(doc["open_positions"], [])
+        voided = [p for p in doc["settled_positions"] if p["id"] == "S1|legacy|yes"]
+        self.assertEqual(len(voided), 1)
+        self.assertEqual(voided[0]["status"], "voided")
+        self.assertIsNone(voided[0]["realized_net"])
+        self.assertEqual(self._strat(doc, "S1")["voided"], 1)
+        self.assertEqual(self._strat(doc, "S1")["settled"], 0)
+
     def test_open_position_is_marked_to_bid_and_fee_is_charged_at_exit(self):
         self._write([self._alert("up")], {"KXAAAGASM-X-1": self._obs(0.49, 0.50)},
                     open_rows=[{"ticker": "KXAAAGASM-X-1", "yes_bid_dollars": 0.60, "no_bid_dollars": 0.38,

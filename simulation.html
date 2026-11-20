@@ -51,7 +51,8 @@
     latest snapshot.</p>
   <div id="openTable"></div>
 
-  <h2>Settled positions</h2>
+  <h2>Settled and voided positions</h2>
+  <p class="small mut">VOID = the entry quote breached the spread rule (see Rules). Voided positions are not counted in results.</p>
   <div id="settledTable"></div>
 
   <h2>Rules and fee model</h2>
@@ -127,6 +128,7 @@ function render(sim, rules) {
       { key: "filled", label: "Filled", num: true },
       { key: "nq", label: "No stored quote", num: true },
       { key: "bp", label: "Entry outside 0.01–0.99", num: true },
+      { key: "ws", label: "Spread above rule", num: true },
       { key: "dup", label: "Skipped: already open", num: true },
     ],
     strat.map((s) => ({
@@ -135,6 +137,7 @@ function render(sim, rules) {
       filled: KD.num(s.filled),
       nq: KD.num(s.not_filled_no_quote || 0),
       bp: KD.num(s.not_filled_bad_price || 0),
+      ws: KD.num(s.not_filled_wide_spread || 0),
       dup: KD.num(s.skipped_duplicate || 0),
     })),
     { empty: "No rules defined." }
@@ -226,10 +229,12 @@ function render(sim, rules) {
       { key: "result", label: "Result" }, { key: "net", label: "Realised net", num: true },
     ],
     (sim.settled_positions || []).map((p) => posRow(p, {
-      result: p.settled_result ? `<span class="badge ${p.settled_result === p.side ? "ok" : "bad"}">${esc(p.settled_result.toUpperCase())}</span>` : '<span class="na">—</span>',
+      result: p.status === "voided"
+        ? `<span class="badge warn" title="${esc(p.mark_note || "")}">VOID</span>`
+        : p.settled_result ? `<span class="badge ${p.settled_result === p.side ? "ok" : "bad"}">${esc(p.settled_result.toUpperCase())}</span>` : '<span class="na">—</span>',
       net: signedMoney(p.realized_net),
     })),
-    { empty: "No settled paper positions yet." }
+    { empty: "No settled or voided paper positions yet." }
   ) + `<p class="small mut">Settlement: <a href="${SETTLE_DOC}">market settlement</a>. Fee: <a href="${FEE_DOC}">fee schedule (PDF)</a>.</p>`;
 
   $("#rules").innerHTML =

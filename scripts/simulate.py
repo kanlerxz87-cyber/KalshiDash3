@@ -112,7 +112,7 @@ def quote_for_signal(sig: dict, hist: dict):
 
 def empty_counters() -> dict:
     return {"signals": 0, "not_filled": 0, "not_filled_no_quote": 0, "not_filled_bad_price": 0,
-            "skipped_duplicate": 0, "filled": 0,
+            "not_filled_wide_spread": 0, "voided": 0, "skipped_duplicate": 0, "filled": 0,
             "settled": 0, "wins": 0, "losses": 0, "realized_net": 0.0}
 
 
@@ -144,6 +144,7 @@ def main() -> int:
     base = markets.get("base_url") or "https://external-api.demo.kalshi.co/trade-api/v2"
 
     strategies = strat["strategies"]
+    max_spread = float(strat["max_quote_spread_dollars"])
     bands = strat["trade_type_bands"]
     contracts = int(strat["contracts_per_signal"])
     alerts = archive.get("alerts", [])
@@ -184,6 +185,10 @@ def main() -> int:
                 bump(counters, st["id"], "not_filled")
                 bump(counters, st["id"], "not_filled_bad_price")
                 continue
+            if yes_bid is not None and yes_ask is not None and (yes_ask - yes_bid) > max_spread + 1e-9:
+                bump(counters, st["id"], "not_filled")
+                bump(counters, st["id"], "not_filled_wide_spread")
+                continue
             dup = any(p["strategy"] == st["id"] and p["ticker"] == sig["ticker"] and p["status"] == "open"
                       for p in positions.values())
             if dup:
@@ -213,9 +218,17 @@ def main() -> int:
             tt.setdefault(tt_key, {"filled": 0, "settled": 0, "wins": 0, "losses": 0, "realized_net": 0.0})
             tt[tt_key]["filled"] += 1
 
-    # 2) Settle or mark every open position.
+    # 2) Void, settle, or mark every open position.
     for pid in list(positions):
         p = positions[pid]
+        if p.get("quote_bid") is not None and p.get("quote_ask") is not None \
+                and (p["quote_ask"] - p["quote_bid"]) > max_spread + 1e-9:
+            # The entry quote breached the spread rule (possible only for fills made before the rule existed).
+            p.update(status="voided", outcome="void", mark_note=f"entry spread above {max_spread:.2f}: not a tradable quote")
+            bump(counters, p["strategy"], "voided")
+            closed.append(p)
+            del positions[pid]
+            continue
         res = settled_rows.get(p["ticker"])
         if res and res["result"] == "scalar":
             p.update(status="settled_scalar", settled_result="scalar", settled_at=res.get("settlement_ts"),
@@ -280,8 +293,10 @@ def main() -> int:
         summaries.append({
             "id": st["id"], "name": st["name"], "side_rule": st["side_rule"],
             "signal_filter": st["signal_filter"], "description": st["description"],
-            "signals": c["signals"], "not_filled": c["not_filled"],
+            "signals": c["signals"], "not_filled": c["not_filled"], "not_filled_wide_spread": c["not_filled_wide_spread"],
+            "voided": c["voided"],
             "not_filled_no_quote": c["not_filled_no_quote"], "not_filled_bad_price": c["not_filled_bad_price"],
+            "not_filled_wide_spread": c["not_filled_wide_spread"], "voided": c["voided"],
             "skipped_duplicate": c["skipped_duplicate"],
             "filled": c["filled"], "open": len(opens), "settled": n, "wins": c["wins"], "losses": c["losses"],
             "hit_rate": round(c["wins"] / n, 4) if n else None,
@@ -325,6 +340,7 @@ def main() -> int:
             "Entry is at the observed ask in the observation at the alert time. No slippage beyond that and no fill-probability model.",
             "A signal is not filled when no bid/ask was stored at the alert time (not_filled_no_quote). The collector stores quotes only while a market is in its open scan, so most expired markets have none. Nothing is filled from last-trade prices.",
             "Fees are the official taker fee. The multipliers were read from the PDF text (see strategies.json multiplier_caveat).",
+            "A quote whose yes ask minus yes bid exceeds max_quote_spread_dollars is not treated as tradable: such a signal is not filled, and an open position with such an entry quote is voided.",
             "Sample sizes are small until settled positions reach min_settled_for_conclusion. No strategy is recommended before that.",
         ],
         "state": {"processed_alert_ids": processed, "open": open_list, "closed": closed_list, "counters": counters},
