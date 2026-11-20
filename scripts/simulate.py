@@ -117,7 +117,9 @@ def empty_counters() -> dict:
 
 
 def bump(counters: dict, key: str, field: str, amount=1):
-    counters.setdefault(key, empty_counters())[field] += amount
+    # Tolerates state written by an earlier version of this script (missing newer counters).
+    dst = counters.setdefault(key, {})
+    dst[field] = dst.get(field, 0) + amount
 
 
 def load_json(path: Path, default):

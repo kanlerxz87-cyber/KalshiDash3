@@ -104,13 +104,13 @@ function render(sim, rules) {
   const strat = sim.strategies || [];
   const totals = strat.reduce(
     (a, s) => ({ signals: a.signals + s.signals, filled: a.filled + s.filled, settled: a.settled + s.settled,
-                 open: a.open + s.open, wins: a.wins + s.wins, losses: a.losses + s.losses }),
-    { signals: 0, filled: 0, settled: 0, open: 0, wins: 0, losses: 0 });
+                 open: a.open + s.open, wins: a.wins + s.wins, losses: a.losses + s.losses, voided: a.voided + (s.voided || 0) }),
+    { signals: 0, filled: 0, settled: 0, open: 0, wins: 0, losses: 0, voided: 0 });
   const s1 = strat.find((s) => s.id === "S1") || { signals: 0, not_filled_no_quote: 0, not_filled_bad_price: 0 };
 
   $("#kpis").innerHTML = [
     kpi("Swing alerts processed", KD.num(sim.counts.signals_processed_total), `${KD.num(sim.counts.new_signals_this_run)} new in the last run`),
-    kpi("Paper fills (all rules)", KD.num(totals.filled), `${KD.num(totals.open)} open · ${KD.num(totals.settled)} settled`),
+    kpi("Paper fills (all rules)", KD.num(totals.filled), `${KD.num(totals.open)} open · ${KD.num(totals.settled)} settled · ${KD.num(totals.voided)} voided`),
     kpi("Settled wins / losses", `${KD.num(totals.wins)} / ${KD.num(totals.losses)}`, `needs ${KD.num(minN)} settled per rule to conclude`),
     kpi("Not filled (rule S1)", KD.num(s1.not_filled || 0), `${KD.num(s1.not_filled_no_quote || 0)} with no stored quote`),
   ].join("");
