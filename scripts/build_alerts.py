@@ -4,7 +4,7 @@
 Input  (no network, no credentials):
   data/live/price_history.json  observations written by scripts/collect.py
   data/live/markets.json        market metadata from GET /markets
-  data/alert_rules.json         thresholds and the (placeholder) high-ROI screen
+  data/alert_rules.json         threshold and the experimental screen (mirrors the dashboard)
 Output:
   data/live/alerts_archive.json append-only archive of every alert ever detected
   data/live/alerts.json         two feeds rendered from the archive: all_events and high_roi
@@ -65,7 +65,6 @@ def main() -> int:
     threshold = float(rules["swing_threshold_dollars"])
     roi = rules["high_roi"]
     by_ticker = {m["ticker"]: m for m in markets.get("open_markets", [])}
-    lo, hi = roi["post_move_price_band_dollars"]
 
     new_count = 0
     for ticker, rec in hist.get("series", {}).items():
@@ -99,16 +98,13 @@ def main() -> int:
                 continue
             known.add(key)
             new_count += 1
-            # High-ROI placeholder screen (see data/alert_rules.json). Decided once, at detection time.
+            # Experimental screen = the dashboard's 'Model watch' filter (data/alert_rules.json). Decided at detection time.
             alert["first_seen_at"] = now
             alert["high_roi"] = bool(
                 m is not None
-                and m.get("status") == roi["require_status"]
+                and m.get("category_basis") == roi["require_category_basis"]
                 and (m.get("volume_24h_fp") or 0) > roi["require_volume_24h_gt"]
-                and lo - EPS <= b <= hi + EPS
-                and abs(delta) + EPS >= roi["min_abs_swing_dollars"]
             )
-            alert["implied_return"] = round((1 - b) / b, 4) if (alert["high_roi"] and b > 0) else None
             archive["alerts"].append(alert)
 
     archive["alerts"].sort(key=lambda r: (r["to_time"], abs(r["delta"])), reverse=True)
@@ -130,7 +126,7 @@ def main() -> int:
         "generated_at": now,
         "snapshot_collected_at": markets.get("collected_at"),
         "threshold_dollars": threshold,
-        "high_roi_status": rules.get("status"),
+        "rules_status": rules.get("status"),
         "high_roi_rule": roi,
         "counts": {"all_events": len(all_feed), "high_roi": len(roi_feed), "archive_total": len(archive["alerts"]), "new_this_run": new_count},
         "all_events": newest_first(all_feed),
@@ -140,7 +136,7 @@ def main() -> int:
             "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
             "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
             "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
-            "The high_roi feed uses a placeholder screen (data/alert_rules.json, status=placeholder); it is not an owner-approved model.",
+            "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
         ],
     }
     (LIVE / "alerts.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")

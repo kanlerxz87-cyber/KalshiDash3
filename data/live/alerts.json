@@ -1,23 +1,17 @@
 {
  "schema": 1,
- "generated_at": "2026-11-20T13:19:22Z",
+ "generated_at": "2026-11-20T13:20:38Z",
  "snapshot_collected_at": "2026-11-20T13:18:28Z",
  "threshold_dollars": 0.1,
- "high_roi_status": "placeholder",
+ "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
-  "description": "PLACEHOLDER. The owner's 'high ROI' model was not supplied. Until it is, this filter uses the rule below, which is a mechanical screen and NOT a prediction or recommendation. Replace this block when the owner's model is available (see Flagged for Review, F-14).",
-  "min_abs_swing_dollars": 0.1,
-  "post_move_price_band_dollars": [
-   0.05,
-   0.5
-  ],
-  "require_status": "active",
-  "require_volume_24h_gt": 0,
-  "implied_return_formula": "(1 - p) / p, where p is the post-move last price. Arithmetic only: the return if a YES contract bought at p settles YES, before fees."
+  "description": "EXPERIMENTAL SCREEN, NOT AN ROI MODEL. Identical to the dashboard's 'Model watch' filter: category_basis == 'seed' (series in the official fee schedule) and volume_24h_fp > 0. The owner's model was not supplied (F-14).",
+  "require_category_basis": "seed",
+  "require_volume_24h_gt": 0
  },
  "counts": {
   "all_events": 4,
-  "high_roi": 2,
+  "high_roi": 0,
   "archive_total": 4,
   "new_this_run": 0
  },
@@ -39,9 +33,8 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": true,
-   "implied_return": 1.2222
+   "first_seen_at": "2026-11-20T13:20:38Z",
+   "high_roi": false
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -60,9 +53,8 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": true,
-   "implied_return": 1.8571
+   "first_seen_at": "2026-11-20T13:20:38Z",
+   "high_roi": false
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -81,9 +73,8 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": false,
-   "implied_return": null
+   "first_seen_at": "2026-11-20T13:20:38Z",
+   "high_roi": false
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -102,60 +93,16 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": false,
-   "implied_return": null
+   "first_seen_at": "2026-11-20T13:20:38Z",
+   "high_roi": false
   }
  ],
- "high_roi": [
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:31:35Z",
-   "to_time": "2026-11-20T11:33:33Z",
-   "from_price": 0.35,
-   "to_price": 0.45,
-   "delta": 0.1,
-   "direction": "up",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": true,
-   "implied_return": 1.2222
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:28:31Z",
-   "to_time": "2026-11-20T11:31:35Z",
-   "from_price": 0.55,
-   "to_price": 0.35,
-   "delta": -0.2,
-   "direction": "down",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:19:22Z",
-   "high_roi": true,
-   "implied_return": 1.8571
-  }
- ],
+ "high_roi": [],
  "disclaimers": [
   "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
   "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
   "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
-  "The high_roi feed uses a placeholder screen (data/alert_rules.json, status=placeholder); it is not an owner-approved model."
+  "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model."
  ]
 }

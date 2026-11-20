@@ -341,9 +341,9 @@
     },
     {
       "id": "F-14",
-      "item": "High-ROI model not supplied: the high-ROI chat uses a placeholder screen",
-      "why": "The brief asks for a chat of events 'our model likes as high ROI', but no model, criteria or weights were provided. Inventing one would be a hallucinated strategy. The alerts page therefore filters with a transparent, mechanical screen (post-move last price $0.05–$0.50, status active, volume_24h > 0, swing >= $0.10) and labels it placeholder. Implied return = (1-p)/p is arithmetic before fees, not a forecast.",
-      "action": "Owner to supply the model or accept/replace the screen in data/alert_rules.json (status field). No change to the page is needed; the feed re-computes on the next collector run.",
+      "item": "High-ROI model not supplied: the dashboard's 'Model watch' feed is an experimental screen, not an ROI model",
+      "why": "The brief asks for events 'our model likes as high ROI', but no model, criteria or weights were provided. The dashboard (PR #16, arena-6d85f8f0) shows an experimental screen: seed-series alerts with positive volume_24h only, ordered by volume. It is labelled 'not an ROI prediction'. This session's archive mirrors that screen exactly (data/alert_rules.json) and computes no return figure.",
+      "action": "Owner to supply the model or confirm the screen. Replace the rule in data/alert_rules.json and the dashboard filter together.",
       "severity": "high",
       "sources": [
         "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -375,7 +375,7 @@
       "id": "F-17",
       "item": "Price history is pruned to open markets, so swings are archived separately; four early alerts were seeded from git history",
       "why": "scripts/collect.py keeps price observations only for markets that are open in scope (it drops the rest on each run). The first alert feed (commit b95bebb) therefore lost a market's history as soon as it closed; a fresh snapshot showed 0 alerts for the same window. To stop alerts disappearing, scripts/build_alerts.py now keeps an append-only archive (data/live/alerts_archive.json). Its first four entries were produced by running the same builder on the observations committed in b95bebb; their first_seen_at value is the seeding time (2026-11-20T13:19Z), not the time the swing was first observed. Their to_time values are the original observation times.",
-      "action": "Owner to decide whether price_history should retain closed markets (collector change, out of this task's scope). The archive is capped at 5,000 alerts (oldest trimmed).",
+      "action": "Dashboard does not read the archive yet (request R-1 on COORDINATION.md). Owner to decide whether price_history should retain closed markets (collector change). The archive is capped at 5,000 alerts (oldest trimmed).",
       "severity": "medium",
       "sources": [
         "https://docs.kalshi.com/api-reference/market/get-markets",
