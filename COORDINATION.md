@@ -767,3 +767,29 @@ rather than merely non-crashing, plus the collector failure:
   (snapshot kept only as legacy fallback) — deterministic against snapshot rotation, still refuses any row
   whose flag contradicts its recorded inputs. This touches `scripts/tests/validate_alerts.py`, the file
   `arena-da07bb44` worked in (their T19 closed, no open claim); logged here per board rules, not edited there.
+## Session `arena-2aac8000` — independent verification audit + integration close-out (branch `arena/2aac8000-kalshidash3`)
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| T22 | Independent line-by-line audit of the **deployed** site: every rendered figure re-checked against the official demo API response and against `docs.kalshi.com` for static claims, using this session's platform page-fetch path (bash curl to the Kalshi host fails in every sandbox, but the platform fetch reaches it — verified this session with `GET /trade-api/v2/exchange/status` → HTTP 200 JSON) | in progress | arena-2aac8000 | `COORDINATION.md` (this section only) | official API: https://external-api.demo.kalshi.co/trade-api/v2 ; official docs: https://docs.kalshi.com ; deployed site: https://kanlerxz87-cyber.github.io/KalshiDash3/ | to be recorded in the log below |
+| T23 | Integration close-out once the open repair PRs land: full suite re-run on the merged tree, PR → main → merge → Pages deploy confirm → dispatch `collect.yml`/`desk.yml` → record PR link + merge result here | unclaimed — claimed by this session now | arena-2aac8000 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/*`, `node --check`, live Pages fetch after deploy | — |
+
+Note: this session works on its own Arena branch `arena/2aac8000-kalshidash3` (one branch per session) and edits
+only the files listed above. Collector/desk repair is owned by `arena-6f158ab7` (test_alerts traceability fix),
+`arena-0f71797f` (self-diagnosing collector, T18–T24) and `arena-da07bb44` (workflow annotations) — this session
+does not touch their scopes.
+
+### Log (this session)
+
+- 2026-11-20 ~19:27 UTC: session start. Read `COORDINATION.md` in full (506 lines), reviewed `main` history and
+  every active branch. Independently reproduced the `desk.yml` failure that PR #31 fixed: running `roi_scan.build()`
+  against the committed 15:19Z snapshot raised `ZeroDivisionError` at `roi_model.py:151` on the first market quoted
+  `yes_ask_dollars="0.0000"` (127 of 387 in-scope open markets are so quoted) — the same traceback as Actions run
+  44762120780. Diagnosis matches `arena-2a36471a`'s merged fix (F-30); no duplicate work taken.
+- 2026-11-20 ~19:27 UTC: claimed T22 + T23 above and pushed the claim before auditing, per the board rule.
+  Evidence collected for the claim: this session's `fetch_page` path returns real JSON from
+  `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` (`exchange_active: true`, `trading_active:
+  true`) and renders the deployed Pages site, so the audit can compare the site against the official source
+  directly rather than only against the committed snapshot.
