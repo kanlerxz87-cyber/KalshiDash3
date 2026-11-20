@@ -144,29 +144,27 @@ def score(market: dict, model: dict, book: dict | None, ctx: dict) -> dict:
         except ValueError:
             ttc_h = None
 
-    # A side is priced only when buying it actually costs something. The demo book pins whole
-    # series at $0.00/$1.00 (measured: 127 of the 387 open in-scope markets in the committed
-    # 2026-11-20T15:19Z snapshot carry yes_ask_dollars "0.0000" or yes_bid_dollars "1.0000"),
-    # and there ROI = (win − cost) / cost is undefined: a ZeroDivisionError in Python and
-    # +Infinity in the browser, which ranked a pinned quote as an infinite edge. The side is
-    # dropped with a stated reason instead, and the market then falls to the "no buyable side"
-    # gate below — so it is reported as unpriced, never as a number.
+    # A quoted level of exactly 0.00 (or a NO-side 1.00, i.e. a YES bid of 0.00) is what
+    # GET /markets returns for a market with no resting order on that side — observed on
+    # 127 of 387 open in-scope markets in the 2026-11-20T15:19Z snapshot, e.g.
+    # KXAAAGASD-26NOV21-3.7300 with yes_bid = yes_ask = last = "0.0000". Paying $0.00 for a
+    # contract cannot happen, so such a side is not buyable: it is skipped here instead of
+    # producing cost = 0 and a ZeroDivisionError that aborted the whole scan. The side is
+    # never silently repriced; when neither side is buyable the market reports
+    # "no buyable side" below, exactly as a market with no quotes does.
+    # Field types per https://docs.kalshi.com/api-reference/market/get-markets
     sides = []
-    if ask is not None:
+    if ask is not None and 0.0 < ask < 1.0:
         fee = taker_fee_unit(ask, mult["taker"])
         cost = ask + fee
-        if cost > 0:
-            sides.append({"side": "YES", "entry": ask, "fee_unit": fee, "cost": cost, "ev": q - cost, "roi": (q - cost) / cost})
-        else:
-            reasons.append("YES ask $0.00: cost zero, so ROI divides by zero — side left unpriced")
-    if bid is not None:
+        sides.append({"side": "YES", "entry": ask, "fee_unit": fee, "cost": cost, "ev": q - cost, "roi": (q - cost) / cost})
+    if bid is not None and 0.0 < (1.0 - bid) < 1.0:
         pno = 1 - bid
         fee = taker_fee_unit(pno, mult["taker"])
         cost = pno + fee
-        if cost > 0:
-            sides.append({"side": "NO", "entry": pno, "fee_unit": fee, "cost": cost, "ev": 1 - q - cost, "roi": (1 - q - cost) / cost})
-        else:
-            reasons.append("NO price $0.00 (YES bid $1.00): cost zero, so ROI divides by zero — side left unpriced")
+        sides.append({"side": "NO", "entry": pno, "fee_unit": fee, "cost": cost, "ev": 1 - q - cost, "roi": (1 - q - cost) / cost})
+    if not sides and (ask is not None or bid is not None):
+        reasons.append("quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced")
     best = sorted(sides, key=lambda s: -s["roi"])[0] if sides else None
 
     fail = []
