@@ -69,13 +69,29 @@ jobs:
         env:
           VALIDATE: ${{ github.event.inputs.validate }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           n="${VALIDATE:-24}"
           case "$n" in ''|*[!0-9]*) n=24 ;; esac
-          python3 scripts/roi_scan.py --validate "$n" --out data/live/roi.json
+          if out=$(python3 scripts/roi_scan.py --validate "$n" --out data/live/roi.json 2>&1); then
+            printf '%s\n' "$out"
+          else
+            printf '%s\n' "$out" | head -12 | while IFS= read -r line; do
+              printf '::error::%s\n' "$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r/%0D/g')"
+            done
+            exit 1
+          fi
 
       - name: Refuse to commit an unsourced or inconsistent scan
-        run: python3 scripts/tests/validate_roi.py
+        run: |
+          set -uo pipefail
+          if out=$(python3 scripts/tests/validate_roi.py 2>&1); then
+            printf '%s\n' "$out"
+          else
+            printf '%s\n' "$out" | head -12 | while IFS= read -r line; do
+              printf '::error::%s\n' "$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r/%0D/g')"
+            done
+            exit 1
+          fi
 
       - name: Commit the scan
         run: |

@@ -187,13 +187,20 @@ function commonAsserts(label, r) {
           + "returns 200 with empty arrays and reads as 'no liquidity': " + (r.state.badBookQuery || "").slice(0, 140));
     const msgs = r.doc.querySelectorAll("#feedAll .msg").length;
     check(msgs >= 1, `a 13c jump between polls must appear in the all-events chat (got ${msgs})`);
+    // The ROI feed must show a qualifying market OR its explanation: a zero-pick scan is
+    // a legitimate state (the screen demands positive net ROI after fees), and the page
+    // renders the `.none` explanation with the closest candidates for exactly that case.
+    // Counting only `.msg` made the DOM step fail whenever the committed scan had no
+    // picks (e.g. data/live/roi.json @ 2026-11-20T19:15:11Z: 0 picks, 212 unscoreable),
+    // which would have broken every desk run on main. Found by session arena-da07bb44 (T19).
     const roiMsgs = r.doc.querySelectorAll("#feedRoi .msg").length;
-    check(roiMsgs >= 1, "the ROI feed must show the qualifying market or its explanation");
+    const roiNone = r.doc.querySelectorAll("#feedRoi .none").length;
+    check(roiMsgs >= 1 || roiNone >= 1, "the ROI feed must show the qualifying market or its explanation");
     const causes = r.doc.querySelectorAll('#feedAll a[href*="gasprices.aaa.com"]').length;
     check(causes >= 1, "the catalyst link must be the URL copied out of the market's own rules text");
     const recorded = r.doc.querySelectorAll('#feedAll a[href*="external-api.demo.kalshi.co"]').length;
     check(recorded >= 1, "every alert must link the official API record it came from");
-    console.log(`  B live mode       ok  (${r.state.calls.length} API calls, ${msgs} chat messages, ${roiMsgs} ROI-feed messages)`);
+    console.log(`  B live mode       ok  (${r.state.calls.length} API calls, ${msgs} chat messages, ${roiMsgs} ROI-feed messages, ${roiNone} explanation)`);
     r.close();
   }
 

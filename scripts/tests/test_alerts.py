@@ -81,8 +81,43 @@ class FeedTests(unittest.TestCase):
             self.assertIn("/markets/", a["market_source"])
 
     def test_alerts_reference_real_tickers(self):
+        """Every alert must reference a real market — but "real" must respect the
+        archive's documented design (T12, request R-1): the archive exists precisely
+        so an alert survives its market leaving the collector's snapshot, and
+        validate_alerts counts those as "archive-only". Requiring the ticker to sit
+        in the CURRENT snapshot contradicted that design and made the scheduled
+        collector fail on main once an hourly market (KXDEMOFUTHOURLY-*) rotated
+        out — runs 44799627492 / 44800299801 / 44800908243; found and fixed by
+        session arena-da07bb44 (T19, COORDINATION.md).
+
+        The invariant now, per alert in all_events:
+          1. it must be an exact archive entry (ticker, from_time, to_time) —
+             nothing may appear in the feed that the detector did not record;
+          2. if its ticker is still in the snapshot, the alert's own market_source
+             must point at that ticker (no misattributed source);
+          3. if its ticker is gone from the snapshot, it is counted as an
+             archive-only survivor — visible, not silently waved through.
+        """
+        archive_path = LIVE / "alerts_archive.json"
+        if not archive_path.exists():
+            self.skipTest("no committed alerts_archive.json to check against")
+        archive_keys = {
+            (a["ticker"], a["from_time"], a["to_time"])
+            for a in json.loads(archive_path.read_text()).get("alerts", [])
+        }
+        archive_only = 0
         for a in self.feed["all_events"]:
-            self.assertIn(a["ticker"], self.tickers)
+            key = (a["ticker"], a["from_time"], a["to_time"])
+            self.assertIn(key, archive_keys,
+                          f"{a.get('ticker')}@{a.get('to_time')} is not an archived detection")
+            if a["ticker"] in self.tickers:
+                self.assertIn(a["ticker"], a["market_source"],
+                              f"{a['ticker']} market_source does not name the market")
+            else:
+                archive_only += 1
+        if archive_only:
+            print(f"note: {archive_only} archive-only alert(s) whose market has left the "
+                  "snapshot — allowed by design (T12), counted by validate_alerts.py")
 
     def test_high_roi_is_subset_of_all_events(self):
         all_keys = {(a["ticker"], a["to_time"]) for a in self.feed["all_events"]}

@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-20T19:15:11Z",
- "runtime_seconds": 16.2,
+ "collected_at": "2026-11-20T19:30:16Z",
+ "runtime_seconds": 25.3,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -63,8 +63,8 @@
    "ask": 0.99,
    "spread": 0.98,
    "depth": 12.0,
-   "vol24": 1490.0,
-   "ttc_hours": 0.7469444444444444,
+   "vol24": 4490.0,
+   "ttc_hours": 0.4955555555555556,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -81,7 +81,7 @@
     "roi": -0.3409495508026537
    },
    "score": -0.3409495508026537,
-   "dollars_traded_estimate": 1232.0,
+   "dollars_traded_estimate": 2469.5,
    "title": "Demo BTC at or above 58337.51 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
@@ -89,9 +89,9 @@
    "event_ticker": "KXDEMOFUTHOURLY-26NOV20H20",
    "status": "active",
    "result": null,
-   "volume_fp": 2240.0,
-   "volume_24h_fp": 1490.0,
-   "open_interest_fp": 60.0,
+   "volume_fp": 4490.0,
+   "volume_24h_fp": 4490.0,
+   "open_interest_fp": 40.0,
    "catalysts": [],
    "book": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
@@ -116,7 +116,7 @@
    "spread": 0.5,
    "depth": 10.0,
    "vol24": 10.0,
-   "ttc_hours": 674.7469444444445,
+   "ttc_hours": 674.4955555555556,
    "momentum": null,
    "series_ticker": "KXGRAMMYNOMROTY",
    "fee_multiplier": {
@@ -171,7 +171,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -217,7 +217,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -263,7 +263,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -309,7 +309,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -355,7 +355,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -401,7 +401,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -447,7 +447,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -493,7 +493,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 92.74694444444444,
+   "ttc_hours": 92.49555555555555,
    "momentum": null,
    "series_ticker": "KXBTCEVENT",
    "fee_multiplier": {
@@ -521,18 +521,18 @@
  ],
  "alerts": [],
  "validation": {
-  "markets_tested": 8,
-  "candles_used": 443,
+  "markets_tested": 17,
+  "candles_used": 944,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 5,
-  "baseline_always_yes_hits": 2,
+  "baseline_always_yes_bets": 8,
+  "baseline_always_yes_hits": 3,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 3,
-   "no side passed the replay gates": 5
+   "candle without a price": 9,
+   "no side passed the replay gates": 8
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -541,7 +541,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.4
+  "baseline_always_yes_hit_rate": 0.375
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",

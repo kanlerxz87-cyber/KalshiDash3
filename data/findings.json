@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-20T19:20:00Z",
-  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added F-31 (order-book query form) and fact F-55.",
+  "generated": "2026-11-20T20:10:00Z",
+  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added F-33 (order-book query form: depth was silently empty); its own divide-by-zero and fixture-time-bomb findings were NOT re-added here because PR #31 (F-30) and PR #34 (F-32) already carry them with merge evidence.",
   "questions": [
     {
       "id": "Q1",
@@ -492,9 +492,9 @@
     },
     {
       "id": "F-16",
-      "item": "Scheduled collector has not run: all recent runs were manual, so the snapshot is stale",
-      "why": "collect.yml declares a '*/20 * * * *' schedule, but the last five runs of the workflow were all workflow_dispatch; none were scheduled. At the time of the check (2026-11-20 13:17 UTC) the newest committed snapshot was collected_at 11:33:33Z, about 1h44m old, so the swing feed cannot show live moves. The site's banner shows this as stale.",
-      "action": "Dispatch the collector manually (done on this branch) and confirm that scheduled runs start on main after merge. Scheduled workflows run only from the default branch, so the schedule can only fire once collect.yml is on main.",
+      "item": "Scheduled collector did not run for most of 2026-11-20; first scheduled event observed at 19:19Z but failed on a now-fixed test",
+      "why": "collect.yml declares a '*/20 * * * *' schedule. Checked at 13:17 UTC, the last five runs were all workflow_dispatch and the newest snapshot (11:33:33Z) was ~1h44m old. UPDATE 2026-11-20 ~19:2x UTC (session arena-da07bb44): run 44800299801 on main is the FIRST observed run triggered by the 'schedule' event (checked with gh run view: 'Triggered via schedule'), i.e. scheduled collection does fire now. That run FAILED at the validation step \u2014 root cause F-31, fixed the same session; the workflows now also surface validator output as check annotations (readable via `gh run view`) because the sandbox cannot download Actions log archives (blocked hosts), so a failure's cause is visible in annotations.",
+      "action": "Manual dispatches keep data fresh (multiple sessions). Scheduled runs are now observed on main; after the F-31 fix merges, scheduled runs are expected green \u2014 session arena-da07bb44 confirmed the identical pipeline green on its branch in run 44801502297 (all steps passed, snapshot 2026-11-20T19:22:42Z committed).",
       "severity": "high",
       "sources": [
         "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
@@ -646,6 +646,30 @@
     },
     {
       "id": "F-31",
+      "item": "test_alerts.py required every archived alert to still sit in the CURRENT snapshot, contradicting the archive's documented persistence design (T12/R-1) \u2014 broke the scheduled collector",
+      "why": "The >= $0.10 alert archive exists precisely so a swing survives its market leaving the collector's snapshot ('archive-only \u2014 market pruned from history' is a first-class state in scripts/tests/validate_alerts.py, and the dashboard renders archive-backed feeds after request R-1). But FeedTests.test_alerts_reference_real_tickers asserted every all_events ticker \u2208 open_markets + settled_markets of the current snapshot. Hourly demo markets (KXDEMOFUTHOURLY-*, e.g. 6 of the 9 archive entries at 2026-11-20T15:19Z) rotate out of the snapshot within hours, so failure was inevitable: CI runs 44799627492 (19:1xZ, workflow_dispatch), 44800299801 (19:19Z, schedule) and 44800908243 (annotated rerun) all failed at exactly that test.",
+      "action": "Fixed by session arena-da07bb44 (T19): the test now requires every feed entry to be an exact archived detection (ticker, from_time, to_time), checks the alert's market_source names its market when the market is still in the snapshot, and counts archive-only survivors instead of failing on them. Synthetic proof recorded: a fabricated row is still refused; the survivor case is accepted and counted; the old assertion fails on exactly the 7 hourly rows. Full collect pipeline verified green in run 44801502297.",
+      "severity": "high",
+      "sources": [
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800299801",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800908243",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44801502297",
+        "https://docs.kalshi.com/api-reference/market/get-markets"
+      ]
+    },
+    {
+      "id": "F-32",
+      "item": "Offline ROI-scan test carried a hard-coded fixture close time (2026-11-20T17:00:00Z) \u2014 a time bomb that started failing all desk.yml runs once real time passed it",
+      "why": "scripts/tests/test_roi_scan_offline.py pinned its open-market fixtures to a fixed close_time; the model's own 'already past close_time' gate then rejected them and 6 assertions failed with zero picks from 17:00Z onward. Found INDEPENDENTLY by two sessions within minutes (arena-2a36471a 19:11:21Z, arena-da07bb44 19:11:25Z); arena-2a36471a's relative-time fix was merged first (PR #31, commit 0639c40) and kept; this session's duplicate was withdrawn during rebase.",
+      "action": "Fixed on main by arena-2a36471a (close times relative to run time). Not a data or model bug: the model behaved exactly as specified; the fixture was wrong. desk.yml confirmed green after the merge (scan committed 2026-11-20T19:15:11Z, see F-30's record).",
+      "severity": "low",
+      "sources": [
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44762120780"
+      ]
+    },
+    {
+      "id": "F-33",
       "item": "Order-book depth was silently missing from every published scan and from the live page: the multi-market query used the wrong parameter form",
       "why": "GET /markets/orderbooks declares `tickers` as a repeated string[] (1-100 elements, 200-char max each), while GET /markets accepts a comma-separated list. Both callers comma-joined the list, and because a ticker the API does not recognise is answered with HTTP 200 + empty yes_dollars/no_dollars arrays rather than an error (documented, and re-measured live on 2026-11-20), the request looked like a success: the published data/live/roi.json reported orderbooks: 0 with no error in the run, every depth gate fell back to 'not applied', and the live page's contracts-at-price ladder had no book to show. The liquidity half of the brief was therefore being answered with an empty object, not with a wrong number - which is worse, because nothing complained.",
       "action": "Fixed by session arena-d243bfa7: scripts/roi_scan.py now sends repeated `tickers=` parameters (urlencode doseq) in chunks of 100 (the documented maximum), keeps only entries whose ticker was actually requested, and publishes orderbook_fetch {requested, returned, unexpected_tickers, failed_chunks} so a silent-empty response is visible in the data. assets/live.js pollBooks() builds the same query with URLSearchParams.append and live.html shows 'book coverage N of M'. scripts/tests/test_roi_scan_snapshot.py asserts the request shape (a comma-joined query now fails the test) and that unrequested tickers are dropped; scripts/tests/test_pages_dom.js asserts the browser never sends the comma form. Both assertions were mutation-checked by re-introducing the old encoding in each implementation and watching the tests fail.",
