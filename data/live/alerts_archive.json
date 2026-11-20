@@ -8,6 +8,37 @@
    "category_id": "crypto",
    "category_basis": "keyword",
    "status": "active",
+   "from_time": "2026-11-20T13:32:25Z",
+   "to_time": "2026-11-20T13:43:49Z",
+   "from_price": 0.55,
+   "to_price": 0.65,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": 5985.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "first_seen_at": "2026-11-20T13:43:56Z",
+   "high_roi": false,
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H14",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z",
+   "cause_attached_at": "2026-11-20T13:43:56Z"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
+   "title": "Demo BTC at or above 61498.92 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
    "from_time": "2026-11-20T13:18:28Z",
    "to_time": "2026-11-20T13:32:25Z",
    "from_price": 0.35,
@@ -16,13 +47,21 @@
    "direction": "up",
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official event reference was collected for this market",
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H14",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
    "first_seen_at": "2026-11-20T13:32:25Z",
    "high_roi": false,
-   "cause_candidates": [],
-   "cause_kind": "none",
-   "cause_attached_at": "2026-11-20T13:38:05Z"
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_attached_at": "2026-11-20T13:43:56Z",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -39,13 +78,21 @@
    "direction": "up",
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official event reference was collected for this market",
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
    "first_seen_at": "2026-11-20T13:20:38Z",
    "high_roi": false,
-   "cause_candidates": [],
-   "cause_kind": "none",
-   "cause_attached_at": "2026-11-20T13:38:05Z"
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_attached_at": "2026-11-20T13:43:56Z",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -62,13 +109,21 @@
    "direction": "down",
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official event reference was collected for this market",
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
    "first_seen_at": "2026-11-20T13:20:38Z",
    "high_roi": false,
-   "cause_candidates": [],
-   "cause_kind": "none",
-   "cause_attached_at": "2026-11-20T13:38:05Z"
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_attached_at": "2026-11-20T13:43:56Z",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -85,13 +140,21 @@
    "direction": "down",
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official event reference was collected for this market",
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
    "first_seen_at": "2026-11-20T13:20:38Z",
    "high_roi": false,
-   "cause_candidates": [],
-   "cause_kind": "none",
-   "cause_attached_at": "2026-11-20T13:38:05Z"
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_attached_at": "2026-11-20T13:43:56Z",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -108,13 +171,21 @@
    "direction": "up",
    "volume_24h_fp": 4485.0,
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official event reference was collected for this market",
+   "cause_link": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12",
+   "cause_status": "unverified: the official settlement source(s) listed for this event are candidates to check, not a confirmed cause - the API publishes no news feed, so nothing links a source to this move",
    "first_seen_at": "2026-11-20T13:20:38Z",
    "high_roi": false,
-   "cause_candidates": [],
-   "cause_kind": "none",
-   "cause_attached_at": "2026-11-20T13:38:05Z"
+   "cause_candidates": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "cause_kind": "official_settlement_source",
+   "cause_attached_at": "2026-11-20T13:43:56Z",
+   "cause_event_title": "Demo hourly BTC price",
+   "cause_public_url": null,
+   "cause_refs_generated_at": "2026-11-20T13:43:56Z"
   }
  ]
 }

@@ -1,0 +1,845 @@
+{
+ "schema": 1,
+ "generated_at": "2026-11-20T13:43:56Z",
+ "snapshot_collected_at": "2026-11-20T13:43:49Z",
+ "environment": "demo",
+ "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
+ "method": "For every event that appears on an in-scope market, GET /events?series_ticker={series} is called on the official Kalshi demo API and the returned fields are stored verbatim: title, sub_title, strike_date, category and settlement_sources. settlement_sources are the official reference websites the contract resolves against (AAA for US gas prices, CF Benchmarks for crypto reference prices, the PGA Tour / ESPN / Fox Sports for golf, news wires for elections and culture). They are the places to look for the reason a price moved; they are NOT an attribution of cause for any particular jump, because the API publishes no news feed. The public Kalshi link is only published when the request for it succeeded.",
+ "sources": {
+  "get_event": "https://docs.kalshi.com/api-reference/events/get-event",
+  "get_events": "https://docs.kalshi.com/api-reference/events/get-events",
+  "demo_env": "https://docs.kalshi.com/getting_started/demo_env"
+ },
+ "counts": {
+  "events_in_scope": 27,
+  "events_fetched": 27,
+  "events_unavailable": 0,
+  "events_with_settlement_sources": 26,
+  "settlement_source_links": 63
+ },
+ "events": [
+  {
+   "event_ticker": "KXAAAGASD-26NOV21",
+   "series_ticker": "KXAAAGASD",
+   "api_category": "Economics",
+   "title": "US gas prices tomorrow",
+   "sub_title": "On Nov 21, 2026",
+   "strike_date": "2026-11-21T04:59:00Z",
+   "last_updated_ts": "2026-11-20T12:08:02.282122Z",
+   "category_ids": [
+    "gas"
+   ],
+   "settlement_sources": [
+    {
+     "name": "AAA",
+     "url": "https://gasprices.aaa.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASD&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXAAAGASD-26NOV21"
+  },
+  {
+   "event_ticker": "KXAAAGASM-26DEC31",
+   "series_ticker": "KXAAAGASM",
+   "api_category": "Economics",
+   "title": "Gas prices in the US in Dec 2026?",
+   "sub_title": "On Dec 31, 2026",
+   "strike_date": "2026-12-31T15:00:00Z",
+   "last_updated_ts": "2026-11-13T02:00:00.974602Z",
+   "category_ids": [
+    "gas"
+   ],
+   "settlement_sources": [
+    {
+     "name": "AAA",
+     "url": "https://gasprices.aaa.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXAAAGASM-26DEC31"
+  },
+  {
+   "event_ticker": "KXAAAGASM-26NOV30",
+   "series_ticker": "KXAAAGASM",
+   "api_category": "Economics",
+   "title": "Gas prices in the US in Nov 2026?",
+   "sub_title": "On Nov 30, 2026",
+   "strike_date": "2026-11-30T15:00:00Z",
+   "last_updated_ts": "2026-11-13T02:00:08.790718Z",
+   "category_ids": [
+    "gas"
+   ],
+   "settlement_sources": [
+    {
+     "name": "AAA",
+     "url": "https://gasprices.aaa.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXAAAGASM-26NOV30"
+  },
+  {
+   "event_ticker": "KXBALLONDOR-27",
+   "series_ticker": "KXBALLONDOR",
+   "api_category": "Sports",
+   "title": "Who will win the Ballon d'Or next year?",
+   "sub_title": "In 2027",
+   "strike_date": null,
+   "last_updated_ts": "2026-10-27T16:23:23.579756Z",
+   "category_ids": [
+    "culture"
+   ],
+   "settlement_sources": [
+    {
+     "name": "France Football",
+     "url": "https://www.francefootball.fr/"
+    },
+    {
+     "name": "MSNBC",
+     "url": "https://www.msnbc.com/"
+    },
+    {
+     "name": "The Wall Street Journal",
+     "url": "https://www.wsj.com/"
+    },
+    {
+     "name": "Semafor",
+     "url": "https://www.semafor.com/"
+    },
+    {
+     "name": "ABC",
+     "url": "https://abcnews.go.com/"
+    },
+    {
+     "name": "The Information",
+     "url": "https://www.theinformation.com/"
+    },
+    {
+     "name": "CBS",
+     "url": "https://www.cbsnews.com/"
+    },
+    {
+     "name": "The Washington Post",
+     "url": "https://www.washingtonpost.com/"
+    },
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "Axios",
+     "url": "https://www.axios.com/"
+    },
+    {
+     "name": "CNN",
+     "url": "https://www.cnn.com/"
+    },
+    {
+     "name": "Reuters",
+     "url": "https://www.reuters.com/"
+    },
+    {
+     "name": "the Associated Press",
+     "url": "https://apnews.com/"
+    },
+    {
+     "name": "Politico",
+     "url": "https://www.politico.com/"
+    },
+    {
+     "name": "The New York Times",
+     "url": "https://www.nytimes.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXBALLONDOR&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXBALLONDOR-27"
+  },
+  {
+   "event_ticker": "KXBTCY-27JAN0100",
+   "series_ticker": "KXBTCY",
+   "api_category": "Crypto",
+   "title": "Bitcoin price at the end of 2026",
+   "sub_title": "On Jan 1, 2027 at 12am EST",
+   "strike_date": "2027-01-01T05:00:00Z",
+   "last_updated_ts": "2026-11-13T01:59:56.512157Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "CF Benchmarks",
+     "url": "https://www.cfbenchmarks.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXBTCY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXBTCY-27JAN0100"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H02",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T01:01:06.924684Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H02"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H03",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T02:01:07.893997Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H03"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H04",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T03:01:50.512698Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H04"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H05",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T04:01:25.746871Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H05"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H06",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T05:01:17.724051Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H06"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H07",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T06:01:14.684291Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H07"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H08",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T07:01:43.748995Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H08"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H09",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T08:00:38.863274Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H09"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H10",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T09:01:53.351536Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H10"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H11",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T10:00:55.151095Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H11"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T11:02:14.973593Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H12"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H13",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T12:03:50.691621Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H13"
+  },
+  {
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "api_category": "Test",
+   "title": "Demo hourly BTC price",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T13:01:51.033193Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Coinbase Exchange",
+     "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXDEMOFUTHOURLY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXDEMOFUTHOURLY-26NOV20H14"
+  },
+  {
+   "event_ticker": "KXELECTIRAN",
+   "series_ticker": "KXELECTIRAN",
+   "api_category": "Elections",
+   "title": "Will Iran hold a presidential election?",
+   "sub_title": "Before the specified date",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-06T17:56:33.017252Z",
+   "category_ids": [
+    "elections"
+   ],
+   "settlement_sources": [
+    {
+     "name": "The New York Times",
+     "url": "https://www.nytimes.com/"
+    },
+    {
+     "name": "the Associated Press",
+     "url": "https://apnews.com/"
+    },
+    {
+     "name": "Reuters",
+     "url": "https://www.reuters.com/"
+    },
+    {
+     "name": "Axios",
+     "url": "https://www.axios.com/"
+    },
+    {
+     "name": "Politico",
+     "url": "https://www.politico.com/"
+    },
+    {
+     "name": "Semafor",
+     "url": "https://www.semafor.com/"
+    },
+    {
+     "name": "The Information",
+     "url": "https://www.theinformation.com/"
+    },
+    {
+     "name": "The Washington Post",
+     "url": "https://www.washingtonpost.com/"
+    },
+    {
+     "name": "The Wall Street Journal",
+     "url": "https://www.wsj.com/"
+    },
+    {
+     "name": "ABC",
+     "url": "https://abcnews.go.com/"
+    },
+    {
+     "name": "CBS",
+     "url": "https://www.cbsnews.com/"
+    },
+    {
+     "name": "CNN",
+     "url": "https://www.cnn.com/"
+    },
+    {
+     "name": "Fox News",
+     "url": "https://www.foxnews.com/"
+    },
+    {
+     "name": "MSNBC",
+     "url": "https://www.msnbc.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXELECTIRAN&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXELECTIRAN"
+  },
+  {
+   "event_ticker": "KXETHY-27JAN0100",
+   "series_ticker": "KXETHY",
+   "api_category": "Crypto",
+   "title": "Ethereum price at the end of 2026",
+   "sub_title": "On Jan 1, 2027 at 12am EST",
+   "strike_date": "2027-01-01T05:00:00Z",
+   "last_updated_ts": "2026-11-13T01:59:56.444845Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "CF Benchmarks",
+     "url": "https://www.cfbenchmarks.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXETHY&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXETHY-27JAN0100"
+  },
+  {
+   "event_ticker": "KXPGARYDER-RC27",
+   "series_ticker": "KXPGARYDER",
+   "api_category": "Sports",
+   "title": "2027 Ryder Cup Winner",
+   "sub_title": "2027 Ryder Cup",
+   "strike_date": null,
+   "last_updated_ts": "2026-08-26T11:52:43.941019Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Fox Sports",
+     "url": "https://www.foxsports.com/"
+    },
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "The Wall Street Journal",
+     "url": "https://www.wsj.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGARYDER&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGARYDER-RC27"
+  },
+  {
+   "event_ticker": "KXPGATOUR-AUCPBCS26",
+   "series_ticker": "KXPGATOUR",
+   "api_category": "Sports",
+   "title": "Austin Championship presented by Compliance Solutions Winner",
+   "sub_title": "2026 Austin Championship presented by Compliance Solutions",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-16T13:23:54.533163Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Fox Sports",
+     "url": "https://www.foxsports.com"
+    },
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "the Governing League",
+     "url": "https://www.pgatour.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-AUCPBCS26"
+  },
+  {
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "api_category": "Sports",
+   "title": "2027 The Masters Champion",
+   "sub_title": "2027 Masters Tournament",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T13:04:50.688912Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "the Governing League",
+     "url": "https://www.pgatour.com/"
+    },
+    {
+     "name": "the Governing Body",
+     "url": "https://www.masters.com/index.html"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-MAST27"
+  },
+  {
+   "event_ticker": "KXPGATOUR-THOC26H24975",
+   "series_ticker": "KXPGATOUR",
+   "api_category": "Sports",
+   "title": "Harrison PR 24975 demo validation fixture",
+   "sub_title": "",
+   "strike_date": null,
+   "last_updated_ts": "2026-09-12T03:26:03.462481Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-THOC26H24975",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-THOC26H24975"
+  },
+  {
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "api_category": "Sports",
+   "title": "The RSM Classic Winner",
+   "sub_title": "2026 The RSM Classic",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-20T02:39:17.305957Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Fox Sports",
+     "url": "https://www.foxsports.com"
+    },
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "the Governing League",
+     "url": "https://www.pgatour.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-THRC26"
+  },
+  {
+   "event_ticker": "KXPGATOUR-WOWTC26",
+   "series_ticker": "KXPGATOUR",
+   "api_category": "Sports",
+   "title": "World Wide Technology Championship Winner",
+   "sub_title": "2026 World Wide Technology Championship",
+   "strike_date": null,
+   "last_updated_ts": "2026-11-04T12:53:30.048951Z",
+   "category_ids": [
+    "golf"
+   ],
+   "settlement_sources": [
+    {
+     "name": "Fox Sports",
+     "url": "https://www.foxsports.com"
+    },
+    {
+     "name": "ESPN",
+     "url": "https://www.espn.com/"
+    },
+    {
+     "name": "the Governing League",
+     "url": "https://www.pgatour.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGATOUR&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXPGATOUR-WOWTC26"
+  },
+  {
+   "event_ticker": "KXSOLE-26NOV2102",
+   "series_ticker": "KXSOLE",
+   "api_category": "Crypto",
+   "title": "SOL price range tomorrow at 2am EST?",
+   "sub_title": "On Nov 21, 2026 at 2am EST",
+   "strike_date": "2026-11-21T07:00:00Z",
+   "last_updated_ts": "2026-11-20T10:38:55.543533Z",
+   "category_ids": [
+    "crypto"
+   ],
+   "settlement_sources": [
+    {
+     "name": "CF Benchmarks",
+     "url": "https://www.cfbenchmarks.com/"
+    }
+   ],
+   "kalshi_public_url": null,
+   "kalshi_public_http_status": 429,
+   "kalshi_public_final_url": null,
+   "kalshi_public_note": "The public Kalshi page for this series was not reachable in this run, so no link is published.",
+   "status": "ok",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXSOLE&limit=200",
+   "event_source": "https://external-api.demo.kalshi.co/trade-api/v2/events/KXSOLE-26NOV2102"
+  }
+ ],
+ "disclaimers": [
+  "Demo environment: market data is mock and may not reflect real markets.",
+  "settlement_sources are copied verbatim from the official API response. Their reachability is not asserted.",
+  "No causal claim is made: the API has no news feed, so a swing's cause stays unverified."
+ ]
+}
