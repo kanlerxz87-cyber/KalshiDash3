@@ -74,6 +74,7 @@
     <h3 id="chartTitle">Price chart — X = time, Y = contract price ($)</h3>
     <p class="small mut" id="chartMeta">Pick a market from the tables below.</p>
     <canvas id="priceChart" height="340" aria-label="Chart of contract price over time"></canvas>
+    <div class="swinglist" id="swings"></div>
     <p class="small mut" id="chartFoot"></p>
     <div id="causeBox"></div>
   </div>
@@ -108,7 +109,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/engine.js"></script>
 <script>
 KD.nav("dashboard.html");
-const state = { snap: null, hist: null, sel: null, cat: "" };
+const state = { snap: null, hist: null, alerts: null, sel: null, cat: "" };
 const live = { obs: new Map(), markers: new Map(), on: false };
 
 const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
@@ -318,6 +319,7 @@ function drawChart() {
       1, 60 and 1440-minute intervals (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>).
       This chart therefore plots <b>one observation per collector run</b> from
       <code>data/live/price_history.json</code>; widen the window or wait for more runs.`;
+    KD.$("#swings").innerHTML = "";
     return;
   }
   const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
@@ -355,6 +357,51 @@ function drawChart() {
   ctx.font = "12px system-ui";
   ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
     Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
+
+  // Swing markers: |Δ last price| >= $0.10 between consecutive observations.
+  // Uses the `last` field (the alert rule) and is independent of the series
+  // selector, so a swing is marked even when the chart plots bid/ask. Event and
+  // market links come from the canonical alert feed (data/live/alerts.json);
+  // the cause is left blank and flagged because Kalshi has no official cause feed.
+  const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
+    .map(o => ({ t: Date.parse(o.t), v: o.last }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+  const swings = [];
+  for (let i = 1; i < obsLast.length; i++) {
+    const delta = obsLast[i].v - obsLast[i - 1].v;
+    if (Math.abs(delta) >= 0.10 - 1e-9) {
+      swings.push({ t: obsLast[i].t, v: obsLast[i].v, prior: obsLast[i - 1].v, delta, mag: Math.abs(delta) });
+    }
+  }
+  if (key === "last") {
+    swings.filter(s => s.t >= t0 && s.t <= t1).forEach(s => {
+      ctx.fillStyle = s.delta > 0 ? "#f0b429" : "#f2695c";
+      ctx.beginPath(); ctx.arc(X(s.t), Y(s.v), 4, 0, 7); ctx.fill();
+      ctx.strokeStyle = css.getPropertyValue("--panel"); ctx.lineWidth = 1.2; ctx.stroke();
+    });
+  }
+  const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
+  const alertFor = (t) => allAlerts.find(
+    a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
+    || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
+  const swingHost = KD.$("#swings");
+  if (!swings.length) {
+    swingHost.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between collected observations for this market. Sharp jumps (≥ $0.10) are marked on the chart when it plots the last price.</p>';
+  } else {
+    swingHost.innerHTML = swings.map(s => {
+      const a = alertFor(s.t);
+      const at = new Date(s.t);
+      const time = at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const dir = s.delta > 0 ? "up" : "down";
+      const deltaTxt = (s.delta > 0 ? "+" : "−") + KD.cents(Math.abs(s.delta));
+      const ev = a && a.event_ticker
+        ? " · " + KD.srcLink(String(a.market_source || a.source || "").replace(/\/markets\/.*$/, "") + "/events/" + a.event_ticker, "event")
+        : "";
+      return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
+        `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
+        `<span>${KD.esc(time)}${ev} <span class="cause">cause blank — flagged</span></span></div>`;
+    }).join("");
+  }
 
   foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
     ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
@@ -398,6 +445,7 @@ async function load() {
   const refresh = Date.now();
   try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
   try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
+  try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { /* swings still render from history */ }
   KD.snapshotBanner(state.snap);
   renderAlerts();
   if (!state.snap) {

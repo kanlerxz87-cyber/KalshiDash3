@@ -57,6 +57,13 @@
       <tr><td>Live prices, volumes, results</td>
           <td>Never hardcoded. Produced by <code>scripts/collect.py</code> and rendered with the query URL and fetch time attached.</td>
           <td>We did not type a single market number into the HTML.</td></tr>
+      <tr><td>Alert rule and ROI model</td>
+          <td>The <b>≥ $0.10</b> swing threshold is the brief's requirement. <code>swing_roi</code> / <code>high_roi</code> is a
+              project-local heuristic, labelled as a model wherever it is shown.</td>
+          <td>We did not present the ROI score as a Kalshi-provided field; Kalshi returns no ROI field (F-15).</td></tr>
+      <tr><td>Cause of a jump</td>
+          <td>Each alert links the official market and event API URLs. The <i>cause</i> is left blank and flagged.</td>
+          <td>Kalshi publishes no official cause feed, so we inferred nothing and invented no news link (F-14).</td></tr>
     </tbody>
   </table></div>
 
@@ -69,6 +76,9 @@
       <tr><td>Provenance present</td><td>Every row carries an https source URL; the snapshot carries a fetch time and a disclaimer block.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
       <tr><td>Book ordering</td><td>Order book price levels must be ascending, matching the documented response shape.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
       <tr><td>No broken links</td><td>Every internal link and asset must resolve before deploy.</td><td><code>scripts/check_site.py</code></td></tr>
+      <tr><td>Swing threshold enforced</td><td>An alert fires only when |Δ last price| ≥ $0.10; the validator rejects any alert below it.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>Alert provenance &amp; blank cause</td><td>Every alert carries an https market URL and a blank, flagged cause.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>Alert engine tests</td><td>16 tests: threshold, both directions, ROI filter, null handling, and the real committed snapshot.</td><td><code>scripts/tests/test_alerts.py</code></td></tr>
     </tbody>
   </table></div>
 

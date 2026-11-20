@@ -452,6 +452,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     (LIVE / "price_history.json").write_text(
         json.dumps({"schema": 1, "note": "Observations accumulated from GET /markets last_price_dollars on each collector run. Seconds resolution is only possible by accumulation because candlesticks support 1/60/1440-minute intervals only.", "series": hist}, indent=1)
     )
+
     print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets)")
     return payload
 
