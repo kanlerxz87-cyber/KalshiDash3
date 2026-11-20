@@ -80,6 +80,15 @@
     S1 additionally needs at least two price observations per market, which only accumulate over successive collector runs.
   </div>
 
+<h2>Automated test loop</h2>
+  <p class="small mut">
+    These four rules are implemented as a deterministic <b>automated paper engine</b> on the
+    <a href="portfolio.html">Portfolio page</a> (section 4), which replays collected price history through each rule with
+    modelled fees and categorised results. That engine is a test loop over demo snapshots — running it does
+    <b>not</b> satisfy the promotion rule above (no resolved-trade backtest, no fee-verified fills), so every row above
+    stays “untested” until the evidence column is met.
+  </p>
+
 <h2>Promotion rule</h2>
   <div class="notice">
     A strategy moves from <span class="badge warn">untested</span> to <span class="badge ok">supported</span> only when:

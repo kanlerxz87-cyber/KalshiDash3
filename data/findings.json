@@ -317,6 +317,18 @@
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
    ]
+  },
+  {
+   "id": "G18",
+   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html \u00a74 \u2014 a deterministic S1\u2013S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy \u00d7 category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
+   "why_it_helps_decisions": "Tests the strategy page's stated rules against collected history with no manual input, and shows real thin-book exit slippage that a live alert trader would face.",
+   "effort": "Done in this session",
+   "risk": "Replay fills only at collected observation timestamps; per-series fee multipliers not applied; demo prices only.",
+   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07\u00d7C\u00d7P\u00d7(1\u2212P)) to the cent.",
+   "status": "implemented",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
   }
  ],
  "flagged": [
@@ -606,6 +618,17 @@
    "sources": [
     "https://docs.kalshi.com/getting_started/market_settlement",
     "https://docs.kalshi.com/getting_started/settlement_bounds"
+   ]
+  },
+  {
+   "id": "F-29",
+   "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
+   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
+   "action": "Fixed during the arena-f068786c integration merge: the README now describes only the canonical tree plus the features shipped by the parallel sessions and this session.",
+   "severity": "low",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/13",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/15"
    ]
   }
  ]

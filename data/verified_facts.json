@@ -431,11 +431,20 @@
    "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
    "verified": true,
    "note": "Not an API field \u2014 recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
+  },
+  {
+   "id": "F-54",
+   "claim": "GET /markets responses include volume_24h_fp (contracts traded in the last 24h), a fixed-point string \u2014 used by the alert model's volume factor",
+   "value": "volume_24h_fp (string, fixed-point, e.g. \"10.00\")",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "checked_on": "2026-11-20",
+   "how": "Read the Get Markets response schema on docs.kalshi.com; the field appears in the documented response body."
   }
  ],
  "counts": {
-  "facts": 58,
-  "verified": 57,
+  "total": 59,
+  "verified": 58,
   "unverified": 1
  }
 }
