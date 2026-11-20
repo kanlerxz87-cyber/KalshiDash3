@@ -1,78 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio Performance — KalshiDash3</title>
-<link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-<div class="header">
-  <div class="header-inner">
-    <a class="site-name" href="index.html">KalshiDash3</a>
-    <span class="tagline">Portfolio &bull; Kalshi demo account &bull; trade results &bull; P&amp;L</span>
-  </div>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio & Trading — Kalshi Demo</title><link rel="stylesheet" href="assets/css/style.css"></head>
+<body><header class="top"><div class="wrap"><nav class="main">
+<a class="brand" href="index.html">Kalshi<span>Dash</span></a>
+<a href="dashboard.html">Dashboard</a><a href="gas.html">Gas</a><a href="elections.html">Elections</a><a href="culture.html">Culture</a><a href="crypto.html">Crypto</a><a href="golf.html">Golf</a><a href="resolved.html">Resolved</a><a href="portfolio.html" class="active">Portfolio</a><a href="suggestions.html">Suggestions</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<main><div class="wrap">
+<h1>Portfolio performance & demo trading</h1>
+<div class="notice"><strong>Demo only.</strong> Paste your own <em>demo</em> API key ID + private key (PEM). It is stored only in this browser's <code>localStorage</code> and never committed to the repo. Demo keys do not work on production and vice versa. Source: <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo env</a> · <a href="https://docs.kalshi.com/getting_started/api_keys.md" target="_blank" rel="noopener">API Keys</a>.</div>
+<h2>Connect demo account</h2>
+<div class="row">
+<div><label>API key ID (demo)</label><input id="keyId" placeholder="your-demo-key-id"></div>
+<div><label>Private key PEM (Ed25519 or RSA)</label><textarea id="keyPem" rows="4" placeholder="-----BEGIN PRIVATE KEY----- …"></textarea></div>
 </div>
-<nav>
-  <div class="nav-inner"></div>
-</nav>
-<main>
-  <section class="section">
-    <h2>Portfolio Performance — Kalshi Demo Account</h2>
-    <p>Tracks trades executed on Kalshi demo events and their performance until the events resolve (resolution: Yes or No). Trade results are analyzed, trades are categorized, and strategies are created based on the type of trade (see <a href="strategies.html">Strategies</a>).</p>
-    <div class="callout warn">
-      <strong>Unverified / template only.</strong> No API keys or demo-account credentials are available to this sandbox, and the Kalshi hosts cannot be reached. No portfolio balances, trade history, fills, or P&L figures have been confirmed from an official Kalshi source. All figures are blank and flagged unverified. Enter demo-account data only through your own Kalshi demo account; this page is a reporting template.
-    </div>
-    <div class="kv" style="max-width:520px;">
-      <div><b>Demo account balance</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Total realized P&amp;L</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Unrealized P&amp;L (open contracts)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Win rate</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Total trades</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Resolved trades (Yes)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Resolved trades (No)</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-      <div><b>Open trades</b> <span class="value-blank">—</span> <span class="badge badge-unverified">unverified</span></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Trade log</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Trade ID</th>
-          <th>Event Ticker</th>
-          <th>Market Ticker</th>
-          <th>Category</th>
-          <th>Side (Yes/No)</th>
-          <th>Entry Price</th>
-          <th>Exit Price</th>
-          <th>Quantity (contracts)</th>
-          <th>P&amp;L</th>
-          <th>Status</th>
-          <th>Trade date</th>
-          <th>Resolution date</th>
-          <th>Resolution (Yes/No)</th>
-          <th>Source</th>
-          <th>Verified</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
-          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
-          <td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td><td class="value-blank">—</td>
-          <td class="source-cell"><a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a></td>
-          <td><span class="badge badge-unverified">unverified</span></td>
-        </tr>
-      </tbody>
-    </table>
-    <p class="small">Each row must carry a source link to an official Kalshi site. Never infer P&L, prices, or quantities; leave blank and mark unverified.</p>
-  </section>
-</main>
-<footer class="footer">
-  KalshiDash3 &middot; <a href="index.html">Home</a> &middot; <a href="strategies.html">Strategies</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a> &middot; Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a>
-</footer>
-<script src="assets/app.js"></script>
-</body>
-</html>
+<div class="row"><div><button id="saveKeyBtn">Save key (browser only)</button> <button class="secondary" id="clearKeyBtn">Remove key</button> <button class="secondary" id="loadBtn">Load portfolio</button></div><div><p class="small muted" id="connStatus">No key stored.</p></div></div>
+<h2>Balance & positions</h2>
+<div id="balanceWrap"><p class="muted">Connect to load.</p></div>
+<div id="positionsWrap"></div>
+<h2>Place a demo trade</h2>
+<div class="row">
+<div><label>Market ticker</label><input id="tradeTicker" placeholder="KXBTC-…"></div>
+<div><label>Side (outcome)</label><select id="tradeSide"><option value="yes">YES</option><option value="no">NO</option></select></div>
+<div><label>Action</label><select id="tradeAction"><option value="buy">Buy</option><option value="sell">Sell</option></select></div>
+<div><label>Count (contracts)</label><input id="tradeCount" type="number" value="1" min="1"></div>
+<div><label>Limit price ($, 0.01–0.99)</label><input id="tradePrice" type="number" step="0.01" value="0.50" min="0.01" max="0.99"></div>
+</div>
+<div class="row"><div><button id="tradeBtn">Place demo order</button></div><div><p class="small muted">Uses <code>POST /portfolio/events/orders</code> with a fresh <code>client_order_id</code>. See <a href="https://docs.kalshi.com/getting_started/quick_start_create_order.md" target="_blank" rel="noopener">Quick Start: Create your first order</a>.</p></div></div>
+<pre id="tradeResult" style="display:none"></pre>
+<h2>Fills — trade analysis by category & strategy</h2>
+<p class="muted small">Fills are categorized by the 5 dashboard categories (series prefix / keywords), by side, and by taker/maker. Settlements join on ticker to compute win rate and realized P&amp;L. Strategy hints are suggestions only — nothing auto-trades.</p>
+<div id="fillsWrap"><p class="muted">Connect to load fills.</p></div>
+<h2>Settlements (resolved positions)</h2>
+<div id="settlementsWrap"><p class="muted">Connect to load.</p></div>
+</div></main>
+<footer><div class="wrap">Portfolio endpoints require a signed demo key. Signing: <a href="https://docs.kalshi.com/getting_started/api_environments" target="_blank" rel="noopener">API Environments</a>.</div></footer>
+<script src="assets/js/kalshi.js"></script><script src="assets/js/portfolio.js"></script>
+</body></html>

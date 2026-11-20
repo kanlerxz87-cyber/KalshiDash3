@@ -1,84 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KalshiDash3 — Kalshi Demo Dashboard</title>
-<link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-<div class="header">
-  <div class="header-inner">
-    <a class="site-name" href="index.html">KalshiDash3</a>
-    <span class="tagline">Kalshi demo event dashboard &bull; gas prices &bull; elections &bull; culture &bull; crypto &bull; golf</span>
-  </div>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kalshi Dashboard — Live Demo Tracker</title><link rel="stylesheet" href="assets/css/style.css"></head>
+<body><header class="top"><div class="wrap"><nav class="main">
+<a class="brand" href="index.html">Kalshi<span>Dash</span></a>
+<a href="dashboard.html">Dashboard</a><a href="gas.html">Gas</a><a href="elections.html">Elections</a><a href="culture.html">Culture</a><a href="crypto.html">Crypto</a><a href="golf.html">Golf</a><a href="resolved.html">Resolved</a><a href="portfolio.html">Portfolio</a><a href="suggestions.html">Suggestions</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<main><div class="wrap">
+<h1>Kalshi live dashboard — highest-dollar events</h1>
+<p class="muted">Tracks live demo markets in <strong>gas prices, elections, culture, crypto, and golf only</strong> until each resolves <strong>yes</strong> or <strong>no</strong>. All numbers are fetched live in your browser from the official demo API — nothing is hardcoded.</p>
+<div class="notice"><strong>Demo warning:</strong> Kalshi states demo prices/behavior “may not be reflective of those in real markets.” Rankings here are illustrative. Source: <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">demo_env</a>.</div>
+<div class="grid">
+<div class="card"><div class="muted small">Demo REST base</div><div class="big" style="font-size:15px;word-break:break-all">https://external-api.demo.kalshi.co/trade-api/v2</div><div class="small muted">Recommended. Also: demo-api.kalshi.co. <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Source</a></div></div>
+<div class="card"><div class="muted small">Exchange status</div><div id="exStatus" class="big" style="font-size:18px">Loading…</div><div class="small muted" id="exStatusSub"></div></div>
+<div class="card"><div class="muted small">Tracked markets</div><div id="trackedCount" class="big">0</div><div class="small muted">Stored in this browser until resolved.</div></div>
+<div class="card"><div class="muted small">Environment</div><div class="big" style="font-size:18px" id="envLabel">Demo</div><div class="small muted"><button class="secondary" id="toggleEnv" style="margin-top:6px">Switch to production (read-only)</button></div></div>
 </div>
-<nav>
-  <div class="nav-inner"></div>
-</nav>
-<main>
-  <section class="hero">
-    <h1>KalshiDash3 — Executive Summary</h1>
-    <p><strong>Purpose.</strong> Collect, organize, and analyze live Kalshi demo trade-api v2 events, focused on five topics: gas prices, elections, culture, crypto, and golf.</p>
-    <p><strong>Surface.</strong> Official recommended demo endpoint: <code>https://external-api.demo.kalshi.co/trade-api/v2</code> (also supported: <code>https://demo-api.kalshi.co/trade-api/v2</code>). WebSocket API: <code>wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2</code> (also: <code>wss://demo-api.kalshi.co/trade-api/ws/v2</code>).</p>
-    <p><strong>Scope.</strong> Track live events until they resolve (resolution: Yes or No); track portfolio performance using the Kalshi demo account; analyze trade results, categorize trades, and build strategies by trade type; view price movements on a time graph (X axis = time in seconds/minutes/hours; Y axis = current contract price); view current liquidity (contracts available at a given price).</p>
-    <p><strong>Decision support.</strong> A suggestions section lets someone review suggestions and choose the best path before implementing changes. A questions/information/answers section lists what must be addressed before any decision can be reasonably made, plus suggestions to discover missing information.</p>
-    <div class="callout warn">
-      <strong>Verification status.</strong> This sandbox cannot reach the Kalshi hosts (outbound network is limited to GitHub hosts and package registries). Every value on this site is therefore <strong>blank and flagged unverified</strong> until confirmed against an official Kalshi source. No values are inferred or filled in. See <a href="flagged-for-review.html">Flagged for Review</a> for the full list.
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Track by category</h2>
-    <p>Each category page lists Kalshi events/markets in a simple table with source links to the official Kalshi trade API v2. Values are blank/unverified until confirmed from an official source.</p>
-    <div class="grid-cards">
-      <a class="card" href="gas-prices.html">
-        <div class="card-title">Gas Prices</div>
-        <div class="card-desc">Energy / natural gas price events on the Kalshi demo exchange.</div>
-      </a>
-      <a class="card" href="elections.html">
-        <div class="card-title">Elections</div>
-        <div class="card-desc">Election events (resolution: Yes or No) until resolved.</div>
-      </a>
-      <a class="card" href="culture.html">
-        <div class="card-title">Culture</div>
-        <div class="card-desc">Culture and entertainment events.</div>
-      </a>
-      <a class="card" href="crypto.html">
-        <div class="card-title">Crypto</div>
-        <div class="card-desc">Cryptocurrency price and market events.</div>
-      </a>
-      <a class="card" href="golf.html">
-        <div class="card-title">Golf</div>
-        <div class="card-desc">Golf tournament and player events.</div>
-      </a>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Dashboard features</h2>
-    <ul>
-      <li><a href="graph.html">Price movement graph</a> — current contract price (Y axis) over time (X axis), selectable seconds/minutes/hours window, with current liquidity (contracts available at a given price).</li>
-      <li><a href="portfolio.html">Portfolio performance</a> — Kalshi demo account tracking, trade results analysis, categorization.</li>
-      <li><a href="strategies.html">Trade categorization &amp; strategies</a> — strategies based on type of trade.</li>
-      <li><a href="suggestions.html">Suggestions</a> — review suggestions and choose the best path before implementing changes.</li>
-      <li><a href="questions.html">Questions / information / answers</a> — preconditions for decisions and missing-information discovery.</li>
-    </ul>
-  </section>
-
-  <section class="section">
-    <h2>How to read this site</h2>
-    <ul>
-      <li><strong>—</strong> means the value could not be confirmed from an official source and is intentionally left blank.</li>
-      <li><span class="badge badge-unverified">unverified</span> means the row is flagged for review against an official Kalshi source.</li>
-      <li>Every table row carries a source link to an official Kalshi site for manual review.</li>
-      <li>There is no manual input required to use the site; all entries, findings, and analysis are pre-populated as verified/unverified.</li>
-    </ul>
-  </section>
-</main>
-<footer class="footer">
-  KalshiDash3 &middot; Source links: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">external-api.demo.kalshi.co/trade-api/v2</a> &middot; <a href="https://demo-api.kalshi.co/trade-api/v2" target="_blank" rel="noopener">demo-api.kalshi.co/trade-api/v2</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a>
-</footer>
-<script src="assets/app.js"></script>
-</body>
-</html>
+<h2>Top 5 by dollar volume (all 5 categories)</h2>
+<p class="muted small">Ranked by lifetime volume (contracts × $1 notional), tie-break open interest. Click a row to open it in the dashboard.</p>
+<div id="topTable"><p class="muted">Loading live markets…</p></div>
+<h2>How to use</h2>
+<ol>
+<li><a href="dashboard.html">Dashboard</a> — live ranking, price graph (seconds/minutes/hours), liquidity ladder, track-until-resolved.</li>
+<li>Category pages — <a href="gas.html">Gas</a> · <a href="elections.html">Elections</a> · <a href="culture.html">Culture</a> · <a href="crypto.html">Crypto</a> · <a href="golf.html">Golf</a>.</li>
+<li><a href="resolved.html">Resolved</a> — markets that finished yes/no.</li>
+<li><a href="portfolio.html">Portfolio</a> — connect your own demo key (browser-only) to see balance/positions/fills, analyze trades, and place demo orders.</li>
+<li><a href="suggestions.html">Suggestions</a> — improvement proposals + open questions. <a href="sources.html">Sources</a> — every claim linked; unverified items flagged.</li>
+</ol>
+<h2>Executive summary</h2>
+<p>See <a href="EXECUTIVE_SUMMARY.md">EXECUTIVE_SUMMARY.md</a> in the repo and the <a href="suggestions.html">Suggestions</a> page for the full summary, trade-strategy notes, and the Questions/Info/Answers list.</p>
+</div></main>
+<footer><div class="wrap">KalshiDash3 · Demo data via official Kalshi API · Not affiliated with Kalshi · <a href="https://docs.kalshi.com/" target="_blank" rel="noopener">docs.kalshi.com</a></div></footer>
+<script src="assets/js/kalshi.js"></script>
+<script>
+(function(){
+  var K=window.Kalshi;
+  function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function fmt$(n){return "$"+Number(n||0).toLocaleString(undefined,{maximumFractionDigits:0});}
+  function fmtP(p){return p==null?"—":"$"+Number(p).toFixed(3);}
+  function renderTop(markets){
+    var ranked=K.rankByDollars(markets).slice(0,5);
+    if(!ranked.length){ document.getElementById("topTable").innerHTML="<p class='muted'>No open markets found in the 5 categories right now.</p>"; return; }
+    var h="<table><thead><tr><th>#</th><th>Market</th><th>Category</th><th>Yes bid/ask</th><th>Volume ($)</th><th>Open int.</th><th>Close</th><th>Source</th></tr></thead><tbody>";
+    ranked.forEach(function(m,i){
+      var cat=K.classify(m)||"—";
+      h+="<tr class='clickable' data-ticker='"+esc(m.ticker)+"'><td>"+(i+1)+"</td><td><strong>"+esc(m.title||m.ticker)+"</strong><br><span class='muted small'>"+esc(m.ticker)+"</span></td><td>"+esc(cat)+"</td><td>"+fmtP(m.yes_bid)+" / "+fmtP(m.yes_ask)+"</td><td>"+fmt$(m.volume)+"</td><td>"+Number(m.open_interest||0).toLocaleString()+"</td><td class='small'>"+esc(m.close_time||"")+"</td><td class='small'><a href='"+K.marketUrl(m.ticker)+"' target='_blank' rel='noopener'>Kalshi</a> · <a href='"+K.apiUrl("/markets/"+encodeURIComponent(m.ticker))+"' target='_blank' rel='noopener'>API</a></td></tr>";
+    });
+    h+="</tbody></table>";
+    document.getElementById("topTable").innerHTML=h;
+    Array.prototype.forEach.call(document.querySelectorAll("#topTable tr[data-ticker]"),function(tr){
+      tr.addEventListener("click",function(){ location.href="dashboard.html?ticker="+encodeURIComponent(tr.getAttribute("data-ticker")); });
+    });
+  }
+  K.getExchangeStatus().then(function(s){
+    var el=document.getElementById("exStatus");
+    var txt=JSON.stringify(s).slice(0,200);
+    el.textContent="Connected";
+    document.getElementById("exStatusSub").textContent=txt;
+  }).catch(function(e){ document.getElementById("exStatus").textContent="API unreachable"; document.getElementById("exStatusSub").textContent=String(e); });
+  document.getElementById("trackedCount").textContent=Object.keys(K.loadTracked()).length;
+  document.getElementById("envLabel").textContent=(K.base()===K.DEMO_BASE?"Demo":"Production");
+  document.getElementById("toggleEnv").addEventListener("click",function(){
+    K.setBase(K.base()===K.DEMO_BASE?K.PROD_BASE:K.DEMO_BASE); location.reload();
+  });
+  K.fetchAllOpenMarkets(8).then(function(all){
+    var filtered=all.filter(function(m){return K.classify(m);});
+    renderTop(filtered);
+    document.getElementById("trackedCount").textContent=Object.keys(K.loadTracked()).length;
+  }).catch(function(e){
+    document.getElementById("topTable").innerHTML="<div class='notice'>Could not load live markets: "+esc(String(e))+". Check your connection and reload. API base: <code>"+esc(K.base())+"</code></div>";
+  });
+})();
+</script></body></html>

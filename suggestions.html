@@ -1,95 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Suggestions — KalshiDash3</title>
-<link rel="stylesheet" href="assets/style.css">
-</head>
-<body>
-<div class="header">
-  <div class="header-inner">
-    <a class="site-name" href="index.html">KalshiDash3</a>
-    <span class="tagline">Review suggestions &bull; choose the best path before implementing</span>
-  </div>
-</div>
-<nav>
-  <div class="nav-inner"></div>
-</nav>
-<main>
-  <section class="section">
-    <h2>Suggestions — Site &amp; Decision-Making Improvements</h2>
-    <p>This section lists suggestions for improving the site and for improving decision making. Review each suggestion and choose the best path before implementing any changes. None of these are implemented until reviewed.</p>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Suggestion</th>
-          <th>Area</th>
-          <th>Expected benefit</th>
-          <th>Review status</th>
-          <th>Decision</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>Connect a Kalshi demo API key and back the portfolio table with real trade fills from the demo trade API v2.</td>
-          <td>Portfolio / live data</td>
-          <td>Real P&amp;L and trade results instead of blank unverified placeholders.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Enable the price graph to stream live market ticks via the Kalshi WebSocket API (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2) so price movements update in real time.</td>
-          <td>Price graph</td>
-          <td>Live price movement tracking on the graph as events progress toward resolution.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Add a liquidity depth table showing how many contracts are available at each price level (bid/ask ladder) per market.</td>
-          <td>Price graph / liquidity</td>
-          <td>See current liquidity amounts and contracts available at a given price before trading.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>Populate category tables from the official Kalshi events endpoint once reachable; mark every row verified/unverified per the verification rules.</td>
-          <td>Category tables</td>
-          <td>Complete, source-linked inventory of tracked events by category.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-        <tr>
-          <td>5</td>
-          <td>Add per-trade notes and outcome coding (why the trade was taken, what happened, lessons) to improve future decisions.</td>
-          <td>Portfolio / analysis</td>
-          <td>Better trade-result analysis and strategy refinement by trade type.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td>Add email/alert notification when a tracked event resolves (Yes or No).</td>
-          <td>Event tracking</td>
-          <td>Know immediately when live events have resolved and how.</td>
-          <td>Proposed — not reviewed</td>
-          <td>Pending review</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="callout">
-      <strong>Review process.</strong> For each suggestion: assess benefit, effort, and risk; choose the best path; record the decision in the "Decision" column; implement only after review. Record outcomes in <a href="flagged-for-review.html">Flagged for Review</a> if any irregularity is found.
-    </div>
-  </section>
-</main>
-<footer class="footer">
-  KalshiDash3 &middot; <a href="index.html">Home</a> &middot; <a href="questions.html">Questions / Info / Answers</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a> &middot; Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a>
-</footer>
-<script src="assets/app.js"></script>
-</body>
-</html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Suggestions & Questions — Kalshi Dashboard</title><link rel="stylesheet" href="assets/css/style.css"></head>
+<body><header class="top"><div class="wrap"><nav class="main">
+<a class="brand" href="index.html">Kalshi<span>Dash</span></a>
+<a href="dashboard.html">Dashboard</a><a href="gas.html">Gas</a><a href="elections.html">Elections</a><a href="culture.html">Culture</a><a href="crypto.html">Crypto</a><a href="golf.html">Golf</a><a href="resolved.html">Resolved</a><a href="portfolio.html">Portfolio</a><a href="suggestions.html" class="active">Suggestions</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<main><div class="wrap">
+<h1>Suggestions — review before implementing</h1>
+<p class="muted">Nothing below is implemented yet. Pick the best path, then implement. Each suggestion lists expected benefit, risk, and what information is still missing.</p>
+<h2>Suggested improvements (decision-making)</h2>
+<table><thead><tr><th>#</th><th>Suggestion</th><th>Benefit</th><th>Risk / cost</th><th>Status</th></tr></thead><tbody>
+<tr><td>S1</td><td>Add WebSocket live streaming (ticker + orderbook_delta) instead of 30s polling</td><td>Second-level price moves; seconds graph becomes real</td><td>Needs signed key; connection management</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S2</td><td>Show spread + depth-weighted mid and liquidity score per market</td><td>Filters thin books before trading</td><td>Needs orderbook fetch per market (rate limits)</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S3</td><td>Backtest strategies on candlesticks + trades before demo execution</td><td>Evidence before risking demo balance</td><td>Needs historical data + fee model</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S4</td><td>Per-category win-rate / P&amp;L dashboard from fills + settlements</td><td>Reveals which of the 5 categories actually make money</td><td>Needs enough settled trades (currently none)</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S5</td><td>Alerts: price moved &gt; X¢ in Y minutes; resolution imminent</td><td>Catch fast moves without watching</td><td>Needs background worker; browser-only is fragile</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S6</td><td>Server-side collector (Python) persisting snapshots to CSV/JSON</td><td>Durable history beyond browser storage</td><td>Needs hosting + key management</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S7</td><td>Risk limits: max $ per market/category, max concurrent positions</td><td>Prevents concentrated demo losses</td><td>Needs policy decision (see Q7)</td><td><span class="pill warn">Proposed</span></td></tr>
+<tr><td>S8</td><td>Production read-only mode with explicit banner (already toggleable)</td><td>Compare demo vs real liquidity</td><td>Demo ≠ production prices; confusion risk</td><td><span class="pill">Partially built</span></td></tr>
+</tbody></table>
+<h2>Questions / Information / Answers — needed before reasonable decisions</h2>
+<table><thead><tr><th>#</th><th>Question</th><th>What we have</th><th>What is missing</th><th>How to discover it</th><th>Answer</th></tr></thead><tbody>
+<tr><td>Q1</td><td>Demo API key ID + private key?</td><td>Code supports browser-only key entry</td><td>Actual demo credentials</td><td>Create demo account at demo.kalshi.co, generate key</td><td>— (awaiting user)</td></tr>
+<tr><td>Q2</td><td>Which demo markets to trade first?</td><td>Ranking by dollar volume</td><td>Strategy + risk appetite</td><td>Pick S3 backtest first; see S7 limits</td><td>—</td></tr>
+<tr><td>Q3</td><td>What is “highest dollar amount” exactly?</td><td>Volume × $1 notional (heuristic)</td><td>Kalshi publishes no single “dollar volume” field</td><td>Confirm with user: volume vs open interest vs liquidity</td><td>Using volume; flagged</td></tr>
+<tr><td>Q4</td><td>Should trading be manual, semi-auto, or auto?</td><td>Manual form + Python script</td><td>Automation policy</td><td>Decide after S3 backtest</td><td>—</td></tr>
+<tr><td>Q5</td><td>Exact series tickers per category?</td><td>Prefixes from fee schedule (gas/golf) + keywords</td><td>Authoritative category→series map</td><td>Call GET /series and inspect categories</td><td>Prefixes in kalshi.js</td></tr>
+<tr><td>Q6</td><td>Are demo prices representative?</td><td>Official docs say they may not be</td><td>Production comparison</td><td>Toggle production read-only and compare</td><td>No — illustrative only</td></tr>
+<tr><td>Q7</td><td>Risk limits ($/market, $/category, max positions)?</td><td>None enforced yet</td><td>User policy</td><td>Set before any auto-trading</td><td>—</td></tr>
+<tr><td>Q8</td><td>Fee model for P&amp;L?</td><td>Settlement free for yes/no; trading fees per fill</td><td>Per-market fee rates</td><td>GET /margin/fee_tiers or fee schedule</td><td>See Sources</td></tr>
+<tr><td>Q9</td><td>Data retention for fills/settlements?</td><td>Undocumented how far back</td><td>Kalshi retention policy</td><td>Test with old demo account; assume gaps</td><td>Flagged</td></tr>
+<tr><td>Q10</td><td>Hosting for collector (S6)?</td><td>Static GitHub Pages only</td><td>Server + secrets store</td><td>Decide after Q4</td><td>—</td></tr>
+</tbody></table>
+<p class="small muted">Answers marked “—” are genuinely unknown; do not treat suggestions as decisions until Q1–Q4 and Q7 are answered.</p>
+</div></main>
+<footer><div class="wrap">Review suggestions here, then request changes.</div></footer>
+</body></html>
