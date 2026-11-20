@@ -38,10 +38,28 @@ jobs:
         run: python3 scripts/simulate.py
       - name: Validate the snapshot, the alert archive/feeds, and the simulation
         run: |
-          python3 scripts/tests/validate_live.py
-          python3 scripts/tests/validate_alerts.py
-          python3 scripts/tests/test_alerts.py
-          python3 scripts/tests/test_simulate.py
+          set -uo pipefail
+          status=0
+          annotate() {  # surface validator diagnostics as check annotations, readable via `gh run view`
+            printf '%s\n' "$1" | head -12 | while IFS= read -r line; do
+              printf '::error::%s\n' "$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r/%0D/g')"
+            done
+          }
+          run_v() {
+            name="$1"; shift
+            if out=$("$@" 2>&1); then
+              printf '%s\n' "$out"
+            else
+              status=1
+              printf '::error::%s FAILED\n' "$name"
+              annotate "$out"
+            fi
+          }
+          run_v validate_live   python3 scripts/tests/validate_live.py
+          run_v validate_alerts python3 scripts/tests/validate_alerts.py
+          run_v test_alerts     python3 scripts/tests/test_alerts.py
+          run_v test_simulate   python3 scripts/tests/test_simulate.py
+          exit $status
       - name: Run alert-feed tests
         run: python3 scripts/tests/test_alerts.py
       - name: Commit snapshot
