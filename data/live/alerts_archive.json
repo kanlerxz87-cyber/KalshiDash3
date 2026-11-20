@@ -2,6 +2,26 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
+   "title": "Demo BTC at or above 61498.92 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-20T13:18:28Z",
+   "to_time": "2026-11-20T13:32:25Z",
+   "from_price": 0.35,
+   "to_price": 0.55,
+   "delta": 0.2,
+   "direction": "up",
+   "volume_24h_fp": 4485.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-20T13:32:25Z",
+   "high_roi": false
+  },
+  {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
    "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
    "title": "Demo BTC at or above 61985.83 USD",
