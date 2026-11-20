@@ -232,8 +232,10 @@ const KDA = (() => {
    * ------------------------------------------------------------------ */
   const TRADE_FEE_RATE = 0.07; // general taker fee: 0.07 × C × P × (1−P) — official fee schedule
 
+  // Rounded up to the cent exactly like the manual paper ledger on portfolio.html
+  // (`ceil(0.07 × C × P × (1−P) × 100) / 100`), so both ledgers use the same math.
   function fee(contracts, price) {
-    return TRADE_FEE_RATE * contracts * price * (1 - price);
+    return Math.ceil(TRADE_FEE_RATE * contracts * price * (1 - price) * 100) / 100;
   }
 
   function replayStrategies({ markets, hist, liq, stake = 100, topPerCat = 5, strategies = ["S1", "S2", "S3", "S4"] }) {
@@ -251,9 +253,8 @@ const KDA = (() => {
     for (const cat of Object.keys(byCat)) {
       const rows = byCat[cat]
         .filter((m) => Number(m.dollars_traded_estimate) > 0)
-        .sort((a, b) => b.dollars_traded_estimate - a.dollars_traded_estimate)
-        .slice(0, topPerCat);
-      universe.push(...rows);
+        .sort((a, b) => b.dollars_traded_estimate - a.dollars_traded_estimate);
+      universe.push(...(Number.isFinite(topPerCat) ? rows.slice(0, topPerCat) : rows));
     }
 
     // Global event list: every observation of every universe market, in time order.
@@ -293,9 +294,10 @@ const KDA = (() => {
         if (id === "S4") continue; // resolved at the end, below
         const key = id + ":" + ev.ticker;
         const p = pos.get(key);
-        const prev = p ? p.lastObs : null;
-        // ---- S1-family entry ----
-        if (!p && prev) {
+        const hasPosition = !!(p && p.contracts);
+        const prev = hasPosition ? null : (p ? p.lastObs : null);
+        // ---- S1-family entry (fires on a CONSECUTIVE observation pair) ----
+        if (prev) {
           const move = ev.last - prev.price;
           const volGrew = Number.isFinite(ev.vol) && Number.isFinite(prev.vol) && ev.vol > prev.vol;
           const entryMove = Math.abs(move) >= 0.05 && move > 0 && volGrew; // YES-only momentum on up-moves
@@ -338,11 +340,15 @@ const KDA = (() => {
           }
         }
         if (!p) pos.set(key, { lastObs: { price: ev.last, vol: ev.vol } });
+        else if (!p.contracts) p.lastObs = { price: ev.last, vol: ev.vol }; // advance the consecutive-pair reference
       }
       curve.push({ t: ev.t, equity: cash + Array.from(pos.values()).reduce((s, p) => s + (p.contracts ? mark(p, ev.last) : 0), 0) });
     }
 
     // ---- S4: one pass at each market's final observation ----
+    // S4 positions are OPEN positions awaiting settlement: they are recorded only in
+    // `open` (never in the closed-trade list) and resolve when a run first sees the
+    // market's literal API `result`.
     if (strategies.includes("S4")) {
       const lastByTicker = new Map();
       for (const ev of events) lastByTicker.set(ev.ticker, ev);
@@ -360,14 +366,11 @@ const KDA = (() => {
         const f = fee(contracts, fill);
         cash -= contracts * fill + f;
         tradeId++;
-        trades.push({
-          id: tradeId, strategy: "S4", ticker, title: ev.row.title, category_id: ev.row.category_id,
-          side, entry_ts: ev.t, exit_ts: null, entry_fill: fill, exit_fill: null,
-          contracts, fees: f, pnl: null, status: "open",
+        pos.set("S4:" + ticker, {
+          id: tradeId, strategy: "S4", ticker, row: ev.row, side, entry_ts: ev.t, entry_fill: fill,
+          contracts, entry_fee: f, lastObs: { price: ev.last },
           note: "held until the market settles — payoff $1 per winning contract, no settlement fee",
-          source: ev.row.source,
         });
-        pos.set("S4:" + ticker, { id: tradeId, strategy: "S4", ticker, row: ev.row, side, entry_fill: fill, contracts, entry_fee: f, lastObs: { price: ev.last } });
         curve.push({ t: ev.t, equity: cash + Array.from(pos.values()).reduce((s, p) => s + (p.contracts ? mark(p, ev.last) : 0), 0) });
       }
     }
@@ -386,7 +389,7 @@ const KDA = (() => {
         side: p.side, entry_ts: p.entry_ts, entry_fill: p.entry_fill, contracts: p.contracts, fees: p.entry_fee,
         mark_price: p.side === "yes" ? last : Math.round((1 - last) * 1e6) / 1e6,
         unrealized: value - p.contracts * p.entry_fill - p.entry_fee,
-        status: "open", source: p.row.source,
+        status: "open", note: p.note || null, source: p.row.source,
       });
     }
 
@@ -407,8 +410,8 @@ const KDA = (() => {
       return {
         strategy: id, name: STRATS[id].name, trades: t.length + o.length, closed: t.length, open: o.length,
         wins, win_rate: t.length ? wins / t.length : null,
-        realized_pnl: realized, unrealized_pnl: unreal, fees: t.reduce((s, x) => s + x.fees, 0) + o.reduce((s, x) => s + (x.fees || 0), 0),
-        max_drawdown: maxDD,
+        realized_pnl: realized, unrealized_pnl: unreal,
+        fees: t.reduce((s, x) => s + x.fees, 0) + o.reduce((s, x) => s + (x.fees || 0), 0),
       };
     }
     return {
@@ -418,6 +421,7 @@ const KDA = (() => {
       open,
       stats: strategies.map(statsFor),
       equity: curve,
+      max_drawdown_portfolio: maxDD, // portfolio-level: all strategies' combined equity curve
       ending_cash: cash,
       STRATS,
       stake,
