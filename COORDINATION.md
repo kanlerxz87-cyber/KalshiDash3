@@ -393,3 +393,13 @@ resolving by the one-canonical-page rule:
   timestamps, deterministic replay, S4 never double-counted), dashboard (10/10), data-driven pages (13/13),
   `simulation.html` smoke (renders, no page errors).
 - PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/24 (merge result recorded below after merge).
+
+### Merge result (recorded after PR #24)
+
+- **PR #24 merged into `main` at 2026-11-20T14:02:50Z as commit `4edd4f0`** (merge of `0dede66`, which contains
+  this session's work plus the canonical alert/automation layer from `main` 88307e1).
+- Integration verification on the merged tree: `check_site.py` (18 pages), `validate_live.py` (506 open markets),
+  `validate_alerts.py` (8 archived alerts: 4 re-derived, 4 archive-only), `test_alerts.py`, `test_simulate.py`
+  (16 tests), `engine.test.js`, and jsdom suites for dashboard (10), portfolio §4 (17), data pages (15) — all pass.
+- One integration defect found and fixed in the merged tree: `suggestions.html` only bucketed the exact status
+  `implemented`, so the other sessions' `shipped` statuses (G11–G13) were invisible; bucketing now accepts both.
