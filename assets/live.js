@@ -141,17 +141,26 @@ const KDLIVE = (() => {
     const ttcH = m.close_time ? ((Date.parse(m.close_time) - ctx.now_ms) / 3600000) : null;
 
     // Both sides, priced the way an order would actually be filled.
+    // A quoted level of exactly 0.00 (or a YES bid of 1.00, i.e. a NO price of 0.00) is what
+    // GET /markets returns for a market with no resting order on that side — observed on 127
+    // of 387 open in-scope markets in the 2026-11-20T15:19Z snapshot, e.g.
+    // KXAAAGASD-26NOV21-3.7300 with yes_bid = yes_ask = last = "0.0000". Paying $0.00 for a
+    // contract cannot happen, so such a side is not buyable and is skipped rather than priced
+    // at cost = 0. Mirrors roi_model.score() exactly (parity: scripts/tests/test_roi_parity.py).
     const sides = [];
-    if (ask !== null) {
+    if (ask !== null && ask > 0 && ask < 1) {
       const fee = takerFeeUnit(ask, mult.taker);
       const cost = ask + fee;
       sides.push({ side: "YES", entry: ask, fee_unit: fee, cost, ev: q - cost, roi: (q - cost) / cost });
     }
-    if (bid !== null) {
+    if (bid !== null && 1 - bid > 0 && 1 - bid < 1) {
       const pno = 1 - bid;
       const fee = takerFeeUnit(pno, mult.taker);
       const cost = pno + fee;
       sides.push({ side: "NO", entry: pno, fee_unit: fee, cost, ev: 1 - q - cost, roi: (1 - q - cost) / cost });
+    }
+    if (!sides.length && (ask !== null || bid !== null)) {
+      reasons.push("quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced");
     }
     const best = sides.slice().sort((a, b) => b.roi - a.roi)[0] || null;
 
@@ -513,7 +522,14 @@ const KDLIVE = (() => {
           const cur = obs[obs.length - 1], back = [...obs].reverse().find((o) => now - Date.parse(o.t) >= lb);
           if (back && cur.last !== null && back.last !== null) mom = cur.last - back.last;
         }
-        const r = score(m, S.model, S.books.get(ticker) || null, { now_ms: now, momentum_dollars: mom, series_ticker: String(ticker).split("-")[0].toUpperCase() });
+        let r;
+        try {
+          r = score(m, S.model, S.books.get(ticker) || null, { now_ms: now, momentum_dollars: mom, series_ticker: String(ticker).split("-")[0].toUpperCase() });
+        } catch (err) {
+          // One malformed market must not stop the whole watch list from scoring.
+          S.scanErrors = (S.scanErrors || []).concat([{ ticker, error: String(err && err.message || err) }]);
+          continue;
+        }
         m.category_id = m.category_id || classifyTicker(ticker, m);
         m.category_basis = m.category_basis || (SEED_SERIES.has(r.series_ticker) ? "seed" : "keyword");
         m.__catalysts = catalystLinks(m);

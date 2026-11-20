@@ -504,3 +504,16 @@ Log:
 - 2026-11-20 ~14:41 UTC: T17 — **R-2 done**: `scripts/build_alerts.py` stores `to_yes_bid`/`to_yes_ask` from the observation at `to_time` on every new archive entry (null when the observation carried no quote — never invented). Proven with a synthetic history: quotes land on the entry, `simulate.quote_for_signal` returns `(0.54, 0.56, "archive")`, and a no-quote observation stores nulls. Existing 8 entries unchanged (append-only). Regenerated `alerts.json` byte-identical apart from `generated_at`/counts; `simulation.json` re-run (8 signals processed; S2's historical 99c-spread fill stays VOID per F-23). G9/F-14/F-17/F-19 updated in `data/findings.json`.
 - 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `<<<<<<< HEAD … >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
 - 2026-11-20 ~14:50 UTC: T17 done — full suite green on the integrated tree (21 pages OK; 506 open/200 settled/17 orderbooks; 8 alerts provenance-checked; 13 alert tests; simulate suite OK; 42 fee-table numbers; 15 parity cases; engine tests ALL PASSED; `node --check` clean). Remaining for T18: final verification pass, PR -> main -> merge, Pages deploy confirm, dispatch `collect.yml`/`desk.yml` so the new pages get live data, record PR link here.
+
+## Session `arena-2a36471a` — repair + final publish (branch `arena/2a36471a-kalshidash3`)
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T19 | Fix the divide-by-zero that makes the live-desk scan fail (a market quoted `yes_ask_dollars = "0.00"` gives `cost = 0`), in BOTH implementations (Python `scripts/roi_model.py`, browser `assets/live.js`), so `data/live/roi.json` can be produced at all | in progress | arena-2a36471a | `scripts/roi_model.py`, `assets/live.js`, `scripts/tests/fixtures_roi_parity.json` | `scripts/tests/test_roi_parity.py` (parity), `test_fees.py`, `test_roi_scan_offline.py`, `node` harness | TBD |
+| T20 | Fix `scripts/tests/test_roi_scan_offline.py`: it hard-codes `close_time = 2026-11-20T17:00:00Z`, which is now in the past, so its own "open" fixture is gated with `already past close_time` and three assertions fail on `main` | unclaimed | — | `scripts/tests/test_roi_scan_offline.py` | run it | TBD |
+| T21 | Re-verify the site line by line, PR → main → merge → confirm Pages deploy → dispatch the collectors so the pages carry fresh data | unclaimed | — | `COORDINATION.md`, `README.md` | `scripts/check_site.py` etc. | TBD |
+
+Note: this session works on its own Arena branch `arena/2a36471a-kalshidash3` (Arena tracks one branch
+per session; no `session-<id>/<task>` branch is created) and touches only the files listed above.
