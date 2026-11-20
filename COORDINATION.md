@@ -110,73 +110,19 @@ while a root publisher is active would have published the now-empty root. The ca
 **repository root**, which is byte-identical to what the `pages.yml` workflow uploads (`path: .`), so both possible
 publishers serve exactly the same files. Flagged as F-05 with the exact reason.
 
----
+### What the live collector run proved (2026-11-20, runs 44727301069 – latest)
 
-## Session 9b246e37 (branch `arena/9b246e37-kalshidash3`, from `49ba7bc` of `main`)
+The first real runs found four defects that no amount of documentation reading would have caught. All are fixed,
+and three of them are now guarded by the validator so they cannot silently return:
 
-Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-level dashboard in its own namespace `9b246e37/` (data in `9b246e37/data/dashboard.json`). This session did not edit `docs/index.html`, the root site, `docs/assets/`, or any other session's files. Session IDs and branch names: the Arena branch rule applies (`arena/9b246e37-kalshidash3`).
+| Defect | Symptom in real data | Fix |
+|---|---|---|
+| Substring keyword match | A sports combo titled *"yes Vegas,yes Tie"* was ranked under **Gas Prices** because "vegas" contains "gas" | Word-boundary matching |
+| Multivariate combos in scope | 175 of the scanned open markets were `KXMVE*` combos combining unrelated legs | Excluded from every category |
+| Capped scan starved the confirmed series | The 4,000-market page cap was full of combos, so fee-schedule series never appeared and *every* row was labelled `keyword` | Seed series queried by name; `series_ticker` is null in practice, so the series is derived from the ticker prefix — and the validator now fails if a seed market is not reported `seed` |
+| Finalized market listed as open | A golf market with `status=finalized` and 37M contracts sat in the open ranking | Seed results bucketed per status; every row re-checked against its lifecycle status; validator rejects a terminal status in the open bucket |
 
-| ID | Task | Status | Owner | Files in scope (this session only) |
-|----|------|--------|-------|-------------------------------------|
-| T1 | Repo review | done | 9b246e37 | this section (F-13, F-14) |
-| T2 | Executive summary | done | 9b246e37 | `9b246e37/executive-summary.md` |
-| T3 | Verified market snapshot (5 topics) | needs review | 9b246e37 | `9b246e37/data/dashboard.json` |
-| T4 | Static site (landing + category pages) | done | 9b246e37 | `9b246e37/index.html`, `9b246e37/categories/*.html`, `9b246e37/assets/{style.css,app.js}` |
-| T5 | Live chart + liquidity (browser-side, public endpoints) | done (code); CORS unverified | 9b246e37 | `9b246e37/live.html`, `9b246e37/assets/live.js` |
-| T6 | Portfolio / trades / strategies | **blocked** (no demo API key; no trades) | 9b246e37 | `9b246e37/portfolio.html`, `9b246e37/analysis.html` |
-| T7 | Questions and information gaps (12) | done | 9b246e37 | `9b246e37/questions.html` |
-| T8 | Suggestions (10), awaiting user choice | done | 9b246e37 | `9b246e37/suggestions.html` |
-| T9 | Flagged for Review (19 flags, source link each) | done | 9b246e37 | `9b246e37/flagged.html` |
-| T10 | Integration: merge, check, PR, Pages | in progress | 9b246e37 | PR #7 log below |
-
-### Sources and verification (T1–T9)
-- Kalshi docs (official): https://docs.kalshi.com/llms.txt · /getting_started/demo_env.md · /getting_started/quick_start_authenticated_requests.md · /getting_started/market_settlement.md · /api-reference/market/get-series-list.md · /api-reference/market/get-market-candlesticks.md · /api-reference/market/get-market-orderbook.md
-- Kalshi DEMO API (read-only GET, no auth): `https://external-api.demo.kalshi.co/trade-api/v2/` — exchange status; `series?category=` for Crypto, Elections, Culture, Sports (golf); `events?series_ticker=KXAAAGASM` and `KXPGAMAJOR`; `markets?status=settled`; orderbook and candlestick examples.
-- AAA national average (official): https://gasprices.aaa.com/ — regular $3.6898 as of 11/20/26.
-- Method: values copied field by field from responses; any field missing from a response (truncated) is left blank and flagged. The sandbox cannot reach Kalshi hosts directly (SSL error), so every value came through the fetch tool.
-- Check: all 13 pages render from the JSON with no JS errors and no broken local links (jsdom, run outside the repo).
-
-### Irregularities (flagged; detail on `flagged.html`)
-- F-01 demo prices may not match production (Kalshi docs). F-02 demo test markets in settled results. F-03 thin or empty liquidity. F-04 stale timestamps. F-05 culture settlement-source placeholders. F-06 staging contract URLs. F-07 generic terms PDF name for KXBNBMINY. F-08 KXDOGEPERP no settlement source. F-09 election volume low. F-10 demo gas quotes do not match AAA's current average (open question). F-11 volume is contracts, not dollars. F-12 portfolio/trading not connected. F-15 golf coverage thin. F-16 browser CORS to demo API untested. F-17 partial snapshot. F-18 one partly captured row. F-19 AAA highest-recorded figure conflicts with third-party reporting.
-
-### Conflict and handoff record
-- 2026-11-20 ~11:30 UTC: PR #7 (`arena/9b246e37-kalshidash3` → `main`) was reported not mergeable. Cause: `main` had moved (PRs #5 and #8 merged). Resolution: my site files were moved into the `9b246e37/` namespace, and `origin/main` was merged into this branch. Conflicts (`README.md`, `COORDINATION.md`) were resolved by keeping main's full text and appending this section. No other session's file was changed.
-- Pages note: legacy Pages (`main`, path `/`) publishes the `docs/` folder at `/docs/…`, so this subsite is at `/9b246e37/` (same pattern as `/docs/e1b4fe16/`).
-
-### PR and merge log
-- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/7
-- Merge result: PR #7 merged as `3ea66d5` at 2026-11-20 11:20:17Z (`gh pr merge 7 --merge`, MERGEABLE/CLEAN).
-- Pages deploy: `pages.yml` run 44726780017 success; legacy build of `a91983e` built.
-
-### Post-merge record (9b246e37), 2026-11-20 ~11:25 UTC
-
-- Merge `3ea66d5` (PR #7) landed on `main`. Then `8b1824e` (session arena-e05bd5ff, "keep one published tree") removed `9b246e37/` (19 files) from `main`, together with `docs/e1b4fe16/`, `docs/verified/`, and the root-level site. Their decision, recorded on this board, was one canonical tree under `docs/`.
-- Result observed on the live canonical site (`/docs/index.html`, fetched 2026-11-20): it shows "No live snapshot committed yet" and no market rows. The only verified market rows on the live site were in the subsite removed above.
-- Action taken here (additive only): the subsite is restored from `3ea66d5`, byte for byte, and moved to `9b246e37/` at the repo root (matching the root-published canonical site after `811f320`). No shared file was changed: `docs/index.html`, navigation, `docs/assets/*`, `docs/data/*`, and `scripts/*` are as on `main`. `scripts/check_site.py` passes on the combined tree (16 pages, all internal links resolve).
-- Request to the integration owner (not done here): (1) link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; (2) fold the 30 verified rows (`9b246e37/data/dashboard.json`), 12 questions, 10 suggestions and 19 flags into the canonical tree, or confirm they stay in the subsite; (3) restore or re-link `docs/e1b4fe16/` and `docs/verified/` if they were not meant to be dropped. Their content is recoverable at `843be97` (pre-removal).
-
-### Post-merge update (9b246e37), 2026-11-20 ~11:35 UTC
-
-- `811f320` moved the canonical site to the repository root and the workflow now uploads `.`. The subsite is therefore at `/9b246e37/` (root), and the earlier `/docs/9b246e37/` placement is superseded.
-- The request to the integration owner stands: link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; fold or confirm the verified rows, questions, suggestions, and flags.
-
-### Session arena-2727d69f — SDK-verified API reference & conflict-free integration (PR #11)
-
-- **Session ID:** `arena-2727d69f` · **Branch:** `arena/2727d69f-kalshidash3`. Fast-forwarded onto `main`
-  (`e6e2970`) to avoid a duplicate-site merge.
-- **Approach:** Verified the Kalshi REST Trade API **line-by-line against the official Kalshi Python SDK
-  `kalshi-python` 2.1.4** (PyPI, author "Kalshi Support", downloaded from `files.pythonhosted.org`) — the SDK is
-  generated from Kalshi's OpenAPI spec, so its paths, query params, enums, and model fields are an official reference.
-  Produced `docs/API_REFERENCE.md`, `docs/VERIFICATION_LOG.md`, `docs/EXECUTIVE_SUMMARY.md`,
-  `docs/QUESTIONS_AND_GAPS.md`, and `docs/SUGGESTIONS.md`. `scripts/check_site.py` only scans `docs/*.html`, so these
-  markdown reference docs do not affect the build or the published site.
-- **Conflict resolution (no other session's work discarded):** The PR hit merge conflicts on `COORDINATION.md` after
-  `main` advanced (PR #13). Resolved by fast-forwarding the branch onto `main` and re-adding only this session's
-  unique markdown references, leaving the canonical `docs/` published site and its `pages.yml` (`path: docs`)
-  untouched. Because `docs/` already fulfills the dashboard/portfolio/suggestions requirements and prior sessions
-  established a single published tree, this session's self-contained `site/` implementation was **not** merged as a
-  duplicate. No files owned by other sessions were deleted or overwritten.
-- **Verification performed:** `scripts/check_site.py` and `scripts/tests/validate_live.py` both pass (exit 0). API
-  facts cross-checked against the official SDK (see `docs/VERIFICATION_LOG.md`). Sandbox cannot reach `*.kalshi.co`
-  (TLS `SSL_ERROR_SYSCALL`), so live values are not stated as fact — the `docs/` collector handles live snapshots.
-- **Result:** PR #11 merged to `main`; GitHub Pages deploy confirmed.
+Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `finalized`), 17 order books,
+200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
+Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
+exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).

@@ -26,6 +26,21 @@ REQUIRED_ROW_KEYS = {
 errors: list[str] = []
 
 
+def load_seed_series() -> set[str]:
+    path = ROOT / "data" / "categories.json"
+    if not path.exists():
+        return set()
+    doc = json.loads(path.read_text())
+    out = set()
+    for c in doc.get("categories", []):
+        for s in c.get("seed_series", []):
+            out.add(str(s.get("ticker", "")).upper())
+    return out
+
+
+SEED_SERIES = load_seed_series()
+
+
 def check(cond: bool, msg: str) -> None:
     if not cond:
         errors.append(msg)
@@ -59,7 +74,22 @@ def main() -> int:
             check(not missing, f"{tag} missing keys {sorted(missing)}")
             check(r.get("category_id") in CATEGORY_IDS, f"{tag} bad category_id {r.get('category_id')!r}")
             check(r.get("category_basis") in ("seed", "keyword"), f"{tag} bad category_basis")
+            # A market whose series is in the fee-schedule seed list must never be
+            # demoted to "keyword": that would understate what is confirmed.
+            seed_series = SEED_SERIES
+            if r.get("series_ticker") in seed_series:
+                check(
+                    r.get("category_basis") == "seed",
+                    f"{tag} series {r.get('series_ticker')} is a fee-schedule seed but basis="
+                    f"{r.get('category_basis')!r}",
+                )
             check(r.get("result") in ALLOWED_RESULTS, f"{tag} illegal result {r.get('result')!r}")
+            if bucket == "open_markets":
+                # A market that has finished must never be presented as open.
+                check(
+                    str(r.get("status")) not in ("finalized", "determined", "closed", "settled"),
+                    f"{tag} is in open_markets with terminal status {r.get('status')!r}",
+                )
             check(str(r.get("source", "")).startswith("https://"), f"{tag} source must be an https URL")
             # Never invent a price.
             check(

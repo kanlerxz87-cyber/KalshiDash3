@@ -52,7 +52,10 @@ KD.nav("categories.html");
       { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
       { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
       { k: "Settled markets inside the five categories", v: KD.num(snap.counts.settled_in_scope) },
-      { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) }
+      { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) },
+      { k: "Open multivariate combos excluded", v: KD.num(snap.counts.open_excluded_multivariate) },
+      { k: "Settled multivariate combos excluded", v: KD.num(snap.counts.settled_excluded_multivariate) },
+      { k: "Confirmed (seed) series markets found", v: KD.num(snap.counts.seed_markets_found) }
     ]);
 })();
 </script>
