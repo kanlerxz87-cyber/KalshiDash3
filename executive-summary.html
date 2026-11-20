@@ -39,7 +39,10 @@
           <td>Seconds resolution must be accumulated from live reads: candlesticks only go down to one minute (<a href="flagged.html">F-06</a>).</td></tr>
       <tr><td>Show current liquidity — how many contracts are available at a given price</td>
           <td><span class="badge ok">done</span></td><td>Liquidity ladder on the dashboard</td>
-          <td>Depth is a point-in-time read and goes stale between collector runs.</td></tr>
+          <td>Depth is a point-in-time read and goes stale between collector runs. <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Official orderbook API</a></td></tr>
+      <tr><td>Alert on price swings of at least $0.10 with all-event and filtered feeds</td>
+          <td><span class="badge ok">done · snapshot-based</span></td><td><a href="dashboard.html#alertsTitle">Dashboard alert feeds</a></td>
+          <td>Detects consecutive collected last-price observations and refreshes the page every minute; the collector runs every 20 minutes, so it is not tick-level streaming. The experimental filtered screen is not a validated ROI model. Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; authenticated streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
           <td>Four implemented because they removed a correctness risk; four are awaiting your decision.</td></tr>
