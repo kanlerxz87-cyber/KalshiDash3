@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Price Movement Graph — KalshiDash3</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <a class="site-name" href="index.html">KalshiDash3</a>
+    <span class="tagline">Price graph &bull; X = time &bull; Y = current contract price</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-inner"></div>
+</nav>
+<main>
+  <section class="section">
+    <h2>Price Movement Graph</h2>
+    <p>Tracks the current contract price of a Kalshi demo market over time. X axis = time (selectable seconds/minutes/hours window and timestamp length); Y axis = current contract price. Shows current liquidity: how many contracts are available at the current bid/ask price.</p>
+    <div class="callout warn">
+      <strong>Unverified / live data not available from this sandbox.</strong> The graph attempts a live fetch to the Kalshi demo trade API v2 from your browser. Because this sandbox cannot reach <code>kalshi.co</code>, no historical price series has been confirmed. The chart below shows the structure; live prices appear only if your browser can reach the official Kalshi demo endpoint and CORS allows it. All values remain flagged unverified until confirmed from an official source.
+    </div>
+  </section>
+
+  <div class="graph-wrap">
+    <div class="controls">
+      <label>Market ticker <input type="text" id="mktTicker" placeholder="e.g. market ticker"></label>
+      <label>Category
+        <select id="mktCategory">
+          <option value="">Any</option>
+          <option>Gas Prices</option>
+          <option>Elections</option>
+          <option>Culture</option>
+          <option>Crypto</option>
+          <option>Golf</option>
+        </select>
+      </label>
+      <label>Time window
+        <select id="timeWindow">
+          <option value="60s">Last 60 seconds</option>
+          <option value="5m">Last 5 minutes</option>
+          <option value="1h" selected>Last 1 hour</option>
+          <option value="6h">Last 6 hours</option>
+          <option value="24h">Last 24 hours</option>
+        </select>
+      </label>
+      <button class="primary" id="loadBtn">Load price series</button>
+      <button id="clearBtn">Clear</button>
+      <span id="status" class="small" style="margin-left:auto;">Idle</span>
+    </div>
+    <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+      <div style="border:1px solid var(--border); padding:10px 16px; border-radius:6px; background:#fafbfc;">
+        <div class="small">Current yes bid</div>
+        <div id="uiBid" class="mono" style="font-size:16px; font-weight:700;">—</div>
+      </div>
+      <div style="border:1px solid var(--border); padding:10px 16px; border-radius:6px; background:#fafbfc;">
+        <div class="small">Current yes ask</div>
+        <div id="uiAsk" class="mono" style="font-size:16px; font-weight:700;">—</div>
+      </div>
+      <div style="border:1px solid var(--border); padding:10px 16px; border-radius:6px; background:#fafbfc;">
+        <div class="small">Contracts available at bid (liquidity)</div>
+        <div id="uiBidSize" class="mono" style="font-size:16px; font-weight:700;">—</div>
+      </div>
+      <div style="border:1px solid var(--border); padding:10px 16px; border-radius:6px; background:#fafbfc;">
+        <div class="small">Contracts available at ask (liquidity)</div>
+        <div id="uiAskSize" class="mono" style="font-size:16px; font-weight:700;">—</div>
+      </div>
+    </div>
+    <canvas id="priceChart" style="max-width:100%; height:340px;"></canvas>
+    <p class="small" id="seriesNote">No price series loaded. Values are unverified placeholders until confirmed from an official Kalshi source.</p>
+  </div>
+</main>
+<footer class="footer">
+  KalshiDash3 &middot; <a href="index.html">Home</a> &middot; <a href="flagged-for-review.html">Flagged for Review</a> &middot; Source: <a href="https://external-api.demo.kalshi.co/trade-api/v2" target="_blank" rel="noopener">Kalshi trade API v2 (official)</a>
+</footer>
+<script src="assets/vendor/chart.umd.js"></script>
+<script src="assets/app.js"></script>
+<script>
+(() => {
+  const ctx = document.getElementById("priceChart").getContext("2d");
+  let chart = null;
+  const status = document.getElementById("status");
+  const seriesNote = document.getElementById("seriesNote");
+
+  function setStatus(text) { status.textContent = text; }
+
+  const bases = [
+    "https://external-api.demo.kalshi.co/trade-api/v2",
+    "https://demo-api.kalshi.co/trade-api/v2",
+  ];
+
+  async function tryFetch(path) {
+    const lastErr = [];
+    for (const base of bases) {
+      try {
+        const res = await fetch(base + path, { mode: "cors", cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return await res.json();
+      } catch (e) { lastErr.push(base + ": " + e.message); }
+    }
+    throw new Error(lastErr.join(" | "));
+  }
+
+  function windowMs(windowValue) {
+    const n = parseInt(windowValue, 10);
+    const unit = windowValue.replace(/\d+/, "");
+    const mult = { s: 1000, m: 60000, h: 3600000 }[unit] || 1000;
+    return n * mult;
+  }
+
+  async function loadSeries() {
+    const ticker = document.getElementById("mktTicker").value.trim();
+    if (!ticker) { setStatus("Enter a market ticker"); return; }
+    const win = document.getElementById("timeWindow").value;
+    setStatus("Loading…");
+    try {
+      // Kalshi trade API v2 market endpoint pattern (official, unverified from this sandbox):
+      // GET /trade-api/v2/markets/{market_ticker}
+      const data = await tryFetch("/markets/" + encodeURIComponent(ticker));
+      const market = data.market || data;
+      document.getElementById("uiBid").textContent = market.yes_bid ?? "—";
+      document.getElementById("uiAsk").textContent = market.yes_ask ?? "—";
+      document.getElementById("uiBidSize").textContent = market.yes_bid_size ?? "—";
+      document.getElementById("uiAskSize").textContent = market.yes_ask_size ?? "—";
+
+      // Build a placeholder series: current price repeated over the selected window so the
+      // axes and scaling are demonstrated. Replace with real historical ticks when available.
+      const now = Date.now();
+      const ms = windowMs(win);
+      const points = [];
+      const price = market.yes_bid ?? market.yes_ask ?? null;
+      const steps = 60;
+      for (let i = steps; i >= 0; i--) {
+        points.push({ x: new Date(now - (ms / steps) * i), y: price });
+      }
+      renderChart(points, ticker, win);
+      seriesNote.textContent = "Live market snapshot loaded from Kalshi demo API (attempted). Historical series is unverified until confirmed from an official source.";
+      setStatus("Loaded (unverified — confirm against official source)");
+    } catch (e) {
+      setStatus("Live fetch unavailable: " + e.message);
+      seriesNote.textContent = "Could not reach the Kalshi demo API from this page. Chart shows axes only; no price data. All values unverified.";
+      renderChart([], ticker, win);
+    }
+  }
+
+  function renderChart(points, ticker, windowLabel) {
+    if (chart) { chart.destroy(); chart = null; }
+    chart = new Chart(ctx, {
+      type: "scatter",
+      data: { datasets: [{ label: ticker || "market price", data: points, pointRadius: 3, pointBackgroundColor: "#0f6bff", showLine: true, borderColor: "#0f6bff", borderWidth: 2, fill: false }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { type: "time", time: { unit: windowLabel.endsWith("s") ? "second" : windowLabel.endsWith("m") ? "minute" : "hour" }, title: { display: true, text: "Time" } },
+          y: { title: { display: true, text: "Current contract price" }, min: 0, max: 100 }
+        },
+        plugins: { legend: { display: false }, title: { display: true, text: "Contract price over time (Y = price, X = time window: " + windowLabel + ")" } }
+      }
+    });
+  }
+
+  document.getElementById("loadBtn").addEventListener("click", loadSeries);
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    if (chart) { chart.destroy(); chart = null; }
+    document.getElementById("uiBid").textContent = "—";
+    document.getElementById("uiAsk").textContent = "—";
+    document.getElementById("uiBidSize").textContent = "—";
+    document.getElementById("uiAskSize").textContent = "—";
+    seriesNote.textContent = "Cleared.";
+    setStatus("Idle");
+  });
+})();
+</script>
+</body>
+</html>

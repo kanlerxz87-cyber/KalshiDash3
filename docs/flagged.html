@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flagged for Review — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
+<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a class="on" href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<div class="wrap">
+<h1>Flagged for Review</h1>
+<p class="mut">Irregularities and unverified items. These do <b>not</b> block the merge. Review after the site is live and request changes by ID.</p>
+<table><thead><tr><th>ID</th><th>Item</th><th>Why flagged</th><th>What to do</th></tr></thead><tbody>
+<tr><td>F1</td><td>Category series tickers (V9–V13) left blank</td><td>Cannot confirm Gas/Elections/Culture/Crypto/Golf series tickers without live <span class="mono">/series</span> results; sandbox has no direct Kalshi API access.</td><td>Open dashboard → confirm matched series → fill Verification table.</td></tr>
+<tr><td>F2</td><td>Demo balance/positions blank (V14)</td><td>No API keys provided; inventing a balance would be a hallucination.</td><td>Create demo keys at demo.kalshi.co; run collector script.</td></tr>
+<tr><td>F3</td><td>"Highest dollar" = notional estimate</td><td>Kalshi has no single "highest dollar" field; volume × last price is our labeled estimate.</td><td>Decide in Q1 (volume vs. open interest vs. notional).</td></tr>
+<tr><td>F4</td><td>Keyword category mapping may misclassify</td><td>Series titles/categories vary; keywords are heuristic.</td><td>Review matches; approve Suggestion G6.</td></tr>
+</tbody></table>
+</div>
+<footer><div class="wrap">KalshiDash3 · <a href="verification.html">Verification</a></div></footer>
+</body></html>
