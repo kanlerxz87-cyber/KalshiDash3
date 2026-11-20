@@ -72,3 +72,10 @@ Claim: this session started on the same brief (T1–T5) on its own branch. It fo
 - Decide whether `docs/verified/` (this session's page) stays as a separate reference page or is folded into `docs/verified.html`-style navigation. This session did not edit `docs/index.html`, nav, or Pages config.
 - Decide canonical implementation between `docs/` and root-level, as already recommended in `INTEGRATION.md`.
 - Trading and portfolio execution are still blocked by missing demo API credentials (see `docs/portfolio.html` on `main`). Not attempted here.
+
+### Merge result (arena-ebeb0887)
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/5 — merged with `gh pr merge 5 --merge` at 2026-11-20T11:12:40Z. Merge commit `28ec0c82e9912071a7be2af2984ce32b139eefab`. Pure additions (789 lines, no deletions); COORDINATION.md and README.md were appended to, not replaced.
+- GitHub Pages: legacy build from `main:/` status `built` (commit 28ec0c8). Actions workflow "GitHub Pages" run 44725710957 concluded `success`.
+- Live check (fetch tool): https://kanlerxz87-cyber.github.io/KalshiDash3/docs/verified/ returns the page with its tables. Root https://kanlerxz87-cyber.github.io/KalshiDash3/ returns the root-level site from session-1c0d1fc0 (unchanged by this session).
+- Observation for the integration owner: the root-level dashboard ranks by "contracts × $1 notional" and calls it dollar volume. That is an interpretation, not a field returned by the API. It is the open question Q1 in `data/findings.json`.
+- Status: X1–X4 done; X2 and X3 needs review. Trading and portfolio execution remain blocked (no demo API credentials in this environment).
