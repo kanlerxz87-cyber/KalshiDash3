@@ -566,3 +566,33 @@ per session; no `session-<id>/<task>` branch is created) and touches only the fi
   external-api.demo.kalshi.co fails TLS), so the runner state cannot be reproduced from here. Evidence for them:
   the step is #8, steps 5–7 (Collect / Build live alert feed / Paper-trade) all succeeded, so the snapshot exists but
   one of the four validators rejected it.
+
+### Merge results (this session)
+
+| PR | Branch | Merge commit | Result |
+|----|--------|--------------|--------|
+| [#31](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31) | `arena/2a36471a-kalshidash3` | `b8321c4` | merged — divide-by-zero fix + time-relative offline fixture |
+| [#32](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/32) | `arena/2a36471a-kalshidash3` | `ee0cc44` | merged — F-30 on the Flagged page + board closeout |
+
+Pages after `ee0cc44`: workflow run 44800743390 **success**, `pages/builds` `status=built` on `ee0cc44`.
+Live checks: `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/roi.json` serves a real scan
+(`collected_at 2026-11-20T19:15:11Z`), and `flagged.html` serves 29 irregularities / 10 high including F-30
+(re-checked with a cache-busting query — the first fetch was a stale edge copy, verified by rendering the same page
+against the committed JSON in jsdom: 29 rows, F-30 present).
+
+**Line-by-line check of the landing page against the committed snapshot** (`data/live/markets.json`,
+`collected_at 2026-11-20T15:19:53Z`), every figure recomputed from the JSON rather than copied from the page:
+387 in-scope open = `len(open_markets)` 387; 369 confirmed = rows with `category_basis == "seed"`; 200 resolved
+yes/no = settled rows with result yes/no (200 settled rows, 194 `no` + 6 `yes`); largest per category —
+gas `KXAAAGASM-26NOV30-3.90` $23,271, elections `KXELECTIRAN-27JAN01` $3, culture `KXBALLONDOR-27-YDIO` $0,
+crypto `KXBTCY-27JAN0100-B47500` $78,575,131, golf `KXPGATOUR-THRC26-SSTR` $18,999 — all identical to the page.
+Every external host referenced by the HTML/JS is official or a primary source: docs.kalshi.com (101),
+kalshi.com incl. the fee-schedule PDF (17), the demo API hosts (7), help.kalshi.com (4), docs.github.com (4),
+demo.kalshi.co (4), plus per-topic settlement sources (eia.gov, fec.gov, eac.gov, pgatour.com, coinbase.com,
+cmegroup.com, emmys.com, grammys.com, oscars.org). No undocumented third-party data host.
+
+**Left open, deliberately, and owned elsewhere:** F-16 (no `schedule` event has ever fired in this repo — every run
+is `workflow_dispatch`), F-07/Q3 (no demo credentials exist, so portfolio performance stays blank), and the
+`collect.yml` validation failure logged above. Three other sessions (`arena/0f71797f`, `arena/6f158ab7`,
+`arena/da07bb44`) are committing on their own branches; this session stopped editing after `ee0cc44` so it cannot
+collide with them.
