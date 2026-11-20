@@ -78,7 +78,14 @@ const KD = (() => {
     if (!rows.length) return empty(opts.empty || "No rows.");
     const th = headers.map((h) => `<th${h.num ? ' class="r"' : ""}>${h.label}</th>`).join("");
     const tb = rows
-      .map((r) => "<tr>" + headers.map((h) => `<td${h.num ? ' class="r"' : ""}>${r[h.key] ?? ""}</td>`).join("") + "</tr>")
+      .map((r, i) => {
+        // data-field lets the live-price updater find a cell without re-rendering the
+        // whole table; rowAttr lets a page tag a row with its market ticker.
+        const attrs = opts.rowAttr ? " " + opts.rowAttr(r, i) : "";
+        return "<tr" + attrs + ">" +
+          headers.map((h) => `<td${h.num ? ' class="r"' : ""} data-field="${esc(h.key)}">${r[h.key] ?? ""}</td>`).join("") +
+          "</tr>";
+      })
       .join("");
     return `<div class="tw"><table><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table></div>`;
   }
@@ -132,5 +139,105 @@ const KD = (() => {
       items.map(([h, l]) => `<a href="${h}"${h === active ? ' class="on"' : ""}>${l}</a>`).join("");
   }
 
-  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav };
+  /* ------------------------------------------------------------------ *
+   * Browser-side live refresh.
+   *
+   * The committed snapshot (data/live/markets.json) is the fallback that
+   * always works. When the browser itself can reach the official demo API
+   * (CORS was measured, not assumed — see data/live/cors.json), the page
+   * also polls the API directly and updates the live price cells in place.
+   * The freshness strip always says which of the two is being shown; the
+   * page never claims a price it did not receive.
+   * ------------------------------------------------------------------ */
+
+  const LIVE_BASE = "https://external-api.demo.kalshi.co/trade-api/v2";
+
+  function liveStrip() {
+    let host = $("#liveStrip");
+    if (!host) {
+      host = document.createElement("div");
+      host.id = "liveStrip";
+      host.className = "lives";
+      const main = $("main.wrap") || $("main") || $(".top .wrap");
+      const h1 = main && main.querySelector("h1");
+      if (main && h1) h1.insertAdjacentElement("afterend", host);
+      else if (main) main.insertBefore(host, main.firstChild);
+      else document.body.insertBefore(host, document.body.firstChild);
+    }
+    return host;
+  }
+
+  function setLiveState(state, detail) {
+    const host = liveStrip();
+    if (!host) return;
+    const cls = state === "live" ? "ok" : state === "stale" ? "warn" : state === "blocked" ? "bad" : "";
+    host.className = "lives " + cls;
+    host.innerHTML =
+      `<span class="dot"></span><b>${esc(state === "live" ? "LIVE" : state === "stale" ? "SNAPSHOT" : state === "blocked" ? "API BLOCKED" : "CHECKING")}</b>` +
+      `<span class="mut">${esc(detail || "")}</span>`;
+  }
+
+  // Poll the official demo API for the tickers on this page and update the
+  // price cells. Only fields the API actually returned are written.
+  async function startLiveRefresh(opts = {}) {
+    const intervalMs = opts.intervalMs || 20000;
+    const base = opts.base || LIVE_BASE;
+    let snap = null;
+    try { snap = await json("data/live/markets.json"); } catch { snap = null; }
+    const tickers = (opts.tickers || []).filter(Boolean);
+    if (!tickers.length) { setLiveState("snapshot", "no tickers on this page"); return null; }
+
+    const seen = new Map();
+    const stamp = () => new Date().toISOString().replace("T", " ").replace("Z", " UTC");
+
+    async function pull() {
+      // GET /markets takes `tickers` as a comma-separated list — see
+      // https://docs.kalshi.com/api-reference/market/get-markets
+      const chunks = [];
+      for (let i = 0; i < tickers.length; i += 60) chunks.push(tickers.slice(i, i + 60));
+      let got = 0;
+      for (const c of chunks) {
+        let d;
+        try {
+          const r = await fetch(`${base}/markets?tickers=${encodeURIComponent(c.join(","))}`, { cache: "no-store" });
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          d = await r.json();
+        } catch (e) {
+          setLiveState("blocked", "browser could not reach the demo API (" + (e.message || e) + ") — showing the committed snapshot");
+          return got;
+        }
+        for (const m of d.markets || []) {
+          got++;
+          seen.set(m.ticker, m);
+          paint(m);
+        }
+      }
+      setLiveState("live", `${got} live quotes · polled ${stamp()}`);
+      return got;
+    }
+
+    function paint(m) {
+      const el = document.querySelector(`[data-live-ticker="${CSS.escape(m.ticker)}"]`);
+      if (!el) return;
+      for (const td of el.querySelectorAll("td[data-field]")) {
+        const f = td.dataset.field;
+        let v = null;
+        if (f === "last") v = m.last_price_dollars;
+        else if (f === "bid") v = m.yes_bid_dollars;
+        else if (f === "ask") v = m.yes_ask_dollars;
+        else if (f === "vol") v = m.volume_fp;
+        else if (f === "oi") v = m.open_interest_fp;
+        else if (f === "status") v = null;
+        if (v === null || v === undefined) continue;
+        td.innerHTML = cents(v);
+        td.classList.add("livecell");
+      }
+    }
+
+    await pull();
+    const t = setInterval(pull, intervalMs);
+    return { stop: () => clearInterval(t), pull, seen };
+  }
+
+  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, liveStrip, setLiveState, startLiveRefresh, LIVE_BASE };
 })();

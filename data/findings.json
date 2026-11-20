@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T14:50:00Z",
+ "generated": "2026-11-20 (official-source re-audit, session arena-0f71797f)",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series.",
  "questions": [
   {
@@ -107,6 +107,18 @@
    "decision_needed": "Owner. The simulator stays unchanged until the owner answers.",
    "sources": [
     "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
+  },
+  {
+   "id": "Q10",
+   "question": "Should a swing row ever name a cause, and if so, what would count as an acceptable source?",
+   "known": "Kalshi publishes one official per-series page carrying an 'AI Digest' with its own linked sources (verified 2026-11-20 for the gas, culture, elections, crypto and golf series in scope). The digest discusses the series, not the specific market's move, and it is written for the production site.",
+   "unknown": "Whether a digest that describes the series is close enough to 'why this market moved' to be shown on the same row as the move. The brief forbids asserting unsupported causality, so this session shows it as a lead and labels it as one.",
+   "answer_if_forced": "Show the series page as a lead, never as a cause; keep cause_link null until a source that names the specific market and the specific time exists.",
+   "decision_needed": "Confirm whether the AI Digest link is the right granularity of lead, or whether a narrower source is wanted.",
+   "sources": [
+    "https://kalshi.com/markets/kxethy",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   }
  ],
@@ -320,14 +332,39 @@
   },
   {
    "id": "G18",
-   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html §4 — a deterministic S1–S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy × category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
+   "suggestion": "SHIPPED: a second, complementary paper experiment on portfolio.html \u00a74 \u2014 a deterministic S1\u2013S4 strategy replay over the collected price history (entries at observed asks, exits at observed bids, official fee formula, strategy \u00d7 category ledger, equity curve, settlement against the literal API result). Distinct from the alerts-page auto-sim, which trades the live alert stream.",
    "why_it_helps_decisions": "Tests the strategy page's stated rules against collected history with no manual input, and shows real thin-book exit slippage that a live alert trader would face.",
    "effort": "Done in this session",
    "risk": "Replay fills only at collected observation timestamps; per-series fee multipliers not applied; demo prices only.",
-   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07×C×P×(1−P)) to the cent.",
+   "success_metric": "Replay is deterministic per snapshot; every fill timestamp is a collected observation; fees match ceil(0.07\u00d7C\u00d7P\u00d7(1\u2212P)) to the cent.",
    "status": "implemented",
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
+  {
+   "id": "G19",
+   "suggestion": "Let the desk scan keep its near misses, and turn them into a watch list rather than dropping them.",
+   "why_it_helps_decisions": "Right now the desk scan reports 0 eligible picks and 2 near misses. The near misses are the only actionable output: one is a 98-cent spread on a 1-hour market, the other a market with an unknown spread. A watch list that shows why each was rejected tells you what a small rule change (a wider spread tolerance, a minimum depth) would pick up, before any rule is changed.",
+   "effort": "Small \u2014 roi.json already carries the rejection reason for each near miss.",
+   "risk": "None. It displays numbers that already exist and changes no trading logic.",
+   "success_metric": "roi.html lists each near miss with its rejection reason and the value it would have needed.",
+   "status": "partially implemented \u2014 the reasons are published on roi.html; a dedicated watch list is still to do.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/orderbook_responses"
+   ]
+  },
+  {
+   "id": "G20",
+   "suggestion": "Poll the demo API from the browser for the top-dollar markets only, and rate-limit it by the documented public limit.",
+   "why_it_helps_decisions": "The committed snapshot is at best 20 minutes old, which is the difference between a tradeable signal and a stale one. The dashboard already fetches the demo API from the browser on live.html; doing the same for the highest-dollar market on every category page would make each page live without any manual step.",
+   "effort": "Done for the category pages and the home page in this session (assets/site.js startLiveRefresh).",
+   "risk": "Public unauthenticated requests have their own rate limit, and the API's responses are cached for a short time, so a browser poll can see a price a few seconds old. The freshness strip shows the poll time so no one mistakes it for a tick stream.",
+   "success_metric": "Every category page shows a LIVE strip with a poll time when the browser can reach the API, and says plainly when it cannot.",
+   "status": "implemented",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/rate_limits",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   }
  ],
@@ -482,20 +519,21 @@
   },
   {
    "id": "F-15",
-   "item": "Causes of sharp price jumps (news / website links) are not collected",
-   "why": "The brief asks for events and website links that may have caused a move of $0.10 or more. Kalshi's official API returns price fields but no cause or news field, and no official source links causes to specific price moves. Every alert therefore has cause_link = null and is labelled 'unverified'. Linking news sites would be a guess, so none was added.",
-   "action": "Left blank by design. A cause can be added only with a source that can be checked (e.g. the market's own rules page or an official Kalshi announcement) for the specific ticker and time.",
+   "item": "Causes of sharp price jumps are still not collected \u2014 Kalshi's API has no news or cause field",
+   "why": "The brief asks for website links that may have caused a move of at least $0.10. The official Get Markets schema (read again 2026-11-20) has no news, url, cause or catalyst field, and no official source maps a price move to an event. Every alert therefore still carries cause_link = null and is labelled 'unverified'. Linking a news site and calling it the cause would be fabrication.",
+   "action": "Left blank by design, and the blank is now visible on every row. What was added instead is the two links that ARE official and checkable: the market's own API record, and Kalshi's own series page, which carries Kalshi's own AI Digest for that series (verified for KXAAAGASM, KXAAAGASD, KXBALLONDOR, KXELECTIRAN, KXETHY, KXPGATOUR and KXBTCY on 2026-11-20). Those are labelled 'leads', never causes.",
    "severity": "medium",
    "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-markets"
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://kalshi.com/markets/kxethy"
    ]
   },
   {
    "id": "F-16",
-   "item": "Scheduled collector has not run: all recent runs were manual, so the snapshot is stale",
-   "why": "collect.yml declares a '*/20 * * * *' schedule, but the last five runs of the workflow were all workflow_dispatch; none were scheduled. At the time of the check (2026-11-20 13:17 UTC) the newest committed snapshot was collected_at 11:33:33Z, about 1h44m old, so the swing feed cannot show live moves. The site's banner shows this as stale.",
-   "action": "Dispatch the collector manually (done on this branch) and confirm that scheduled runs start on main after merge. Scheduled workflows run only from the default branch, so the schedule can only fire once collect.yml is on main.",
-   "severity": "high",
+   "item": "Scheduled collection: the cron only takes effect once the workflow file is on the default branch",
+   "why": "Earlier checks saw 0 `schedule` events across every run of this repository and concluded that scheduling was broken. Re-checked on 2026-11-20: the schedule DID fire. Run 44800299801 was created with event=`schedule` at 2026-11-20T19:14:35Z on `main`, hours after the repository's last manual dispatch. The official reference states the rule directly: 'This event will only trigger a workflow run if the workflow file exists on the default branch' and 'Scheduled workflows will only run on the default branch'. collect.yml only reached main when the integration PR merged, so no earlier cron could fire. The same reference also warns that scheduled runs can be delayed or dropped under load, and that public repositories auto-disable schedules after 60 days without activity.",
+   "action": "collect.yml and desk.yml are on main with their cron schedules, and a scheduled run has now been observed end to end. The site no longer depends on the schedule alone: every page also polls the demo API directly from the browser when the browser can reach it (CORS was measured, not assumed - see data/live/cors.json), and the freshness strip always says whether the number on screen came from the live API or from the committed snapshot.",
+   "severity": "medium",
    "sources": [
     "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
     "https://docs.kalshi.com/api-reference/market/get-markets"
@@ -566,7 +604,7 @@
   {
    "id": "F-24",
    "item": "Browser CORS access to the demo API is undocumented by Kalshi; live mode relies on it",
-   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json — it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
+   "why": "The in-browser live poller (alerts.html, dashboard live mode) only works if the demo API returns CORS headers for the site's origin. Kalshi's docs do not document CORS at all, so the engine probes GET /exchange/status at runtime and records the observed headers per collector run in data/live/cors.json \u2014 it never assumes the header exists. If Kalshi changes or restricts CORS, live mode degrades automatically to committed collector snapshots and says so on the page.",
    "action": "Runtime self-test with automatic fallback; observed headers committed per run; third-party header capture (another project's Pages origin) kept as circumstantial evidence only. Coexists with F-15: the server-side archive keeps cause_link null (no cause data collected), while the alert chats render news SEARCH links computed from the market title and label them unverified leads.",
    "severity": "medium",
    "sources": [
@@ -577,19 +615,20 @@
   },
   {
    "id": "F-25",
-   "item": "Alert 'possible-cause' links are news search leads, never verified causes",
-   "why": "The brief asks that live charts include website links that may have caused a sharp jump. No API returns a causal mapping from price moves to events, so the site links each >= $0.10 alert to a Google/Bing/DuckDuckGo news search for the market title plus the market's own API query. These are leads to check by hand — the site never asserts a cause, because asserting one without a source would be fabrication.",
-   "action": "Search links labelled 'possible-cause leads — unverified' on every alert bubble; no causal claim is ever rendered.",
-   "severity": "medium",
+   "item": "Alert 'possible-cause' links were generic news-search links; they are now the market's own records",
+   "why": "An earlier build pointed every swing at a Google/Bing/DuckDuckGo news search for the market title. That is a link to a search engine, not to a source, and it cannot be checked row by row. Re-checked on 2026-11-20 against the official Get Markets schema: the API carries no news field at all, and the only official per-series publication is Kalshi's own series page, which carries Kalshi's own AI Digest with linked sources.",
+   "action": "Replaced. Each >= $0.10 row now links (a) the official demo API record for that exact ticker and (b) Kalshi's own page for that series. Both are labelled as leads; no causal claim is rendered anywhere, and cause_link remains null. A demo-only series with no production page (KXDEMOFUTHOURLY) gets the API link only - the link is not fabricated.",
+   "severity": "low",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
-    "https://docs.kalshi.com/getting_started/quick_start_market_data"
+    "https://docs.kalshi.com/getting_started/quick_start_market_data",
+    "https://kalshi.com/markets/kxpgatour"
    ]
   },
   {
    "id": "F-26",
    "item": "The 'model picks' scorer is a disclosed heuristic, not a backtested strategy",
-   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask — a conditional figure, not an expected return.",
+   "why": "The second chat filters alerts by score = 0.30*liquidity + 0.25*price-band + 0.30*momentum + 0.15*spread with a 0.55 threshold. The weights were chosen to reflect stated priorities (liquidity first, mid-band prices where the fee formula peaks), not fitted to fills. 'High ROI' on the page means modeled ROI if the position resolves in favor at the quoted ask \u2014 a conditional figure, not an expected return.",
    "action": "Formula, weights, threshold and per-alert component values are all rendered on alerts.html; the disclaimer is on every pick. The auto-sim (trading.html) exists precisely to gather the evidence the model still needs.",
    "severity": "medium",
    "sources": [
@@ -623,7 +662,7 @@
   {
    "id": "F-29",
    "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
-   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists — a stale reference that contradicts the one-tree rule.",
+   "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
    "action": "Fixed during the arena-f068786c integration merge: the README now describes only the canonical tree plus the features shipped by the parallel sessions and this session.",
    "severity": "low",
    "sources": [

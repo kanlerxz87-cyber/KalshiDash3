@@ -89,6 +89,7 @@ KD.nav("golf");
     { key: "close", label: "Close (UTC)" }, { key: "status", label: "Status" },
     { key: "basis", label: "Category basis" }, { key: "src", label: "Source" },
   ], open.map(r => ({
+    _ticker: r.ticker,
     ticker: '<span class="mono">' + KD.esc(r.ticker) + '</span>',
     title: KD.esc(r.title),
     dollars: KD.money(r.dollars_traded_estimate, 0),
@@ -97,7 +98,7 @@ KD.nav("golf");
     close: r.close_time ? KD.esc(r.close_time.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
     status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis),
     src: KD.srcLink(r.source, "API"),
-  })), { empty: "No open golf markets are in the current snapshot. That is a real result, not an error: the collector reports only what the API returned." });
+  })), { empty: "No open golf markets are in the current snapshot. That is a real result, not an error: the collector reports only what the API returned." }, rowAttr: (row) => 'data-live-ticker="' + KD.esc(row._ticker) + '"' });
 
   KD.$("#resolved").innerHTML = KD.table([
     { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" }, { key: "result", label: "Resolved" },
@@ -110,6 +111,10 @@ KD.nav("golf");
     ts: r.settlement_ts ? KD.esc(r.settlement_ts.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
     vol: KD.num(r.volume_fp), src: KD.srcLink(r.source, "API"),
   })), { empty: "No settled golf markets in the current snapshot." });
+  // Browser-side live refresh: the committed snapshot above is the fallback; when this
+  // browser can reach the official demo API the same cells are updated in place and the
+  // freshness strip says so. Nothing is written that the API did not return.
+  KD.startLiveRefresh({ tickers: open.map(r => r.ticker) });
 })();
 </script>
 </body></html>

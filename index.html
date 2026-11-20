@@ -133,6 +133,7 @@ KD.nav("");
     const r = top[id];
     return {
       cat: live[id],
+      _ticker: r ? r.ticker : null,
       title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 68))}</a>` +
                  `<div class="small mut mono">${KD.esc(r.ticker)}</div>` : '<span class="na">none open in scope</span>',
       dollars: r ? KD.money(r.dollars_traded_estimate, 0) : '<span class="na">—</span>',
@@ -149,13 +150,19 @@ KD.nav("");
      { key: "vol", label: "Contracts", num: true }, { key: "oi", label: "Open int.", num: true },
      { key: "basis", label: "Category basis" },
      { key: "src", label: "Source" }],
-    rows
+    rows,
+    { rowAttr: (row) => (row._ticker ? 'data-live-ticker="' + KD.esc(row._ticker) + '"' : "") }
   ) + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
      Kalshi has no official “dollars traded” field — see
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
      “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.</p>`;
+
+  // Browser-side live refresh. The committed snapshot above is the fallback; when this
+  // browser can reach the official demo API, the same cells are updated in place and the
+  // freshness strip states which source the number came from.
+  KD.startLiveRefresh({ tickers: Object.values(top).map(r => r.ticker) });
 })();
 </script>
 </body></html>

@@ -123,3 +123,17 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 44px;colo
 .swing-item .dir.down{color:var(--bad);font-weight:700}
 .swing-item .cause{color:var(--mut);font-style:italic;font-size:11.5px}
 .swing-empty{color:var(--mut);font-size:12.5px;padding:6px 0}
+
+/* --- browser-side live refresh strip (assets/site.js) --- */
+.lives{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:0 0 12px;padding:7px 12px;
+  border:1px solid var(--line);border-left:3px solid var(--mut);border-radius:var(--r);
+  background:var(--panel);font-size:12.5px}
+.lives.ok{border-left-color:var(--ok)}
+.lives.warn{border-left-color:var(--warn)}
+.lives.bad{border-left-color:var(--bad)}
+.lives .dot{width:9px;height:9px;border-radius:50%;background:var(--mut);flex:none}
+.lives.ok .dot{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent)}
+.lives.warn .dot{background:var(--warn)}
+.lives.bad .dot{background:var(--bad)}
+.lives b{letter-spacing:.06em;font-size:11.5px}
+td.livecell{color:var(--ok);font-variant-numeric:tabular-numeric}
