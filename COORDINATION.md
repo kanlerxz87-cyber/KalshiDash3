@@ -180,3 +180,16 @@ Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-le
   facts cross-checked against the official SDK (see `docs/VERIFICATION_LOG.md`). Sandbox cannot reach `*.kalshi.co`
   (TLS `SSL_ERROR_SYSCALL`), so live values are not stated as fact — the `docs/` collector handles live snapshots.
 - **Result:** PR #11 merged to `main`; GitHub Pages deploy confirmed.
+
+### Session arena-2727d69f — final result
+
+- **PR:** https://github.com/kanlerxz87-cyber/KalshiDash3/pull/11 (session `arena-2727d69f` → `main`).
+- **Merge result:** MERGED. Squash-merge commit `96f3536` ("docs: SDK-verified Kalshi API reference,
+  verification log, executive summary, questions/gaps, suggestions (session arena-2727d69f) (#11)").
+- **Files merged:** `docs/API_REFERENCE.md`, `docs/VERIFICATION_LOG.md`, `docs/EXECUTIVE_SUMMARY.md`,
+  `docs/QUESTIONS_AND_GAPS.md`, `docs/SUGGESTIONS.md`, and the `COORDINATION.md` session record.
+- **GitHub Pages deploy:** CONFIRMED. `Deploy site to GitHub Pages` workflow run `44728028941` and
+  `pages-build-deployment` run `44728027801` both completed with **conclusion: success**. Pages source =
+  `main`, live URL https://kanlerxz87-cyber.github.io/KalshiDash3/ (not reachable from the build sandbox due
+  to the outbound allowlist, but the deployment runs are authoritative).
+- **Flagged irregularities** remain published on the Flagged for Review page and do not block the merge.
