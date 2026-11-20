@@ -290,6 +290,10 @@ def build(validate_n: int, out_path: Path) -> dict:
 
     series_idx = COLLECT.fetch_series_index()
     rows, seen_combo = [], 0
+    # NOTE: `category_id`/`category_basis` are NOT API fields — GET /markets has no topic
+    # field. They are this project's classification, attached to the market object here so
+    # the model's require_seed_category gate reads exactly what the page reads (the browser
+    # mirror attaches the same two keys in scoreAll()).
     for m in open_ms:
         if COLLECT.is_multivariate(m):
             seen_combo += 1
@@ -303,6 +307,8 @@ def build(validate_n: int, out_path: Path) -> dict:
             continue
         if str(m.get("status") or "").lower() in ("finalized", "determined", "closed", "settled"):
             continue
+        m["category_id"] = cid
+        m["category_basis"] = basis
         rows.append({"m": m, "cid": cid, "basis": basis, "series": st})
     print(f"  in scope: {len(rows)} open markets in the five categories ({seen_combo} combos skipped by the local guard)")
 
@@ -310,10 +316,12 @@ def build(validate_n: int, out_path: Path) -> dict:
     for r in rows:
         r["dollars"] = COLLECT.dollars_traded(r["m"])
 
-    # 3. order-book depth for the watchlist: biggest by that estimate, capped at 100 tickers
+    # 3. order-book depth for EVERY in-scope market, in chunks of 100 (the documented
+    #    maximum per request). Depth is a safety gate, so it is not fair to apply it only
+    #    to the biggest names and leave the rest unscored.
     rows.sort(key=lambda r: -(r["dollars"] or 0))
-    watch = [r["m"]["ticker"] for r in rows[:100]]
-    books = books_for(watch, "order book depth from GET /markets/orderbooks (bids only; a NO bid at Y is a YES ask at 1-Y)")
+    books = books_for([r["m"]["ticker"] for r in rows],
+                      "order book depth from GET /markets/orderbooks (bids only; a NO bid at Y is a YES ask at 1-Y)")
     print(f"  order books: {len(books)}")
 
     # 4. score with the shared model
@@ -347,6 +355,9 @@ def build(validate_n: int, out_path: Path) -> dict:
     near = [s for s in scored if not s["eligible"] and s.get("score") is not None]
     near.sort(key=lambda s: (len(s.get("fails") or []), -(s["score"] or -9e9)))
     near_misses = near[:8]
+    # Rows the model cannot even price (no two-sided quote, no last) are listed separately
+    # with their reason, so "nothing to show" is never mistaken for "nothing happened".
+    unscoreable = [s for s in scored if not s["eligible"] and s.get("score") is None][:8]
 
     # 5. swings >= threshold across the retained observation history
     thr = model["swing_alert"]["threshold_dollars"]
@@ -409,6 +420,7 @@ def build(validate_n: int, out_path: Path) -> dict:
             "eligible": len(eligible),
             "picks": len(picks),
             "near_misses": len(near_misses),
+            "unscoreable": sum(1 for s in scored if not s["eligible"] and s.get("score") is None),
             "orderbooks": len(books),
             "alerts": len(alerts),
             "markets_with_momentum": sum(1 for s in scored if s.get("momentum") is not None),
@@ -417,6 +429,7 @@ def build(validate_n: int, out_path: Path) -> dict:
         "historical_cutoff": cutoff,
         "picks": picks,
         "near_misses": near_misses,
+        "unscoreable": unscoreable,
         "alerts": alerts,
         "validation": validation,
         "disclaimers": [
@@ -430,7 +443,11 @@ def build(validate_n: int, out_path: Path) -> dict:
     }
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=1))
-    print(f"  wrote {out_path.relative_to(ROOT)} ({len(picks)} picks, {len(alerts)} alerts)")
+    try:
+        shown = out_path.relative_to(ROOT)
+    except ValueError:
+        shown = out_path
+    print(f"  wrote {shown} ({len(picks)} picks, {len(near_misses)} near misses, {len(alerts)} alerts)")
     return payload
 
 
