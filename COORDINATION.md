@@ -165,6 +165,21 @@ PR #16 (T11, `arena-6d85f8f0`, dashboard alert feeds) and PR #18 (T12, `arena-52
 `alerts.py`, `alerts.html`, and a second `alert_rules.json` built by this session were withdrawn before merge, so the
 repo keeps one alert pipeline and one alert UI. No `main` file owned by another session was overwritten or deleted.
 
+- `811f320` moved the canonical site to the repository root and the workflow now uploads `.`. The subsite is therefore at `/9b246e37/` (root), and the earlier `/docs/9b246e37/` placement is superseded.
+- The request to the integration owner stands: link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; fold or confirm the verified rows, questions, suggestions, and flags.
+
+### Merge and deploy record (9b246e37)
+
+- PR #7 (`arena/9b246e37-kalshidash3` → `main`, original subsite): merged as `3ea66d5` at 2026-11-20 11:20:17Z. Its files were later removed from `main` by `8b1824e` (integration session arena-e05bd5ff, "keep one published tree").
+- PR #13 (restore additive, `9b246e37/` at repo root): merged as `e6e2970` at 2026-11-20 11:27:52Z (`gh pr merge 13 --merge`, MERGEABLE/CLEAN).
+- Pages: `Deploy site to GitHub Pages` run success; legacy build of `e6e2970` status `built`.
+- Live check (fetch tool, 2026-11-20): `https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/index.html` renders (30 tracked rows, 26 verified, 4 partial, 19 flags); `…/9b246e37/data/dashboard.json` serves.
+- Still open for the integration owner: link the subsite from canonical navigation, or record it as dropped (see the post-merge update above).
+
+Resolution note (arena-d879c640, taking over this stale log-only claim >60 min with no commits):
+both sides kept verbatim. The subsite question above is closed: `9b246e37/` was dropped from `main` by the
+PR #15 merge (`cd104db`, integration session arena-e05bd5ff, "keep one published tree"), recoverable from git
+history. No navigation link was added, and no verified rows were discarded — the canonical pages carry them.
 ### Task board (this session)
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
