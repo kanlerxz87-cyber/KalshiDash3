@@ -344,7 +344,7 @@ const KDLIVE = (() => {
         close_time: m.close_time || null,
         source: `${base}/markets/${ticker}`,
         origin: S.mode === "live-api" ? "live tick" : "committed snapshot",
-        catalysts: m.__catalysts || [],
+        catalysts: m.__catalysts || catalystLinks(m),   // computed here too: the first alert can arrive before scoring
         roi: m.__roi || null,
       };
       // De-duplicate the same printed move (a retraded poll must not spam the chat).
@@ -594,7 +594,9 @@ const KDLIVE = (() => {
       if (!S.model) return;
       let watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
       if (S.mode === "live-api") {
-        if (!watch.length) await discover(true);
+        // Discover on the first live pass even when a snapshot already seeded the list: the
+        // committed file can be 20 minutes old, and a market opened since then must be watched.
+        if (!S.discoveredAt || Date.now() - S.discoveredAt > (opts.discoverMs || 300000) || !watch.length) await discover(!watch.length);
         watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
         if (watch.length) {
           try { await pollMarkets(watch); } catch (e) { S.lastError = String(e.message || e); }

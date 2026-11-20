@@ -109,11 +109,19 @@ def main() -> int:
         warns.append("no picks in this scan (normal: the screen demands a positive edge after fees)")
 
     if errors:
-        print(f"INVALID scan {path.relative_to(ROOT)}:", file=sys.stderr)
+        try:
+            shown = str(path.relative_to(ROOT))
+        except ValueError:
+            shown = str(path)
+        print(f"INVALID scan {shown}:", file=sys.stderr)
         for e in errors[:40]:
             print("  -", e, file=sys.stderr)
         return 1
-    print(f"OK: {len(doc.get('picks') or [])} picks, {len(doc.get('near_misses') or [])} near misses, "
+    try:
+        shown = str(path.relative_to(ROOT))
+    except ValueError:
+        shown = str(path)
+    print(f"OK {shown}: {len(doc.get('picks') or [])} picks, {len(doc.get('near_misses') or [])} near misses, "
           f"{len(doc.get('alerts') or [])} alerts, collected_at={doc.get('collected_at')} — "
           "provenance present, no sub-threshold alert, no ineligible pick, no coerced result.")
     for w in warns:

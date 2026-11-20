@@ -1,0 +1,421 @@
+
+"use strict";
+/* ---- nav: this page exists before the shared shell is updated by the integration
+      session, so it adds its own entry idempotently instead of editing site.js. ---- */
+KD.nav("live.html");
+(function ensureNav() {
+  const host = KD.$("#nav"); if (!host) return;
+  for (const [href, label] of [["live.html", "Live Desk"], ["roi.html", "ROI Model"]]) {
+    if (!host.querySelector(`a[href="${href}"]`)) {
+      const a = document.createElement("a");
+      a.href = href; a.textContent = label;
+      if (href === location.pathname.split("/").pop()) a.className = "on";
+      host.appendChild(a);
+    }
+  }
+})();
+
+const CATS = { gas: "Gas Prices", elections: "Elections", culture: "Culture", crypto: "Crypto", golf: "Golf" };
+const S = { snap: null, cat: "", sel: null, candles: {}, candAt: {}, resolving: new Map(), alerts: [] };
+const eng = KDLIVE.create({ pollMs: 6000, bookMs: 30000, snapshotMs: 60000, watchMax: 60 });
+
+const fmt = {
+  hhmmss: (iso) => { const d = new Date(iso); return Number.isNaN(d) ? "—" : d.toTimeString().slice(0, 8); },
+  hm: (ms) => { const d = new Date(ms); return d.toTimeString().slice(0, 5); },
+  ago: (iso) => KD.ago(iso),
+};
+
+/* ------------------------------- status bar ------------------------------- */
+function renderBar() {
+  const s = eng.S;
+  const el = KD.$("#livebar");
+  const modeCls = s.mode === "live-api" ? "mode-live" : s.mode === "snapshot" ? "mode-snapshot" : s.mode === "offline" ? "mode-offline" : "";
+  const modeTxt = s.mode === "live-api" ? "LIVE · direct demo API"
+    : s.mode === "snapshot" ? "SNAPSHOT · committed collector output"
+    : s.mode === "offline" ? "OFFLINE · no data source reachable" : "probing…";
+  const thr = s.model ? (s.model.swing_alert.threshold_dollars * 100).toFixed(0) + "¢" : "10¢";
+  const tickCount = Array.from(s.ticks.values()).reduce((a, b) => a + b.length, 0);
+  el.className = "livebar " + modeCls;
+  el.innerHTML = `<span><i class="dot"></i><b>${modeTxt}</b></span>` +
+    `<span class="sep">|</span><span>poll every <b>${(s.pollMs / 1000).toFixed(0)}s</b> · requests <b>${s.requests}</b> · failures <b>${s.failures}</b></span>` +
+    `<span class="sep">|</span><span>tick log <b>${tickCount}</b> points across <b>${s.ticks.size}</b> markets</span>` +
+    `<span class="sep">|</span><span>threshold <b>±${thr}</b></span>` +
+    (s.lastPollAt ? `<span class="sep">|</span><span>last poll <b>${fmt.hhmmss(s.lastPollAt)}</b> local</span>` : "") +
+    (s.snapshotAge ? `<span class="sep">|</span><span>snapshot <b>${fmt.ago(s.snapshotAge)}</b> (${KD.esc(s.snapshotAge)})</span>` : "") +
+    (s.cut && s.cut.market_settled_ts ? `<span class="sep">|</span><span>historical cutoff <b>${KD.esc(s.cut.market_settled_ts)}</b></span>` : "") +
+    (s.mode !== "live-api" ? `<span class="sep">|</span><span class="mut">${KD.esc(s.modeReason || "")}</span>` : "");
+}
+
+/* --------------------------------- chats ---------------------------------- */
+function msgHtml(a) {
+  const m = a.market || {};
+  const title = (a.title || m.title || a.ticker).replace(/\*\*/g, "");
+  const cat = CATS[a.category_id || m.category_id] || "";
+  const basis = (a.category_basis || m.category_basis) === "seed"
+    ? '<span class="pill on" title="series ticker appears in the official fee schedule">confirmed</span>'
+    : '<span class="pill no" title="keyword match only — not confirmed by an official source">keyword</span>';
+  const roi = a.roi && a.roi.eligible
+    ? `<span class="pill roi">ROI ${(a.roi.score * 100).toFixed(2)}%</span>` : "";
+  const liq = a.roi ? `<span>depth ${KD.num(a.roi.depth)} @touch</span><span>spread ${a.roi.spread === null ? "—" : (a.roi.spread * 100).toFixed(1) + "¢"}</span>` : "";
+  const cause = (a.catalysts && a.catalysts.length)
+    ? `<span class="cause">source this market settles on (from its own record): ${a.catalysts.map(c =>
+        `<a href="${KD.esc(c.url)}" target="_blank" rel="noopener">${KD.esc(hostOf(c.url))}</a>`).join(" · ")}</span>`
+    : `<span class="cause">no source URL in the market's own record — causality is not invented here</span>`;
+  return `<article class="msg ${a.direction}${Date.now() - Date.parse(a.t) < 20000 ? " fresh" : ""}" data-t="${KD.esc(a.ticker)}">
+    <time datetime="${KD.esc(a.t)}">${fmt.hhmmss(a.t)}</time>
+    <span class="who"><a href="#${encodeURIComponent(a.ticker)}" data-pick="${KD.esc(a.ticker)}">${KD.esc(title.slice(0, 96))}</a>
+      <span class="pill">${cat}</span>${basis}${roi}</span>
+    <span class="move">${a.delta > 0 ? "▲" : "▼"} ${a.cents.toFixed(1)}¢</span>
+    <span class="meta">
+      <span class="mono">$${a.from.toFixed(2)} → $${a.to.toFixed(2)}</span>
+      <span>24h vol ${KD.num(a.volume_24h_fp)} c</span><span>total ${KD.num(a.volume_fp)} c</span>
+      <span>settles ${a.close_time ? fmt.hm(Date.parse(a.close_time)) + " local" : "—"}</span>
+      ${liq}
+      <a href="${KD.esc(a.source)}" target="_blank" rel="noopener">API record</a>
+      <span class="mut">${KD.esc(a.origin || "")}</span>
+    </span>
+    ${cause}
+  </article>`;
+}
+const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u.slice(0, 30); } };
+
+function renderChats() {
+  const all = S.alerts.slice(0, 60);
+  KD.$("#feedAll").innerHTML = all.length
+    ? all.map(msgHtml).join("")
+    : `<div class="none">No swing of ±${((eng.S.model?.swing_alert?.threshold_dollars || 0.1) * 100).toFixed(0)}¢ in this session or in the retained collector history. The feeds fill in as prices move; nothing is back-filled by guessing.</div>`;
+  KD.$("#allCount").textContent = all.length + " shown";
+  KD.$("#allSub").textContent = `every market in the five topics · ${eng.S.markets.size} markets tracked · threshold ±${((eng.S.model?.swing_alert?.threshold_dollars || 0.1) * 100).toFixed(0)}¢`;
+
+  const livePicks = eng.S.picks || [];
+  const ciPicks = (!livePicks.length && S.ci?.picks?.length) ? S.ci.picks.map(p => ({ ...p, at: S.ci.collected_at, ci: true })) : [];
+  const shownPicks = (livePicks.length ? livePicks : ciPicks).slice(0, 8);
+  const pickLines = shownPicks.map(p => `<article class="msg ${p.entry && p.entry.roi >= 0 ? "up" : "down"}">
+      <time>${fmt.hhmmss(p.at || eng.S.lastPollAt || new Date().toISOString())}${p.ci ? '<div class="mut">scheduled scan</div>' : ""}</time>
+      <span class="who"><a href="#${encodeURIComponent(p.ticker)}" data-pick="${KD.esc(p.ticker)}">${KD.esc((p.title || p.ticker).slice(0, 96))}</a>
+        <span class="pill">${CATS[p.category_id] || ""}</span><span class="pill roi">${p.entry.side} ROI ${(p.score * 100).toFixed(2)}%</span></span>
+      <span class="move">q ${(p.q * 100).toFixed(1)}¢</span>
+      <span class="meta"><span>pay ${KD.cents(p.entry.entry)}</span><span>fee ${((p.entry.fee_unit || 0) * 100).toFixed(2)}¢/c</span>
+        <span>edge ${(p.entry.ev * 100).toFixed(2)}¢</span><span>depth ${KD.num(p.depth)}</span>
+        <span>to close ${p.ttc_hours === null ? "—" : p.ttc_hours.toFixed(1) + " h"}</span>
+        <a href="${KD.esc(p.source)}" target="_blank" rel="noopener">API record</a></span>
+    </article>`).join("");
+  const picksForFilter = new Set(shownPicks.map(p => p.ticker));
+  const roiAlerts2 = S.alerts.filter(a => picksForFilter.has(a.ticker) || a.in_picks).slice(0, 60);
+  KD.$("#feedRoi").innerHTML = (roiAlerts2.length || pickLines)
+    ? (pickLines + roiAlerts2.map(msgHtml).join(""))
+    : `<div class="none">Nothing passes the screen right now. That is a normal state: the model demands a positive
+        edge <i>after</i> crossing the spread and paying the documented taker fee, and on a well-quoted book that is
+        rare. Closest candidates: ${nearestFails()} — <a href="roi.html">model and measured hit rate</a>.</div>`;
+  KD.$("#roiCount").textContent = `${(eng.S.picks || []).length || shownPicks.length} picks · ${roiAlerts2.length} swings`;
+  KD.$("#roiSub").textContent = eng.S.model
+    ? `screen v${(eng.S.model.id || "").split("-v")[1] || "1"} · ${eng.S.model.parameters.filters.require_seed_category ? "fee-schedule-confirmed topics only" : "all topics"} · top ${eng.S.model.scoring.top_k}`
+    : "model unavailable";
+}
+function nearestFails() {
+  const rows = Array.from(eng.S.markets.values()).map(m => m.__roi).filter(Boolean)
+    .filter(r => !r.eligible && r.score !== null && r.score !== undefined).sort((a, b) => b.score - a.score).slice(0, 3);
+  if (!rows.length) return "none scored yet";
+  return rows.map(r => `<code>${KD.esc(r.ticker.split("-")[0])}</code> (${(r.score * 100).toFixed(2)}%: ${KD.esc((r.fails || [])[0] || "")})`).join("; ");
+}
+
+/* --------------------------------- chart ---------------------------------- */
+async function drawChart() {
+  const cv = KD.$("#chart"), ctx = cv.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth || 900, H = 360;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  const css = getComputedStyle(document.body);
+  const line = css.getPropertyValue("--line"), mut = css.getPropertyValue("--mut");
+  const pad = { l: 56, r: 16, t: 14, b: 34 }, iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const seriesSel = KD.$("#seriesSel").value;
+  const winSel = KD.$("#window").value;
+
+  ctx.strokeStyle = line; ctx.fillStyle = mut; ctx.lineWidth = 1; ctx.font = "11px ui-monospace,monospace";
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ih * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText("$" + (1 - i / 4).toFixed(2), 8, y + 4);
+  }
+  const row = currentRow();
+  if (!row) { text(ctx, mut, "No market selected yet.", W / 2 - 90, H / 2); return; }
+
+  let pts = [], note = "", foot = "";
+  if (winSel === "ticks") {
+    const obs = eng.seriesFor(row.ticker);
+    pts = obs.map(o => ({ t: Date.parse(o.t), v: o[seriesSel === "last" ? "last" : seriesSel === "bid" ? "yes_bid" : "yes_ask"],
+                          hi: Math.max(o.last ?? 0, o.yes_ask ?? 0), lo: Math.min(...[o.last, o.yes_bid, o.yes_ask].filter(x => x !== null)) }));
+    note = `${pts.length} in-session/snapshot ticks · ${obs.length ? fmt.hhmmss(obs[0].t) + " → " + fmt.hhmmss(obs[obs.length - 1].t) : "—"}`;
+    foot = `Tick cadence ${((eng.S.pollMs || 5000) / 1000).toFixed(0)}s from the browser when ${eng.S.mode === "live-api" ? "the API is reachable" : "unreachable (older points come from the committed snapshot)"}.`;
+  } else {
+    const minutes = { "5m": 300, "60m": 60 * 72, "1440m": 60 * 24 * 30 }[winSel];
+    const interval = { "5m": 1, "60m": 60, "1440m": 1440 }[winSel];
+    const key = row.ticker + "|" + minutes;
+    const fresh = S.candAt[key] && Date.now() - S.candAt[key] < 60000;
+    if (!S.candles[key] || !fresh) {
+      KD.$("#chartNote").textContent = "loading " + interval + "-minute candles…";
+      try {
+        const d = await eng.candles(row.ticker.split("-")[0], row.ticker, minutes);
+        S.candles[key] = d.candles; S.candAt[key] = Date.now();
+      } catch (e) {
+        S.candles[key] = []; S.candAt[key] = Date.now();
+        KD.$("#chartNote").textContent = "candles unavailable from this browser: " + (e.message || e);
+      }
+    }
+    const cs = S.candles[key] || [];
+    pts = cs.map(c => ({ t: c.t, v: seriesSel === "last" ? c.close : seriesSel === "bid" ? c.bid_close : seriesSel === "ask" ? c.ask_close : c.close,
+                         hi: seriesSel === "range" ? c.high : null, lo: seriesSel === "range" ? c.low : null }));
+    note = `${cs.length} candles at ${interval}-minute resolution (the only intervals the API offers: 1, 60, 1440)`;
+    foot = `Each candle's price block carries open/high/low/close for the traded price; the bid and ask columns come from the same response. `;
+  }
+  pts = pts.filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+  KD.$("#chartNote").textContent = note;
+  KD.$("#chartMeta") && (KD.$("#chartMeta").textContent = "");
+  if (!pts.length) { text(ctx, mut, "No price points in this window — widen the window or wait for the next poll.", pad.l + 12, pad.t + 24); KD.$("#chartFoot").textContent = foot; return; }
+
+  const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
+  const X = t => pad.l + iw * (t - t0) / (t1 - t0);
+  const Y = v => pad.t + ih * (1 - Math.min(1, Math.max(0, v)));
+  const span = t1 - t0;
+  for (let i = 0; i <= 4; i++) {
+    const t = t0 + span * i / 4, d = new Date(t);
+    const lab = span > 86400e3 ? `${d.getUTCMonth() + 1}/${d.getUTCDate()}`
+      : span > 3600e3 * 6 ? d.toTimeString().slice(0, 5) : d.toTimeString().slice(0, 8);
+    ctx.fillStyle = mut; ctx.fillText(lab, Math.min(X(t) - 20, W - 52), H - 12);
+  }
+  if (seriesSel === "range") {
+    ctx.strokeStyle = "rgba(0,182,122,.32)"; ctx.lineWidth = 1;
+    for (const p of pts) { if (p.hi === null || p.lo === null) continue;
+      ctx.beginPath(); ctx.moveTo(X(p.t), Y(p.hi)); ctx.lineTo(X(p.t), Y(p.lo)); ctx.stroke(); }
+  }
+  ctx.strokeStyle = "#00b67a"; ctx.lineWidth = 1.8; ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)));
+  ctx.stroke();
+  if (pts.length < 220) { ctx.fillStyle = "#00b67a"; for (const p of pts) { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.1, 0, 7); ctx.fill(); } }
+  const last = pts[pts.length - 1];
+  ctx.fillStyle = css.getPropertyValue("--txt"); ctx.font = "12px system-ui";
+  ctx.fillText((last.v * 100).toFixed(1) + "¢", Math.min(X(last.t) + 7, W - 48), Math.max(Y(last.v) - 7, 14));
+
+  const marks = S.alerts.filter(a => a.ticker === row.ticker).slice(0, 40);
+  for (const a of marks) {
+    const t = Date.parse(a.t); if (!Number.isFinite(t) || t < t0 || t > t1) continue;
+    const y = Y(a.to), up = a.delta > 0;
+    ctx.fillStyle = up ? "#45d483" : "#f2695c";
+    ctx.beginPath();
+    ctx.moveTo(X(t), y + (up ? -9 : 9)); ctx.lineTo(X(t) - 5, y + (up ? -2 : 2)); ctx.lineTo(X(t) + 5, y + (up ? -2 : 2));
+    ctx.closePath(); ctx.fill();
+  }
+  KD.$("#chartFoot").innerHTML = `${foot} Market <code>${KD.esc(row.ticker)}</code> · status ${KD.esc(row.status || "—")} ·
+    result ${KD.esc(row.result || "not yet")} · open interest ${KD.num(row.open_interest_fp)} contracts ·
+    <a href="${KD.esc(row.source)}" target="_blank" rel="noopener">official record</a>.`;
+}
+function text(ctx, colour, s, x, y) { ctx.fillStyle = colour; ctx.font = "13px system-ui"; ctx.fillText(s, x, y); }
+
+/* ------------------------------- watchlist -------------------------------- */
+function currentRow() {
+  if (!S.sel) return null;
+  return eng.S.markets.get(S.sel) || (S.snap?.open_markets || []).concat(S.snap?.settled_markets || []).find(r => r.ticker === S.sel) || null;
+}
+function spark(ticks) {
+  if (!ticks || ticks.length < 2) return '<span class="na">—</span>';
+  const v = ticks.map(t => t.last).filter(x => x !== null && x !== undefined);
+  if (v.length < 2) return '<span class="na">—</span>';
+  const lo = Math.min(...v), hi = Math.max(...v), rng = hi - lo || 0.02;
+  const step = 100 / (v.length - 1);
+  const poly = v.map((x, i) => `${(i * step).toFixed(1)},${(20 - ((x - lo) / rng) * 18).toFixed(1)}`).join(" ");
+  const dir = v[v.length - 1] > v[0] ? "" : v[v.length - 1] < v[0] ? "down" : "flat";
+  return `<svg class="spark ${dir}" viewBox="0 0 100 22" preserveAspectRatio="none" aria-hidden="true"><polyline points="${poly}"/></svg>`;
+}
+function renderWatch() {
+  const rows = Array.from(eng.S.markets.values())
+    .filter(m => !S.cat || m.category_id === S.cat)
+    .sort((a, b) => {
+      const ea = a.__roi, eb = b.__roi;
+      const pa = ea && ea.eligible ? 0 : 1, pb = eb && eb.eligible ? 0 : 1;
+      if (pa !== pb) return pa - pb;
+      return ((b.volume_fp || 0) * (b.last_price_dollars || 0)) - ((a.volume_fp || 0) * (a.last_price_dollars || 0));
+    })
+    .slice(0, 25)
+    .map(m => {
+      const r = m.__roi || {};
+      const ticks = eng.seriesFor(m.ticker);
+      const first = ticks.find(t => t.last !== null), cur = ticks.slice().reverse().find(t => t.last !== null);
+      const d = first && cur ? cur.last - first.last : null;
+      const roi = r.eligible
+        ? `<span class="pill roi">${r.entry.side} ${(r.score * 100).toFixed(2)}%</span>`
+        : `<span class="pill no" title="${KD.esc((r.fails || []).join(" · "))}">${r.score === null || r.score === undefined ? "not scored" : (r.score * 100).toFixed(2) + "% · gated"}</span>`;
+      return {
+        m: `<button class="ghost" data-pick="${KD.esc(m.ticker)}" style="padding:2px 8px;font-size:11.5px">chart</button>`,
+        title: `<a href="${KD.esc(m.source || ("https://external-api.demo.kalshi.co/trade-api/v2/markets/" + m.ticker))}" target="_blank" rel="noopener">${KD.esc((m.title || m.yes_sub_title || m.ticker).replace(/\*\*/g, "").slice(0, 74))}</a>
+                <div class="small mut mono">${KD.esc(m.ticker)}</div>`,
+        cat: CATS[m.category_id] || '<span class="na">—</span>',
+        spark: spark(ticks),
+        last: KD.cents(m.last_price_dollars),
+        chg: d === null ? '<span class="na">—</span>' : `<span class="mono" style="color:${d > 0 ? "var(--ok)" : d < 0 ? "var(--bad)" : "var(--mut)"}">${d > 0 ? "+" : ""}${(d * 100).toFixed(1)}¢</span>`,
+        bid: KD.cents(m.yes_bid_dollars), ask: KD.cents(m.yes_ask_dollars),
+        spr: r.spread === null || r.spread === undefined ? '<span class="na">—</span>' : (r.spread * 100).toFixed(1) + "¢",
+        dep: r.depth === undefined ? '<span class="na">—</span>' : KD.num(r.depth),
+        vol: KD.num(m.volume_24h_fp),
+        roi,
+        close: m.close_time ? fmt.hm(Date.parse(m.close_time)) : '<span class="na">—</span>',
+        status: KD.statusBadge(m.status),
+      };
+    });
+  KD.$("#watch").innerHTML = KD.table([
+    { key: "m", label: "" }, { key: "title", label: "Market (live)" }, { key: "cat", label: "Topic" },
+    { key: "spark", label: "Session" }, { key: "last", label: "Last", num: true }, { key: "chg", label: "Δ session", num: true },
+    { key: "bid", label: "YES bid", num: true }, { key: "ask", label: "YES ask", num: true },
+    { key: "spr", label: "Spread", num: true }, { key: "dep", label: "Depth @touch", num: true },
+    { key: "vol", label: "24h vol", num: true }, { key: "roi", label: "ROI screen" },
+    { key: "close", label: "Closes", num: true }, { key: "status", label: "Status" },
+  ], rows, { empty: "No markets loaded yet — the collector snapshot and the direct API are both unreachable from this browser." });
+}
+
+function renderPicker() {
+  const sel = KD.$("#pickMarket");
+  const rows = Array.from(eng.S.markets.values())
+    .filter(m => !S.cat || m.category_id === S.cat)
+    .sort((a, b) => ((b.volume_fp || 0) * (b.last_price_dollars || 0)) - ((a.volume_fp || 0) * (a.last_price_dollars || 0)))
+    .slice(0, 40);
+  const cur = S.sel;
+  sel.innerHTML = rows.map(m => `<option value="${KD.esc(m.ticker)}"${m.ticker === cur ? " selected" : ""}>${KD.esc((m.title || m.ticker).slice(0, 60))} · ${KD.cents(m.last_price_dollars).replace(/<[^>]+>/g, "—")}</option>`).join("")
+    || '<option value="">no markets yet</option>';
+  if (!rows.some(m => m.ticker === S.sel) && rows.length) S.sel = rows[0].ticker;
+  sel.value = S.sel || "";
+}
+
+/* --------------------------------- ladder --------------------------------- */
+function renderLadder() {
+  const head = KD.$("#liqHead"), host = KD.$("#ladder");
+  const b = S.sel ? eng.S.books.get(S.sel) : null;
+  if (!b) {
+    head.innerHTML = S.sel ? `No order book in this poll for <code>${KD.esc(S.sel)}</code>. Books are read for the
+      watchlist (up to 100 tickers per request); the endpoint is public
+      (<a href="https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks" target="_blank" rel="noopener">GET /markets/orderbooks</a>).`
+      : "Pick a market to see its depth.";
+    host.innerHTML = ""; return;
+  }
+  head.innerHTML = `<code>${KD.esc(S.sel)}</code> · best YES bid ${KD.cents(b.bid_price)} (${KD.num(b.depth_at_bid)} c) ·
+    best YES ask ${KD.cents(b.ask_price)} (${KD.num(b.depth_at_ask)} c) · read at ${fmt.hhmmss(b.at)}`;
+  const max = Math.max(1, ...b.yes_ladder.map(x => x.contracts || 0), ...b.no_ladder.map(x => x.contracts || 0));
+  const col = (rows, cls) => rows.slice().reverse().slice(0, 12).map(r =>
+    `<div class="lvl ${cls}"><span>$${r.price.toFixed(4)}</span><span class="g"><i style="width:${((r.contracts || 0) / max * 100).toFixed(1)}%"></i></span><span>${KD.num(r.contracts)}</span></div>`).join("")
+    || '<p class="empty">Empty side — no resting orders (the API returns empty arrays for an empty book).</p>';
+  host.innerHTML = `<div><h4>YES bids — a seller can hit these</h4>${col(b.yes_ladder, "")}</div>
+                    <div><h4>YES asks implied by NO bids — a buyer can lift these</h4>${col(b.no_ladder, "ask")}</div>`;
+}
+
+/* ------------------------------ resolutions ------------------------------- */
+function renderResolutions() {
+  const rows = Array.from(S.resolving.values());
+  KD.$("#resolving").innerHTML = rows.length
+    ? rows.map(r => `<div class="small">· <b>${KD.esc(r.ticker)}</b> ${KD.esc(r.note)} <span class="mut">${fmt.hhmmss(r.at)}</span></div>`).join("")
+    : `nothing closing inside this session`;
+  const settled = (S.snap?.settled_markets || []).filter(r => !S.cat || r.category_id === S.cat).slice(0, 25).map(r => ({
+    t: r.settlement_ts ? fmt.hhmmss(r.settlement_ts) : '<span class="na">—</span>',
+    m: `<a href="${KD.esc(r.source)}" target="_blank" rel="noopener">${KD.esc((r.title || r.ticker).replace(/\*\*/g, "").slice(0, 70))}</a><div class="small mut mono">${KD.esc(r.ticker)}</div>`,
+    cat: CATS[r.category_id] || "—",
+    res: KD.resultBadge(r.result),
+    sv: r.settlement_value_dollars === null || r.settlement_value_dollars === undefined ? '<span class="na">—</span>' : "$" + Number(r.settlement_value_dollars).toFixed(4),
+    last: KD.cents(r.last_price_dollars),
+    vol: KD.num(r.volume_fp),
+    basis: KD.basisBadge(r.category_basis),
+  }));
+  KD.$("#resolved").innerHTML = KD.table([
+    { key: "t", label: "Settled" }, { key: "m", label: "Market" }, { key: "cat", label: "Topic" },
+    { key: "res", label: "Resolved" }, { key: "sv", label: "Settlement value", num: true },
+    { key: "last", label: "Last price", num: true }, { key: "vol", label: "Contracts", num: true }, { key: "basis", label: "Topic basis" },
+  ], settled, { empty: "The committed snapshot has no settled markets in scope yet." });
+}
+
+/* ---------------------------------- KPIs ---------------------------------- */
+function renderKpis() {
+  const s = eng.S;
+  const eligible = (s.picks || []).length;
+  const scored = Array.from(s.markets.values()).filter(m => m.__roi).length;
+  const ups = S.alerts.filter(a => a.delta > 0).length, downs = S.alerts.filter(a => a.delta < 0).length;
+  const best = (s.picks || [])[0];
+  KD.$("#kpis").innerHTML = [
+    ["Markets scored", KD.num(scored), "in the five topics"],
+    ["Passing the screen", KD.num(eligible), "positive ROI after fees"],
+    ["Swings ≥10¢", `${KD.num(ups + downs)}<span class="small mut"> ↑${ups} ↓${downs}</span>`, "this session + collector history"],
+    ["Best modelled ROI", best ? (best.score * 100).toFixed(2) + "%" : "—", best ? best.entry.side + " at " + KD.cents(best.entry.entry) : "nothing qualifies"],
+    ["Ticks in log", KD.num(Array.from(s.ticks.values()).reduce((a, b) => a + b.length, 0)), `${s.ticks.size} markets`],
+  ].map(([l, v, s2]) => `<div class="card"><div class="l">${l}</div><div class="v">${v}</div><div class="small mut">${s2}</div></div>`).join("");
+}
+
+/* --------------------------------- wiring --------------------------------- */
+function selectTicker(t) {
+  S.sel = t;
+  history.replaceState(null, "", "#" + encodeURIComponent(t));
+  renderLadder(); drawChart(); renderWatch();
+}
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("[data-pick]");
+  if (!a) return;
+  e.preventDefault();
+  selectTicker(a.getAttribute("data-pick"));
+});
+KD.$("#window").addEventListener("change", () => drawChart());
+KD.$("#seriesSel").addEventListener("change", () => drawChart());
+KD.$("#pickMarket").addEventListener("change", (e) => selectTicker(e.target.value));
+window.addEventListener("resize", () => drawChart());
+
+function renderCatTabs() {
+  const host = KD.$("#catTabs");
+  host.innerHTML = [["", "All five"]].concat(Object.entries(CATS))
+    .map(([id, lab]) => `<button class="ghost${id === S.cat ? " on" : ""}" data-cat="${id}">${lab}</button>`).join("");
+  host.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => {
+    S.cat = b.dataset.cat; renderCatTabs(); renderPicker(); renderWatch(); renderResolutions(); drawChart();
+  }));
+}
+
+eng.on("alert", (a) => { S.alerts = eng.S.alerts.slice(); renderChats(); renderKpis(); });
+eng.on("pick", () => { renderChats(); renderKpis(); renderPicker(); renderWatch(); });
+eng.on("status", () => { renderBar(); });
+eng.on("tick", () => { /* batched by the frame loop below */ });
+
+let raf = 0;
+function scheduleRender() {
+  if (raf) return;
+  raf = requestAnimationFrame(() => { raf = 0; renderWatch(); renderBar(); renderKpis(); });
+}
+setInterval(() => { if (eng.S.mode === "live-api") scheduleRender(); }, 5000);
+
+/* Detect a watched market crossing its close time / changing lifecycle status, so the
+   "tracked until resolved" promise is visible in-session, from the official status field. */
+eng.on("tick", (m) => {
+  const prev = S.resolving.get(m.ticker + "|status");
+  const st = String(m.status || "");
+  if (prev && prev !== st) {
+    S.resolving.set(m.ticker, { ticker: m.ticker, at: new Date().toISOString(), note: `lifecycle status ${prev} → ${st}${m.result ? ", result " + m.result : ""}` });
+  }
+  S.resolving.set(m.ticker + "|status", st);
+});
+
+(async function boot() {
+  renderCatTabs();
+  try {
+    await eng.start({ seedMarkets: true, modelUrl: "data/roi_model.json" });
+  } catch (e) {
+    KD.$("#livebar").className = "livebar mode-offline";
+    KD.$("#livebar").innerHTML = `<span><i class="dot"></i><b>OFFLINE</b></span> <span class="mut">${KD.esc(e.message || String(e))}</span>`;
+    return;
+  }
+  try { S.snap = await KD.json("data/live/markets.json"); } catch (e) { S.snap = null; }
+  try { S.ci = await KD.json("data/live/roi.json"); } catch (e) { S.ci = null; }
+  S.alerts = eng.S.alerts.slice();
+  if (!S.alerts.length && S.ci?.alerts?.length) S.alerts = S.ci.alerts.map(a => ({ ...a, origin: "scheduled scan " + (S.ci.collected_at || "") }));
+  const hash = decodeURIComponent(location.hash.replace("#", ""));
+  if (hash) S.sel = hash;
+  else if ((eng.S.picks || [])[0]) S.sel = eng.S.picks[0].ticker;
+  renderBar(); renderChats(); renderPicker(); renderWatch(); renderLadder(); renderResolutions(); renderKpis();
+  drawChart();
+  // Re-run the probe: a browser that was offline at load should become live without a click.
+  setInterval(async () => {
+    await eng.probe();
+    if (eng.S.mode === "live-api") await eng.tick();
+    renderWatch(); renderBar(); renderKpis(); renderResolutions();
+  }, 120000);
+})();

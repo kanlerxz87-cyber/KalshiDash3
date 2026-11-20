@@ -27,6 +27,8 @@
 
   <div class="kpirow" id="kpis"></div>
 
+  <div class="smalltabs" id="catTabs" role="group" aria-label="Filter every panel on this page by topic"></div>
+
   <h2>Alert chats</h2>
   <p class="small mut">
     A message is emitted when <code>|last price − last price at the previous observation| ≥ $0.10</code> in either
@@ -504,6 +506,7 @@ window.addEventListener("resize", () => drawChart());
 
 function renderCatTabs() {
   const host = KD.$("#catTabs");
+  if (!host) return;
   host.innerHTML = [["", "All five"]].concat(Object.entries(CATS))
     .map(([id, lab]) => `<button class="ghost${id === S.cat ? " on" : ""}" data-cat="${id}">${lab}</button>`).join("");
   host.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => {
