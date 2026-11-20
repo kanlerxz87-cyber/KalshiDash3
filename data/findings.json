@@ -420,7 +420,7 @@
     {
       "id": "F-18",
       "item": "Pages build setting and the deploy workflow disagree about how the site is published",
-      "why": "GET /repos/kanlerxz87-cyber/KalshiDash3/pages reports build_type 'legacy' with source main:/ (deploy from branch). pages.yml deploys with GitHub Actions. GitHub's documentation says a branch source and an Actions source are separate publishing modes; the Actions run is always the deploy step, so the live result depends on which setting the owner has. This session could not change the setting (PUT /pages returns 403). Not changed.",
+      "why": "GET /repos/kanlerxz87-cyber/KalshiDash3/pages reports build_type 'legacy' with source main:/ (deploy from branch). pages.yml deploys with GitHub Actions. GitHub's documentation says a branch source and an Actions source are separate publishing modes; the Actions run is always the deploy step, so the live result depends on which setting the owner has. This session could not change the setting (PUT /pages returns 403). Not changed. Evidence (checked after the merge of PR #20): the GitHub Pages build history shows two publishers running. A pages-build-deployment (branch build) built the collector's snapshot commit 82218d3 at 13:32:28Z, and pages.yml built merge ca10d37 at 13:31:56Z. Two publishers can publish different trees; see F-05.",
       "action": "Owner to confirm in Settings > Pages which source is intended, and set it to GitHub Actions if pages.yml should publish. Not changed by this session.",
       "severity": "medium",
       "sources": [
@@ -456,6 +456,16 @@
       "severity": "medium",
       "sources": [
         "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+      ]
+    },
+    {
+      "id": "F-23",
+      "item": "Demo quotes can show a 99-cent spread; the first simulator version filled across it",
+      "why": "The stored quote at the alert time for KXDEMOFUTHOURLY-26NOV20H14-UP was yes bid 0.01 and yes ask 1.00. The first version of scripts/simulate.py filled a NO position at 0.99 on that quote. The next run marked it to a 0.00 bid, an unrealised result of -1.00. That fill is not a price anyone could trade at. The simulator now treats a spread above max_quote_spread_dollars (0.10, a project rule set to match the swing threshold) as untradable: such signals are not filled, and an open position whose entry quote breaches it is voided, not settled.",
+      "action": "Owner to confirm the 0.10 threshold in data/strategies.json. The voided position stays visible on simulation.html as VOID.",
+      "severity": "medium",
+      "sources": [
+        "https://docs.kalshi.com/getting_started/orderbook_responses"
       ]
     }
   ]

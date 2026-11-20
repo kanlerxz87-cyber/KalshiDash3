@@ -2,7 +2,7 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-20T13:32:26Z",
+ "generated_at": "2026-11-20T13:34:36Z",
  "snapshot_collected_at": "2026-11-20T13:32:25Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
@@ -10,9 +10,9 @@
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
   "signals_processed_total": 5,
-  "new_signals_this_run": 1,
-  "open_positions": 1,
-  "settled_positions_kept": 0
+  "new_signals_this_run": 0,
+  "open_positions": 0,
+  "settled_positions_kept": 1
  },
  "strategies": [
   {
@@ -23,6 +23,8 @@
    "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going.",
    "signals": 5,
    "not_filled": 5,
+   "not_filled_wide_spread": 0,
+   "voided": 0,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 1,
    "skipped_duplicate": 0,
@@ -46,17 +48,19 @@
    "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses.",
    "signals": 5,
    "not_filled": 4,
+   "not_filled_wide_spread": 0,
+   "voided": 1,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 0,
    "skipped_duplicate": 0,
    "filled": 1,
-   "open": 1,
+   "open": 0,
    "settled": 0,
    "wins": 0,
    "losses": 0,
    "hit_rate": null,
    "realized_net": 0.0,
-   "unrealized_net_open": -1.0,
+   "unrealized_net_open": null,
    "avg_realized_per_settled": null,
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
@@ -77,6 +81,8 @@
    "description": "S1 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
    "signals": 0,
    "not_filled": 0,
+   "not_filled_wide_spread": 0,
+   "voided": 0,
    "not_filled_no_quote": 0,
    "not_filled_bad_price": 0,
    "skipped_duplicate": 0,
@@ -100,6 +106,8 @@
    "description": "S2 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
    "signals": 0,
    "not_filled": 0,
+   "not_filled_wide_spread": 0,
+   "voided": 0,
    "not_filled_no_quote": 0,
    "not_filled_bad_price": 0,
    "skipped_duplicate": 0,
@@ -127,7 +135,8 @@
    "hit_rate": null
   }
  ],
- "open_positions": [
+ "open_positions": [],
+ "settled_positions": [
   {
    "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
    "strategy": "S2",
@@ -149,25 +158,25 @@
    "quote_bid": 0.01,
    "quote_ask": 1.0,
    "quote_source": "price_history",
-   "status": "open",
-   "outcome": null,
+   "status": "voided",
+   "outcome": "void",
    "settled_at": null,
    "settled_result": null,
    "realized_net": null,
    "bid_now": 0.0,
    "unrealized_net": -1.0,
-   "mark_note": null,
+   "mark_note": "entry spread above 0.10: not a tradable quote",
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
    "mark_at": "2026-11-20T13:32:25Z"
   }
  ],
- "settled_positions": [],
  "disclaimers": [
   "PAPER ONLY. No orders are placed and no account is used. Results are what the fixed rules would have produced at observed prices.",
   "Demo prices may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
   "Entry is at the observed ask in the observation at the alert time. No slippage beyond that and no fill-probability model.",
   "A signal is not filled when no bid/ask was stored at the alert time (not_filled_no_quote). The collector stores quotes only while a market is in its open scan, so most expired markets have none. Nothing is filled from last-trade prices.",
   "Fees are the official taker fee. The multipliers were read from the PDF text (see strategies.json multiplier_caveat).",
+  "A quote whose yes ask minus yes bid exceeds max_quote_spread_dollars is not treated as tradable: such a signal is not filled, and an open position with such an entry quote is voided.",
   "Sample sizes are small until settled positions reach min_settled_for_conclusion. No strategy is recommended before that."
  ],
  "state": {
@@ -178,7 +187,8 @@
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:31:35Z>2026-11-20T11:33:33Z",
    "KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z"
   ],
-  "open": [
+  "open": [],
+  "closed": [
    {
     "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
     "strategy": "S2",
@@ -200,19 +210,18 @@
     "quote_bid": 0.01,
     "quote_ask": 1.0,
     "quote_source": "price_history",
-    "status": "open",
-    "outcome": null,
+    "status": "voided",
+    "outcome": "void",
     "settled_at": null,
     "settled_result": null,
     "realized_net": null,
     "bid_now": 0.0,
     "unrealized_net": -1.0,
-    "mark_note": null,
+    "mark_note": "entry spread above 0.10: not a tradable quote",
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
     "mark_at": "2026-11-20T13:32:25Z"
    }
   ],
-  "closed": [],
   "counters": {
    "S1": {
     "signals": 5,
@@ -236,7 +245,8 @@
     "settled": 0,
     "wins": 0,
     "losses": 0,
-    "realized_net": 0.0
+    "realized_net": 0.0,
+    "voided": 1
    },
    "_cat|S2|crypto": {
     "signals": 0,

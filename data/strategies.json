@@ -3,7 +3,7 @@
   "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
   "note": "Strategy definitions for scripts/simulate.py. Each signal is one swing in data/live/alerts_archive.json (built by scripts/build_alerts.py). Edit this file to change a rule; no code change is needed. Rules are project choices unless marked otherwise.",
   "contracts_per_signal": 1,
-  "entry_rule": "Taker entry at the observed ask in the observation at the alert's to_time: YES at yes_ask_dollars; NO at 1 - yes_bid_dollars (documented reciprocal relation, https://docs.kalshi.com/getting_started/orderbook_responses). No quote at that time, or an entry outside 0.01-0.99, means not filled.",
+  "entry_rule": "Taker entry at the observed ask in the observation at the alert's to_time: YES at yes_ask_dollars; NO at 1 - yes_bid_dollars (documented reciprocal relation, https://docs.kalshi.com/getting_started/orderbook_responses). No quote at that time, or an entry outside 0.01-0.99, means not filled. A quote whose spread (yes ask minus yes bid) exceeds max_quote_spread_dollars is not filled.",
   "exit_rule": "Hold to settlement. A position settles only when the market appears in the settled list with result yes or no (https://docs.kalshi.com/getting_started/market_settlement). Before that it is marked to the current bid: unrealised = bid - entry - entry fee - exit fee at that bid.",
   "one_open_position_rule": "At most one open position per strategy per market. Further signals for the same market are counted as skipped_duplicate.",
   "min_settled_for_conclusion": 30,
@@ -79,5 +79,7 @@
     }
   ],
   "signal_source": "data/live/alerts_archive.json: every consecutive last-price pair with |change| >= $0.10 (threshold from the brief; data/alert_rules.json).",
-  "high_roi_definition": "The 'high_roi' flag in the archive is the dashboard's EXPERIMENTAL 'Model watch' screen (fee-schedule seed series with positive volume_24h_fp). It is not an owner-approved ROI model (Flagged F-14)."
+  "high_roi_definition": "The 'high_roi' flag in the archive is the dashboard's EXPERIMENTAL 'Model watch' screen (fee-schedule seed series with positive volume_24h_fp). It is not an owner-approved ROI model (Flagged F-14).",
+  "max_quote_spread_dollars": 0.1,
+  "max_quote_spread_note": "Project rule (not an official fact). A stored quote whose yes ask minus yes bid exceeds this value is not a tradable price: a 99-cent spread on a demo market gives a fill that no trader could get. Set at 10 cents to match the swing threshold. Open positions whose entry quote breaches it are voided (status 'voided'), not settled. See Flagged F-23."
 }
