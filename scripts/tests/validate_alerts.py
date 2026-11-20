@@ -123,22 +123,40 @@ def main() -> int:
     check(bool(alerts_doc.get("disclaimers")), "alerts.json disclaimers missing")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
-    # ---- high_roi screen reproduces from the rules against the CURRENT snapshot ----
+    # ---- high_roi screen reproduces from the rules, against the inputs STORED WITH THE ALERT ----
+    # The screen is decided at detection time (build_alerts.py) and the archive is append-only, so
+    # a flag is a record of what the rule said about that market at that moment. Checking it
+    # against a LATER snapshot is a category error: volume_24h_fp moves every collection, and the
+    # moment any archived market crosses the > 0 boundary the collector refuses its own snapshot
+    # forever — which is exactly what broke every collect.yml run at 2026-11-20T19:35Z
+    # ("archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True").
+    # So: the flag is verified against the entry's own recorded inputs (which is also STRICTER than
+    # before — an alert whose market has since left the snapshot is now checked at all instead of
+    # skipped), and disagreement with the current snapshot is counted and reported, not fatal.
     markets_path = LIVE / "markets.json"
     snap = load(markets_path)
     roi_rules = rules.get("high_roi") or {}
-    if snap and roi_rules:
-        by_ticker = {m["ticker"]: m for m in (snap.get("open_markets") or [])}
+    drift = 0
+    if roi_rules:
+        req_basis = roi_rules.get("require_category_basis")
+        req_gt = roi_rules.get("require_volume_24h_gt", -1)
+        by_ticker = {m["ticker"]: m for m in ((snap or {}).get("open_markets") or [])}
         for a in archive:
-            m = by_ticker.get(a.get("ticker", ""))
-            if m is None:
-                continue  # detection-time screen; market left the snapshot
-            expected = bool(
-                m.get("category_basis") == roi_rules.get("require_category_basis")
-                and (m.get("volume_24h_fp") or 0) > roi_rules.get("require_volume_24h_gt", -1)
-            )
+            expected = bool(a.get("category_basis") == req_basis and (a.get("volume_24h_fp") or 0) > req_gt)
             check(a.get("high_roi") == expected,
-                  f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} != rules-derived {expected}")
+                  f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} contradicts the "
+                  f"inputs stored with it (category_basis={a.get('category_basis')!r}, "
+                  f"volume_24h_fp={a.get('volume_24h_fp')!r}, rule-derived {expected})")
+            m = by_ticker.get(a.get("ticker", ""))
+            if m is not None:
+                now = bool(m.get("category_basis") == req_basis
+                           and (m.get("volume_24h_fp") or 0) > req_gt)
+                if now != expected:
+                    drift += 1
+        if drift:
+            print(f"note: {drift} archived alert(s) whose screen result differs in the CURRENT snapshot — "
+                  f"expected and allowed: high_roi is frozen at detection time (volume_24h_fp changes "
+                  f"between collections); the flag is verified against each entry's own stored inputs.")
 
     # ---- provenance: recompute swings from the committed observations ----
     hist = load(LIVE / "price_history.json")

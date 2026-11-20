@@ -695,3 +695,22 @@ Two further overlaps were resolved the same way on the second `origin/main` merg
   published as a second id for one defect. `data/findings.json` was rebuilt as a real merge, and this session's
   severity label was left as `main`'s. Nothing from PR #31/#34/#36 was overwritten.
 
+
+### Post-merge fix (same session): the collector was refusing every new snapshot — F-34
+- 2026-11-20 20:50 UTC: after PR #35 merged (`351080f`), `desk.yml` went green for the first time and committed
+  `data/live/roi.json` at `a64c54c` with `orderbooks: 214 of 214 requested` and the `orderbook_fetch` coverage
+  block (was `orderbooks: 0` on every previous run) — the depth fix is live, not just tested.
+- The same dispatch round showed `collect.yml` **failing** at its validation step (run 44803531445). Read via the
+  check-run annotations (the log blob is off this sandbox's allowlist, but annotations are on `api.github.com`):
+  `archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True`. Root cause:
+  `validate_alerts.py` re-derives the `high_roi` screen from the **current** `markets.json`, while
+  `build_alerts.py` decides it at **detection time** on an **append-only** archive. `volume_24h_fp` changes every
+  collection, so once any archived market crosses `> 0` the workflow refuses to commit its own snapshot — forever.
+  The committed files validate under either rule, so nothing local showed it; only a fresh run does.
+- Fix: verify the flag against the inputs recorded with the alert (stricter than before: archive-only alerts are
+  now checked at all instead of skipped), report current-snapshot disagreement as drift, document the freeze
+  semantics in `data/alert_rules.json` next to the rule, and pin it all in `scripts/tests/test_alerts.py`
+  `HighRoiFreezeTests` (3 tests; mutation-checked — restoring the old comparison fails 2 of 16).
+  Files touched: `scripts/tests/validate_alerts.py`, `scripts/tests/test_alerts.py`, `data/alert_rules.json`,
+  `data/findings.json`, `COORDINATION.md`. `scripts/build_alerts.py` deliberately **not** changed — its behaviour
+  is the correct one and it belongs to T12.

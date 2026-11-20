@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-20T19:20:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-d243bfa7 also added F-34 (the collector's detection-time-vs-current-snapshot rule bug).",
  "questions": [
   {
    "id": "Q1",
@@ -682,6 +682,19 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30&tickers=KXBTCY-27JAN0100-B47500",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30%2CKXBTCY-27JAN0100-B47500",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/35"
+   ]
+  },
+  {
+   "id": "F-34",
+   "item": "The scheduled collector refused to commit any new snapshot: the alert validator re-judged a detection-time decision against a later collection",
+   "why": "build_alerts.py decides `high_roi` from the snapshot it is reading and the archive is append-only, but validate_alerts.py re-derived the same screen from the CURRENT data/live/markets.json and failed the run when the two disagreed. volume_24h_fp moves every collection, so one archived alert crossing the '> 0' boundary was enough: collect.yml run 44803531445 (2026-11-20T19:35Z) failed with 'archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True' \u2014 the entry recorded volume_24h_fp 0.0, the market started trading afterwards. Because the workflow only commits a snapshot that validates, every later run would fail the same way: the site's freshness (and with it the live alerting the brief asks for) was blocked by a rule-application bug, not by the API. The committed files pass either way, which is why no local check showed it.",
+   "action": "Fixed by session arena-d243bfa7: the flag is now verified against the volume_24h_fp / category_basis STORED WITH each alert (which also makes it STRICTER \u2014 an alert whose market has left the snapshot is checked now, where before it was skipped), and disagreement with the current snapshot is printed as a drift note instead of failing the build. data/alert_rules.json states the freeze semantics next to the rule itself. scripts/tests/test_alerts.py HighRoiFreezeTests pins all three behaviours (drift allowed + reported, contradicted flag rejected, inputs present on every entry) and was mutation-checked: restoring the old current-snapshot comparison fails 2 of the 16 tests. collect.yml re-dispatched on main after the merge to prove a fresh collection commits again.",
+   "severity": "high",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44803531445",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/alerts_archive.json",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/markets.json",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   }
  ]
