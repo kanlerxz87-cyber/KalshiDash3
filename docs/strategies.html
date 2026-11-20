@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strategies — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
+<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a class="on" href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<div class="wrap">
+<h1>Trade categorization &amp; strategies</h1>
+<p class="mut">Every trade is auto-categorized (Gas / Elections / Culture / Crypto / Golf / Other) by ticker keywords — the same mapping used on the dashboard. Strategies below are <b>hypotheses</b>, not proven edges. Each states its evidence requirement and risk. Nothing here is financial advice.</p>
+<table><thead><tr><th>ID</th><th>Strategy</th><th>Rule</th><th>Evidence needed</th><th>Risk</th><th>Status</th></tr></thead><tbody>
+<tr><td>S1</td><td>Highest-dollar momentum</td><td>Only trade top-3 notional markets per category; enter when price moves &gt;5¢ in 15 min with rising volume.</td><td>Paper-trade log showing win rate vs. buy-and-hold on same markets.</td><td>Chasing crowded markets; slippage.</td><td><span class="badge warn">hypothesis</span></td></tr>
+<tr><td>S2</td><td>Liquidity filter</td><td>Skip markets with &lt;100 visible contracts at best bid/ask (orderbook depth).</td><td>Fill-rate comparison: filtered vs. unfiltered.</td><td>Missing thin-market opportunities.</td><td><span class="badge warn">hypothesis</span></td></tr>
+<tr><td>S3</td><td>Resolution fade</td><td>Fade extreme prices (&lt;10¢ / &gt;90¢) only when orderbook is one-sided.</td><td>Settled-market backtest with result=yes/no outcomes.</td><td>Tail risk; binary payout is all-or-nothing.</td><td><span class="badge warn">hypothesis</span></td></tr>
+<tr><td>S4</td><td>Category rotation</td><td>Allocate paper cash equally across the 5 categories; rebalance weekly.</td><td>Category P&amp;L table on Portfolio page after ≥30 trades.</td><td>Equal weight ignores liquidity differences.</td><td><span class="badge warn">hypothesis</span></td></tr>
+</tbody></table>
+<h2>How to validate</h2>
+<p>1) Execute paper trades on the <a href="portfolio.html">Portfolio page</a>. 2) Watch the category P&amp;L table. 3) Only promote a strategy to "supported" after ≥30 categorized trades with logged fills. 4) Re-verify against settled results (yes/no) on the dashboard's resolution tracker. Settlement mechanics: <a href="https://docs.kalshi.com/getting_started/market_settlement">Market Settlement</a>.</p>
+</div>
+<footer><div class="wrap">KalshiDash3 · <a href="suggestions.html">Suggestions</a></div></footer>
+</body></html>
