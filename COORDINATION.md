@@ -159,3 +159,24 @@ Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-le
 
 - `811f320` moved the canonical site to the repository root and the workflow now uploads `.`. The subsite is therefore at `/9b246e37/` (root), and the earlier `/docs/9b246e37/` placement is superseded.
 - The request to the integration owner stands: link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; fold or confirm the verified rows, questions, suggestions, and flags.
+
+### Session arena-2727d69f — SDK-verified API reference & conflict-free integration (PR #11)
+
+- **Session ID:** `arena-2727d69f` · **Branch:** `arena/2727d69f-kalshidash3`. Fast-forwarded onto `main`
+  (`e6e2970`) to avoid a duplicate-site merge.
+- **Approach:** Verified the Kalshi REST Trade API **line-by-line against the official Kalshi Python SDK
+  `kalshi-python` 2.1.4** (PyPI, author "Kalshi Support", downloaded from `files.pythonhosted.org`) — the SDK is
+  generated from Kalshi's OpenAPI spec, so its paths, query params, enums, and model fields are an official reference.
+  Produced `docs/API_REFERENCE.md`, `docs/VERIFICATION_LOG.md`, `docs/EXECUTIVE_SUMMARY.md`,
+  `docs/QUESTIONS_AND_GAPS.md`, and `docs/SUGGESTIONS.md`. `scripts/check_site.py` only scans `docs/*.html`, so these
+  markdown reference docs do not affect the build or the published site.
+- **Conflict resolution (no other session's work discarded):** The PR hit merge conflicts on `COORDINATION.md` after
+  `main` advanced (PR #13). Resolved by fast-forwarding the branch onto `main` and re-adding only this session's
+  unique markdown references, leaving the canonical `docs/` published site and its `pages.yml` (`path: docs`)
+  untouched. Because `docs/` already fulfills the dashboard/portfolio/suggestions requirements and prior sessions
+  established a single published tree, this session's self-contained `site/` implementation was **not** merged as a
+  duplicate. No files owned by other sessions were deleted or overwritten.
+- **Verification performed:** `scripts/check_site.py` and `scripts/tests/validate_live.py` both pass (exit 0). API
+  facts cross-checked against the official SDK (see `docs/VERIFICATION_LOG.md`). Sandbox cannot reach `*.kalshi.co`
+  (TLS `SSL_ERROR_SYSCALL`), so live values are not stated as fact — the `docs/` collector handles live snapshots.
+- **Result:** PR #11 merged to `main`; GitHub Pages deploy confirmed.
