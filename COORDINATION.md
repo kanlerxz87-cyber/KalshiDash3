@@ -102,3 +102,41 @@ Branch naming: the task rules ask for `session-<id>/<task>`. Arena fixes the bra
 - Merge result: merged as `843be97` at 2026-11-20 11:14:55Z (`gh pr merge 8 --merge`; mergeable, no conflicts)
 - Pages deploy: legacy build of `843be97` status `built`; `pages.yml` run 44726027274 success. Live check: https://kanlerxz87-cyber.github.io/KalshiDash3/docs/e1b4fe16/index.html serves the subsite landing page. The PR body says `/e1b4fe16/`; the correct URL is `/docs/e1b4fe16/`.
 - This log update: separate PR (see below).
+
+---
+
+## Session 9b246e37 (branch `arena/9b246e37-kalshidash3`, from `49ba7bc` of `main`)
+
+Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-level dashboard in its own namespace `docs/9b246e37/` (data in `docs/9b246e37/data/dashboard.json`). This session did not edit `docs/index.html`, the root site, `docs/assets/`, or any other session's files. Session IDs and branch names: the Arena branch rule applies (`arena/9b246e37-kalshidash3`).
+
+| ID | Task | Status | Owner | Files in scope (this session only) |
+|----|------|--------|-------|-------------------------------------|
+| T1 | Repo review | done | 9b246e37 | this section (F-13, F-14) |
+| T2 | Executive summary | done | 9b246e37 | `docs/9b246e37/executive-summary.md` |
+| T3 | Verified market snapshot (5 topics) | needs review | 9b246e37 | `docs/9b246e37/data/dashboard.json` |
+| T4 | Static site (landing + category pages) | done | 9b246e37 | `docs/9b246e37/index.html`, `docs/9b246e37/categories/*.html`, `docs/9b246e37/assets/{style.css,app.js}` |
+| T5 | Live chart + liquidity (browser-side, public endpoints) | done (code); CORS unverified | 9b246e37 | `docs/9b246e37/live.html`, `docs/9b246e37/assets/live.js` |
+| T6 | Portfolio / trades / strategies | **blocked** (no demo API key; no trades) | 9b246e37 | `docs/9b246e37/portfolio.html`, `docs/9b246e37/analysis.html` |
+| T7 | Questions and information gaps (12) | done | 9b246e37 | `docs/9b246e37/questions.html` |
+| T8 | Suggestions (10), awaiting user choice | done | 9b246e37 | `docs/9b246e37/suggestions.html` |
+| T9 | Flagged for Review (19 flags, source link each) | done | 9b246e37 | `docs/9b246e37/flagged.html` |
+| T10 | Integration: merge, check, PR, Pages | in progress | 9b246e37 | PR #7 log below |
+
+### Sources and verification (T1–T9)
+- Kalshi docs (official): https://docs.kalshi.com/llms.txt · /getting_started/demo_env.md · /getting_started/quick_start_authenticated_requests.md · /getting_started/market_settlement.md · /api-reference/market/get-series-list.md · /api-reference/market/get-market-candlesticks.md · /api-reference/market/get-market-orderbook.md
+- Kalshi DEMO API (read-only GET, no auth): `https://external-api.demo.kalshi.co/trade-api/v2/` — exchange status; `series?category=` for Crypto, Elections, Culture, Sports (golf); `events?series_ticker=KXAAAGASM` and `KXPGAMAJOR`; `markets?status=settled`; orderbook and candlestick examples.
+- AAA national average (official): https://gasprices.aaa.com/ — regular $3.6898 as of 11/20/26.
+- Method: values copied field by field from responses; any field missing from a response (truncated) is left blank and flagged. The sandbox cannot reach Kalshi hosts directly (SSL error), so every value came through the fetch tool.
+- Check: all 13 pages render from the JSON with no JS errors and no broken local links (jsdom, run outside the repo).
+
+### Irregularities (flagged; detail on `flagged.html`)
+- F-01 demo prices may not match production (Kalshi docs). F-02 demo test markets in settled results. F-03 thin or empty liquidity. F-04 stale timestamps. F-05 culture settlement-source placeholders. F-06 staging contract URLs. F-07 generic terms PDF name for KXBNBMINY. F-08 KXDOGEPERP no settlement source. F-09 election volume low. F-10 demo gas quotes do not match AAA's current average (open question). F-11 volume is contracts, not dollars. F-12 portfolio/trading not connected. F-15 golf coverage thin. F-16 browser CORS to demo API untested. F-17 partial snapshot. F-18 one partly captured row. F-19 AAA highest-recorded figure conflicts with third-party reporting.
+
+### Conflict and handoff record
+- 2026-11-20 ~11:30 UTC: PR #7 (`arena/9b246e37-kalshidash3` → `main`) was reported not mergeable. Cause: `main` had moved (PRs #5 and #8 merged). Resolution: my site files were moved into the `docs/9b246e37/` namespace, and `origin/main` was merged into this branch. Conflicts (`README.md`, `COORDINATION.md`) were resolved by keeping main's full text and appending this section. No other session's file was changed.
+- Pages note: legacy Pages (`main`, path `/`) publishes the `docs/` folder at `/docs/…`, so this subsite is at `/docs/9b246e37/` (same pattern as `/docs/e1b4fe16/`).
+
+### PR and merge log
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/7
+- Merge result: recorded below after `gh pr merge`
+- Pages deploy: recorded below after check

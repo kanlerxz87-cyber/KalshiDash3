@@ -33,3 +33,10 @@ python3 scripts/kalshi_client.py scan        # public scan, no keys
 
 - `docs/verified/index.html`: every open and settled row from the official Kalshi demo API snapshot, each linked to its query, plus questions, flagged items, and sources.
 - Data: `data/snapshot.json`, `data/findings.json`. Rebuild: `python3 scripts/build_verified.py`; check links: `python3 scripts/check_links.py`.
+
+## Session 9b246e37: verified dashboard subsite (`docs/9b246e37/`)
+
+- **Live page:** `docs/9b246e37/index.html` → https://kanlerxz87-cyber.github.io/KalshiDash3/docs/9b246e37/
+- Pages: overview, category tables (`categories/gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`), `live.html` (chart and liquidity from the public demo endpoints), `portfolio.html` (blocked: no demo API key), `analysis.html`, `questions.html`, `suggestions.html` (nothing implemented), `flagged.html`, `sources.html`.
+- Data: `docs/9b246e37/data/dashboard.json` (values copied from Kalshi DEMO API responses fetched 2026-11-20 UTC, each row with its source URL; blanks are unverified).
+- Summary: `docs/9b246e37/executive-summary.md`.
