@@ -103,6 +103,22 @@ def is_multivariate(m):
     return bool(m.get("mve_collection_ticker")) or str(m.get("ticker", "")).startswith("KXMVE")
 
 
+def series_of(m):
+    """Best available series identifier for a market.
+
+    Observed 2026-11-20: GET /markets returns `series_ticker: null`, so the
+    field cannot be relied on. Kalshi series tickers carry no hyphen, so the
+    part of the market ticker before the first "-" is the series
+    (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM). Measured against the seed list, which
+    makes a wrong derivation visible rather than silent: it simply fails to match.
+    """
+    st = (m.get("series_ticker") or "").strip()
+    if st:
+        return st.upper()
+    t = str(m.get("ticker") or "")
+    return t.split("-")[0].upper() if "-" in t else t.upper()
+
+
 def classify(cats, series_ticker, series_title, series_categories, market_title):
     """Return (category_id, basis) for a market, or (None, None).
 
@@ -263,7 +279,8 @@ def public_market_row(m, cat_id, basis):
     return {
         "ticker": m.get("ticker"),
         "event_ticker": m.get("event_ticker"),
-        "series_ticker": m.get("series_ticker"),
+        "series_ticker": series_of(m),
+        "series_ticker_from_api": m.get("series_ticker"),
         "title": m.get("title") or m.get("yes_sub_title") or "",
         "category_id": cat_id,
         "category_basis": basis,
@@ -324,11 +341,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             if is_multivariate(m):
                 excluded_mve[status] += 1
                 continue
-            st = (m.get("series_ticker") or "").upper()
+            st = series_of(m)
             s = series_index.get(st, {})
             cat_id, basis = classify(
                 cats,
-                m.get("series_ticker"),
+                st,
                 s.get("title"),
                 " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
                 m.get("title") or m.get("yes_sub_title"),
