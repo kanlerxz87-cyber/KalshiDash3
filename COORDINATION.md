@@ -773,9 +773,9 @@ rather than merely non-crashing, plus the collector failure:
 
 | ID | Task | Status | Owner | Files in scope | Sources / verification | Irregularities |
 |----|------|--------|-------|----------------|------------------------|----------------|
-| T22 | Independent line-by-line audit of the **deployed** site: every rendered figure re-checked against the official demo API response and against `docs.kalshi.com` for static claims, using this session's platform page-fetch path (bash curl to the Kalshi host fails in every sandbox, but the platform fetch reaches it — verified this session with `GET /trade-api/v2/exchange/status` → HTTP 200 JSON) | in progress | arena-2aac8000 | `COORDINATION.md` (this section only) | official API: https://external-api.demo.kalshi.co/trade-api/v2 ; official docs: https://docs.kalshi.com ; deployed site: https://kanlerxz87-cyber.github.io/KalshiDash3/ | to be recorded in the log below |
-| T23 | Integration close-out once the open repair PRs land: full suite re-run on the merged tree, PR → main → merge → Pages deploy confirm → dispatch `collect.yml`/`desk.yml` → record PR link + merge result here | unclaimed — claimed by this session now | arena-2aac8000 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/*`, `node --check`, live Pages fetch after deploy | — |
-| T24 | **Defect fix**: intermittent `collect.yml` validation failure — `scripts/build_alerts.py` freezes `high_roi` at detection time while `scripts/tests/validate_alerts.py` re-derives it from the CURRENT snapshot, so any archived flag drifts as soon as the market's `volume_24h_fp` crosses 0 (evidence: Actions check-run 136521462974 annotations on run 44803531445, `archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True`; run 19:29Z passed on 19:30 data, run 19:35Z failed on 19:35 data) | claimed by this session now (19:39Z, no other session had this failure — it surfaced after PR #34/#35 merged) | arena-2aac8000 | `scripts/build_alerts.py`, `scripts/tests/test_alerts.py` (regression test only) | `scripts/tests/validate_alerts.py` (the failing gate), synthetic before/after proof recorded in the log | — |
+| T22 | Independent line-by-line audit of the **deployed** site: every rendered figure re-checked against the official demo API response and against `docs.kalshi.com` for static claims, using this session's platform page-fetch path (bash curl to the Kalshi host fails in every sandbox, but the platform fetch reaches it — verified this session with `GET /trade-api/v2/exchange/status` → HTTP 200 JSON) | **done** — findings in the log below and F-37 | arena-2aac8000 | `COORDINATION.md` (this section only), `data/findings.json` (F-37 only) | official API: https://external-api.demo.kalshi.co/trade-api/v2 ; official docs: https://docs.kalshi.com ; fee schedule: https://kalshi.com/docs/kalshi-fee-schedule.pdf ; deployed site: https://kanlerxz87-cyber.github.io/KalshiDash3/ | F-37 (index settled-count label); everything else verified clean |
+| T23 | Integration close-out once the open repair PRs land: full suite re-run on the merged tree, PR → main → merge → Pages deploy confirm → dispatch `collect.yml`/`desk.yml` → record PR link + merge result here | in progress — repair PRs #31/#33/#34/#35/#36/#37/#39 all merged; suite green on `main@d4eec40`; PR pending | arena-2aac8000 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/*`, `node --check`, live Pages fetch after deploy | — |
+| T24 | **Defect fix**: intermittent `collect.yml` validation failure — `build_alerts` froze `high_roi` at detection time while `validate_alerts` re-derived it from the CURRENT snapshot, so the flag drifted as soon as the market's `volume_24h_fp` crossed 0 (evidence: check-run 136521462974 on run 44803531445: `archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True`) | **superseded** — this session claimed and diagnosed it (19:39Z) with a build-side re-derivation fix, but `arena-6f158ab7`'s PR #39 (merged 19:44Z) had already landed the opposite design: flags stay detection-time and `validate_alerts` reproduces them from the row's OWN recorded fields. Per the no-discard rule this session dropped its conflicting edits (never pushed) and verified the merged design instead | arena-2aac8000 (claim), arena-6f158ab7 (fix) | none (edits discarded) | merged design proven clock-independent by this session: patching the current snapshot's `volume_24h_fp` 0→500 no longer fails `validate_alerts` (exit 0); collect run 44805426075 green after #39 | — |
 
 Note: this session works on its own Arena branch `arena/2aac8000-kalshidash3` (one branch per session) and edits
 only the files listed above. Collector/desk repair is owned by `arena-6f158ab7` (test_alerts traceability fix),
@@ -794,3 +794,55 @@ does not touch their scopes.
   `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` (`exchange_active: true`, `trading_active:
   true`) and renders the deployed Pages site, so the audit can compare the site against the official source
   directly rather than only against the committed snapshot.
+- 2026-11-20 ~19:31–19:50 UTC: **T22 audit — every figure re-checked against the official source, nothing inferred.**
+  (a) *Deployed index vs official API* (each row fetched live from
+  `https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}`): gas `KXAAAGASM-26NOV30-3.90`
+  75.0¢ / 31,028 / 24,989 / $23,271 = API `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`,
+  31027.52×0.75=23,270.64 → $23,271 ✓; elections `KXELECTIRAN-27JAN01` 90.0¢ / 3 / 0 / $3 = API
+  `volume_fp 3.19`, `last 0.9000` ✓; culture `KXBALLONDOR-27-YDIO` all zero = API `volume_fp 0.00`,
+  `last 0.0000` ✓; crypto on the 19:30Z deploy `KXBTCY-27JAN0100-B147500` 98.0¢ / 65,336,335 / 6,920,631 /
+  $64,029,609 = API `volume_fp 65336335.23`, `open_interest_fp 6920631.49`, `last 0.9800`,
+  65336335.23×0.98=64,029,608.53 → $64,029,609 ✓ (the 15:19Z deploy's `KXBTCY-...-B47500` row verified the
+  same way before it rotated out); golf `KXPGATOUR-THRC26-SSTR` 2.5¢ / 761,433 / 681,895 / $19,036 = API
+  `last 0.0250`, `volume_fp 761433.95`, `open_interest_fp 681894.62` ✓. Banner/KPI counts recomputed from
+  `data/live/markets.json`: 489 open, 369 seed, 200/200 resolved, 4,369/3,456 scanned, 1,473 settled-in-scope
+  all equal the page ✓. **One mismatch found:** the index card "of 200 settled markets in scope" uses the stored
+  row cap (200) while `counts.settled_in_scope` is 1,473 (19:30Z) / 1,600 (19:48Z) — published as **F-37**.
+  (b) *Alerts feed vs API*: all 6 distinct tickers in the 19:30Z feed resolve on the official API with real
+  records — `KXAAAGASD-26NOV21-3.6600` (active, vol 48), `KXAAAGASM-26DEC31-3.30` (active, vol 395.88),
+  `KXBTCY-27JAN0100-B47500`, `KXDEMOFUTHOURLY-26NOV20H12-UP` (finalized, `result: no`,
+  `settlement_value_dollars: 0.0000`), `...H14-UP` (finalized, `result: yes`, `settlement_value_dollars:
+  1.0000`), `...H20-UP` (active) — so the site's "resolved yes/no" claims and every alert source link are
+  official, and the ticker the old snapshot-presence test wrongly rejected is demonstrably real.
+  (c) *Static claims vs official docs, all re-fetched this session*: orderbook = bids only, ascending, best
+  last, no auth, NO-bid⇒YES-ask rule (https://docs.kalshi.com/getting_started/orderbook_responses) ✓;
+  candlesticks `period_interval` ∈ {1,60,1440} only (https://docs.kalshi.com/api-reference/market/get-market-candlesticks) ✓;
+  settlement $1 per contract on the winning side (https://docs.kalshi.com/getting_started/market_settlement) ✓;
+  demo disclaimer quoted verbatim and both REST + both WS endpoints match the brief's table
+  (https://docs.kalshi.com/getting_started/demo_env) ✓; WebSocket handshake auth required even for public
+  channels (https://docs.kalshi.com/getting_started/quick_start_websockets) ✓; lifecycle statuses
+  `initialized|active|inactive|closed|determined|disputed|amended|finalized` and `result ∈ {yes,no,scalar}` —
+  exactly the validators' `ALLOWED_RESULTS` (https://docs.kalshi.com/getting_started/market_lifecycle) ✓;
+  pagination: `/markets` limit max 1000 (empirical: `limit=1000` → 200 + cursor, `limit=1001` → rejected),
+  undecodable cursor returns page 1, dedup by ticker, `/series` not paginated
+  (https://docs.kalshi.com/getting_started/pagination) ✓; 429 carries no `Retry-After` and no penalty
+  (https://docs.kalshi.com/getting_started/rate_limits) ✓; `GET /markets` schema has no news/URL field, so
+  every catalyst link must come from the market's own text (https://docs.kalshi.com/api-reference/market/get-markets) ✓.
+  (d) *Fee schedule PDF* (https://kalshi.com/docs/kalshi-fee-schedule.pdf): general taker
+  `round up(M×0.07×C×P×(1−P))`, maker `M×0.0175` default 0 ✓; all 42 published table numbers are pinned by
+  `test_fees.py` ✓; every one of the 13 seed series in `data/categories.json` and all 13 multipliers in
+  `data/roi_model.json` appear in the Non-Standard Fees table with the transcribed values ✓.
+  (e) *Order-books query form, measured live*: `tickers=A&tickers=B` → 2 books keyed `A`,`B`;
+  `tickers=A,B` → 1 book keyed `"A,B"` — confirming F-25; `scripts/roi_scan.py` on `main` now repeats the
+  parameter (PR #35 fixed it while this audit ran).
+- 2026-11-20 ~19:39–19:47 UTC: **T24 claimed, diagnosed, then superseded — recorded, not hidden.**
+  Independently reproduced the intermittent `collect.yml` failure from the check-run annotations
+  (run 44803531445: `archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True`),
+  reproduced it byte-for-byte locally by patching the snapshot's `volume_24h_fp`, and wrote a build-side
+  re-derivation fix + a three-step regression test (detect → drift must fail → rebuild must pass). Before
+  pushing, `git fetch` showed `arena-6f158ab7`'s PR #39 had just merged the **opposite** design: keep the flag
+  at detection time and reproduce it from the alert row's own recorded `category_basis`/`volume_24h_fp`, which
+  makes the check clock-independent. Their design is coherent, merged, and green (collect run 44805426075),
+  so this session **discarded its own conflicting edits** rather than fight it, and instead verified theirs:
+  with the current snapshot's `volume_24h_fp` patched 0→500, `validate_alerts.py` still exits 0 (the row's
+  recorded fields decide), and the full suite is green on `main@d4eec40`. Claim marked superseded above.

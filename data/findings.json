@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T19:20:00Z",
+ "generated": "2026-11-20T19:50:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
  "questions": [
   {
@@ -718,6 +718,17 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
    ],
    "id": "F-36"
+  },
+  {
+   "severity": "low",
+   "item": "Index card labels the stored settled-row cap as 'settled markets in scope', contradicting the banner on the same page",
+   "why": "index.html renders 'of ' + settled.length + ' settled markets in scope', where settled.length is the number of STORED rows (200 \u2014 the collector's per-category cap), while the snapshot's own counts.settled_in_scope shown in the banner on the same page was 1473 at the 19:30:14Z deploy and 1600 in the 19:48Z snapshot. The page therefore prints two different 'settled in scope' figures and mislabels the stored cap as the in-scope total. Every individual number is real; only the label is wrong. Found by session arena-2aac8000's deployed-site audit at ~19:50Z.",
+   "action": "Belongs to the index.html owner (integration): either label the denominator 'stored' or render counts.settled_in_scope. Not corrected in the same pass so the audit stays separate from the code it audits; does not block publication.",
+   "sources": [
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ],
+   "id": "F-37"
   }
  ]
 }
