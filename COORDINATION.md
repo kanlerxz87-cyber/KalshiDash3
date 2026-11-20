@@ -65,7 +65,7 @@ and publishes only the repository root.
 | T7 | Correct the verification layer: official field names, removed endpoints, real category seeds | done | arena-e05bd5ff | `docs/verification.html`, `docs/flagged.html`, `data/verified_facts.json`, `data/findings.json` | 44 claims checked against docs.kalshi.com and the fee schedule PDF, each with its URL | 9 irregularities raised, all resolved or published on Flagged: legacy order endpoint (410 Gone), non-existent "no notional field" claim, unverified ticker list, WebSocket-needs-a-key correction, two Pages mechanisms, seconds-resolution impossibility, missing demo credentials, status-vocabulary mismatch |
 | T8 | Canonical dashboard: candle/observation chart, liquidity per price level, resolution tracker | done | arena-e05bd5ff | `docs/dashboard.html`, `docs/assets/site.js`, `docs/assets/site.css`, `docs/categories.html` | `scripts/check_site.py` passes; every rendered number comes from `data/live/` or a verified fact | — |
 | T9 | Single canonical tree + deploy lock-down | done | arena-e05bd5ff | `docs/*` only; root duplicates removed; `.github/workflows/pages.yml` | Link/HTML/data check is a required step before `upload-pages-artifact` | Root-level duplicate site from PRs #4/#5 removed (recoverable from git history); Pages publishing source switched to GitHub Actions |
-| T10 | Final integrated publish (PR → main, merge, confirm Pages) | in progress | arena-e05bd5ff | `COORDINATION.md`, `README.md` | Pending PR + deploy confirmation | — |
+| T10 | Final integrated publish (PR → main, merge, confirm Pages) | done | arena-e05bd5ff | `COORDINATION.md`, `README.md` | PR #15 merged 2026-11-20; deploy run 44729110721 succeeded; Pages API status `built` at https://kanlerxz87-cyber.github.io/KalshiDash3/ | None observed |
 
 ### Sources used by this session (all official)
 
@@ -154,3 +154,20 @@ exchange's composition limits (`notional` is always 1.0000; elections has one co
 - 2026-11-20: arena-5225610f T12 (superseded wording, kept for the record). Built `scripts/build_alerts.py` → `data/live/alerts.json` (consecutive last-price observations with |Δ| ≥ $0.10, both directions) and `alerts.html` — this page was REMOVED during the merge because it duplicated the dashboard feeds from arena-6d85f8f0 (T11, PR #16). Sources: https://docs.kalshi.com/api-reference/market/get-markets (verified fields `last_price_dollars`, `volume_24h_fp`, `status`), https://docs.kalshi.com/getting_started/market_lifecycle. Irregularities F-14 (ROI model not supplied), F-15 (cause links not collected; left null), F-16 (scheduled collector never fired: last 5 runs all manual; snapshot stale ~1h44m at 13:17 UTC; source https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows). Added alert build step to `collect.yml`.
 - 2026-11-20: arena-5225610f T11 follow-up: the fresh snapshot dropped the closed market that produced the first 4 alerts (collector prunes history to open markets). Added append-only `data/live/alerts_archive.json` in `build_alerts.py` and seeded it from commit b95bebb. Irregularity F-17.
 - 2026-11-20: arena-5225610f T12 merged. PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/18 — merge commit `a0a8862c7328374ced662d4d36c7162461a14f70` (merge, mergeable CLEAN). Pages run 44743562211 (Deploy site to GitHub Pages) and pages-build-deployment 44743561977: success. Live `flagged.html` lists 17 irregularities (F-01..F-17), confirmed by fetch. Still open: R-1 (dashboard should read `data/live/alerts_archive.json`), F-14 (owner ROI model), F-16 (scheduled collector not yet observed on main).
+
+## Session `arena-090062fa` — final integration QA audit
+
+Branch `arena/090062fa-kalshidash3`, originally based on `cd104dbb3aa2f9bc324f8b159688603c9630165b` and rebased onto `4dc9ee2` to incorporate PRs #16–#19.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T13 | Final integrated audit of canonical pages, collector, simulated/real demo trading boundaries, alert archive, data provenance, and Pages automation; fix confirmed defects | in progress | arena-090062fa | `COORDINATION.md`, `README.md`, all root HTML pages, `assets/*`, `scripts/*`, `.github/workflows/*`, `data/*` | Pending re-verification against official Kalshi and GitHub documentation plus local checks | R-1 from arena-5225610f: integrate dashboard feeds with the persistent alert archive; keep catalyst attribution unverified |
+
+### Log
+
+- 2026-11-20: Confirmed PR #15 is merged to `main` (merge commit `cd104dbb3aa2f9bc324f8b159688603c9630165b`), its `Deploy site to GitHub Pages` run 44729110721 succeeded, and GitHub Pages reports `status=built` at https://kanlerxz87-cyber.github.io/KalshiDash3/. This completes the prior T10 publish task.
+- 2026-11-20: Initially claimed T11 before audit work; after rebasing onto the concurrently advanced `main`, discovered the completed alert-feed T11 from `arena-6d85f8f0` and re-scoped to T12. The subsequently merged PR #18 from `arena-5225610f` added the persistent alert archive and a documented R-1 request to the integration session; this session is now re-scoped to T13 final integration.
+- 2026-11-20: Rebase conflict in `COORDINATION.md` occurred because parallel sessions appended integration records. Resolved by retaining the complete PR #16 and PR #18 records, plus this session's updated claim/log; no other session's work was discarded.
+- 2026-11-20: Integration follow-up R-1 will connect the single dashboard alert UI to `data/live/alerts_archive.json` so a market leaving the open scan does not erase its alert history; no external-news cause will be inferred.
