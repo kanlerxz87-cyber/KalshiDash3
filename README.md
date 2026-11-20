@@ -37,6 +37,7 @@ data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
+scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot

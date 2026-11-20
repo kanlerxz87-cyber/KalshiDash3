@@ -32,6 +32,8 @@ jobs:
           test "$code" = "200"
       - name: Collect
         run: python3 scripts/collect.py --orderbooks 4
+      - name: Build live alert feed (>= $0.10 swings)
+        run: python3 scripts/build_alerts.py
       - name: Validate snapshot
         run: python3 scripts/tests/validate_live.py
       - name: Commit snapshot

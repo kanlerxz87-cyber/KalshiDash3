@@ -14,6 +14,7 @@
 | T5 | GitHub Pages publish + final integration (build check, link check, PR to main, merge, deploy confirm) | in progress | arena-5761b399 | `.github/workflows/pages.yml`, `docs/*` (integration only) | Link check passed; JS/Python syntax passed | — |
 | T6 | Second implementation (root-level site) + verified facts + tracker script | done | session-1c0d1fc0 | `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `portfolio.html`, `suggestions.html`, `sources.html`, `assets/*`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md`, `scripts/kalshi_tracker.py` | Official docs: demo_env, api_environments, market_lifecycle, market_settlement, orderbook_responses, quick_start_create_order, candlesticks, fee schedule | F1–F6 on `sources.html`; no demo keys so trading unexercised |
 | T7 | Integration merge (PR #2 → main), Pages deploy confirm | done | session-1c0d1fc0 | `README.md`, `COORDINATION.md`, `.github/workflows/pages.yml`, `INTEGRATION.md` | — | Merge conflict with PR #1 resolved without discarding either implementation (see Log) |
+| T12 | Persistent alert archive (`data/live/alerts_archive.json`, built by `scripts/build_alerts.py`) so swings survive market close; feeds the T11 alert streams | done | arena-5225610f | `scripts/build_alerts.py`, `data/alert_rules.json`, `data/live/alerts*.json`, `.github/workflows/collect.yml` (build step) | Derived only from `data/live/price_history.json` + `markets.json` (official demo API observations); `validate_live.py`, `check_site.py` | Dashboard does not yet read the archive (request R-1, see log). Causal news links not collected (F-15). ROI model not supplied (F-14). Scheduled collector had not fired (F-16). |
 
 ## Log
 - 2026-11-20: arena-5761b399 claimed T1–T5 (single-session build; no other sessions active). Repo was empty except README. Starting build.
@@ -52,6 +53,11 @@ brief asks for: it merged the branches' intent into one canonical tree, re-verif
 and publishes only the repository root.
 
 ### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | done | arena-6d85f8f0 | `dashboard.html`, `assets/site.css`, `executive-summary.html` | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `node --check`, and a Node fixture smoke test covering the exact 10¢ threshold, sub-threshold rejection, screen criteria, category filter, and source output all passed | GitHub Pages snapshot cadence is not tick-level live; the experimental shortlist is not a validated ROI model and no causal news links are claimed. |
+
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
@@ -127,19 +133,51 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
 
-## Session `arena-e5adea9d` — live alerts, paper strategies, integration (branch `arena/e5adea9d-kalshidash3`, base `cd104db`)
+### Session `arena-6d85f8f0` — alert feed enhancement
 
-Only one session is active on the board (the others are merged). This session claims the open items from the brief.
+- Claim: T11; files touched: `dashboard.html`, `assets/site.css`, `executive-summary.html` (claim committed and pushed to the current Arena branch before implementation).
+- Added two bounded, newest-first scrolling feeds that compare consecutive collected `last` prices and trigger only for absolute changes >= $0.10. Each alert links to the official Kalshi demo market API record. Category selection filters both feeds.
+- The experimental screen is explicitly not an ROI model: only fee-schedule `seed` markets with positive official `volume_24h_fp` qualify, ordered by reported volume. No predicted-return or profitability claim is displayed.
+- The browser rechecks the static snapshot every 60 seconds, but the scheduled collector runs every 20 minutes and the UI states this limitation; not tick-level streaming. No news-event causal links are asserted.
+- Official sources used: https://docs.kalshi.com/api-reference/market/get-markets ; https://docs.kalshi.com/getting_started/quick_start_websockets ; https://docs.kalshi.com/api-reference/market/get-market-orderbook . Existing dashboard history provenance: GET /markets source above.
+- Verification: `python3 scripts/check_site.py`, `python3 scripts/tests/validate_live.py`, `node --check` on the embedded dashboard script, plus a Node fixture smoke test for exact threshold, below-threshold behavior, experimental screen eligibility, category filtering, and source link output. All passed.
+- Irregularities: the source set does not provide causal news/source URLs per price move; UI links the official market record and flags the absence of causal attribution. The 20-minute workflow cadence and absence of a validated ROI model are disclosed in the UI and executive summary.
+- Pull request: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/16 — merged by squash on 2026-11-20 13:18 UTC; merge commit `0a7067d3670489a1ec70415d1f23756722f75a7b`.
+- Pages workflow: https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44743119261 — completed successfully (build + deploy). GitHub Pages API reports `status=built`, public URL https://kanlerxz87-cyber.github.io/KalshiDash3/ (publishing source `main /`). The deployed dashboard was fetched and verified to include both alert feeds and sources. The snapshot shown was 2026-11-20T11:33:33Z and correctly marked stale at verification time.
+- Workflow warning: GitHub reports Node.js 20 action deprecation annotations for pinned `@v4/@v5` actions; run still succeeded and this did not block deployment.
+
+### Session `arena-5225610f` — overlap with T11 (resolved, see note)
+
+- 2026-11-20: arena-5225610f claimed T11 (live ≥$0.10 alert feed) on branch `arena/5225610f-kalshidash3`.
+- 2026-11-20: OVERLAP. While this branch was in progress, `main` received PR #16 (arena-6d85f8f0, T11 'Add sourced price-swing alert streams', merged 13:18 UTC) with the same ≥$0.10 feeds on `dashboard.html`. Resolution: this session did NOT keep a second alert UI. The `alerts.html` page was removed; the dashboard feeds remain the single UI. This session's contribution is re-scoped as T12 (persistent archive, data layer) and the branch merges `origin/main` without discarding either side.
+- 2026-11-20: Request R-1 (to the dashboard owner / integration session): point the dashboard's alert feeds at `data/live/alerts_archive.json` (or `alerts.json`) instead of recomputing from `price_history.json`, so alerts survive a market leaving the open scan (F-17). Not done in this branch because `dashboard.html` belongs to the done T11 task.
+- 2026-11-20: arena-5225610f T12 (superseded wording, kept for the record). Built `scripts/build_alerts.py` → `data/live/alerts.json` (consecutive last-price observations with |Δ| ≥ $0.10, both directions) and `alerts.html` — this page was REMOVED during the merge because it duplicated the dashboard feeds from arena-6d85f8f0 (T11, PR #16). Sources: https://docs.kalshi.com/api-reference/market/get-markets (verified fields `last_price_dollars`, `volume_24h_fp`, `status`), https://docs.kalshi.com/getting_started/market_lifecycle. Irregularities F-14 (ROI model not supplied), F-15 (cause links not collected; left null), F-16 (scheduled collector never fired: last 5 runs all manual; snapshot stale ~1h44m at 13:17 UTC; source https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows). Added alert build step to `collect.yml`.
+- 2026-11-20: arena-5225610f T11 follow-up: the fresh snapshot dropped the closed market that produced the first 4 alerts (collector prunes history to open markets). Added append-only `data/live/alerts_archive.json` in `build_alerts.py` and seeded it from commit b95bebb. Irregularity F-17.
+- 2026-11-20: arena-5225610f T12 merged. PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/18 — merge commit `a0a8862c7328374ced662d4d36c7162461a14f70` (merge, mergeable CLEAN). Pages run 44743562211 (Deploy site to GitHub Pages) and pages-build-deployment 44743561977: success. Live `flagged.html` lists 17 irregularities (F-01..F-17), confirmed by fetch. Still open: R-1 (dashboard should read `data/live/alerts_archive.json`), F-14 (owner ROI model), F-16 (scheduled collector not yet observed on main).
+
+## Session `arena-e5adea9d` — paper-trading simulator, verification, integration (branch `arena/e5adea9d-kalshidash3`)
+
+### Coordination note (read first)
+
+This session's first claim (T11–T14, commit `8d5833e`) was pushed at 13:20 UTC. Within minutes `main` received
+PR #16 (T11, `arena-6d85f8f0`, dashboard alert feeds) and PR #18 (T12, `arena-5225610f`, alert archive and
+`scripts/build_alerts.py`). Those two tasks were already done and are **not** repeated here. The duplicate
+`alerts.py`, `alerts.html`, and a second `alert_rules.json` built by this session were withdrawn before merge, so the
+repo keeps one alert pipeline. Work from this session that overlapped with them is recorded as withdrawn in the
+task table below. No `main` file was overwritten or deleted.
 
 ### Task board (this session)
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T11 | Live price-swing alerts (≥ $0.10 either direction) as two scrolling feeds: all events, and a labelled high-ROI filter | in progress | arena-e5adea9d | `scripts/alerts.py`, `data/alert_rules.json`, `data/live/alerts.json` (generated), `alerts.html`, `assets/site.js` (nav), `assets/site.css` (feed styles) | pending | pending |
-| T12 | Automated paper trading of defined strategies, settlement from official `result`, categorised results | in progress | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html` | pending | pending |
-| T13 | Verification + Flagged for Review updates for T11/T12 and for repo irregularities found this session | in progress | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json`, `scripts/tests/validate_live.py` | pending | pending |
-| T14 | Integration: README, index card, check_site, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress | arena-e5adea9d | `README.md`, `index.html`, `COORDINATION.md`, `.github/workflows/collect.yml` | pending | pending |
+| T11 | Live ≥ $0.10 swing feeds | **done by arena-6d85f8f0 (PR #16)**; this session withdrew its duplicate | arena-6d85f8f0 | — | — | see F-14 (ROI model not supplied) |
+| T12 | Persistent alert archive | **done by arena-5225610f (PR #18)**; this session withdrew its duplicate | arena-5225610f | — | — | see F-15 to F-17 |
+| T15 | Automated paper trading of defined strategies on the alert archive, with the official taker-fee model, settlement from the official `result`, and results by strategy, topic and trade type | in progress | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html`, `scripts/tests/test_alerts_sim.py`, `.github/workflows/collect.yml` (one step), `scripts/tests/validate_live.py` (one check block) | pending | pending |
+| T13 | Verification and Flagged for Review updates for T15 (new IDs F-18 onward, facts F-50 onward, Q9, G9, G10) | in progress | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json`, `sources.html` | pending | pending |
+| T14 | Integration: README, index card, check_site, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress | arena-e5adea9d | `README.md`, `index.html`, `COORDINATION.md` | pending | pending |
 
 ### Log
 
-- 2026-11-20 13:20 UTC: arena-e5adea9d claimed T11–T14. Checked before claiming: `origin/main` = `cd104db`; no other open session branch; the latest collector snapshot is 11:33 UTC and the scheduled (`*/20`) collector has not fired since merge (all recent runs are `workflow_dispatch` from the old branch). The sandbox cannot reach `external-api.demo.kalshi.co` (TLS fails), so live data comes only from the Actions collector.
+- 2026-11-20 13:20 UTC: claimed T11–T14 (commit `8d5833e`). Checked before claiming: `main` = `cd104db`; no other open session branch.
+- 2026-11-20 ~13:21 UTC: `main` advanced by PR #16 (T11) and PR #18 (T12). The T11/T12 claim overlapped that work. Withdrawn as described above, kept only as a record. Merge conflict in this file was resolved by keeping every existing row and log line.
+- 2026-11-20 13:16 UTC (observed before merge): the scheduled collector had not fired on `main`; the latest snapshot was 11:33 UTC. Recorded as F-16 on the earlier board and checked again after merge (see T14).
