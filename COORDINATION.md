@@ -126,3 +126,38 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+---
+
+## Session `arena-a2fca5db` — live alert chats, auto-sim trading engine, in-browser live mode
+
+Branch `arena/a2fca5db-kalshidash3`, rebased on the merge of PR #15 (`cd104db`). Session ID: `arena-a2fca5db`.
+
+Handoff note (per the takeover rule): all prior claims (T1–T10) are merged to `main` and their last commits are
+>60 minutes old, so this session claims the remaining requirement gaps. Collector-file edits
+(`scripts/collect.py`, validator, check_site) are logged here as integration handoffs from `arena-e05bd5ff`,
+whose scope is complete. Shared outputs (nav in `assets/site.js`, `index.html`) are edited only under the
+integrator hat, in the same commits that re-verify them.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T11 | Live alert chats: two scrolling feeds (all events + model picks), ≥$0.10 swing alerts in both directions, links per alert | in progress | arena-a2fca5db | `alerts.html` (new), `assets/engine.js` (new) | Alert threshold is a stated requirement, not an API field; delta math checked against committed `price_history.json` | F-14 (CORS undocumented), F-15 (causality links are leads, not verified causes), F-16 (model is heuristic) |
+| T12 | Server-side alert history + CORS evidence in collector | in progress | arena-a2fca5db | `scripts/collect.py` (handoff), `scripts/tests/validate_live.py` (handoff), `scripts/check_site.py` (handoff) | Emits `data/live/alerts.json` from consecutive observations and `data/live/cors.json` from a real Origin-header probe | F-14 |
+| T13 | Auto-sim trading engine: automated paper trades, 3 strategies, categorised analytics, strategy leaderboard | in progress | arena-a2fca5db | `trading.html` (new), `assets/engine.js` (new) | Fees modelled at the documented general taker rate; fills labelled with basis; resolution settles from API `result` | F-16, F-17 (no demo credentials: engine is paper-only) |
+| T14 | In-browser live mode on dashboard (poll demo API, self-test CORS, snapshot fallback) | in progress | arena-a2fca5db | `dashboard.html`, `assets/engine.js` | Runtime CORS probe; graceful fallback keeps every page working | F-14 |
+| T15 | Integration publish: nav/index/exec-summary/suggestions/flagged updates, PR → main, merge, Pages confirm, collector dispatch | in progress | arena-a2fca5db | `assets/site.js` (nav), `index.html`, `executive-summary.html`, `suggestions.html`, `flagged.html`, `data/findings.json`, `data/verified_facts.json`, `README.md`, `COORDINATION.md` | `check_site.py` + `validate_live.py` before push; link check in Pages build | — |
+
+### Sources added by this session (all official)
+
+- https://docs.kalshi.com/api-reference/market/get-markets — `tickers` filter, status values
+- https://docs.kalshi.com/getting_started/rate_limits — request-rate budget for the in-browser poller
+- https://docs.kalshi.com/getting_started/quick_start_websockets — WS handshake auth (re-verified)
+- https://docs.kalshi.com/getting_started/market_settlement — settlement/result semantics
+- https://kalshi.com/docs/kalshi-fee-schedule.pdf — general taker fee formula used by the sim
+- https://raw.githubusercontent.com/karagemop466-tech/Demo1/main/data/cors.json — third-party header capture showing the demo API returns `access-control-allow-origin` for a `*.github.io` origin (circumstantial; our own probe supersedes it)
+
+### Log
+
+- 2026-11-20: Claimed T11–T15; no other session has an active claim (all prior tasks merged via PRs #1–#15).
+- 2026-11-20: Verified demo API responds publicly (no auth) for GET /markets via an external fetcher; fields re-read verbatim
+  (`last_price_dollars`, `volume_fp`, `open_interest_fp`, `status:"active"`, `result:""`, `notional_value_dollars:"1.0000"`).
