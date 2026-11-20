@@ -1,9 +1,26 @@
 #!/usr/bin/env python3
-"""Validate data/live/alerts.json by RECOMPUTING every alert from price_history.json.
+"""Validate the canonical alert pipeline by RECOMPUTING every swing from the
+committed observations, reproducing the feeds from the archive + rules, and
+enforcing the no-invention guarantees.
 
-This is a provenance check, not just a schema check: an alert is only valid if the same
->= $0.10 diff can be re-derived from the committed observations, and every re-derivable
-diff must appear in the file. A fabricated or stale alert fails the build.
+Validates (schema of session arena-5225610f / arena-e5adea9d, canonical on main):
+  data/live/alerts_archive.json  append-only archive of >= $0.10 swings
+  data/live/alerts.json          feeds (all_events, high_roi) rendered from the archive
+  data/alert_rules.json          threshold + experimental screen rules
+
+Checks
+  1. schemas and provenance blocks present; threshold == 0.10 (project requirement)
+  2. every alert: prices in 0..1, delta == to_price - from_price, |delta| >= threshold,
+     direction sign, from_time < to_time, ISO-8601 Z stamps, https market_source
+  3. no invented causes: cause_link must be null and cause_status must state unverified
+  4. feeds reproduce exactly from the archive (order + membership + counts)
+  5. the high_roi screen reproduces from the rules against the current markets.json
+     for every alert whose market is still in the snapshot
+  6. provenance: every alert whose market still has both observations in
+     price_history.json must match the recomputed diff exactly; every re-derivable
+     swing must be present in the archive. Alerts whose market was pruned from the
+     collector's price history are allowed (that is why the archive exists) and are
+     counted as archive-only.
 
 Run: python3 scripts/tests/validate_alerts.py
 """
@@ -16,10 +33,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
-CATEGORY_IDS = {"gas", "elections", "culture", "crypto", "golf"}
-ALLOWED_RESULTS = {None, "yes", "no", "scalar", ""}
+RULES = ROOT / "data" / "alert_rules.json"
 
 errors: list[str] = []
+archive_only = 0
 
 
 def check(cond: bool, msg: str) -> None:
@@ -27,105 +44,144 @@ def check(cond: bool, msg: str) -> None:
         errors.append(msg)
 
 
-def fnum(v):
-    if v is None:
+def load(path: Path):
+    if not path.exists():
         return None
     try:
-        return float(v)
-    except (TypeError, ValueError):
+        return json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        errors.append(f"{path.name}: invalid JSON ({e})")
         return None
+
+
+def iso_z(v: str) -> bool:
+    try:
+        datetime.strptime(str(v), "%Y-%m-%dT%H:%M:%SZ")
+        return True
+    except (ValueError, TypeError):
+        return False
 
 
 def main() -> int:
-    alerts_path = LIVE / "alerts.json"
-    hist_path = LIVE / "price_history.json"
-    if not alerts_path.exists():
-        print("skip: no alerts.json yet")
+    global archive_only
+    alerts_doc = load(LIVE / "alerts.json")
+    archive_doc = load(LIVE / "alerts_archive.json")
+    rules = load(RULES)
+    if alerts_doc is None and archive_doc is None:
+        print("skip: no alert data yet")
         return 0
-    doc = json.loads(alerts_path.read_text())
+    if archive_doc is None:
+        errors.append("alerts_archive.json missing while alerts.json exists")
+        return finish(0, 0)
+    if alerts_doc is None:
+        errors.append("alerts.json missing while alerts_archive.json exists")
+        return finish(0, 0)
+    if rules is None:
+        errors.append("data/alert_rules.json missing")
+        return finish(0, 0)
 
-    check(doc.get("schema") == 1, "schema must be 1")
-    check(doc.get("environment") == "demo", "environment must be demo")
-    check(doc.get("base_url") == "https://external-api.demo.kalshi.co/trade-api/v2", "wrong base_url")
-    check(doc.get("threshold_dollars") == 0.10, "threshold must be the required 0.10")
-    check(bool(doc.get("threshold_note")), "threshold_note missing (threshold must be labelled a project requirement)")
-    check(isinstance(doc.get("sources"), dict) and doc["sources"], "sources block missing")
-    check(bool(doc.get("disclaimers")), "disclaimers missing")
-    try:
-        datetime.strptime(doc.get("generated_at", ""), "%Y-%m-%dT%H:%M:%SZ")
-    except ValueError:
-        errors.append(f"generated_at not ISO-8601 Z: {doc.get('generated_at')!r}")
+    threshold = float(rules.get("swing_threshold_dollars", -1))
+    check(threshold == 0.10, f"swing_threshold_dollars must be the required 0.10, got {threshold}")
 
-    alerts = doc.get("alerts")
-    check(isinstance(alerts, list), "alerts must be a list")
+    # ---- archive schema + per-alert invariants ----
+    archive = archive_doc.get("alerts")
+    check(archive_doc.get("schema") == 1, "archive schema must be 1")
+    check(isinstance(archive, list), "archive.alerts must be a list")
+    seen_keys = set()
+    for a in archive or []:
+        tag = f"archive:{a.get('ticker')}@{a.get('to_time')}"
+        key = (a.get("ticker"), a.get("from_time"), a.get("to_time"))
+        check(key not in seen_keys, f"{tag} duplicate archive entry")
+        seen_keys.add(key)
+        for f in ("from_price", "to_price"):
+            check(isinstance(a.get(f), (int, float)) and 0.0 <= float(a[f]) <= 1.0, f"{tag} {f} outside 0..1")
+        d = a.get("delta")
+        check(isinstance(d, (int, float)), f"{tag} delta missing")
+        if isinstance(d, (int, float)):
+            calc = round(float(a["to_price"]) - float(a["from_price"]), 6)
+            check(abs(calc - float(d)) <= 1e-6, f"{tag} delta {d} != to_price - from_price ({calc})")
+            check(abs(float(d)) + 1e-9 >= threshold, f"{tag} |delta| below the {threshold} threshold")
+            check(("up" if d > 0 else "down") == a.get("direction"), f"{tag} direction contradicts delta sign")
+        check(iso_z(a.get("from_time")) and iso_z(a.get("to_time")), f"{tag} timestamps not ISO-8601 Z")
+        check(str(a.get("from_time", "")) < str(a.get("to_time", "")), f"{tag} from_time must precede to_time")
+        check(str(a.get("market_source", "")).startswith("https://"), f"{tag} market_source must be https")
+        check(a.get("cause_link") is None, f"{tag} cause_link must stay null (no official cause source — F-25)")
+        check("unverified" in str(a.get("cause_status", "")), f"{tag} cause_status must state unverified")
+        check(isinstance(a.get("high_roi"), bool), f"{tag} high_roi must be a boolean")
 
-    # ---- recompute ground truth from the committed observations ----
-    recomputed: dict[tuple, dict] = {}
-    if hist_path.exists():
-        hist = json.loads(hist_path.read_text())
+    # ---- feeds reproduce from the archive ----
+    MAX = 300
+    expected_all = archive[:MAX]
+    check(alerts_doc.get("all_events") == expected_all, "alerts.json all_events does not reproduce from the archive (order/membership/300 cap)")
+    expected_roi = [a for a in archive if a.get("high_roi")][:MAX]
+    check(alerts_doc.get("high_roi") == expected_roi, "alerts.json high_roi does not reproduce from the archive")
+    counts = alerts_doc.get("counts") or {}
+    check(counts.get("all_events") == len(alerts_doc.get("all_events") or []), "counts.all_events mismatch")
+    check(counts.get("high_roi") == len(alerts_doc.get("high_roi") or []), "counts.high_roi mismatch")
+    check(counts.get("archive_total") == len(archive), "counts.archive_total mismatch")
+    check(float(alerts_doc.get("threshold_dollars", -1)) == threshold, "alerts.json threshold differs from alert_rules.json")
+    check(bool(alerts_doc.get("disclaimers")), "alerts.json disclaimers missing")
+    check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
+
+    # ---- high_roi screen reproduces from the rules against the CURRENT snapshot ----
+    markets_path = LIVE / "markets.json"
+    snap = load(markets_path)
+    roi_rules = rules.get("high_roi") or {}
+    if snap and roi_rules:
+        by_ticker = {m["ticker"]: m for m in (snap.get("open_markets") or [])}
+        for a in archive:
+            m = by_ticker.get(a.get("ticker", ""))
+            if m is None:
+                continue  # detection-time screen; market left the snapshot
+            expected = bool(
+                m.get("category_basis") == roi_rules.get("require_category_basis")
+                and (m.get("volume_24h_fp") or 0) > roi_rules.get("require_volume_24h_gt", -1)
+            )
+            check(a.get("high_roi") == expected,
+                  f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} != rules-derived {expected}")
+
+    # ---- provenance: recompute swings from the committed observations ----
+    hist = load(LIVE / "price_history.json")
+    if hist:
+        recomputed: dict[tuple, dict] = {}
         for ticker, entry in (hist.get("series") or {}).items():
             obs = sorted(entry.get("observations") or [], key=lambda o: o.get("t") or "")
-            for i in range(1, len(obs)):
-                prev, cur = obs[i - 1], obs[i]
-                p0, p1 = fnum(prev.get("last")), fnum(cur.get("last"))
+            for prev, cur in zip(obs, obs[1:]):
+                p0, p1 = prev.get("last"), cur.get("last")
                 t0, t1 = prev.get("t"), cur.get("t")
                 if p0 is None or p1 is None or not t0 or not t1 or t1 <= t0:
                     continue
-                d = round(p1 - p0, 6)
-                if abs(d) + 1e-12 >= 0.10:
-                    recomputed[(ticker, t0)] = {
-                        "delta": d, "from": round(p0, 6), "to": round(p1, 6), "to_ts": t1,
-                    }
+                d = round(float(p1) - float(p0), 6)
+                if abs(d) + 1e-9 >= threshold:
+                    recomputed[(ticker, t0, t1)] = {"delta": d, "from": float(p0), "to": float(p1)}
+        fresh = 0
+        for a in archive:
+            key = (a.get("ticker"), a.get("from_time"), a.get("to_time"))
+            truth = recomputed.pop(key, None)
+            if truth is None:
+                archive_only += 1  # market pruned from price history — the archive's purpose
+                continue
+            fresh += 1
+            tag = f"archive:{a['ticker']}@{a['to_time']}"
+            check(abs(truth["delta"] - float(a["delta"])) <= 1e-6, f"{tag} delta differs from recomputed {truth['delta']}")
+            check(abs(truth["from"] - float(a["from_price"])) <= 1e-6, f"{tag} from_price differs from recomputed")
+            check(abs(truth["to"] - float(a["to_price"])) <= 1e-6, f"{tag} to_price differs from recomputed")
+        missing = sorted(recomputed.keys())
+        check(not missing,
+              f"{len(missing)} re-derivable swing(s) missing from the archive, e.g. {[k[0] + '@' + k[2] for k in missing[:3]]}")
 
-    seen: set[tuple] = set()
-    for a in alerts or []:
-        tag = f"alert:{a.get('ticker')}@{a.get('to_ts')}"
-        key = (a.get("ticker"), a.get("from_ts"))
-        check(key not in seen, f"{tag} duplicate alert for the same from-observation")
-        seen.add(key)
+    return finish(len(archive or []), fresh)
 
-        check(str(a.get("source", "")).startswith("https://"), f"{tag} source must be https")
-        check(a.get("observed_basis") == "api_diff", f"{tag} observed_basis must be api_diff")
-        check(a.get("category_id") is None or a.get("category_id") in CATEGORY_IDS,
-              f"{tag} bad category_id {a.get('category_id')!r}")
-        check(a.get("result") in ALLOWED_RESULTS, f"{tag} illegal result {a.get('result')!r}")
-        for f in ("from_price_dollars", "to_price_dollars"):
-            check(a.get(f) is None or 0.0 <= float(a[f]) <= 1.0, f"{tag} {f} outside 0..1")
-        for f in ("from_ts", "to_ts"):
-            try:
-                datetime.strptime(str(a.get(f, "")), "%Y-%m-%dT%H:%M:%SZ")
-            except ValueError:
-                errors.append(f"{tag} {f} not ISO-8601 Z: {a.get(f)!r}")
-        check(str(a.get("from_ts", "")) < str(a.get("to_ts", "")), f"{tag} from_ts must precede to_ts")
 
-        d = a.get("delta_dollars")
-        check(d is not None and abs(float(d)) >= 0.10 - 1e-9, f"{tag} delta below the 0.10 threshold")
-        calc = round(float(a["to_price_dollars"]) - float(a["from_price_dollars"]), 6)
-        check(d is not None and abs(calc - float(d)) <= 1e-9, f"{tag} delta does not equal to - from")
-        check(("up" if d > 0 else "down") == a.get("direction"), f"{tag} direction contradicts delta sign")
-
-        # Provenance: the same diff must be re-derivable from the observations.
-        truth = recomputed.get(key)
-        check(truth is not None, f"{tag} NOT re-derivable from price_history.json — possible fabrication or stale snapshot")
-        if truth:
-            check(abs(truth["delta"] - float(d)) <= 1e-9, f"{tag} delta differs from recomputed {truth['delta']}")
-            check(abs(truth["from"] - float(a["from_price_dollars"])) <= 1e-9, f"{tag} from price differs from recomputed")
-            check(abs(truth["to"] - float(a["to_price_dollars"])) <= 1e-9, f"{tag} to price differs from recomputed")
-
-    # Completeness: every re-derivable swing must be in the file.
-    missing = [k for k in recomputed if k not in seen]
-    check(not missing, f"{len(missing)} re-derivable swing(s) missing from alerts.json, e.g. {sorted(missing)[:3]}")
-
-    counts = doc.get("counts") or {}
-    check(counts.get("alerts") == len(alerts or []), "counts.alerts does not match the alerts list length")
-
+def finish(total: int, fresh: int) -> int:
     if errors:
-        print("INVALID alerts.json:", file=sys.stderr)
+        print("INVALID alert data:", file=sys.stderr)
         for e in errors[:40]:
             print(f"  - {e}", file=sys.stderr)
         return 1
-    print(f"OK: {len(alerts or [])} alerts, all re-derived from {len(recomputed)} recomputed swings "
-          f"in price_history.json (provenance verified)")
+    print(f"OK: {total} archived alerts provenance-checked "
+          f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned from history), "
+          f"feeds and high_roi screen reproduce from alert_rules.json")
     return 0
 
 

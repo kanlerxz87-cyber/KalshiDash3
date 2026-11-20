@@ -20,6 +20,23 @@
 
   <div id="snapshotBanner"></div>
 
+  <section aria-labelledby="alertsTitle">
+    <h2 id="alertsTitle">Price-swing alert feeds</h2>
+    <p class="small mut">Triggers when consecutive collected last-trade observations differ by at least $0.10. New observations are checked as the committed snapshot refreshes; this is not tick-level streaming. Each source opens the official Kalshi demo API market record. No external news source is attached unless causation is independently verified.</p>
+    <div class="alert-grid">
+      <section class="card alert-card" aria-labelledby="allAlertsTitle">
+        <div class="alert-heading"><h3 id="allAlertsTitle">All qualifying events</h3><span id="allAlertCount" class="badge">0</span></div>
+        <div id="allAlerts" class="alert-feed" role="log" aria-live="polite" aria-label="All price swing alerts"></div>
+      </section>
+      <section class="card alert-card" aria-labelledby="modelAlertsTitle">
+        <div class="alert-heading"><h3 id="modelAlertsTitle">Model watch · experimental screen</h3><span id="modelAlertCount" class="badge warn">0</span></div>
+        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, ordered by that volume. It has no demonstrated profitability.</p>
+        <div id="modelAlerts" class="alert-feed" role="log" aria-live="polite" aria-label="Experimental screened price swing alerts"></div>
+      </section>
+    </div>
+    <p class="small mut" id="alertFreshness"></p>
+  </section>
+
   <div class="controls">
     <label>Category <select id="catFilter"><option value="">All five</option></select></label>
     <label>Chart window
@@ -87,6 +104,50 @@ function pickInitialTicker() {
   if (h) return h;
   const open = (state.snap?.open_markets || []).filter(r => r.dollars_traded_estimate);
   return open.length ? open[0].ticker : null;
+}
+
+function renderAlerts() {
+  const marketRows = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || []);
+  const byTicker = new Map(marketRows.map(row => [row.ticker, row]));
+  const alerts = [];
+  for (const [ticker, data] of Object.entries(state.hist?.series || {})) {
+    const market = byTicker.get(ticker);
+    if (!market || (state.cat && market.category_id !== state.cat)) continue;
+    const points = (data.observations || [])
+      .filter(p => Number.isFinite(Date.parse(p.t)) && p.last !== null && p.last !== undefined && Number.isFinite(Number(p.last)))
+      .slice().sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
+    for (let i = 1; i < points.length; i++) {
+      const before = Number(points[i - 1].last), after = Number(points[i].last);
+      const change = after - before;
+      if (Math.abs(change) + 1e-9 < 0.10) continue;
+      alerts.push({ ticker, market, before, after, change, time: points[i].t, previousTime: points[i - 1].t });
+    }
+  }
+  alerts.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
+  const all = alerts.slice(0, 100);
+  const screen = alerts.filter(a => a.market.category_basis === "seed" && Number(a.market.volume_24h_fp) > 0)
+    .sort((a, b) => Number(b.market.volume_24h_fp) - Number(a.market.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
+    .slice(0, 100);
+  const renderFeed = (items, emptyText) => items.length ? items.map(a => {
+    const sign = a.change > 0 ? "+" : "−";
+    const direction = a.change > 0 ? "up" : "down";
+    const title = `${a.market.title} · ${a.ticker}`;
+    return `<article class="alert-item">
+      <div class="alert-top"><time datetime="${KD.esc(a.time)}">${KD.esc(a.time.replace("T", " ").replace("Z", " UTC"))}</time><span>${KD.esc(KD.CAT_LABEL[a.market.category_id] || "")}</span></div>
+      <span class="alert-market">${KD.esc(title)}</span>
+      <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
+      <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
+      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+    </article>`;
+  }).join("") : `<div class="alert-empty">${emptyText}</div>`;
+  KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");
+  KD.$("#modelAlerts").innerHTML = renderFeed(screen, "No qualifying alerts meet the experimental screen.");
+  KD.$("#allAlertCount").textContent = `${all.length} shown`;
+  KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
+  const fetched = state.snap?.collected_at;
+  KD.$("#alertFreshness").textContent = fetched
+    ? `Alert scan uses consecutive snapshots through ${fetched} UTC. The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
+    : "Alert feeds are empty until a sourced snapshot is available.";
 }
 
 function renderTables() {
@@ -268,13 +329,13 @@ function drawChart() {
     <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
 
   // ≥$0.10 swing markers, at the exact observation timestamps where they were observed.
-  const marks = (state.alerts?.alerts || []).filter(a => a.ticker === row.ticker);
+  const marks = (state.alerts?.all_events || []).filter(a => a.ticker === row.ticker);
   if (marks.length) {
     ctx.save();
     for (const a of marks) {
-      const mt = Date.parse(a.to_ts);
+      const mt = Date.parse(a.to_time);
       if (!Number.isFinite(mt) || mt < t0 || mt > t1) continue;
-      ctx.translate(X(mt), Y(a.to_price_dollars));
+      ctx.translate(X(mt), Y(a.to_price));
       ctx.rotate(Math.PI / 4);
       ctx.fillStyle = a.direction === "up" ? "#45d483" : "#f2695c";
       ctx.fillRect(-4, -4, 8, 8);
@@ -316,15 +377,22 @@ function drawLiq() {
   KD.$("#chartFoot").innerHTML += "";
 }
 
+let loading = false;
 async function load() {
-  try { state.snap = await KD.json("data/live/markets.json"); } catch { state.snap = null; }
-  try { state.hist = await KD.json("data/live/price_history.json"); } catch { state.hist = null; }
-  try { state.alerts = await KD.json("data/live/alerts.json"); } catch { state.alerts = null; }
+  if (loading) return;
+  loading = true;
+  const refresh = Date.now();
+  try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
+  try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
+  // Canonical alert feed (server-built by scripts/build_alerts.py, provenance-validated)
+  try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { state.alerts = null; }
   KD.snapshotBanner(state.snap);
+  renderAlerts();
   if (!state.snap) {
     KD.$("#tables").innerHTML = KD.empty("No snapshot committed yet.");
     KD.$("#resolved").innerHTML = KD.empty("No snapshot committed yet.");
     KD.$("#pending").innerHTML = KD.empty("No snapshot committed yet.");
+    loading = false;
     return;
   }
   const sel = KD.$("#catFilter");
@@ -332,29 +400,33 @@ async function load() {
     Object.entries(KD.CAT_LABEL).map(([id, l]) => `<option value="${id}">${l}</option>`).join("");
   sel.value = state.cat;
   renderTables(); renderResolved(); renderPending();
-  if (!state.sel || !state.sel.startsWith("")) state.sel = pickInitialTicker();
-  state.sel = pickInitialTicker() || state.sel;
+  const available = (state.snap.open_markets || []).concat(state.snap.settled_markets || []);
+  if (!state.sel || !available.some(r => r.ticker === state.sel)) {
+    const preferred = pickInitialTicker();
+    state.sel = available.some(r => r.ticker === preferred) ? preferred : (available[0]?.ticker || null);
+  }
   drawChart(); drawLiq();
+  loading = false;
 }
 
-KD.$("#catFilter").addEventListener("change", e => { state.cat = e.target.value; renderTables(); renderResolved(); renderPending(); });
+KD.$("#catFilter").addEventListener("change", e => { state.cat = e.target.value; renderAlerts(); renderTables(); renderResolved(); renderPending(); });
 KD.$("#window").addEventListener("change", drawChart);
 KD.$("#seriesSel").addEventListener("change", drawChart);
 KD.$("#reload").addEventListener("click", load);
 window.addEventListener("resize", () => { drawChart(); });
 load();
 
-/* Live poll — re-fetch the committed snapshot every 60 s so a new collector run
- * appears on the page without a manual reload. GitHub Pages serves static files,
- * so this only ever sees data the collector has committed; nothing is invented
+/* Live poll — re-fetch the committed snapshot every 60 s (paused while the tab is
+ * hidden) so a new collector run appears without a manual reload. GitHub Pages
+ * serves static files, so this only ever sees committed data; nothing is invented
  * between runs. */
 let lastAlertsSig = null;
 async function pollLive() {
   const note = KD.$("#pollNote");
   try {
-    const fresh = await KD.json("data/live/markets.json");
-    const freshAlerts = await KD.json("data/live/alerts.json").catch(() => null);
-    const sig = freshAlerts ? freshAlerts.generated_at + ":" + freshAlerts.counts.alerts : null;
+    const fresh = await KD.json(`data/live/markets.json?poll=${Date.now()}`);
+    const freshAlerts = await KD.json(`data/live/alerts.json?poll=${Date.now()}`).catch(() => null);
+    const sig = freshAlerts ? freshAlerts.generated_at + ":" + freshAlerts.counts.all_events : null;
     const changed = (state.snap && fresh.collected_at !== state.snap.collected_at) || (lastAlertsSig !== null && sig !== lastAlertsSig);
     lastAlertsSig = sig;
     if (changed) {
@@ -367,7 +439,7 @@ async function pollLive() {
     note.innerHTML = `live poll failed ${new Date().toLocaleTimeString()} (offline or no snapshot yet)`;
   }
 }
-setInterval(pollLive, 60000);
+window.setInterval(() => { if (!document.hidden) pollLive(); }, 60_000);
 pollLive();
 </script>
 </body></html>

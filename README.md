@@ -22,10 +22,11 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `alerts.html` | Two scrolling alert chats: every ≥$0.10 swing in either direction, plus the swings the high-ROI model likes (on-page formula, provenance-validated alerts, optional labelled SIM stream) |
 | `portfolio.html` | Real demo-account endpoints, the working executor, a labelled paper ledger, and an automated simulated trader that runs the S1–S4 strategies over collected prices with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
-| `suggestions.html` | Eleven proposals; six shipped to remove a correctness risk or deliver a brief requirement, five awaiting your decision |
-| `questions.html` | Eight questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 50 claims, each with the official page it was checked against |
-| `flagged.html` | Sixteen irregularities found, plus every value deliberately left blank |
+| `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
+| `suggestions.html` | Thirteen proposals; each with its effort, risk and success metric |
+| `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
+| `verification.html` | 54 claims, each with the official page it was checked against |
+| `flagged.html` | 25 irregularities found, plus every value deliberately left blank |
 | `sources.html` | The complete source list, including the official per-category research sites used for alert causes |
 
 ## Repository layout
@@ -38,7 +39,9 @@ data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py) + derived alerts.json
 scripts/collect.py    credential-free demo data collector
-scripts/build_alerts.py   derives every ≥$0.10 swing by diffing consecutive collected observations
+scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
+scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
+scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py    refuses a fabricated snapshot
@@ -53,9 +56,11 @@ Nothing here needs credentials. All market data comes from public demo endpoints
 
 ```bash
 python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
-python3 scripts/build_alerts.py       # derives data/live/alerts.json (≥$0.10 swings)
+python3 scripts/build_alerts.py       # writes data/live/alerts_archive.json + alerts.json (≥$0.10 swings)
+python3 scripts/simulate.py           # writes data/live/simulation.json (paper only)
 python3 scripts/tests/validate_live.py
 python3 scripts/tests/validate_alerts.py
+python3 scripts/tests/test_simulate.py
 python3 scripts/check_site.py
 python3 -m http.server 8000           # then open http://localhost:8000
 ```
@@ -99,21 +104,25 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
   intervals only — so it is accumulated one observation per collector run.
 - WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks; alerts are therefore
-  bounded by the collector cadence, and the alerts page offers a clearly-labelled simulated stream for previewing the
-  real-time path (never persisted, off by default).
-- Portfolio performance is a labelled paper simulation until demo credentials exist; the automated trader replays
-  collected prices deterministically and can only fill at collected observation timestamps.
+  bounded by the collector cadence (F-24), and the alerts page offers a clearly-labelled simulated stream for previewing
+  the real-time path (never persisted, off by default).
+- Portfolio performance is a labelled paper simulation until demo credentials exist; the automated trader on
+  `portfolio.html` replays collected prices deterministically and can only fill at collected observation timestamps.
+- Paper results need a stored bid and ask at the alert time. Today's archive stores only last-trade prices, so most swings cannot be filled and the simulation page shows zero fills until the archive stores quotes (Flagged F-19, request R-2).
+- Paper results on demo prices are not evidence that a strategy would make money in real markets (Kalshi: demo prices may not reflect real markets).
 
 ## Session arena-f068786c (2026-11-20): alerting system + automated simulated trading
 
 - Built the live alerting system the brief requires: `alerts.html` with two scrolling chats (all ≥$0.10 swings and the
   high-ROI model picks), a transparent on-page scoring model (`assets/alerts.js`), 60-second polling of committed
   snapshots, and a default-off simulated tick stream that is badged `SIM` everywhere and never persisted.
-- Alerts are derived by `scripts/build_alerts.py` from consecutive collected observations and provenance-checked by
-  `scripts/tests/validate_alerts.py` (every alert must be re-derivable from the raw data).
+- Alerts come from the persistent archive built by `scripts/build_alerts.py` and are provenance-checked by
+  `scripts/tests/validate_alerts.py` (every current-history alert must re-derive from the raw observations; feeds and
+  counts must reproduce from the archive and `data/alert_rules.json`).
 - Automated simulated trading on `portfolio.html` §4: the S1–S4 strategy rules run themselves over collected price
   history with fee modelling, a strategy × category ledger, equity curve and settlement against the literal API result.
-- Removed the stale README section that still advertised the `9b246e37/` subsite removed by PR #15 (flag F-16).
+  (`simulation.html` from session arena-e5adea9d runs the archive-based simulator; both are labelled paper.)
+- Removed the stale README section that still advertised the `9b246e37/` subsite removed by PR #15 (flag F-26).
 
 ## Sources
 

@@ -33,7 +33,7 @@
     </div>
     <p class="small mut" style="margin:8px 0 0">
       REST polling can only see what the collector saw: changes <b>between</b> runs. Between runs nothing can move on this page —
-      that gap needs the authenticated WebSocket (see <a href="flagged.html">F-14</a>). Turn the SIM stream on to watch the
+      that gap needs the authenticated WebSocket (see <a href="flagged.html">F-24</a>). Turn the SIM stream on to watch the
       chats behave in real time with clearly-marked simulated ticks seeded from real last prices; it never writes anywhere.
     </p>
   </div>
@@ -60,7 +60,7 @@
   <p class="small mut">
     The brief asks for website links that <b>may</b> have caused a sharp jump. Per-alert cause attribution cannot be verified
     from an official source automatically, so instead of guessing causes, every category carries links to the official bodies
-    that publish the underlying facts (flagged as <a href="flagged.html">F-15</a>). Each alert row also links the exact API
+    that publish the underlying facts (flagged as <a href="flagged.html">F-25</a>). Each alert row also links the exact API
     query so you can pull the market up while checking the news.
   </p>
   <div class="tw"><table>
@@ -105,7 +105,7 @@ function renderModel() {
 
 function renderWorkedExample() {
   const host = KD.$("#workedExample");
-  const a = (state.alerts && state.alerts.alerts || [])[0];
+  const a = (state.feed || [])[0];
   if (!a) { host.innerHTML = ""; return; }
   const sc = KDA.scoreAlert(a, state.byTicker[a.ticker], state.byLiq[a.ticker]);
   host.innerHTML = `<div class="notice blue"><b>Worked example</b> (computed in your browser from the top alert in this snapshot):
@@ -129,7 +129,7 @@ function pushAlert(a, { silent } = {}) {
 }
 
 function renderLog() {
-  const rows = (state.alerts && state.alerts.alerts || [])
+  const rows = (state.feed || [])
     .slice()
     .sort((x, y) => (x.to_ts < y.to_ts ? 1 : -1))
     .slice(0, 200)
@@ -158,30 +158,33 @@ function renderLog() {
 
 function renderCounts() {
   const c = state.alerts && state.alerts.counts;
-  KD.$("#alertCount").textContent = c ? c.alerts : "0";
-  KD.$("#alertUp").textContent = c ? c.up : "0";
-  KD.$("#alertDown").textContent = c ? c.down : "0";
+  const feed = state.feed || [];
+  const up = feed.filter(a => a.direction === "up").length;
+  KD.$("#alertCount").textContent = c ? c.all_events : "0";
+  KD.$("#alertUp").textContent = String(up);
+  KD.$("#alertDown").textContent = String(feed.length - up);
 }
 
 async function poll(first) {
   try {
-    const [snap, alerts, hist] = await Promise.all([
+    const [snap, alertsDoc, hist] = await Promise.all([
       KDA.loadJSON("data/live/markets.json"),
       KDA.loadJSON("data/live/alerts.json"),
       KDA.loadJSON("data/live/price_history.json").catch(() => null),
     ]);
-    const prevSnap = state.snap, prevAlerts = state.alerts;
-    state.snap = snap; state.alerts = alerts; state.hist = hist;
+    const prevSnap = state.snap;
+    const norm = KDA.normalizeFeed(alertsDoc);
+    state.snap = snap; state.alerts = alertsDoc; state.feed = norm; state.hist = hist;
     state.byTicker = KDA.indexMarkets(snap);
     state.byLiq = KDA.indexLiquidity(snap);
     KD.snapshotBanner(snap);
     renderCounts(); renderLog(); renderWorkedExample();
     KD.$("#lastCheck").textContent = new Date().toLocaleTimeString();
 
-    const fresh = (alerts.alerts || []).filter(a => !state.seen.has(alertKey(a)));
+    const fresh = norm.filter(a => !state.seen.has(alertKey(a)));
     if (first) {
       // chronological fill: oldest first so the chat reads bottom-up
-      for (const a of (alerts.alerts || []).slice().sort((x, y) => (x.to_ts < y.to_ts ? -1 : 1))) pushAlert(a, { silent: false });
+      for (const a of norm.slice().sort((x, y) => (x.to_ts < y.to_ts ? -1 : 1))) pushAlert(a, { silent: false });
       KD.$("#dot").className = "livedot";
     } else {
       let added = 0;

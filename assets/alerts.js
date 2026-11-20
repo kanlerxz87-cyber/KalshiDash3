@@ -65,7 +65,7 @@ const KDA = (() => {
 
   /* ------------------------------------------------------------------ *
    * 2 · Where a cause would first appear — official research links      *
-   *    (starting points, NOT verified per-alert causes — see F-15)      *
+   *    (starting points, NOT verified per-alert causes — see F-25)      *
    * ------------------------------------------------------------------ */
   const RESEARCH = {
     gas: [{ label: "EIA — gasoline & diesel data", url: "https://www.eia.gov/petroleum/gas/" }],
@@ -93,6 +93,30 @@ const KDA = (() => {
     const r = await fetch(path + bust, { cache: "no-store" });
     if (!r.ok) throw new Error(`HTTP ${r.status} for ${path}`);
     return r.json();
+  }
+
+  // Normalize the canonical feed schema built by scripts/build_alerts.py
+  // (from_time/to_time/from_price/to_price/delta/market_source) into the field
+  // names this library's scoring and chat rendering use.
+  function normalizeAlert(a) {
+    return {
+      ticker: a.ticker,
+      title: a.title,
+      category_id: a.category_id,
+      category_basis: a.category_basis,
+      direction: a.direction,
+      delta_dollars: a.delta,
+      from_price_dollars: a.from_price,
+      to_price_dollars: a.to_price,
+      from_ts: a.from_time,
+      to_ts: a.to_time,
+      source: a.market_source,
+      screen: !!a.high_roi,               // the dashboard's experimental screen (alert_rules.json)
+      cause_status: a.cause_status || null,
+    };
+  }
+  function normalizeFeed(doc) {
+    return (doc && doc.all_events ? doc.all_events : doc && doc.alerts ? doc.alerts : []).map(normalizeAlert);
   }
 
   function indexMarkets(snap) {
@@ -130,6 +154,7 @@ const KDA = (() => {
       const t = (a.to_ts || "").replace("T", " ").replace("Z", "") + "Z";
       const cat = a.category_id ? `<span class="chip">${esc(catLabel(a.category_id))}</span>` : `<span class="chip warn">unknown</span>`;
       const scChip = sc ? `<span class="chip score" title="model ${MODEL.version}: magnitude ${sc.parts.magnitude} + relative ${sc.parts.relative} + liquidity ${sc.parts.liquidity} + volume ${sc.parts.volume}">score ${sc.score}</span>` : "";
+      const screenChip = a.screen ? `<span class="chip" title="Also selected by the dashboard's experimental Model-watch screen (data/alert_rules.json): fee-schedule seed series with positive 24h volume">screen</span>` : "";
       const badge = sys ? `<span class="badge">SYS</span>`
         : sim ? `<span class="badge sim" title="Simulated tick — generated in this browser for testing the alerting path. Not API data; never persisted.">SIM</span>`
         : `<span class="badge api" title="Diff of two consecutive observations collected from the official demo API">API</span>`;
@@ -139,7 +164,7 @@ const KDA = (() => {
       return `<div class="bub ${up ? "up" : "down"}${sim ? " simb" : ""}">` +
         head +
         `<div class="small">${esc(titleShort)}</div>` +
-        `<div class="small mut">${cat} ${sys || (sim && !a.from_ts) ? esc(t) : `${cents(a.from_price_dollars)} → <b>${cents(a.to_price_dollars)}</b> · ` + esc(t)}${scChip}</div>` +
+        `<div class="small mut">${cat} ${sys || (sim && !a.from_ts) ? esc(t) : `${cents(a.from_price_dollars)} → <b>${cents(a.to_price_dollars)}</b> · ` + esc(t)}${scChip}${screenChip}</div>` +
         `<div class="small"><a href="${esc(a.source || "#")}" target="_blank" rel="noopener">${sys ? "workflow" : sim ? "about (flagged page)" : "API query"}</a>` +
         (sim ? ` <span class="mut">· simulated tick (not market data)</span>` : ``) +
         `</div></div>`;
@@ -428,5 +453,5 @@ const KDA = (() => {
     };
   }
 
-  return { MODEL, RESEARCH, scoreAlert, loadJSON, indexMarkets, indexLiquidity, makeChat, makeSim, replayStrategies, fee, TRADE_FEE_RATE, mulberry32, esc, cents, num };
+  return { MODEL, RESEARCH, scoreAlert, loadJSON, normalizeAlert, normalizeFeed, indexMarkets, indexLiquidity, makeChat, makeSim, replayStrategies, fee, TRADE_FEE_RATE, mulberry32, esc, cents, num };
 })();

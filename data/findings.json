@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20",
+ "generated": "2026-11-20T13:20:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path.",
  "questions": [
   {
@@ -96,6 +96,17 @@
    "decision_needed": "This session made that call (see Flagged F-05) because a single canonical tree is required for a link-checked build. Reversible from git history.",
    "sources": [
     "https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"
+   ]
+  },
+  {
+   "id": "Q9",
+   "question": "Should the paper rules S3 and S4 be judged on the experimental high-ROI screen before an owner ROI model exists?",
+   "known": "S3 and S4 use the archive field high_roi, which is the dashboard's experimental 'Model watch' screen (F-14). It is a project screen, not an owner-approved model. The archive does not yet store quotes at alert time, so no S3 or S4 fill exists (F-19).",
+   "unknown": "Which ROI model, if any, the owner wants. Whether the screen should be the signal for any strategy at all.",
+   "answer_if_forced": "No. Treat S3 and S4 as exploratory. Report them with the same fee, settlement and sample-size rules as S1 and S2, and make no ROI claim.",
+   "decision_needed": "Owner. The simulator stays unchanged until the owner answers.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/market_settlement"
    ]
   }
  ],
@@ -202,6 +213,30 @@
   },
   {
    "id": "G9",
+   "suggestion": "Store the bid and ask at each alert time in the alert archive.",
+   "why_it_helps_decisions": "It is the only way to fill a paper trade on a market that has since closed, and it gives the dashboard the quote behind each swing.",
+   "effort": "Low",
+   "risk": "Adds two fields to an append-only archive. Existing entries stay unchanged; old entries stay unfilled.",
+   "success_metric": "Every new archive entry has a stored to_yes_bid and to_yes_ask.",
+   "status": "proposed (request R-2, see COORDINATION.md)",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/orderbook_responses"
+   ]
+  },
+  {
+   "id": "G10",
+   "suggestion": "Keep price history for closed markets until they finalize.",
+   "why_it_helps_decisions": "It lets the page show the price path for a swing whose market has closed and lets the simulator mark its positions.",
+   "effort": "Medium",
+   "risk": "File size grows. Keep it bounded and keep the 120-point cap per market.",
+   "success_metric": "Every archived alert resolves to a stored observation at its to_time.",
+   "status": "proposed",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/market_lifecycle"
+   ]
+  },
+  {
+   "id": "G11",
    "suggestion": "Make the \u2265$0.10 alerting system a first-class page: two scrolling chats (all swings + high-ROI model picks) fed by a provenance-validated alert file.",
    "why_it_helps_decisions": "A trader sees every material repricing the moment a snapshot lands, without re-reading 489 rows; the picks chat applies the same filter a human would apply by eye.",
    "effort": "Done in this session",
@@ -213,7 +248,7 @@
    ]
   },
   {
-   "id": "G10",
+   "id": "G12",
    "suggestion": "Automate the simulated trader: run the S1\u2013S4 rules over collected price history with fee modelling and a categorised ledger, so strategies produce measurable paper results without manual input.",
    "why_it_helps_decisions": "Turns the strategy page from prose into numbers: trades, win rate, fee drag and drawdown per strategy and per category, computed identically on every run.",
    "effort": "Done in this session",
@@ -225,7 +260,7 @@
    ]
   },
   {
-   "id": "G11",
+   "id": "G13",
    "suggestion": "Close the real-time gap: connect the authenticated demo WebSocket (orderbook + ticker channels) using a demo API key you supply, so alerts fire on ticks instead of 20-minute snapshots.",
    "why_it_helps_decisions": "Seconds-level alerting, live order-book depth between collector runs, and true fill reporting for the simulated strategies.",
    "effort": "Needs your demo API key (create at demo.kalshi.co \u2192 Account Settings \u2192 API Keys); the client-side code change is small.",
@@ -378,6 +413,100 @@
   },
   {
    "id": "F-14",
+   "item": "High-ROI model not supplied: the dashboard's 'Model watch' feed is an experimental screen, not an ROI model",
+   "why": "The brief asks for events 'our model likes as high ROI', but no model, criteria or weights were provided. The dashboard (PR #16, arena-6d85f8f0) shows an experimental screen: seed-series alerts with positive volume_24h only, ordered by volume. It is labelled 'not an ROI prediction'. This session's archive mirrors that screen exactly (data/alert_rules.json) and computes no return figure.",
+   "action": "Owner to supply the model or confirm the screen. Replace the rule in data/alert_rules.json and the dashboard filter together.",
+   "severity": "high",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
+  {
+   "id": "F-15",
+   "item": "Causes of sharp price jumps (news / website links) are not collected",
+   "why": "The brief asks for events and website links that may have caused a move of $0.10 or more. Kalshi's official API returns price fields but no cause or news field, and no official source links causes to specific price moves. Every alert therefore has cause_link = null and is labelled 'unverified'. Linking news sites would be a guess, so none was added.",
+   "action": "Left blank by design. A cause can be added only with a source that can be checked (e.g. the market's own rules page or an official Kalshi announcement) for the specific ticker and time.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-16",
+   "item": "Scheduled collector has not run: all recent runs were manual, so the snapshot is stale",
+   "why": "collect.yml declares a '*/20 * * * *' schedule, but the last five runs of the workflow were all workflow_dispatch; none were scheduled. At the time of the check (2026-11-20 13:17 UTC) the newest committed snapshot was collected_at 11:33:33Z, about 1h44m old, so the swing feed cannot show live moves. The site's banner shows this as stale.",
+   "action": "Dispatch the collector manually (done on this branch) and confirm that scheduled runs start on main after merge. Scheduled workflows run only from the default branch, so the schedule can only fire once collect.yml is on main.",
+   "severity": "high",
+   "sources": [
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-17",
+   "item": "Price history is pruned to open markets, so swings are archived separately; four early alerts were seeded from git history",
+   "why": "scripts/collect.py keeps price observations only for markets that are open in scope (it drops the rest on each run). The first alert feed (commit b95bebb) therefore lost a market's history as soon as it closed; a fresh snapshot showed 0 alerts for the same window. To stop alerts disappearing, scripts/build_alerts.py now keeps an append-only archive (data/live/alerts_archive.json). Its first four entries were produced by running the same builder on the observations committed in b95bebb; their first_seen_at value is the seeding time (2026-11-20T13:19Z), not the time the swing was first observed. Their to_time values are the original observation times.",
+   "action": "Dashboard does not read the archive yet (request R-1 on COORDINATION.md). Owner to decide whether price_history should retain closed markets (collector change). The archive is capped at 5,000 alerts (oldest trimmed).",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_lifecycle"
+   ]
+  },
+  {
+   "id": "F-18",
+   "item": "Pages build setting and the deploy workflow disagree about how the site is published",
+   "why": "GET /repos/kanlerxz87-cyber/KalshiDash3/pages reports build_type 'legacy' with source main:/ (deploy from branch). pages.yml deploys with GitHub Actions. GitHub's documentation says a branch source and an Actions source are separate publishing modes; the Actions run is always the deploy step, so the live result depends on which setting the owner has. This session could not change the setting (PUT /pages returns 403). Not changed. Evidence (checked after the merge of PR #20): the GitHub Pages build history shows two publishers running. A pages-build-deployment (branch build) built the collector's snapshot commit 82218d3 at 13:32:28Z, and pages.yml built merge ca10d37 at 13:31:56Z. Two publishers can publish different trees; see F-05.",
+   "action": "Owner to confirm in Settings > Pages which source is intended, and set it to GitHub Actions if pages.yml should publish. Not changed by this session.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"
+   ]
+  },
+  {
+   "id": "F-19",
+   "item": "The paper simulator has no fills on the current alert archive, so no strategy result exists yet",
+   "why": "Each archived swing stores only the last-trade prices. It does not store the bid and ask at the alert time. All four current swings come from KXDEMOFUTHOURLY-26NOV20H12-UP, which settled 'no' (finalized) and has left the open scan, so price_history holds no quote for it (F-17). scripts/simulate.py therefore marks all four signals not filled for every strategy. Filling from the last-trade price would invent an entry, so it is not done.",
+   "action": "Request R-2 (T12 owner, scripts/build_alerts.py): store to_yes_bid and to_yes_ask from the observation at to_time on each new archive entry. simulate.py already reads those fields when present. Until then the simulation page shows 0 fills and says why.",
+   "severity": "high",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://docs.kalshi.com/getting_started/market_lifecycle"
+   ]
+  },
+  {
+   "id": "F-20",
+   "item": "Fee multipliers for 13 non-standard series were read from extracted PDF text and need a human check",
+   "why": "The per-series multiplier M in the fee formula (0 for KXBTCY, KXETHY and KXELECTIRAN; 1 for the other 10 listed series) was read from the text of the fee-schedule PDF, which extracts with noise. Series not in that list use M = 1 by default, including KXAAAGASD, KXSOLE and KXDEMOFUTHOURLY. Every simulated fee depends on these values.",
+   "action": "A person to compare each multiplier with the PDF table visually and correct data/strategies.json if any differ. Recorded in strategies.json as multiplier_caveat.",
+   "severity": "medium",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
+  {
+   "id": "F-21",
+   "item": "Paper results include keyword-only series with no official basis (149 of 706 rows)",
+   "why": "Across the open and settled rows in data/live/markets.json, 149 rows are classified only by keyword: KXSOLE 119 (crypto), KXDEMOFUTHOURLY 13 (crypto), KXAAAGASD 17 (gas). None of these series appears in the 13-series non-standard fee table, so their topic labels are unverified and their fees use the default M = 1. The simulation page's topic tables include them as they are.",
+   "action": "Owner to confirm the series list (see Q2). The simulation page's topic note says that keyword matching is the basis and points to this entry.",
+   "severity": "medium",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
+  {
+   "id": "F-23",
+   "item": "Demo quotes can show a 99-cent spread; the first simulator version filled across it",
+   "why": "The stored quote at the alert time for KXDEMOFUTHOURLY-26NOV20H14-UP was yes bid 0.01 and yes ask 1.00. The first version of scripts/simulate.py filled a NO position at 0.99 on that quote. The next run marked it to a 0.00 bid, an unrealised result of -1.00. That fill is not a price anyone could trade at. The simulator now treats a spread above max_quote_spread_dollars (0.10, a project rule set to match the swing threshold) as untradable: such signals are not filled, and an open position whose entry quote breaches it is voided, not settled.",
+   "action": "Owner to confirm the 0.10 threshold in data/strategies.json. The voided position stays visible on simulation.html as VOID.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/orderbook_responses"
+   ]
+  },
+  {
+   "id": "F-24",
    "item": "Real-time (second-level) alerting is not possible on a static site without credentials",
    "why": "The brief asks for a live alerting system. REST polling only sees changes between collector runs (20-minute cadence), and every Kalshi WebSocket session \u2014 even public channels \u2014 requires an API key at the handshake, which a static GitHub Pages site cannot hold.",
    "action": "Implemented the honest version: alerts are derived from consecutive collected observations, the page polls the committed snapshot every 60 s, and a clearly-labelled SIMULATED tick stream (default off, never persisted) demonstrates the real-time path. A user-supplied demo key would close the gap (see G11).",
@@ -388,7 +517,7 @@
    ]
   },
   {
-   "id": "F-15",
+   "id": "F-25",
    "item": "Alert 'cause' links are research starting points, not verified causes",
    "why": "The brief asks for website links that may have caused a \u2265$0.10 jump. No official source attributes a price move to an event, and automatic news attribution would be unverifiable guesswork.",
    "action": "Each alert links the exact API query that produced the prices, and each category links the official bodies that publish the underlying facts (EIA, FEC/EAC, Oscars/Grammys/Emmys academies, CME/Coinbase, PGA Tour). The pages state explicitly that these are starting points, not verified causes.",
@@ -399,7 +528,7 @@
    ]
   },
   {
-   "id": "F-16",
+   "id": "F-26",
    "item": "README advertised a subsite (9b246e37/) that PR #15's integration removed",
    "why": "The repository README still described a '9b246e37/' verified dashboard subsite restored by PR #13, but the final integration (PR #15) published exactly one canonical tree and that directory no longer exists \u2014 a stale reference that contradicts the one-tree rule.",
    "action": "Fixed in this session: the README now describes only the canonical tree plus the alerting/automated-trading features added by session arena-f068786c.",

@@ -32,12 +32,15 @@ jobs:
           test "$code" = "200"
       - name: Collect
         run: python3 scripts/collect.py --orderbooks 4
-      - name: Validate snapshot
-        run: python3 scripts/tests/validate_live.py
-      - name: Build >= $0.10 swing alerts (and validate them against the observations)
+      - name: Build live alert feed (>= $0.10 swings)
+        run: python3 scripts/build_alerts.py
+      - name: Paper-trade fixed strategies on the alert archive (no orders, no account)
+        run: python3 scripts/simulate.py
+      - name: Validate the snapshot, the alert archive/feeds, and the simulation
         run: |
-          python3 scripts/build_alerts.py
+          python3 scripts/tests/validate_live.py
           python3 scripts/tests/validate_alerts.py
+          python3 scripts/tests/test_simulate.py
       - name: Commit snapshot
         run: |
           set -euo pipefail

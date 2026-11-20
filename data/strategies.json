@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
+  "note": "Strategy definitions for scripts/simulate.py. Each signal is one swing in data/live/alerts_archive.json (built by scripts/build_alerts.py). Edit this file to change a rule; no code change is needed. Rules are project choices unless marked otherwise.",
+  "contracts_per_signal": 1,
+  "entry_rule": "Taker entry at the observed ask in the observation at the alert's to_time: YES at yes_ask_dollars; NO at 1 - yes_bid_dollars (documented reciprocal relation, https://docs.kalshi.com/getting_started/orderbook_responses). No quote at that time, or an entry outside 0.01-0.99, means not filled. A quote whose spread (yes ask minus yes bid) exceeds max_quote_spread_dollars is not filled.",
+  "exit_rule": "Hold to settlement. A position settles only when the market appears in the settled list with result yes or no (https://docs.kalshi.com/getting_started/market_settlement). Before that it is marked to the current bid: unrealised = bid - entry - entry fee - exit fee at that bid.",
+  "one_open_position_rule": "At most one open position per strategy per market. Further signals for the same market are counted as skipped_duplicate.",
+  "min_settled_for_conclusion": 30,
+  "min_settled_origin": "Project choice. Below this many settled positions a strategy is reported as insufficient sample, not as profitable or unprofitable.",
+  "fee_model": {
+    "formula": "fee = round up to the next cent of ( M x 0.07 x C x P x (1 - P) ), with P = price in dollars, C = contracts, M = taker multiplier",
+    "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
+    "default_taker_multiplier": 1,
+    "default_origin": "General formula states M defaults to 1 unless otherwise indicated.",
+    "settlement_fee": "none (fee schedule: 'There is no settlement fee.')",
+    "multipliers": {
+      "KXAAAGASM": 1,
+      "KXBALLONDOR": 1,
+      "KXBTCMAX150": 1,
+      "KXBTCY": 0,
+      "KXETHY": 0,
+      "KXELECTIRAN": 0,
+      "KXEMMYCACTO": 1,
+      "KXEMMYCACTR": 1,
+      "KXEMMYCSERIES": 1,
+      "KXPGATOUR": 1,
+      "KXPGARYDER": 1,
+      "KXPGASOLHEIM": 1,
+      "KXSUPERBOWLHEADLINE": 1
+    },
+    "multiplier_caveat": "Per-series multipliers M (fee_model.multipliers) were read from the text of the non-standard fee table in https://kalshi.com/docs/kalshi-fee-schedule.pdf (July 7, 2026). The PDF text extracts with noise, so the values need a visual check by a person (Flagged F-20). Series not in the table use default_taker_multiplier (1)."
+  },
+  "strategies": [
+    {
+      "id": "S1",
+      "name": "Momentum: follow every swing",
+      "side_rule": "follow",
+      "signal_filter": "all",
+      "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going."
+    },
+    {
+      "id": "S2",
+      "name": "Fade: bet against every swing",
+      "side_rule": "fade",
+      "signal_filter": "all",
+      "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses."
+    },
+    {
+      "id": "S3",
+      "name": "Momentum on experimental high-ROI screen only",
+      "side_rule": "follow",
+      "signal_filter": "high_roi",
+      "description": "S1 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model)."
+    },
+    {
+      "id": "S4",
+      "name": "Fade on experimental high-ROI screen only",
+      "side_rule": "fade",
+      "signal_filter": "high_roi",
+      "description": "S2 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model)."
+    }
+  ],
+  "trade_type_bands": [
+    {
+      "id": "low",
+      "label": "entry below 0.20",
+      "max_exclusive": 0.2
+    },
+    {
+      "id": "mid",
+      "label": "entry 0.20 to 0.80",
+      "max_exclusive": 0.8
+    },
+    {
+      "id": "high",
+      "label": "entry above 0.80",
+      "max_exclusive": 1.01
+    }
+  ],
+  "signal_source": "data/live/alerts_archive.json: every consecutive last-price pair with |change| >= $0.10 (threshold from the brief; data/alert_rules.json).",
+  "high_roi_definition": "The 'high_roi' flag in the archive is the dashboard's EXPERIMENTAL 'Model watch' screen (fee-schedule seed series with positive volume_24h_fp). It is not an owner-approved ROI model (Flagged F-14).",
+  "max_quote_spread_dollars": 0.1,
+  "max_quote_spread_note": "Project rule (not an official fact). A stored quote whose yes ask minus yes bid exceeds this value is not a tradable price: a 99-cent spread on a demo market gives a fill that no trader could get. Set at 10 cents to match the swing threshold. Open positions whose entry quote breaches it are voided (status 'voided'), not settled. See Flagged F-23."
+}
