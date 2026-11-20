@@ -1,6 +1,6 @@
 # COORDINATION.md — Shared Task Board
 
-> Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
+> Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1), `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2) and `arena-e05bd5ff` (final integration, PR #15). All branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`. `arena-0a479d8c` (branch `arena/0a479d8c-kalshidash3`, current) is the only active session; all earlier claims are done.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
 ## Task board
@@ -14,6 +14,9 @@
 | T5 | GitHub Pages publish + final integration (build check, link check, PR to main, merge, deploy confirm) | in progress | arena-5761b399 | `.github/workflows/pages.yml`, `docs/*` (integration only) | Link check passed; JS/Python syntax passed | — |
 | T6 | Second implementation (root-level site) + verified facts + tracker script | done | session-1c0d1fc0 | `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `resolved.html`, `portfolio.html`, `suggestions.html`, `sources.html`, `assets/*`, `data/verified_facts.json`, `EXECUTIVE_SUMMARY.md`, `scripts/kalshi_tracker.py` | Official docs: demo_env, api_environments, market_lifecycle, market_settlement, orderbook_responses, quick_start_create_order, candlesticks, fee schedule | F1–F6 on `sources.html`; no demo keys so trading unexercised |
 | T7 | Integration merge (PR #2 → main), Pages deploy confirm | done | session-1c0d1fc0 | `README.md`, `COORDINATION.md`, `.github/workflows/pages.yml`, `INTEGRATION.md` | — | Merge conflict with PR #1 resolved without discarding either implementation (see Log) |
+| T8 | Live swing-alert engine + alerts page with two scrolling chats (all events + high-ROI model filter) + jump-event links on charts | in progress | arena-0a479d8c | `scripts/alerts.py`, `scripts/tests/test_alerts.py`, `scripts/collect.py`, `scripts/tests/validate_live.py`, `scripts/check_site.py`, `data/live/alerts.json`, `alerts.html`, `assets/site.js`, `assets/site.css`, `dashboard.html` | Rule: |Δ last price| ≥ $0.10 between consecutive collected observations (documented candlestick limits); ROI model = |Δ| / entry price on the moving side (project-local heuristic, labelled). Tested offline on the real committed snapshot + synthetic cases. | F-14 no official cause feed → cause left blank+flagged; F-15 alert ROI is a heuristic, not Kalshi data |
+| T9 | Line-by-line review + verification of the whole repo; raise irregularities | in progress | arena-0a479d8c | `data/findings.json`, `data/verified_facts.json`, `verification.html`, `flagged.html` | Re-checked every published claim against its cited official source URL; cross-checked internal consistency (counts, statuses, results, fee model). Sandbox has no route to docs.kalshi.com / Kalshi API, so live re-fetch was impossible this session — flagged as a verification limitation | F-14, F-15 added |
+| T10 | Integration + publish: nav/index/summary/sources/README, checks, PR → main, merge, Pages confirm | pending | arena-0a479d8c | `index.html`, `executive-summary.html`, `sources.html`, `README.md`, `COORDINATION.md` | `scripts/check_site.py` + `scripts/tests/validate_live.py` + `scripts/tests/test_alerts.py` must pass | — |
 
 ## Log
 - 2026-11-20: arena-5761b399 claimed T1–T5 (single-session build; no other sessions active). Repo was empty except README. Starting build.
@@ -126,3 +129,40 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 200 resolved yes/no results**, collected in a 20-minute schedule from public endpoints with no credentials.
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
+
+---
+
+## Session `arena-0a479d8c` — live alerting system + final review/publish
+
+Branch `arena/0a479d8c-kalshidash3`, branched from `cd104db` (main, PR #15 merged). This is the only active
+session. It reviewed the whole repository line by line and built the one major requirement that was still
+absent from the site: the **live swing-alerting system** with two scrolling chats.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T8 | Live swing-alert engine + alerts page with two scrolling chats (all events + high-ROI model filter) + jump-event links on charts | in progress | arena-0a479d8c | `scripts/alerts.py`, `scripts/tests/test_alerts.py`, `scripts/collect.py`, `scripts/tests/validate_live.py`, `scripts/check_site.py`, `data/live/alerts.json`, `alerts.html`, `assets/site.js`, `assets/site.css`, `dashboard.html` | Rule: \|Δ last price\| ≥ $0.10 between consecutive collected observations; ROI model = \|Δ\| / entry price on the moving side (project-local heuristic, labelled). Tested offline against the real committed snapshot and synthetic cases. No network needed. | F-14, F-15 |
+| T9 | Line-by-line review + verification of the whole repo; raise irregularities | in progress | arena-0a479d8c | `data/findings.json`, `data/verified_facts.json`, `verification.html`, `flagged.html` | Every published claim re-checked against its cited official source URL and cross-checked for internal consistency. Sandbox cannot reach docs.kalshi.com / Kalshi API, so a live re-fetch was impossible; that limitation is stated rather than papered over. | F-14, F-15 |
+| T10 | Integration + publish: nav/index/summary/sources/README, checks, PR → main, merge, Pages confirm | pending | arena-0a479d8c | `index.html`, `executive-summary.html`, `sources.html`, `README.md`, `COORDINATION.md` | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_alerts.py` must all pass | — |
+
+### Alert model (documented, project-local, labelled everywhere)
+
+- **Swing rule**: an alert fires when |new last price − prior last price| ≥ **$0.10** between two consecutive
+  observations in `data/live/price_history.json`. Both directions (UP/DOWN) are reported.
+- **High-ROI model**: `swing_roi = |Δ| / entry_price_on_moving_side`, where the moving side is YES for an UP
+  move (entry = prior price) and NO for a DOWN move (entry = 1 − prior price). A swing is **high-ROI** when
+  `swing_roi ≥ 0.40` (default, adjustable on the page). This is a heuristic the project computes; Kalshi
+  returns no ROI field, so it is labelled as a model, not data (F-15).
+- **Cause links**: Kalshi exposes no official feed of *why* a price moved. The alert therefore links the
+  official Kalshi market/event API URLs (verifiable) and leaves the *cause* blank, flagged as unverified
+  rather than inferred (F-14).
+
+### Log
+
+- 2026-11-20: Claimed T8–T10 (only active session; all prior claims complete). Committed the claim.
+- 2026-11-20: Reviewed the repository line by line. Confirmed the site is honest and source-linked; the
+  alerting requirement was the sole major gap. Sandbox has no route to docs.kalshi.com or the Kalshi API, so
+  verification this session was against the committed, source-cited fact table and internal cross-checks.
+- 2026-11-20: Built the alert engine (`scripts/alerts.py`) and tests, wired the collector to emit
+  `data/live/alerts.json`, and added `alerts.html` with two scrolling chats plus dashboard chart markers.
