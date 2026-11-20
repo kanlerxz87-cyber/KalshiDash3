@@ -163,21 +163,36 @@ This session's first claim (T11–T14, commit `8d5833e`) was pushed at 13:20 UTC
 PR #16 (T11, `arena-6d85f8f0`, dashboard alert feeds) and PR #18 (T12, `arena-5225610f`, alert archive and
 `scripts/build_alerts.py`). Those two tasks were already done and are **not** repeated here. The duplicate
 `alerts.py`, `alerts.html`, and a second `alert_rules.json` built by this session were withdrawn before merge, so the
-repo keeps one alert pipeline. Work from this session that overlapped with them is recorded as withdrawn in the
-task table below. No `main` file was overwritten or deleted.
+repo keeps one alert pipeline and one alert UI. No `main` file owned by another session was overwritten or deleted.
 
 ### Task board (this session)
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T11 | Live ≥ $0.10 swing feeds | **done by arena-6d85f8f0 (PR #16)**; this session withdrew its duplicate | arena-6d85f8f0 | — | — | see F-14 (ROI model not supplied) |
-| T12 | Persistent alert archive | **done by arena-5225610f (PR #18)**; this session withdrew its duplicate | arena-5225610f | — | — | see F-15 to F-17 |
-| T15 | Automated paper trading of defined strategies on the alert archive, with the official taker-fee model, settlement from the official `result`, and results by strategy, topic and trade type | in progress | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html`, `scripts/tests/test_alerts_sim.py`, `.github/workflows/collect.yml` (one step), `scripts/tests/validate_live.py` (one check block) | pending | pending |
-| T13 | Verification and Flagged for Review updates for T15 (new IDs F-18 onward, facts F-50 onward, Q9, G9, G10) | in progress | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json`, `sources.html` | pending | pending |
-| T14 | Integration: README, index card, check_site, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress | arena-e5adea9d | `README.md`, `index.html`, `COORDINATION.md` | pending | pending |
+| T11 | Live ≥ $0.10 swing feeds | **done by arena-6d85f8f0 (PR #16)**; this session withdrew its duplicate | arena-6d85f8f0 | — | — | F-14 (ROI model not supplied) |
+| T12 | Persistent alert archive | **done by arena-5225610f (PR #18)**; this session withdrew its duplicate | arena-5225610f | — | — | F-15 to F-17; request R-1 open |
+| T15 | Paper simulator: fixed rules applied to `data/live/alerts_archive.json` (main's T12 output), official taker fee, settlement from the official `result`, results by rule, topic and trade type | in progress (pending PR) | arena-e5adea9d | `scripts/simulate.py`, `data/strategies.json`, `data/live/simulation.json` (generated), `simulation.html`, `scripts/tests/test_simulate.py`, `scripts/tests/validate_live.py` (`check_simulation` block only), `.github/workflows/collect.yml` (one step after the alert build) | `python3 scripts/tests/test_simulate.py` (14 tests OK); `validate_live.py` OK; a synthetic-data render test of `simulation.html` in a temp copy (not committed) | F-19, F-20, F-21 |
+| T13 | Verification and Flagged updates for T15 (facts F-50 to F-53; flagged F-18 to F-21; question Q9; suggestions G9, G10) | in progress (pending PR) | arena-e5adea9d | `data/verified_facts.json`, `data/findings.json` | Each new fact read from its official page this session (demo_env, market_lifecycle, market_settlement, orderbook_responses, GitHub Pages publishing source) | F-18 (Pages source discrepancy) |
+| T14 | Integration: nav entry, index card and pipeline row, README, PR → main, merge, collector dispatch on main, Pages deploy confirm | in progress (pending PR) | arena-e5adea9d | `assets/site.js` (nav entry only), `index.html` (one card, one pipeline row), `README.md`, `COORDINATION.md` | `check_site.py` OK; `node --check` on every inline and asset script OK; jsdom render of simulation, index, strategies and dashboard with no errors; YAML parsed with js-yaml | — |
+
+Sources were not changed: every official URL used by this session is already listed on `sources.html` (checked
+before editing).
+
+### Requests logged by this session
+
+- **R-1 (still open, from arena-5225610f):** point the dashboard alert feeds at `data/live/alerts_archive.json`.
+  Owner: dashboard. Not implemented here.
+- **R-2 (new, to arena-5225610f / T12 owner):** in `scripts/build_alerts.py`, store `to_yes_bid` and `to_yes_ask`
+  (taken from the observation at `to_time`) on each new archive entry. `scripts/simulate.py` already reads those
+  fields when present; until they exist, most swings cannot be filled and the simulation page shows that. Flagged F-19.
+  Not implemented here, because `build_alerts.py` belongs to T12.
 
 ### Log
 
 - 2026-11-20 13:20 UTC: claimed T11–T14 (commit `8d5833e`). Checked before claiming: `main` = `cd104db`; no other open session branch.
-- 2026-11-20 ~13:21 UTC: `main` advanced by PR #16 (T11) and PR #18 (T12). The T11/T12 claim overlapped that work. Withdrawn as described above, kept only as a record. Merge conflict in this file was resolved by keeping every existing row and log line.
-- 2026-11-20 13:16 UTC (observed before merge): the scheduled collector had not fired on `main`; the latest snapshot was 11:33 UTC. Recorded as F-16 on the earlier board and checked again after merge (see T14).
+- 2026-11-20 ~13:21 UTC: `main` advanced by PR #16 (T11) and PR #18 (T12). The T11/T12 claim overlapped that work. Withdrawn; kept only as a record. The merge conflict in this file was resolved by keeping every existing row and log line.
+- 2026-11-20 13:26 UTC: re-claimed the remaining scope as T15 (simulator and page) and T13 and T14 (verification and integration), with the rows above. Re-read `origin/main` before the claim: T11 and T12 done; T13 and T14 not claimed.
+- 2026-11-20 13:26–13:31 UTC: rebuilt on `origin/main` (merge). Kept only: strategy definitions, simulator, simulation page, fee and settlement tests (`test_simulate.py`), and one simulation check in `validate_live.py`. Dropped: the duplicate alert page, alert script, alert rules, and alert tests.
+- 2026-11-20 13:30 UTC: observed on `main`: the collector ran again (snapshot 13:18:28Z, 506 open and 200 settled in scope). The archive holds 4 swings; all 4 are from one market that settled `no` and left the open scan, so none can be filled (F-19, R-2).
+- 2026-11-20 13:31 UTC: a `git push` of this branch is the next step. Re-read `origin/main` before the push (see T14).
+- Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.

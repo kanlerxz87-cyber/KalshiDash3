@@ -303,7 +303,7 @@
     {
       "id": "F-42",
       "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
-      "value": "\"The RSM Classic: Bill Haas wins\" \u2014 \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
+      "value": "\"The RSM Classic: Bill Haas wins\" — \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
       "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
       "verified": true
     },
@@ -362,11 +362,43 @@
       "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
       "verified": true,
       "note": "Relevant to fee modelling: at 0.94 the taker fee is 0.07 x 0.94 x 0.06 = 0.0039 per contract, far below the ~0.0175 at 50 cents, so fee drag is not uniform across the ranking."
+    },
+    {
+      "id": "F-50",
+      "claim": "Markets in the demo environment may not behave like real markets",
+      "value": "\"The price and behavior of markets in the demo environment may not be reflective of those in real markets.\"",
+      "source": "https://docs.kalshi.com/getting_started/demo_env",
+      "verified": true,
+      "note": "Read 2026-11-20. Every paper result on simulation.html inherits this limit (see F-08)."
+    },
+    {
+      "id": "F-51",
+      "claim": "A market's result is set when it is determined; payout happens when it is finalized",
+      "value": "Statuses closed -> determined (result set to yes/no/scalar; settlement timer runs) -> finalized (positions paid; settlement_ts populated). REST settled = finalized.",
+      "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "verified": true,
+      "note": "Read 2026-11-20. scripts/simulate.py settles a paper position only on a yes or no result in the collector's settled list. A disputed market can be re-determined (disputed, amended)."
+    },
+    {
+      "id": "F-52",
+      "claim": "Yes/no settlement pays $1 per net contract to the holders of the winning side",
+      "value": "Yes outcome: yes holders receive $1 per contract. No outcome: no holders receive $1 per contract.",
+      "source": "https://docs.kalshi.com/getting_started/market_settlement",
+      "verified": true,
+      "note": "Read 2026-11-20. Basis for the payoff used by scripts/simulate.py (payoff 1.00 minus entry minus entry fee). Same page: fees are zero for simple yes/no determinations."
+    },
+    {
+      "id": "F-53",
+      "claim": "An empty or mistyped ticker returns 200 with empty order-book arrays, not 404",
+      "value": "GET /markets/{ticker}/orderbook returns empty yes_dollars and no_dollars for an unknown or archived ticker. Check GET /markets/{ticker} to tell them apart.",
+      "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "verified": true,
+      "note": "Read 2026-11-20. Empty books in the collector's liquidity block must not be read as 'no liquidity' without this check."
     }
   ],
   "counts": {
-    "total": 49,
-    "verified": 48,
+    "total": 53,
+    "verified": 52,
     "unverified": 1
   }
 }

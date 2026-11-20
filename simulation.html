@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paper strategies — KalshiDash3</title>
+<meta name="description" content="Paper-only test of four fixed rules on the $0.10 swing alerts in data/live/alerts_archive.json: entries, official taker fees, settlements, and results by strategy, topic and trade type.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Paper strategies on live swing alerts</h1>
+  <p class="lede">
+    Four fixed rules are applied to every $0.10 swing in the alert archive
+    (<code>data/live/alerts_archive.json</code>, built by the alert pipeline). Each fill is a <b>paper</b>
+    position: no order is sent and no account is used. Results show what the rule would have produced at the
+    prices that were actually stored, with the official taker fee deducted. Positions are grouped by topic and
+    by trade type so each rule can be judged on the kind of trade it takes.
+  </p>
+
+  <div class="notice warn"><b>Paper only.</b> A strategy is not treated as profitable or unprofitable until it has
+    <span id="minSettled">30</span> settled positions. Demo prices may not reflect real markets
+    (<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a>).</div>
+
+  <div id="snapshotBanner"></div>
+  <div id="simBanner"></div>
+  <div class="grid" id="kpis"></div>
+
+  <h2>Why positions are missing</h2>
+  <p class="small mut">A signal fills only when a bid and ask were stored at the alert time. The collector stores quotes
+    only while a market is in its open scan, so markets that have closed have none. Nothing is filled from last-trade
+    prices.</p>
+  <div id="fillTable"></div>
+
+  <h2>Strategy results</h2>
+  <div id="stratTable"></div>
+
+  <h2>Results by topic</h2>
+  <p class="small mut">Topics are kept separate. Counts are small, so read them as a record, not a verdict.</p>
+  <div id="catTable"></div>
+
+  <h2>Results by trade type</h2>
+  <p class="small mut">Trade type = topic | direction of the move that triggered the signal | price band of the entry
+    (below 0.20, 0.20 to 0.80, above 0.80).</p>
+  <div id="ttTable"></div>
+
+  <h2>Open positions (marked to the current bid)</h2>
+  <p class="small mut">Unrealised = current bid − entry − entry fee − exit fee at that bid. Blank when the market is not in the
+    latest snapshot.</p>
+  <div id="openTable"></div>
+
+  <h2>Settled positions</h2>
+  <div id="settledTable"></div>
+
+  <h2>Rules and fee model</h2>
+  <div id="rules"></div>
+
+  <h2>What this page does not show</h2>
+  <div class="notice small" id="disclaimers"></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · paper simulation on Kalshi <b>demo</b> data ·
+<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf">Fee schedule (PDF)</a> ·
+<a href="https://docs.kalshi.com/getting_started/market_settlement">Settlement</a> ·
+<a href="dashboard.html">live alerts</a> · <a href="portfolio.html">portfolio &amp; paper ledger</a> ·
+<a href="sources.html">every source</a> · <a href="flagged.html">flagged for review</a>
+</div></footer>
+
+<script src="assets/site.js"></script>
+<script>
+"use strict";
+KD.nav("simulation.html");
+
+const SIM_URL = "data/live/simulation.json";
+const RULES_URL = "data/strategies.json";
+const ENTRY_DOC = "https://docs.kalshi.com/getting_started/orderbook_responses";
+const SETTLE_DOC = "https://docs.kalshi.com/getting_started/market_settlement";
+const FEE_DOC = "https://kalshi.com/docs/kalshi-fee-schedule.pdf";
+
+const $ = KD.$;
+const esc = KD.esc;
+
+function kpi(label, value, note) {
+  return `<div class="card"><div class="mut small">${esc(label)}</div><div class="big">${value}</div>` +
+    (note ? `<div class="small mut">${note}</div>` : "") + `</div>`;
+}
+
+function signedMoney(v) {
+  if (v === null || v === undefined || Number.isNaN(Number(v))) return '<span class="na">—</span>';
+  const n = Number(v);
+  return (n < 0 ? "−" : "") + "$" + Math.abs(n).toFixed(2);
+}
+
+function render(sim, rules) {
+  const minN = rules.min_settled_for_conclusion;
+  $("#minSettled").textContent = String(minN);
+  if (!sim) return;
+  $("#disclaimers").innerHTML = (sim.disclaimers || []).map((d) => `<p>${esc(d)}</p>`).join("");
+
+  const strat = sim.strategies || [];
+  const totals = strat.reduce(
+    (a, s) => ({ signals: a.signals + s.signals, filled: a.filled + s.filled, settled: a.settled + s.settled,
+                 open: a.open + s.open, wins: a.wins + s.wins, losses: a.losses + s.losses }),
+    { signals: 0, filled: 0, settled: 0, open: 0, wins: 0, losses: 0 });
+  const s1 = strat.find((s) => s.id === "S1") || { signals: 0, not_filled_no_quote: 0, not_filled_bad_price: 0 };
+
+  $("#kpis").innerHTML = [
+    kpi("Swing alerts processed", KD.num(sim.counts.signals_processed_total), `${KD.num(sim.counts.new_signals_this_run)} new in the last run`),
+    kpi("Paper fills (all rules)", KD.num(totals.filled), `${KD.num(totals.open)} open · ${KD.num(totals.settled)} settled`),
+    kpi("Settled wins / losses", `${KD.num(totals.wins)} / ${KD.num(totals.losses)}`, `needs ${KD.num(minN)} settled per rule to conclude`),
+    kpi("Not filled (rule S1)", KD.num(s1.not_filled || 0), `${KD.num(s1.not_filled_no_quote || 0)} with no stored quote`),
+  ].join("");
+
+  $("#simBanner").innerHTML =
+    `<div class="notice blue"><b>Simulation run:</b> ${esc(sim.generated_at)} · ` +
+    `<b>Prices as of:</b> ${esc(sim.snapshot_collected_at)} · <b>Signals:</b> <code>${esc(sim.signals_file)}</code> · ` +
+    `<b>Rules:</b> <code>${esc(sim.rules_file)}</code></div>`;
+
+  const noFillTotal = strat.reduce((a, s) => a + (s.not_filled || 0), 0);
+  $("#fillTable").innerHTML = KD.table(
+    [
+      { key: "id", label: "Rule" },
+      { key: "signals", label: "Signals", num: true },
+      { key: "filled", label: "Filled", num: true },
+      { key: "nq", label: "No stored quote", num: true },
+      { key: "bp", label: "Entry outside 0.01–0.99", num: true },
+      { key: "dup", label: "Skipped: already open", num: true },
+    ],
+    strat.map((s) => ({
+      id: `<b>${esc(s.id)}</b> ${esc(s.name)}`,
+      signals: KD.num(s.signals),
+      filled: KD.num(s.filled),
+      nq: KD.num(s.not_filled_no_quote || 0),
+      bp: KD.num(s.not_filled_bad_price || 0),
+      dup: KD.num(s.skipped_duplicate || 0),
+    })),
+    { empty: "No rules defined." }
+  ) + `<p class="small mut">Derived counts from <code>${esc(sim.signals_file)}</code>. Rules: ` +
+    `<a href="${ENTRY_DOC}">order-book quotes</a> (reciprocal NO price).</p>`;
+
+  $("#stratTable").innerHTML = KD.table(
+    [
+      { key: "name", label: "Strategy" },
+      { key: "filter", label: "Signals used" },
+      { key: "open", label: "Open", num: true },
+      { key: "settled", label: "Settled", num: true },
+      { key: "wr", label: "Hit rate", num: true },
+      { key: "net", label: "Realised net", num: true },
+      { key: "unr", label: "Unrealised (open)", num: true },
+      { key: "concl", label: "Status" },
+    ],
+    strat.map((s) => ({
+      name: `<b>${esc(s.id)}</b> ${esc(s.name)}<div class="small mut">${esc(s.description)}</div>`,
+      filter: s.signal_filter === "high_roi" ? "experimental high-ROI screen only" : "all swings",
+      open: KD.num(s.open),
+      settled: KD.num(s.settled),
+      wr: s.hit_rate === null ? '<span class="na">—</span>' : KD.pct(s.hit_rate, 0),
+      net: signedMoney(s.realized_net),
+      unr: s.unrealized_net_open === null ? '<span class="na">—</span>' : signedMoney(s.unrealized_net_open),
+      concl: esc(s.conclusion),
+    })),
+    { empty: "No strategies defined." }
+  );
+
+  const catRows = [];
+  for (const s of strat) {
+    for (const [cat, v] of Object.entries(s.by_category || {})) {
+      catRows.push({
+        strat: `<b>${esc(s.id)}</b>`,
+        cat: esc(KD.CAT_LABEL[cat] || cat),
+        filled: KD.num(v.filled), settled: KD.num(v.settled),
+        wl: `${KD.num(v.wins)} / ${KD.num(v.losses)}`,
+        net: signedMoney(v.realized_net),
+      });
+    }
+  }
+  $("#catTable").innerHTML = KD.table(
+    [
+      { key: "strat", label: "Rule" }, { key: "cat", label: "Topic" },
+      { key: "filled", label: "Filled", num: true }, { key: "settled", label: "Settled", num: true },
+      { key: "wl", label: "Wins / losses", num: true }, { key: "net", label: "Realised net", num: true },
+    ],
+    catRows,
+    { empty: "No paper fills in any topic yet." }
+  ) + `<p class="small mut">Topic labels come from the category classifier: seed series (listed in the fee schedule) or keyword match. Keyword-only series are unverified (Flagged F-21).</p>`;
+
+  $("#ttTable").innerHTML = KD.table(
+    [
+      { key: "tt", label: "Trade type" }, { key: "filled", label: "Filled", num: true },
+      { key: "settled", label: "Settled", num: true }, { key: "wl", label: "Wins / losses", num: true },
+      { key: "net", label: "Realised net", num: true },
+    ],
+    (sim.trade_types || []).map((t) => ({
+      tt: esc(t.trade_type), filled: KD.num(t.filled), settled: KD.num(t.settled),
+      wl: `${KD.num(t.wins)} / ${KD.num(t.losses)}`, net: signedMoney(t.realized_net),
+    })),
+    { empty: "No paper fills yet, so no trade types to show." }
+  );
+
+  const posRow = (p, extra) => ({
+    id: esc(p.id), strat: esc(p.strategy), title: esc(p.title || p.ticker),
+    ticker: `<code>${esc(p.ticker)}</code> ${KD.srcLink(p.source, "market API")}`,
+    side: esc((p.side || "").toUpperCase()), entry: KD.cents(p.entry_price), fee: KD.money(p.entry_fee),
+    ...extra,
+  });
+  $("#openTable").innerHTML = KD.table(
+    [
+      { key: "strat", label: "Rule" }, { key: "title", label: "Market" }, { key: "ticker", label: "Ticker & source" },
+      { key: "side", label: "Side" }, { key: "entry", label: "Entry", num: true }, { key: "fee", label: "Entry fee", num: true },
+      { key: "bid", label: "Bid now", num: true }, { key: "unr", label: "Unrealised", num: true },
+    ],
+    (sim.open_positions || []).map((p) => posRow(p, {
+      bid: p.bid_now === null || p.bid_now === undefined ? `<span class="na" title="${esc(p.mark_note || "")}">—</span>` : KD.cents(p.bid_now),
+      unr: p.unrealized_net === null || p.unrealized_net === undefined ? '<span class="na">—</span>' : signedMoney(p.unrealized_net),
+    })),
+    { empty: "No open paper positions." }
+  );
+
+  $("#settledTable").innerHTML = KD.table(
+    [
+      { key: "strat", label: "Rule" }, { key: "title", label: "Market" }, { key: "ticker", label: "Ticker & source" },
+      { key: "side", label: "Side" }, { key: "entry", label: "Entry", num: true }, { key: "fee", label: "Entry fee", num: true },
+      { key: "result", label: "Result" }, { key: "net", label: "Realised net", num: true },
+    ],
+    (sim.settled_positions || []).map((p) => posRow(p, {
+      result: p.settled_result ? `<span class="badge ${p.settled_result === p.side ? "ok" : "bad"}">${esc(p.settled_result.toUpperCase())}</span>` : '<span class="na">—</span>',
+      net: signedMoney(p.realized_net),
+    })),
+    { empty: "No settled paper positions yet." }
+  ) + `<p class="small mut">Settlement: <a href="${SETTLE_DOC}">market settlement</a>. Fee: <a href="${FEE_DOC}">fee schedule (PDF)</a>.</p>`;
+
+  $("#rules").innerHTML =
+    `<div class="tw"><table><thead><tr><th>Rule</th><th>Definition</th><th>Basis</th></tr></thead><tbody>` +
+    strat.map((s) => `<tr><td><b>${esc(s.id)}</b> ${esc(s.name)}</td><td>${esc(s.description)}</td>` +
+      `<td>${s.signal_filter === "high_roi"
+        ? "Project screen (experimental, not an official fact)"
+        : `<a href="${ENTRY_DOC}">order-book quotes</a>`}</td></tr>`).join("") +
+    `<tr><td><b>Entry</b></td><td>${esc(rules.entry_rule)}</td><td><a href="${ENTRY_DOC}">order-book quotes</a></td></tr>` +
+    `<tr><td><b>Settlement</b></td><td>${esc(rules.exit_rule || "Settles only on the official yes/no result.")}</td><td><a href="${SETTLE_DOC}">market settlement</a></td></tr>` +
+    `<tr><td><b>Fee</b></td><td>Official taker fee: round up(M × 0.07 × C × P × (1−P)); M is per series from the non-standard table. ` +
+    `No settlement fee. Multipliers were read from PDF text and need a human check (see Flagged).</td><td><a href="${FEE_DOC}">fee schedule (PDF)</a></td></tr>` +
+    `<tr><td><b>Signals</b></td><td>${esc(rules.signal_source)}</td><td>Project rule (not an official fact)</td></tr>` +
+    `</tbody></table></div>`;
+}
+
+(async () => {
+  let sim = null, rules = null;
+  try { sim = await KD.json(SIM_URL); } catch { sim = null; }
+  try { rules = await KD.json(RULES_URL); } catch { rules = null; }
+  if (!rules) {
+    $("#simBanner").innerHTML = `<div class="notice bad">Rules file <code>${RULES_URL}</code> could not be loaded. No results are shown.</div>`;
+    return;
+  }
+  if (!sim) {
+    $("#simBanner").innerHTML = `<div class="notice warn"><b>No simulation run committed yet.</b> The collector writes <code>${SIM_URL}</code> after each alert build. Nothing is shown until then.</div>`;
+    $("#kpis").innerHTML = "";
+    $("#disclaimers").innerHTML = "<p>No results to disclaim yet.</p>";
+    return;
+  }
+  KD.snapshotBanner(await KD.json("data/live/markets.json").catch(() => null));
+  render(sim, rules);
+})();
+</script>
+</body>
+</html>
