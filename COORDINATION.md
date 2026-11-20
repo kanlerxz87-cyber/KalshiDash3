@@ -750,3 +750,11 @@ rather than merely non-crashing, plus the collector failure:
   snapshot size with keep-caps (400 seed + 120 keyword per category; 1,600 most-recent settled). Also kept
   `rules_primary/secondary/subtitle` for open rows (F-33) so the ROI scan's `catalyst_links()` and the swing leads
   can cite the market's own settlement text. **F-34 (thin-book swings), F-35 (capped biased ranking), F-36 (rules text discarded) added to `data/findings.json`** — renumbered from the drafted F-31..F-33 because `arena-da07bb44` took those IDs on `main` first; the three defects stand as described.
+- 2026-11-20 20:35-20:45 UTC (post-rebase onto `351080f`, which brought PRs #34/#35/#36): lead coverage taken to
+  11/11 of the 19:30Z archive — fetched `GET /markets/KXDEMOFUTHOURLY-26NOV20H20-UP` (strike 58337.51; window
+  19:05-19:35 Coinbase closes 58249.98→58079.56, max HIGH 58310.32, so the 30c up-print sits under the strike
+  across the whole window → `no_external_move_supporting_this_swing`) and
+  `GET /markets/KXBTCY-27JAN0100-B47500` (settles on CF Benchmarks' BRTI, no free public series — recorded as an
+  explicit `not_reviewed` reason: 0.98→0.06 on `volume_24h_fp 0.00` with `updated_time 2026-04-28T02:27:21Z`,
+  consistent with F-34 rather than news). `validate_catalysts.py` catches the stale-lead gap by itself (it
+  refused the 9-row file against the 11-row archive before anything was rebuilt).

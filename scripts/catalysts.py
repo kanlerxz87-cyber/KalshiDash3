@@ -215,9 +215,10 @@ def build() -> dict:
             "links": [],
             "state": "not_reviewed",
             "relation": None,
-            "note": ("No review entry for this swing, so nothing is asserted about it. "
-                     "Not the same as 'no news existed': nobody in this project has read the "
-                     "reference for this market at this minute yet."),
+            "note": ledger.get("not_reviewed_reasons", {}).get(ticker) or (
+                "No review entry for this swing, so nothing is asserted about it. "
+                "Not the same as 'no news existed': nobody in this project has read the "
+                "reference for this market at this minute yet."),
             "reviewed_at": None,
         }
         if rules_text:

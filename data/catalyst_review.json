@@ -189,6 +189,86 @@
         "open_interest_fp": "30.00",
         "updated_time": "2026-11-20T12:01:19.622681Z"
       }
+    },
+    {
+      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+      "fetched_at": "2026-11-20T20:38Z",
+      "observed": {
+        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T20:00:00+00:00 closes at or above 58337.51 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T19:00:00+00:00. Missing data delays determination.",
+        "title": "Demo BTC at or above 58337.51 USD",
+        "status": "active",
+        "result": "",
+        "last_price_dollars": "0.5500",
+        "volume_24h_fp": "5225.00",
+        "open_interest_fp": "70.00",
+        "close_time": "2026-11-20T20:00:00Z",
+        "updated_time": "2026-11-20T19:00:05.598989Z"
+      }
+    },
+    {
+      "id": "COINBASE_BTCUSD_1MIN_1905_1935",
+      "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
+      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
+      "fetched_at": "2026-11-20T20:38Z",
+      "observed": {
+        "candle_closes_by_minute_UTC": {
+          "19:05": 58249.98,
+          "19:06": 58211.71,
+          "19:07": 58229.2,
+          "19:08": 58194.85,
+          "19:09": 58140.36,
+          "19:10": 58159,
+          "19:11": 58183.18,
+          "19:12": 58073.19,
+          "19:13": 58036.48,
+          "19:14": 58056.96,
+          "19:15": 58008.53,
+          "19:16": 57988.28,
+          "19:17": 57802.29,
+          "19:18": 57915.02,
+          "19:19": 57886.39,
+          "19:20": 57932.97,
+          "19:21": 58012.63,
+          "19:22": 57995.21,
+          "19:23": 57989.23,
+          "19:24": 57925.2,
+          "19:25": 57749.6,
+          "19:26": 57917.41,
+          "19:27": 58047.17,
+          "19:28": 58121.23,
+          "19:29": 58076.91,
+          "19:30": 58111.03,
+          "19:31": 57931.65,
+          "19:32": 58035.49,
+          "19:33": 58100.85,
+          "19:34": 58079.56
+        },
+        "window_max_high": 58310.32,
+        "granularity_s": 60
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+      "fetched_at": "2026-11-20T20:38Z",
+      "observed": {
+        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+        "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
+        "title": "BTC price  on Jan 1, 2027?",
+        "status": "active",
+        "result": "",
+        "last_price_dollars": "0.0600",
+        "previous_price_dollars": "0.9800",
+        "volume_24h_fp": "0.00",
+        "volume_fp": "80178731.12",
+        "open_interest_fp": "26587902.55",
+        "updated_time": "2026-04-28T02:27:21.580016Z",
+        "floor_strike": 45000.0,
+        "cap_strike": 49999.99
+      }
     }
   ],
   "reviews": [
@@ -412,6 +492,31 @@
         "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
       ],
       "note": "The market printed up 10c while the index kept falling away from the strike. Recorded as unexplained."
+    },
+    {
+      "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+      "alert_to_time": "2026-11-20T19:30:14Z",
+      "source_ids": [
+        "COINBASE_BTCUSD_1MIN_1905_1935",
+        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
+      ],
+      "window_from": "2026-11-20T19:05:00Z",
+      "window_to": "2026-11-20T19:34:00Z",
+      "comparison": {
+        "kind": "index_below_strike_all_window",
+        "strike": 58337.51,
+        "reference_side": "yes",
+        "value_before": 58249.98,
+        "value_before_at": "2026-11-20T19:06:00Z",
+        "value_after": 58079.56,
+        "value_after_at": "2026-11-20T19:35:00Z"
+      },
+      "verdict_override": "no_external_move_supporting_this_swing",
+      "links": [
+        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
+      ],
+      "note": "The collector recorded this market printing up to 0.55 during its 19:30:14Z run. Across the fetched 19:05-19:35 candles the Coinbase index the rules name fell (close 58249.98 to 58079.56) and stayed under the 58337.51 strike the whole window - the highest candle HIGH was 58310.32, 27.19 short. The market's own record shows last_price 0.5500 against yes_ask 0.9900 / yes_bid 0.0100 on 70.00 open interest: the print sits in a spread, not near a book. Recorded as unexplained by the reference."
     }
   ],
   "sources_of_method": {
@@ -425,5 +530,8 @@
   "swings_in_archive_not_reviewed": {
     "count_expected": 0,
     "note": "Every alert in data/live/alerts_archive.json as of 2026-11-20T19:38Z has a review entry. New swings appear here as not_reviewed until someone reads the reference; scripts/catalysts.py labels them rather than guessing."
+  },
+  "not_reviewed_reasons": {
+    "KXBTCY-27JAN0100-B47500": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news."
   }
 }
