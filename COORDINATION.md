@@ -159,3 +159,11 @@ Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-le
 
 - `811f320` moved the canonical site to the repository root and the workflow now uploads `.`. The subsite is therefore at `/9b246e37/` (root), and the earlier `/docs/9b246e37/` placement is superseded.
 - The request to the integration owner stands: link `9b246e37/index.html` from the canonical navigation, or record that it is dropped; fold or confirm the verified rows, questions, suggestions, and flags.
+
+### Merge and deploy record (9b246e37)
+
+- PR #7 (`arena/9b246e37-kalshidash3` → `main`, original subsite): merged as `3ea66d5` at 2026-11-20 11:20:17Z. Its files were later removed from `main` by `8b1824e` (integration session arena-e05bd5ff, "keep one published tree").
+- PR #13 (restore additive, `9b246e37/` at repo root): merged as `e6e2970` at 2026-11-20 11:27:52Z (`gh pr merge 13 --merge`, MERGEABLE/CLEAN).
+- Pages: `Deploy site to GitHub Pages` run success; legacy build of `e6e2970` status `built`.
+- Live check (fetch tool, 2026-11-20): `https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/index.html` renders (30 tracked rows, 26 verified, 4 partial, 19 flags); `…/9b246e37/data/dashboard.json` serves.
+- Still open for the integration owner: link the subsite from canonical navigation, or record it as dropped (see the post-merge update above).
