@@ -15,32 +15,33 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 
 | Page | What it answers |
 |---|---|
-| `docs/index.html` | Landing page, snapshot age, largest live market per category |
-| `docs/executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
-| `docs/categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `docs/dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
-| `docs/portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
-| `docs/strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
-| `docs/suggestions.html` | Eight proposals; four shipped to remove a correctness risk, four awaiting your decision |
-| `docs/questions.html` | Eight questions: known / unknown / best answer if forced / how to close it |
-| `docs/verification.html` | 44 claims, each with the official page it was checked against |
-| `docs/flagged.html` | Nine irregularities found, plus every value deliberately left blank |
-| `docs/sources.html` | The complete source list |
+| `index.html` | Landing page, snapshot age, largest live market per category |
+| `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
+| `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
+| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
+| `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
+| `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
+| `suggestions.html` | Eight proposals; four shipped to remove a correctness risk, four awaiting your decision |
+| `questions.html` | Eight questions: known / unknown / best answer if forced / how to close it |
+| `verification.html` | 44 claims, each with the official page it was checked against |
+| `flagged.html` | Nine irregularities found, plus every value deliberately left blank |
+| `sources.html` | The complete source list |
 
 ## Repository layout
 
 ```
-docs/                 the published site (GitHub Pages artifact)
-docs/data/categories.json  the five topics and their confirmed seed series
-docs/data/verified_facts.json  every static claim + its official source
-docs/data/findings.json    questions, suggestions, flagged irregularities
-docs/data/live/            collected snapshots (written by scripts/collect.py)
+*.html                the published site — one page per topic, shared shell in assets/
+assets/               site.css + site.js (no build step, no dependencies)
+data/categories.json  the five topics and their confirmed seed series
+data/verified_facts.json  every static claim + its official source
+data/findings.json    questions, suggestions, flagged irregularities
+data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
 .github/workflows/collect.yml   scheduled collection
-.github/workflows/pages.yml     deploy docs/ to Pages
+.github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
 
 ## How to re-run everything
@@ -48,10 +49,10 @@ scripts/tests/validate_live.py  refuses a fabricated snapshot
 Nothing here needs credentials. All market data comes from public demo endpoints.
 
 ```bash
-python3 scripts/collect.py            # writes docs/data/live/markets.json + price_history.json
+python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
 python3 scripts/tests/validate_live.py
 python3 scripts/check_site.py
-python3 -m http.server -d docs 8000   # then open http://localhost:8000
+python3 -m http.server 8000           # then open http://localhost:8000
 ```
 
 ## Track the real demo portfolio (the one manual step)
