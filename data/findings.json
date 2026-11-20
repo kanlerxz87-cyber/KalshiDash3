@@ -97,6 +97,17 @@
       "sources": [
         "https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"
       ]
+    },
+    {
+      "id": "Q9",
+      "question": "Should the paper rules S3 and S4 be judged on the experimental high-ROI screen before an owner ROI model exists?",
+      "known": "S3 and S4 use the archive field high_roi, which is the dashboard's experimental 'Model watch' screen (F-14). It is a project screen, not an owner-approved model. The archive does not yet store quotes at alert time, so no S3 or S4 fill exists (F-19).",
+      "unknown": "Which ROI model, if any, the owner wants. Whether the screen should be the signal for any strategy at all.",
+      "answer_if_forced": "No. Treat S3 and S4 as exploratory. Report them with the same fee, settlement and sample-size rules as S1 and S2, and make no ROI claim.",
+      "decision_needed": "Owner. The simulator stays unchanged until the owner answers.",
+      "sources": [
+        "https://docs.kalshi.com/getting_started/market_settlement"
+      ]
     }
   ],
   "suggestions": [
@@ -198,6 +209,30 @@
       "sources": [
         "https://docs.kalshi.com/getting_started/quick_start_websockets",
         "https://docs.kalshi.com/getting_started/api_keys"
+      ]
+    },
+    {
+      "id": "G9",
+      "suggestion": "Store the bid and ask at each alert time in the alert archive.",
+      "why_it_helps_decisions": "It is the only way to fill a paper trade on a market that has since closed, and it gives the dashboard the quote behind each swing.",
+      "effort": "Low",
+      "risk": "Adds two fields to an append-only archive. Existing entries stay unchanged; old entries stay unfilled.",
+      "success_metric": "Every new archive entry has a stored to_yes_bid and to_yes_ask.",
+      "status": "proposed (request R-2, see COORDINATION.md)",
+      "sources": [
+        "https://docs.kalshi.com/getting_started/orderbook_responses"
+      ]
+    },
+    {
+      "id": "G10",
+      "suggestion": "Keep price history for closed markets until they finalize.",
+      "why_it_helps_decisions": "It lets the page show the price path for a swing whose market has closed and lets the simulator mark its positions.",
+      "effort": "Medium",
+      "risk": "File size grows. Keep it bounded and keep the 120-point cap per market.",
+      "success_metric": "Every archived alert resolves to a stored observation at its to_time.",
+      "status": "proposed",
+      "sources": [
+        "https://docs.kalshi.com/getting_started/market_lifecycle"
       ]
     }
   ],
@@ -380,6 +415,47 @@
       "sources": [
         "https://docs.kalshi.com/api-reference/market/get-markets",
         "https://docs.kalshi.com/getting_started/market_lifecycle"
+      ]
+    },
+    {
+      "id": "F-18",
+      "item": "Pages build setting and the deploy workflow disagree about how the site is published",
+      "why": "GET /repos/kanlerxz87-cyber/KalshiDash3/pages reports build_type 'legacy' with source main:/ (deploy from branch). pages.yml deploys with GitHub Actions. GitHub's documentation says a branch source and an Actions source are separate publishing modes; the Actions run is always the deploy step, so the live result depends on which setting the owner has. This session could not change the setting (PUT /pages returns 403). Not changed.",
+      "action": "Owner to confirm in Settings > Pages which source is intended, and set it to GitHub Actions if pages.yml should publish. Not changed by this session.",
+      "severity": "medium",
+      "sources": [
+        "https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"
+      ]
+    },
+    {
+      "id": "F-19",
+      "item": "The paper simulator has no fills on the current alert archive, so no strategy result exists yet",
+      "why": "Each archived swing stores only the last-trade prices. It does not store the bid and ask at the alert time. All four current swings come from KXDEMOFUTHOURLY-26NOV20H12-UP, which settled 'no' (finalized) and has left the open scan, so price_history holds no quote for it (F-17). scripts/simulate.py therefore marks all four signals not filled for every strategy. Filling from the last-trade price would invent an entry, so it is not done.",
+      "action": "Request R-2 (T12 owner, scripts/build_alerts.py): store to_yes_bid and to_yes_ask from the observation at to_time on each new archive entry. simulate.py already reads those fields when present. Until then the simulation page shows 0 fills and says why.",
+      "severity": "high",
+      "sources": [
+        "https://docs.kalshi.com/getting_started/orderbook_responses",
+        "https://docs.kalshi.com/getting_started/market_lifecycle"
+      ]
+    },
+    {
+      "id": "F-20",
+      "item": "Fee multipliers for 13 non-standard series were read from extracted PDF text and need a human check",
+      "why": "The per-series multiplier M in the fee formula (0 for KXBTCY, KXETHY and KXELECTIRAN; 1 for the other 10 listed series) was read from the text of the fee-schedule PDF, which extracts with noise. Series not in that list use M = 1 by default, including KXAAAGASD, KXSOLE and KXDEMOFUTHOURLY. Every simulated fee depends on these values.",
+      "action": "A person to compare each multiplier with the PDF table visually and correct data/strategies.json if any differ. Recorded in strategies.json as multiplier_caveat.",
+      "severity": "medium",
+      "sources": [
+        "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+      ]
+    },
+    {
+      "id": "F-21",
+      "item": "Paper results include keyword-only series with no official basis (149 of 706 rows)",
+      "why": "Across the open and settled rows in data/live/markets.json, 149 rows are classified only by keyword: KXSOLE 119 (crypto), KXDEMOFUTHOURLY 13 (crypto), KXAAAGASD 17 (gas). None of these series appears in the 13-series non-standard fee table, so their topic labels are unverified and their fees use the default M = 1. The simulation page's topic tables include them as they are.",
+      "action": "Owner to confirm the series list (see Q2). The simulation page's topic note says that keyword matching is the basis and points to this entry.",
+      "severity": "medium",
+      "sources": [
+        "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
       ]
     }
   ]
