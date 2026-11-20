@@ -108,13 +108,15 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 - In-browser live polling depends on CORS headers the demo API returns but Kalshi does not document. The engine probes
   the API at runtime, records the observed headers per collector run into `data/live/cors.json`, and falls back to
   committed snapshots automatically (flagged as [F-24](flagged.html)).
-- The initial fee-aware ROI scan failed on a zero-price market; that defect was fixed in PR #31, and desk run
-  [44800342205](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205) committed a scan. The snapshot
-  collected at `2026-11-20T19:15:11Z` has 214 in-scope markets, 0 orderbooks, 0 eligible picks, 0 picks, 2 near misses,
-  212 unscoreable markets, 0 alerts and 0 scoring errors. No picks are claimed. The zero-book count may reflect the
-  scanner's comma-joined `tickers` request: direct demo probes showed that form does not return individual books, unlike
-  repeated `tickers` parameters; a corrected production scan has not confirmed the result. See [F-30](flagged.html) and
-  [F-31](flagged.html) for the historical failure and current flagged status.
+- The initial fee-aware ROI scan failed on a zero-price market; PR #31 fixed that crash. The latest scan committed on
+  `main` is run [44800342205](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205), collected at
+  `2026-11-20T19:15:11Z`: 214 in-scope markets, 0 orderbook records, 0 eligible picks, 0 picks, 2 near misses, 212
+  unscoreable markets, 0 alerts and 0 scoring errors. A later successful scan on the unmerged branch
+  `arena/6f158ab7-kalshidash3` (run [44801234891](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44801234891),
+  snapshot commit `05bca10`) returned 10,342 orderbook records but still 0 eligible picks and 0 picks; it also hit its
+  20,000-market open and settled safety caps, so that scan is partial and is not the data currently on `main`/Pages.
+  Orderbook response counts do not establish resting liquidity, and no picks are claimed. See [F-30](flagged.html) and
+  [F-31](flagged.html) for the historical failure and current query/paging status.
 - Unauthenticated request limits are undocumented; the poller is conservative (default 10 s, back-off on 429).
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
   intervals only — so it is accumulated one observation per collector run (plus live poll points in the browser session).

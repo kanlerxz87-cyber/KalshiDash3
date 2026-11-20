@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-20T19:24:09Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-278443e8 updated F-30 with the successful zero-pick scan and added F-31 for the likely multi-ticker orderbook query-encoding issue (pending corrected production verification).",
+ "generated": "2026-11-20T19:27:04Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-278443e8 updated F-30 with the successful zero-pick scan and updated F-31 with the successful repeated-parameter scan from an unmerged branch; it returned orderbook records but still had zero picks and hit its market-paging safety caps.",
  "questions": [
   {
    "id": "Q1",
@@ -646,16 +646,19 @@
   },
   {
    "id": "F-31",
-   "item": "The latest live ROI scan reports zero orderbooks, so its zero-pick result is not yet a verified liquidity outcome",
-   "why": "The successful desk run 44800342205 committed data/live/roi.json collected at 2026-11-20T19:15:11Z: 214 open in-scope markets, orderbooks=0, eligible=0, picks=0, near_misses=2, unscoreable=212, alerts=0 and scoring_errors=0. Source inspection finds scripts/roi_scan.py books_for() sends each chunk as one comma-joined tickers value. Direct demo endpoint probes showed a comma-joined two-ticker value is treated as one combined literal ticker with empty book data, while repeated tickers query parameters return separate books; the official endpoint documents tickers as an array of 1–100 values. This makes query serialization a likely explanation for the zero book count, but no corrected production scan has confirmed it. An empty book response from this request is not evidence that the underlying markets have no resting liquidity.",
-   "action": "Keep the current snapshot result strictly as reported: it produced zero eligible picks, and no picks or liquidity should be inferred. The repeated-parameter fix was already claimed by session arena/0f71797f in the coordination history; after that fix, add/retain offline coverage, run the live desk scan and validate the committed snapshot, then update this finding from the observed result.",
+   "item": "The main-branch scan returned zero orderbook records; a newer unmerged scan returns records but is capped and still has no picks",
+   "why": "The latest scan committed on main is run 44800342205 (collected 2026-11-20T19:15:11Z): 214 open in-scope markets, orderbooks=0, eligible=0, picks=0, near_misses=2, unscoreable=212, alerts=0 and scoring_errors=0. The main-branch scripts/roi_scan.py passed each up-to-100 ticker chunk as one comma-joined tickers value. Direct demo endpoint probes showed a comma-joined two-ticker value is treated as one combined literal ticker with empty book data, while repeated tickers query parameters return separate books; the official endpoint documents tickers as an array of 1–100 values. A later scan on unmerged branch arena/6f158ab7-kalshidash3 changed the request to repeated parameters and returned 10,342 orderbook records (run 44801234891; snapshot commit 05bca10, collected 2026-11-20T19:21:33Z), which supports the query-encoding diagnosis. That scan still had eligible=0 and picks=0; it also set both open_truncated_at_safety_cap and settled_truncated_at_safety_cap to true at 20,000 markets, so it is partial and not the data currently deployed from main. Response-entry counts do not prove resting liquidity, and zero picks remain the observed result.",
+   "action": "The repeated-parameter request and response-ticker guard were implemented on branch arena/6f158ab7 in commit 279fbbf and exercised by successful run 44801234891, which committed snapshot 05bca10. That branch has not been integrated into main/Pages at this check. Keep the currently deployed main snapshot and the newer unmerged branch result clearly distinguished; do not claim picks or liquidity. Before treating the newer result as complete, resolve the reported 20,000-market open/settled safety-cap truncation and rerun/validate the desk scan after integration.",
    "severity": "medium",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/roi_scan.py",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26NOV30-3.50%2CKXPGATOUR-THRC26-SSTR",
-    "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26NOV30-3.50&tickers=KXPGATOUR-THRC26-SSTR"
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26NOV30-3.50&tickers=KXPGATOUR-THRC26-SSTR",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/commit/279fbbf9697c0713ad5a58d13d3b1d8799c9c447",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/commit/05bca10bb6e39cebdf5818a334401706060a284d",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44801234891"
    ]
   }
  ]
