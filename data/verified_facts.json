@@ -1,404 +1,441 @@
 {
-  "generated": "2026-11-20",
-  "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
-  "facts": [
-    {
-      "id": "F-01",
-      "claim": "Demo REST Trade API recommended base URL",
-      "value": "https://external-api.demo.kalshi.co/trade-api/v2",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-02",
-      "claim": "Demo REST Trade API also-supported base URL",
-      "value": "https://demo-api.kalshi.co/trade-api/v2",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-03",
-      "claim": "Demo WebSocket API recommended URL",
-      "value": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-04",
-      "claim": "Demo WebSocket API also-supported URL",
-      "value": "wss://demo-api.kalshi.co/trade-api/ws/v2",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-05",
-      "claim": "Production REST Trade API recommended base URL",
-      "value": "https://external-api.kalshi.com/trade-api/v2",
-      "source": "https://docs.kalshi.com/getting_started/api_environments",
-      "verified": true
-    },
-    {
-      "id": "F-06",
-      "claim": "Production WebSocket API recommended URL",
-      "value": "wss://external-api-ws.kalshi.com/trade-api/ws/v2",
-      "source": "https://docs.kalshi.com/getting_started/api_environments",
-      "verified": true
-    },
-    {
-      "id": "F-07",
-      "claim": "Demo environment uses mock funds; credentials are not shared with production",
-      "value": "Demo at https://demo.kalshi.co/ with mock funds; demo keys only work on demo endpoints",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-08",
-      "claim": "Demo market prices/behavior may not reflect real markets",
-      "value": "Official warning on demo_env page",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true
-    },
-    {
-      "id": "F-09",
-      "claim": "Public REST market data (series, events, markets, orderbooks, trades, candlesticks) needs no API key; portfolio endpoints and ALL WebSocket sessions require a signed key",
-      "value": "Quick Start: Market Data (no auth) vs Quick Start: WebSockets (auth at handshake)",
-      "source": "https://docs.kalshi.com/getting_started/quick_start_market_data",
-      "verified": true,
-      "note": "Corrected: the previous wording implied WebSocket data was key-free. F-31 shows it is not."
-    },
-    {
-      "id": "F-10",
-      "claim": "Request signing: sign timestamp + METHOD + full path from API root without query string",
-      "value": "e.g. sign /trade-api/v2/portfolio/orders for .../portfolio/orders?limit=5",
-      "source": "https://docs.kalshi.com/getting_started/api_environments",
-      "verified": true
-    },
-    {
-      "id": "F-11",
-      "claim": "Market statuses returned by REST",
-      "value": "initialized, active, inactive, closed, determined, disputed, amended, finalized",
-      "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
-      "verified": true
-    },
-    {
-      "id": "F-12",
-      "claim": "GET /markets?status= filter mapping",
-      "value": "unopened=initialized, open=active, paused=inactive, closed=past close_time not finalized, settled=finalized",
-      "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
-      "verified": true
-    },
-    {
-      "id": "F-13",
-      "claim": "Determination sets result to yes/no/scalar; settlement pays $1 per winning contract",
-      "value": "Yes holders get $1 on yes; No holders get $1 on no; only net positions settle",
-      "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
-      "verified": true
-    },
-    {
-      "id": "F-14",
-      "claim": "Settlement fees are zero for simple yes/no determinations",
-      "value": "May apply for sub-cent scalar settlement",
-      "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
-      "verified": true
-    },
-    {
-      "id": "F-15",
-      "claim": "Orderbook endpoint returns bids only (yes_dollars + no_dollars); asks are implied as $1 minus opposite bid",
-      "value": "GET /markets/{ticker}/orderbook, no auth required",
-      "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
-      "verified": true
-    },
-    {
-      "id": "F-16",
-      "claim": "Orderbook arrays are [price_dollars, count_fp] string pairs sorted ascending; best bid is last element",
-      "value": "depth param returns best N levels per side",
-      "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
-      "verified": true
-    },
-    {
-      "id": "F-17",
-      "claim": "Candlestick period_interval valid values",
-      "value": "1 (minute), 60 (hour), 1440 (day)",
-      "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md",
-      "verified": true
-    },
-    {
-      "id": "F-18",
-      "claim": "Gas-price series ticker confirmed present in the official fee schedule",
-      "value": "KXAAAGASM (US gas price)",
-      "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
-      "verified": true,
-      "note": "Only KXAAAGASM is confirmed. The earlier value also named KXAAAGASMAX/KXAAAGASMIN, which do NOT appear in the fee schedule; they have been removed as unverified."
-    },
-    {
-      "id": "F-19",
-      "claim": "Golf series tickers (examples from fee schedule)",
-      "value": "KXPGATOUR (PGA Tour), KXPGARYDER (Ryder Cup), KXPGASOLHEIM (Solheim Cup)",
-      "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
-      "verified": true
-    },
-    {
-      "id": "F-20",
-      "claim": "Live market values (prices, volumes, resolutions) in this repo",
-      "value": "",
-      "source": "",
-      "verified": false,
-      "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL."
-    },
-    {
-      "id": "F-21",
-      "claim": "Scope of the legacy GET /markets?status= filter",
-      "value": "unopened | open | paused | closed | settled (per OpenAPI); note GET /markets/{ticker} returns the lifecycle status values in F-11",
-      "source": "https://docs.kalshi.com/api-reference/market/get-markets",
-      "verified": true,
-      "note": "Both lists are official. The filter vocabulary and the response vocabulary differ, which is why the collector filters on lifecycle values client-side."
-    },
-    {
-      "id": "F-22",
-      "claim": "Field name for the dollar value of a market",
-      "value": "notional_value_dollars = \"The total value of a single contract at settlement in dollars\". It is NOT total dollars traded.",
-      "source": "https://docs.kalshi.com/api-reference/market/get-markets",
-      "verified": true,
-      "note": "Overturns the earlier F3 flag on docs/flagged.html, which said Kalshi has no such field. It exists, but its meaning is per-contract settlement value, so it must not be used as a volume ranking. This project ranks by dollars traded = volume_fp x last_price_dollars, explicitly labelled an estimate."
-    },
-    {
-      "id": "F-23",
-      "claim": "volume_fp / open_interest_fp are fixed-point contract-count strings (2 decimals, min granularity 0.01 contracts); volume_24h_fp exists",
-      "source": "https://docs.kalshi.com/api-reference/market/get-markets",
-      "value": "FixedPointCount, example \"10.00\"",
-      "verified": true
-    },
-    {
-      "id": "F-24",
-      "claim": "Market.result is one of 'yes', 'no', 'scalar', '' (empty while unresolved)",
-      "source": "https://docs.kalshi.com/api-reference/market/get-markets",
-      "value": "enum: yes | no | scalar | \"\"",
-      "verified": true,
-      "note": "A market can therefore resolve to 'scalar', not only yes/no. The tracker reports the actual value and never maps scalar to yes/no."
-    },
-    {
-      "id": "F-25",
-      "claim": "Legacy order-write endpoints are REMOVED and return 410 Gone (code deprecated_v1_order_endpoint)",
-      "source": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
-      "value": "POST /portfolio/orders is dead; use POST /portfolio/events/orders",
-      "verified": true,
-      "note": "scripts/kalshi_client.py still posts to /portfolio/orders. Fixed in this session."
-    },
-    {
-      "id": "F-26",
-      "claim": "V2 create-order request contract",
-      "value": "POST /portfolio/events/orders requires ticker, side (bid|ask), count (string), price (string, fixed-point dollars), time_in_force (fill_or_kill|good_till_canceled|immediate_or_cancel), self_trade_prevention_type (taker_at_cross|maker)",
-      "source": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
-      "verified": true,
-      "note": "Response 201 contains order_id, fill_count, remaining_count, ts_ms. 201 means accepted, not resting."
-    },
-    {
-      "id": "F-27",
-      "claim": "Orderbook price levels are [price_dollars, count_fp] string pairs, ascending, best bid last; depth 1-100 per side; unknown ticker returns 200 with empty arrays",
-      "source": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
-      "value": "orderbook_fp.{yes_dollars,no_dollars}",
-      "verified": true
-    },
-    {
-      "id": "F-28",
-      "claim": "Liquidity available at the best YES ask = count at the best NO bid; best YES bid = highest yes_dollars price",
-      "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
-      "value": "YES ask = $1.00 - highest no_dollars price; contracts available at that ask = no_dollars count at that price",
-      "verified": true,
-      "note": "This is what 'how many contracts are available at a given price' means on Kalshi: depth on the opposite side of the book."
-    },
-    {
-      "id": "F-29",
-      "claim": "Candlestick request limits",
-      "value": "period_interval in {1,60,1440} minutes; start_ts/end_ts in SECONDS (milliseconds rejected 400); max 5000 periods per request; path /series/{series_ticker}/markets/{ticker}/candlesticks; latest candles can lag a few seconds",
-      "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-      "verified": true,
-      "note": "Sub-minute (seconds) history is NOT available from candlesticks. Seconds-resolution data can only be accumulated live."
-    },
-    {
-      "id": "F-30",
-      "claim": "Candlestick object fields",
-      "value": "end_period_ts, yes_bid{open,low,high,close_dollars}, yes_ask{...}, price{...}, volume_fp, open_interest_fp",
-      "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-      "verified": true
-    },
-    {
-      "id": "F-31",
-      "claim": "WebSocket sessions require an API key; there is no anonymous WebSocket",
-      "value": "Handshake signed with timestamp+GET+/trade-api/ws/v2. Public channels (ticker, trade, market_lifecycle_v2) need no extra channel auth but still need the authenticated session.",
-      "source": "https://docs.kalshi.com/getting_started/quick_start_websockets",
-      "verified": true,
-      "note": "Blocks the 'true real-time in the browser with no keys' idea. Dashboard must poll over REST until keys exist."
-    },
-    {
-      "id": "F-32",
-      "claim": "GET /events supports status unopened|open|closed|settled, limit max 200, cursor pagination, with_nested_markets=true to embed markets, series_ticker filter",
-      "source": "https://docs.kalshi.com/api-reference/events/get-events",
-      "verified": true,
-      "note": "Event-level status matches if ANY child market matches, so a partially settled event appears under both open and settled."
-    },
-    {
-      "id": "F-33",
-      "claim": "GET /portfolio/positions fields",
-      "value": "market_positions[] with ticker, total_traded_dollars, position_fp (signed: positive YES, negative NO), market_exposure_dollars, realized_pnl_dollars, fees_paid_dollars; settlement_status unsettled|settled|all; count_filter position|total_traded",
-      "source": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
-      "verified": true
-    },
-    {
-      "id": "F-34",
-      "claim": "GET /portfolio/fills fields",
-      "value": "fill_id, trade_id, order_id, ticker/market_ticker, outcome_side, book_side, count_fp, yes_price_dollars, no_price_dollars, is_taker, fee_cost; legacy side/action deprecated",
-      "source": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
-      "verified": true
-    },
-    {
-      "id": "F-35",
-      "claim": "GET /portfolio/balance returns balance, balance_dollars, portfolio_value, updated_ts; own rate bucket, 1/s (Basic/Advanced) or 5/s (higher tiers)",
-      "source": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
-      "verified": true
-    },
-    {
-      "id": "F-36",
-      "claim": "Trading fee formula for general markets",
-      "value": "taker fee = ceil(M x 0.07 x C x P x (1-P)); maker fee = ceil(M x 0.0175 x C x P x (1-P)), M defaults to 0 for makers",
-      "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
-      "verified": true,
-      "note": "Fee schedule states 'Last updated and effective: July 7, 2026'. Per-series multipliers differ (e.g. KXBTCY and KXETHY are 0/0)."
-    },
-    {
-      "id": "F-37",
-      "claim": "No settlement fee and no membership fee",
-      "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
-      "value": "\"There is no settlement fee.\" / \"There is no membership fee.\"",
-      "verified": true
-    },
-    {
-      "id": "F-38",
-      "claim": "Demo account has no preloaded funds; mock funds are added with published test payment methods; demo sign-up at demo.kalshi.co/sign-up and .com is NOT a valid Kalshi domain",
-      "source": "https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account",
-      "verified": true,
-      "note": "Directly relevant to 'track portfolio performance on my demo account': the account exists only after a human signs up and funds it. An agent cannot create it."
-    },
-    {
-      "id": "F-39",
-      "claim": "Unauthenticated public requests are rate limited separately from token budgets; authenticated requests cost 10 tokens by default; 429 returns too_many_requests with X-RateLimit-* headers and no Retry-After",
-      "source": "https://docs.kalshi.com/getting_started/rate_limits",
-      "verified": true
-    },
-    {
-      "id": "F-40",
-      "claim": "The demo API answers the documented series filter and returns markets for gas and golf seed series",
-      "value": "GET /markets?series_ticker=KXAAAGASM and ?series_ticker=KXPGATOUR both returned markets",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
-      "verified": true,
-      "note": "Observed 2026-11-20. Sample rows and a second golf query are recorded in data/live/spotcheck.json. This proves the seed series exist; it is not a full scan."
-    },
-    {
-      "id": "F-41",
-      "claim": "KXAAAGASM is a US average gas-price series settled against AAA",
-      "value": "Settlement rule observed: \"If average regular gas prices for United States are strictly greater than $4.80 on Nov 30, 2026 according to AAA, then the market resolves to Yes.\"",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
-      "verified": true
-    },
-    {
-      "id": "F-42",
-      "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
-      "value": "\"The RSM Classic: Bill Haas wins\" — \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
-      "verified": true
-    },
-    {
-      "id": "F-43",
-      "claim": "Real market rows carry the fixed-point and result fields this site relies on",
-      "value": "Observed: volume_fp \"55571.52\", open_interest_fp \"55567.52\", last_price_dollars \"0.0300\", result \"\", status \"active\", notional_value_dollars \"1.0000\"",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
-      "verified": true,
-      "note": "Confirms F-22 in practice: notional_value_dollars is 1.0000 on every row regardless of size, so it cannot rank markets."
-    },
-    {
-      "id": "F-44",
-      "claim": "Unfiltered GET /markets?status=open is dominated by multivariate sports combo markets",
-      "value": "Sampled page contained KXMVECROSSCATEGORY-* markets (multi-leg NCAA basketball and football combos)",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
-      "verified": true,
-      "note": "Explains why out-of-scope markets are counted and excluded instead of being keyword-matched into a topic."
-    },
-    {
-      "id": "F-45",
-      "claim": "GET /markets returns series_ticker: null on the demo environment (observed 2026-11-20)",
-      "value": "series_ticker is null on every sampled row, so the series must be derived from the ticker prefix",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
-      "verified": true,
-      "note": "The field exists in the schema but was empty in practice. Collector now derives the series from the part of the ticker before the first hyphen (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM) and keeps the raw API value alongside, so a wrong derivation fails to match rather than silently misclassifying."
-    },
-    {
-      "id": "F-46",
-      "claim": "The demo exchange is dominated by multivariate combo markets and demo-only futures-style series",
-      "value": "A capped scan saw 5,825 open and 3,825 settled markets, of which 175 open and 202 settled were KXMVE* combos",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=1000",
-      "verified": true,
-      "note": "Combos are excluded from every category because they combine unrelated legs; they have their own lifecycle channel (market_lifecycle_v2 excludes KXMVE*, which has multivariate_market_lifecycle)."
-    },
-    {
-      "id": "F-47",
-      "claim": "A finalized market can still be returned with a large volume, so a status filter alone does not make a page of 'open' markets",
-      "value": "Observed: a golf market with status=finalized showed 37,084,522 contracts traded",
-      "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
-      "verified": true,
-      "note": "Found by this project's own data check, not by reading the docs: the collector had merged the open and settled seed results into one dict. Fixed; the validator now also checks that no open row carries a terminal status."
-    },
-    {
-      "id": "F-48",
-      "claim": "Volume and open interest are large real numbers on the demo env, and notional_value_dollars is always 1.0000",
-      "value": "Observed BTC series row: volume_fp 80,178,706, open_interest_fp 26,587,877, last_price_dollars 0.98, notional_value_dollars 1.0000",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=100",
-      "verified": true,
-      "note": "Confirms in data what F-22 states from the schema: notional_value_dollars is 1 for a binary market at any size, so it is useless for ranking. The site uses volume x last price and labels it an estimate."
-    },
-    {
-      "id": "F-49",
-      "claim": "Demo prices reach 0.98 and 0.94 on large-volume markets",
-      "value": "KXBTCY-27JAN0100-B47500 last 0.98; KXAAAGASM-26MAR31-4.00 last 0.94",
-      "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
-      "verified": true,
-      "note": "Relevant to fee modelling: at 0.94 the taker fee is 0.07 x 0.94 x 0.06 = 0.0039 per contract, far below the ~0.0175 at 50 cents, so fee drag is not uniform across the ranking."
-    },
-    {
-      "id": "F-50",
-      "claim": "Markets in the demo environment may not behave like real markets",
-      "value": "\"The price and behavior of markets in the demo environment may not be reflective of those in real markets.\"",
-      "source": "https://docs.kalshi.com/getting_started/demo_env",
-      "verified": true,
-      "note": "Read 2026-11-20. Every paper result on simulation.html inherits this limit (see F-08)."
-    },
-    {
-      "id": "F-51",
-      "claim": "A market's result is set when it is determined; payout happens when it is finalized",
-      "value": "Statuses closed -> determined (result set to yes/no/scalar; settlement timer runs) -> finalized (positions paid; settlement_ts populated). REST settled = finalized.",
-      "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
-      "verified": true,
-      "note": "Read 2026-11-20. scripts/simulate.py settles a paper position only on a yes or no result in the collector's settled list. A disputed market can be re-determined (disputed, amended)."
-    },
-    {
-      "id": "F-52",
-      "claim": "Yes/no settlement pays $1 per net contract to the holders of the winning side",
-      "value": "Yes outcome: yes holders receive $1 per contract. No outcome: no holders receive $1 per contract.",
-      "source": "https://docs.kalshi.com/getting_started/market_settlement",
-      "verified": true,
-      "note": "Read 2026-11-20. Basis for the payoff used by scripts/simulate.py (payoff 1.00 minus entry minus entry fee). Same page: fees are zero for simple yes/no determinations."
-    },
-    {
-      "id": "F-53",
-      "claim": "An empty or mistyped ticker returns 200 with empty order-book arrays, not 404",
-      "value": "GET /markets/{ticker}/orderbook returns empty yes_dollars and no_dollars for an unknown or archived ticker. Check GET /markets/{ticker} to tell them apart.",
-      "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
-      "verified": true,
-      "note": "Read 2026-11-20. Empty books in the collector's liquidity block must not be read as 'no liquidity' without this check."
-    }
-  ],
-  "counts": {
-    "total": 53,
-    "verified": 52,
-    "unverified": 1
+ "generated": "2026-11-20",
+ "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
+ "facts": [
+  {
+   "id": "F-01",
+   "claim": "Demo REST Trade API recommended base URL",
+   "value": "https://external-api.demo.kalshi.co/trade-api/v2",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-02",
+   "claim": "Demo REST Trade API also-supported base URL",
+   "value": "https://demo-api.kalshi.co/trade-api/v2",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-03",
+   "claim": "Demo WebSocket API recommended URL",
+   "value": "wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-04",
+   "claim": "Demo WebSocket API also-supported URL",
+   "value": "wss://demo-api.kalshi.co/trade-api/ws/v2",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-05",
+   "claim": "Production REST Trade API recommended base URL",
+   "value": "https://external-api.kalshi.com/trade-api/v2",
+   "source": "https://docs.kalshi.com/getting_started/api_environments",
+   "verified": true
+  },
+  {
+   "id": "F-06",
+   "claim": "Production WebSocket API recommended URL",
+   "value": "wss://external-api-ws.kalshi.com/trade-api/ws/v2",
+   "source": "https://docs.kalshi.com/getting_started/api_environments",
+   "verified": true
+  },
+  {
+   "id": "F-07",
+   "claim": "Demo environment uses mock funds; credentials are not shared with production",
+   "value": "Demo at https://demo.kalshi.co/ with mock funds; demo keys only work on demo endpoints",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-08",
+   "claim": "Demo market prices/behavior may not reflect real markets",
+   "value": "Official warning on demo_env page",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true
+  },
+  {
+   "id": "F-09",
+   "claim": "Public REST market data (series, events, markets, orderbooks, trades, candlesticks) needs no API key; portfolio endpoints and ALL WebSocket sessions require a signed key",
+   "value": "Quick Start: Market Data (no auth) vs Quick Start: WebSockets (auth at handshake)",
+   "source": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+   "verified": true,
+   "note": "Corrected: the previous wording implied WebSocket data was key-free. F-31 shows it is not."
+  },
+  {
+   "id": "F-10",
+   "claim": "Request signing: sign timestamp + METHOD + full path from API root without query string",
+   "value": "e.g. sign /trade-api/v2/portfolio/orders for .../portfolio/orders?limit=5",
+   "source": "https://docs.kalshi.com/getting_started/api_environments",
+   "verified": true
+  },
+  {
+   "id": "F-11",
+   "claim": "Market statuses returned by REST",
+   "value": "initialized, active, inactive, closed, determined, disputed, amended, finalized",
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
+   "verified": true
+  },
+  {
+   "id": "F-12",
+   "claim": "GET /markets?status= filter mapping",
+   "value": "unopened=initialized, open=active, paused=inactive, closed=past close_time not finalized, settled=finalized",
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
+   "verified": true
+  },
+  {
+   "id": "F-13",
+   "claim": "Determination sets result to yes/no/scalar; settlement pays $1 per winning contract",
+   "value": "Yes holders get $1 on yes; No holders get $1 on no; only net positions settle",
+   "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
+   "verified": true
+  },
+  {
+   "id": "F-14",
+   "claim": "Settlement fees are zero for simple yes/no determinations",
+   "value": "May apply for sub-cent scalar settlement",
+   "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
+   "verified": true
+  },
+  {
+   "id": "F-15",
+   "claim": "Orderbook endpoint returns bids only (yes_dollars + no_dollars); asks are implied as $1 minus opposite bid",
+   "value": "GET /markets/{ticker}/orderbook, no auth required",
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
+   "verified": true
+  },
+  {
+   "id": "F-16",
+   "claim": "Orderbook arrays are [price_dollars, count_fp] string pairs sorted ascending; best bid is last element",
+   "value": "depth param returns best N levels per side",
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
+   "verified": true
+  },
+  {
+   "id": "F-17",
+   "claim": "Candlestick period_interval valid values",
+   "value": "1 (minute), 60 (hour), 1440 (day)",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md",
+   "verified": true
+  },
+  {
+   "id": "F-18",
+   "claim": "Gas-price series ticker confirmed present in the official fee schedule",
+   "value": "KXAAAGASM (US gas price)",
+   "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+   "verified": true,
+   "note": "Only KXAAAGASM is confirmed. The earlier value also named KXAAAGASMAX/KXAAAGASMIN, which do NOT appear in the fee schedule; they have been removed as unverified."
+  },
+  {
+   "id": "F-19",
+   "claim": "Golf series tickers (examples from fee schedule)",
+   "value": "KXPGATOUR (PGA Tour), KXPGARYDER (Ryder Cup), KXPGASOLHEIM (Solheim Cup)",
+   "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+   "verified": true
+  },
+  {
+   "id": "F-20",
+   "claim": "Live market values (prices, volumes, resolutions) in this repo",
+   "value": "",
+   "source": "",
+   "verified": false,
+   "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL."
+  },
+  {
+   "id": "F-21",
+   "claim": "Scope of the legacy GET /markets?status= filter",
+   "value": "unopened | open | paused | closed | settled (per OpenAPI); note GET /markets/{ticker} returns the lifecycle status values in F-11",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "note": "Both lists are official. The filter vocabulary and the response vocabulary differ, which is why the collector filters on lifecycle values client-side."
+  },
+  {
+   "id": "F-22",
+   "claim": "Field name for the dollar value of a market",
+   "value": "notional_value_dollars = \"The total value of a single contract at settlement in dollars\". It is NOT total dollars traded.",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "note": "Overturns the earlier F3 flag on docs/flagged.html, which said Kalshi has no such field. It exists, but its meaning is per-contract settlement value, so it must not be used as a volume ranking. This project ranks by dollars traded = volume_fp x last_price_dollars, explicitly labelled an estimate."
+  },
+  {
+   "id": "F-23",
+   "claim": "volume_fp / open_interest_fp are fixed-point contract-count strings (2 decimals, min granularity 0.01 contracts); volume_24h_fp exists",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "value": "FixedPointCount, example \"10.00\"",
+   "verified": true
+  },
+  {
+   "id": "F-24",
+   "claim": "Market.result is one of 'yes', 'no', 'scalar', '' (empty while unresolved)",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "value": "enum: yes | no | scalar | \"\"",
+   "verified": true,
+   "note": "A market can therefore resolve to 'scalar', not only yes/no. The tracker reports the actual value and never maps scalar to yes/no."
+  },
+  {
+   "id": "F-25",
+   "claim": "Legacy order-write endpoints are REMOVED and return 410 Gone (code deprecated_v1_order_endpoint)",
+   "source": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+   "value": "POST /portfolio/orders is dead; use POST /portfolio/events/orders",
+   "verified": true,
+   "note": "scripts/kalshi_client.py still posts to /portfolio/orders. Fixed in this session."
+  },
+  {
+   "id": "F-26",
+   "claim": "V2 create-order request contract",
+   "value": "POST /portfolio/events/orders requires ticker, side (bid|ask), count (string), price (string, fixed-point dollars), time_in_force (fill_or_kill|good_till_canceled|immediate_or_cancel), self_trade_prevention_type (taker_at_cross|maker)",
+   "source": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+   "verified": true,
+   "note": "Response 201 contains order_id, fill_count, remaining_count, ts_ms. 201 means accepted, not resting."
+  },
+  {
+   "id": "F-27",
+   "claim": "Orderbook price levels are [price_dollars, count_fp] string pairs, ascending, best bid last; depth 1-100 per side; unknown ticker returns 200 with empty arrays",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+   "value": "orderbook_fp.{yes_dollars,no_dollars}",
+   "verified": true
+  },
+  {
+   "id": "F-28",
+   "claim": "Liquidity available at the best YES ask = count at the best NO bid; best YES bid = highest yes_dollars price",
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "value": "YES ask = $1.00 - highest no_dollars price; contracts available at that ask = no_dollars count at that price",
+   "verified": true,
+   "note": "This is what 'how many contracts are available at a given price' means on Kalshi: depth on the opposite side of the book."
+  },
+  {
+   "id": "F-29",
+   "claim": "Candlestick request limits",
+   "value": "period_interval in {1,60,1440} minutes; start_ts/end_ts in SECONDS (milliseconds rejected 400); max 5000 periods per request; path /series/{series_ticker}/markets/{ticker}/candlesticks; latest candles can lag a few seconds",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true,
+   "note": "Sub-minute (seconds) history is NOT available from candlesticks. Seconds-resolution data can only be accumulated live."
+  },
+  {
+   "id": "F-30",
+   "claim": "Candlestick object fields",
+   "value": "end_period_ts, yes_bid{open,low,high,close_dollars}, yes_ask{...}, price{...}, volume_fp, open_interest_fp",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
+   "id": "F-31",
+   "claim": "WebSocket sessions require an API key; there is no anonymous WebSocket",
+   "value": "Handshake signed with timestamp+GET+/trade-api/ws/v2. Public channels (ticker, trade, market_lifecycle_v2) need no extra channel auth but still need the authenticated session.",
+   "source": "https://docs.kalshi.com/getting_started/quick_start_websockets",
+   "verified": true,
+   "note": "Blocks the 'true real-time in the browser with no keys' idea. Dashboard must poll over REST until keys exist."
+  },
+  {
+   "id": "F-32",
+   "claim": "GET /events supports status unopened|open|closed|settled, limit max 200, cursor pagination, with_nested_markets=true to embed markets, series_ticker filter",
+   "source": "https://docs.kalshi.com/api-reference/events/get-events",
+   "verified": true,
+   "note": "Event-level status matches if ANY child market matches, so a partially settled event appears under both open and settled."
+  },
+  {
+   "id": "F-33",
+   "claim": "GET /portfolio/positions fields",
+   "value": "market_positions[] with ticker, total_traded_dollars, position_fp (signed: positive YES, negative NO), market_exposure_dollars, realized_pnl_dollars, fees_paid_dollars; settlement_status unsettled|settled|all; count_filter position|total_traded",
+   "source": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
+   "verified": true
+  },
+  {
+   "id": "F-34",
+   "claim": "GET /portfolio/fills fields",
+   "value": "fill_id, trade_id, order_id, ticker/market_ticker, outcome_side, book_side, count_fp, yes_price_dollars, no_price_dollars, is_taker, fee_cost; legacy side/action deprecated",
+   "source": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+   "verified": true
+  },
+  {
+   "id": "F-35",
+   "claim": "GET /portfolio/balance returns balance, balance_dollars, portfolio_value, updated_ts; own rate bucket, 1/s (Basic/Advanced) or 5/s (higher tiers)",
+   "source": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
+   "verified": true
+  },
+  {
+   "id": "F-36",
+   "claim": "Trading fee formula for general markets",
+   "value": "taker fee = ceil(M x 0.07 x C x P x (1-P)); maker fee = ceil(M x 0.0175 x C x P x (1-P)), M defaults to 0 for makers",
+   "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+   "verified": true,
+   "note": "Fee schedule states 'Last updated and effective: July 7, 2026'. Per-series multipliers differ (e.g. KXBTCY and KXETHY are 0/0)."
+  },
+  {
+   "id": "F-37",
+   "claim": "No settlement fee and no membership fee",
+   "source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+   "value": "\"There is no settlement fee.\" / \"There is no membership fee.\"",
+   "verified": true
+  },
+  {
+   "id": "F-38",
+   "claim": "Demo account has no preloaded funds; mock funds are added with published test payment methods; demo sign-up at demo.kalshi.co/sign-up and .com is NOT a valid Kalshi domain",
+   "source": "https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account",
+   "verified": true,
+   "note": "Directly relevant to 'track portfolio performance on my demo account': the account exists only after a human signs up and funds it. An agent cannot create it."
+  },
+  {
+   "id": "F-39",
+   "claim": "Unauthenticated public requests are rate limited separately from token budgets; authenticated requests cost 10 tokens by default; 429 returns too_many_requests with X-RateLimit-* headers and no Retry-After",
+   "source": "https://docs.kalshi.com/getting_started/rate_limits",
+   "verified": true
+  },
+  {
+   "id": "F-40",
+   "claim": "The demo API answers the documented series filter and returns markets for gas and golf seed series",
+   "value": "GET /markets?series_ticker=KXAAAGASM and ?series_ticker=KXPGATOUR both returned markets",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+   "verified": true,
+   "note": "Observed 2026-11-20. Sample rows and a second golf query are recorded in data/live/spotcheck.json. This proves the seed series exist; it is not a full scan."
+  },
+  {
+   "id": "F-41",
+   "claim": "KXAAAGASM is a US average gas-price series settled against AAA",
+   "value": "Settlement rule observed: \"If average regular gas prices for United States are strictly greater than $4.80 on Nov 30, 2026 according to AAA, then the market resolves to Yes.\"",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+   "verified": true
+  },
+  {
+   "id": "F-42",
+   "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
+   "value": "\"The RSM Classic: Bill Haas wins\" \u2014 \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
+   "verified": true
+  },
+  {
+   "id": "F-43",
+   "claim": "Real market rows carry the fixed-point and result fields this site relies on",
+   "value": "Observed: volume_fp \"55571.52\", open_interest_fp \"55567.52\", last_price_dollars \"0.0300\", result \"\", status \"active\", notional_value_dollars \"1.0000\"",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+   "verified": true,
+   "note": "Confirms F-22 in practice: notional_value_dollars is 1.0000 on every row regardless of size, so it cannot rank markets."
+  },
+  {
+   "id": "F-44",
+   "claim": "Unfiltered GET /markets?status=open is dominated by multivariate sports combo markets",
+   "value": "Sampled page contained KXMVECROSSCATEGORY-* markets (multi-leg NCAA basketball and football combos)",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+   "verified": true,
+   "note": "Explains why out-of-scope markets are counted and excluded instead of being keyword-matched into a topic."
+  },
+  {
+   "id": "F-45",
+   "claim": "GET /markets returns series_ticker: null on the demo environment (observed 2026-11-20)",
+   "value": "series_ticker is null on every sampled row, so the series must be derived from the ticker prefix",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+   "verified": true,
+   "note": "The field exists in the schema but was empty in practice. Collector now derives the series from the part of the ticker before the first hyphen (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM) and keeps the raw API value alongside, so a wrong derivation fails to match rather than silently misclassifying."
+  },
+  {
+   "id": "F-46",
+   "claim": "The demo exchange is dominated by multivariate combo markets and demo-only futures-style series",
+   "value": "A capped scan saw 5,825 open and 3,825 settled markets, of which 175 open and 202 settled were KXMVE* combos",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=1000",
+   "verified": true,
+   "note": "Combos are excluded from every category because they combine unrelated legs; they have their own lifecycle channel (market_lifecycle_v2 excludes KXMVE*, which has multivariate_market_lifecycle)."
+  },
+  {
+   "id": "F-47",
+   "claim": "A finalized market can still be returned with a large volume, so a status filter alone does not make a page of 'open' markets",
+   "value": "Observed: a golf market with status=finalized showed 37,084,522 contracts traded",
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "verified": true,
+   "note": "Found by this project's own data check, not by reading the docs: the collector had merged the open and settled seed results into one dict. Fixed; the validator now also checks that no open row carries a terminal status."
+  },
+  {
+   "id": "F-48",
+   "claim": "Volume and open interest are large real numbers on the demo env, and notional_value_dollars is always 1.0000",
+   "value": "Observed BTC series row: volume_fp 80,178,706, open_interest_fp 26,587,877, last_price_dollars 0.98, notional_value_dollars 1.0000",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXBTCY&status=open&limit=100",
+   "verified": true,
+   "note": "Confirms in data what F-22 states from the schema: notional_value_dollars is 1 for a binary market at any size, so it is useless for ranking. The site uses volume x last price and labels it an estimate."
+  },
+  {
+   "id": "F-49",
+   "claim": "Demo prices reach 0.98 and 0.94 on large-volume markets",
+   "value": "KXBTCY-27JAN0100-B47500 last 0.98; KXAAAGASM-26MAR31-4.00 last 0.94",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXAAAGASM&status=open&limit=100",
+   "verified": true,
+   "note": "Relevant to fee modelling: at 0.94 the taker fee is 0.07 x 0.94 x 0.06 = 0.0039 per contract, far below the ~0.0175 at 50 cents, so fee drag is not uniform across the ranking."
+  },
+  {
+   "id": "F-50",
+   "claim": "Markets in the demo environment may not behave like real markets",
+   "value": "\"The price and behavior of markets in the demo environment may not be reflective of those in real markets.\"",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true,
+   "note": "Read 2026-11-20. Every paper result on simulation.html inherits this limit (see F-08)."
+  },
+  {
+   "id": "F-51",
+   "claim": "A market's result is set when it is determined; payout happens when it is finalized",
+   "value": "Statuses closed -> determined (result set to yes/no/scalar; settlement timer runs) -> finalized (positions paid; settlement_ts populated). REST settled = finalized.",
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "verified": true,
+   "note": "Read 2026-11-20. scripts/simulate.py settles a paper position only on a yes or no result in the collector's settled list. A disputed market can be re-determined (disputed, amended)."
+  },
+  {
+   "id": "F-52",
+   "claim": "Yes/no settlement pays $1 per net contract to the holders of the winning side",
+   "value": "Yes outcome: yes holders receive $1 per contract. No outcome: no holders receive $1 per contract.",
+   "source": "https://docs.kalshi.com/getting_started/market_settlement",
+   "verified": true,
+   "note": "Read 2026-11-20. Basis for the payoff used by scripts/simulate.py (payoff 1.00 minus entry minus entry fee). Same page: fees are zero for simple yes/no determinations."
+  },
+  {
+   "id": "F-53",
+   "claim": "An empty or mistyped ticker returns 200 with empty order-book arrays, not 404",
+   "value": "GET /markets/{ticker}/orderbook returns empty yes_dollars and no_dollars for an unknown or archived ticker. Check GET /markets/{ticker} to tell them apart.",
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "verified": true,
+   "note": "Read 2026-11-20. Empty books in the collector's liquidity block must not be read as 'no liquidity' without this check."
+  },
+  {
+   "id": "V-01",
+   "claim": "GET /markets with `tickers` as the only filter returns every matching market in one response; `limit` is not applied and the returned cursor is empty",
+   "value": "documented paging rule used by the in-browser live poller",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "note": "Enables watching dozens of markets with 1-3 requests per poll cycle."
+  },
+  {
+   "id": "V-02",
+   "claim": "REST responses are cached for a short time; prices, sizes and status can lag the exchange by several seconds",
+   "value": "documented on Get Markets; the UI states it next to the poll-interval control",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true
+  },
+  {
+   "id": "V-03",
+   "claim": "Unauthenticated public requests are subject to separate rate limits; callers should authenticate where supported and back off on 429",
+   "value": "the live engine polls conservatively (default 10s) and backs off exponentially on 429",
+   "source": "https://docs.kalshi.com/getting_started/rate_limits",
+   "verified": true
+  },
+  {
+   "id": "V-04",
+   "claim": "Settlement: Yes outcome pays Yes contract holders $1 per contract; No outcome pays No contract holders $1 per contract",
+   "value": "the auto-sim settles held positions exactly this way; settlement fees are zero for simple yes/no determinations",
+   "source": "https://docs.kalshi.com/getting_started/market_settlement",
+   "verified": true
+  },
+  {
+   "id": "V-05",
+   "claim": "Alert threshold >= $0.10 in either direction",
+   "value": "project requirement (brief), enforced in assets/engine.js ALERT_THRESHOLD and scripts/collect.py compute_alerts; the validator refuses any committed alert with a smaller delta",
+   "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
+   "verified": true,
+   "note": "Not an API field \u2014 recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
   }
+ ],
+ "counts": {
+  "facts": 58,
+  "verified": 57,
+  "unverified": 1
+ }
 }

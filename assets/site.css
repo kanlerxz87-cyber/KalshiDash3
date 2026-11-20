@@ -54,6 +54,10 @@ td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .notice.warn{border-left-color:var(--warn)}
 .notice.bad{border-left-color:var(--bad)}
 .notice.blue{border-left-color:#3f8ae0}
+.notice.ok{border-left-color:var(--ok)}
+.badge.live{color:#7ce8bb;border-color:#0f4d3a;background:#0f4d3a}
+.vr{display:inline-block;width:1px;height:22px;background:var(--line)}
+.pos{color:var(--ok)} .neg{color:var(--bad)}
 .empty{color:var(--mut);font-size:13.5px;padding:12px;margin:0}
 .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
 .controls label{font-size:13px;color:var(--mut)}

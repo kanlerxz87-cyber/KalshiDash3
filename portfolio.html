@@ -138,7 +138,7 @@ KD.nav("portfolio.html");
 const KEY = "kalshidash3.paper.v2";
 const BANDS = [[0, .1, "0–10¢"], [.1, .25, "10–25¢"], [.25, .5, "25–50¢"], [.5, .75, "50–75¢"], [.75, .9, "75–90¢"], [.9, 1.0001, "90–100¢"]];
 const bandOf = p => (BANDS.find(b => p >= b[0] && p < b[1]) || BANDS[BANDS.length - 1])[2];
-const takerFee = (c, p) => Math.ceil(1 * 0.07 * c * p * (1 - p) * 100) / 100;
+const takerFee = (c, p) => Math.ceil(Number((1 * 0.07 * c * p * (1 - p) * 100).toFixed(6))) / 100; // round before cent-ceil: float noise cannot overcharge a cent
 
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || { cash: 10000, trades: [] }; } catch { return { cash: 10000, trades: [] }; } };
 const save = o => localStorage.setItem(KEY, JSON.stringify(o));
