@@ -2,6 +2,28 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "event_ticker": "KXAAAGASM-26DEC31",
+   "title": "Will average **gas prices** be above $3.30?",
+   "category_id": "gas",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-20T13:50:26Z",
+   "to_time": "2026-11-20T15:19:53Z",
+   "from_price": 0.29,
+   "to_price": 0.71,
+   "delta": 0.42,
+   "direction": "up",
+   "volume_24h_fp": 30.2,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "to_yes_bid": 0.29,
+   "to_yes_ask": 0.71,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-20T15:19:53Z",
+   "high_roi": true
+  },
+  {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
    "event_ticker": "KXAAAGASD-26NOV21",
    "title": "Will average **gas prices** be above $3.6600?",

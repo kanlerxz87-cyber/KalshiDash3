@@ -2,15 +2,15 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-20T14:41:59Z",
- "snapshot_collected_at": "2026-11-20T13:50:27Z",
+ "generated_at": "2026-11-20T15:19:53Z",
+ "snapshot_collected_at": "2026-11-20T15:19:53Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
  "endpoint": "https://external-api.demo.kalshi.co/trade-api/v2",
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
-  "signals_processed_total": 8,
-  "new_signals_this_run": 0,
+  "signals_processed_total": 9,
+  "new_signals_this_run": 1,
   "open_positions": 0,
   "settled_positions_kept": 1
  },
@@ -21,9 +21,9 @@
    "side_rule": "follow",
    "signal_filter": "all",
    "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going.",
-   "signals": 8,
-   "not_filled": 8,
-   "not_filled_wide_spread": 2,
+   "signals": 9,
+   "not_filled": 9,
+   "not_filled_wide_spread": 3,
    "voided": 0,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 2,
@@ -46,9 +46,9 @@
    "side_rule": "fade",
    "signal_filter": "all",
    "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses.",
-   "signals": 8,
-   "not_filled": 7,
-   "not_filled_wide_spread": 2,
+   "signals": 9,
+   "not_filled": 8,
+   "not_filled_wide_spread": 3,
    "voided": 1,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 1,
@@ -79,9 +79,9 @@
    "side_rule": "follow",
    "signal_filter": "high_roi",
    "description": "S1 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
-   "signals": 0,
-   "not_filled": 0,
-   "not_filled_wide_spread": 0,
+   "signals": 1,
+   "not_filled": 1,
+   "not_filled_wide_spread": 1,
    "voided": 0,
    "not_filled_no_quote": 0,
    "not_filled_bad_price": 0,
@@ -104,9 +104,9 @@
    "side_rule": "fade",
    "signal_filter": "high_roi",
    "description": "S2 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
-   "signals": 0,
-   "not_filled": 0,
-   "not_filled_wide_spread": 0,
+   "signals": 1,
+   "not_filled": 1,
+   "not_filled_wide_spread": 1,
    "voided": 0,
    "not_filled_no_quote": 0,
    "not_filled_bad_price": 0,
@@ -182,6 +182,7 @@
  "state": {
   "processed_alert_ids": [
    "KXAAAGASD-26NOV21-3.6600@2026-11-20T13:35:54Z>2026-11-20T13:50:26Z",
+   "KXAAAGASM-26DEC31-3.30@2026-11-20T13:50:26Z>2026-11-20T15:19:53Z",
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:24:20Z>2026-11-20T11:26:21Z",
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:26:21Z>2026-11-20T11:28:31Z",
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:28:31Z>2026-11-20T11:31:35Z",
@@ -227,8 +228,8 @@
   ],
   "counters": {
    "S1": {
-    "signals": 8,
-    "not_filled": 8,
+    "signals": 9,
+    "not_filled": 9,
     "not_filled_no_quote": 4,
     "not_filled_bad_price": 2,
     "skipped_duplicate": 0,
@@ -237,11 +238,11 @@
     "wins": 0,
     "losses": 0,
     "realized_net": 0.0,
-    "not_filled_wide_spread": 2
+    "not_filled_wide_spread": 3
    },
    "S2": {
-    "signals": 8,
-    "not_filled": 7,
+    "signals": 9,
+    "not_filled": 8,
     "not_filled_no_quote": 4,
     "not_filled_bad_price": 1,
     "skipped_duplicate": 0,
@@ -251,7 +252,7 @@
     "losses": 0,
     "realized_net": 0.0,
     "voided": 1,
-    "not_filled_wide_spread": 2
+    "not_filled_wide_spread": 3
    },
    "_cat|S2|crypto": {
     "signals": 0,
@@ -273,6 +274,16 @@
      "losses": 0,
      "realized_net": 0.0
     }
+   },
+   "S3": {
+    "signals": 1,
+    "not_filled": 1,
+    "not_filled_wide_spread": 1
+   },
+   "S4": {
+    "signals": 1,
+    "not_filled": 1,
+    "not_filled_wide_spread": 1
    }
   }
  }
