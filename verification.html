@@ -68,6 +68,8 @@
       <tr><td>No coerced results</td><td><code>result</code> may only be one of <code>yes</code>, <code>no</code>, <code>scalar</code>, or empty.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
       <tr><td>Provenance present</td><td>Every row carries an https source URL; the snapshot carries a fetch time and a disclaimer block.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
       <tr><td>Book ordering</td><td>Order book price levels must be ascending, matching the documented response shape.</td><td><code>scripts/tests/validate_live.py</code></td></tr>
+      <tr><td>Alert provenance</td><td>Every ≥$0.10 alert must be re-derivable by diffing the committed observations, and every re-derivable swing must be present — a fabricated or stale alert fails the build.</td><td><code>scripts/tests/validate_alerts.py</code></td></tr>
+      <tr><td>Replay determinism</td><td>The automated trader's trade list must be a pure function of the committed snapshot, and every fill must occur at a collected observation timestamp.</td><td>jsdom browser test (run in the build session, documented in <code>COORDINATION.md</code>)</td></tr>
       <tr><td>No broken links</td><td>Every internal link and asset must resolve before deploy.</td><td><code>scripts/check_site.py</code></td></tr>
     </tbody>
   </table></div>

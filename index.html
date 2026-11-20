@@ -26,10 +26,13 @@
 
   <div class="grid">
     <div class="card"><h3>Live dashboard</h3>
-      <p>Top markets per category with liquidity depth, a price chart (X = time, Y = contract price) and a resolution tracker.</p>
+      <p>Top markets per category with liquidity depth, a price chart (X = time, Y = contract price), ≥$0.10 swing markers and a resolution tracker.</p>
       <a href="dashboard.html">Open →</a></div>
+    <div class="card"><h3>Live alerts — two chats</h3>
+      <p>Scrolling chat of every ≥$0.10 price swing in either direction, plus a second chat filtered to the swings the high-ROI model likes.</p>
+      <a href="alerts.html">Open →</a></div>
     <div class="card"><h3>Portfolio &amp; trading</h3>
-      <p>Demo-account performance, trade execution, and value-at-risk style categorisation. Paper until demo keys exist.</p>
+      <p>Demo-account performance, trade execution, an automated strategy simulator over collected prices, and categorised paper ledgers.</p>
       <a href="portfolio.html">Open →</a></div>
     <div class="card"><h3>Strategies</h3>
       <p>Four strategy hypotheses, each with the evidence it still needs and its failure mode.</p>
@@ -61,7 +64,10 @@
       <tr><td>3</td><td><code>scripts/tests/validate_live.py</code> rejects a snapshot that invents a price or coerces a result to yes/no</td>
           <td>Fabrication fails the build instead of reaching the page</td>
           <td><a href="verification.html">Verification page</a></td></tr>
-      <tr><td>4</td><td>This site renders that snapshot statically</td>
+      <tr><td>4</td><td><code>scripts/build_alerts.py</code> diffs consecutive observations and records every ≥$0.10 swing in <code>data/live/alerts.json</code>, which <code>scripts/tests/validate_alerts.py</code> re-derives from the raw data</td>
+          <td>An alert is provably a diff of two real collected prices — never a guess, never stale</td>
+          <td><a href="alerts.html">Alerts page</a></td></tr>
+      <tr><td>5</td><td>This site renders that snapshot statically and re-polls it every 60 s</td>
           <td>What you read is what was collected, not what your browser happened to get</td>
           <td><a href="https://docs.github.com/en/pages" target="_blank" rel="noopener">GitHub Pages</a></td></tr>
     </tbody>

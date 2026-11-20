@@ -22,6 +22,15 @@
       <tr><td>Dashboard of highest dollar-amount live events, limited to gas prices, elections, culture, crypto, golf</td>
           <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Live dashboard</a></td>
           <td>Ranked by a labelled estimate, because Kalshi has no “dollars traded” field (<a href="questions.html">Q1</a>). Only five categories shown by construction.</td></tr>
+      <tr><td>Live alerting system for price swings ≥ $0.10 in either direction, as two scrolling chats (all events + high-ROI model picks)</td>
+          <td><span class="badge ok">done</span></td><td><a href="alerts.html">Live alerts</a></td>
+          <td>Every alert is a provenance-validated diff of two collected prices. The ≥$0.10 threshold is this project's requirement, not an official number. Latency is bounded by the 20-minute collector cadence — second-level alerting needs an authenticated WebSocket (<a href="flagged.html">F-14</a>). A clearly-labelled simulated stream (off by default) previews the real-time path.</td></tr>
+      <tr><td>Automate simulated trades to test different strategies</td>
+          <td><span class="badge ok">done</span></td><td><a href="portfolio.html">Portfolio §4</a></td>
+          <td>The S1–S4 rules run themselves over collected price history: deterministic replay, fee modelled on every fill at the official general rate, trades categorised by strategy, category and price band. Fills occur only at collected observation timestamps — replay is a test loop, not evidence of an edge.</td></tr>
+      <tr><td>Live charts include the events and website links that may have caused a sharp jump</td>
+          <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Dashboard markers</a> + <a href="alerts.html">alert rows</a></td>
+          <td>Charts mark the exact observation where a ≥$0.10 swing completed; each alert links the exact API query plus official per-category research sites. No source attributes a move to a cause, so per-alert causation stays a flagged research link, never an assertion (<a href="flagged.html">F-15</a>).</td></tr>
       <tr><td>Track events until resolved, showing how they resolved (yes or no)</td>
           <td><span class="badge ok">done</span></td><td>Resolution tracker on the dashboard</td>
           <td>The literal API result is shown; a market can resolve to <code>scalar</code>, which is displayed as such rather than forced to yes/no.</td></tr>
@@ -29,8 +38,8 @@
           <td><span class="badge bad">blocked</span></td><td><a href="portfolio.html">Portfolio</a></td>
           <td>No demo account or API key exists. Kalshi requires a human sign-up; the value is left blank rather than invented (<a href="flagged.html">F-07</a>).</td></tr>
       <tr><td>Analyse trade results, categorise trades, build strategies by trade type</td>
-          <td><span class="badge ok">done</span></td><td><a href="strategies.html">Strategies</a></td>
-          <td>Categorisation is live; performance is measurable once trades exist. All four strategies are marked untested.</td></tr>
+          <td><span class="badge ok">done</span></td><td><a href="strategies.html">Strategies</a> + <a href="portfolio.html">Portfolio §4</a></td>
+          <td>Categorisation is live on both the manual and the automated paper ledgers (by strategy, category, price band). All four strategies remain marked untested until the promotion rule's evidence exists.</td></tr>
       <tr><td>Execute trades and track their performance</td>
           <td><span class="badge warn">ready, unexercised</span></td><td><a href="portfolio.html">Portfolio</a></td>
           <td>Executor targets the current V2 endpoint and is unexercised because keys do not exist. The old endpoint it used to target is gone (<a href="flagged.html">F-01</a>).</td></tr>
@@ -48,7 +57,7 @@
           <td>Eight questions; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>39 claims checked; 1 deliberately blank. Nine irregularities found and listed.</td></tr>
+          <td>50 claims checked; 1 deliberately blank (live values are never stored as claims). Sixteen irregularities found and listed (F-01–F-16).</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>

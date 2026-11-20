@@ -18,29 +18,32 @@ confirmed against an official Kalshi page is left blank and listed on the *Flagg
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker |
-| `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
+| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, ≥$0.10 swing markers, resolution tracker, 60-second live poll |
+| `alerts.html` | Two scrolling alert chats: every ≥$0.10 swing in either direction, plus the swings the high-ROI model likes (on-page formula, provenance-validated alerts, optional labelled SIM stream) |
+| `portfolio.html` | Real demo-account endpoints, the working executor, a labelled paper ledger, and an automated simulated trader that runs the S1–S4 strategies over collected prices with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
-| `suggestions.html` | Eight proposals; four shipped to remove a correctness risk, four awaiting your decision |
+| `suggestions.html` | Eleven proposals; six shipped to remove a correctness risk or deliver a brief requirement, five awaiting your decision |
 | `questions.html` | Eight questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 44 claims, each with the official page it was checked against |
-| `flagged.html` | Nine irregularities found, plus every value deliberately left blank |
-| `sources.html` | The complete source list |
+| `verification.html` | 50 claims, each with the official page it was checked against |
+| `flagged.html` | Sixteen irregularities found, plus every value deliberately left blank |
+| `sources.html` | The complete source list, including the official per-category research sites used for alert causes |
 
 ## Repository layout
 
 ```
 *.html                the published site — one page per topic, shared shell in assets/
-assets/               site.css + site.js (no build step, no dependencies)
+assets/               site.css + site.js + alerts.js (no build step, no dependencies)
 data/categories.json  the five topics and their confirmed seed series
 data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
-data/live/            collected snapshots (written by scripts/collect.py)
+data/live/            collected snapshots (written by scripts/collect.py) + derived alerts.json
 scripts/collect.py    credential-free demo data collector
+scripts/build_alerts.py   derives every ≥$0.10 swing by diffing consecutive collected observations
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
-scripts/tests/validate_live.py  refuses a fabricated snapshot
-.github/workflows/collect.yml   scheduled collection
+scripts/tests/validate_live.py    refuses a fabricated snapshot
+scripts/tests/validate_alerts.py  re-derives every alert from the observations (provenance check)
+.github/workflows/collect.yml   scheduled collection + alert derivation
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
 
@@ -50,7 +53,9 @@ Nothing here needs credentials. All market data comes from public demo endpoints
 
 ```bash
 python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
+python3 scripts/build_alerts.py       # derives data/live/alerts.json (≥$0.10 swings)
 python3 scripts/tests/validate_live.py
+python3 scripts/tests/validate_alerts.py
 python3 scripts/check_site.py
 python3 -m http.server 8000           # then open http://localhost:8000
 ```
@@ -84,6 +89,8 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 3. **Results are never coerced.** `result` may be `yes`, `no`, `scalar` or empty, and is displayed exactly as returned.
 4. **Provenance on every row.** Each row carries the query URL and each snapshot carries its fetch time.
 5. **Demo is labelled demo.** Kalshi warns demo prices may not reflect real markets.
+6. **Simulations are labelled simulations.** The optional simulated tick stream and the automated paper trader are
+   badged as such everywhere, are never persisted into `data/`, and are never shown as market values.
 
 ## Known limitations
 
@@ -91,8 +98,22 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
   runs on GitHub Actions. Scheduled workflows can be delayed or skipped; the site shows the snapshot age for that reason.
 - Seconds-resolution price history cannot be requested from Kalshi — candlesticks support 1, 60 and 1440 minute
   intervals only — so it is accumulated one observation per collector run.
-- WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
-- Portfolio performance is a labelled paper simulation until demo credentials exist.
+- WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks; alerts are therefore
+  bounded by the collector cadence, and the alerts page offers a clearly-labelled simulated stream for previewing the
+  real-time path (never persisted, off by default).
+- Portfolio performance is a labelled paper simulation until demo credentials exist; the automated trader replays
+  collected prices deterministically and can only fill at collected observation timestamps.
+
+## Session arena-f068786c (2026-11-20): alerting system + automated simulated trading
+
+- Built the live alerting system the brief requires: `alerts.html` with two scrolling chats (all ≥$0.10 swings and the
+  high-ROI model picks), a transparent on-page scoring model (`assets/alerts.js`), 60-second polling of committed
+  snapshots, and a default-off simulated tick stream that is badged `SIM` everywhere and never persisted.
+- Alerts are derived by `scripts/build_alerts.py` from consecutive collected observations and provenance-checked by
+  `scripts/tests/validate_alerts.py` (every alert must be re-derivable from the raw data).
+- Automated simulated trading on `portfolio.html` §4: the S1–S4 strategy rules run themselves over collected price
+  history with fee modelling, a strategy × category ledger, equity curve and settlement against the literal API result.
+- Removed the stale README section that still advertised the `9b246e37/` subsite removed by PR #15 (flag F-16).
 
 ## Sources
 
@@ -101,10 +122,3 @@ and in the repository's `COORDINATION.md`. The primary ones are
 [docs.kalshi.com](https://docs.kalshi.com/welcome),
 the [demo environment page](https://docs.kalshi.com/getting_started/demo_env) and the
 [fee schedule](https://kalshi.com/docs/kalshi-fee-schedule.pdf).
-
-## Session 9b246e37: verified dashboard subsite (`9b246e37/`)
-
-- **Page:** https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/
-- Pages: overview, category tables (gas, elections, culture, crypto, golf), live chart and liquidity from the public demo endpoints, portfolio (blocked: no demo API key), analysis, questions, suggestions (nothing implemented), flagged, sources.
-- Data: `9b246e37/data/dashboard.json`. Values copied from Kalshi DEMO API responses fetched 2026-11-20 UTC, each row with its source URL. Blanks are unverified.
-- Details and the post-merge record are in `COORDINATION.md`.
