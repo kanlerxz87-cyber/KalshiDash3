@@ -1,0 +1,26 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Dashboard — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
+<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
+<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a class="on" href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
+</nav></div></header>
+<div class="wrap">
+<h1>Live dashboard — highest-dollar events</h1>
+<p class="mut">Categories: Gas Prices · Elections · Culture · Crypto · Golf. Ranked by notional ≈ volume × last price. Click <b>Watch</b> to chart a market and follow it until it resolves yes/no.</p>
+<div class="controls"><span id="liveStatus" class="badge">Starting…</span><button id="refreshBtn" class="btn ghost">Refresh all</button>
+<label class="small">Chart window <select id="windowMode"><option value="seconds">Seconds (live poll)</option><option value="minutes" selected>Minutes</option><option value="hours">Hours</option></select></label></div>
+
+<div class="card" id="chartCard"><h3>Price chart <span class="mut small">— X = time, Y = contract price</span></h3>
+<p id="selInfo" class="mut">Select a market with Watch below.</p>
+<canvas id="priceChart" class="chart"></canvas>
+<h4>Liquidity — contracts available at each price</h4>
+<p id="liqSummary" class="mut small"></p>
+<div id="liquidity" class="liq"></div>
+<p class="mut small">Orderbook source: <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook">GET /markets/{ticker}/orderbook</a>. Binary books return bids only; ask = 1 − best opposing bid (<a href="https://docs.kalshi.com/getting_started/orderbook_responses">Orderbook Responses</a>).</p></div>
+
+<div class="grid" id="topTables"></div>
+
+<div class="card"><h3>Resolution tracker — settled markets (yes/no)</h3><div id="resolvedTable"><p class="mut">Loading…</p></div></div>
+</div>
+<footer><div class="wrap">KalshiDash3 · Live demo API · <a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></div></footer>
+<script src="assets/app.js"></script>
+</body></html>
