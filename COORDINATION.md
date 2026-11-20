@@ -133,7 +133,25 @@ Final snapshot shape: **489 open rows (all `active`), 200 settled rows (all `fin
 Two documentation gaps were also found and are on the Flagged page: `series_ticker: null` (F-10) and the demo
 exchange's composition limits (`notional` is always 1.0000; elections has one confirmed series) (F-13).
 
-<<<<<<< HEAD
+- 2026-11-20: MERGE CONFLICT with origin/main (PRs #16-#21 from arena-6d85f8f0, arena-5225610f, arena-e5adea9d had
+  landed overlapping work). Resolved without discarding either side: their `build_alerts.py`/`alerts_archive.json`/
+  `simulation.html`/`simulator` and dashboard alert feeds are kept as the server-side layer; this session's live
+  engine, alert chats and auto-sim become the browser-side layer on top. Concretely: (1) my findings F-14..F-18
+  renumbered to F-24..F-28 and suggestions G9..G15 to G11..G17 to avoid ID collisions; (2) `data/live/alerts.json`
+  ownership given to their `build_alerts.py` (single writer, single schema) — my duplicate writer was removed from
+  `scripts/collect.py`, which keeps only the unique CORS probe (`data/live/cors.json`); (3) the engine now consumes
+  THEIR alerts.json/alerts_archive.json schema and computes news-lead links client-side (their `cause_link` stays
+  null, coexistence documented in F-24/F-25); (4) validator extended for their schema + cors.json; (5) exec summary,
+  index, README and nav integrate both. All suites re-run on the merged tree: engine tests 21/21, check_site 19
+  pages OK, validate_live OK, all inline JS parses.
+- 2026-11-20: Second conflict round: origin/main advanced again (PR #22, arena-0a479d8c — committed-history swing
+  markers on the chart + swinglist + test_alerts.py). Resolved: both marker systems now coexist on dashboard.html —
+  their markers are derived from committed observations (server-side layer), mine are >= $0.10 swings detected live
+  in the browser session; index card text merged. An earlier anomaly was also handled: another session force-pushed
+  origin/main history onto this branch's remote ref; the push of this session's history restored it, and the stray
+  in-progress rebase was aborted cleanly. No work from either side was lost.
+
+
 ---
 
 ## Session `arena-a2fca5db` — live alert chats, auto-sim trading engine, in-browser live mode
@@ -178,7 +196,7 @@ integrator hat, in the same commits that re-verify them.
 - 2026-11-20: Design decision recorded: auto-sim entries fire only on live in-session alerts; collector-history alerts
   (~20 min apart) are shown in the chats but are too stale to trade. Documented on trading.html and in F-16/F-17.
 
-=======
+
 ### Session `arena-6d85f8f0` — alert feed enhancement
 
 - Claim: T11; files touched: `dashboard.html`, `assets/site.css`, `executive-summary.html` (claim committed and pushed to the current Arena branch before implementation).
@@ -262,20 +280,6 @@ before editing).
 - 2026-11-20 13:32Z: the new simulation run opened one paper position from the 13:18→13:32 KXDEMOFUTHOURLY-26NOV20H14-UP swing. Its stored quote was yes bid 0.01, yes ask 1.00, so a NO fill at 0.99 with a 0.00 bid later showed −1.00. That is not a tradable price. Follow-up: spread rule (F-23) and void of the breaching position.
 - 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
 - Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.
-<<<<<<< HEAD
->>>>>>> origin/main
-- 2026-11-20: MERGE CONFLICT with origin/main (PRs #16-#21 from arena-6d85f8f0, arena-5225610f, arena-e5adea9d had
-  landed overlapping work). Resolved without discarding either side: their `build_alerts.py`/`alerts_archive.json`/
-  `simulation.html`/`simulator` and dashboard alert feeds are kept as the server-side layer; this session's live
-  engine, alert chats and auto-sim become the browser-side layer on top. Concretely: (1) my findings F-14..F-18
-  renumbered to F-24..F-28 and suggestions G9..G15 to G11..G17 to avoid ID collisions; (2) `data/live/alerts.json`
-  ownership given to their `build_alerts.py` (single writer, single schema) — my duplicate writer was removed from
-  `scripts/collect.py`, which keeps only the unique CORS probe (`data/live/cors.json`); (3) the engine now consumes
-  THEIR alerts.json/alerts_archive.json schema and computes news-lead links client-side (their `cause_link` stays
-  null, coexistence documented in F-24/F-25); (4) validator extended for their schema + cors.json; (5) exec summary,
-  index, README and nav integrate both. All suites re-run on the merged tree: engine tests 21/21, check_site 19
-  pages OK, validate_live OK, all inline JS parses.
-=======
 
 ## Session `arena-0a479d8c` — review + chart jump markers + alert-feed tests (branch `arena/0a479d8c-kalshidash3`)
 
@@ -325,10 +329,8 @@ internal cross-checks; that limitation is stated rather than papered over.
   T11/T12; withdrew the duplicate alerts page and kept the chart jump markers + alert-feed tests.
 - 2026-11-20: Merged `origin/main` (advanced by PRs #16/#18/#20/#21); resolved the conflict by adopting
   main's canonical architecture and re-applying only the non-duplicative additions. PR #22 opened for merge.
->>>>>>> c37aad2
-- 2026-11-20: Second conflict round: origin/main advanced again (PR #22, arena-0a479d8c — committed-history swing
-  markers on the chart + swinglist + test_alerts.py). Resolved: both marker systems now coexist on dashboard.html —
-  their markers are derived from committed observations (server-side layer), mine are >= $0.10 swings detected live
-  in the browser session; index card text merged. An earlier anomaly was also handled: another session force-pushed
-  origin/main history onto this branch's remote ref; the push of this session's history restored it, and the stray
-  in-progress rebase was aborted cleanly. No work from either side was lost.
+- 2026-11-20: **PR #22 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/22 , merge commit
+  `c37aad297abcc8ee85533a5dab23e46cde1384c9` (merged 2026-11-20T13:46:25Z). GitHub Pages rebuild completed
+  successfully (run 44747260546, conclusion `success`); Pages API reports `status=built`, live site
+  https://kanlerxz87-cyber.github.io/KalshiDash3/ (source `main /`). No irregularities were introduced by this
+  session; prior sessions' flagged items (F-14, F-15, etc.) remain on the Flagged for Review page.
