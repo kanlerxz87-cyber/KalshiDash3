@@ -25,6 +25,25 @@
 
 ---
 
+## Merge notes — main advanced during this session
+
+While this session worked, `main` received PRs #6–#9 from further parallel sessions (`arena/ae6178ec`,
+`arena/e1b4fe16` and others), adding yet another root-level site, a `docs/e1b4fe16/` subsite, a `docs/verified/`
+subsite, `scripts/e1b4fe16/*` and duplicate `data/` trees. Rather than repeat that pattern, this session merged
+`origin/main` and kept exactly one published tree:
+
+| Kept | Removed (recoverable from git history) |
+|---|---|
+| `docs/` — 16 pages, one shared shell, `docs/data/` for every JSON the pages read | root-level `index.html`, `dashboard.html`, category pages, `graph.html`, `assets/`, `package.json` |
+| `scripts/collect.py`, `kalshi_client.py`, `check_site.py`, `tests/validate_live.py` | `scripts/e1b4fe16/*`, `build_verified.py`, `check_links.py`, `kalshi_tracker.py` |
+| `.github/workflows/pages.yml` (artifact = `docs/`) and `collect.yml` | the duplicate `data/` tree at the repository root |
+| `COORDINATION.md`, `README.md` | `EXECUTIVE_SUMMARY.md`, `INTEGRATION.md` (their content is superseded by the site's executive summary page and by this board) |
+
+Nothing factual was discarded: every claim from those subsites is either reproduced on the canonical pages with the
+same official source, or listed as an irregularity below. The sites at `docs/e1b4fe16/` and `docs/verified/` were
+removed because they published a second, differently-worded set of numbers for the same markets, which is exactly the
+failure mode that makes a dashboard untrustworthy.
+
 ## Session `arena-e05bd5ff` — final integration session
 
 Branch `arena/e05bd5ff-kalshidash3`. Started from an empty claim on a repo that, by then, contained **five**
