@@ -18,6 +18,7 @@ import json
 import subprocess
 import sys
 import tempfile
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -27,17 +28,13 @@ sys.path.insert(0, str(ROOT / "scripts" / "tests"))
 import roi_scan  # noqa: E402
 import collect  # noqa: E402
 
-# Open fixtures must close in the FUTURE relative to whenever this runs, otherwise the
-# model's own "already past close_time" gate rejects them and the assertions below fail for
-# a reason that has nothing to do with the code under test (this happened on main: the
-# hard-coded 2026-11-20T17:00:00Z became the past and three checks went red).
-import datetime as _d
-
+# Open fixtures must close in the future relative to test time, but inside the model's
+# 90-day horizon; a fixed timestamp made the "already past close_time" gate fail as time passed.
 def _future(hours=2):
-    return (_d.datetime.now(_d.timezone.utc) + _d.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return (datetime.now(timezone.utc) + timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-CLOSE = _future(2)
+CLOSE = _future(48)
 
 
 def mkt(t, bid, ask, last, vol24, title, close=CLOSE, status="active", result=None, vb="900.00", va="800.00"):
@@ -56,8 +53,9 @@ def mkt(t, bid, ask, last, vol24, title, close=CLOSE, status="active", result=No
 
 
 OPEN = [
-    # eligible: 0.48/0.48 with a 13c upward move in the fixture history -> q 0.50, small positive ROI
-    mkt("KXAAAGASM-26DEC31-4.00", 0.48, 0.48, 0.48, 5000.0, "US average gas price on Dec 31?"),
+    # Synthetic qualifying case: coherent 0.40/0.41 touch, 0.60 last, and matching book;
+    # the model's blended q clears the YES ask plus its fee. History below records a 13c swing.
+    mkt("KXAAAGASM-26DEC31-4.00", 0.40, 0.41, 0.60, 5000.0, "US average gas price on Dec 31?"),
     # gated: one-sided quote, so the spread cannot be measured
     mkt("KXPGATOUR-26NOV22-T60", 0.20, None, None, 30000.0, "The RSM Classic: winner?"),
     # must be excluded entirely: a multivariate combo mentioning gas
@@ -78,7 +76,7 @@ SETTLED = [
 ]
 
 BOOKS = {
-    "KXAAAGASM-26DEC31-4.00": {"yes": [["0.4800", "900.00"]], "no": [["0.5100", "800.00"]]},
+    "KXAAAGASM-26DEC31-4.00": {"yes": [["0.4000", "900.00"]], "no": [["0.5900", "800.00"]]},
     "KXPGATOUR-26NOV22-T60": {"yes": [["0.2000", "20.00"]], "no": []},
     "KXMVE-26NOV20-A": {"yes": [], "no": []},
 }
@@ -128,14 +126,14 @@ def fake_get(path, params=None, retries=3):
 def main() -> int:
     tmp = Path(tempfile.mkdtemp(prefix="kdsim"))
     # History for the eligible market, timestamped relative to now so the 30-minute
-    # lookback window keeps working whenever this runs: 0.35 -> 0.48 is a 13c swing.
+    # lookback window keeps working whenever this runs: 0.47 -> 0.60 is a 13c swing.
     import datetime as _dt
     def ago(mins):
         return (_dt.datetime.now(_dt.timezone.utc) - _dt.timedelta(minutes=mins)).strftime("%Y-%m-%dT%H:%M:%SZ")
     (tmp / "price_history.json").write_text(json.dumps({"schema": 1, "series": {
         "KXAAAGASM-26DEC31-4.00": {"observations": [
-            {"t": ago(36), "last": 0.35, "yes_bid": 0.34, "yes_ask": 0.36, "volume_fp": "80000.00"},
-            {"t": ago(2), "last": 0.48, "yes_bid": 0.47, "yes_ask": 0.49, "volume_fp": "90000.00"},
+            {"t": ago(36), "last": 0.47, "yes_bid": 0.46, "yes_ask": 0.48, "volume_fp": "80000.00"},
+            {"t": ago(2), "last": 0.60, "yes_bid": 0.40, "yes_ask": 0.41, "volume_fp": "90000.00"},
         ]}}}))
     orig_get, orig_collect_get, orig_live = roi_scan.get, collect.get, roi_scan.LIVE
     roi_scan.get = fake_get
