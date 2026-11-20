@@ -101,3 +101,48 @@ and publishes only `docs/`.
 - 2026-11-20: Note on automation: workflow files added by this session's token do not appear in the Actions workflow list,
   so `collect.yml` and the rewritten `pages.yml` could not be dispatched or triggered from here. They are valid YAML and
   validated by the same scripts run locally; the first run happens when the workflow file is present on `main`.
+
+---
+
+## Session 9b246e37 (branch `arena/9b246e37-kalshidash3`, from `49ba7bc` of `main`)
+
+Claim: five topics (gas, elections, culture, crypto, golf) as a verified, row-level dashboard in its own namespace `docs/9b246e37/` (data in `docs/9b246e37/data/dashboard.json`). This session did not edit `docs/index.html`, the root site, `docs/assets/`, or any other session's files. Session IDs and branch names: the Arena branch rule applies (`arena/9b246e37-kalshidash3`).
+
+| ID | Task | Status | Owner | Files in scope (this session only) |
+|----|------|--------|-------|-------------------------------------|
+| T1 | Repo review | done | 9b246e37 | this section (F-13, F-14) |
+| T2 | Executive summary | done | 9b246e37 | `docs/9b246e37/executive-summary.md` |
+| T3 | Verified market snapshot (5 topics) | needs review | 9b246e37 | `docs/9b246e37/data/dashboard.json` |
+| T4 | Static site (landing + category pages) | done | 9b246e37 | `docs/9b246e37/index.html`, `docs/9b246e37/categories/*.html`, `docs/9b246e37/assets/{style.css,app.js}` |
+| T5 | Live chart + liquidity (browser-side, public endpoints) | done (code); CORS unverified | 9b246e37 | `docs/9b246e37/live.html`, `docs/9b246e37/assets/live.js` |
+| T6 | Portfolio / trades / strategies | **blocked** (no demo API key; no trades) | 9b246e37 | `docs/9b246e37/portfolio.html`, `docs/9b246e37/analysis.html` |
+| T7 | Questions and information gaps (12) | done | 9b246e37 | `docs/9b246e37/questions.html` |
+| T8 | Suggestions (10), awaiting user choice | done | 9b246e37 | `docs/9b246e37/suggestions.html` |
+| T9 | Flagged for Review (19 flags, source link each) | done | 9b246e37 | `docs/9b246e37/flagged.html` |
+| T10 | Integration: merge, check, PR, Pages | in progress | 9b246e37 | PR #7 log below |
+
+### Sources and verification (T1–T9)
+- Kalshi docs (official): https://docs.kalshi.com/llms.txt · /getting_started/demo_env.md · /getting_started/quick_start_authenticated_requests.md · /getting_started/market_settlement.md · /api-reference/market/get-series-list.md · /api-reference/market/get-market-candlesticks.md · /api-reference/market/get-market-orderbook.md
+- Kalshi DEMO API (read-only GET, no auth): `https://external-api.demo.kalshi.co/trade-api/v2/` — exchange status; `series?category=` for Crypto, Elections, Culture, Sports (golf); `events?series_ticker=KXAAAGASM` and `KXPGAMAJOR`; `markets?status=settled`; orderbook and candlestick examples.
+- AAA national average (official): https://gasprices.aaa.com/ — regular $3.6898 as of 11/20/26.
+- Method: values copied field by field from responses; any field missing from a response (truncated) is left blank and flagged. The sandbox cannot reach Kalshi hosts directly (SSL error), so every value came through the fetch tool.
+- Check: all 13 pages render from the JSON with no JS errors and no broken local links (jsdom, run outside the repo).
+
+### Irregularities (flagged; detail on `flagged.html`)
+- F-01 demo prices may not match production (Kalshi docs). F-02 demo test markets in settled results. F-03 thin or empty liquidity. F-04 stale timestamps. F-05 culture settlement-source placeholders. F-06 staging contract URLs. F-07 generic terms PDF name for KXBNBMINY. F-08 KXDOGEPERP no settlement source. F-09 election volume low. F-10 demo gas quotes do not match AAA's current average (open question). F-11 volume is contracts, not dollars. F-12 portfolio/trading not connected. F-15 golf coverage thin. F-16 browser CORS to demo API untested. F-17 partial snapshot. F-18 one partly captured row. F-19 AAA highest-recorded figure conflicts with third-party reporting.
+
+### Conflict and handoff record
+- 2026-11-20 ~11:30 UTC: PR #7 (`arena/9b246e37-kalshidash3` → `main`) was reported not mergeable. Cause: `main` had moved (PRs #5 and #8 merged). Resolution: my site files were moved into the `docs/9b246e37/` namespace, and `origin/main` was merged into this branch. Conflicts (`README.md`, `COORDINATION.md`) were resolved by keeping main's full text and appending this section. No other session's file was changed.
+- Pages note: legacy Pages (`main`, path `/`) publishes the `docs/` folder at `/docs/…`, so this subsite is at `/docs/9b246e37/` (same pattern as `/docs/e1b4fe16/`).
+
+### PR and merge log
+- PR: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/7
+- Merge result: PR #7 merged as `3ea66d5` at 2026-11-20 11:20:17Z (`gh pr merge 7 --merge`, MERGEABLE/CLEAN).
+- Pages deploy: `pages.yml` run 44726780017 success; legacy build of `a91983e` built.
+
+### Post-merge record (9b246e37), 2026-11-20 ~11:25 UTC
+
+- Merge `3ea66d5` (PR #7) landed on `main`. Then `8b1824e` (session arena-e05bd5ff, "keep one published tree") removed `docs/9b246e37/` (19 files) from `main`, together with `docs/e1b4fe16/`, `docs/verified/`, and the root-level site. Their decision, recorded on this board, was one canonical tree under `docs/`.
+- Result observed on the live canonical site (`/docs/index.html`, fetched 2026-11-20): it shows "No live snapshot committed yet" and no market rows. The only verified market rows on the live site were in the subsite removed above.
+- Action taken here (additive only): `docs/9b246e37/` is restored from `3ea66d5`, byte for byte. No shared file was changed: `docs/index.html`, navigation, `docs/assets/*`, `docs/data/*`, and `scripts/*` are as on `main`. `scripts/check_site.py` passes on the combined tree (16 pages, all internal links resolve).
+- Request to the integration owner (not done here): (1) link `docs/9b246e37/index.html` from the canonical navigation, or record that it is dropped; (2) fold the 30 verified rows (`docs/9b246e37/data/dashboard.json`), 12 questions, 10 suggestions and 19 flags into the canonical tree, or confirm they stay in the subsite; (3) restore or re-link `docs/e1b4fe16/` and `docs/verified/` if they were not meant to be dropped. Their content is recoverable at `843be97` (pre-removal).

@@ -1,0 +1,412 @@
+{
+  "meta": {
+    "generated_at_utc": "2026-11-20T11:12:00Z",
+    "snapshot_window_utc": "2026-11-20 ~11:00 to 11:12",
+    "demo_api_base": "https://external-api.demo.kalshi.co/trade-api/v2",
+    "docs_base": "https://docs.kalshi.com",
+    "notes": "All market values were copied from Kalshi DEMO API responses retrieved on the snapshot date. Demo prices may not match production (see F-01). Blank cell = not confirmed by an official source; never inferred."
+  },
+  "urls": {
+    "gas_events": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+    "series_crypto": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+    "series_elections": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+    "series_culture": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
+    "series_sports_golf": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&include_volume=true",
+    "golf_events": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAMAJOR&status=open&with_nested_markets=true&limit=5",
+    "settled_markets": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3",
+    "exchange_status": "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status",
+    "aaa_national": "https://gasprices.aaa.com/",
+    "docs_welcome": "https://docs.kalshi.com/welcome",
+    "docs_demo_env": "https://docs.kalshi.com/getting_started/demo_env.md",
+    "docs_auth": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md",
+    "docs_settlement": "https://docs.kalshi.com/getting_started/market_settlement.md",
+    "docs_series_list": "https://docs.kalshi.com/api-reference/market/get-series-list.md",
+    "docs_candlesticks": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md",
+    "docs_orderbook": "https://docs.kalshi.com/api-reference/market/get-market-orderbook.md",
+    "docs_llms": "https://docs.kalshi.com/llms.txt"
+  },
+  "aaa": {
+    "label": "AAA national average, regular unleaded (settlement reference for gas markets)",
+    "current": "3.6898",
+    "as_of": "11/20/26",
+    "yesterday": "3.7212",
+    "week_ago": "3.8724",
+    "month_ago": "4.2786",
+    "year_ago": "3.1003",
+    "highest_recorded_regular": "5.0165 (6/14/22)",
+    "source_url": "https://gasprices.aaa.com/"
+  },
+  "exchange": {
+    "status": "exchange_active=true, trading_active=true (demo)",
+    "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status"
+  },
+  "rows": [
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-2.50",
+      "title": "Will average gas prices be above $2.50? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.0100", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "0.02", "volume": "3.16", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-11-13T02:00:08Z (event last_updated_ts)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04", "F-10"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-2.60",
+      "title": "Will average gas prices be above $2.60? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.0100", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "0.02", "volume": "3.16", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-11-13T02:00:08Z (event last_updated_ts)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04", "F-10"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-2.70",
+      "title": "Will average gas prices be above $2.70? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.0100", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "0.02", "volume": "3.16", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-11-13T02:00:08Z (event last_updated_ts)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04", "F-10"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-2.80",
+      "title": "Will average gas prices be above $2.80? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.0100", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "0.02", "volume": "3.16", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-11-13T02:00:08Z (event last_updated_ts)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04", "F-10"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-2.90",
+      "title": "Will average gas prices be above $2.90? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.0100", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "0.02", "volume": "3.16", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-11-13T02:00:08Z (event last_updated_ts)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04", "F-10"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.00",
+      "title": "Will average gas prices be above $3.00? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.9800", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "341.90", "volume": "345.04", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-04-28T02:11:38Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.10",
+      "title": "Will average gas prices be above $3.10? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.9800", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "341.91", "volume": "345.05", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-04-28T02:11:38Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.20",
+      "title": "Will average gas prices be above $3.20? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.9800", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "341.88", "volume": "341.88", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-10-27T20:34:13Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.30",
+      "title": "Will average gas prices be above $3.30? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.9700", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "684.76", "volume": "694.76", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-10-27T20:34:13Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.40",
+      "title": "Will average gas prices be above $3.40? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.9700", "yes_bid": "0.0000", "yes_ask": "1.0000",
+      "open_interest": "1713.40", "volume": "1915.40", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-10-27T20:34:13Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.50",
+      "title": "Will average gas prices be above $3.50? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.5000", "yes_bid": "0.5000", "yes_ask": "0.5100",
+      "yes_bid_size": "103.81", "yes_ask_size": "97.27",
+      "open_interest": "5324.76", "volume": "6828.00", "volume_24h": "3507.66", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-10-27T20:34:13Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-04"], "verification": "verified"
+    },
+    {
+      "category": "gas", "type": "market", "ticker": "KXAAAGASM-26NOV30-3.60",
+      "title": "Will average gas prices be above $3.60? (AAA national regular, Nov 30, 2026)",
+      "status": "active", "last_price": "0.1000", "yes_bid": "", "yes_ask": "",
+      "open_interest": "6282.92", "volume": "", "volume_unit": "contracts",
+      "close_time": "2026-11-30T04:59:00Z", "result": "", "frequency": "monthly (event KXAAAGASM-26NOV30)",
+      "settlement_source": "AAA (per rules_primary)", "last_updated": "2026-10-27T20:34:13Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2",
+      "flags": ["F-18"], "verification": "partial"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXLINK", "title": "Chainlink range",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "24510512.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "daily", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/data/indices/LINKUSD_RTI)",
+      "last_updated": "2026-11-20T08:30:31.635653Z", "terms_url": "https://assets.kalshi.com/contract_terms/LINK.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": ["F-06"], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXBTCMINY", "title": "How low will Bitcoin fall this year?",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "19464180.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "annual", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/data/indices/BRTI)",
+      "last_updated": "2026-11-20T10:46:14.263334Z", "terms_url": "https://assets.kalshi.com/contract_terms/BTCMINMAX.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXAVAX", "title": "Avalanche range",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "17532299.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "daily", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/data/indices/AVAXUSD_RTI)",
+      "last_updated": "2026-11-20T10:39:49.540549Z", "terms_url": "https://assets.kalshi.com/contract_terms/AVAX.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXCRYPTORETURNY", "title": "Crypto being positive",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "165735.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "annual", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+      "last_updated": "2026-11-20T10:55:20.206365Z", "terms_url": "https://assets.kalshi.com/contract_terms/CRYPTORETURN.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXDOTMINY", "title": "Polkadot min",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "71848.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "annual", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+      "last_updated": "2026-11-20T10:59:07.408662Z", "terms_url": "https://assets.kalshi.com/contract_terms/DOTMINMAX.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXPRCBTC", "title": "Bitcoin legalization in PRC",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "16875.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "custom", "settlement_source": "Bloomberg (https://www.bloomberg.com/)",
+      "last_updated": "2026-11-20T09:57:34.476427Z", "terms_url": "https://assets.kalshi.com/contract_terms/PRCBTC.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXBNBMINY", "title": "BNB Min Year",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "24.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "annual", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+      "last_updated": "2026-10-13T18:34:01.879891Z", "terms_url": "https://assets.kalshi.com/contract_terms/CRYPTOMINMAX.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": ["F-07"], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXNEAR", "title": "NEAR range",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "hourly", "settlement_source": "CF Benchmarks (https://www.cfbenchmarks.com/)",
+      "last_updated": "2026-10-13T18:34:01.879891Z", "terms_url": "https://assets.kalshi.com/contract_terms/CRYPTO.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXFDVFOGO", "title": "FOGO FDV",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "CoinGecko (https://www.coingecko.com)",
+      "last_updated": "2026-11-20T10:55:01.813381Z", "terms_url": "https://assets.kalshi.com/contract_terms/CRYPTOFDV.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": [], "verification": "verified"
+    },
+    {
+      "category": "crypto", "type": "series", "ticker": "KXDOGEPERP", "title": "100 DOGE",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "often", "settlement_source": "", "last_updated": "2026-11-20T10:30:58.962445Z",
+      "terms_url": "https://assets.kalshi.com/contract_terms/.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true",
+      "flags": ["F-08"], "verification": "partial"
+    },
+    {
+      "category": "elections", "type": "series", "ticker": "KXCABALLOTMEASURES", "title": "Which California ballot measures will pass?",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "40.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "Multiple news outlets and official government website of geography (see API list)",
+      "last_updated": "2026-11-20T08:56:06.684073Z", "terms_url": "https://assets.kalshi.com/contract_terms/REFERENDUMPASS.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+      "flags": ["F-09"], "verification": "verified"
+    },
+    {
+      "category": "elections", "type": "series", "ticker": "KXUSPSELECTION", "title": "Will Trump's election order lead to large-scale ballot blocking?",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "1.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "Multiple news outlets (see API list)",
+      "last_updated": "2026-10-26T14:55:46.752384Z", "terms_url": "https://assets.kalshi.com/contract_terms/REPORTTOPIC.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+      "flags": ["F-09"], "verification": "verified"
+    },
+    {
+      "category": "elections", "type": "series", "ticker": "KXTALARICOPAXTONDEBATE", "title": "Talarico and Paxton debate",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "C-SPAN, ABC, WSJ, Bloomberg and others (see API list)",
+      "last_updated": "2026-11-20T10:56:51.952851Z", "terms_url": "https://assets.kalshi.com/contract_terms/DEBATEPEOPLE.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+      "flags": ["F-09"], "verification": "verified"
+    },
+    {
+      "category": "elections", "type": "series", "ticker": "KXAGNOMDVA", "title": "Democratic Nominee for Attorney General in Virginia?",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "WSJ, Washington Post, Axios, Reuters, NYT, AP, Politico (see API list)",
+      "last_updated": "2026-11-20T10:35:17.157612Z", "terms_url": "https://assets.kalshi.com/contract_terms/AGNOM.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true",
+      "flags": ["F-09"], "verification": "verified"
+    },
+    {
+      "category": "culture", "type": "series", "ticker": "KXXBANNEDGROK", "title": "Will Grok be banned this year",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "Lists 23 sources incl. placeholder entries (see F-05)",
+      "last_updated": "2026-11-20T09:57:29.442797Z", "terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
+      "flags": ["F-05"], "verification": "partial"
+    },
+    {
+      "category": "culture", "type": "series", "ticker": "KXXBANNEDMURRAYHILLGUY1", "title": "Will @MurrayHillGuy1 get banned from X this year?",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "one_off", "settlement_source": "Same list as KXXBANNEDGROK (see F-05)",
+      "last_updated": "2026-11-20T10:00:16.115208Z", "terms_url": "https://assets.kalshi.com/contract_terms/XBANNED.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true",
+      "flags": ["F-05"], "verification": "partial"
+    },
+    {
+      "category": "golf", "type": "series", "ticker": "KXPGAMAJOR", "title": "PGA Major Wins",
+      "status": "series", "last_price": "", "yes_bid": "", "yes_ask": "", "open_interest": "", "volume": "0.00", "volume_unit": "contracts (series total)",
+      "close_time": "", "result": "", "frequency": "custom", "settlement_source": "ESPN (https://www.espn.com); the Governing League (https://www.pgatour.com/)",
+      "last_updated": "2026-11-20T08:10:41.509206Z", "terms_url": "https://assets.kalshi.com/contract_terms/GOLFMILESTONES.pdf",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Sports&include_volume=true",
+      "flags": ["F-15"], "verification": "verified"
+    },
+    {
+      "category": "golf", "type": "market", "ticker": "KXPGAMAJOR-27BDEC-1",
+      "title": "Will Bryson DeChambeau win 1+ golf major championships in 2027?",
+      "status": "active", "last_price": "0.0000", "yes_bid": "0.0000", "yes_ask": "0.0000",
+      "open_interest": "0.00", "volume": "0.00", "volume_unit": "contracts",
+      "close_time": "2028-01-14T15:00:00Z", "result": "", "frequency": "event KXPGAMAJOR-27BDEC (expected expiration 2027-12-31T15:00:00Z)",
+      "settlement_source": "ESPN; the Governing League (per series)", "last_updated": "2026-10-21T17:03:52.169588Z (market updated_time)",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAMAJOR&status=open&with_nested_markets=true&limit=5",
+      "flags": ["F-15"], "verification": "verified"
+    }
+  ],
+  "resolved": [
+    {
+      "ticker": "KXDEMOFUTHOURLY-26NOV20H11-UP", "title": "Demo BTC at or above 61580.32 USD",
+      "result": "yes", "status": "finalized", "settlement_value_dollars": "1.0000",
+      "last_price_dollars": "0.6500", "volume": "8195.00", "close_time": "2026-11-20T11:00:00Z",
+      "settlement_ts": "2026-11-20T11:01:19.613451Z",
+      "rule": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T11:00:00+00:00 closes at or above 61580.32 USD; otherwise NO.",
+      "category": "demo (test market)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3",
+      "flags": ["F-02"], "verification": "verified"
+    },
+    {
+      "ticker": "KXQUICKSETTLE-20NOV26H0530-2", "title": "1+1 = 2",
+      "result": "yes", "status": "finalized", "settlement_value_dollars": "1.0000",
+      "last_price_dollars": "0.3000", "volume": "4.00", "close_time": "2026-11-20T10:30:00Z",
+      "settlement_ts": "2026-11-20T11:00:44.561468Z",
+      "rule": "If 1+1 equals 2 at the scheduled time, the market resolves to Yes.",
+      "category": "demo (test market)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3",
+      "flags": ["F-02"], "verification": "verified"
+    },
+    {
+      "ticker": "KXQUICKSETTLE-20NOV26H0530-3", "title": "1+1 = 3",
+      "result": "no", "status": "finalized", "settlement_value_dollars": "0.0000",
+      "last_price_dollars": "0.0000", "volume": "0.00", "close_time": "2026-11-20T10:30:00Z",
+      "settlement_ts": "2026-11-20T11:00:44.561468Z",
+      "rule": "If 1+1 equals 3 at the scheduled time, the market resolves to Yes.",
+      "category": "demo (test market)", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3",
+      "flags": ["F-02"], "verification": "verified"
+    }
+  ],
+  "orderbook_examples": [
+    {
+      "ticker": "KXAAAGASM-26NOV30-3.50",
+      "note": "Top-of-book from the market object (not the orderbook endpoint): yes bid 0.5000 with 103.81 contracts; yes ask 0.5100 with 97.27 contracts.",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2"
+    },
+    {
+      "ticker": "KXAAAGASM-26NOV30-3.00",
+      "note": "GET /markets/{ticker}/orderbook returned empty yes_dollars and no_dollars arrays (no resting orders at snapshot).",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.00/orderbook"
+    }
+  ],
+  "candlestick_examples": [
+    {
+      "ticker": "KXAAAGASM-26NOV30-3.00",
+      "note": "1-day candlesticks for 2026-11-13 to 2026-11-20 returned an empty array.",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM/markets/KXAAAGASM-26NOV30-3.00/candlesticks?start_ts=1794568022&end_ts=1795172822&period_interval=1440"
+    },
+    {
+      "ticker": "KXDEMOFUTHOURLY-26NOV20H11-UP",
+      "note": "1-minute candlesticks (period_interval=1) returned data with price.close_dollars, yes_bid/yes_ask OHLC and volume_fp per minute (demo test market).",
+      "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV20H11-UP/candlesticks?start_ts=1795170000&end_ts=1795172822&period_interval=1"
+    }
+  ],
+  "flags": [
+    {"id": "F-01", "severity": "high", "title": "Demo data is not production data", "detail": "Kalshi's docs state: 'The price and behavior of markets in the demo environment may not be reflective of those in real markets.' Every price here is a demo price. Do not use demo prices to make real trading decisions.", "source_url": "https://docs.kalshi.com/getting_started/demo_env.md"},
+    {"id": "F-02", "severity": "medium", "title": "Demo test markets appear in settled results", "detail": "The settled-markets list contains demo/test markets (KXDEMOFUTHOURLY, KXQUICKSETTLE, e.g. '1+1 = 2'). They are shown only as resolution examples and excluded from category analysis.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3"},
+    {"id": "F-03", "severity": "high", "title": "Liquidity is thin or missing for most markets", "detail": "Orderbook for KXAAAGASM-26NOV30-3.00 is empty; 1-day candlesticks for the same market are empty. Most series in the five topics show 0.00 volume. Liquidity by price level can only be shown for a few markets.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.00/orderbook"},
+    {"id": "F-04", "severity": "medium", "title": "Timestamps are inconsistent", "detail": "Gas rung markets show updated_time 2026-04-28 or 2026-10-27 while the event last_updated_ts is 2026-11-13. Markets with 'active' status and close time 2026-11-30 can carry older update times. Values were recorded as returned; freshness is unconfirmed.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2"},
+    {"id": "F-05", "severity": "high", "title": "Culture markets list irregular settlement sources", "detail": "KXXBANNEDGROK and KXXBANNEDMURRAYHILLGUY1 list 'account holder of ' with a Google search URL, Barchart's $INX page, and unrelated outlets (e.g. Ars Technica via Google search, Elon Musk's X profile). Some entries are placeholders, not official settlement sources. The rules need manual review.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true"},
+    {"id": "F-06", "severity": "low", "title": "Staging host in production contract_url fields", "detail": "The contract_url field of these series points to kalshi-public-docs-staging.s3.us-east-1.amazonaws.com: KXLINK, KXAVAX, KXDOTMINY, KXBTCMINY, KXCRYPTORETURNY, KXFDVFOGO, KXPRCBTC, KXCABALLOTMEASURES, KXUSPSELECTION, KXTALARICOPAXTONDEBATE, KXAGNOMDVA, KXXBANNEDGROK, KXPGAMAJOR. A staging host in production metadata is worth review. The terms PDFs on assets.kalshi.com are linked as terms_url in this dashboard.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true"},
+    {"id": "F-07", "severity": "low", "title": "BNB series uses a generic terms PDF name", "detail": "KXBNBMINY's terms PDF is CRYPTOMINMAX.pdf (a generic name that does not match the BNB title). Its contract_url is on assets.kalshi.com. Confirm the applicable contract text before relying on it.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true"},
+    {"id": "F-08", "severity": "high", "title": "KXDOGEPERP has no settlement source or contract", "detail": "Series KXDOGEPERP (title '100 DOGE', category Crypto) has settlement_sources null, an empty contract_url, and a blank terms PDF path (assets.kalshi.com/contract_terms/.pdf). It cannot be verified and is left as partial.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Crypto&include_volume=true"},
+    {"id": "F-09", "severity": "medium", "title": "Election series have very low activity", "detail": "Largest election series in the snapshot has 40.00 contracts traded in total. Election coverage is limited to 4 series; the Elections list has 529 result pages, so full enumeration was not done.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections&include_volume=true"},
+    {"id": "F-10", "severity": "high", "title": "Demo gas quotes do not match AAA today", "detail": "AAA's national regular average was $3.6898 on 11/20/26. The demo quote for the 'above $3.50' rung (yes bid 0.50, yes ask 0.51) and the 'above $2.50' rung (last 0.01) are not explained by the data we have. This is an open question; see Q-05. No conclusion is drawn.", "source_url": "https://gasprices.aaa.com/"},
+    {"id": "F-11", "severity": "medium", "title": "Volume is contracts, not dollars", "detail": "The API reports volume_fp as a count of contracts traded (docs: 'String representation of the total number of contracts traded'). The 'highest dollar amount' ranking requested cannot be computed from these fields alone. Dollar value needs a defined method (trade history or price x volume), which is not verified here.", "source_url": "https://docs.kalshi.com/api-reference/market/get-series-list.md"},
+    {"id": "F-12", "severity": "high", "title": "Portfolio and trading not connected", "detail": "Portfolio and order endpoints need authenticated requests (API key ID + RSA/Ed25519 signature). No demo API key exists in this sandbox and none was created. No trades were executed and no portfolio figures are shown.", "source_url": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md"},
+    {"id": "F-13", "severity": "low", "title": "Repository review: README only", "detail": "The repo contains only README.md ('# KalshiDash3', no trailing newline) at commit 49ba7bc. No code, tests, license, CI workflow, or COORDINATION.md existed before this session.", "source_url": "https://github.com/kanlerxz87-cyber/KalshiDash3"},
+    {"id": "F-14", "severity": "medium", "title": "Other session branches exist on origin", "detail": "origin has arena/1c0d1fc0-kalshidash3 (cea0346) and arena/ae6178ec-kalshidash3 (86eb94f). They were not read or changed by this session; they may overlap with this work.", "source_url": "https://github.com/kanlerxz87-cyber/KalshiDash3/branches"},
+    {"id": "F-15", "severity": "medium", "title": "Golf coverage is thin", "detail": "Only PGA Major Wins (KXPGAMAJOR) was found in the golf scope. Its listed market (Bryson DeChambeau, 1+ majors in 2027) has 0.00 volume. No live golf tournament market was located; coverage remains a gap.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXPGAMAJOR&status=open&with_nested_markets=true&limit=5"},
+    {"id": "F-16", "severity": "medium", "title": "Browser access (CORS) to the demo API is unverified", "detail": "The live chart calls the demo API from the viewer's browser. The sandbox could not confirm CORS headers. If the browser blocks requests, the chart shows a message and falls back to the snapshot tables.", "source_url": "https://docs.kalshi.com/getting_started/demo_env.md"},
+    {"id": "F-17", "severity": "medium", "title": "Snapshot is partial", "detail": "Coverage is a sample, not the full list for each category. It uses series-level category queries and selected event lookups. Full enumeration needs cursor pagination (see Q-08).", "source_url": "https://docs.kalshi.com/getting_started/pagination.md"},
+    {"id": "F-18", "severity": "low", "title": "Partially captured market row", "detail": "KXAAAGASM-26NOV30-3.60: last price, open interest and close time were captured. Yes bid, yes ask and volume were cut off in the API response, so they are left blank.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2"},
+    {"id": "F-19", "severity": "medium", "title": "AAA 'highest recorded' conflicts with third-party reporting", "detail": "AAA's page lists a highest recorded regular average of $5.0165 (6/14/22). Third-party articles (not official) cite a 2026 high of $4.56 on May 21. The 2026 high was not confirmed against an official AAA historical table, so it is not used.", "source_url": "https://gasprices.aaa.com/"}
+  ],
+  "questions": [
+    {"id": "Q-01", "question": "What is the official definition of 'highest dollar amount' for ranking events?", "status": "Unanswered", "answer": "Not answered by the API. volume_fp is contracts traded, not dollars.", "missing_info": "Chosen metric (contracts, dollars traded, open interest x price), and whether to use production or demo data.", "how_to_discover": "Decide the metric (see S-04); compute from trade history (GET /markets/trades) once the data source is confirmed.", "source_url": "https://docs.kalshi.com/api-reference/market/get-series-list.md"},
+    {"id": "Q-02", "question": "How are gas markets resolved (YES/NO rule)?", "status": "Answered", "answer": "YES if AAA's average regular gas price is strictly greater than the strike on the date stated; otherwise NO (rules_primary, KXAAAGASM markets). Settlement source: AAA.", "missing_info": "Confirm the AAA series used for each rung (national daily vs. monthly).", "how_to_discover": "Read the rulebook for each series (contract_terms_url).", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/events?series_ticker=KXAAAGASM&status=open&with_nested_markets=true&limit=2"},
+    {"id": "Q-03", "question": "Can we see our own demo portfolio, positions, and P&L?", "status": "Unanswered", "answer": "Not from this sandbox. Portfolio endpoints need signed requests with a demo API key.", "missing_info": "A Kalshi demo account and API key (key ID + private key). These cannot be created by the agent.", "how_to_discover": "Create a demo key at https://demo.kalshi.co (Account & security > API Keys) and provide it as a GitHub Actions secret (see S-02).", "source_url": "https://docs.kalshi.com/getting_started/quick_start_authenticated_requests.md"},
+    {"id": "Q-04", "question": "How does a resolved market show YES or NO?", "status": "Answered", "answer": "Settled markets return status 'finalized', result 'yes' or 'no', and settlement_value_dollars (1.0000 for yes, 0.0000 for no).", "missing_info": "No real (non-demo) resolved market from the five topics was found in the snapshot.", "how_to_discover": "Poll GET /markets?status=settled and filter by ticker prefix.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=3"},
+    {"id": "Q-05", "question": "Why do the demo gas quotes differ from AAA's current average?", "status": "Unanswered", "answer": "Not answered. Demo quotes are not production prices (F-01). AAA's current regular average is $3.6898 (11/20/26).", "missing_info": "Production gas market quotes; AAA daily history; confirmation that the demo market follows the same rule.", "how_to_discover": "Pull production data (external-api.kalshi.com) when a read-only key is available; collect AAA daily history.", "source_url": "https://gasprices.aaa.com/"},
+    {"id": "Q-06", "question": "Is the liquidity at each price visible on the site?", "status": "Partly answered", "answer": "Yes for a few markets: top-of-book sizes are in the market object (e.g. KXAAAGASM-26NOV30-3.50 yes bid 103.81 @0.50, yes ask 97.27 @0.51). Full depth is available from the orderbook endpoint, but it was empty for the sampled market.", "missing_info": "Orderbook depth for liquid markets (5 topics), sampled over time.", "how_to_discover": "Snapshot GET /markets/{ticker}/orderbook for each tracked ticker on a schedule.", "source_url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook.md"},
+    {"id": "Q-07", "question": "Which elections, culture, and golf markets are live right now?", "status": "Partly answered", "answer": "Series-level data was captured for 4 election series, 2 culture series, and 1 golf series. All show low or zero volume.", "missing_info": "Live event-level markets for the upcoming election dates and golf tournaments.", "how_to_discover": "Query /events with series_ticker and status=open for each category, with cursor pagination.", "source_url": "https://docs.kalshi.com/getting_started/pagination.md"},
+    {"id": "Q-08", "question": "How do we list every market in a category?", "status": "Partly answered", "answer": "Series can be filtered by category (documented). The Elections series list has 529 pages of results.", "missing_info": "A complete run through every page.", "how_to_discover": "Run a scripted cursor loop with rate-limit awareness (see docs rate limits).", "source_url": "https://docs.kalshi.com/getting_started/rate_limits.md"},
+    {"id": "Q-09", "question": "Is the browser allowed to call the demo API directly?", "status": "Unanswered", "answer": "Not verified (F-16).", "missing_info": "A browser test of CORS headers from the GitHub Pages origin.", "how_to_discover": "Test the live page in a browser after deployment.", "source_url": "https://docs.kalshi.com/getting_started/demo_env.md"},
+    {"id": "Q-10", "question": "Which fee schedule applies to the trades we would place?", "status": "Partly answered", "answer": "Series fee_type is 'quadratic' (or other types per series) and fee_multiplier is 1 in the snapshot. Kalshi's fee schedule PDF is referenced in the docs but was not opened here.", "missing_info": "The fee formula and whether demo fees match production.", "how_to_discover": "Open https://kalshi.com/docs/kalshi-fee-schedule.pdf and confirm the rounding rules (docs.kalshi.com/getting_started/fee_rounding.md).", "source_url": "https://docs.kalshi.com/api-reference/market/get-series-list.md"},
+    {"id": "Q-11", "question": "Which strategies should we test, and on what trade categories?", "status": "Unanswered", "answer": "No trades exist yet, so no strategy can be evaluated from data.", "missing_info": "Trade history (demo), categories, and a hypothesis per category.", "how_to_discover": "Decide after the first demo trades (see S-07).", "source_url": "https://docs.kalshi.com/getting_started/quick_start_create_order.md"},
+    {"id": "Q-12", "question": "Which sources are official for settlement of each category?", "status": "Partly answered", "answer": "Gas: AAA (confirmed on AAA's site). Crypto: CF Benchmarks (named in series). Golf: ESPN and PGA Tour (named). Culture: list contains placeholders (F-05). Elections: many outlets, not a single official source.", "missing_info": "Confirmed official rulebook text for each series, especially culture and elections.", "how_to_discover": "Open each series' terms PDF (terms_url) and record the named source.", "source_url": "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Culture&include_volume=true"}
+  ],
+  "suggestions": [
+    {"id": "S-01", "title": "Schedule an hourly snapshot job", "detail": "A GitHub Actions job every hour that calls only public endpoints (markets, orderbooks, candlesticks) and commits data/*.json. This builds price history for the chart over time.", "benefit": "Real history on the chart instead of only the live browser view.", "cost": "Adds commits to the repo; relies on Actions minutes.", "risk": "Untested from the sandbox (no egress to Kalshi here); needs one manual run to confirm."},
+    {"id": "S-02", "title": "Connect a Kalshi DEMO API key for portfolio and trades", "detail": "Create a demo key at demo.kalshi.co and store the key ID and private key as repository secrets. Add a read-only portfolio page first, then order placement.", "benefit": "Unblocks Q-03, portfolio tracking, and trade analysis.", "cost": "Requires the user to create the key (cannot be automated by the agent). Keep it demo-only.", "risk": "Secret handling; never commit keys."},
+    {"id": "S-03", "title": "Full enumeration with cursor pagination", "detail": "Loop each category's series and events with cursors, store every row with its source URL, and report the coverage percentage on each page.", "benefit": "Resolves F-17 and Q-08.", "cost": "Many requests; needs rate-limit handling.", "risk": "Large data files; keep them out of git if they grow."},
+    {"id": "S-04", "title": "Define 'highest dollar amount' before ranking", "detail": "Options: (a) contracts traded (volume_fp, available now); (b) dollars traded from trade history; (c) open interest x price. Pick one and document it.", "benefit": "Makes the ranking reproducible (Q-01).", "cost": "Option (b) needs trade history calls.", "risk": "Ranking changes depending on the metric."},
+    {"id": "S-05", "title": "Show resolution outcomes automatically", "detail": "Poll settled markets and record result yes/no with the settlement time and source. Keep demo test markets in a separate bucket.", "benefit": "Answers the 'track until resolved' requirement (Q-04).", "cost": "Small."},
+    {"id": "S-06", "title": "Remove the staging-host and placeholder-source issues from the data", "detail": "Do not treat staging contract URLs or placeholder settlement sources as verified. Mark those rows and link the rulebook for manual review.", "benefit": "Protects the 'verified' label.", "cost": "Manual rulebook review."},
+    {"id": "S-07", "title": "Strategy taxonomy only after trades exist", "detail": "Define trade types (e.g., directional, hedge, range, time-decay) and categorize trades. Do this after the first demo trades so the categories come from data.", "benefit": "Keeps strategy claims tied to evidence.", "cost": "Waits on S-02."},
+    {"id": "S-08", "title": "Use WebSocket streams for live prices", "detail": "Kalshi documents a demo WebSocket endpoint (wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2). Subscribe to tickers for real-time updates instead of polling.", "benefit": "Faster, lighter live view.", "cost": "Auth and connection handling; more code.", "risk": "Not tested from this sandbox."},
+    {"id": "S-09", "title": "Verify the chart's CORS access after deploy", "detail": "Load the live page in a browser and confirm candlesticks load from the demo API. If blocked, switch to the snapshot approach (S-01).", "benefit": "Resolves F-16 and Q-09.", "cost": "Small."},
+    {"id": "S-10", "title": "Add production read-only data as a comparison (after demo works)", "detail": "Compare demo and production quotes for the same gas rungs to test F-01 and Q-05. Use production data only for analysis, never for trades.", "benefit": "Shows whether demo prices track the real market.", "cost": "Needs a production read-only key or public endpoints."}
+  ]
+}
