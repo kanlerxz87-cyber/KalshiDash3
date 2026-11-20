@@ -29,7 +29,7 @@ left blank and listed on the *Flagged for Review* page.
 | `suggestions.html` | Ten proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
 | `verification.html` | 59 claims, each with the official page it was checked against |
-| `flagged.html` | 31 irregularities found, plus every value deliberately left blank |
+| `flagged.html` | 32 irregularities found, plus every value deliberately left blank |
 | `sources.html` | The complete source list |
 
 ## Repository layout
