@@ -10,7 +10,14 @@ Both sides are run over ONE fixture (scripts/tests/fixtures_roi_parity.json), wh
 a qualifying pick, a wide spread, a thin book, a missing book (size fields instead), a
 zero-fee series, a keyword-only topic, a market past its close, a market with no close
 time, an extreme price, low volume, a downward tilt, a catalyst URL inside the market's
-own rules text, a one-sided quote, and a market with no price at all.
+own rules text, a one-sided quote, a market with no price at all, a market with no depth
+information (the depth gate is skipped, not zeroed), and the two pinned-quote cases the
+demo book actually produces (YES ask $0.00 observed verbatim in the committed snapshot;
+YES bid $1.00 as its labelled mirror) where ROI is undefined and must stay unpriced.
+
+Beyond parity this test also audits both outputs: no priced side may have a zero/negative
+cost or a non-finite ROI. That matters because JSON turns JavaScript's `Infinity` into
+`null`, so a browser-side regression could otherwise slip through a pure equality check.
 
 Run: python3 scripts/tests/test_roi_parity.py
 """
@@ -37,6 +44,33 @@ def close(a, b):
     if a is None or b is None:
         return a is None and b is None
     return math.isclose(float(a), float(b), abs_tol=TOL, rel_tol=1e-12)
+
+
+def audit(rows, label: str) -> list[str]:
+    """Neither implementation may price a side whose cost is zero or whose ROI is not finite.
+
+    A pinned demo quote (ask $0.0000 / bid $1.0000) makes ROI = (win − cost) / cost undefined:
+    Python must not raise, and the browser must not rank Infinity above every real edge.
+    """
+    bad = []
+    for r in rows or []:
+        tag = f"{label} {r.get('ticker')}"
+        e = r.get("entry")
+        if e is None:
+            if not (r.get("reasons") or r.get("fails")):
+                bad.append(f"{tag}: unpriced without a stated reason")
+            continue
+        cost, roi = e.get("cost"), e.get("roi")
+        if not isinstance(cost, (int, float)) or cost <= 0:
+            bad.append(f"{tag}: priced a side at cost {cost!r} — a zero-cost side must be left unpriced")
+        for k in ("roi", "ev"):
+            v = e.get(k)
+            if not isinstance(v, (int, float)) or not math.isfinite(v):
+                bad.append(f"{tag}: {k} is {v!r}, not a finite number")
+        sc = r.get("score")
+        if sc is not None and (not isinstance(sc, (int, float)) or not math.isfinite(sc)):
+            bad.append(f"{tag}: score is {sc!r}")
+    return bad
 
 
 def main() -> int:
@@ -108,6 +142,10 @@ def main() -> int:
             if not all(close(x, y) for x, y in zip(a, b)):
                 problems.append(f"fees at {a[0]}: {a} vs {b}")
 
+    # Both engines are audited on their own, not just against each other.
+    problems += audit(mine, "python")
+    problems += audit(theirs["scores"], "browser")
+
     if problems:
         print("PARITY BROKEN — browser and CI would publish different models:", file=sys.stderr)
         for p in problems[:40]:
@@ -115,7 +153,8 @@ def main() -> int:
         return 1
     print(f"OK: {len(mine)} scoring cases, {len(my_swings)} swings, "
           f"{sum(len(c) for c in my_catalysts)} catalyst links and {len(my_fees)} fee points "
-          "are identical between assets/live.js (browser) and scripts/roi_model.py (CI).")
+          "are identical between assets/live.js (browser) and scripts/roi_model.py (CI); "
+          "no priced side has a zero cost or a non-finite ROI in either.")
     return 0
 
 

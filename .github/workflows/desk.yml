@@ -42,6 +42,10 @@ jobs:
           python3 scripts/tests/test_roi_parity.py
           node scripts/tests/test_engine_node.js
           python3 scripts/tests/test_roi_scan_offline.py
+          # The scan itself, over the real committed snapshot with the network stubbed: this is
+          # the run that would have caught the ZeroDivisionError that kept roi.json from ever
+          # being written (127 of 387 open demo markets carry a $0.00 ask).
+          python3 scripts/tests/test_roi_scan_snapshot.py
 
       - name: Page render smoke test (jsdom, no network)
         run: |

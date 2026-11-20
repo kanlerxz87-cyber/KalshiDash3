@@ -227,15 +227,26 @@ def replay_settled(model: dict, markets: list[dict], max_markets: int) -> dict:
         q = RM.clip((w["mid"] + w["micro"]) * mid + w["last"] * last, *model["parameters"]["clip_q"])
         mult = RM.series_mult(series_ticker, model)
         sides = []
+        zero_cost_sides = 0
         if ask is not None:
             fee = RM.taker_fee_unit(ask, mult["taker"])
             cost = ask + fee
-            sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "YES", "entry": ask, "cost": cost, "roi": (q - cost) / cost})
+            else:
+                zero_cost_sides += 1
         if bid is not None:
             pno = 1 - bid
             fee = RM.taker_fee_unit(pno, mult["taker"])
             cost = pno + fee
-            sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
+            if cost > 0:
+                sides.append({"side": "NO", "entry": pno, "cost": cost, "roi": (1 - q - cost) / cost})
+            else:
+                zero_cost_sides += 1
+        if zero_cost_sides:
+            # Counted, not silently dropped: a pinned $0.00/$1.00 candle is a fact about the
+            # market's quote, and the replay must say how many sides it refused to price.
+            skip["side pinned at $0.00 (ROI undefined)"] = skip.get("side pinned at $0.00 (ROI undefined)", 0) + zero_cost_sides
         # Only the price-side gates the replay can honestly apply.
         sides = [s for s in sides
                  if f["min_entry_price"] <= s["entry"] <= f["max_entry_price"] and s["roi"] > f["min_net_roi"]]

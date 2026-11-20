@@ -1,5 +1,5 @@
 {
- "note": "FIXTURE for tests only \u2014 NOT market data. These round numbers exist to prove the browser model (assets/live.js) and the CI model (scripts/roi_model.py) compute identical values. now_ms is pinned so close_time offsets stay deterministic. 15 cases, one per branch worth pinning: qualifying pick, wide spread, thin book, book absent but quote sizes present, zero-fee series, keyword-only topic, past close, no close time, extreme price, low volume, downward tilt, catalyst URL in rules, one-sided quote, no quote at all, and no depth information at all (the depth gate must be skipped, not treated as zero).",
+ "note": "FIXTURE for tests only \u2014 NOT market data. These round numbers exist to prove the browser model (assets/live.js) and the CI model (scripts/roi_model.py) compute identical values. now_ms is pinned so close_time offsets stay deterministic. 15 cases, one per branch worth pinning: qualifying pick, wide spread, thin book, book absent but quote sizes present, zero-fee series, keyword-only topic, past close, no close time, extreme price, low volume, downward tilt, catalyst URL in rules, one-sided quote, no quote at all, and no depth information at all (the depth gate must be skipped, not treated as zero). Cases 16-17 pin the zero-cost quote the demo book really produces (16 observed verbatim, 17 its constructed mirror, each labelled in provenance): a side whose cost is $0.00 is left unpriced, never scored as an infinite ROI.",
  "now_ms": 1795183200000,
  "cases": [
   {
@@ -425,6 +425,74 @@
     "now_ms": 1795183200000,
     "momentum_dollars": 0.12,
     "series_ticker": "KXAAAGASM"
+   }
+  },
+  {
+   "name": "pinned-zero-ask-yes-side-unpriced",
+   "market": {
+    "ticker": "KXAAAGASD-26NOV21-3.7300",
+    "event_ticker": "KXAAAGASD-26NOV21",
+    "title": "Will average **gas prices** be above $3.7300?",
+    "yes_bid_dollars": 0.0,
+    "yes_ask_dollars": 0.0,
+    "last_price_dollars": 0.0,
+    "no_bid_dollars": 1.0,
+    "no_ask_dollars": 1.0,
+    "volume_fp": 0.0,
+    "volume_24h_fp": 0.0,
+    "open_interest_fp": 0.0,
+    "category_id": "gas",
+    "category_basis": "keyword",
+    "status": "active",
+    "result": null,
+    "close_time": "2026-11-21T04:59:00Z",
+    "expected_expiration_time": "2026-11-21T15:00:00Z",
+    "notional_value_dollars": 1.0
+   },
+   "book": null,
+   "ctx": {
+    "now_ms": 1795183200000,
+    "momentum_dollars": null,
+    "series_ticker": "KXAAAGASD"
+   },
+   "provenance": {
+    "status": "observed verbatim from the official demo API",
+    "snapshot": "data/live/markets.json collected_at 2026-11-20T15:19:53Z",
+    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.7300",
+    "why": "yes_ask_dollars 0.0000 makes the YES cost $0.00, so ROI = (win - cost)/cost is undefined. 127 of the 387 open in-scope markets in that snapshot have this quote. Before this case, roi_scan.py died with ZeroDivisionError and the browser model ranked the pinned quote as an infinite edge."
+   }
+  },
+  {
+   "name": "pinned-one-bid-no-side-unpriced",
+   "market": {
+    "ticker": "KXAAAGASD-26NOV21-3.7000-MIRROR",
+    "event_ticker": "KXAAAGASD-26NOV21",
+    "title": "Will average **gas prices** be above $3.7300?",
+    "yes_bid_dollars": 1.0,
+    "yes_ask_dollars": 1.0,
+    "last_price_dollars": 1.0,
+    "no_bid_dollars": 0.0,
+    "no_ask_dollars": 0.0,
+    "volume_fp": 0.0,
+    "volume_24h_fp": 0.0,
+    "open_interest_fp": 0.0,
+    "category_id": "gas",
+    "category_basis": "keyword",
+    "status": "active",
+    "result": null,
+    "close_time": "2026-11-21T04:59:00Z",
+    "expected_expiration_time": "2026-11-21T15:00:00Z",
+    "notional_value_dollars": 1.0
+   },
+   "book": null,
+   "ctx": {
+    "now_ms": 1795183200000,
+    "momentum_dollars": null,
+    "series_ticker": "KXAAAGASD"
+   },
+   "provenance": {
+    "status": "CONSTRUCTED \u2014 the mirror of the case above, not an observed market",
+    "why": "Pins the same branch on the other side: a YES bid at $1.0000 makes the NO cost $0.0000. No market in the 2026-11-20T15:19Z snapshot carries that quote, but the live price band makes it reachable: price_ranges [{start 0.0000, end 1.0000, step 0.0100}] (GET /markets, checked 2026-11-20), so a bid at the top of the band is a legal book state. The ticker is marked -MIRROR so this file never reads as data."
    }
   }
  ],

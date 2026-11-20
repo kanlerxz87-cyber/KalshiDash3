@@ -144,16 +144,29 @@ def score(market: dict, model: dict, book: dict | None, ctx: dict) -> dict:
         except ValueError:
             ttc_h = None
 
+    # A side is priced only when buying it actually costs something. The demo book pins whole
+    # series at $0.00/$1.00 (measured: 127 of the 387 open in-scope markets in the committed
+    # 2026-11-20T15:19Z snapshot carry yes_ask_dollars "0.0000" or yes_bid_dollars "1.0000"),
+    # and there ROI = (win − cost) / cost is undefined: a ZeroDivisionError in Python and
+    # +Infinity in the browser, which ranked a pinned quote as an infinite edge. The side is
+    # dropped with a stated reason instead, and the market then falls to the "no buyable side"
+    # gate below — so it is reported as unpriced, never as a number.
     sides = []
     if ask is not None:
         fee = taker_fee_unit(ask, mult["taker"])
         cost = ask + fee
-        sides.append({"side": "YES", "entry": ask, "fee_unit": fee, "cost": cost, "ev": q - cost, "roi": (q - cost) / cost})
+        if cost > 0:
+            sides.append({"side": "YES", "entry": ask, "fee_unit": fee, "cost": cost, "ev": q - cost, "roi": (q - cost) / cost})
+        else:
+            reasons.append("YES ask $0.00: cost zero, so ROI divides by zero — side left unpriced")
     if bid is not None:
         pno = 1 - bid
         fee = taker_fee_unit(pno, mult["taker"])
         cost = pno + fee
-        sides.append({"side": "NO", "entry": pno, "fee_unit": fee, "cost": cost, "ev": 1 - q - cost, "roi": (1 - q - cost) / cost})
+        if cost > 0:
+            sides.append({"side": "NO", "entry": pno, "fee_unit": fee, "cost": cost, "ev": 1 - q - cost, "roi": (1 - q - cost) / cost})
+        else:
+            reasons.append("NO price $0.00 (YES bid $1.00): cost zero, so ROI divides by zero — side left unpriced")
     best = sorted(sides, key=lambda s: -s["roi"])[0] if sides else None
 
     fail = []

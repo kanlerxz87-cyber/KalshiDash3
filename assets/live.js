@@ -141,17 +141,29 @@ const KDLIVE = (() => {
     const ttcH = m.close_time ? ((Date.parse(m.close_time) - ctx.now_ms) / 3600000) : null;
 
     // Both sides, priced the way an order would actually be filled.
+    // A side is priced only when buying it actually costs something: the demo book pins whole
+    // series at $0.00/$1.00, where ROI = (win − cost) / cost is undefined (+Infinity here, a
+    // ZeroDivisionError in the Python twin). Drop the side with a stated reason instead.
+    // Mirrors roi_model.score() exactly (parity: scripts/tests/test_roi_parity.py).
     const sides = [];
     if (ask !== null) {
       const fee = takerFeeUnit(ask, mult.taker);
       const cost = ask + fee;
-      sides.push({ side: "YES", entry: ask, fee_unit: fee, cost, ev: q - cost, roi: (q - cost) / cost });
+      if (cost > 0) {
+        sides.push({ side: "YES", entry: ask, fee_unit: fee, cost, ev: q - cost, roi: (q - cost) / cost });
+      } else {
+        reasons.push("YES ask $0.00: cost zero, so ROI divides by zero — side left unpriced");
+      }
     }
     if (bid !== null) {
       const pno = 1 - bid;
       const fee = takerFeeUnit(pno, mult.taker);
       const cost = pno + fee;
-      sides.push({ side: "NO", entry: pno, fee_unit: fee, cost, ev: 1 - q - cost, roi: (1 - q - cost) / cost });
+      if (cost > 0) {
+        sides.push({ side: "NO", entry: pno, fee_unit: fee, cost, ev: 1 - q - cost, roi: (1 - q - cost) / cost });
+      } else {
+        reasons.push("NO price $0.00 (YES bid $1.00): cost zero, so ROI divides by zero — side left unpriced");
+      }
     }
     const best = sides.slice().sort((a, b) => b.roi - a.roi)[0] || null;
 

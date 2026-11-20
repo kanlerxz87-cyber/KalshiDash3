@@ -24,10 +24,23 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "scripts" / "tests"))
 
+import datetime as _dt
+
 import roi_scan  # noqa: E402
 import collect  # noqa: E402
 
-CLOSE = "2026-11-20T17:00:00Z"
+# Derived from the clock, never hard-coded. An earlier revision pinned CLOSE to
+# "2026-11-20T17:00:00Z"; roi_scan scores against the real wall clock, so once that hour
+# passed every fixture market tripped the "already past close_time" gate, the scan produced
+# zero picks, and this test failed for a reason that had nothing to do with the code — while
+# still having passed in CI an hour earlier. A test whose fixture expires is a test that
+# silently stops testing, so the open fixtures are always three hours ahead of now.
+def _hours_ahead(h: float) -> str:
+    t = _dt.datetime.now(_dt.timezone.utc) + _dt.timedelta(hours=h)
+    return t.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+CLOSE = _hours_ahead(3)
 
 
 def mkt(t, bid, ask, last, vol24, title, close=CLOSE, status="active", result=None, vb="900.00", va="800.00"):
@@ -60,11 +73,14 @@ OPEN = [
 OPEN[1]["yes_bid_size_fp"] = "20.00"
 OPEN[1]["yes_ask_size_fp"] = "0.00"
 
+# A settled market must sit in the PAST, so both are derived from the clock too (an earlier
+# revision had the golf one closing 2026-11-21T23:00Z — "settled" with a future close_time,
+# which is a state the API cannot return).
 SETTLED = [
     mkt("KXAAAGASM-26NOV19-4.00", 0.60, 0.62, 0.61, 1200.0, "US average gas price on Nov 19?",
-        close="2026-11-19T22:00:00Z", status="finalized", result="no"),
+        close=_hours_ahead(-8), status="finalized", result="no"),
     mkt("KXPGATOUR-26NOV21-T1", 0.55, 0.57, 0.56, 8000.0, "The RSM Classic: winner 1?",
-        close="2026-11-21T23:00:00Z", status="finalized", result="yes"),
+        close=_hours_ahead(-3), status="finalized", result="yes"),
 ]
 
 BOOKS = {
