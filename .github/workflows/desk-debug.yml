@@ -1,0 +1,62 @@
+name: Desk diagnostic (capture the scan failure)
+
+# TEMPORARY diagnostic workflow. desk.yml's "Scan the demo API" step failed on main at
+# 2026-11-20T15:19:30Z and the raw log is served from a blob host this sandbox cannot
+# reach, so the traceback is captured to a file and committed back to the DISPATCHING
+# branch only, where it can be read through the repository API. No data is written.
+on:
+  workflow_dispatch:
+    inputs:
+      validate:
+        description: "settled markets to replay (0 disables)"
+        required: false
+        default: "8"
+
+permissions:
+  contents: write
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run the scan, capturing everything
+        env:
+          VALIDATE: ${{ github.event.inputs.validate }}
+        run: |
+          set +e
+          {
+            echo "# desk diagnostic $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "## python: $(python3 -V)"
+            echo "## step: scripts/roi_scan.py --validate ${VALIDATE:-8} --out /tmp/roi.json"
+            timeout 900 python3 scripts/roi_scan.py --validate "${VALIDATE:-8}" --out /tmp/roi.json 2>&1
+            echo "## roi_scan exit: $?"
+            echo "## step: validate_roi.py on the produced file"
+            python3 scripts/tests/validate_roi.py /tmp/roi.json 2>&1
+            echo "## validate exit: $?"
+            echo "## step: exchange status probe"
+            curl -sS -m 30 -o /tmp/st.json -w 'HTTP %{http_code}\n' https://external-api.demo.kalshi.co/trade-api/v2/exchange/status
+            head -c 300 /tmp/st.json; echo
+            echo "## step: first page of GET /markets?status=open&mve_filter=exclude&limit=2"
+            curl -sS -m 30 -o /tmp/m.json -w 'HTTP %{http_code}\n' "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&mve_filter=exclude&limit=2"
+            head -c 200 /tmp/m.json; echo
+            echo "## step: GET /markets?status=settled&limit=2"
+            curl -sS -m 30 -o /tmp/s.json -w 'HTTP %{http_code}\n' "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=2"
+            head -c 200 /tmp/s.json; echo
+            echo "## step: /series first page HTTP code"
+            curl -sS -m 30 -o /tmp/ser.json -w 'HTTP %{http_code}\n' "https://external-api.demo.kalshi.co/trade-api/v2/series?limit=1"
+            head -c 200 /tmp/ser.json; echo
+          } > data/live/desk-diagnostic.txt 2>&1
+          wc -c data/live/desk-diagnostic.txt
+      - name: Commit the diagnostic to this branch
+        run: |
+          set -euo pipefail
+          git config user.name  "desk-diagnostic-bot"
+          git config user.email "desk-diagnostic-bot@users.noreply.github.com"
+          git add -f data/live/desk-diagnostic.txt
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -q -m "diag: capture desk scan output ($(date -u +%H:%MZ))"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
