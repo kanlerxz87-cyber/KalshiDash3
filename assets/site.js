@@ -112,6 +112,8 @@ const KD = (() => {
       ["executive-summary.html", "Summary"],
       ["categories.html", "Categories"],
       ["dashboard.html", "Live Dashboard"],
+      ["alerts.html", "Alert Chats"],
+      ["trading.html", "Auto-Sim"],
       ["portfolio.html", "Portfolio"],
       ["strategies.html", "Strategies"],
       ["simulation.html", "Paper trading"],

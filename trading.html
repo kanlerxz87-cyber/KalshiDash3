@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auto-sim trading engine — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+<style>
+  .badge.dim { background:transparent; color:var(--mut); border:1px solid var(--line); }
+  .badge.ok { background:#0f4d3a; color:#7ce8bb; }
+  .badge.bad { background:#5b2620; color:#ffb3a7; }
+  .badge.warn { background:#5a4a1f; color:#ffe08a; }
+  .autosim-tag { display:inline-block; background:#3a2f0f; color:#ffe08a; border:1px solid #6b5a1f;
+                 border-radius:6px; padding:2px 10px; font-size:12px; letter-spacing:1px; }
+  .spark { width:100%; height:120px; }
+  .strategy-card { border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin-bottom:8px; }
+  .strategy-card h4 { margin:0 0 4px 0; font-size:14px; display:flex; gap:10px; align-items:center; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Auto-sim trading engine <span class="autosim-tag">AUTO-SIM · PAPER ONLY</span></h1>
+  <p class="lede">
+    Automated simulated trades that test strategies against live demo-API prices. The engine runs by itself:
+    it watches the same ≥$0.10 swing alerts as the <a href="alerts.html">alert chats</a>, opens and closes
+    paper positions, settles them from the API's literal <code>result</code> field, and categorises every trade
+    by strategy, topic and price band. It places <b>no real orders</b> — demo order placement needs API keys
+    that do not exist yet (<a href="flagged.html">F-07, F-27</a>). The ledger lives in this browser
+    (<code>localStorage</code>) and can be exported.
+  </p>
+
+  <div class="notice warn">
+    <b>What "simulated" means here, precisely.</b> Entry fills are simulated at the best quoted ask for the side
+    bought (YES ask, or the NO ask derived from the YES bid per the documented reciprocal order-book relationship —
+    <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Order Book Responses</a>).
+    Exits fill at the YES bid when quoted, otherwise the last traded price; exits that would need an unquoted price are
+    not taken. Fees are modelled at the documented general taker rate <code>ceil(M×0.07×C×P×(1−P))</code>
+    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>); per-series
+    fee multipliers differ, so net P&amp;L is an estimate. Settlement pays $1 per winning contract because the official
+    docs state YES outcomes pay YES holders and NO outcomes pay NO holders, with zero settlement fees for simple yes/no
+    (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
+    Markets whose result is <code>scalar</code> are left open and flagged rather than guessed.
+  </div>
+
+  <div class="controls">
+    <label><input type="checkbox" id="enabled" checked> Engine running</label>
+    <label><input type="checkbox" id="stMomentum" checked> Momentum chase</label>
+    <label><input type="checkbox" id="stReversion" checked> Spike fade</label>
+    <label><input type="checkbox" id="stLongshot" checked> Favorite harvest</label>
+    <label>Per-strategy cash cap ($) <input id="cap" type="number" min="50" step="50" value="300" style="width:6em"></label>
+    <button class="ghost" id="btnExport">Export ledger JSON</button>
+    <button class="ghost" id="btnReset">Reset ledger</button>
+    <span class="small mut" id="saveNote"></span>
+  </div>
+
+  <div class="grid" id="kpis"></div>
+
+  <h2>Strategies — the exact rules the engine follows</h2>
+  <div id="strategyCards"></div>
+
+  <h2>Strategy leaderboard</h2>
+  <p class="small mut">ROI on stake = net P&amp;L ÷ gross stake placed. A strategy needs resolved trades before its
+     ROI means anything; open-only rows show <span class="na">—</span> instead of a number. Categorising trades by
+     type is the point of this page: each table below is the same ledger sliced differently.</p>
+  <div id="byStrategy"></div>
+
+  <h2>Performance by topic</h2>
+  <div id="byCategory"></div>
+
+  <h2>Performance by entry price band</h2>
+  <p class="small mut">The fee formula peaks at 50¢ and the payout profile is binary, so behaviour near 50¢ is not
+     comparable to behaviour near 90¢ — trades are grouped by entry band.</p>
+  <div id="byBand"></div>
+
+  <h2>Performance by exit reason</h2>
+  <div id="byExit"></div>
+
+  <h2>Equity curve (paper)</h2>
+  <div class="card"><canvas id="spark" class="spark" aria-label="Paper equity curve"></canvas>
+  <p class="small mut" id="sparkNote"></p></div>
+
+  <h2>Open positions</h2>
+  <div id="positions"></div>
+
+  <h2>Closed trades</h2>
+  <div id="closed"></div>
+
+  <h2>What these numbers can and cannot tell you</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Metric</th><th>Meaning</th><th>Limit you must know</th></tr></thead>
+    <tbody>
+      <tr><td>Realised net P&amp;L</td><td>Sum of closed-trade net P&amp;L, fees included.</td>
+          <td>Paper fills assume the quote was available to trade at the shown size; real fills can be partial.</td></tr>
+      <tr><td>Equity</td><td>Paper cash + open stake at entry prices.</td>
+          <td>Open stake is not marked-to-market in the headline number; unrealised estimates are per-position below.</td></tr>
+      <tr><td>Win rate</td><td>Closed trades with net P&amp;L &gt; 0 ÷ closed.</td>
+          <td>Meaningless before positions resolve or hit exits; strategies stay open until then by design.</td></tr>
+      <tr><td>Settlement P&amp;L</td><td>Positions held to resolution pay $1 per winning contract.</td>
+          <td>Only simple yes/no results settle this way; scalar results are left open (flagged F-28).</td></tr>
+    </tbody>
+  </table></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script src="assets/engine.js"></script>
+<script>
+KD.nav("trading.html");
+const AT = KDL.AT;
+
+function fmt(v, d = 2) { return v === null || v === undefined || Number.isNaN(v) ? '<span class="na">—</span>' : Number(v).toFixed(d); }
+function roi(st) { return st.stake > 0 ? st.net / st.stake : null; }
+
+function strategyTable() {
+  const s = AT.stats();
+  const rows = Object.entries(KDL.STRATS).map(([sid, st]) => {
+    const v = s.byStrategy[sid] || { n: 0, open: 0, wins: 0, losses: 0, stake: 0, fees: 0, net: 0 };
+    const r = roi(v);
+    return {
+      strategy: `<a href="strategies.html#${sid}">${KD.esc(st.label)}</a>`,
+      rule: `<span class="small mut">${KD.esc(st.rule)}</span>`,
+      n: KD.num(v.n), open: KD.num(v.open), w: `${KD.num(v.wins)} / ${KD.num(v.losses)}`,
+      stake: fmt(v.stake), fees: fmt(v.fees), net: fmt(v.net),
+      roi: r === null ? '<span class="na">—</span>' : `<span class="${r >= 0 ? "pos" : "neg"}">${(r * 100).toFixed(1)}%</span>`,
+      on: AT.cfg.strategies[sid] ? '<span class="badge ok">on</span>' : '<span class="badge dim">off</span>'
+    };
+  });
+  KD.$("#byStrategy").innerHTML = KD.table([
+    { key: "strategy", label: "Strategy" }, { key: "rule", label: "Entry rule" },
+    { key: "on", label: "State" }, { key: "n", label: "Trades", num: true }, { key: "open", label: "Open", num: true },
+    { key: "w", label: "Wins / losses", num: true }, { key: "stake", label: "Gross stake", num: true },
+    { key: "fees", label: "Fees", num: true }, { key: "net", label: "Net P&L", num: true }, { key: "roi", label: "ROI on stake", num: true },
+  ], rows, { empty: "No trades yet — the engine opens its first paper position on the next qualifying alert." });
+}
+
+function catTable() {
+  const s = AT.stats();
+  const rows = Object.entries(s.byCategory).map(([c, v]) => {
+    const r = roi(v);
+    return {
+      cat: (KD.CAT_LABEL[c] || KD.esc(c)) + (c && c !== "unknown" ? ` <a class="small" href="${c}.html">page</a>` : ""),
+      n: KD.num(v.n), open: KD.num(v.open), stake: fmt(v.stake), fees: fmt(v.fees), net: fmt(v.net),
+      roi: roi(v) === null ? '<span class="na">—</span>' : `<span class="${r >= 0 ? "pos" : "neg"}">${(r * 100).toFixed(1)}%</span>`
+    };
+  });
+  KD.$("#byCategory").innerHTML = KD.table([
+    { key: "cat", label: "Topic" }, { key: "n", label: "Trades", num: true }, { key: "open", label: "Open", num: true },
+    { key: "stake", label: "Gross stake", num: true }, { key: "fees", label: "Fees", num: true },
+    { key: "net", label: "Net P&L", num: true }, { key: "roi", label: "ROI on stake", num: true },
+  ], rows, { empty: "No trades yet." });
+}
+
+function bandTable() {
+  const s = AT.stats();
+  const rows = Object.entries(s.byBand).map(([b, v]) => {
+    const r = roi(v);
+    return { band: b, n: KD.num(v.n), stake: fmt(v.stake), fees: fmt(v.fees), net: fmt(v.net),
+      roi: r === null ? '<span class="na">—</span>' : `<span class="${r >= 0 ? "pos" : "neg"}">${(r * 100).toFixed(1)}%</span>` };
+  });
+  KD.$("#byBand").innerHTML = KD.table([
+    { key: "band", label: "Entry band" }, { key: "n", label: "Trades", num: true },
+    { key: "stake", label: "Gross stake", num: true }, { key: "fees", label: "Fees", num: true },
+    { key: "net", label: "Net P&L", num: true }, { key: "roi", label: "ROI on stake", num: true },
+  ], rows, { empty: "No trades yet." });
+}
+
+function exitTable() {
+  const s = AT.stats();
+  const rows = Object.entries(s.byExitReason).map(([b, v]) => {
+    const r = roi(v);
+    return { reason: KD.esc(b), n: KD.num(v.n), open: KD.num(v.open), net: fmt(v.net),
+      roi: r === null ? '<span class="na">—</span>' : `<span class="${r >= 0 ? "pos" : "neg"}">${(r * 100).toFixed(1)}%</span>` };
+  });
+  KD.$("#byExit").innerHTML = KD.table([
+    { key: "reason", label: "Exit reason" }, { key: "n", label: "Trades", num: true },
+    { key: "open", label: "Open", num: true }, { key: "net", label: "Net P&L", num: true }, { key: "roi", label: "ROI on stake", num: true },
+  ], rows, { empty: "No trades yet." });
+}
+
+function markSide(dir) { return dir === 1 ? '<span class="badge ok">YES</span>' : '<span class="badge bad">NO</span>'; }
+
+function positionsTable() {
+  const rows = AT.state.positions.map((p) => {
+    const m = KDL.markets.get(p.ticker) || {};
+    const yesBid = KDL.num(m.yes_bid_dollars);
+    let unreal = null, markBasis = "unquoted";
+    if (yesBid !== null) {
+      const exitYes = yesBid;
+      const entryYes = p.dir === 1 ? p.entry_price : 1 - p.entry_price;
+      unreal = p.dir === 1 ? (exitYes - entryYes) * p.count : (entryYes - exitYes) * p.count;
+      markBasis = "yes_bid";
+    }
+    return {
+      when: new Date(p.ts).toLocaleTimeString(),
+      ticker: `<span class="mono">${KD.esc(p.ticker)}</span> <a class="small" target="_blank" rel="noopener" href="https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=${encodeURIComponent(p.ticker)}">api</a>`,
+      title: KD.esc(String(p.title).slice(0, 70)),
+      side: markSide(p.dir), strat: (KDL.STRATS[p.strategy] || {}).label || KD.esc(p.strategy),
+      cat: KD.CAT_LABEL[p.category_id] || "—",
+      count: KD.num(p.count), entry: `${KD.cents(p.entry_price)} <span class="small mut">(${KD.esc(p.entry_basis)})</span>`,
+      trigger: `<span class="small mut">${KD.esc(p.trigger || "")}</span>`,
+      unreal: unreal === null ? '<span class="na">—</span>' : `<span class="${unreal >= 0 ? "pos" : "neg"}">${fmt(unreal)}</span> <span class="small mut">${markBasis}</span>`,
+      age: KD.ago(new Date(p.ts).toISOString())
+    };
+  });
+  KD.$("#positions").innerHTML = KD.table([
+    { key: "when", label: "Opened" }, { key: "ticker", label: "Market" }, { key: "title", label: "Title" },
+    { key: "side", label: "Side" }, { key: "strat", label: "Strategy" }, { key: "cat", label: "Topic" },
+    { key: "count", label: "Qty", num: true }, { key: "entry", label: "Entry (basis)" }, { key: "trigger", label: "Trigger" },
+    { key: "unreal", label: "Unrealised est.", num: true }, { key: "age", label: "Age" },
+  ], rows, { empty: "No open paper positions." });
+}
+
+function closedTable() {
+  const rows = AT.state.closed.slice().reverse().slice(0, 200).map((t) => ({
+    when: new Date(t.ts).toLocaleString(),
+    ticker: `<span class="mono">${KD.esc(t.ticker)}</span> <a class="small" target="_blank" rel="noopener" href="https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=${encodeURIComponent(t.ticker)}">api</a>`,
+    side: markSide(t.dir), strat: (KDL.STRATS[t.strategy] || {}).label || KD.esc(t.strategy),
+    cat: KD.CAT_LABEL[t.category_id] || "—",
+    count: KD.num(t.count),
+    entry: `${KD.cents(t.entry_price)} <span class="small mut">(${KD.esc(t.entry_basis)})</span>`,
+    exit: `${KD.cents(t.exit_price)} <span class="small mut">(${KD.esc(t.exit_basis)})</span>`,
+    reason: KD.esc(t.exit_reason),
+    pnl: `<span class="${t.pnl_net >= 0 ? "pos" : "neg"}">${fmt(t.pnl_net)}</span>`
+  }));
+  KD.$("#closed").innerHTML = KD.table([
+    { key: "when", label: "Opened" }, { key: "ticker", label: "Market" }, { key: "side", label: "Side" },
+    { key: "strat", label: "Strategy" }, { key: "cat", label: "Topic" }, { key: "count", label: "Qty", num: true },
+    { key: "entry", label: "Entry (basis)" }, { key: "exit", label: "Exit (basis)" },
+    { key: "reason", label: "Exit reason" }, { key: "pnl", label: "Net P&L", num: true },
+  ], rows, { empty: "No closed trades yet." });
+}
+
+function kpis() {
+  const s = AT.stats();
+  const kp = [
+    ["Paper cash", "$" + s.cash.toFixed(2)],
+    ["Equity (cash + open stake at entry)", "$" + s.equity.toFixed(2)],
+    ["Realised net P&L", `<span class="${s.realized >= 0 ? "pos" : "neg"}">$${s.realized.toFixed(2)}</span>`],
+    ["Modelled fees", "$" + s.fees.toFixed(2)],
+    ["Open positions", String(s.openCount)],
+    ["Open risk (stake at entry)", "$" + s.openRisk.toFixed(2)]
+  ];
+  KD.$("#kpis").innerHTML = kp.map(([k, v]) => `<div class="card"><div class="kpi">${v}</div><small class="mut">${k}</small></div>`).join("");
+}
+
+function spark() {
+  const cv = KD.$("#spark");
+  const closed = AT.state.closed.slice().sort((a, b) => a.ts - b.ts);
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth || 800, H = 120;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const css = getComputedStyle(document.body);
+  let eq = AT.cfg.cashStart;
+  const pts = [{ t: Date.parse(AT.state.started_at || Date.now()), v: eq }];
+  for (const t of closed) { eq += t.pnl_net; pts.push({ t: t.exit_ts, v: eq }); }
+  KD.$("#sparkNote").textContent = closed.length
+    ? `${closed.length} closed trades; equity = paper cash after each close. Start $${AT.cfg.cashStart.toFixed(2)}, now $${eq.toFixed(2)}.`
+    : "The curve draws one point per closed trade. It is empty until a trade closes — nothing is extrapolated.";
+  if (pts.length < 2) {
+    ctx.fillStyle = css.getPropertyValue("--mut") || "#888"; ctx.font = "12px system-ui";
+    ctx.fillText("Not enough closed trades to draw a curve.", 12, 24);
+    return;
+  }
+  const vs = pts.map((p) => p.v);
+  const lo = Math.min(...vs), hi = Math.max(...vs), span = Math.max(1e-9, hi - lo);
+  const X = (i) => 8 + (W - 16) * i / (pts.length - 1);
+  const Y = (v) => 10 + (H - 24) * (1 - (v - lo) / span);
+  ctx.strokeStyle = "#00b67a"; ctx.lineWidth = 2; ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(X(i), Y(p.v)) : ctx.moveTo(X(i), Y(p.v)));
+  ctx.stroke();
+  ctx.fillStyle = css.getPropertyValue("--mut") || "#888"; ctx.font = "11px ui-monospace,monospace";
+  ctx.fillText("$" + hi.toFixed(2), 6, 14);
+  ctx.fillText("$" + lo.toFixed(2), 6, H - 4);
+}
+
+function renderAll() { kpis(); strategyTable(); catTable(); bandTable(); exitTable(); positionsTable(); closedTable(); spark(); }
+
+function syncControls() {
+  KD.$("#enabled").checked = AT.cfg.enabled;
+  KD.$("#stMomentum").checked = !!AT.cfg.strategies.momentum;
+  KD.$("#stReversion").checked = !!AT.cfg.strategies.reversion;
+  KD.$("#stLongshot").checked = !!AT.cfg.strategies.longshot;
+  KD.$("#cap").value = AT.cfg.perStrategyCashCap;
+  KD.$("#saveNote").textContent = `ledger: ${AT.state.positions.length} open, ${AT.state.closed.length} closed · started ${new Date(AT.state.started_at).toLocaleString()}`;
+}
+
+function strategyCards() {
+  KD.$("#strategyCards").innerHTML = Object.values(KDL.STRATS).map((s) =>
+    `<div class="strategy-card" id="${s.id}">
+      <h4>${KD.esc(s.label)} <span class="small mut">size ${s.size} contracts · max ${s.maxOpen} open · cooldown ${s.cooldownMs / 60000}min</span></h4>
+      <div class="small">Entry: ${KD.esc(s.rule)}</div>
+      <div class="small mut">Exit: ${KD.esc(s.exit)}</div>
+    </div>`).join("");
+}
+
+KD.$("#enabled").addEventListener("change", (e) => { AT.cfg.enabled = e.target.checked; AT.save(); syncControls(); });
+for (const [id, key] of [["#stMomentum", "momentum"], ["#stReversion", "reversion"], ["#stLongshot", "longshot"]]) {
+  KD.$(id).addEventListener("change", (e) => { AT.cfg.strategies[key] = e.target.checked; AT.save(); renderAll(); });
+}
+KD.$("#cap").addEventListener("change", (e) => { AT.cfg.perStrategyCashCap = Math.max(50, Number(e.target.value) || 300); AT.save(); });
+KD.$("#btnReset").addEventListener("click", () => { AT.reset(); renderAll(); syncControls(); });
+KD.$("#btnExport").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({ cfg: AT.cfg, state: AT.state, stats: AT.stats() }, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = "kalshidash3-autosim-ledger.json"; a.click();
+});
+window.addEventListener("resize", spark);
+
+async function boot() {
+  AT.load();
+  strategyCards();
+  syncControls();
+  renderAll();
+  KDL.onAlert(() => { renderAll(); syncControls(); });
+  KDL.onRows(() => { renderAll(); });
+  // Snapshot + collector history so the engine has a market universe without live REST…
+  const snap = await KDL.loadSnapshot();
+  KDL.ingest((snap?.open_markets || []).concat(snap?.settled_markets || []), "collector", { silent: true });
+  // …then go live if the browser can reach the demo API.
+  const ok = await KDL.probe();
+  if (ok) {
+    const rows = (snap?.open_markets || []).filter((r) => r.last_price_dollars !== null)
+      .sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0));
+    KDL.setWatch(rows.slice(0, 60).map((r) => r.ticker));
+    KDL.start(10000);
+  }
+}
+boot();
+</script>
+</body></html>
