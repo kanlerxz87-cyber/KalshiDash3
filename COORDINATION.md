@@ -349,3 +349,27 @@ internal cross-checks; that limitation is stated rather than papered over.
   alerts.html reports `live · REST OK` with ticks from the user's browser, 8 alerts in view across both chats
   (collector history + live ticks), model picks rendering score reasons. Local curl cannot reach github.io from the
   build sandbox (no route), so verification used an external page fetcher. T11-T15 complete; board closed for this session.
+
+---
+
+## Session `arena-d022c8de` — browser-live layer + fee-aware ROI model with out-of-sample validation
+
+Branch `arena/d022c8de-kalshidash3`, rebased onto `main@0a7067d` (PR #16 alert feeds) at claim time. Claimed
+2026-11-20 13:25 UTC, before writing any code.
+
+Coordination read before claiming: `arena-6a3c4e55` holds T11 (alert feeds/`detect_alerts.py`/`alerts.html`) and
+T12 (`simulate_strategies.py`, automated simulated trades). `arena-5225610f` has `scripts/build_alerts.py`,
+`data/alert_rules.json`, `data/live/alerts.json`, `alerts.html` on its branch. `arena-6d85f8f0` T11 is done and
+merged via PR #16. This session therefore **does not touch**: `dashboard.html`, `alerts.html`, `assets/site.css`,
+`scripts/build_alerts.py`, `scripts/detect_alerts.py`, `scripts/simulate_strategies.py`, `data/live/alerts.json`,
+`data/alert_rules.json`, `strategies.html`, `portfolio.html`, `scripts/collect.py`, `.github/workflows/collect.yml`.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|----------------|----------------|
+| T13 | Browser-live data layer: direct public demo REST polling from the page (tick-level prices, multi-market order books, candlesticks) with explicit runtime mode detection and automatic fallback to the committed snapshot; shared engine used by every page that opts in | in progress | arena-d022c8de | `assets/live.js`, `assets/live.css`, `live.html`, `scripts/tests/test_live_engine.mjs` | Official docs re-fetched 2026-11-20: https://docs.kalshi.com/api-reference/market/get-markets (query params `limit`≤1000, `status`, `tickers`, `mve_filter`, `series_ticker`), https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks (`GET /markets/orderbooks?tickers=`, 1–100 tickers, `{orderbooks:[{ticker,orderbook_fp}]}`), https://docs.kalshi.com/api-reference/market/get-market-candlesticks (`period_interval` 1/60/1440 only), https://docs.kalshi.com/getting_started/orderbook_responses (bids only, ascending, best last; no auth needed), https://docs.kalshi.com/getting_started/quick_start_websockets (handshake auth required even for public channels ⇒ a browser cannot open an unauthenticated WS) | CORS of the demo REST endpoints is not documented anywhere on docs.kalshi.com; the page detects it at runtime and labels the mode instead of assuming it |
+| T14 | Fee-aware high-ROI screen: one documented, parameterised model (JSON) read by both the browser and CI, with an out-of-sample hit-rate measurement against markets that later settled | in progress | arena-d022c8de | `data/roi_model.json`, `scripts/roi_scan.py`, `scripts/tests/validate_roi.py`, `roi.html`, `data/live/roi.json` | Fee formula and per-series multipliers transcribed from https://kalshi.com/docs/kalshi-fee-schedule.pdf (general taker `roundup(M×0.07×C×P×(1−P))`, maker `roundup(M×0.0175×C×P×(1−P))`, maker multiplier defaults to 0); settlement `$1.00` YES / `$0.00` NO per https://docs.kalshi.com/getting_started/market_settlement | A "high ROI" claim is a modelled edge, not a guarantee; the model is measured on DEMO data, which Kalshi states may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env) |
+| T15 | Catalyst links on ≥$0.10 moves, built only from URLs that the market's own official record contains | in progress | arena-d022c8de | part of `assets/live.js`, `live.html`, `scripts/roi_scan.py` | `GET /markets` has **no** news/URL field (response schema lists `rules_primary`, `rules_secondary`, `yes_sub_title`, `subtitle`, none of them a URL field) ⇒ any link is extracted verbatim from those official text fields, and when no URL is present the cell is left blank and labelled as such | Causality is never asserted: a link found in a market's rules text is labelled "the source this market settles on", not "the news that moved it" |
+| T16 | Scheduled live-desk collection (10-min) independent of the 20-min collector, so the fallback path is also fresher | in progress | arena-d022c8de | `.github/workflows/desk.yml`, `data/live/roi.json`, `data/live/desk.json` | Runs the same `scripts/roi_scan.py` that CI validation checks; validator refuses a snapshot without provenance | New workflow files registered from a token may not appear immediately (seen before in this repo); `workflow_dispatch` is used to prove it runs |
+
+Log:
+- 2026-11-20 13:25 UTC: Claimed T13–T16 and pushed the claim before implementing. Rebased on `main@0a7067d`.
