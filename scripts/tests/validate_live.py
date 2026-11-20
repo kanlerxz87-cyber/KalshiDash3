@@ -9,6 +9,7 @@ Run: python3 scripts/tests/validate_live.py
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from datetime import datetime
@@ -44,6 +45,66 @@ SEED_SERIES = load_seed_series()
 def check(cond: bool, msg: str) -> None:
     if not cond:
         errors.append(msg)
+
+
+def check_simulation() -> None:
+    """Simulation-only check. Runs only when data/live/simulation.json exists.
+
+    Every paper position must (a) come from an archived alert, (b) use an entry
+    price in 0.01-0.99 and the official taker fee for its series, and (c) have a
+    realised result that recomputes from the stored result and entry.
+    """
+    path = LIVE / "simulation.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    check(doc.get("schema") == 1, "simulation.json schema must be 1")
+    check("PAPER" in str(doc.get("mode", "")), "simulation must be labelled PAPER ONLY")
+    check(bool(doc.get("disclaimers")), "simulation disclaimers missing")
+
+    strat = json.loads((ROOT / "data" / "strategies.json").read_text())
+    check(
+        [x["id"] for x in doc.get("strategies") or []] == [x["id"] for x in strat["strategies"]],
+        "simulation strategies must match data/strategies.json",
+    )
+
+    archive_path = LIVE / "alerts_archive.json"
+    archive_keys = set()
+    if archive_path.exists():
+        for a in json.loads(archive_path.read_text()).get("alerts", []):
+            archive_keys.add(f"{a['ticker']}@{a['from_time']}>{a['to_time']}")
+
+    spec = importlib.util.spec_from_file_location("simulate", ROOT / "scripts" / "simulate.py")
+    sim = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sim)
+
+    for group in ("open_positions", "settled_positions"):
+        for pos in doc.get(group) or []:
+            tag = f"{group[:-1]} {pos.get('id')}"
+            entry = float(pos["entry_price"])
+            check(0.01 <= entry <= 0.99, f"{tag} entry outside 0.01-0.99")
+            mult = int(pos["taker_multiplier"])
+            check(
+                abs(float(pos["entry_fee"]) - sim.taker_fee(entry, int(pos["contracts"]), mult)) < 1e-9,
+                f"{tag} entry fee does not match the official taker formula",
+            )
+            check(pos.get("side") in ("yes", "no"), f"{tag} bad side")
+            check(
+                pos.get("alert_key") in archive_keys if archive_keys else False,
+                f"{tag} alert_key is not in data/live/alerts_archive.json",
+            )
+            if pos.get("status") == "settled":
+                payoff = 1.0 if pos.get("settled_result") == pos.get("side") else 0.0
+                expect = round(payoff - entry - float(pos["entry_fee"]), 4)
+                check(
+                    abs(float(pos["realized_net"]) - expect) < 1e-9,
+                    f"{tag} realized_net does not recompute",
+                )
+    for st in doc.get("strategies") or []:
+        check(
+            st.get("settled", 0) == st.get("wins", 0) + st.get("losses", 0),
+            f"strategy {st.get('id')} win/loss does not add up to settled",
+        )
 
 
 def main() -> int:
@@ -113,26 +174,29 @@ def main() -> int:
             prices = [x["price"] for x in rows]
             check(prices == sorted(prices), f"{liq.get('ticker')} {side} not ascending")
 
-    # Optional companion files: alert history and the CORS header probe.
+    # Alert feed (written by scripts/build_alerts.py) and the CORS header probe.
+    # alerts.json schema is the parallel sessions' build_alerts.py output:
+    # all_events[] with from_price/to_price/delta/direction.
     alerts_path = LIVE / "alerts.json"
     if alerts_path.exists():
         adoc = json.loads(alerts_path.read_text())
         check(adoc.get("schema") == 1, "alerts.json schema must be 1")
         check(float(adoc.get("threshold_dollars") or 0) == 0.10, "alerts.json threshold_dollars must be 0.10")
-        for a in adoc.get("alerts") or []:
+        for a in adoc.get("all_events") or []:
             d = a.get("delta")
             if d is not None:
-                check(abs(float(d)) >= 0.10 - 1e-9, f"alert {a.get('id')} delta {d} is below the $0.10 requirement")
-                check((float(d) > 0) == (a.get("dir") == "up"), f"alert {a.get('id')} direction contradicts its delta")
-            check(str((a.get("links") or {}).get("api_query", "")).startswith("https://"),
-                  f"alert {a.get('id')} api_query link must be https")
-            check(a.get("origin") == "collector", f"alert {a.get('id')} must carry origin=collector in the committed file")
+                check(abs(float(d)) >= 0.10 - 1e-9, f"alert {a.get('ticker')}@{a.get('to_time')} delta {d} is below the $0.10 requirement")
+                check((float(d) > 0) == (a.get("direction") == "up"), f"alert {a.get('ticker')}@{a.get('to_time')} direction contradicts its delta")
+            check(str(a.get("market_source", "")).startswith("https://"),
+                  f"alert {a.get('ticker')}@{a.get('to_time')} market_source must be https")
+            check(a.get("cause_link") is None, f"alert {a.get('ticker')} cause_link must stay null — causes are never invented (F-15)")
     cors_path = LIVE / "cors.json"
     if cors_path.exists():
         cdoc = json.loads(cors_path.read_text())
         check(bool(cdoc.get("checked_at")), "cors.json checked_at missing")
         check(str(cdoc.get("origin_tested", "")).startswith("https://"), "cors.json origin_tested must be https")
         check("access_control_allow_origin" in cdoc, "cors.json must record allow-origin (or null) — never assume it")
+    check_simulation()
 
     if errors:
         print("INVALID live snapshot:", file=sys.stderr)

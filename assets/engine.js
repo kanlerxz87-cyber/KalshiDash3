@@ -215,7 +215,7 @@ window.KDL = (() => {
   // ---------------------------------------------------------------- model (transparent scorer)
   // Weights and components are published verbatim on alerts.html and
   // strategies.html. This is a heuristic screen, NOT a backtested strategy:
-  // flagged for review (F-16) — it has never been validated against fills.
+  // flagged for review (F-26) — it has never been validated against fills.
   const MODEL = {
     weights: { liquidity: 0.30, band: 0.25, momentum: 0.30, spread: 0.15 },
     threshold: 0.55,
@@ -255,7 +255,7 @@ window.KDL = (() => {
       modeled_roi_if_yes_at_ask: a.links && num(m.yes_ask_dollars) > 0
         ? Math.round(((1 - num(m.yes_ask_dollars)) / num(m.yes_ask_dollars)) * 1000) / 1000 : null,
       threshold: MODEL.threshold,
-      disclaimer: "Heuristic screen, not backtested, not advice (F-16)."
+      disclaimer: "Heuristic screen, not backtested, not advice (F-26)."
     };
     return a;
   }
@@ -416,31 +416,53 @@ window.KDL = (() => {
     return snap;
   }
 
+  // Committed server-side alerts, produced by scripts/build_alerts.py:
+  //   data/live/alerts.json          -> {all_events: [...]}  (current feed)
+  //   data/live/alerts_archive.json  -> {alerts: [...]}      (append-only history)
+  // Schema per entry: ticker, title, category_id, category_basis, from_price,
+  // to_price, delta, direction ("up"|"down"), from_time, to_time, status,
+  // volume_24h_fp, market_source, cause_link (always null — causes are never
+  // invented server-side), first_seen_at, high_roi.
+  // The chats compute news-SEARCH lead links from the title themselves and
+  // label them unverified (F-25); cause_link stays null and untouched.
+  function collectorAlertFromEntry(a) {
+    const t = Date.parse(a.to_time || "");
+    const delta = num(a.delta);
+    const row = Object.assign({}, S.markets.get(a.ticker) || {}, a);
+    const links = marketPageLinks({ ticker: a.ticker, title: a.title });
+    if (a.market_source) links.api_query = a.market_source;
+    const full = makeAlert(row, num(a.from_price), num(a.to_price), delta, "collector",
+      `Server-side swing between committed observations ${a.from_time} → ${a.to_time}. ${a.cause_status || ""}`);
+    full.id = `${a.ticker}@${a.to_time}@${a.direction || (delta > 0 ? "up" : "down")}`;
+    if (!Number.isNaN(t)) full.ts = t;
+    full.high_roi_screen = a.high_roi === true;
+    full.ts_source = a.to_time || null;
+    return full;
+  }
+
   async function loadCollectorAlerts(base = "") {
-    let doc = null;
-    try { doc = await (await fetch(base + "data/live/alerts.json", { cache: "no-store" })).json(); } catch { doc = null; }
-    if (!doc || !Array.isArray(doc.alerts)) return [];
-    const known = new Set(feedAlerts().map((a) => a.id));
     const revived = [];
-    for (const a of doc.alerts) {
-      if (known.has(a.id)) continue;
-      const r = S.markets.get(a.ticker) || a;
-      const full = makeAlert(Object.assign({}, r, a), a.from, a.to, a.delta, "collector", a.note || null);
-      // Preserve the collector's own identity so reloading the page never
-      // duplicates or re-dates committed alerts.
-      full.id = a.id || full.id;
-      const parsed = Date.parse(a.ts || "");
-      if (!Number.isNaN(parsed)) full.ts = parsed;
-      scoreAlert(full);
-      pushAlert(full);
-      revived.push(full);
+    const known = new Set(feedAlerts().map((a) => a.id));
+    for (const path of ["data/live/alerts_archive.json", "data/live/alerts.json"]) {
+      let doc = null;
+      try { doc = await (await fetch(base + path, { cache: "no-store" })).json(); } catch { doc = null; }
+      const entries = doc ? (doc.alerts || doc.all_events || []) : [];
+      for (const a of entries) {
+        if (!a || !a.ticker || num(a.delta) === null) continue;
+        const full = collectorAlertFromEntry(a);
+        if (known.has(full.id)) continue;
+        known.add(full.id);
+        scoreAlert(full);
+        pushAlert(full);
+        revived.push(full);
+      }
     }
     return revived;
   }
 
   // ---------------------------------------------------------------- AUTO-SIM (paper trading engine)
   // Labelled AUTO-SIM everywhere. It NEVER places real orders: demo order
-  // placement needs API keys the project does not have (flagged.html F-07/F-17).
+  // placement needs API keys the project does not have (flagged.html F-07/F-27).
   const STRATS = {
     momentum: {
       id: "momentum", label: "Momentum chase",

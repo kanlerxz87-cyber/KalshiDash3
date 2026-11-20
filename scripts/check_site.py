@@ -95,8 +95,8 @@ def check_page(page: Path) -> None:
 
 def check_data() -> None:
     for rel in ("data/live/markets.json", "data/live/price_history.json",
-                "data/live/alerts.json", "data/live/cors.json",
-                "data/verified_facts.json", "data/findings.json", "data/categories.json"):
+                "data/live/alerts.json", "data/live/alerts_archive.json", "data/live/cors.json",
+                "data/alert_rules.json", "data/verified_facts.json", "data/findings.json", "data/categories.json"):
         path = ROOT / rel
         if not path.exists():
             if rel.startswith("data/live/"):

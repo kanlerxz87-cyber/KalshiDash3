@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-20",
- "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp. Entries V-01+ were added by session arena-a2fca5db; the V- prefix avoids colliding with the older F- fact IDs.",
+ "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
  "facts": [
   {
    "id": "F-01",
@@ -364,6 +364,38 @@
    "note": "Relevant to fee modelling: at 0.94 the taker fee is 0.07 x 0.94 x 0.06 = 0.0039 per contract, far below the ~0.0175 at 50 cents, so fee drag is not uniform across the ranking."
   },
   {
+   "id": "F-50",
+   "claim": "Markets in the demo environment may not behave like real markets",
+   "value": "\"The price and behavior of markets in the demo environment may not be reflective of those in real markets.\"",
+   "source": "https://docs.kalshi.com/getting_started/demo_env",
+   "verified": true,
+   "note": "Read 2026-11-20. Every paper result on simulation.html inherits this limit (see F-08)."
+  },
+  {
+   "id": "F-51",
+   "claim": "A market's result is set when it is determined; payout happens when it is finalized",
+   "value": "Statuses closed -> determined (result set to yes/no/scalar; settlement timer runs) -> finalized (positions paid; settlement_ts populated). REST settled = finalized.",
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "verified": true,
+   "note": "Read 2026-11-20. scripts/simulate.py settles a paper position only on a yes or no result in the collector's settled list. A disputed market can be re-determined (disputed, amended)."
+  },
+  {
+   "id": "F-52",
+   "claim": "Yes/no settlement pays $1 per net contract to the holders of the winning side",
+   "value": "Yes outcome: yes holders receive $1 per contract. No outcome: no holders receive $1 per contract.",
+   "source": "https://docs.kalshi.com/getting_started/market_settlement",
+   "verified": true,
+   "note": "Read 2026-11-20. Basis for the payoff used by scripts/simulate.py (payoff 1.00 minus entry minus entry fee). Same page: fees are zero for simple yes/no determinations."
+  },
+  {
+   "id": "F-53",
+   "claim": "An empty or mistyped ticker returns 200 with empty order-book arrays, not 404",
+   "value": "GET /markets/{ticker}/orderbook returns empty yes_dollars and no_dollars for an unknown or archived ticker. Check GET /markets/{ticker} to tell them apart.",
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "verified": true,
+   "note": "Read 2026-11-20. Empty books in the collector's liquidity block must not be read as 'no liquidity' without this check."
+  },
+  {
    "id": "V-01",
    "claim": "GET /markets with `tickers` as the only filter returns every matching market in one response; `limit` is not applied and the returned cursor is empty",
    "value": "documented paging rule used by the in-browser live poller",
@@ -402,8 +434,8 @@
   }
  ],
  "counts": {
-  "facts": 54,
-  "verified": 53,
+  "facts": 58,
+  "verified": 57,
   "unverified": 1
  }
 }

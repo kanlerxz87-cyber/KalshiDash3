@@ -116,6 +116,7 @@ const KD = (() => {
       ["trading.html", "Auto-Sim"],
       ["portfolio.html", "Portfolio"],
       ["strategies.html", "Strategies"],
+      ["simulation.html", "Paper trading"],
       ["suggestions.html", "Suggestions"],
       ["questions.html", "Questions"],
       ["verification.html", "Verification"],

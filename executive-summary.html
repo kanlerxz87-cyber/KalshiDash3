@@ -42,22 +42,25 @@
           <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between its runs (~20 min) (<a href="flagged.html">F-14</a>).</td></tr>
       <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
           <td><span class="badge ok">done, labelled as leads</span></td><td>Alert bubbles + chart markers on the dashboard</td>
-          <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-15</a>).</td></tr>
+          <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-25</a>).</td></tr>
       <tr><td>Automate simulated trades to test different strategies</td>
           <td><span class="badge ok">done — paper only</span></td><td><a href="trading.html">Auto-sim</a></td>
-          <td>Three disclosed strategies run automatically on live prices, settle from the API's literal <code>result</code>, and report net-of-fee P&amp;L by strategy/topic/band. Paper fills only: no demo credentials exist (<a href="flagged.html">F-17</a>; model unbacktested <a href="flagged.html">F-16</a>).</td></tr>
+          <td>Three disclosed strategies run automatically on live prices, settle from the API's literal <code>result</code>, and report net-of-fee P&amp;L by strategy/topic/band. Paper fills only: no demo credentials exist (<a href="flagged.html">F-27</a>; model unbacktested <a href="flagged.html">F-26</a>).</td></tr>
       <tr><td>Show current liquidity — how many contracts are available at a given price</td>
           <td><span class="badge ok">done</span></td><td>Liquidity ladder on the dashboard</td>
-          <td>Depth is a point-in-time read; with live mode on, the selected market's book refreshes each poll.</td></tr>
+          <td>Depth is a point-in-time read and goes stale between collector runs; with live mode on, the selected market's book refreshes each poll. <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Official orderbook API</a></td></tr>
+      <tr><td>Alert on price swings of at least $0.10 with all-event and filtered feeds</td>
+          <td><span class="badge ok">done · snapshot + live</span></td><td><a href="dashboard.html#alertsTitle">Dashboard alert feeds</a> · <a href="alerts.html">Alert chats</a></td>
+          <td>The dashboard scans consecutive committed observations (the collector runs every 20 minutes, so this is not tick-level streaming). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
-          <td>Fifteen suggestions; seven shipped (correctness fixes and the live/alert/auto-sim layer), eight awaiting your decision.</td></tr>
+          <td>Seventeen suggestions across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
       <tr><td>A clear list of questions, information and answers needed before a decision</td>
           <td><span class="badge ok">done</span></td><td><a href="questions.html">Questions</a></td>
           <td>Eight questions; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>53 claims checked; 1 deliberately blank. Eighteen irregularities found and listed, including four about this session's own live layer (<a href="flagged.html">F-14–F-18</a>).</td></tr>
+          <td>53 claims checked; 1 deliberately blank. Twenty-seven irregularities found and listed across all sessions; the five added by the live/alert/auto-sim layer are F-24–F-28 (<a href="flagged.html">flagged</a>).</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>

@@ -70,7 +70,10 @@
     Kalshi documents that REST responses are cached briefly, so prices can lag the exchange by seconds — polling
     faster than that cannot add information. Unauthenticated requests have separate rate limits; the engine backs
     off exponentially on HTTP 429 (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>).
-    "News leads" links are search queries, not verified causes — causality is never asserted (see <a href="flagged.html">F-15</a>).
+    Without live REST, the chats replay the collector's committed history (<code>scripts/build_alerts.py</code> →
+    <code>data/live/alerts_archive.json</code>, an append-only archive, so swings survive a market closing).
+    "News leads" links are search queries computed from the market title, not verified causes — the archive keeps
+    <code>cause_link</code> null by design and causality is never asserted (see <a href="flagged.html">F-15, F-25</a>).
   </p>
 
   <div class="chats">
@@ -94,7 +97,7 @@
       (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>) are both maximal;
       momentum from the swing size (capped at 30¢); spread from the API bid/ask gap.
       <b>This is a heuristic screen, not a backtested strategy and not advice</b> — it is flagged for review
-      (<a href="flagged.html">F-16</a>).
+      (<a href="flagged.html">F-26</a>).
     </p>
     <p class="small mut">Category tabs filter both chats. Categories stay separate — a market is attributed to one
       topic only, either by a fee-schedule-confirmed series (<span class="badge ok">confirmed</span>) or a flagged

@@ -403,14 +403,12 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             hist = {}
     update_price_history(hist, raw["open"])
     # Only keep history for markets that are actually shown, so the file stays small.
+    # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
+    # which the collect workflow runs right after this script. This file deliberately
+    # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
     hist = {k: v for k, v in hist.items() if k in watch}
 
-    # Server-side alert history: >= $0.10 swings between consecutive committed
-    # observations, so the alert chats have content even when a browser cannot
-    # reach the API directly (see assets/engine.js for the live in-browser path).
-    rows_by_ticker = {r["ticker"]: r for r in rows["open"] + rows["settled"]}
-    alerts = compute_alerts(hist, rows_by_ticker)
 
     payload = {
         "schema": 1,
@@ -441,7 +439,6 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         "open_markets": rows["open"],
         "settled_markets": rows["settled"][:200],
         "liquidity": depth_rows,
-        "alerts_in_history": len(alerts),
         "disclaimers": [
             "All values are from the Kalshi DEMO environment (mock funds). The official docs warn that demo prices and behaviour may not reflect real markets.",
             "dollars_traded_estimate = volume_fp x last_price_dollars. It is an estimate computed here, not an official Kalshi field.",
@@ -455,68 +452,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     (LIVE / "price_history.json").write_text(
         json.dumps({"schema": 1, "note": "Observations accumulated from GET /markets last_price_dollars on each collector run. Seconds resolution is only possible by accumulation because candlesticks support 1/60/1440-minute intervals only.", "series": hist}, indent=1)
     )
-    (LIVE / "alerts.json").write_text(
-        json.dumps({
-            "schema": 1,
-            "note": "Swing alerts with |delta| >= $0.10 between consecutive committed observations. The threshold is this project's requirement, not an API field. News links are search leads, never verified causes (flagged.html F-15).",
-            "generated_at": utcnow(),
-            "threshold_dollars": 0.10,
-            "counts": {"up": sum(1 for a in alerts if a["dir"] == "up"), "down": sum(1 for a in alerts if a["dir"] == "down")},
-            "alerts": alerts,
-        }, indent=1)
-    )
-    print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets, {len(alerts)} swing alerts in history)")
+    print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets)")
     return payload
-
-
-def compute_alerts(hist, rows_by_ticker, min_delta=0.10):
-    """Cross-run swing alerts from consecutive committed observations.
-
-    The alert threshold is this project's stated requirement (>= $0.10 swings in
-    either direction); it is not an API field. Each alert compares two
-    consecutive observations of `last_price_dollars` for one market, so a slow
-    drift under $0.10 per run never fires. Links are exact public API queries,
-    plus news SEARCH links which are leads, never verified causes.
-
-    https://docs.kalshi.com/api-reference/market/get-markets
-    """
-    alerts = []
-    for ticker, series in (hist or {}).items():
-        obs = series.get("observations") or []
-        row = rows_by_ticker.get(ticker) or {}
-        for a, b in zip(obs, obs[1:]):
-            pa, pb = fnum(a.get("last")), fnum(b.get("last"))
-            if pa is None or pb is None:
-                continue
-            delta = pb - pa
-            if abs(delta) + 1e-9 < min_delta:
-                continue
-            alerts.append({
-                "id": f"{ticker}@{b.get('t')}@{'up' if delta > 0 else 'down'}",
-                "ts": b.get("t"),
-                "ticker": ticker,
-                "title": row.get("title") or ticker,
-                "category_id": row.get("category_id"),
-                "category_basis": row.get("category_basis"),
-                "from": round(pa, 4),
-                "to": round(pb, 4),
-                "delta": round(delta, 4),
-                "dir": "up" if delta > 0 else "down",
-                "status": row.get("status"),
-                "result": row.get("result"),
-                "origin": "collector",
-                "note": "Recovered from two consecutive committed collector observations (about 20 minutes apart).",
-                "links": {
-                    "api_query": f"{BASE}/markets?tickers={ticker}",
-                    "api_orderbook": f"{BASE}/markets/{ticker}/orderbook?depth=10",
-                    "demo_ui": "https://demo.kalshi.co/",
-                    "news_google": "https://news.google.com/search?q=" + urllib.parse.quote_plus(row.get("title") or ticker),
-                    "news_bing": "https://www.bing.com/news/search?q=" + urllib.parse.quote_plus(row.get("title") or ticker),
-                    "news_ddg": "https://duckduckgo.com/?q=" + urllib.parse.quote_plus(row.get("title") or ticker) + "&iax=news&ia=news",
-                },
-            })
-    alerts.sort(key=lambda x: (x.get("ts") or ""))
-    return alerts[-300:]
 
 
 def probe_cors(origin="https://kanlerxz87-cyber.github.io"):
