@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-20T19:20:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31.",
+ "generated": "2026-11-20T19:24:09Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-278443e8 updated F-30 with the successful zero-pick scan and added F-31 for the likely multi-ticker orderbook query-encoding issue (pending corrected production verification).",
  "questions": [
   {
    "id": "Q1",
@@ -633,15 +633,29 @@
   },
   {
    "id": "F-30",
-   "item": "The live-desk scan crashed on markets quoted 0.00, and because of that the high-ROI page has never shown a scan",
+   "item": "The first live-desk scan crashed on a 0.00 quote; that defect was fixed, and a scan is now committed",
    "why": "GET /markets returns yes_bid_dollars = yes_ask_dollars = last_price_dollars = \"0.0000\" for a market with no resting order on that side; measured on 127 of 387 open in-scope markets in the 2026-11-20T15:19:53Z snapshot (e.g. KXAAAGASD-26NOV21-3.7300). scripts/roi_model.py priced that side at cost = 0.00, so roi = (q - cost)/cost raised ZeroDivisionError and scripts/roi_scan.py aborted before writing data/live/roi.json. The workflow run at 19:11Z died on exactly that line (log committed by session arena-0f71797f as data/live/roi_scan_log.txt). Separately, the desk workflow's model-test step had been failing on main because scripts/tests/test_roi_scan_offline.py hard-coded an open-market close_time of 2026-11-20T17:00:00Z, which the model's own 'already past close_time' gate rejected once that date passed.",
-   "action": "Fixed and merged in PR #31 (merge b8321c4). A side is now priced only when its cost is strictly inside (0, 1) in BOTH implementations (scripts/roi_model.py and assets/live.js, parity re-pinned with 2 fixtures built from the real 0.00 quote); a degenerate level is reported as a reason and never repriced. roi_scan.py no longer discards the whole scan for one unscorable market (counts.scoring_errors). The offline fixture now derives its close times from run time. The rescheduled desk run (44800342205) succeeded and committed data/live/roi.json, so the ROI page renders a real scan for the first time.",
+   "action": "Fixed and merged in PR #31 (merge b8321c4). A side is now priced only when its cost is strictly inside (0, 1) in BOTH implementations (scripts/roi_model.py and assets/live.js, parity re-pinned with 2 fixtures built from the real 0.00 quote); a degenerate level is reported as a reason and never repriced. roi_scan.py no longer discards the whole scan for one unscorable market (counts.scoring_errors). The offline fixture now derives its close times from run time. The rescheduled desk run (44800342205) succeeded and committed data/live/roi.json, so the ROI page renders a real scan for the first time. The successful scan snapshot collected at 2026-11-20T19:15:11Z contains no eligible picks; the separate zero-orderbook issue is documented in F-31.",
    "severity": "high",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
     "https://docs.kalshi.com/getting_started/market_lifecycle",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/31",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205"
+   ]
+  },
+  {
+   "id": "F-31",
+   "item": "The latest live ROI scan reports zero orderbooks, so its zero-pick result is not yet a verified liquidity outcome",
+   "why": "The successful desk run 44800342205 committed data/live/roi.json collected at 2026-11-20T19:15:11Z: 214 open in-scope markets, orderbooks=0, eligible=0, picks=0, near_misses=2, unscoreable=212, alerts=0 and scoring_errors=0. Source inspection finds scripts/roi_scan.py books_for() sends each chunk as one comma-joined tickers value. Direct demo endpoint probes showed a comma-joined two-ticker value is treated as one combined literal ticker with empty book data, while repeated tickers query parameters return separate books; the official endpoint documents tickers as an array of 1–100 values. This makes query serialization a likely explanation for the zero book count, but no corrected production scan has confirmed it. An empty book response from this request is not evidence that the underlying markets have no resting liquidity.",
+   "action": "Keep the current snapshot result strictly as reported: it produced zero eligible picks, and no picks or liquidity should be inferred. The repeated-parameter fix was already claimed by session arena/0f71797f in the coordination history; after that fix, add/retain offline coverage, run the live desk scan and validate the committed snapshot, then update this finding from the observed result.",
+   "severity": "medium",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/roi_scan.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44800342205",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26NOV30-3.50%2CKXPGATOUR-THRC26-SSTR",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26NOV30-3.50&tickers=KXPGATOUR-THRC26-SSTR"
    ]
   }
  ]
