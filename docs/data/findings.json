@@ -1,0 +1,234 @@
+{
+  "generated": "2026-11-20",
+  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path.",
+  "questions": [
+    {
+      "id": "Q1",
+      "question": "What does 'highest dollar amount live event' mean, precisely?",
+      "known": "Kalshi returns three different dollar/volume quantities per market: volume_fp (contracts traded), volume_24h_fp (contracts traded in 24h), open_interest_fp (contracts held), and notional_value_dollars, which the OpenAPI schema defines as 'the total value of a single contract at settlement in dollars'.",
+      "unknown": "Which of these the owner wants ranked. They are not interchangeable: notional_value_dollars is a per-contract settlement value, so it is identical across many markets and useless as a size ranking.",
+      "answer_if_forced": "Rank by dollars traded = volume_fp x last_price_dollars, and label it an estimate.",
+      "decision_needed": "Confirm the ranking metric, or accept the labelled estimate.",
+      "sources": ["https://docs.kalshi.com/api-reference/market/get-markets"]
+    },
+    {
+      "id": "Q2",
+      "question": "Which Kalshi series belong to Gas Prices, Elections, Culture, Crypto and Golf?",
+      "known": "Series carry ticker, title, category and a categories list; GET /series supports a category filter that matches any entry in categories (exact, case-sensitive). The official fee schedule lists per-series tickers, which confirms a series exists.",
+      "unknown": "Kalshi publishes no canonical 'Gas Prices' / 'Culture' / 'Golf' category list in the API docs. The category strings used by the exchange were not enumerable from this sandbox in a documented way.",
+      "answer_if_forced": "Use only series tickers confirmed in the official fee schedule (KXAAAGASM; KXELECTIRAN; KXEMMY* + KXBALLONDOR; KXBTCMAX150, KXBTCY, KXETHY; KXPGATOUR, KXPGARYDER, KXPGASOLHEIM) and treat everything else as a flagged keyword match.",
+      "decision_needed": "Approve the seed list, or supply the exact category strings your account sees.",
+      "sources": ["https://kalshi.com/docs/kalshi-fee-schedule.pdf", "https://docs.kalshi.com/api-reference/market/get-series-list"]
+    },
+    {
+      "id": "Q3",
+      "question": "How can the demo portfolio be tracked if the demo account does not exist yet?",
+      "known": "Kalshi's help centre states a demo account is created by signing up at demo.kalshi.co/sign-up and that it has no preloaded funds; funds are added with test payment methods. API keys are then generated in Account Settings. Demo and production credentials are not shared.",
+      "unknown": "Whether an account already exists for this project, and, if so, its API key ID and private key. Neither was provided and neither can be created without a human signup.",
+      "answer_if_forced": "Do not invent a balance. Run the browser-side paper ledger, clearly labelled, and ship a working executor that goes live the moment keys are supplied.",
+      "decision_needed": "A human signs up and supplies KALSHI_KEY_ID + private key path (as env vars or Actions secrets). This is the single unavoidable manual step; it cannot be delegated to an agent.",
+      "sources": ["https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account", "https://docs.kalshi.com/getting_started/api_keys", "https://docs.kalshi.com/getting_started/demo_env"]
+    },
+    {
+      "id": "Q4",
+      "question": "Can the browser get true sub-second or WebSocket live prices?",
+      "known": "Every WebSocket session requires a signed API key at the handshake, including for public channels. REST market reads are cached for several seconds. Candlesticks only support 1, 60 and 1440 minute intervals.",
+      "unknown": "Nothing technical. This is settled by the docs: no anonymous WebSocket, and no sub-minute historical candles.",
+      "answer_if_forced": "Seconds-resolution charts must be built by accumulating REST observations; that is what the collector does. True tick-level streaming requires keys plus a server-side relay (a browser cannot hold the private key safely).",
+      "decision_needed": "Accept accumulated REST points, or add a key-holding relay later.",
+      "sources": ["https://docs.kalshi.com/getting_started/quick_start_websockets", "https://docs.kalshi.com/api-reference/market/get-market-candlesticks", "https://docs.kalshi.com/getting_started/quick_start_market_data"]
+    },
+    {
+      "id": "Q5",
+      "question": "How should a market that resolves to 'scalar' be reported?",
+      "known": "Market.result is an enum of 'yes', 'no', 'scalar' or the empty string. Binary markets settle at $1 per winning contract; scalar markets can settle at intermediate values.",
+      "unknown": "Which of the tracked five-category series are scalar rather than binary.",
+      "answer_if_forced": "Display the literal value returned by the API and never coerce it to yes or no.",
+      "decision_needed": "Say whether scalar resolutions should be counted as wins, losses or excluded in any win-rate calculation.",
+      "sources": ["https://docs.kalshi.com/api-reference/market/get-markets", "https://docs.kalshi.com/getting_started/market_settlement"]
+    },
+    {
+      "id": "Q6",
+      "question": "What does a trade actually cost after fees, and is that modelled?",
+      "known": "General markets charge a taker fee of ceil(M x 0.07 x C x P x (1-P)) and a maker fee of ceil(M x 0.0175 x C x P x (1-P)). Per-series multipliers vary and some series are 0/0. There is no settlement fee and no membership fee.",
+      "unknown": "The fee_type and fee_multiplier actually attached to each tracked series at runtime, and the owner's membership tier.",
+      "answer_if_forced": "Show gross P&L and label fees as not modelled in the paper ledger; read fee_type per series from GET /series before claiming net P&L.",
+      "decision_needed": "Approve modelling fees at the general 0.07 / 0.0175 rates as a stated assumption, or fund a real demo account so fees come from actual fills.",
+      "sources": ["https://kalshi.com/docs/kalshi-fee-schedule.pdf", "https://docs.kalshi.com/api-reference/market/get-series-list"]
+    },
+    {
+      "id": "Q7",
+      "question": "Which polling cadence is affordable?",
+      "known": "Authenticated requests cost 10 tokens by default against Read/Write buckets; unauthenticated public requests are limited separately; 429 returns too_many_requests with X-RateLimit-* headers and no Retry-After. GET /portfolio/balance has its own bucket (1/s or 5/s depending on tier).",
+      "unknown": "The account's tier, so the token budget is unknown. endpoint_costs was not queried because that needs credentials.",
+      "answer_if_forced": "Keep public reads modest: one collector run per 20 minutes reading markets in bulk, plus four orderbooks per category, is far inside any documented limit.",
+      "decision_needed": "Once keys exist, call GET /account/endpoint_costs and record the tier here.",
+      "sources": ["https://docs.kalshi.com/getting_started/rate_limits", "https://docs.kalshi.com/api-reference/portfolio/get-balance"]
+    },
+    {
+      "id": "Q8",
+      "question": "Which site tree is canonical after five parallel sessions?",
+      "known": "Main contains a root-level site, a docs/ site, and two Pages mechanisms (branch deploy of / and a workflow that uploads docs/). Two mechanisms mean the deployed content can flip without a visible code change.",
+      "unknown": "Which tree the owner wants to keep. Both contain overlapping pages.",
+      "answer_if_forced": "docs/ is canonical, deployed by workflow artifact; root-level duplicates are removed.",
+      "decision_needed": "This session made that call (see Flagged F-05) because a single canonical tree is required for a link-checked build. Reversible from git history.",
+      "sources": ["https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"]
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "G1",
+      "suggestion": "Make a single canonical site tree and a build step that fails on a broken link.",
+      "why_it_helps_decisions": "Five overlapping pages with different numbers is the biggest source of wrong decisions right now. One tree means every screenshot you compare is the same site.",
+      "effort": "Done in this session",
+      "risk": "Removes duplicate pages other sessions created; recoverable from git history.",
+      "success_metric": "scripts/check_site.py exits 0 on every push; no 404 in the deployed site.",
+      "status": "implemented",
+      "sources": ["https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"]
+    },
+    {
+      "id": "G2",
+      "suggestion": "Keep a scheduled, key-free collector as the only source of live numbers on the page.",
+      "why_it_helps_decisions": "A static page that fetches live data in your browser shows a different picture to every viewer and cannot be audited. A committed snapshot carries one timestamp and one query URL you can re-run.",
+      "effort": "Done in this session",
+      "risk": "GitHub scheduled workflows can be delayed or skipped; the site must therefore show the snapshot age prominently.",
+      "success_metric": "data/live/markets.json collected_at is never older than 60 minutes during market hours.",
+      "status": "implemented",
+      "sources": ["https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows", "https://docs.kalshi.com/getting_started/quick_start_market_data"]
+    },
+    {
+      "id": "G3",
+      "suggestion": "Show category membership basis (seed vs keyword) next to every row.",
+      "why_it_helps_decisions": "A wrong category silently changes which 'top event' you act on. Labelling the basis lets you dismiss a heuristic match without re-deriving it.",
+      "effort": "Done in this session",
+      "risk": "None; it is a label.",
+      "success_metric": "Every row shows seed or keyword; the flagged count is visible on the verification page.",
+      "status": "implemented",
+      "sources": ["https://kalshi.com/docs/kalshi-fee-schedule.pdf"]
+    },
+    {
+      "id": "G4",
+      "suggestion": "Add orderbook depth and implied ask to the ranking table, not just price.",
+      "why_it_helps_decisions": "'Highest dollar' is meaningless if there are 5 contracts at the touch. Contracts available at the best price decides whether a trade is even fillable.",
+      "effort": "Done in this session",
+      "risk": "Depth is a point-in-time read and can be stale by the time you act.",
+      "success_metric": "Every top row shows contracts at best bid and best ask.",
+      "status": "implemented",
+      "sources": ["https://docs.kalshi.com/getting_started/orderbook_responses", "https://docs.kalshi.com/api-reference/market/get-market-orderbook"]
+    },
+    {
+      "id": "G5",
+      "suggestion": "Model fees before trusting any P&L number.",
+      "why_it_helps_decisions": "Near 50 cents the taker fee is about 2 cents per contract, i.e. about 4% of a 50c stake. A strategy that looks break-even gross is a loser net.",
+      "effort": "Medium",
+      "risk": "Fee multipliers vary per series; a naive flat model misstates cost for 0/0 series.",
+      "success_metric": "Fee-adjusted P&L shown alongside gross, with the series fee_multiplier displayed.",
+      "status": "proposed",
+      "sources": ["https://kalshi.com/docs/kalshi-fee-schedule.pdf"]
+    },
+    {
+      "id": "G6",
+      "suggestion": "Log which chart window and which snapshot you looked at when you place each trade.",
+      "why_it_helps_decisions": "Without that, a post-mortem cannot tell a bad rule from a bad look. It is the cheapest way to make strategy reviews honest.",
+      "effort": "Low",
+      "risk": "Extra friction per trade.",
+      "success_metric": "Every paper trade row carries snapshot timestamp and chart window.",
+      "status": "proposed",
+      "sources": ["https://docs.kalshi.com/getting_started/market_lifecycle"]
+    },
+    {
+      "id": "G7",
+      "suggestion": "Run a resolved-market backtest before any live demo order.",
+      "why_it_helps_decisions": "The collector already stores settled markets with their literal result. That is a free out-of-sample test set for the four proposed strategies.",
+      "effort": "Medium",
+      "risk": "Survivorship bias: markets settled before the historical cutoff are only reachable through /historical endpoints.",
+      "success_metric": "Win rate and fee-adjusted expectancy per strategy, reported with sample size.",
+      "status": "proposed",
+      "sources": ["https://docs.kalshi.com/getting_started/historical_data", "https://docs.kalshi.com/api-reference/market/get-markets"]
+    },
+    {
+      "id": "G8",
+      "suggestion": "Add a server-side, key-holding relay only if tick-level data is truly needed.",
+      "why_it_helps_decisions": "It is the only way to reach WebSocket data, but it introduces key custody risk that a static site does not have. Decide it deliberately, not by accident.",
+      "effort": "High",
+      "risk": "Private key on a server; demo keys are lower risk than production keys but still a secret.",
+      "success_metric": "Tick latency under 1s with no key material in the repository or the browser.",
+      "status": "proposed",
+      "sources": ["https://docs.kalshi.com/getting_started/quick_start_websockets", "https://docs.kalshi.com/getting_started/api_keys"]
+    }
+  ],
+  "flagged": [
+    {
+      "id": "F-01",
+      "item": "Legacy order endpoint used by the shipped scripts",
+      "why": "Example scripts posted to /portfolio/orders. The official docs say the legacy /portfolio/orders write endpoints have been removed and now return 410 Gone with code deprecated_v1_order_endpoint.",
+      "action": "Fixed in this session: scripts use POST /portfolio/events/orders with the V2 body (ticker, side bid|ask, count, price, time_in_force, self_trade_prevention_type).",
+      "severity": "high",
+      "sources": ["https://docs.kalshi.com/api-reference/orders/create-order-v2", "https://docs.kalshi.com/getting_started/quick_start_create_order"]
+    },
+    {
+      "id": "F-02",
+      "item": "Claim that Kalshi has no 'notional' field",
+      "why": "An earlier build stated no such field exists. GET /markets does return notional_value_dollars, but its official definition is 'the total value of a single contract at settlement in dollars', which is not a traded-dollar ranking.",
+      "action": "Both halves corrected: the field exists, and it must not be used as a size ranking. Ranking uses a labelled volume x price estimate.",
+      "severity": "medium",
+      "sources": ["https://docs.kalshi.com/api-reference/market/get-markets"]
+    },
+    {
+      "id": "F-03",
+      "item": "Unverified series tickers presented as fact",
+      "why": "An earlier build listed KXAAAGASMAX / KXAAAGASMIN as gas series and used KXGAS, KXPRES, KXSENATE, KXHOUSE, KXCULTURE, KXMOVIE, KXOSCAR, KXBTC, KXETH, KXCRYPTO, KXGOLF, KXPGA as candidates. Only KXAAAGASM among the gas pair appears in the official fee schedule; the rest are not confirmed by any official source.",
+      "action": "Removed from the verified table. Category membership now starts from fee-schedule seeds and every other match is labelled keyword and flagged.",
+      "severity": "high",
+      "sources": ["https://kalshi.com/docs/kalshi-fee-schedule.pdf"]
+    },
+    {
+      "id": "F-04",
+      "item": "Claim that public market data needs no key, applied to WebSocket",
+      "why": "True for public REST reads, false for streaming: every WebSocket session is authenticated at the handshake, including channels carrying public market data.",
+      "action": "Verification row F-09 rewritten; the real-time suggestion now states the key requirement and the need for a relay.",
+      "severity": "medium",
+      "sources": ["https://docs.kalshi.com/getting_started/quick_start_websockets", "https://docs.kalshi.com/getting_started/quick_start_market_data"]
+    },
+    {
+      "id": "F-05",
+      "item": "Two competing Pages publishing mechanisms",
+      "why": "GitHub Pages was configured to deploy from the repository root while .github/workflows/pages.yml uploaded the docs/ directory. The live content could change without any visible code change, and five sessions produced overlapping root and docs/ sites.",
+      "action": "This session made docs/ canonical, set Pages to the workflow source, and removed the root-level duplicate pages. Recoverable from git history.",
+      "severity": "high",
+      "sources": ["https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site"]
+    },
+    {
+      "id": "F-06",
+      "item": "Seconds-resolution price history is not available from Kalshi",
+      "why": "Candlesticks accept only 1, 60 and 1440 minute intervals. A 'seconds' chart therefore cannot be back-filled; it can only be accumulated from live reads.",
+      "action": "The collector accumulates one observation per run into data/live/price_history.json and the seconds chart states its sample interval. Previously the dashboard implied a seconds series that only existed while the tab stayed open.",
+      "severity": "medium",
+      "sources": ["https://docs.kalshi.com/api-reference/market/get-market-candlesticks"]
+    },
+    {
+      "id": "F-07",
+      "item": "No demo credentials, so no real portfolio performance",
+      "why": "The demo account does not exist yet. Kalshi's help centre requires a signup at demo.kalshi.co/sign-up and states there are no preloaded funds. No balance, position or fill can be reported until keys exist, and inventing one would be fabrication.",
+      "action": "Portfolio page shows the paper ledger, clearly labelled, plus the exact endpoints and a ready executor. Flagged unverified; this does not block the site.",
+      "severity": "high",
+      "sources": ["https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account", "https://docs.kalshi.com/getting_started/demo_env", "https://docs.kalshi.com/getting_started/api_keys"]
+    },
+    {
+      "id": "F-08",
+      "item": "Demo prices are not real prices",
+      "why": "The official demo page warns that price and behaviour of markets in the demo environment may not be reflective of real markets. Every ranking on this site is therefore a demo ranking.",
+      "action": "Stated on every page and in the snapshot metadata. Do not use these numbers for production decisions.",
+      "severity": "medium",
+      "sources": ["https://docs.kalshi.com/getting_started/demo_env"]
+    },
+    {
+      "id": "F-09",
+      "item": "Market status vocabulary differs between the filter and the response",
+      "why": "GET /markets?status= accepts unopened|open|paused|closed|settled, while GET /markets/{ticker} returns initialized|active|inactive|closed|determined|disputed|amended|finalized. A naive string comparison across the two silently mismatches.",
+      "action": "The collector filters server-side and displays the response status verbatim; the verification page documents both vocabularies.",
+      "severity": "low",
+      "sources": ["https://docs.kalshi.com/getting_started/market_lifecycle", "https://docs.kalshi.com/api-reference/market/get-markets"]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+name: Collect Kalshi demo data
+
+# Why this exists: the sandbox that builds the site has no network route to
+# Kalshi, and a static GitHub Pages site cannot run a background poller. GitHub
+# Actions is the neutral, reproducible middle layer: it calls only PUBLIC demo
+# endpoints (no keys, no secrets), and commits the resulting snapshot. The site
+# then renders real API values with no manual input from the user.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub Actions cron is UTC. 20-minute cadence, best effort (scheduled runs
+    # can be delayed or dropped under load; that is a documented GitHub behaviour).
+    - cron: "*/20 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify the official demo REST root responds
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -m 30 -o /tmp/status.json -w '%{http_code}' \
+            https://external-api.demo.kalshi.co/trade-api/v2/exchange/status)
+          echo "HTTP $code"
+          cat /tmp/status.json || true
+          test "$code" = "200"
+
+      - name: Collect public demo data
+        run: |
+          set -euo pipefail
+          python3 scripts/collect.py --orderbooks 4
+
+      - name: Validate snapshot shape
+        run: |
+          set -euo pipefail
+          python3 scripts/tests/validate_live.py
+
+      - name: Commit snapshot
+        run: |
+          set -euo pipefail
+          git config user.name  "kalshi-collector-bot"
+          git config user.email "kalshi-collector-bot@users.noreply.github.com"
+          git add docs/data/live
+          if git diff --cached --quiet; then
+            echo "No change in snapshot."
+          else
+            git commit -m "data: demo snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push
+          fi

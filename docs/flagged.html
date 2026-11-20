@@ -1,17 +1,71 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Flagged for Review — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a class="on" href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Flagged for Review</h1>
-<p class="mut">Irregularities and unverified items. These do <b>not</b> block the merge. Review after the site is live and request changes by ID.</p>
-<table><thead><tr><th>ID</th><th>Item</th><th>Why flagged</th><th>What to do</th></tr></thead><tbody>
-<tr><td>F1</td><td>Category series tickers (V9–V13) left blank</td><td>Cannot confirm Gas/Elections/Culture/Crypto/Golf series tickers without live <span class="mono">/series</span> results; sandbox has no direct Kalshi API access.</td><td>Open dashboard → confirm matched series → fill Verification table.</td></tr>
-<tr><td>F2</td><td>Demo balance/positions blank (V14)</td><td>No API keys provided; inventing a balance would be a hallucination.</td><td>Create demo keys at demo.kalshi.co; run collector script.</td></tr>
-<tr><td>F3</td><td>"Highest dollar" = notional estimate</td><td>Kalshi has no single "highest dollar" field; volume × last price is our labeled estimate.</td><td>Decide in Q1 (volume vs. open interest vs. notional).</td></tr>
-<tr><td>F4</td><td>Keyword category mapping may misclassify</td><td>Series titles/categories vary; keywords are heuristic.</td><td>Review matches; approve Suggestion G6.</td></tr>
-</tbody></table>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="verification.html">Verification</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flagged for review — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Flagged for review</h1>
+  <p class="lede">
+    Irregularities found during verification, including places where an earlier build of this repository stated something
+    the official documentation does not support. These do <b>not</b> block publication: the site is live so you can review
+    them with the source links in front of you. Reply with an ID to request a change.
+  </p>
+
+  <div id="summary"></div>
+  <div id="flags"></div>
+
+  <h2>Unverified values currently visible on the site</h2>
+  <div id="blank"></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("flagged.html");
+(async () => {
+  let f, facts;
+  try { f = await KD.json("docs/data/findings.json"); } catch { KD.$("#flags").innerHTML = KD.empty("docs/data/findings.json missing."); return; }
+  try { facts = (await KD.json("docs/data/verified_facts.json")).facts || []; } catch { facts = []; }
+
+  const sev = id => f.flagged.find(x => x.id === id)?.severity;
+  KD.$("#summary").innerHTML = `<div class="grid">
+    <div class="card"><div class="kpi">${f.flagged.length}<small>flagged irregularities</small></div></div>
+    <div class="card"><div class="kpi">${f.flagged.filter(x => x.severity === "high").length}<small>high severity — correctness or provenance</small></div></div>
+    <div class="card"><div class="kpi">${facts.filter(x => !x.verified).length}<small>blank values, not guessed</small></div></div>
+  </div>`;
+
+  KD.$("#flags").innerHTML = KD.table([
+    { key: "id", label: "ID" }, { key: "sev", label: "Severity" }, { key: "item", label: "Item" },
+    { key: "why", label: "Why it is a problem" }, { key: "action", label: "What this build did" },
+    { key: "src", label: "Source" },
+  ], f.flagged.map(x => ({
+    id: `<b>${KD.esc(x.id)}</b>`,
+    sev: x.severity === "high" ? '<span class="badge bad">high</span>' : x.severity === "medium" ? '<span class="badge warn">medium</span>' : '<span class="badge">low</span>',
+    item: KD.esc(x.item),
+    why: KD.esc(x.why),
+    action: KD.esc(x.action),
+    src: (x.sources || []).map(u => KD.srcLink(u, "source")).join(" "),
+  })));
+
+  const blanks = facts.filter(x => !x.verified);
+  KD.$("#blank").innerHTML = KD.table([
+    { key: "id", label: "ID" }, { key: "claim", label: "Claim" }, { key: "why", label: "Why it is blank" }, { key: "src", label: "Source" },
+  ], blanks.map(x => ({
+    id: `<b>${KD.esc(x.id)}</b>`, claim: KD.esc(x.claim),
+    why: KD.esc(x.flag || x.note || "Not confirmable from an official source."),
+    src: KD.srcLink(x.source, "source"),
+  })), { empty: "Nothing blank." });
+})();
+</script>
 </body></html>

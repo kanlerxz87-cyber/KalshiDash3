@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Golf — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Golf — live demo markets</h1>
+  <p class="lede">
+    Every open and settled Kalshi <b>demo</b> market assigned to Golf in the current snapshot, ranked by the labelled
+    dollars-traded estimate. Category membership starts from the PGA Tour, Ryder Cup and Solheim Cup series listed in the official fee schedule. A row marked
+    <span class="badge ok">confirmed</span> comes from that list; a row marked
+    <span class="badge warn">keyword</span> is a heuristic title match and is <a href="flagged.html">flagged</a>.
+  </p>
+
+  <div id="snapshotBanner"></div>
+
+  <div class="grid">
+    <div class="card"><div class="kpi" id="kOpen">—</div><small class="mut">open markets in scope</small></div>
+    <div class="card"><div class="kpi" id="kSettled">—</div><small class="mut">settled markets captured</small></div>
+    <div class="card"><div class="kpi" id="kResolved">—</div><small class="mut">resolved yes / no</small></div>
+    <div class="card"><div class="kpi" id="kDollars">—</div><small class="mut">largest dollars traded (est.)</small></div>
+  </div>
+
+  <h2>Open markets</h2>
+  <div id="open"></div>
+
+  <h2>Resolved markets</h2>
+  <p class="small mut">The result column is the literal API value. Source:
+     <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</p>
+  <div id="resolved"></div>
+
+  <h2>About this category</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Item</th><th>Detail</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Seed series used</td><td><code>KXPGATOUR</code></td>
+          <td><a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule (PDF)</a></td></tr>
+      <tr><td>How a market joins this category</td>
+          <td>The market's <code>series_ticker</code> is checked against the seed list first; only if that fails is a keyword match attempted, and the basis is recorded on every row.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td></tr>
+      <tr><td>Ranking metric</td>
+          <td><code>volume_fp × last_price_dollars</code>, an estimate computed by this project. Kalshi has no official dollars-traded field.</td>
+          <td><a href="questions.html">Q1</a></td></tr>
+      <tr><td>Why demo, not production</td>
+          <td>The brief specifies the demo environment; Kalshi warns demo prices may not reflect real markets.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Environment</a></td></tr>
+    </tbody>
+  </table></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("golf");
+(async () => {
+  let snap = null;
+  try { snap = await KD.json("data/live/markets.json"); } catch { snap = null; }
+  KD.snapshotBanner(snap);
+  const CAT = "golf";
+  if (!snap) {
+    ["#open", "#resolved"].forEach(s => KD.$(s).innerHTML = KD.empty("No snapshot committed yet."));
+    return;
+  }
+  const open = (snap.open_markets || []).filter(r => r.category_id === CAT);
+  const settled = (snap.settled_markets || []).filter(r => r.category_id === CAT);
+  const resolved = settled.filter(r => r.result === "yes" || r.result === "no");
+  KD.$("#kOpen").textContent = open.length;
+  KD.$("#kSettled").textContent = settled.length;
+  KD.$("#kResolved").textContent = resolved.length;
+  const maxD = open.reduce((a, r) => Math.max(a, r.dollars_traded_estimate || 0), 0);
+  KD.$("#kDollars").textContent = maxD ? "$" + Math.round(maxD).toLocaleString() : "—";
+
+  KD.$("#open").innerHTML = KD.table([
+    { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
+    { key: "dollars", label: "$ traded est.", num: true }, { key: "vol", label: "Contracts", num: true },
+    { key: "oi", label: "Open int.", num: true }, { key: "last", label: "Last", num: true },
+    { key: "bid", label: "YES bid", num: true }, { key: "ask", label: "YES ask", num: true },
+    { key: "close", label: "Close (UTC)" }, { key: "status", label: "Status" },
+    { key: "basis", label: "Category basis" }, { key: "src", label: "Source" },
+  ], open.map(r => ({
+    ticker: '<span class="mono">' + KD.esc(r.ticker) + '</span>',
+    title: KD.esc(r.title),
+    dollars: KD.money(r.dollars_traded_estimate, 0),
+    vol: KD.num(r.volume_fp), oi: KD.num(r.open_interest_fp),
+    last: KD.cents(r.last_price_dollars), bid: KD.cents(r.yes_bid_dollars), ask: KD.cents(r.yes_ask_dollars),
+    close: r.close_time ? KD.esc(r.close_time.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
+    status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis),
+    src: KD.srcLink(r.source, "API"),
+  })), { empty: "No open golf markets are in the current snapshot. That is a real result, not an error: the collector reports only what the API returned." });
+
+  KD.$("#resolved").innerHTML = KD.table([
+    { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" }, { key: "result", label: "Resolved" },
+    { key: "settle", label: "Settlement value", num: true }, { key: "ts", label: "Settled (UTC)" },
+    { key: "vol", label: "Contracts", num: true }, { key: "src", label: "Source" },
+  ], settled.map(r => ({
+    ticker: '<span class="mono">' + KD.esc(r.ticker) + '</span>', title: KD.esc(r.title),
+    result: KD.resultBadge(r.result),
+    settle: KD.money(r.settlement_value_dollars, 4),
+    ts: r.settlement_ts ? KD.esc(r.settlement_ts.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
+    vol: KD.num(r.volume_fp), src: KD.srcLink(r.source, "API"),
+  })), { empty: "No settled golf markets in the current snapshot." });
+})();
+</script>
+</body></html>

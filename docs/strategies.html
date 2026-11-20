@@ -1,19 +1,100 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Strategies — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a class="on" href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Trade categorization &amp; strategies</h1>
-<p class="mut">Every trade is auto-categorized (Gas / Elections / Culture / Crypto / Golf / Other) by ticker keywords — the same mapping used on the dashboard. Strategies below are <b>hypotheses</b>, not proven edges. Each states its evidence requirement and risk. Nothing here is financial advice.</p>
-<table><thead><tr><th>ID</th><th>Strategy</th><th>Rule</th><th>Evidence needed</th><th>Risk</th><th>Status</th></tr></thead><tbody>
-<tr><td>S1</td><td>Highest-dollar momentum</td><td>Only trade top-3 notional markets per category; enter when price moves &gt;5¢ in 15 min with rising volume.</td><td>Paper-trade log showing win rate vs. buy-and-hold on same markets.</td><td>Chasing crowded markets; slippage.</td><td><span class="badge warn">hypothesis</span></td></tr>
-<tr><td>S2</td><td>Liquidity filter</td><td>Skip markets with &lt;100 visible contracts at best bid/ask (orderbook depth).</td><td>Fill-rate comparison: filtered vs. unfiltered.</td><td>Missing thin-market opportunities.</td><td><span class="badge warn">hypothesis</span></td></tr>
-<tr><td>S3</td><td>Resolution fade</td><td>Fade extreme prices (&lt;10¢ / &gt;90¢) only when orderbook is one-sided.</td><td>Settled-market backtest with result=yes/no outcomes.</td><td>Tail risk; binary payout is all-or-nothing.</td><td><span class="badge warn">hypothesis</span></td></tr>
-<tr><td>S4</td><td>Category rotation</td><td>Allocate paper cash equally across the 5 categories; rebalance weekly.</td><td>Category P&amp;L table on Portfolio page after ≥30 trades.</td><td>Equal weight ignores liquidity differences.</td><td><span class="badge warn">hypothesis</span></td></tr>
-</tbody></table>
-<h2>How to validate</h2>
-<p>1) Execute paper trades on the <a href="portfolio.html">Portfolio page</a>. 2) Watch the category P&amp;L table. 3) Only promote a strategy to "supported" after ≥30 categorized trades with logged fills. 4) Re-verify against settled results (yes/no) on the dashboard's resolution tracker. Settlement mechanics: <a href="https://docs.kalshi.com/getting_started/market_settlement">Market Settlement</a>.</p>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="suggestions.html">Suggestions</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strategies — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Trade categorisation &amp; strategy candidates</h1>
+  <p class="lede">
+    None of these is a proven edge, and none is financial advice. Each one states the rule, the evidence that
+    would be required before believing it, and how it fails. Every rule is expressed using quantities this site
+    actually measures, so it can be tested against the collected snapshot rather than asserted.
+  </p>
+
+  <h2>How a trade is categorised</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Dimension</th><th>Values</th><th>Why it is a useful axis</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td>Topic</td><td>Gas Prices · Elections · Culture · Crypto · Golf · unknown</td>
+          <td>Different news drivers and different liquidity pools.</td>
+          <td>Category assigned at collection time; the seed/keyword basis travels with the trade.</td></tr>
+      <tr><td>Entry price band</td><td>0–10¢ · 10–25¢ · 25–50¢ · 50–75¢ · 75–90¢ · 90–100¢</td>
+          <td>The taker fee is 0.07 × C × P × (1−P), which peaks near 50¢ and vanishes at the extremes, so the fee drag per dollar staked changes by an order of magnitude across bands.</td>
+          <td><a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Fee schedule</a></td></tr>
+      <tr><td>Time to resolution</td><td>close_time − now</td>
+          <td>A 2¢ edge realised in an hour is a different trade from the same edge locked up for a month.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market lifecycle</a></td></tr>
+      <tr><td>Liquidity at the touch</td><td>contracts at best bid / best ask</td>
+          <td>A market can rank highest by dollars traded and still be unenterable at size.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook responses</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Strategy candidates</h2>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Rule</th><th>Evidence required before believing it</th><th>How it fails</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>S1</b></td>
+        <td><b>Size-weighted momentum.</b> Only consider the top 3 markets by dollars traded per category; enter with the trend when the last price moved more than 5¢ inside one collected window and volume grew.</td>
+        <td>Resolved-market backtest over at least 30 markets per category, fee-adjusted, with the same window length used live.</td>
+        <td>Chasing crowded markets into a reversal; slippage larger than the move; the window is one collector run, so a "move" can be an artefact of the sampling interval.</td>
+        <td><span class="badge warn">untested</span></td>
+      </tr>
+      <tr>
+        <td><b>S2</b></td>
+        <td><b>Liquidity floor.</b> Skip any market with fewer than 100 contracts resting at the best ask, regardless of how attractive the price is.</td>
+        <td>Fill-rate comparison between filtered and unfiltered paper trades, recorded per trade.</td>
+        <td>Excludes thin but genuinely mispriced markets; the depth snapshot goes stale between runs.</td>
+        <td><span class="badge warn">untested</span></td>
+      </tr>
+      <tr>
+        <td><b>S3</b></td>
+        <td><b>Fee-aware band selection.</b> Prefer bands where the modelled fee is below 1% of stake, i.e. avoid roughly 25–75¢ unless the expected move justifies it.</td>
+        <td>Fee-as-%-of-stake measured from real fills (<code>fee_cost</code> in <code>GET /portfolio/fills</code>) rather than the general formula.</td>
+        <td>Ignores that near-50¢ markets are where the most information is priced in; per-series multipliers can be 0/0, which destroys the premise.</td>
+        <td><span class="badge warn">untested</span></td>
+      </tr>
+      <tr>
+        <td><b>S4</b></td>
+        <td><b>Resolution fade.</b> Take the opposite side of a market priced below 10¢ or above 90¢ only when the order book is one-sided (no resting bids on the opposing side).</td>
+        <td>Backtest against settled markets with the literal <code>result</code> field; report tail loss explicitly, since a binary pays all or nothing.</td>
+        <td>Extreme prices are usually correct. This strategy's failure mode is a cluster of total losses, which a win-rate number hides.</td>
+        <td><span class="badge warn">untested</span></td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <h2>What the collected data can already test</h2>
+  <div class="notice warn" id="readiness">
+    <b>Nothing yet, and here is why.</b> A strategy can only be tested against outcomes, and outcomes come from
+    markets that have <b>settled</b> inside the five requested topics. The collector reports that count on the
+    <a href="dashboard.html">dashboard</a> resolution tracker and on each
+    <a href="categories.html">category page</a>. If it is zero, the sample is empty and any win rate would be invented.
+    S1 additionally needs at least two price observations per market, which only accumulate over successive collector runs.
+  </div>
+
+<h2>Promotion rule</h2>
+  <div class="notice">
+    A strategy moves from <span class="badge warn">untested</span> to <span class="badge ok">supported</span> only when:
+    (1) it has at least 30 categorised, resolved trades; (2) P&amp;L is reported net of modelled fees;
+    (3) the backtest sample is disjoint from the period the rule was invented on; and (4) the worst-case run of losses is
+    stated alongside the win rate. Until then the honest label is “untested”, which is what every row above says.
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>KD.nav("strategies.html");</script>
 </body></html>

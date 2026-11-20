@@ -1,26 +1,325 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Live Dashboard — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a class="on" href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Live dashboard — highest-dollar events</h1>
-<p class="mut">Categories: Gas Prices · Elections · Culture · Crypto · Golf. Ranked by notional ≈ volume × last price. Click <b>Watch</b> to chart a market and follow it until it resolves yes/no.</p>
-<div class="controls"><span id="liveStatus" class="badge">Starting…</span><button id="refreshBtn" class="btn ghost">Refresh all</button>
-<label class="small">Chart window <select id="windowMode"><option value="seconds">Seconds (live poll)</option><option value="minutes" selected>Minutes</option><option value="hours">Hours</option></select></label></div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live dashboard — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
 
-<div class="card" id="chartCard"><h3>Price chart <span class="mut small">— X = time, Y = contract price</span></h3>
-<p id="selInfo" class="mut">Select a market with Watch below.</p>
-<canvas id="priceChart" class="chart"></canvas>
-<h4>Liquidity — contracts available at each price</h4>
-<p id="liqSummary" class="mut small"></p>
-<div id="liquidity" class="liq"></div>
-<p class="mut small">Orderbook source: <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook">GET /markets/{ticker}/orderbook</a>. Binary books return bids only; ask = 1 − best opposing bid (<a href="https://docs.kalshi.com/getting_started/orderbook_responses">Orderbook Responses</a>).</p></div>
+  <h1>Live dashboard — highest-dollar events</h1>
+  <p class="lede">
+    Gas Prices · Elections · Culture · Crypto · Golf only. Ranked by the labelled dollars-traded estimate.
+    Pick a market to chart contract price against time and to see how many contracts are available at each price.
+    Markets are followed until they resolve; the literal API result is shown, so a market that settles to
+    <code>scalar</code> is never mislabelled as yes/no.
+  </p>
 
-<div class="grid" id="topTables"></div>
+  <div id="snapshotBanner"></div>
 
-<div class="card"><h3>Resolution tracker — settled markets (yes/no)</h3><div id="resolvedTable"><p class="mut">Loading…</p></div></div>
-</div>
-<footer><div class="wrap">KalshiDash3 · Live demo API · <a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a></div></footer>
-<script src="assets/app.js"></script>
+  <div class="controls">
+    <label>Category <select id="catFilter"><option value="">All five</option></select></label>
+    <label>Chart window
+      <select id="window">
+        <option value="s">Seconds (snapshot observations)</option>
+        <option value="m" selected>Minutes</option>
+        <option value="h">Hours</option>
+        <option value="all">All collected</option>
+      </select>
+    </label>
+    <label>Price series
+      <select id="seriesSel">
+        <option value="last" selected>Last traded price</option>
+        <option value="bid">Best YES bid</option>
+        <option value="ask">Best YES ask</option>
+      </select>
+    </label>
+    <button class="ghost" id="reload">Reload snapshot</button>
+    <span id="chartNote" class="small mut"></span>
+  </div>
+
+  <div class="card" id="chartCard">
+    <h3 id="chartTitle">Price chart — X = time, Y = contract price ($)</h3>
+    <p class="small mut" id="chartMeta">Pick a market from the tables below.</p>
+    <canvas id="priceChart" height="340" aria-label="Chart of contract price over time"></canvas>
+    <p class="small mut" id="chartFoot"></p>
+  </div>
+
+  <h2>Liquidity — contracts available at each price</h2>
+  <div class="card">
+    <div id="liqHead" class="small mut">Pick a market to see its order book.</div>
+    <div class="liq" id="liq"></div>
+  </div>
+
+  <h2>Largest live markets per category</h2>
+  <div id="tables"></div>
+
+  <h2>Resolution tracker — markets that have settled</h2>
+  <p class="small mut">Ranked by settlement time. The result column is the literal <code>result</code> field returned by
+     the API (<code>yes</code>, <code>no</code>, <code>scalar</code>, or empty). Source:
+     <a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>.</p>
+  <div id="resolved"></div>
+
+  <h2>Markets still open, tracked until resolution</h2>
+  <p class="small mut">A market leaves this list when it closes; it then appears above with its result once determined.</p>
+  <div id="pending"></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("dashboard.html");
+const state = { snap: null, hist: null, sel: null, cat: "" };
+
+const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
+
+function pickInitialTicker() {
+  const h = decodeURIComponent(location.hash.replace("#", ""));
+  if (h) return h;
+  const open = (state.snap?.open_markets || []).filter(r => r.dollars_traded_estimate);
+  return open.length ? open[0].ticker : null;
+}
+
+function renderTables() {
+  const open = (state.snap?.open_markets || []).filter(r => !state.cat || r.category_id === state.cat);
+  const host = KD.$("#tables");
+  const byCat = {};
+  for (const r of open) (byCat[r.category_id] ||= []).push(r);
+  const ids = Object.keys(KD.CAT_LABEL).filter(id => !state.cat || id === state.cat);
+  host.innerHTML = ids.map(id => {
+    const rows = (byCat[id] || []).slice(0, 8);
+    const liqByTicker = {};
+    for (const l of state.snap?.liquidity || []) liqByTicker[l.ticker] = l.orderbook || {};
+    const trs = rows.map(r => {
+      const ob = liqByTicker[r.ticker] || {};
+      return {
+        ticker: `<button class="ghost" data-t="${KD.esc(r.ticker)}" style="padding:2px 8px;font-size:11.5px">chart</button>`,
+        title: `<a href="${KD.esc(r.source)}" target="_blank" rel="noopener" title="${KD.esc(r.title)}">${KD.esc(r.title)}</a>
+                <div class="small mut mono">${KD.esc(r.ticker)}</div>`,
+        dollars: KD.money(r.dollars_traded_estimate, 0),
+        vol: KD.num(r.volume_fp),
+        oi: KD.num(r.open_interest_fp),
+        last: KD.cents(r.last_price_dollars),
+        bid: KD.cents(r.yes_bid_dollars),
+        ask: KD.cents(ob.best_yes_ask_derived ?? r.yes_ask_dollars),
+        atAsk: ob.contracts_at_best_yes_ask === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_ask),
+        atBid: ob.contracts_at_best_yes_bid === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_bid),
+        status: KD.statusBadge(r.status),
+        basis: KD.basisBadge(r.category_basis),
+      };
+    });
+    return `<div class="card"><h3>${KD.CAT_LABEL[id]} <span class="small mut">${rows.length} of ${(byCat[id] || []).length} open in scope</span></h3>` +
+      KD.table([
+        { key: "ticker", label: "" }, { key: "title", label: "Market" },
+        { key: "dollars", label: "$/traded est.", num: true }, { key: "vol", label: "Contracts", num: true },
+        { key: "oi", label: "Open int.", num: true }, { key: "last", label: "Last", num: true },
+        { key: "bid", label: "YES bid", num: true }, { key: "ask", label: "YES ask*", num: true },
+        { key: "atAsk", label: "Qty at ask", num: true }, { key: "atBid", label: "Qty at bid", num: true },
+        { key: "status", label: "Status" }, { key: "basis", label: "Category" },
+      ], trs, { empty: "No open markets matched this category in the current snapshot." }) + `</div>`;
+  }).join("");
+  host.querySelectorAll("[data-t]").forEach(b => b.addEventListener("click", () => select(b.dataset.t)));
+}
+
+function renderResolved() {
+  const rows = (state.snap?.settled_markets || [])
+    .filter(r => !state.cat || r.category_id === state.cat)
+    .slice(0, 60)
+    .map(r => ({
+      time: r.settlement_ts ? KD.esc(r.settlement_ts.replace("T", " ").replace("Z", "Z")) : '<span class="na">—</span>',
+      ticker: `<a href="${KD.esc(r.source)}" target="_blank" rel="noopener" class="mono">${KD.esc(r.ticker)}</a>`,
+      title: KD.esc(r.title),
+      cat: KD.CAT_LABEL[r.category_id] || "—",
+      result: KD.resultBadge(r.result),
+      settle: KD.money(r.settlement_value_dollars, 4),
+      last: KD.cents(r.last_price_dollars),
+      vol: KD.num(r.volume_fp),
+      basis: KD.basisBadge(r.category_basis),
+    }));
+  KD.$("#resolved").innerHTML = KD.table([
+    { key: "time", label: "Settled (UTC)" }, { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
+    { key: "cat", label: "Category" }, { key: "result", label: "Resolved" }, { key: "settle", label: "Settlement value", num: true },
+    { key: "last", label: "Last price", num: true }, { key: "vol", label: "Contracts", num: true }, { key: "basis", label: "Category basis" },
+  ], rows, { empty: "No settled markets in scope in this snapshot." });
+}
+
+function renderPending() {
+  const rows = (state.snap?.open_markets || [])
+    .filter(r => !state.cat || r.category_id === state.cat)
+    .slice(0, 80)
+    .map(r => ({
+      ticker: `<a href="${KD.esc(r.source)}" target="_blank" rel="noopener" class="mono">${KD.esc(r.ticker)}</a>`,
+      title: KD.esc(r.title),
+      cat: KD.CAT_LABEL[r.category_id] || "—",
+      close: r.close_time ? KD.esc(r.close_time.replace("T", " ").replace("Z", "Z")) : '<span class="na">—</span>',
+      expiry: r.expected_expiration_time ? KD.esc(r.expected_expiration_time.replace("T", " ")) : '<span class="na">—</span>',
+      status: KD.statusBadge(r.status),
+      result: KD.resultBadge(r.result),
+    }));
+  KD.$("#pending").innerHTML = KD.table([
+    { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" }, { key: "cat", label: "Category" },
+    { key: "close", label: "Close time (UTC)" }, { key: "expiry", label: "Expected resolution" },
+    { key: "status", label: "Lifecycle status" }, { key: "result", label: "Result so far" },
+  ], rows, { empty: "No open markets in scope." });
+}
+
+function select(ticker) {
+  state.sel = ticker;
+  history.replaceState(null, "", "#" + encodeURIComponent(ticker));
+  drawChart();
+  drawLiq();
+}
+
+function currentRow() {
+  if (!state.sel) return null;
+  return (state.snap?.open_markets || []).concat(state.snap?.settled_markets || [])
+    .find(r => r.ticker === state.sel) || null;
+}
+
+function drawChart() {
+  const cv = KD.$("#priceChart");
+  const row = currentRow();
+  const meta = KD.$("#chartMeta"), foot = KD.$("#chartFoot");
+  const dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth || 900, H = 340;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const css = getComputedStyle(document.body);
+  const line = css.getPropertyValue("--line"), mut = css.getPropertyValue("--mut"), green = "#00b67a", bad = "#f2695c";
+  if (!row) {
+    meta.textContent = "Pick a market from the tables below.";
+    foot.textContent = "";
+    return;
+  }
+  const series = (state.hist?.series?.[row.ticker]?.observations) || [];
+  const key = KD.$("#seriesSel").value;
+  const win = WINDOWS[KD.$("#window").value] || Infinity;
+  const now = Date.now();
+  const pts = series
+    .map(o => ({ t: Date.parse(o.t), v: o[key] }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v))
+    .filter(p => win === Infinity || now - p.t <= win);
+
+  meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
+    `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis)} · ` +
+    `status ${KD.statusBadge(row.status)} · result ${KD.resultBadge(row.result)} · ` +
+    `last ${KD.cents(row.last_price_dollars)} · ${KD.num(row.volume_fp)} contracts traded · ` +
+    `open interest ${KD.num(row.open_interest_fp)}`;
+
+  const pad = { l: 54, r: 14, t: 16, b: 34 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  ctx.strokeStyle = line; ctx.fillStyle = mut; ctx.font = "11px ui-monospace,monospace"; ctx.lineWidth = 1;
+  // Y axis: contract price is bounded 0..1 by definition.
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ih * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText("$" + (1 - i / 4).toFixed(2), 6, y + 4);
+  }
+  ctx.fillText("price", 6, pad.t - 4);
+
+  if (pts.length < 1) {
+    ctx.fillStyle = mut; ctx.font = "13px system-ui";
+    ctx.fillText("No observations in this window yet.", pad.l + 12, pad.t + 26);
+    ctx.font = "11px ui-monospace,monospace";
+    foot.innerHTML = `Seconds-resolution history cannot be requested from Kalshi: candlesticks only support
+      1, 60 and 1440-minute intervals (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>).
+      This chart therefore plots <b>one observation per collector run</b> from
+      <code>data/live/price_history.json</code>; widen the window or wait for more runs.`;
+    return;
+  }
+  const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
+  const X = t => pad.l + iw * (t - t0) / (t1 - t0);
+  const Y = v => pad.t + ih * (1 - Math.min(1, Math.max(0, v)));
+  for (let i = 0; i <= 4; i++) {
+    const t = t0 + (t1 - t0) * i / 4;
+    const d = new Date(t);
+    const label = (t1 - t0) > 86400e3 ? `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${String(d.getUTCHours()).padStart(2, "0")}:00`
+      : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    ctx.fillText(label, X(t) - 26, H - 10);
+  }
+  ctx.strokeStyle = key === "ask" ? bad : green;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)));
+  ctx.stroke();
+  ctx.fillStyle = key === "ask" ? bad : green;
+  pts.forEach(p => { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.4, 0, 7); ctx.fill(); });
+  // last point callout
+  const lastP = pts[pts.length - 1];
+  ctx.fillStyle = css.getPropertyValue("--txt");
+  ctx.font = "12px system-ui";
+  ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
+    Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
+
+  foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
+    ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
+    Y axis is the contract price in dollars, bounded 0–1. Collected by
+    <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
+}
+
+function drawLiq() {
+  const host = KD.$("#liq"), head = KD.$("#liqHead");
+  const ob = (state.snap?.liquidity || []).find(l => l.ticker === state.sel)?.orderbook;
+  if (!state.sel) { head.textContent = "Pick a market to see its order book."; host.innerHTML = ""; return; }
+  if (!ob) {
+    head.innerHTML = `No order book snapshot was collected for <code>${KD.esc(state.sel)}</code> in this run.
+      Order books are collected for the top few markets per category only. Live source:
+      <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">GET /markets/{ticker}/orderbook</a>.`;
+    host.innerHTML = "";
+    return;
+  }
+  if (ob.error) { head.innerHTML = `<span class="badge bad">order book unavailable</span> ${KD.esc(ob.error)}`; host.innerHTML = ""; return; }
+  const maxC = Math.max(1, ...ob.yes_bids.map(x => x.contracts), ...ob.no_bids.map(x => x.contracts));
+  const ladder = (rows, side) => rows.slice().reverse().slice(0, 10).map(r =>
+    `<div class="row"><span>$${r.price.toFixed(4)}</span>
+     <span class="bar ${side === "ask" ? "ask" : ""}"><i style="width:${(r.contracts / maxC * 100).toFixed(1)}%"></i></span>
+     <span class="r">${KD.num(r.contracts)}</span></div>`).join("") || '<p class="empty">No resting orders on this side.</p>';
+  head.innerHTML = `Order book for <code>${KD.esc(state.sel)}</code>, collected ${KD.esc(ob.fetched_at || "")}.
+    Best YES bid <b>${KD.cents(ob.best_yes_bid?.price)}</b> (${KD.num(ob.contracts_at_best_yes_bid)} contracts) ·
+    best YES ask <b>${KD.cents(ob.best_yes_ask_derived)}</b> (${KD.num(ob.contracts_at_best_yes_ask)} contracts) ·
+    visible depth ${KD.num(ob.visible_contracts_total)} contracts ·
+    <a href="${KD.esc(ob.source)}" target="_blank" rel="noopener">query</a>`;
+  host.innerHTML =
+    `<div><h3>YES bids — contracts a seller can hit</h3><div class="book">${ladder(ob.yes_bids, "bid")}</div></div>` +
+    `<div><h3>YES asks, implied — contracts a buyer can lift</h3><div class="book">${ladder(ob.no_bids, "ask")}</div></div>`;
+  KD.$("#chartFoot").innerHTML += "";
+}
+
+async function load() {
+  try { state.snap = await KD.json("data/live/markets.json"); } catch { state.snap = null; }
+  try { state.hist = await KD.json("data/live/price_history.json"); } catch { state.hist = null; }
+  KD.snapshotBanner(state.snap);
+  if (!state.snap) {
+    KD.$("#tables").innerHTML = KD.empty("No snapshot committed yet.");
+    KD.$("#resolved").innerHTML = KD.empty("No snapshot committed yet.");
+    KD.$("#pending").innerHTML = KD.empty("No snapshot committed yet.");
+    return;
+  }
+  const sel = KD.$("#catFilter");
+  sel.innerHTML = '<option value="">All five</option>' +
+    Object.entries(KD.CAT_LABEL).map(([id, l]) => `<option value="${id}">${l}</option>`).join("");
+  sel.value = state.cat;
+  renderTables(); renderResolved(); renderPending();
+  if (!state.sel || !state.sel.startsWith("")) state.sel = pickInitialTicker();
+  state.sel = pickInitialTicker() || state.sel;
+  drawChart(); drawLiq();
+}
+
+KD.$("#catFilter").addEventListener("change", e => { state.cat = e.target.value; renderTables(); renderResolved(); renderPending(); });
+KD.$("#window").addEventListener("change", drawChart);
+KD.$("#seriesSel").addEventListener("change", drawChart);
+KD.$("#reload").addEventListener("click", load);
+window.addEventListener("resize", () => { drawChart(); });
+load();
+</script>
 </body></html>

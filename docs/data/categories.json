@@ -1,0 +1,60 @@
+{
+  "generated": "2026-11-20",
+  "note": "Category scope for this project. `seed_series` are series tickers that appear IN THE OFFICIAL KALSHI FEE SCHEDULE (https://kalshi.com/docs/kalshi-fee-schedule.pdf) and are therefore confirmed to exist. Keyword matching is a FALLBACK only and every match records which basis matched it (basis=seed|keyword) so nothing is presented as confirmed when it is not. All live values are fetched from the API by scripts/collect.py; nothing about live prices/volumes is stored here.",
+  "categories": [
+    {
+      "id": "gas",
+      "label": "Gas Prices",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "seed_series": [{"ticker": "KXAAAGASM", "description_in_fee_schedule": "US gas price", "basis": "seed", "verified": true}],
+      "keyword_fallback": ["gas", "gasoline"],
+      "keyword_fallback_verified": false
+    },
+    {
+      "id": "elections",
+      "label": "Elections",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "seed_series": [{"ticker": "KXELECTIRAN", "description_in_fee_schedule": "Will Iran hold a presidential election?", "basis": "seed", "verified": true}],
+      "keyword_fallback": ["election", "president", "senate", "congress", "vote"],
+      "keyword_fallback_verified": false
+    },
+    {
+      "id": "culture",
+      "label": "Culture",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "seed_series": [
+        {"ticker": "KXEMMYCACTO", "description_in_fee_schedule": "Emmys Award for Lead Comedy Actor", "basis": "seed", "verified": true},
+        {"ticker": "KXEMMYCACTR", "description_in_fee_schedule": "Emmys Award for Lead Comedy Actress", "basis": "seed", "verified": true},
+        {"ticker": "KXEMMYCSERIES", "description_in_fee_schedule": "Emmys Award for Comedy Series", "basis": "seed", "verified": true},
+        {"ticker": "KXBALLONDOR", "description_in_fee_schedule": "Ballon d'Or", "basis": "seed", "verified": true},
+        {"ticker": "KXSUPERBOWLHEADLINE", "description_in_fee_schedule": "Who will headline super bowl LX", "basis": "seed", "verified": true}
+      ],
+      "keyword_fallback": ["emmy", "ballon", "headline", "movie", "oscar", "grammy", "album", "box office", "celebrity", "song"],
+      "keyword_fallback_verified": false
+    },
+    {
+      "id": "crypto",
+      "label": "Crypto",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "seed_series": [
+        {"ticker": "KXBTCMAX150", "description_in_fee_schedule": "When will bitcoin hit 150k?", "basis": "seed", "verified": true},
+        {"ticker": "KXBTCY", "description_in_fee_schedule": "BTC price range EOY", "basis": "seed", "verified": true},
+        {"ticker": "KXETHY", "description_in_fee_schedule": "ETH price EOY", "basis": "seed", "verified": true}
+      ],
+      "keyword_fallback": ["bitcoin", "btc", "ethereum", "eth ", "crypto", "solana"],
+      "keyword_fallback_verified": false
+    },
+    {
+      "id": "golf",
+      "label": "Golf",
+      "seed_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "seed_series": [
+        {"ticker": "KXPGATOUR", "description_in_fee_schedule": "PGA Tour", "basis": "seed", "verified": true},
+        {"ticker": "KXPGARYDER", "description_in_fee_schedule": "Ryder Cup", "basis": "seed", "verified": true},
+        {"ticker": "KXPGASOLHEIM", "description_in_fee_schedule": "Solheim Cup", "basis": "seed", "verified": true}
+      ],
+      "keyword_fallback": ["golf", "pga", "ryder cup", "solheim", "masters"],
+      "keyword_fallback_verified": false
+    }
+  ]
+}

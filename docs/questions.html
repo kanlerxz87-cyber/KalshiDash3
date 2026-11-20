@@ -1,22 +1,69 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Open Questions — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a class="on" href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Open questions — what we know, what we don't, how to find out</h1>
-<details open><summary>Q1. What is the official definition of "highest dollar amount"?</summary>
-<p><b>Known:</b> API returns <span class="mono">volume_fp</span>, <span class="mono">open_interest_fp</span>, <span class="mono">last_price_dollars</span> separately (<a href="https://docs.kalshi.com/api-reference/market/get-markets">Get Markets</a>). <b>Unknown:</b> which field best represents "highest dollar amount" for your decision. <b>Current choice:</b> notional ≈ volume × last price (labeled estimate). <b>To discover:</b> compare rankings by volume vs. open interest vs. notional on live data; pick one and record it here.</p></details>
-<details><summary>Q2. Which series belong to each of the 5 categories?</summary>
-<p><b>Known:</b> series have <span class="mono">ticker/title/category</span> (<a href="https://docs.kalshi.com/api-reference/market/get-series-list">Get Series List</a>). <b>Unknown:</b> exact Gas/Elections/Culture/Crypto/Golf series tickers — discovery is keyword-based and may miss or misclassify. <b>To discover:</b> review the matched-series list on the Verification page; approve/reject each match (Suggestion G6).</p></details>
-<details><summary>Q3. Where are the demo API keys for the real portfolio?</summary>
-<p><b>Known:</b> keys are asymmetric pairs; private key never leaves your system; demo/prod keys differ (<a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a>). <b>Unknown:</b> no keys were provided. <b>To discover:</b> create keys at <a href="https://demo.kalshi.co/">demo.kalshi.co</a> → Account Settings → API Keys, then set env vars for <span class="mono">scripts/kalshi_client.py</span>. Never paste keys into chat or commit them.</p></details>
-<details><summary>Q4. Should trading be paper-only or live on demo?</summary>
-<p><b>Known:</b> demo uses mock funds and may not reflect real markets (<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a>). <b>Unknown:</b> your risk appetite and position-size limits. <b>To discover:</b> paper-trade first (Portfolio page), then decide max contracts per trade and per category.</p></details>
-<details><summary>Q5. Which chart window matters most (seconds / minutes / hours)?</summary>
-<p><b>Known:</b> candlesticks support 1m/60m/1440m periods (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks">Get Market Candlesticks</a>); live polling covers seconds. <b>Unknown:</b> which horizon drives your decisions. <b>To discover:</b> use the window switcher on the dashboard; log which window you check before each paper trade.</p></details>
-<details><summary>Q6. What are the fee and rate-limit constraints for our polling cadence?</summary>
-<p><b>Known:</b> default cost 10 tokens/request; Read/Write budgets by tier; 429 on exceed (<a href="https://docs.kalshi.com/getting_started/rate_limits">Rate Limits</a>). <b>Unknown:</b> our account tier. <b>To discover:</b> call <span class="mono">GET /account/limits</span> once keys exist; tune poll interval to stay under budget.</p></details>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="flagged.html">Flagged for Review</a></div></footer>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open questions — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
+
+  <h1>Questions, information and answers</h1>
+  <p class="lede">
+    This is the list that must be closed before a decision can be called reasonable. Each row separates what is
+    established from an official source, what is genuinely missing, the best available answer if forced, and the exact
+    action that would close the gap. Rows marked <b>open</b> are why some values on this site are blank.
+  </p>
+
+  <div id="summary"></div>
+  <div id="list"></div>
+
+  <h2>The single blocking item</h2>
+  <div class="notice bad">
+    <b>Q3 cannot be closed by an agent.</b> Kalshi's help centre says a demo account is created by signing up at
+    <a href="https://demo.kalshi.co/sign-up" target="_blank" rel="noopener">demo.kalshi.co/sign-up</a> and that it
+    “does not come with funds preloaded”
+    (<a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">source</a>).
+    Until a person completes that signup and generates an API key, there is no balance, position or fill to report.
+    Everything else on this site was completed without that step, and the executor is ready for the moment it happens.
+  </div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("questions.html");
+(async () => {
+  let f;
+  try { f = await KD.json("data/findings.json"); } catch { KD.$("#list").innerHTML = KD.empty("data/findings.json missing."); return; }
+  KD.$("#summary").innerHTML = `<div class="grid">
+    <div class="card"><div class="kpi">${f.questions.length}<small>questions needing a decision</small></div></div>
+    <div class="card"><div class="kpi">${f.questions.filter(q => (q.decision_needed || "").toLowerCase().includes("signs up")).length}<small>blocked on a human step</small></div></div>
+    <div class="card"><div class="kpi">${f.questions.filter(q => (q.known || "").toLowerCase().includes("settled by the docs")).length}<small>settled by the official docs</small></div></div>
+  </div>`;
+  KD.$("#list").innerHTML = KD.table([
+    { key: "id", label: "ID" }, { key: "q", label: "Question" },
+    { key: "known", label: "Known — with the authoritative quantity" },
+    { key: "unknown", label: "Unknown" },
+    { key: "forced", label: "Best answer if forced" },
+    { key: "action", label: "Action that closes it" },
+    { key: "src", label: "Source" },
+  ], f.questions.map(q => ({
+    id: `<b>${KD.esc(q.id)}</b>`,
+    q: KD.esc(q.question),
+    known: KD.esc(q.known),
+    unknown: `<span class="warn">${KD.esc(q.unknown)}</span>`,
+    forced: KD.esc(q.answer_if_forced),
+    action: KD.esc(q.decision_needed),
+    src: (q.sources || []).map(u => KD.srcLink(u, "source")).join(" "),
+  })));
+})();
+</script>
 </body></html>

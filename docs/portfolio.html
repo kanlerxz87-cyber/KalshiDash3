@@ -1,34 +1,268 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Portfolio &amp; Trading — KalshiDash3</title><link rel="stylesheet" href="assets/style.css"></head><body>
-<header class="top"><div class="wrap"><nav class="main"><span class="brand">Kalshi<b>Dash3</b></span>
-<a href="index.html">Home</a><a href="executive-summary.html">Executive Summary</a><a href="dashboard.html">Live Dashboard</a><a class="on" href="portfolio.html">Portfolio &amp; Trading</a><a href="strategies.html">Strategies</a><a href="suggestions.html">Suggestions</a><a href="questions.html">Open Questions</a><a href="verification.html">Verification</a><a href="flagged.html">Flagged for Review</a><a href="sources.html">Sources</a>
-</nav></div></header>
-<div class="wrap">
-<h1>Portfolio performance &amp; trade execution</h1>
-<div class="notice"><b>Paper mode (current).</b> No demo API keys were provided, so no real demo-account balance is shown — inventing one would be a hallucination. The ledger below is a <b>local paper simulation</b> ($10,000 starting cash) so the execute → categorize → analyze workflow is fully testable. To connect the real demo account, create keys at <a href="https://demo.kalshi.co/">demo.kalshi.co</a> and run <span class="mono">scripts/kalshi_client.py</span> with <span class="mono">KALSHI_KEY_ID</span> + <span class="mono">KALSHI_PRIVATE_KEY_PATH</span> env vars. Signing/auth: <a href="https://docs.kalshi.com/getting_started/api_keys">API Keys</a>.</div>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio &amp; trading — KalshiDash3</title>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
+<main class="wrap">
 
-<div class="grid">
-<div class="card"><h3>Paper cash</h3><div class="kpi" id="paperCash">—</div><p class="mut small">Stored only in this browser (localStorage).</p><button id="resetPaper" class="btn ghost">Reset paper ledger</button></div>
-<div class="card"><h3>Execute paper trade</h3>
-<div class="controls"><input id="ptTicker" placeholder="Ticker e.g. KXBTC-…" style="flex:1;min-width:180px">
-<select id="ptSide"><option value="yes">YES</option><option value="no">NO</option></select>
-<input id="ptCount" type="number" value="10" style="width:80px"><input id="ptPrice" type="number" step="0.01" value="0.55" style="width:90px">
-<button id="tradeBtn" class="btn">Execute</button></div>
-<p class="mut small">Price must be 0–1. Real order flow (when keys exist): <a href="https://docs.kalshi.com/api-reference/portfolio/create-order">Create Order</a>.</p></div>
-</div>
+  <h1>Portfolio performance &amp; trade execution</h1>
+  <p class="lede">
+    Trade accounting is split into three separate, clearly labelled ledgers so a paper number is never
+    mistaken for a demo-account number: <b>(1) real demo account</b> — empty until keys exist;
+    <b>(2) executor</b> — a working script that posts real demo orders the moment keys are supplied;
+    <b>(3) paper ledger</b> — a local simulation so the analyse → categorise → strategy loop is testable now.
+  </p>
 
-<div class="card"><h3>Trade log (categorized)</h3><div id="paperTrades"><p class="mut">No paper trades yet.</p></div></div>
-<div class="card"><h3>Performance by category</h3><div id="catSummary"><p class="mut">No data yet — execute a trade above.</p></div></div>
+  <div id="snapshotBanner"></div>
 
-<h2>Real demo-account endpoints (ready to wire)</h2>
-<table><thead><tr><th>Endpoint</th><th>Use</th><th>Official source</th></tr></thead><tbody>
-<tr><td class="mono">GET /portfolio/balance</td><td>Demo cash balance (auth required)</td><td><a href="https://docs.kalshi.com/api-reference/portfolio/get-balance">Get Balance</a></td></tr>
-<tr><td class="mono">GET /portfolio/positions</td><td>Open positions</td><td><a href="https://docs.kalshi.com/api-reference/portfolio/get-positions">Get Positions</a></td></tr>
-<tr><td class="mono">GET /portfolio/fills</td><td>Fill history for P&amp;L</td><td><a href="https://docs.kalshi.com/api-reference/portfolio/get-fills">Get Fills</a></td></tr>
-<tr><td class="mono">POST /portfolio/orders</td><td>Place order</td><td><a href="https://docs.kalshi.com/api-reference/portfolio/create-order">Create Order</a></td></tr>
-<tr><td class="mono">GET /portfolio/orders</td><td>Order history</td><td><a href="https://docs.kalshi.com/api-reference/portfolio/get-orders">Get Orders</a></td></tr>
-</tbody></table>
-</div>
-<footer><div class="wrap">KalshiDash3 · <a href="strategies.html">Strategies</a> · <a href="questions.html">Open Questions</a></div></footer>
-<script src="assets/app.js"></script>
+  <div class="notice bad">
+    <b>Why there is no demo-account balance on this page.</b> A Kalshi demo account must be created by a person at
+    <a href="https://demo.kalshi.co/sign-up" target="_blank" rel="noopener">demo.kalshi.co/sign-up</a>, and Kalshi states
+    it “does not come with funds preloaded”
+    (<a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">Kalshi Help Center</a>).
+    API keys do not exist until then. Printing a balance without a key would be fabrication, so the cell stays blank and is
+    listed on <a href="flagged.html">Flagged for Review</a> (F-07). This is the one step that cannot be automated.
+  </div>
+
+  <h2>1 · Real demo account</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Field</th><th>Value</th><th>How it is obtained</th><th>Official source</th></tr></thead>
+    <tbody>
+      <tr><td>Cash balance</td><td><span class="na">blank — no credentials</span></td>
+          <td><code>GET /portfolio/balance</code> → <code>balance_dollars</code></td>
+          <td><a href="https://docs.kalshi.com/api-reference/portfolio/get-balance" target="_blank" rel="noopener">Get Balance</a></td></tr>
+      <tr><td>Portfolio value</td><td><span class="na">blank — no credentials</span></td>
+          <td><code>GET /portfolio/balance</code> → <code>portfolio_value</code></td>
+          <td><a href="https://docs.kalshi.com/api-reference/portfolio/get-balance" target="_blank" rel="noopener">Get Balance</a></td></tr>
+      <tr><td>Open positions</td><td><span class="na">blank — no credentials</span></td>
+          <td><code>GET /portfolio/positions</code> → <code>market_positions[]</code></td>
+          <td><a href="https://docs.kalshi.com/api-reference/portfolio/get-positions" target="_blank" rel="noopener">Get Positions</a></td></tr>
+      <tr><td>Realised P&amp;L / fees</td><td><span class="na">blank — no credentials</span></td>
+          <td><code>realized_pnl_dollars</code>, <code>fees_paid_dollars</code> per position</td>
+          <td><a href="https://docs.kalshi.com/api-reference/portfolio/get-positions" target="_blank" rel="noopener">Get Positions</a></td></tr>
+      <tr><td>Fill history</td><td><span class="na">blank — no credentials</span></td>
+          <td><code>GET /portfolio/fills</code> → <code>outcome_side</code>, <code>count_fp</code>, <code>fee_cost</code></td>
+          <td><a href="https://docs.kalshi.com/api-reference/portfolio/get-fills" target="_blank" rel="noopener">Get Fills</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>2 · Executor — ready, unexercised</h2>
+  <p class="small mut">
+    <code>scripts/kalshi_client.py</code> signs requests with Ed25519 or RSA-PSS exactly as documented
+    (timestamp + method + path without query, 30-second clock tolerance) and posts to the current V2 endpoint
+    <code>POST /portfolio/events/orders</code>. It reads credentials only from environment variables, never from the repo.
+  </p>
+  <div class="tw"><table>
+    <thead><tr><th>Action</th><th>Request contract (verified)</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Place an order</td>
+          <td><code>POST /portfolio/events/orders</code> with <code>ticker</code>, <code>side</code> (<code>bid</code>|<code>ask</code>),
+              <code>count</code>, <code>price</code>, <code>time_in_force</code>, <code>self_trade_prevention_type</code>.
+              A <code>201</code> means accepted, <em>not</em> resting — check <code>remaining_count</code>.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td></tr>
+      <tr><td>Do <em>not</em> use</td>
+          <td>The legacy <code>/portfolio/orders</code> write endpoints are removed and return <code>410 Gone</code> with
+              <code>deprecated_v1_order_endpoint</code>. Earlier builds of this repo used them.</td>
+          <td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Create Order (V2)</a></td></tr>
+      <tr><td>Credentials</td>
+          <td>Key ID plus private key PEM. Header set: <code>KALSHI-ACCESS-KEY</code>, <code>KALSHI-ACCESS-TIMESTAMP</code>,
+              <code>KALSHI-ACCESS-SIGNATURE</code>. Demo and production keys are not interchangeable.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/api_keys" target="_blank" rel="noopener">API Keys</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>3 · Paper ledger — the analysis loop, testable now</h2>
+  <p class="small mut">
+    Stored only in this browser (<code>localStorage</code>), starting at $10,000 of pretend cash. It is a simulation and is
+    labelled as one everywhere. Fees are modelled at the documented general taker rate so the P&amp;L is not flattering:
+    <code>fee = ceil(M × 0.07 × C × P × (1 − P))</code>
+    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>).
+    Per-series multipliers can differ, so treat net P&amp;L as an estimate.
+  </p>
+
+  <div class="grid">
+    <div class="card"><div class="kpi" id="pCash">—</div><small class="mut">paper cash</small></div>
+    <div class="card"><div class="kpi" id="pGross">—</div><small class="mut">gross stake placed</small></div>
+    <div class="card"><div class="kpi" id="pFees">—</div><small class="mut">modelled taker fees</small></div>
+    <div class="card"><div class="kpi" id="pOpen">—</div><small class="mut">open risk (unresolved)</small></div>
+  </div>
+
+  <div class="card">
+    <h3>Execute a paper trade</h3>
+    <div class="controls">
+      <label>Market <select id="tTicker"></select></label>
+      <label>Outcome <select id="tSide"><option value="yes">YES</option><option value="no">NO</option></select></label>
+      <label>Contracts <input id="tCount" type="number" min="1" step="1" value="10"></label>
+      <label>Limit price ($) <input id="tPrice" type="number" min="0.01" max="0.99" step="0.01" value="0.50"></label>
+      <button id="tGo">Place paper order</button>
+      <button class="ghost" id="tReset">Reset ledger</button>
+    </div>
+    <p class="small mut" id="tMsg">The market list is populated from the current snapshot, so tickers are real and never typed by hand.</p>
+  </div>
+
+  <h2>Performance by trade type</h2>
+  <p class="small mut">Trades are categorised by the market's category (from the snapshot, not by guessing from the ticker) and by
+     price band, because the fee formula and the payout profile behave very differently near 50¢ versus near $1.00.</p>
+  <div id="byCat"></div>
+  <div id="byBand"></div>
+
+  <h2>Paper trade log</h2>
+  <div id="log"></div>
+
+  <h2>What each column can and cannot tell you</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Metric</th><th>Meaning</th><th>Limit you must know</th></tr></thead>
+    <tbody>
+      <tr><td>Gross stake</td><td>Sum of contracts × price.</td><td>Not the amount at risk in the way a stock position is: a binary contract is worth $1 or $0.</td></tr>
+      <tr><td>Modelled fees</td><td>Taker fee at the general 0.07 rate.</td><td>Ignores per-series multipliers, which range from 0/0 to 1/1 in the fee schedule.</td></tr>
+      <tr><td>Open risk</td><td>Stake in markets whose <code>result</code> is still empty.</td><td>Becomes realised only when the API returns a result; the paper ledger cannot resolve itself.</td></tr>
+      <tr><td>Win rate</td><td>Not shown until trades resolve.</td><td>Deliberately blank rather than estimated from prices, which would be circular.</td></tr>
+    </tbody>
+  </table></div>
+
+</main>
+<footer><div class="wrap">
+KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
+<a href="https://docs.kalshi.com/getting_started/demo_env">Demo Environment</a> ·
+<a href="sources.html">every source</a> ·
+<a href="flagged.html">flagged for review</a>
+</div></footer>
+<script src="assets/site.js"></script>
+<script>
+KD.nav("portfolio.html");
+const KEY = "kalshidash3.paper.v2";
+const BANDS = [[0, .1, "0–10¢"], [.1, .25, "10–25¢"], [.25, .5, "25–50¢"], [.5, .75, "50–75¢"], [.75, .9, "75–90¢"], [.9, 1.0001, "90–100¢"]];
+const bandOf = p => (BANDS.find(b => p >= b[0] && p < b[1]) || BANDS[BANDS.length - 1])[2];
+const takerFee = (c, p) => Math.ceil(1 * 0.07 * c * p * (1 - p) * 100) / 100;
+
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || { cash: 10000, trades: [] }; } catch { return { cash: 10000, trades: [] }; } };
+const save = o => localStorage.setItem(KEY, JSON.stringify(o));
+
+let snap = null, marketIndex = {};
+
+function fillTickerSelect() {
+  const sel = KD.$("#tTicker");
+  if (!snap) { sel.innerHTML = '<option value="">no snapshot</option>'; return; }
+  const opts = (snap.open_markets || []).slice(0, 150).map(r =>
+    `<option value="${KD.esc(r.ticker)}">${KD.esc(r.title.slice(0, 80))} — ${KD.esc(r.ticker)}</option>`);
+  sel.innerHTML = opts.join("") || '<option value="">no open markets in scope</option>';
+  const first = (snap.open_markets || [])[0];
+  if (first) KD.$("#tPrice").value = (first.last_price_dollars ?? 0.5).toFixed(2);
+  sel.addEventListener("change", () => {
+    const m = marketIndex[sel.value];
+    if (m && m.last_price_dollars != null) KD.$("#tPrice").value = m.last_price_dollars.toFixed(2);
+  });
+}
+
+function render() {
+  const L = load();
+  const gross = L.trades.reduce((a, t) => a + t.count * t.price, 0);
+  const fees = L.trades.reduce((a, t) => a + t.fee, 0);
+  const openRisk = L.trades.filter(t => t.unresolved).reduce((a, t) => a + t.count * t.price, 0);
+  KD.$("#pCash").textContent = "$" + L.cash.toFixed(2);
+  KD.$("#pGross").textContent = "$" + gross.toFixed(2);
+  KD.$("#pFees").textContent = "$" + fees.toFixed(2);
+  KD.$("#pOpen").textContent = "$" + openRisk.toFixed(2);
+
+  // By category
+  const byCat = {};
+  for (const t of L.trades) {
+    const c = t.category || "unknown";
+    byCat[c] ||= { n: 0, stake: 0, fee: 0, contracts: 0 };
+    byCat[c].n++; byCat[c].stake += t.count * t.price; byCat[c].fee += t.fee; byCat[c].contracts += t.count;
+  }
+  KD.$("#byCat").innerHTML = KD.table([
+    { key: "cat", label: "Category" }, { key: "n", label: "Trades", num: true },
+    { key: "contracts", label: "Contracts", num: true }, { key: "stake", label: "Gross stake", num: true },
+    { key: "fee", label: "Fees", num: true }, { key: "sb", label: "Stake by basis" },
+  ], Object.entries(byCat).map(([c, v]) => ({
+    cat: KD.CAT_LABEL[c] || c,
+    n: KD.num(v.n), contracts: KD.num(v.contracts),
+    stake: KD.money(v.stake), fee: KD.money(v.fee),
+    sb: KD.CAT_LABEL[c] ? KD.basisBadge((snap?.open_markets || []).find(r => r.category_id === c)?.category_basis || "keyword") : '<span class="na">—</span>',
+  })), { empty: "No paper trades yet — place one above. Nothing is estimated in its place." });
+
+  // By price band
+  const byBand = {};
+  for (const t of L.trades) {
+    const b = bandOf(t.price);
+    byBand[b] ||= { n: 0, stake: 0, fee: 0 };
+    byBand[b].n++; byBand[b].stake += t.count * t.price; byBand[b].fee += t.fee;
+  }
+  KD.$("#byBand").innerHTML = KD.table([
+    { key: "band", label: "Entry price band" }, { key: "n", label: "Trades", num: true },
+    { key: "stake", label: "Gross stake", num: true }, { key: "fee", label: "Fees", num: true },
+    { key: "feePct", label: "Fee as % of stake", num: true },
+  ], BANDS.filter(b => byBand[b[2]]).map(b => {
+    const v = byBand[b[2]];
+    return {
+      band: b[2], n: KD.num(v.n), stake: KD.money(v.stake), fee: KD.money(v.fee),
+      feePct: v.stake ? KD.pct(v.fee / v.stake, 2) : '<span class="na">—</span>',
+    };
+  }), { empty: "No paper trades yet." });
+
+  KD.$("#log").innerHTML = KD.table([
+    { key: "when", label: "When (local)" }, { key: "ticker", label: "Market" },
+    { key: "side", label: "Outcome" }, { key: "count", label: "Contracts", num: true },
+    { key: "price", label: "Price", num: true }, { key: "fee", label: "Fee", num: true },
+    { key: "cat", label: "Category" }, { key: "band", label: "Band" }, { key: "snap", label: "Snapshot used" },
+  ], L.trades.slice().reverse().map(t => ({
+    when: KD.esc(new Date(t.ts).toLocaleString()),
+    ticker: `<span class="mono">${KD.esc(t.ticker)}</span>`,
+    side: t.side === "yes" ? '<span class="badge ok">YES</span>' : '<span class="badge bad">NO</span>',
+    count: KD.num(t.count), price: KD.cents(t.price), fee: KD.money(t.fee),
+    cat: KD.CAT_LABEL[t.category] || KD.esc(t.category || "unknown"),
+    band: KD.esc(t.band || bandOf(t.price)),
+    snap: t.snapshot_at ? `<span class="small mut">${KD.ago(t.snapshot_at)}</span>` : '<span class="na">—</span>',
+  })), { empty: "No paper trades yet." });
+}
+
+KD.$("#tGo").addEventListener("click", () => {
+  const ticker = KD.$("#tTicker").value;
+  const side = KD.$("#tSide").value;
+  const count = Math.floor(Number(KD.$("#tCount").value));
+  const price = Number(KD.$("#tPrice").value);
+  const msg = KD.$("#tMsg");
+  if (!ticker) { msg.textContent = "No market selected."; return; }
+  if (!(count > 0)) { msg.textContent = "Contracts must be a positive whole number."; return; }
+  if (!(price > 0 && price < 1)) { msg.textContent = "Price must be between $0.01 and $0.99 — a binary contract pays $1."; return; }
+  const m = marketIndex[ticker] || {};
+  const fee = takerFee(count, price);
+  const cost = count * price + fee;
+  const L = load();
+  if (cost > L.cash) { msg.textContent = `Insufficient paper cash: need $${cost.toFixed(2)}, have $${L.cash.toFixed(2)}.`; return; }
+  L.cash -= cost;
+  L.trades.push({
+    ts: Date.now(), ticker, side, count, price, fee, cost,
+    category: m.category_id || "unknown",
+    category_basis: m.category_basis || "keyword",
+    band: bandOf(price),
+    unresolved: true,
+    snapshot_at: snap?.collected_at || null,
+  });
+  save(L);
+  msg.innerHTML = `Recorded: ${count} × ${side.toUpperCase()} on <code>${KD.esc(ticker)}</code> at ${KD.cents(price)},
+    fee $${fee.toFixed(2)} modelled at the general taker rate. This is a paper trade in this browser only.`;
+  render();
+});
+
+KD.$("#tReset").addEventListener("click", () => {
+  save({ cash: 10000, trades: [] });
+  KD.$("#tMsg").textContent = "Paper ledger reset to $10,000.";
+  render();
+});
+
+(async () => {
+  try { snap = await KD.json("data/live/markets.json"); } catch { snap = null; }
+  KD.snapshotBanner(snap);
+  for (const r of (snap?.open_markets || []).concat(snap?.settled_markets || [])) marketIndex[r.ticker] = r;
+  fillTickerSelect();
+  render();
+})();
+</script>
 </body></html>
