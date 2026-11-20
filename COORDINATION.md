@@ -141,11 +141,11 @@ integrator hat, in the same commits that re-verify them.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T11 | Live alert chats: two scrolling feeds (all events + model picks), ≥$0.10 swing alerts in both directions, links per alert | in progress | arena-a2fca5db | `alerts.html` (new), `assets/engine.js` (new) | Alert threshold is a stated requirement, not an API field; delta math checked against committed `price_history.json` | F-14 (CORS undocumented), F-15 (causality links are leads, not verified causes), F-16 (model is heuristic) |
-| T12 | Server-side alert history + CORS evidence in collector | in progress | arena-a2fca5db | `scripts/collect.py` (handoff), `scripts/tests/validate_live.py` (handoff), `scripts/check_site.py` (handoff) | Emits `data/live/alerts.json` from consecutive observations and `data/live/cors.json` from a real Origin-header probe | F-14 |
-| T13 | Auto-sim trading engine: automated paper trades, 3 strategies, categorised analytics, strategy leaderboard | in progress | arena-a2fca5db | `trading.html` (new), `assets/engine.js` (new) | Fees modelled at the documented general taker rate; fills labelled with basis; resolution settles from API `result` | F-16, F-17 (no demo credentials: engine is paper-only) |
-| T14 | In-browser live mode on dashboard (poll demo API, self-test CORS, snapshot fallback) | in progress | arena-a2fca5db | `dashboard.html`, `assets/engine.js` | Runtime CORS probe; graceful fallback keeps every page working | F-14 |
-| T15 | Integration publish: nav/index/exec-summary/suggestions/flagged updates, PR → main, merge, Pages confirm, collector dispatch | in progress | arena-a2fca5db | `assets/site.js` (nav), `index.html`, `executive-summary.html`, `suggestions.html`, `flagged.html`, `data/findings.json`, `data/verified_facts.json`, `README.md`, `COORDINATION.md` | `check_site.py` + `validate_live.py` before push; link check in Pages build | — |
+| T11 | Live alert chats: two scrolling feeds (all events + model picks), ≥$0.10 swing alerts in both directions, links per alert | done | arena-a2fca5db | `alerts.html` (new), `assets/engine.js` (new) | Alert threshold is a stated requirement, not an API field; delta math checked against committed `price_history.json` | F-14 (CORS undocumented), F-15 (causality links are leads, not verified causes), F-16 (model is heuristic) |
+| T12 | Server-side alert history + CORS evidence in collector | done | arena-a2fca5db | `scripts/collect.py` (handoff), `scripts/tests/validate_live.py` (handoff), `scripts/check_site.py` (handoff) | Emits `data/live/alerts.json` from consecutive observations and `data/live/cors.json` from a real Origin-header probe | F-14 |
+| T13 | Auto-sim trading engine: automated paper trades, 3 strategies, categorised analytics, strategy leaderboard | done | arena-a2fca5db | `trading.html` (new), `assets/engine.js` (new) | Fees modelled at the documented general taker rate; fills labelled with basis; resolution settles from API `result` | F-16, F-17 (no demo credentials: engine is paper-only) |
+| T14 | In-browser live mode on dashboard (poll demo API, self-test CORS, snapshot fallback) | done | arena-a2fca5db | `dashboard.html`, `assets/engine.js` | Runtime CORS probe; graceful fallback keeps every page working | F-14 |
+| T15 | Integration publish: nav/index/exec-summary/suggestions/flagged updates, PR → main, merge, Pages confirm, collector dispatch | done | arena-a2fca5db | `assets/site.js` (nav), `index.html`, `executive-summary.html`, `suggestions.html`, `flagged.html`, `data/findings.json`, `data/verified_facts.json`, `README.md`, `COORDINATION.md` | `check_site.py` + `validate_live.py` before push; link check in Pages build | — |
 
 ### Sources added by this session (all official)
 
@@ -161,3 +161,13 @@ integrator hat, in the same commits that re-verify them.
 - 2026-11-20: Claimed T11–T15; no other session has an active claim (all prior tasks merged via PRs #1–#15).
 - 2026-11-20: Verified demo API responds publicly (no auth) for GET /markets via an external fetcher; fields re-read verbatim
   (`last_price_dollars`, `volume_fp`, `open_interest_fp`, `status:"active"`, `result:""`, `notional_value_dollars:"1.0000"`).
+- 2026-11-20: T11–T14 implemented and verified before push: `node scripts/tests/engine.test.js` (21 assertions: threshold,
+  fee cent-ceil, alert firing both directions, 9¢ non-alert, momentum/reversion entries, bid-basis exits, settlement P&L,
+  scalar left open); `python3 scripts/check_site.py` (18 pages, links OK); `validate_live.py` (489 open / 200 settled /
+  17 orderbooks). Collector exercised end-to-end against a mock demo API: alerts.json detected ±12¢ moves in both
+  directions; cors.json recorded the observed `access-control-allow-origin` header. Defects found and fixed during
+  testing: settlement P&L booked as payout×count instead of (payout−entry)×count; fee cent-ceil overcharged one cent on
+  float noise (also fixed in the older portfolio page); collector alerts were re-dated on every page load (dedupe fix).
+- 2026-11-20: Design decision recorded: auto-sim entries fire only on live in-session alerts; collector-history alerts
+  (~20 min apart) are shown in the chats but are too stale to trade. Documented on trading.html and in F-16/F-17.
+
