@@ -217,6 +217,60 @@ before editing).
 - 2026-11-20 ~13:36Z: follow-up branch commit `a5c5d39` and merge `a83ab25` (merge of `origin/main` `82218d3`). Adds `max_quote_spread_dollars` 0.10 to `data/strategies.json`; `simulate.py` does not fill across wider quotes and voids breaching open positions; the page labels them VOID; 16 unit tests OK; `validate_live.py` OK; `check_site.py` OK. Opened as PR #21 for merge to `main`. Its merge result is in the session report, not in this board row, because the board itself can only change through a PR.
 - Collector runs (checked 13:31 UTC with `gh run list --workflow collect.yml`): the last six runs are all `workflow_dispatch`, none `schedule`. The 13:18:05Z run was dispatched from `arena/5225610f-kalshidash3` and produced the 13:18:28Z snapshot. F-16 stays open.
 
+## Session `arena-0a479d8c` — review + chart jump markers + alert-feed tests (branch `arena/0a479d8c-kalshidash3`)
+
+Branched from `cd104db`. This session reviewed the whole repository line by line and attempted to build
+the live alerting system. On merging `origin/main` it found that the alerting requirement was **already
+fulfilled** by earlier sessions, so it withdrew its duplicate and kept only non-duplicative work.
+
+### What this session found
+
+- **Alerting already done.** `arena-6d85f8f0` (T11, PR #16) put two scrolling ≥ $0.10 swing feeds on
+  `dashboard.html` (*All qualifying events* + *Model watch*), and `arena-5225610f` (T12, PR #18) added the
+  append-only `data/live/alerts_archive.json` via `scripts/build_alerts.py`. Those sessions **explicitly
+  removed** a separate `alerts.html` as a duplicate of the dashboard feeds.
+- **Decision:** this session respected that single-UI decision. It did **not** reintroduce `alerts.html`;
+  the dashboard's two scrolling feeds remain the single alert UI.
+
+### What this session kept (non-duplicative)
+
+| Contribution | Files | Why it is not a duplicate |
+|---|---|---|
+| Jump markers + event links on the price chart (≥ $0.10 swings marked, each linked to the official market/event API URL, cause blank + flagged) | `dashboard.html`, `assets/site.css` | Adds jump markers to the chart itself; the dashboard feeds are a separate section and do not mark the chart |
+| Alert-feed tests (schema, $0.10 threshold, both directions, blank cause, high-ROI ⊆ all-events, real tickers) | `scripts/tests/test_alerts.py` | Prior sessions tested the simulator (`test_simulate.py`) but had no test guarding `alerts.json`; wired into `pages.yml` and `collect.yml` |
+| Line-by-line review + this log | `COORDINATION.md` | Coordination record required by the brief |
+
+### Merge conflict resolution
+
+`main` advanced during this session (PRs #16, #18, #20, #21). The PR merge was not cleanly mergeable.
+Resolved by merging `origin/main` into the branch and, for the files the earlier sessions owned
+(`data/live/alerts.json`, `data/findings.json`, `executive-summary.html`, `scripts/check_site.py`,
+`scripts/tests/validate_live.py`, `README.md`, `COORDINATION.md`, `dashboard.html`), keeping `main`'s
+version and re-applying only this session's non-duplicative additions (chart markers, test file, log).
+No earlier session's work was discarded; the duplicate `alerts.html` this session had added was removed
+to honour the single-alert-UI decision.
+
+### Verification
+
+`python3 scripts/tests/validate_live.py` OK · `python3 scripts/tests/test_alerts.py` (13 tests) OK ·
+`python3 scripts/tests/test_simulate.py` OK · `python3 scripts/check_site.py` OK (18 pages) ·
+`node --check` on every inline and asset script OK. This sandbox has no route to docs.kalshi.com or the
+Kalshi API (outbound allowlist), so verification was against the committed, source-cited data and
+internal cross-checks; that limitation is stated rather than papered over.
+
+### Log
+
+- 2026-11-20: Claimed T8–T10 and committed the claim (single active session at claim time).
+- 2026-11-20: Reviewed the repository line by line. Confirmed the alerting requirement was already met by
+  T11/T12; withdrew the duplicate alerts page and kept the chart jump markers + alert-feed tests.
+- 2026-11-20: Merged `origin/main` (advanced by PRs #16/#18/#20/#21); resolved the conflict by adopting
+  main's canonical architecture and re-applying only the non-duplicative additions. PR #22 opened for merge.
+- 2026-11-20: **PR #22 merged** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/22 , merge commit
+  `c37aad297abcc8ee85533a5dab23e46cde1384c9` (merged 2026-11-20T13:46:25Z). GitHub Pages rebuild completed
+  successfully (run 44747260546, conclusion `success`); Pages API reports `status=built`, live site
+  https://kanlerxz87-cyber.github.io/KalshiDash3/ (source `main /`). No irregularities were introduced by this
+  session; prior sessions' flagged items (F-14, F-15, etc.) remain on the Flagged for Review page.
+
 ## Session `arena-d879c640` — final integration (branch `arena/d879c640-kalshidash3`)
 
 ### Task board (this session)
