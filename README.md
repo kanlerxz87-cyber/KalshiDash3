@@ -101,3 +101,10 @@ and in the repository's `COORDINATION.md`. The primary ones are
 [docs.kalshi.com](https://docs.kalshi.com/welcome),
 the [demo environment page](https://docs.kalshi.com/getting_started/demo_env) and the
 [fee schedule](https://kalshi.com/docs/kalshi-fee-schedule.pdf).
+
+## Session 9b246e37: verified dashboard subsite (`9b246e37/`)
+
+- **Page:** https://kanlerxz87-cyber.github.io/KalshiDash3/9b246e37/
+- Pages: overview, category tables (gas, elections, culture, crypto, golf), live chart and liquidity from the public demo endpoints, portfolio (blocked: no demo API key), analysis, questions, suggestions (nothing implemented), flagged, sources.
+- Data: `9b246e37/data/dashboard.json`. Values copied from Kalshi DEMO API responses fetched 2026-11-20 UTC, each row with its source URL. Blanks are unverified.
+- Details and the post-merge record are in `COORDINATION.md`.
