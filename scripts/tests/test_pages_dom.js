@@ -382,7 +382,25 @@ function commonAsserts(label, r) {
       check(!bodies.some(t => /QA7CECC5|Portfolio cash out/.test(t)),
         "index.html: a demo QA fixture must never be the largest live market of a category");
     }
-    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
+    // Resolution tracker (F-65): the landing page must show more than one topic when the
+    // snapshot stores more than one, and must state the stored count per topic and the scan
+    // total. Pre-fix, the stored set was 198/200 crypto and the wording implied it was all.
+    const res = r.doc.querySelector("#resolutions");
+    check(!!res, "index.html: the resolution tracker must render");
+    const resText = res ? res.textContent : "";
+    const storedCats = new Set((markets.settled_markets || []).map(x => x.category_id));
+    if (storedCats.size > 1) {
+      const shownCats = new Set([...(res ? res.querySelectorAll("tbody tr") : [])]
+        .map(tr => tr.children[1] ? tr.children[1].textContent.trim() : "")
+        .filter(Boolean));
+      check(shownCats.size > 1,
+        `index.html: the resolution tracker must show more than one topic when the snapshot stores ${storedCats.size} (got ${[...shownCats].join(",") || "nothing"})`);
+      check(/per topic/i.test(resText),
+        "index.html: the resolution tracker must say the rows are chosen per topic");
+      check(/Stored yes\/no rows by topic/.test(resText),
+        "index.html: the resolution tracker must state how many stored rows each topic has");
+    }
+    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present, ${res ? res.querySelectorAll("tbody tr").length : 0} resolution rows across ${storedCats.size} stored topic(s))`);
     r.close();
   }
 
