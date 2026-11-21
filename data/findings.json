@@ -332,13 +332,8 @@
   },
   {
    "id": "G19",
-<<<<<<< HEAD
    "suggestion": "Add a candle-derived backstop feed for swings the 15-minute (relay) observation gap misses",
    "why_it_helps_decisions": "F-70 shows a real 8.1c intraday move (KXPGATOUR-THRC26-MPEN, 2026-11-21) that the observation-only rule did not raise, because both surrounding snapshots read 0.00. A backstop that polls GET /series/{s}/markets/{t}/candlesticks at 1-minute resolution for the markets on the watch list would catch moves that open and close between collector runs \u2014 which is the case the brief's 'sudden swings' wording is actually about.",
-=======
-   "suggestion": "Add a candle-derived backstop feed for swings the 20-minute observation gap misses",
-   "why_it_helps_decisions": "F-70 shows a real 8.1c intraday move (KXPGATOUR-THRC26-MPEN, 2026-11-21) that the observation-only rule did not raise, because both surrounding snapshots read 0.00. A backstop that polls GET /series/{s}/markets/{t}/candlesticks at 1-minute resolution for the markets on the watch list would catch moves that open and close between collector runs — which is the case the brief's 'sudden swings' wording is actually about.",
->>>>>>> 65d5d30 (T68: record F-75/F-76/F-77 with the measurements behind the evidence layer)
    "effort": "Medium: one more browser-side loop using the endpoint assets/live.js already wraps, plus a distinct 'candle-derived' badge so a reader can tell which rule fired.",
    "risk": "Candles are aggregated, so a single 10c high-low range inside one minute is not the same evidence as two observed prints 10c apart. Mixing them without labelling would overstate conviction — the badge and a separate feed are what keep it honest. Rate limits apply per IP; unauthenticated requests have separate limits (https://docs.kalshi.com/getting_started/rate_limits).",
    "success_metric": "Every alert carries its basis ('observation' or 'candle'), and replaying the F-70 case produces a candle-derived alert while leaving the observation feed unchanged.",
@@ -972,15 +967,9 @@
   {
    "id": "F-74",
    "severity": "medium",
-<<<<<<< HEAD
    "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
    "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops.",
    "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
-=======
-   "item": "freshness-alarm.yml dispatches with a flag gh does not have — every alarm dispatch takes its 'dispatch failed' branch (R-B7)",
-   "why": ".github/workflows/freshness-alarm.yml (still on main at the time of writing) dispatches the collector with `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI `workflow run` command defines no `--event` flag — only `--ref`, `--field`, `--raw-field` and `--json` (cli/cli, pkg/cmd/workflow/run/run.go; latest release v2.105.0, 2026-11-18), and local gh 2.23.0 rejects the invocation with 'unknown flag: --event'. Every alarm dispatch therefore fails, and the workflow file has been in that state since it was written. Note (ID namespace): this project numbers several ledgers in parallel (verified_facts.json and findings.json both use F-nn); verified_facts.json also has an F-72 (candlestick path parameters).",
-   "action": "Not fixed in this PR (the file's newest owner is arena-b25b0914, whose T55 makes the alarm a secondary restart path once fixed; F-75.. may be taken by other in-flight sessions). Correction per the source: drop the invalid `--event workflow_dispatch` argument. While a relay is running on main, its in-flight guard stops the alarm from dispatching anyway. Flagged for the owner or the next integration session; first flagged 2026-11-21T21:20Z (arena-d60d648c, carrying R-B7).",
->>>>>>> 65d5d30 (T68: record F-75/F-76/F-77 with the measurements behind the evidence layer)
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",
