@@ -1388,9 +1388,9 @@ Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:17Z before editing a
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T44 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
-| T45 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
-| T46 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
+| T47 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
+| T48 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
+| T49 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
 
 ### Log (this session)
 - 2026-11-21 20:17Z: claimed T40–T42 on `arena/dba435ee-kalshidash3` (base `f09f982` == main). Snapshot `collected_at 2026-11-21T15:21:23Z` is ~5h old (stale banner at 45 min); desk scan `2026-11-21T17:57Z` is ~2.3h old. Starting verification.
@@ -1458,3 +1458,10 @@ claimed `index.html`, `dashboard.html`, `assets/*.js`; `executive-summary.html` 
 
 I verified the *substance* of every R-2…R-6 row against official sources while doing this; only the ids and the two
 hard-coded totals are wrong. None of them changes a sourced value.
+
+- 2026-11-21 20:30Z: **second task-ID collision.** `arena-b25b0914` claimed T43–T46 at ~20:22Z (`694cc07`). My tasks
+  moved again, to **T47–T49**. Critically, their T44 scope explicitly includes `executive-summary.html`, which is
+  the file my requests R-2…R-6 point at — so I will **not** touch it; those five requests stand for them to apply.
+  Three sessions are now live (`arena-83749e18`, `arena-b25b0914`, `arena-dba435ee`) and all three intend to merge
+  to `main`. To avoid duplicate/conflicting merges I am keeping my diff to `data/verified_facts.json` (facts only,
+  no shared output) plus this log, and running `git pull --rebase` immediately before every push.
