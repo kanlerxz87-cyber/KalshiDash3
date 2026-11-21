@@ -80,7 +80,7 @@
    "question": "Which polling cadence is affordable?",
    "known": "Authenticated requests cost 10 tokens by default against Read/Write buckets; unauthenticated public requests are limited separately; 429 returns too_many_requests with X-RateLimit-* headers and no Retry-After. GET /portfolio/balance has its own bucket (1/s or 5/s depending on tier).",
    "unknown": "The account's tier, so the token budget is unknown. endpoint_costs was not queried because that needs credentials.",
-   "answer_if_forced": "Keep public reads modest: one collector run per 20 minutes reading markets in bulk, plus four orderbooks per category, is far inside any documented limit.",
+   "answer_if_forced": "Keep public reads modest: one collector run about every 15 minutes while the relay runs (each page shows the snapshot age), reading markets in bulk, plus four orderbooks per category, is far inside any documented limit.",
    "decision_needed": "Once keys exist, call GET /account/endpoint_costs and record the tier here.",
    "sources": [
     "https://docs.kalshi.com/getting_started/rate_limits",
@@ -332,7 +332,7 @@
   },
   {
    "id": "G19",
-   "suggestion": "Add a candle-derived backstop feed for swings the 20-minute observation gap misses",
+   "suggestion": "Add a candle-derived backstop feed for swings the 15-minute (relay) observation gap misses",
    "why_it_helps_decisions": "F-70 shows a real 8.1c intraday move (KXPGATOUR-THRC26-MPEN, 2026-11-21) that the observation-only rule did not raise, because both surrounding snapshots read 0.00. A backstop that polls GET /series/{s}/markets/{t}/candlesticks at 1-minute resolution for the markets on the watch list would catch moves that open and close between collector runs \u2014 which is the case the brief's 'sudden swings' wording is actually about.",
    "effort": "Medium: one more browser-side loop using the endpoint assets/live.js already wraps, plus a distinct 'candle-derived' badge so a reader can tell which rule fired.",
    "risk": "Candles are aggregated, so a single 10c high-low range inside one minute is not the same evidence as two observed prints 10c apart. Mixing them without labelling would overstate conviction \u2014 the badge and a separate feed are what keep it honest. Rate limits apply per IP; unauthenticated requests have separate limits (https://docs.kalshi.com/getting_started/rate_limits).",
@@ -944,20 +944,19 @@
    "severity": "low",
    "item": "Site copy still describes a '20-minute' collector cadence; collect.yml declared 7,27,47 + 13,43 since PR #54, and main now sweeps on a 15-minute relay grid (R-B8)",
    "why": "executive-summary.html, live.html, portfolio.html, an assets/live.js comment and data/findings.json texts still say 'every 20 minutes' in places. collect.yml has declared two off-peak crons since PR #54, and PR #62 (merged 2026-11-21T21:13:41Z) replaces the declared cron behaviour on main with a bounded relay (one run, fixed 15-minute grid, <= 5.5 h, one queued successor, pages.yml per committed pass). The pages' own snapshot-age banner is the accurate signal; the hard-coded prose is not.",
-   "action": "FIXED 2026-11-21 (session arena-86046b80, T62): updated executive-summary.html, portfolio.html, assets/live.js comments, and assets/chatdock.js health status (R-B1 + R-B8) to report the 15-minute relay cadence on main and the live snapshot age instead of the retired 20-minute / */20 cron wording. Regression-tested in scripts/tests/test_chatdock.js and scripts/tests/test_pages_dom.js.",
+   "action": "Fixed 2026-11-21 (arena-2a7c58f1, T57): executive-summary.html (2 rows), portfolio.html, assets/live.js (2 comments) and assets/chatdock.js health line (was hard-coded '*/20 * * * *' every 20m; now '15-min grid (cron restart: 7,27,47 + 13,43)' every 15m, with test_chatdock.js updated) now say 'about every 15 minutes while the relay runs; each page shows the snapshot age' (scripts/collect_relay.py INTERVAL_DEFAULT_MIN=15; collect.yml header: fixed 15-minute grid). data/findings.json Q7/G19 forward-looking texts updated to match; F-40/F-70 kept as historical measurements of the old 20-minute cron. Verified by grep (no live '20-minute' cadence claim remains outside historical records) + verify_release.py PASS.",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md"
-   ],
-   "status": "fixed, verified (2026-11-21)"
+   ]
   },
   {
    "id": "F-74",
    "severity": "medium",
-   "item": "freshness-alarm.yml dispatches with a flag gh does not have \u2014 every alarm dispatch takes its 'dispatch failed' branch (R-B7)",
-   "why": ".github/workflows/freshness-alarm.yml (still on main at the time of writing) dispatches the collector with `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI `workflow run` command defines no `--event` flag \u2014 only `--ref`, `--field`, `--raw-field` and `--json` (cli/cli, pkg/cmd/workflow/run/run.go; latest release v2.105.0, 2026-11-18), and local gh 2.23.0 rejects the invocation with 'unknown flag: --event'. Every alarm dispatch therefore fails, and the workflow file has been in that state since it was written. Note (ID namespace): this project numbers several ledgers in parallel (verified_facts.json and findings.json both use F-nn); verified_facts.json also has an F-72 (candlestick path parameters).",
-   "action": "Not fixed in this PR (the file's newest owner is arena-b25b0914, whose T55 makes the alarm a secondary restart path once fixed; F-75.. may be taken by other in-flight sessions). Correction per the source: drop the invalid `--event workflow_dispatch` argument. While a relay is running on main, its in-flight guard stops the alarm from dispatching anyway. Flagged for the owner or the next integration session; first flagged 2026-11-21T21:20Z (arena-d60d648c, carrying R-B7).",
+   "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
+   "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops.",
+   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",

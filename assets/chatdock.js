@@ -375,7 +375,7 @@ const KDCHAT = (() => {
           ? `collector relay running (15-min grid on main · started ${h.activeAt ? esc(ago(h.activeAt)) : "recently"})`
           : queued
             ? `collector relay queued (15-min grid on main)`
-            : `collector workflow (15-min relay on main)`;
+            : `collector relay (15-min grid on main · cron restart: 7,27,47 + 13,43)`;
         host.innerHTML =
           `<span class="cd-health ${late ? "warn" : "ok"}">` +
           `${lead}: ${h.scheduled} of the last ${h.runs} runs were scheduled` +

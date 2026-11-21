@@ -1,8 +1,9 @@
 /* KalshiDash3 — browser-live layer (T13/T14/T15, session arena-d022c8de)
  *
  * Why this file exists: every other surface on this site renders a snapshot
- * committed by the collector workflow (https://.../actions/workflows/collect.yml,
- * 15-minute relay grid on main). That is auditable but it is not live. This layer talks to
+ * committed by a scheduled collector (https://.../actions/workflows/collect.yml,
+ * about every 15 minutes while the relay runs; each page shows the snapshot age).
+ * That is auditable but it is not live. This layer talks to
  * the official public demo REST API directly from the page, so the alert chat and
  * the price chart move on a tick cadence, and it degrades to the committed
  * snapshot when the browser cannot reach the API.
@@ -634,7 +635,8 @@ const KDLIVE = (() => {
       let watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
       if (S.mode === "live-api") {
         // Discover on the first live pass even when a snapshot already seeded the list: the
-        // committed file can be 15+ minutes old, and a market opened since then must be watched.
+        // committed file can be stale (about 15 minutes old while the relay runs, older if the
+        // schedule stalls), and a market opened since then must be watched.
         if (!S.discoveredAt || Date.now() - S.discoveredAt > (opts.discoverMs || 300000) || !watch.length) await discover(!watch.length);
         watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
         if (watch.length) {
