@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T06:54:15Z",
- "snapshot_collected_at": "2026-11-21T06:54:14Z",
+ "generated_at": "2026-11-21T06:56:14Z",
+ "snapshot_collected_at": "2026-11-21T06:56:14Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,12 +11,34 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 25,
-  "high_roi": 7,
-  "archive_total": 25,
-  "new_this_run": 3
+  "all_events": 26,
+  "high_roi": 8,
+  "archive_total": 26,
+  "new_this_run": 1
  },
  "all_events": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-21T06:54:14Z",
+   "to_time": "2026-11-21T06:56:14Z",
+   "from_price": 0.97,
+   "to_price": 0.01,
+   "delta": -0.96,
+   "direction": "down",
+   "volume_24h_fp": 95853.49,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:56:14Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -553,6 +575,28 @@
   }
  ],
  "high_roi": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-21T06:54:14Z",
+   "to_time": "2026-11-21T06:56:14Z",
+   "from_price": 0.97,
+   "to_price": 0.01,
+   "delta": -0.96,
+   "direction": "down",
+   "volume_24h_fp": 95853.49,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:56:14Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
