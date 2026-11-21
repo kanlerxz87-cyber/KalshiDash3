@@ -18,7 +18,13 @@ Checks
      recorded category_basis/volume_24h_fp (detection-time values), so the check does
      not depend on which snapshot happens to be on disk; the snapshot is a fallback
      for legacy rows without those fields
-  6. provenance: every alert whose market still has both observations in
+  6. evidence (T66): every alert carries `evidence`, the block that says whether contracts
+     actually traded between its two observations. The contract count is RECOMPUTED from the
+     committed volume_fp readings and must match exactly; a state that a recalculation
+     contradicts is refused. Quote-only swings (zero contracts traded) must be labelled as such,
+     and an interval whose cumulative volume did not increase must leave the count null instead
+     of recording a negative number.
+  7. provenance: every alert whose market still has both observations in
      price_history.json must match the recomputed diff exactly; every re-derivable
      swing must be present in the archive. Alerts whose market was pruned from the
      collector's price history are allowed (that is why the archive exists) and are
@@ -53,6 +59,8 @@ COMPATIBLE = {
 
 errors: list[str] = []
 archive_only = 0
+candle_only = 0
+ev_counts: dict = {}
 
 
 def check(cond: bool, msg: str) -> None:
@@ -79,7 +87,7 @@ def iso_z(v: str) -> bool:
 
 
 def main() -> int:
-    global archive_only
+    global archive_only, candle_only
     alerts_doc = load(LIVE / "alerts.json")
     archive_doc = load(LIVE / "alerts_archive.json")
     rules = load(RULES)
@@ -124,6 +132,67 @@ def main() -> int:
         check(a.get("cause_link") is None, f"{tag} cause_link must stay null (no official cause source — F-25)")
         check("unverified" in str(a.get("cause_status", "")), f"{tag} cause_status must state unverified")
         check(isinstance(a.get("high_roi"), bool), f"{tag} high_roi must be a boolean")
+
+    # ---- evidence layer (T66) ----
+    # Recomputed here from the committed observations, independent of scripts/alert_evidence.py's
+    # own copy of the rule, so a bug in the classifier cannot validate itself.
+    hist_for_evidence = load(LIVE / "price_history.json") or {}
+    ev_series = hist_for_evidence.get("series") or {}
+    ev_states = ("traded_ge_floor", "traded_below_floor", "quote_only",
+                 "counter_reset", "candle_unquantified", "unknown_no_observations")
+    ev_counts.clear()
+    ev_counts.update({s: 0 for s in ev_states})
+    floor = float((rules.get("evidence") or {}).get("floor_contracts", 100.0))
+    for a in archive or []:
+        tag = f"archive:{a.get('ticker')}@{a.get('to_time')}"
+        ev = a.get("evidence")
+        check(isinstance(ev, dict), f"{tag} evidence block missing (T66)")
+        if not isinstance(ev, dict):
+            continue
+        state = ev.get("state")
+        check(state in ev_states, f"{tag} evidence.state {state!r} is not one of {ev_states}")
+        if state in ev_states:
+            ev_counts[state] += 1
+        check(ev.get("policy_floor_is_a_kalshi_field") is False,
+              f"{tag} evidence must disclose that the floor is a project rule, not a Kalshi field")
+        check(isinstance(ev.get("why"), str) and ev.get("why"), f"{tag} evidence.why must explain the state")
+        obs = sorted(((ev_series.get(a.get("ticker")) or {}).get("observations") or []),
+                     key=lambda o: o.get("t") or "")
+        by_t = {o.get("t"): o for o in obs}
+        p0, p1 = by_t.get(a.get("from_time")), by_t.get(a.get("to_time"))
+        if p0 is None or p1 is None:
+            check(state == "unknown_no_observations",
+                  f"{tag} has no committed observations but is labelled {state!r}")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} no observations, so contract count must stay null")
+            continue
+        def fnum(v):
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return None
+        v0, v1 = fnum(p0.get("volume_fp")), fnum(p1.get("volume_fp"))
+        if (p0.get("source") or "rest") != "rest" or (p1.get("source") or "rest") != "rest":
+            check(state == "candle_unquantified",
+                  f"{tag} is bounded by a candle-backfill observation, so it must be labelled "
+                  f"candle_unquantified (got {state!r}): candlestick volume_fp is per period")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} candle-derived interval count must stay null")
+            continue
+        if v0 is None or v1 is None or v1 < v0:
+            check(state == "counter_reset", f"{tag} volume does not increase but is labelled {state!r}")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} interval count is unknowable, so it must stay null (got {ev.get('contracts_traded')!r})")
+            continue
+        traded = round(v1 - v0, 2)
+        check(ev.get("contracts_traded") == traded,
+              f"{tag} contracts_traded {ev.get('contracts_traded')!r} != volume_to - volume_from ({traded})")
+        want = ("quote_only" if traded == 0
+                else "traded_ge_floor" if traded >= floor else "traded_below_floor")
+        check(state == want, f"{tag} state {state!r} contradicted by {traded} contracts traded "
+                             f"(floor {floor:g}) -> {want!r}")
+        if traded == 0:
+            check(state == "quote_only", f"{tag} zero contracts traded must be labelled quote_only")
 
     # ---- feeds reproduce from the archive ----
     # F-65: build_alerts.py withholds an alert whose series the exchange files outside the topic
@@ -185,6 +254,34 @@ def main() -> int:
     check(counts.get("archive_total") == len(archive), "counts.archive_total mismatch")
     check(float(alerts_doc.get("threshold_dollars", -1)) == threshold, "alerts.json threshold differs from alert_rules.json")
     check(bool(alerts_doc.get("disclaimers")), "alerts.json disclaimers missing")
+    ev_pub = (alerts_doc.get("counts") or {}).get("evidence")
+    check(isinstance(ev_pub, dict), "alerts.json counts.evidence missing (T66)")
+    if isinstance(ev_pub, dict):
+        for st in ev_states:
+            check(st in ev_pub, f"counts.evidence must always publish {st}")
+        # The published block describes the SERVED feeds (the archive also holds rows withheld as
+        # out of scope or as a category conflict), so it is recomputed over exactly the rows that
+        # were served and must equal them state by state. Comparing it with the whole archive
+        # would let a published ratio quietly under-count while the check still passed.
+        served_keys = {(a.get("ticker"), a.get("from_time"), a.get("to_time")) for a in served}
+        ev_served = {st: 0 for st in ev_states}
+        for a in archive or []:
+            key = (a.get("ticker"), a.get("from_time"), a.get("to_time"))
+            if key not in served_keys:
+                continue
+            st = (a.get("evidence") or {}).get("state")
+            if st in ev_served:
+                ev_served[st] += 1
+        for st in ev_states:
+            check(ev_pub.get(st) == ev_served[st],
+                  f"counts.evidence.{st} {ev_pub.get(st)} != recomputed {ev_served[st]} "
+                  f"over the served rows")
+        check(sum(ev_served.values()) == len(served),
+              f"counts.evidence states must partition the {len(served)} served rows, "
+              f"got {sum(ev_served.values())}")
+        check(sum(ev_counts.values()) == len(archive),
+              f"recomputed evidence states must partition the {len(archive)} archived rows, "
+              f"got {sum(ev_counts.values())}")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
     # ---- high_roi screen reproduces from the rules against the ROW ITSELF ----
@@ -227,15 +324,26 @@ def main() -> int:
                   f"between collections); the flag is verified against each entry's own stored inputs.")
 
     # ---- provenance: recompute swings from the committed observations ----
+    # One exclusion, stated rather than silent: a pair of observations is only re-derived when
+    # both are REST reads of last_price_dollars. A candle-backed point carries the candle CLOSE
+    # for that period, which is not the same quantity as a REST last_price read at a minute
+    # boundary (a closed market's final candle can print a settlement-side close), so a swing
+    # across one is verified by the archive itself and NOT re-derived here. The number of
+    # excluded pairs is printed, and every such alert still has to pass the evidence block
+    # above, which forces it to say that its contract count is unquantifiable.
     hist = load(LIVE / "price_history.json")
     if hist:
         recomputed: dict[tuple, dict] = {}
+        candle_pairs: set = set()
         for ticker, entry in (hist.get("series") or {}).items():
             obs = sorted(entry.get("observations") or [], key=lambda o: o.get("t") or "")
             for prev, cur in zip(obs, obs[1:]):
                 p0, p1 = prev.get("last"), cur.get("last")
                 t0, t1 = prev.get("t"), cur.get("t")
                 if p0 is None or p1 is None or not t0 or not t1 or t1 <= t0:
+                    continue
+                if (prev.get("source") or "rest") != "rest" or (cur.get("source") or "rest") != "rest":
+                    candle_pairs.add((ticker, t0, t1))
                     continue
                 d = round(float(p1) - float(p0), 6)
                 if abs(d) + 1e-9 >= threshold:
@@ -245,7 +353,10 @@ def main() -> int:
             key = (a.get("ticker"), a.get("from_time"), a.get("to_time"))
             truth = recomputed.pop(key, None)
             if truth is None:
-                archive_only += 1  # market pruned from price history — the archive's purpose
+                if key in candle_pairs:
+                    candle_only += 1     # verified via the archive; see the note above
+                else:
+                    archive_only += 1    # market pruned from price history — the archive's purpose
                 continue
             fresh += 1
             tag = f"archive:{a['ticker']}@{a['to_time']}"
@@ -265,8 +376,17 @@ def finish(total: int, fresh: int) -> int:
         for e in errors[:40]:
             print(f"  - {e}", file=sys.stderr)
         return 1
+    ev_note = ""
+    if ev_counts:
+        ev_note = (f"evidence: {ev_counts['traded_ge_floor']} traded >= floor, "
+                   f"{ev_counts['traded_below_floor']} thin, {ev_counts['quote_only']} quote-only, "
+                   f"{ev_counts['counter_reset']} volume-n/a, "
+                   f"{ev_counts['candle_unquantified']} candle-sourced, "
+                   f"{ev_counts['unknown_no_observations']} no-history; ")
     print(f"OK: {total} archived alerts provenance-checked "
-          f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned from history), "
+          f"({ev_note}"
+          f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned "
+          f"from history, {candle_only} bounded by a candle-backfill read), "
           f"feeds and high_roi screen reproduce from alert_rules.json")
     return 0
 

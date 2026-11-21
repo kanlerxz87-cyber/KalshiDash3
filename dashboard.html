@@ -148,6 +148,11 @@ function renderAlerts() {
         change: Number(a.delta),
         time: a.to_time,
         screened: Boolean(a.high_roi),
+        // T66: the evidence behind the swing, carried from data/live/alerts.json.
+        evidence: a.evidence || null,
+        evidenceState: (a.evidence && a.evidence.state) || null,
+        contractsTraded: a.evidence ? a.evidence.contracts_traded : null,
+        gaveBackHalf: Boolean((a.evidence_reversion || {}).gave_back_half),
       });
     }
   } else {
@@ -175,6 +180,25 @@ function renderAlerts() {
   const screen = alerts.filter(a => a.screened)
     .sort((a, b) => Number(b.market.volume_24h_fp) - Number(a.market.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
     .slice(0, 100);
+  // T66. "no trades" is the case a trader must not mistake for a market move: the reported last
+  // price changed and the documented cumulative volume field did not. Labels are short and the
+  // tooltip states the exact meaning; the full method is on alerts.html and F-79/F-80.
+  const EVIDENCE_LABEL = {
+    traded_ge_floor: ["traded", "ok", "Contracts traded in the interval at or above this project's floor"],
+    traded_below_floor: ["thin", "warn", "Contracts traded in the interval, below this project's floor"],
+    quote_only: ["no trades", "bad", "The reported last price changed with ZERO contracts traded in the interval"],
+    counter_reset: ["volume n/a", "dim", "The cumulative volume field did not increase across the two reads, so the contract count is unknowable"],
+    candle_unquantified: ["candle-sourced", "dim", "Bounded by a candle-backfill read; candlestick volume is per period, not cumulative, so the count is unknowable"],
+    unknown_no_observations: ["no history", "dim", "The two observations that bound this swing are not in the committed history"],
+  };
+  const evidenceChip = (a) => {
+    const spec = a.evidenceState ? EVIDENCE_LABEL[a.evidenceState] : null;
+    if (!spec) return "";
+    const n = a.contractsTraded;
+    const count = (n === null || n === undefined) ? "" : ` · ${Number(n).toLocaleString()} contracts`;
+    return `<span class="badge ${spec[1]}" title="${KD.esc(spec[2])}">${spec[0]}${count}</span>`
+      + (a.gaveBackHalf ? ` <span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "");
+  };
   const renderFeed = (items, emptyText) => items.length ? items.map(a => {
     const sign = a.change > 0 ? "+" : "−";
     const direction = a.change > 0 ? "up" : "down";
@@ -183,6 +207,7 @@ function renderAlerts() {
       <div class="alert-top"><time datetime="${KD.esc(a.time)}">${KD.esc(a.time.replace("T", " ").replace("Z", " UTC"))}</time><span>${KD.esc(KD.CAT_LABEL[a.market.category_id] || "")}</span></div>
       <span class="alert-market">${KD.esc(title)}</span>
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
+      ${evidenceChip(a)}
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
       <div><button class="ghost" data-t="${KD.esc(a.ticker)}" style="padding:2px 8px;font-size:11.5px;margin-right:8px">Chart &amp; swings</button><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
     </article>`;
@@ -199,11 +224,18 @@ function renderAlerts() {
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
   const feedGen = state.alerts?.generated_at;
-  KD.$("#alertFreshness").textContent = feedGen
+  const ev = state.alerts?.counts?.evidence;
+  const evNote = ev
+    ? ` Of the ${all.length} swings served: ${ev.traded_ge_floor || 0} traded at or above the ${ev.floor_contracts} -contract floor, `
+      + `${ev.traded_below_floor || 0} traded below it, ${ev.quote_only || 0} had ZERO contracts traded in the interval, `
+      + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase), ${ev.candle_unquantified || 0} are bounded by a candle-backfill read (candlestick volume is per period) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
+      + `The floor is a project rule, not a Kalshi field (F-79).`
+    : "";
+  KD.$("#alertFreshness").textContent = (feedGen
     ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record. Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`
     : fetched
       ? `Alert scan uses consecutive snapshots through ${fetched} UTC (archive feed unavailable — recomputed from retained history). The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
-      : "Alert feeds are empty until a sourced snapshot is available.";
+      : "Alert feeds are empty until a sourced snapshot is available.") + evNote;
 }
 
 function renderTables() {

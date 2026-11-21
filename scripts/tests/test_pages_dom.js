@@ -45,6 +45,10 @@ const CTX2D = new Proxy({}, {
 function mkFetch(mode, state) {
   return async function fetchImpl(url, opts) {
     const u = String(url);
+    // After a page is torn down (close()), a fetch that was already in flight must never
+    // resolve: its continuation would run against a destroyed document and throw. That is a
+    // harness artefact, not a page defect, so it is made impossible rather than tolerated.
+    if (state.closed) return new Promise(() => {});
     const send = (body, ok = true) => ({ ok, status: ok ? 200 : 500, json: async () => body, text: async () => JSON.stringify(body) });
     if (/external-api\.demo\.kalshi\.co|demo-api\.kalshi\.co/.test(u)) {
       // The candle stub is served in BOTH modes: it is the one endpoint the chart must reach,
@@ -119,7 +123,7 @@ function inlineAssets(html) {
 
 async function loadPage(file, mode, opts = {}) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null };
+  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, closed: false };
   const errors = [];
   const dom = new JSDOM(html, {
     url: "https://kalshidash3.invalid/" + file + (opts.hash ? "#" + encodeURIComponent(opts.hash) : ""),
@@ -143,7 +147,19 @@ async function loadPage(file, mode, opts = {}) {
   const clone = doc.body.cloneNode(true);
   clone.querySelectorAll("script,style").forEach(n => n.remove());
   const visible = clone.textContent.replace(/\s+/g, " ");
-  return { dom, doc, state, errors, text: visible, close: () => { dom.window.close(); } };
+  // Teardown, deliberately WITHOUT dom.window.close(): jsdom nulls window.document on close,
+  // and a fetch already in flight then resumes into a null document, throwing inside page code
+  // (drawLiq / renderAlerts) at a point that has nothing to do with what the test asserts. The
+  // page is instead frozen: the engine is stopped, further fetches never resolve, and the
+  // document stays valid so any straggling continuation is harmless. process.exit at the end of
+  // the run reclaims everything.
+  return {
+    dom, doc, state, errors, text: visible,
+    close: () => {
+      state.closed = true;
+      try { dom.window.eval("try{KDL.stop()}catch(e){}"); } catch (e) { /* page has no engine */ }
+    }
+  };
 }
 
 const problems = [];
@@ -529,7 +545,63 @@ function commonAsserts(label, r) {
     }
   }
 
-  /* --- J. suggestions.html: handles missing status (G19) and multi-word status (G9) --- */
+  /* --- J. T66: the alert chats must say whether a swing was a trade or only a quote ---
+   * The rule watches last_price_dollars (documented as the last TRADED price). Two reads of it
+   * can be >= $0.10 apart with ZERO contracts traded in between, so every alert now carries an
+   * evidence chip built from the documented cumulative volume_fp field. What this pins:
+   *   - a zero-volume swing is labelled "no trades" and never as a neutral move;
+   *   - a swing with real volume shows the exact contract count;
+   *   - the "traded only" box, when ticked, removes the zero-volume swing from the chat;
+   *   - the published counts.evidence ratio is on the page, including the project-rule floor.
+   */
+  {
+    const r = await loadPage("alerts.html", "snapshot");
+    commonAsserts("alerts.html (evidence)", r);
+    const d = r.doc;
+    const bar = (d.querySelector("#evBar") || {}).textContent || "";
+    check(/no trades:/.test(bar), "alerts.html must publish the zero-trade count in the evidence bar");
+    check(/project rule, not a Kalshi field/.test(bar),
+      `the evidence bar must disclose that the traded floor is a project rule, not a Kalshi field (got: ${bar.slice(0, 160)})`);
+    check(/traded/.test(bar) && /thin/.test(bar), "the evidence bar must publish the traded and thin counts");
+
+    // Inject one quote-only swing and one traded swing, then render.
+    r.dom.window.eval(`
+      const q = KDL.makeAlert({ ticker: "EVID-TEST-QUOTE", title: "quote only fixture",
+        category_id: "crypto", last_price_dollars: 0.6, volume_24h_fp: 10 },
+        0.50, 0.60, 0.10, "collector");
+      q.evidence = { state: "quote_only", contracts_traded: 0, why: "no contracts traded in the interval",
+                     policy_floor_contracts: 100, policy_floor_is_a_kalshi_field: false };
+      q.evidence_state = "quote_only"; q.contracts_traded = 0;
+      KDL.pushAlert(q);
+      const t = KDL.makeAlert({ ticker: "EVID-TEST-TRADED", title: "traded fixture",
+        category_id: "crypto", last_price_dollars: 0.7, volume_24h_fp: 900 },
+        0.55, 0.70, 0.15, "collector");
+      t.evidence = { state: "traded_ge_floor", contracts_traded: 420, why: "420 contracts traded",
+                     policy_floor_contracts: 100, policy_floor_is_a_kalshi_field: false };
+      t.evidence_state = "traded_ge_floor"; t.contracts_traded = 420;
+      KDL.pushAlert(t);
+      render();
+    `);
+    const feed = d.querySelector("#feedAll").textContent;
+    check(/no trades/.test(feed), "a quote-only swing must be labelled \"no trades\" in the chat");
+    check(/0 contracts/.test(feed), "a quote-only swing must print the zero contract count");
+    check(/420 contracts/.test(feed), "a traded swing must print its exact contract count");
+    check(/traded · 420 contracts/.test(feed), "a traded swing must carry the traded chip");
+
+    // The filter must remove quote-only rows when ticked, and say how many it hid.
+    const box = d.querySelector("#tradedOnly");
+    box.checked = true;
+    box.dispatchEvent(new r.dom.window.Event("change"));
+    const filtered = d.querySelector("#feedAll").textContent;
+    check(!/EVID-TEST-QUOTE/.test(filtered), "\"traded only\" must remove the zero-volume swing from the chat");
+    check(/EVID-TEST-TRADED/.test(filtered), "\"traded only\" must keep the swing that actually traded");
+    check(/ of \d+ shown/.test((d.querySelector("#allCount") || {}).textContent || ""),
+      "with a filter active the chat count must say how many of how many are shown");
+    console.log("  J evidence UI   ok  (quote-only vs traded chips, contract counts, traded-only filter, published ratio)");
+    r.close();
+  }
+
+  /* --- K. suggestions.html: handles missing status (G19) and multi-word status (G9) --- */
   {
     const r = await loadPage("suggestions.html", "snapshot");
     commonAsserts("suggestions.html", r);
@@ -542,11 +614,11 @@ function commonAsserts(label, r) {
     check(implText.includes("G9"), "suggestions.html must classify G9 (implemented ...) under #impl");
     check(propText.includes("G19"), "suggestions.html must render G19 safely under #prop");
     check(!r.text.includes("`data/findings.json`"), "suggestions.html must not contain raw markdown backticks");
-    console.log(`  J suggestions   ok  (${implRows.length} implemented, ${propRows.length} proposed)`);
+    console.log(`  K suggestions   ok  (${implRows.length} implemented, ${propRows.length} proposed)`);
     r.close();
   }
 
-  /* --- K. Full-site render sweep across all remaining HTML pages --- */
+  /* --- L. Full-site render sweep across all remaining HTML pages --- */
   {
     const remaining = fs.readdirSync(ROOT).filter(f => f.endsWith(".html") &&
       !["live.html", "roi.html", "alerts.html", "dashboard.html", "index.html", "suggestions.html"].includes(f)).sort();
@@ -555,9 +627,8 @@ function commonAsserts(label, r) {
       commonAsserts(page, r);
       r.close();
     }
-    console.log(`  K all pages     ok  (${remaining.length} additional pages rendered with 0 errors and 0 NaN/undefined leaks)`);
+    console.log(`  L all pages     ok  (${remaining.length} additional pages rendered with 0 errors and 0 NaN/undefined leaks)`);
   }
-
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);

@@ -16,5 +16,43 @@
     "market_fields": "https://docs.kalshi.com/api-reference/market/get-markets",
     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
     "fees": "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+  },
+  "evidence": {
+    "description": "T66 evidence layer. Every alert is classified by whether contracts actually traded between its two observations. Kalshi documents last_price_dollars as the price of the last TRADED contract and volume_fp as the market volume in contracts (https://docs.kalshi.com/api-reference/market/get-markets), so the difference of volume_fp across two reads is the number of contracts traded between them. A swing whose interval traded ZERO contracts is labelled quote_only: the reported last price changed with no trade at all.",
+    "floor_contracts": 100.0,
+    "floor_is_a_kalshi_field": false,
+    "floor_note": "PROJECT RULE, NOT A KALSHI FIELD. Kalshi publishes no per-move significance field. The floor only decides which alert chip reads 'traded' rather than 'thin'; every alert still displays its exact contract count so a reader can apply their own threshold.",
+    "states": [
+      "traded_ge_floor",
+      "traded_below_floor",
+      "quote_only",
+      "counter_reset",
+      "candle_unquantified",
+      "unknown_no_observations"
+    ],
+    "reversion_window_observations": 3,
+    "reversion_half_move": 0.5,
+    "frozen_at_detection": [
+      "state",
+      "contracts_traded",
+      "est_dollars",
+      "volume_from",
+      "volume_to",
+      "why"
+    ],
+    "refreshed_each_build": [
+      "evidence_reversion"
+    ],
+    "sources": {
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "candle_note": "A candidate state added mid-session: candlestick volume_fp is documented as the number of contracts bought DURING the candlestick period (https://docs.kalshi.com/api-reference/market/get-market-candlesticks), whereas GET /markets volume_fp is the market's cumulative volume in contracts. Differencing a candle point against a REST read would subtract unlike quantities, so such a swing is labelled candle_unquantified with a null count.",
+    "findings": [
+      "F-79",
+      "F-80",
+      "F-81"
+    ]
   }
 }
