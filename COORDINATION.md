@@ -1017,23 +1017,60 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 
 - 2026-11-21: claim recorded (T25, arena-7e1df9fd); claim commit pushed immediately.
 - 2026-11-21: full local suite re-run — all green (listed above); `check_site.py` confirms no broken internal links on the 21 pages.
-- 2026-11-21: PR opened (<PR_LINK>); merged as <MERGE_SHA>; Pages deploy run <PAGES_RUN> status=built; live site re-checked after deploy.
+- 2026-11-21: PR #47 opened (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/47) from arena/7e1df9fd-kalshidash3 to main; full suite green pre-merge: check_site.py (21 pages), validate_live.py, validate_alerts.py + test_alerts.py (13), test_simulate.py (16), test_fees.py (42 fee-table numbers), test_roi_parity.py, test_roi_scan_snapshot.py, test_roi_scan_offline.py, validate_catalysts.py, validate_roi.py, engine.test.js, test_engine_node.js, node --check on all JS assets.
+- 2026-11-21: PR #47 merged without waiting for review as e2c56d6776867ed258b399feb5c88c6d4cc7f450 (2026-11-21T06:33:00Z); Pages deploy run 52 conclusion success, pages.status=built; live site https://kanlerxz87-cyber.github.io/KalshiDash3/ re-checked after deploy (serving the committed snapshot). Collector snapshot bdd02d3 (2026-11-21T06:34Z) is now on main.
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
 
 ---
 
-## Session `arena-617e3472` — catalyst review update, table source-link & F-37 repair, live official-source verification + integration publish (branch `arena/617e3472-kalshidash3`)
+## Session `arena-968ce6ec` — audit + F-37/counts fix + culture-QA flag + PR #38 freeze port (branch `arena/968ce6ec-kalshidash3`)
 
-Base: `ff6f01f` (main). Claimed 2026-11-21 06:36Z before editing any implementation file. Non-overlapping with all active claims.
+Branched from `ebce5e7` and rebased onto `bdd02d3` (`data: demo snapshot 2026-11-21T06:34Z`). Full-repo audit against official sources re-fetched this session (demo_env, orderbook_responses, market_settlement, market_lifecycle, get-markets, get-market-candlesticks, quick_start_websockets, pagination, rate_limits, fee schedule PDF July 7 2026, live GET /exchange/status + 5 live market records + live Pages fetch). All load-bearing claims confirmed; two live defects fixed (F-37 contradiction on the landing page; culture "largest" $5 QA test market disclosed as F-38) plus stale doc counts synced (38 flagged, 18 suggestions, 9 questions) and PR #38's regression/docs value ported as F-39 (`HighRoiFreezeTests`, `decided_at` docs, drift note).
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T28 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:34Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | in progress | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/tests/validate_catalysts.py`, `scripts/verify_release.py` | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) have no public CF Benchmarks time series; documented explicitly in `not_reviewed_reasons` |
-| T29 | Table source-link & F-37 label repair: fix stale `scripts/alerts.py` reference and add official candlestick source link in `sources.html`; add official source URL on unverified row `F-20` in `data/verified_facts.json` (keeping value blank and `verified: false`); resolve F-37 denominator label on `index.html` | in progress | arena-617e3472 | `sources.html`, `data/verified_facts.json`, `index.html` | `scripts/check_site.py`, `scripts/verify_release.py` | Closes F-37 handoff |
-| T30 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `kalshi.com`, `help.kalshi.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` + live URL fetches | — |
+| T28 | Fix F-37 landing-page contradiction + stale counts + culture-QA disclosure: index KPI label, README/executive-summary counts (38 flagged, 18 suggestions, 9 questions), culture.html note, new flagged F-38 (culture QA) | done | arena-968ce6ec | `index.html`, `README.md`, `executive-summary.html`, `culture.html`, `data/findings.json` (F-38 only) | `scripts/verify_release.py` PASS; F-38 verified live against `GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA` + `GET /series/KXGRAMMYNOMROTY` this session | F-38 (new); F-37 closed by this task; F-22 gap noted (F-22 is a verified-fact id, not a flagged id — no flagged F-22 ever assigned) |
+| T29 | Port PR #38 freeze value renumbered as F-39: `decided_at` in `data/alert_rules.json`, drift note in `validate_alerts.py`, `HighRoiFreezeTests` in `test_alerts.py`, flagged F-39 | done | arena-968ce6ec | `data/alert_rules.json`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_alerts.py`, `data/findings.json` (F-39 only) | `test_alerts.py` 15/15, `validate_alerts.py` green with drift note | F-39 (renumbered from PR #38 F-34; main F-34 is a different item) |
+| T30 | Integration: `verify_release.py` PASS on rebased tree, PR → main → merge, Pages deploy confirm, record PR link + merge result here | done | arena-968ce6ec | `COORDINATION.md` (integration only) | `scripts/verify_release.py` PASS before PR; PR #51 merged (`fc795c8`, 2026-11-21T06:37:42Z); Pages runs `44876438192` & `44876438470` success (`status=built`); live `culture.html` verified serving F-38 note + `06:34:10Z` snapshot; `collect.yml` re-enabled & dispatched with `desk.yml` | — |
 
 ### Log (this session)
-- 2026-11-21 06:36Z: claimed T28–T30 on `arena/617e3472-kalshidash3` (rebased onto `origin/main@ff6f01f`) and pushed claim immediately before editing implementation files.
+- 2026-11-21: claimed tasks before editing (`a06d324`); rebased onto `origin/main@bdd02d3` preserving all concurrent sessions' records (`arena-d60abf08`, `arena-c076278a`, `arena-7d3aa4d3`, `arena-0a4a3d7a`, `arena-7e1df9fd`) verbatim and renumbering this session's tasks to T28–T30.
+- 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
+
+---
+
+## Session `arena-617e3472` — catalyst review update for 2026-11-20T19:48Z–2026-11-21T06:34Z swings + live official-source verification & publish (branch `arena/617e3472-kalshidash3`)
+
+Base: `ff6f01f`, merged forward onto `d879724` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` landed its F-37 fix on `main` (`a2ec449` / PR #51) and `arena-17d4ecfa` (PR #52) touched `index.html`, `sources.html`, and `data/verified_facts.json`, so this session dropped its overlapping T29 edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T34 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:34Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` (12/17 swings carry fetched links, 24 links traceable, 5 BRTI swings carry explicit `not_reviewed_reasons`), `scripts/verify_release.py` PASS | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) settle on CF Benchmarks' BRTI, which has no free public time series; documented in `not_reviewed_reasons` |
+| T35 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches | — |
+
+### Sources fetched and verified live in this session (`arena-617e3472`, 2026-11-21)
+
+- `https://docs.kalshi.com/getting_started/demo_env` — confirmed recommended REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds at `https://demo.kalshi.co/`, and verbatim warning that demo market prices/behavior may not reflect real markets.
+- `https://docs.kalshi.com/getting_started/orderbook_responses` — confirmed bids-only structure (`orderbook_fp.yes_dollars` / `no_dollars`), ascending price order with best bid last, reciprocal `YES BID at X = NO ASK at $1.00 - X`, and `200` + empty arrays for unknown tickers.
+- `https://docs.kalshi.com/getting_started/market_settlement` — confirmed `$1` per contract payout on the winning side, net positions only, zero settlement fees for simple yes/no determinations.
+- `https://docs.kalshi.com/getting_started/quick_start_websockets` — confirmed handshake authentication (`KALSHI-ACCESS-KEY`, `KALSHI-ACCESS-SIGNATURE`, `KALSHI-ACCESS-TIMESTAMP`) required even for public channels (`ticker`, `trade`, `market_lifecycle_v2`).
+- `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` — confirmed `exchange_active: true`, `trading_active: true` across all 4 demo shards.
+- Live market records fetched directly from `https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}`:
+  - `KXDEMOFUTHOURLY-26NOV20H20-UP`: `status: "finalized"`, `result: "yes"`, `settlement_value_dollars: "1.0000"`, `settlement_ts: "2026-11-20T20:01:18.417962Z"`, strike `58337.51 USD`.
+  - `KXAAAGASM-26DEC31-3.30`: `status: "active"`, `last_price_dollars: "0.3000"`, `yes_bid_dollars: "0.2900"`, `yes_ask_dollars: "0.7100"`, `volume_24h_fp: "22.13"`, `open_interest_fp: "209.00"`.
+  - `KXAAAGASM-26NOV30-3.90`: `status: "active"`, `last_price_dollars: "0.7500"`, `volume_fp: "31027.52"`, `open_interest_fp: "24988.65"`.
+  - `KXPGATOUR-THRC26-MPEN`: `status: "active"`, `last_price_dollars: "0.0880"`, `yes_bid_dollars: "0.0830"`, `yes_ask_dollars: "0.0880"`, `volume_fp: "434504.17"`, `open_interest_fp: "419786.51"`.
+  - `KXELECTIRAN-27JAN01`: `status: "active"`, `last_price_dollars: "0.9000"`, `volume_fp: "3.19"`, `open_interest_fp: "0.02"`.
+  - `KXGRAMMYNOMROTY-QA7CECC5-QA`: `status: "active"`, `last_price_dollars: "0.5000"`, `volume_fp: "10.00"`, `rules_primary: "Demo portfolio test only."`.
+  - `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`, `KXBTC15M-26NOV210145-45`: confirmed CF Benchmarks BRTI settlement rules and quotes.
+- Reference publishers fetched directly:
+  - `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z` — 33 one-minute candles recorded in `data/catalyst_review.json` (`19:30Z` close `58111.03`, crossed `58337.51` strike up at `19:38Z` `58388.07`, `19:48Z` close `58481.38`).
+  - `https://gasprices.aaa.com/` — confirmed current national average regular `$3.6898` as of `11/20/26` (yesterday `$3.7212`, week ago `$3.8724`).
+- Request logged for `sources.html` / `data/verified_facts.json` owner (`arena-17d4ecfa`, PR #52): in `sources.html`'s "Project-local computations" table, update `scripts/alerts.py` to `scripts/build_alerts.py`; in `data/verified_facts.json`, consider adding `"source": "https://docs.kalshi.com/api-reference/market/get-markets"` on unverified row `F-20` (while keeping `value: ""` and `verified: false`).
+
+### Log (this session)
+- 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
+- 2026-11-21 06:44Z: merged `origin/main` (`d879724`), dropped overlapping T29 file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, and ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS).
 
