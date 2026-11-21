@@ -26,6 +26,8 @@
   .badge.live { background:#0f4d3a; color:#7ce8bb; }
   .badge.ok { background:#0f4d3a; color:#7ce8bb; }
   .badge.bad { background:#5b2620; color:#ffb3a7; }
+  .badge.warn { background:#4a3a12; color:#ffd88a; border:1px solid #6b5520; }
+  .evbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:6px 0 0; }
   .badge { display:inline-block; padding:1px 7px; border-radius:20px; font-size:11px; }
   .alertbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:8px 0; }
   .kchip { font:12px ui-monospace,monospace; padding:3px 9px; border:1px solid var(--line); border-radius:20px; }
@@ -59,6 +61,7 @@
     <button class="ghost" id="btnPause">Pause</button>
     <span class="kchip" id="tickInfo">no ticks yet</span>
     <span class="kchip" id="counts">▲ 0 · ▼ 0</span>
+    <label title="Show only swings where contracts actually traded in the interval (project rule, not a Kalshi field)"><input type="checkbox" id="tradedOnly"> traded only</label>
     <button class="ghost" id="btnClear" style="margin-left:auto">Clear chats</button>
     <button class="ghost" id="btnExport">Export JSON</button>
   </div>
@@ -74,6 +77,24 @@
     <code>data/live/alerts_archive.json</code>, an append-only archive, so swings survive a market closing).
     "News leads" links are search queries computed from the market title, not verified causes — the archive keeps
     <code>cause_link</code> null by design and causality is never asserted (see <a href="flagged.html">F-15, F-25</a>).
+  </p>
+
+  <div class="evbar" id="evBar"></div>
+  <p class="small mut">
+    <b>Was it a trade, or only a quote?</b> The alert rule watches <code>last_price_dollars</code>, which Kalshi
+    defines as the price of the last <i>traded</i> contract
+    (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).
+    Two reads of that field can be ≥ $0.10 apart with <b>no trade at all</b> in between, so each alert now carries the
+    contracts actually traded between its two observations — the difference of the cumulative <code>volume_fp</code>
+    field across those reads. Alerts are chipped
+    <span class="badge ok">traded</span> (at or above this project's floor),
+    <span class="badge warn">thin</span> (some contracts, below the floor),
+    <span class="badge bad">no trades</span> (<b>zero</b> contracts — the printed price changed on its own),
+    <span class="badge dim">volume n/a</span> (the cumulative field did not increase across the reads, so the count
+    is unknowable and is left blank) and <span class="badge dim">no history</span> (the two observations are no longer
+    in the committed history). The floor is a <b>project rule, not a Kalshi field</b> — Kalshi publishes no per-move
+    significance field — and every alert shows the exact contract count so you can apply your own. Full method:
+    <code>scripts/alert_evidence.py</code>; <a href="flagged.html">F-76</a>.
   </p>
 
   <div class="chats">
@@ -149,7 +170,7 @@ KD.nav("alerts.html");
   } catch (e) { /* no feed committed yet: nothing to disclose */ }
 })();
 
-const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null };
+const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null, tradedOnly: false, feedCounts: null };
 
 const LEAD_STATE_LABEL = {
   external_move_coincides: "the index this market settles on crossed its strike in the same minutes",
@@ -208,17 +229,46 @@ function renderLeads() {
 
 function catFilter(a) { return !state.cat || a.category_id === state.cat; }
 
+// T66: "traded only" hides swings whose evidence says no contracts traded in the interval.
+// It is OFF by default and the hidden count is stated, so the filter can never look like the
+// full record. Swings with no evidence field at all (legacy rows) are kept and chipped dim.
+function tradedFilter(a) {
+  if (!state.tradedOnly) return true;
+  return a.evidence_state === "traded_ge_floor" || a.evidence_state === "traded_below_floor";
+}
+
 function render() {
   const all = KDL.feedAlerts().filter(catFilter);
   const model = all.filter((a) => a.model && a.model.score >= KDL.MODEL.threshold);
   // chronological order, newest at the BOTTOM: renderFeed auto-scrolls there.
-  KDL.renderFeed(KD.$("#feedAll"), all.slice(-120), { catLabels: KD.CAT_LABEL });
-  KDL.renderFeed(KD.$("#feedModel"), model.slice(-120), { catLabels: KD.CAT_LABEL, showWhy: true });
-  KD.$("#allCount").textContent = all.length + " in view";
-  KD.$("#modelCount").textContent = model.length + " in view";
+  const shownAll = all.filter(tradedFilter);
+  const shownModel = model.filter(tradedFilter);
+  KDL.renderFeed(KD.$("#feedAll"), shownAll.slice(-120), { catLabels: KD.CAT_LABEL });
+  KDL.renderFeed(KD.$("#feedModel"), shownModel.slice(-120), { catLabels: KD.CAT_LABEL, showWhy: true });
+  renderEvidenceBar(all.length, shownAll.length);
+  KD.$("#allCount").textContent = shownAll.length + (shownAll.length === all.length ? " in view" : ` of ${all.length} shown`);
+  KD.$("#modelCount").textContent = shownModel.length + (shownModel.length === model.length ? " in view" : ` of ${model.length} shown`);
   const f = KDL.feedAlerts();
   const up = f.filter((a) => a.dir === "up").length, down = f.length - up;
   KD.$("#counts").textContent = `▲ ${up} · ▼ ${down}`;
+}
+
+// Counts come from data/live/alerts.json -> counts.evidence (computed by
+// scripts/alert_evidence.py over BOTH feeds served, not just what is on screen), so the ratio
+// is published even when a category tab or the "traded only" box hides rows.
+function renderEvidenceBar(total, shown) {
+  const box = KD.$("#evBar");
+  if (!box) return;
+  const c = (state.feedCounts || {}).evidence;
+  if (!c) { box.innerHTML = `<span class="kchip">evidence counts not published in this feed</span>`; return; }
+  const chip = (label, n, cls) => `<span class="kchip"${cls ? ` style="${cls}"` : ""}>${label}: <b>${n}</b></span>`;
+  box.innerHTML = chip("swings served", total)
+    + chip("traded", c.traded_ge_floor || 0, "color:#7ce8bb")
+    + chip("thin", c.traded_below_floor || 0, "color:#ffd88a")
+    + chip("no trades", c.quote_only || 0, "color:#ffb3a7")
+    + chip("volume n/a", c.counter_reset || 0, "")
+    + chip("no history", c.unknown_no_observations || 0, "")
+    + `<span class="kchip">traded floor: ${c.floor_contracts ?? "—"} contracts (project rule, not a Kalshi field)</span>`;
 }
 
 function statusChip(st) {
@@ -247,6 +297,10 @@ async function pickWatchlist() {
 
 async function boot() {
   // Collector layer first so the chats have history even before/without live REST.
+  try {
+    const doc = await (await fetch("data/live/alerts.json", { cache: "no-store" })).json();
+    state.feedCounts = doc.counts || null;
+  } catch { state.feedCounts = null; }
   state.snap = await KDL.loadSnapshot();
   KDL.ingest((state.snap?.open_markets || []).concat(state.snap?.settled_markets || []), "collector", { silent: true });
   await KDL.loadCollectorAlerts();
@@ -290,6 +344,7 @@ KD.$("#btnExport").addEventListener("click", () => {
   a.click();
 });
 KD.$("#interval").addEventListener("change", () => { if (state.started) KDL.start(Number(KD.$("#interval").value)); });
+KD.$("#tradedOnly").addEventListener("change", (e) => { state.tradedOnly = e.target.checked; render(); });
 KD.$("#watchN").addEventListener("change", pickWatchlist);
 
 // category tabs

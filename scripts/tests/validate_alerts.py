@@ -18,7 +18,13 @@ Checks
      recorded category_basis/volume_24h_fp (detection-time values), so the check does
      not depend on which snapshot happens to be on disk; the snapshot is a fallback
      for legacy rows without those fields
-  6. provenance: every alert whose market still has both observations in
+  6. evidence (T66): every alert carries `evidence`, the block that says whether contracts
+     actually traded between its two observations. The contract count is RECOMPUTED from the
+     committed volume_fp readings and must match exactly; a state that a recalculation
+     contradicts is refused. Quote-only swings (zero contracts traded) must be labelled as such,
+     and an interval whose cumulative volume did not increase must leave the count null instead
+     of recording a negative number.
+  7. provenance: every alert whose market still has both observations in
      price_history.json must match the recomputed diff exactly; every re-derivable
      swing must be present in the archive. Alerts whose market was pruned from the
      collector's price history are allowed (that is why the archive exists) and are
@@ -51,6 +57,7 @@ COMPATIBLE = {
 
 errors: list[str] = []
 archive_only = 0
+ev_counts: dict = {}
 
 
 def check(cond: bool, msg: str) -> None:
@@ -123,6 +130,60 @@ def main() -> int:
         check("unverified" in str(a.get("cause_status", "")), f"{tag} cause_status must state unverified")
         check(isinstance(a.get("high_roi"), bool), f"{tag} high_roi must be a boolean")
 
+    # ---- evidence layer (T66) ----
+    # Recomputed here from the committed observations, independent of scripts/alert_evidence.py's
+    # own copy of the rule, so a bug in the classifier cannot validate itself.
+    hist_for_evidence = load(LIVE / "price_history.json") or {}
+    ev_series = hist_for_evidence.get("series") or {}
+    ev_states = ("traded_ge_floor", "traded_below_floor", "quote_only",
+                 "counter_reset", "unknown_no_observations")
+    ev_counts.clear()
+    ev_counts.update({s: 0 for s in ev_states})
+    floor = float((rules.get("evidence") or {}).get("floor_contracts", 100.0))
+    for a in archive or []:
+        tag = f"archive:{a.get('ticker')}@{a.get('to_time')}"
+        ev = a.get("evidence")
+        check(isinstance(ev, dict), f"{tag} evidence block missing (T66)")
+        if not isinstance(ev, dict):
+            continue
+        state = ev.get("state")
+        check(state in ev_states, f"{tag} evidence.state {state!r} is not one of {ev_states}")
+        if state in ev_states:
+            ev_counts[state] += 1
+        check(ev.get("policy_floor_is_a_kalshi_field") is False,
+              f"{tag} evidence must disclose that the floor is a project rule, not a Kalshi field")
+        check(isinstance(ev.get("why"), str) and ev.get("why"), f"{tag} evidence.why must explain the state")
+        obs = sorted(((ev_series.get(a.get("ticker")) or {}).get("observations") or []),
+                     key=lambda o: o.get("t") or "")
+        by_t = {o.get("t"): o for o in obs}
+        p0, p1 = by_t.get(a.get("from_time")), by_t.get(a.get("to_time"))
+        if p0 is None or p1 is None:
+            check(state == "unknown_no_observations",
+                  f"{tag} has no committed observations but is labelled {state!r}")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} no observations, so contract count must stay null")
+            continue
+        def fnum(v):
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return None
+        v0, v1 = fnum(p0.get("volume_fp")), fnum(p1.get("volume_fp"))
+        if v0 is None or v1 is None or v1 < v0:
+            check(state == "counter_reset", f"{tag} volume does not increase but is labelled {state!r}")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} interval count is unknowable, so it must stay null (got {ev.get('contracts_traded')!r})")
+            continue
+        traded = round(v1 - v0, 2)
+        check(ev.get("contracts_traded") == traded,
+              f"{tag} contracts_traded {ev.get('contracts_traded')!r} != volume_to - volume_from ({traded})")
+        want = ("quote_only" if traded == 0
+                else "traded_ge_floor" if traded >= floor else "traded_below_floor")
+        check(state == want, f"{tag} state {state!r} contradicted by {traded} contracts traded "
+                             f"(floor {floor:g}) -> {want!r}")
+        if traded == 0:
+            check(state == "quote_only", f"{tag} zero contracts traded must be labelled quote_only")
+
     # ---- feeds reproduce from the archive ----
     # F-65: build_alerts.py withholds an alert whose series the exchange files outside the topic
     # (the ledger is data/live/markets.json -> series_index). The rule is reproduced here from
@@ -164,6 +225,22 @@ def main() -> int:
     check(counts.get("archive_total") == len(archive), "counts.archive_total mismatch")
     check(float(alerts_doc.get("threshold_dollars", -1)) == threshold, "alerts.json threshold differs from alert_rules.json")
     check(bool(alerts_doc.get("disclaimers")), "alerts.json disclaimers missing")
+    ev_pub = (alerts_doc.get("counts") or {}).get("evidence")
+    check(isinstance(ev_pub, dict), "alerts.json counts.evidence missing (T66)")
+    if isinstance(ev_pub, dict):
+        for st in ev_states:
+            check(st in ev_pub, f"counts.evidence must always publish {st}")
+        n_traded = ev_pub.get("traded_ge_floor", 0) + ev_pub.get("traded_below_floor", 0)
+        check(ev_pub.get("traded_ge_floor") == ev_counts["traded_ge_floor"],
+              f"counts.evidence.traded_ge_floor {ev_pub.get('traded_ge_floor')} != recomputed "
+              f"{ev_counts['traded_ge_floor']}")
+        check(ev_pub.get("quote_only") == ev_counts["quote_only"],
+              f"counts.evidence.quote_only {ev_pub.get('quote_only')} != recomputed {ev_counts['quote_only']}")
+        check(ev_pub.get("counter_reset") == ev_counts["counter_reset"],
+              f"counts.evidence.counter_reset {ev_pub.get('counter_reset')} != recomputed {ev_counts['counter_reset']}")
+        check(n_traded + ev_counts["quote_only"] + ev_counts["counter_reset"]
+              + ev_counts["unknown_no_observations"] == len(archive),
+              "counts.evidence states must partition the whole archive")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
     # ---- high_roi screen reproduces from the rules against the ROW ITSELF ----
@@ -244,7 +321,14 @@ def finish(total: int, fresh: int) -> int:
         for e in errors[:40]:
             print(f"  - {e}", file=sys.stderr)
         return 1
+    ev_note = ""
+    if ev_counts:
+        ev_note = (f"evidence: {ev_counts['traded_ge_floor']} traded >= floor, "
+                   f"{ev_counts['traded_below_floor']} thin, {ev_counts['quote_only']} quote-only, "
+                   f"{ev_counts['counter_reset']} volume-n/a, "
+                   f"{ev_counts['unknown_no_observations']} no-history; ")
     print(f"OK: {total} archived alerts provenance-checked "
+          f"({ev_note}"
           f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned from history), "
           f"feeds and high_roi screen reproduce from alert_rules.json")
     return 0

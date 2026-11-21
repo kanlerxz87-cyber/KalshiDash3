@@ -19,6 +19,10 @@ market whose absolute change is >= the threshold (default $0.10), in either
 direction. Cause fields (news / website links) are deliberately left null:
 no official source for a cause is collected, so none is invented.
 
+T66: each alert also carries `evidence` — whether contracts traded in the
+interval (from the documented cumulative volume field) or the quoted price
+moved with no trade at all. See scripts/alert_evidence.py.
+
 Official references
   Get Markets ..... https://docs.kalshi.com/api-reference/market/get-markets
   Lifecycle ....... https://docs.kalshi.com/getting_started/market_lifecycle
@@ -31,6 +35,8 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+import alert_evidence
 
 ROOT = Path(__file__).resolve().parent.parent
 LIVE = ROOT / "data" / "live"
@@ -167,6 +173,45 @@ def main() -> int:
     if repaired:
         print(f"archive: recorded official series_categories on {repaired} entr(y/ies) from series_index")
 
+    # T66: every swing now carries the EVIDENCE behind it, not just a price difference. The
+    # rule watches last_price_dollars, which Kalshi defines as the last TRADED price; two reads
+    # of it can differ by >= $0.10 with no trade at all in between. `evidence.state` says which
+    # kind of event this was, and `evidence.contracts_traded` is the difference of the documented
+    # cumulative volume field between the two observations (null when the counter does not
+    # behave monotonically — never a negative or guessed count). See scripts/alert_evidence.py.
+    floor = float((rules.get("evidence") or {}).get("floor_contracts", alert_evidence.DEFAULT_FLOOR))
+    series_hist = hist.get("series") or {}
+    for a in archive["alerts"]:
+        obs_list = (series_hist.get(a.get("ticker")) or {}).get("observations") or []
+        current = alert_evidence.evaluate(a, obs_list, floor=floor)
+        prior = a.get("evidence") or {}
+        # FROZEN AT FIRST DETECTION, for the same reason high_roi is: a later observation can
+        # change the reversion answer (a swing that was "still open" gains later reads), but the
+        # contract count between the two bounding observations can never change — the volume
+        # field is cumulative and both reads are fixed. Keeping the detection-time block makes
+        # feed reproduction byte-exact instead of clock-dependent (see validate_alerts.py).
+        base = {
+            "state": current["state"],
+            "contracts_traded": current["contracts_traded"],
+            "est_dollars": current["est_dollars"],
+            "est_dollars_is_an_estimate": True,
+            "volume_from": current.get("volume_from"),
+            "volume_to": current.get("volume_to"),
+            "policy_floor_contracts": current["policy_floor_contracts"],
+            "policy_floor_is_a_kalshi_field": False,
+            "why": current["why"],
+            "sources": current["sources"],
+            "decided_at": (prior.get("decided_at") if prior.get("state") == current["state"]
+                           else now),
+        }
+        # Reversion is a live observation about later reads, so it is refreshed every build and
+        # kept OUTSIDE the frozen block: it is allowed to improve as history accumulates.
+        a["evidence"] = base
+        a["evidence_reversion"] = current["reversion"]
+        if prior.get("state") and prior.get("state") != current["state"]:
+            print(f"evidence: {a.get('ticker')}@{a.get('to_time')} re-classified "
+                  f"{prior.get('state')} -> {current['state']} (volume field changed on re-read)")
+
     archive["alerts"].sort(key=lambda r: (r["to_time"], abs(r["delta"])), reverse=True)
     archive["alerts"] = archive["alerts"][:ARCHIVE_LIMIT]
     archive_path.write_text(json.dumps(archive, indent=1) + "\n", encoding="utf-8")
@@ -229,6 +274,10 @@ def main() -> int:
             # market records official series categories that exclude it from its topic.
             "withheld_category_conflict": withheld,
             "withheld_reasons": {k: dict(v) for k, v in sorted(conflicts.items())},
+            # T66: how many of the served swings were backed by trades, and how many were a
+            # quoted price that changed with no trade at all. Always published, so the ratio
+            # cannot quietly get worse for a reader who never opens a row.
+            "evidence": alert_evidence.summarize(all_feed),
         },
         "all_events": newest_first(all_feed),
         "high_roi": newest_first(roi_feed),
@@ -238,6 +287,8 @@ def main() -> int:
             "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
             "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
             "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
+            "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
+            "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
             "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten.",
         ],
     }

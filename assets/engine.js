@@ -306,6 +306,23 @@ window.KDL = (() => {
     const why = opts.showWhy && a.model
       ? `<div class="chat-why">why: ${a.model.reasons.map(esc).join(" · ")} · modeled ROI if YES at ask: ${a.model.modeled_roi_if_yes_at_ask === null ? "—" : Math.round(a.model.modeled_roi_if_yes_at_ask * 100) + "%"}</div>` : "";
     const l = a.links || {};
+    // T66 evidence chip: only rendered when the field exists. "quote_only" is the case that
+    // matters for a trader — the reported last price changed and NO contract traded — so it is
+    // styled as a warning, not as a neutral label.
+    const EV = {
+      traded_ge_floor: { t: "traded", c: "ok", tip: "Contracts traded in the interval at or above this project's floor" },
+      traded_below_floor: { t: "thin", c: "warn", tip: "Contracts traded in the interval, but below this project's floor" },
+      quote_only: { t: "no trades", c: "bad", tip: "The reported last price changed with ZERO contracts traded in the interval" },
+      counter_reset: { t: "volume n/a", c: "dim", tip: "The cumulative volume field did not increase between the two reads, so the interval's contract count cannot be derived" },
+      unknown_no_observations: { t: "no history", c: "dim", tip: "The two observations that bound this swing are not in the committed history" },
+    };
+    const ev = a.evidence_state ? EV[a.evidence_state] : null;
+    const evBit = ev
+      ? `<span class="badge ${ev.c}" title="${esc(ev.tip)}">${esc(ev.t)}${a.contracts_traded !== null && a.contracts_traded !== undefined ? " · " + num(a.contracts_traded) + " contracts" : ""}</span>`
+      : "";
+    const rev = a.evidence_reversion;
+    const revBit = rev && rev.gave_back_half === true
+      ? `<span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "";
     return `<div class="chat-msg ${up ? "up" : "down"}">
       <div class="chat-head">
         <span class="chat-time">${hh}</span>
@@ -313,6 +330,8 @@ window.KDL = (() => {
         <b>${cents(a.from)} → ${cents(a.to)}</b>
         <span class="mono chat-ticker">${esc(a.ticker)}</span>
         ${modelBit}
+        ${evBit}
+        ${revBit}
         <span class="badge dim">${esc(cat)}</span>
         <span class="badge ${a.origin === "live" ? "live" : "dim"}" title="${a.origin === "live" ? "Detected in your browser from the live demo API" : "Recovered from the collector's committed price history"}">${a.origin}</span>
       </div>
@@ -437,6 +456,14 @@ window.KDL = (() => {
     if (!Number.isNaN(t)) full.ts = t;
     full.high_roi_screen = a.high_roi === true;
     full.ts_source = a.to_time || null;
+    // T66: the evidence behind the swing travels with it. `evidence` is frozen at detection
+    // time by scripts/build_alerts.py; `evidence_reversion` may improve as reads accumulate.
+    // Absent on legacy archive rows (written before the field existed) — never inferred here.
+    full.evidence = a.evidence || null;
+    full.evidence_reversion = a.evidence_reversion || null;
+    full.evidence_state = (a.evidence && a.evidence.state) || null;
+    full.contracts_traded = a.evidence ? a.evidence.contracts_traded : null;
+    if (a.evidence && a.evidence.why) full.note = `${full.note} Evidence: ${a.evidence.why}.`;
     return full;
   }
 
@@ -722,7 +749,7 @@ window.KDL = (() => {
     BASE, ALERT_THRESHOLD, MODEL, STRATS,   // BASE lets a page print the exact official URL it queried
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
-    feedAlerts, clearFeed, renderFeed, bubble,
+    feedAlerts, clearFeed, renderFeed, bubble, pushAlert, makeAlert,
     scoreMarket, scoreAlert,
     AT,
     onRows: addRowsListener,

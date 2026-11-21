@@ -24,7 +24,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T23:16:12Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 95.25,
+    "est_dollars": 0.95,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72325413.58,
+    "volume_to": 72325508.83,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "95.25 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:21:59Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -49,7 +73,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T23:01:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 104.97,
+    "est_dollars": 2.1,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58457823.86,
+    "volume_to": 58457928.83,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "104.97 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.97,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -74,7 +122,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T23:01:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 86.72,
+    "est_dollars": 1.73,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510931.68,
+    "volume_to": 35511018.4,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "86.72 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.97,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -99,7 +171,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T23:01:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 100.06,
+    "est_dollars": 97.06,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72325313.52,
+    "volume_to": 72325413.58,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "100.06 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -124,7 +220,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T23:01:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 1.36,
+    "est_dollars": 0.97,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 409.5,
+    "volume_to": 410.86,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "1.36 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.41,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -149,7 +269,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:46:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 88.91,
+    "est_dollars": 88.02,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510842.77,
+    "volume_to": 35510931.68,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "88.91 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 2,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -174,7 +318,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:31:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 96.89,
+    "est_dollars": 1.94,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510745.88,
+    "volume_to": 35510842.77,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "96.89 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -199,7 +367,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:31:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 117.42,
+    "est_dollars": 1.17,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72325093.26,
+    "volume_to": 72325210.68,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "117.42 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -224,7 +416,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:16:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 107.87,
+    "est_dollars": 106.79,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58457517.59,
+    "volume_to": 58457625.46,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "107.87 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -249,7 +465,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:16:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 94.64,
+    "est_dollars": 93.69,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510651.24,
+    "volume_to": 35510745.88,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "94.64 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -274,7 +514,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T22:01:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 121.56,
+    "est_dollars": 2.43,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510529.68,
+    "volume_to": 35510651.24,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "121.56 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -299,7 +563,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:46:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 96.86,
+    "est_dollars": 1.94,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58457323.76,
+    "volume_to": 58457420.62,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "96.86 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -324,7 +612,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:46:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 93.26,
+    "est_dollars": 92.33,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 35510436.42,
+    "volume_to": 35510529.68,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "93.26 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -349,7 +661,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:46:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 71.98,
+    "est_dollars": 69.82,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72324783.44,
+    "volume_to": 72324855.42,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "71.98 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B52500",
@@ -374,7 +710,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:46:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 100.48,
+    "est_dollars": 10.05,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 61738162.11,
+    "volume_to": 61738262.59,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "100.48 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.89,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -399,7 +759,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:31:10Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 97.96,
+    "est_dollars": 3.92,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 39586021.99,
+    "volume_to": 39586119.95,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "97.96 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.94,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B52500",
@@ -424,7 +808,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:31:10Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 4678.46,
+    "est_dollars": 4631.68,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 61733483.65,
+    "volume_to": 61738162.11,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "4678.46 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.05,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -449,7 +857,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:16:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 7.39,
+    "est_dollars": 7.32,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58457211.2,
+    "volume_to": 58457218.59,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "7.39 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -474,7 +906,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T21:16:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 8.97,
+    "est_dollars": 0.09,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72324682.94,
+    "volume_to": 72324691.91,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "8.97 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
@@ -499,7 +955,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 177.48,
+    "est_dollars": 30.17,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 96742.74,
+    "volume_to": 96920.22,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "177.48 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.39,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
@@ -524,7 +1004,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:34:41Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 34.34,
+    "est_dollars": 19.57,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 96708.4,
+    "volume_to": 96742.74,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "34.34 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -550,7 +1054,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -576,7 +1104,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -601,7 +1153,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:30:54Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 1793.49,
+    "est_dollars": 1739.69,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72322889.45,
+    "volume_to": 72324682.94,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "1793.49 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -626,7 +1202,31 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:30:54Z",
-   "high_roi": true
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 1838.74,
+    "est_dollars": 1801.97,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 39584181.36,
+    "volume_to": 39586020.1,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "1838.74 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.93,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
@@ -652,7 +1252,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 25.0,
+    "est_dollars": 16.25,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 130.0,
+    "volume_to": 155.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "25 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.1,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
@@ -678,7 +1302,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 150.0,
+    "volume_to": 130.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
@@ -704,7 +1352,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-BHAR",
@@ -730,7 +1402,31 @@
    "series_categories": [
     "Sports"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 3112.89,
+    "est_dollars": 2334.67,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 150082.37,
+    "volume_to": 153195.26,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "3112.89 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.745,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -756,7 +1452,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 18.57,
+    "est_dollars": 0.19,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72319504.47,
+    "volume_to": 72319523.04,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "18.57 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
@@ -782,7 +1502,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
@@ -808,7 +1552,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -834,7 +1602,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -860,7 +1652,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 80.5,
+    "volume_to": 58.05,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.16,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -886,7 +1702,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 7.65,
+    "est_dollars": 7.42,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72319460.67,
+    "volume_to": 72319468.32,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "7.65 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -912,7 +1752,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -938,7 +1802,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 23.79,
+    "est_dollars": 19.51,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 28.0,
+    "volume_to": 51.79,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "23.79 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.12,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
@@ -964,7 +1852,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 30.0,
+    "est_dollars": 19.5,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 130.0,
+    "volume_to": 160.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "30 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.1,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
@@ -990,7 +1902,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 150.0,
+    "volume_to": 130.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -1016,7 +1952,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 71.61,
+    "est_dollars": 46.55,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 24.0,
+    "volume_to": 95.61,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "71.61 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.2,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -1042,7 +2002,31 @@
    "series_categories": [
     "Economics"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 11.06,
+    "est_dollars": 3.21,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 395.88,
+    "volume_to": 406.94,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "11.06 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.41,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -1068,7 +2052,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+   "evidence": {
+    "state": "quote_only",
+    "contracts_traded": 0.0,
+    "est_dollars": 0.0,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 12.0,
+    "volume_to": 12.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "no contracts traded between these two reads (volume_fp unchanged), so the reported last price changed without a trade in the interval",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.15,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -1094,7 +2102,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 5.0,
+    "volume_to": 1.22,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.02,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -1120,7 +2152,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 76.7,
+    "est_dollars": 1.53,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58440365.55,
+    "volume_to": 58440442.25,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "76.7 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.97,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -1146,7 +2202,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 80.36,
+    "est_dollars": 79.56,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58440285.19,
+    "volume_to": 58440365.55,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "80.36 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.02,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -1172,7 +2252,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -1198,7 +2302,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 100.0,
+    "est_dollars": 65.0,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 65.0,
+    "volume_to": 165.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "100 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.2,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -1224,7 +2352,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 150.0,
+    "volume_to": 65.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B47500",
@@ -1250,7 +2402,31 @@
    "series_categories": [
     "Crypto"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 26.6,
+    "est_dollars": 1.6,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 80178705.51,
+    "volume_to": 80178732.11,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "26.6 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.88,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -1276,7 +2452,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -1302,7 +2502,31 @@
    "series_categories": [
     "Economics"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM",
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 10.06,
+    "est_dollars": 7.14,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 385.82,
+    "volume_to": 395.88,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "10.06 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.42,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -1326,7 +2550,31 @@
    "series_categories": [
     "Economics"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -1350,7 +2598,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -1376,7 +2648,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 155.0,
+    "volume_to": 145.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.1,
+    "gave_back_half": false,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -1402,7 +2698,31 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "counter_reset",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 150.0,
+    "volume_to": 130.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -1426,7 +2746,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -1450,7 +2794,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -1474,7 +2842,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -1498,7 +2890,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -1522,7 +2938,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -1546,7 +2986,31 @@
    "series_categories": [
     "Test"
    ],
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+   "evidence": {
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": null,
+    "volume_to": null,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-21T23:13:54Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
   }
  ]
 }
