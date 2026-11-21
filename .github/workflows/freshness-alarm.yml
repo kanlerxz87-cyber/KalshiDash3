@@ -81,7 +81,18 @@ jobs:
           # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
           if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
           if [ "$recent" -ge 1 ]; then echo "this monitor already dispatched within the hour; waiting for the cron"; exit 0; fi
-          gh workflow run collect.yml --ref main --event workflow_dispatch \
+          # F-74 (fixed 2026-11-21, arena-220b524c): this line used to end with
+          # `--event workflow_dispatch`. `gh workflow run` has no `--event` flag — its
+          # whole flag set is --ref/-r, --field/-F, --raw-field/-f and --json:
+          #   https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go
+          #   https://cli.github.com/manual/gh_workflow_run
+          # so every alarm dispatch exited non-zero and took the "dispatch failed"
+          # branch below, i.e. this monitor could never restart collection. The run
+          # itself is already a workflow_dispatch (that is what `gh workflow run`
+          # creates), so the flag was redundant as well as invalid.
+          # scripts/tests/test_workflow_cli.py now fails the release gate if any
+          # workflow passes an undefined gh flag.
+          gh workflow run collect.yml --ref main \
             && echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection" \
             || echo "::warning::dispatch failed; the cron schedules remain the only trigger"
 
