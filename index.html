@@ -128,9 +128,9 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows stored in this snapshot"
-      + " (the scan found " + KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope) + " settled in scope; "
-      + KD.num(settled.length) + " are stored, allocated across topics)"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows stored here"
+      + " — the settled scan in scope holds " + KD.num(snap.counts?.settled_in_scope_total ?? "—")
+      + (snap.counts?.settled_in_scope_total_method ? " (" + KD.esc(snap.counts.settled_in_scope_total_method) + ")" : "")],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`;
@@ -202,8 +202,9 @@ KD.nav("");
       `<p class="small mut">Newest resolutions <b>per topic</b> (up to ${PER_TOPIC_SHOWN} each), so a fast-settling
         series cannot crowd out the other four. Stored yes/no rows by topic: ${KD.esc(storedByTopic)}.
         ${KD.num(yn.length)} of the ${KD.num(resRows.length)} stored settled rows resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}.
-        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets in scope and stores
-        ${KD.num(resRows.length)} of them, allocated across topics
+        The settled scan in scope holds ${KD.num(snap.counts?.settled_in_scope_total ?? "—")}
+        (${KD.esc(snap.counts?.settled_in_scope_total_method || "method not stated in this snapshot")}) and this page stores
+        ${KD.num(resRows.length)} rows, allocated across topics
         (<code>counts.settled_published_by_category</code>) to keep the page fast — so a topic can genuinely have
         more history than is shown here, and the stored count above says which. Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +

@@ -632,6 +632,38 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     missing = sorted(t for t in archived_tickers if not hist.get(t, {}).get("observations"))
     hist, backfilled = backfill_from_candles(hist, missing)
 
+    # Exact total, or the best defensible one when the scan was capped (see counts).
+    prev_counts, prev_settled = {}, []
+    try:
+        prev_doc = json.loads((LIVE / "markets.json").read_text())
+        prev_counts = prev_doc.get("counts") or {}
+        prev_settled = prev_doc.get("settled_markets") or []
+    except (OSError, json.JSONDecodeError):
+        prev_counts = {}
+    if not raw.get("_truncated", {}).get("settled"):
+        settled_total_published = settled_in_scope_total
+        settled_total_method = "exact: this run paged the settled scan to exhaustion"
+    else:
+        base = prev_counts.get("settled_in_scope_total")
+        if isinstance(base, int) and base > 0:
+            since = prev_counts.get("collected_at") or None
+            known = {r.get("ticker") for r in prev_settled}
+            known |= {r.get("ticker") for r in rows["settled"]}
+            new_ticks = {r.get("ticker") for r in rows["settled"]} - {r.get("ticker") for r in prev_settled}
+            settled_total_published = base + len(new_ticks)
+            settled_total_method = (
+                "carried forward: the settled scan was truncated by the %d-row safety cap, so the "
+                "previous run's exact total (%s) plus the %d settled tickers this run had not seen "
+                "before. Tickers settled in the capped gap and never observed are not counted."
+                % (SAFETY_SCAN_CAP, f"{base:,}", len(new_ticks)))
+            del since, known
+        else:
+            settled_total_published = settled_in_scope_total
+            settled_total_method = (
+                "lower bound: the settled scan was truncated by the %d-row safety cap and no "
+                "previous exact total was stored, so this is only what this run's window held."
+                % SAFETY_SCAN_CAP)
+
     payload = {
         "schema": 1,
         "environment": "demo",
@@ -671,7 +703,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "scan_sends_mve_filter_exclude": True,
             # Resolution history is allocated across topics, and the allocation is
             # published so a reader never has to infer why a topic is thin.
-            "settled_in_scope_total": settled_in_scope_total,
+            # Exact while paging ran to exhaustion. When the safety cap stopped the scan, the
+            # window covers only the newest N settled markets, so the previous exact total is
+            # carried forward plus this run's newly settled tickers. The method is published
+            # next to the number so neither kind of value is passed off as the other.
+            "settled_in_scope_total": settled_total_published,
+            "settled_in_scope_total_method": settled_total_method,
+            "settled_in_scope_this_run_window": settled_in_scope_total,
             "settled_published": len(rows["settled"]),
             "settled_published_cap": SETTLED_PUBLISHED_CAP,
             "settled_published_reserve_per_category": SETTLED_RESERVE_PER_CATEGORY,

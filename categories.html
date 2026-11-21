@@ -52,7 +52,9 @@ KD.nav("categories.html");
       { k: "Open markets inside the five categories", v: KD.num(snap.counts.open_in_scope) },
       { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
       { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
-      { k: "Settled markets inside the five categories (found by the scan)", v: KD.num(snap.counts.settled_in_scope_total ?? snap.counts.settled_in_scope) },
+      { k: "Settled markets inside the five categories (scan total)", v: KD.num(snap.counts.settled_in_scope_total ?? "—") +
+          (snap.counts.settled_in_scope_total_method ? `<div class="small mut">${KD.esc(snap.counts.settled_in_scope_total_method)}</div>` : "") },
+      { k: "Settled markets in this run's paging window", v: KD.num(snap.counts.settled_in_scope_this_run_window ?? snap.counts.settled_in_scope) },
       { k: "Settled rows published, allocated across the five topics", v: KD.num(snap.counts.settled_published ?? snap.counts.settled_in_scope) },
       { k: "Open rows published (largest first, per category)", v: KD.num(snap.counts.open_published_rows ?? snap.counts.open_in_scope) },
       { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) },

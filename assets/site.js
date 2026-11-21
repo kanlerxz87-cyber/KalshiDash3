@@ -112,8 +112,10 @@ const KD = (() => {
       `<b>Environment:</b> ${esc(meta.environment)} · ` +
       `<b>Endpoint:</b> <code>${esc(meta.base_url)}</code> · ` +
       `<b>Scanned:</b> ${num(meta.counts?.open_total_scanned)} open / ${num(meta.counts?.settled_total_scanned)} settled · ` +
-      `<b>In scope:</b> ${num(meta.counts?.open_in_scope)} open / ${num(meta.counts?.settled_in_scope_total ?? meta.counts?.settled_in_scope)} settled` +
-      `<span class="mut"> (the settled scan is published as ${num(meta.counts?.settled_published ?? meta.counts?.settled_in_scope)} rows, allocated across the five topics)</span>` +
+      `<b>Published:</b> ${num(meta.counts?.open_published_rows ?? meta.counts?.open_in_scope)} open / ` +
+      `${num(meta.counts?.settled_published ?? meta.counts?.settled_in_scope)} settled rows ` +
+      `<span class="mut">(settled rows are allocated across the five topics; ` +
+      `${num(meta.counts?.settled_in_scope_total ?? meta.counts?.settled_in_scope)} settled markets were found in scope)</span>` +
       (stale
         ? ` · <b>Stale fallback:</b> no collection has committed for ${ago(meta.collected_at).replace(" ago", "")}, so these numbers may be out of date. ` +
           `GitHub's scheduler is best-effort — its docs say scheduled runs "can be delayed" and "some queued jobs may be dropped" ` +

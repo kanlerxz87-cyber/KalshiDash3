@@ -158,3 +158,7 @@ check('"settled_in_scope_total": settled_in_scope_total' in collect_src,
       "scripts/collect.py must publish counts.settled_in_scope_total")
 check('"open_published_rows"' in collect_src and '"settled_published_rows"' in collect_src,
       "scripts/collect.py must publish the published-row counts explicitly")
+check('"settled_in_scope_total_method"' in collect_src,
+      "scripts/collect.py must publish how the settled total was obtained (exact vs carried forward)")
+check("settled_in_scope_total_method" in index_html,
+      "index.html must render the method beside the settled total (F-72)")
