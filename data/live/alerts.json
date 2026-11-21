@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T23:21:59Z",
+ "generated_at": "2026-11-21T23:22:02Z",
  "snapshot_collected_at": "2026-11-21T23:16:11Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
@@ -22,10 +22,11 @@
    }
   },
   "evidence": {
-   "traded_ge_floor": 12,
-   "traded_below_floor": 24,
-   "quote_only": 1,
-   "counter_reset": 7,
+   "traded_ge_floor": 11,
+   "traded_below_floor": 20,
+   "quote_only": 0,
+   "counter_reset": 0,
+   "candle_unquantified": 13,
    "unknown_no_observations": 5,
    "gave_back_half_within_3": 0,
    "held_false": 0,
@@ -1286,22 +1287,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 25.0,
-    "est_dollars": 16.25,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 130.0,
     "volume_to": 155.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "25 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1336,7 +1337,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -1344,14 +1345,14 @@
     "volume_to": 130.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1536,7 +1537,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -1544,14 +1545,14 @@
     "volume_to": 58.05,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1686,22 +1687,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 23.79,
-    "est_dollars": 19.51,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 28.0,
     "volume_to": 51.79,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "23.79 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1736,22 +1737,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 30.0,
-    "est_dollars": 19.5,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 130.0,
     "volume_to": 160.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "30 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1786,7 +1787,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -1794,14 +1795,14 @@
     "volume_to": 130.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1836,22 +1837,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 71.61,
-    "est_dollars": 46.55,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 24.0,
     "volume_to": 95.61,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "71.61 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -1936,22 +1937,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
    "evidence": {
-    "state": "quote_only",
-    "contracts_traded": 0.0,
-    "est_dollars": 0.0,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 12.0,
     "volume_to": 12.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "no contracts traded between these two reads (volume_fp unchanged), so the reported last price changed without a trade in the interval",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 1,
@@ -1986,7 +1987,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -1994,14 +1995,14 @@
     "volume_to": 1.22,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -2136,22 +2137,22 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "traded_ge_floor",
-    "contracts_traded": 100.0,
-    "est_dollars": 65.0,
+    "state": "candle_unquantified",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
     "volume_from": 65.0,
     "volume_to": 165.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "100 contracts traded in the interval, at or above this project's 100-contract floor",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -2186,7 +2187,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -2194,14 +2195,14 @@
     "volume_to": 65.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -2384,7 +2385,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -2392,14 +2393,14 @@
     "volume_to": 145.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -2434,7 +2435,7 @@
    "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
    "evidence": {
-    "state": "counter_reset",
+    "state": "candle_unquantified",
     "contracts_traded": null,
     "est_dollars": null,
     "est_dollars_is_an_estimate": true,
@@ -2442,14 +2443,14 @@
     "volume_to": 130.0,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "volume_fp is documented as the market's cumulative volume in contracts (Get Markets); between these two reads it did not increase, so the contracts traded in this interval cannot be derived from them \u2014 left null rather than guessed",
+    "why": "at least one of the two observations is a candle-backfill point; candlestick volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on GET /markets, so subtracting one from the other would invent a number",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:13:54Z"
+    "decided_at": "2026-11-21T23:20:01Z"
    },
    "evidence_reversion": {
     "observed_after": 3,

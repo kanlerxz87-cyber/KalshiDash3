@@ -42,6 +42,11 @@ States (exhaustive, and each one is falsifiable from the snapshot)
   counter_reset        volume_fp DECREASED (or an observation is missing it), so the field does
                        not behave as a monotonic counter across these two reads; the interval's
                        contract count is unknowable from these reads and is left null
+  candle_unquantified  one of the two observations is a CANDLE BACKFILL point. Candlestick
+                       volume_fp is documented as "the number of contracts bought on the market
+                       during the candlestick period" -- a PER-PERIOD figure, NOT the cumulative
+                       volume_fp on GET /markets. Differencing those two different meanings would
+                       invent a contract count, so the count is left null and the state names why
   unknown_no_observations  the swing's two observations are not in the committed history
                        (market pruned or archive-only). Nothing is inferred.
 
@@ -144,6 +149,26 @@ def evaluate(alert: dict, observations, floor: float = DEFAULT_FLOOR) -> dict:
         })
         return base
 
+    # The contract count is only computable when BOTH reads are REST observations of the
+    # cumulative GET /markets volume_fp. Candlestick volume_fp has a different meaning (per
+    # period), documented at
+    # https://docs.kalshi.com/api-reference/market/get-market-candlesticks
+    src0 = (by_time[frm_t] or {}).get("source") or "rest"
+    src1 = (by_time[to_t] or {}).get("source") or "rest"
+    if src0 != "rest" or src1 != "rest":
+        base.update({
+            "state": "candle_unquantified",
+            "contracts_traded": None,
+            "est_dollars": None,
+            "volume_from": _num((by_time[frm_t] or {}).get("volume_fp")),
+            "volume_to": _num((by_time[to_t] or {}).get("volume_fp")),
+            "observation_sources": [src0, src1],
+            "why": "at least one of the two observations is a candle-backfill point; candlestick "
+                   "volume_fp is a PER-PERIOD contract count, not the cumulative volume_fp on "
+                   "GET /markets, so subtracting one from the other would invent a number",
+        })
+        return base
+
     v0 = _num((by_time[frm_t] or {}).get("volume_fp"))
     v1 = _num((by_time[to_t] or {}).get("volume_fp"))
     to_price = _num(alert.get("to_price"))
@@ -191,7 +216,7 @@ def evaluate(alert: dict, observations, floor: float = DEFAULT_FLOOR) -> dict:
 def summarize(evaluated) -> dict:
     """Counts for the feed header. Deterministic order; every state always present."""
     states = ("traded_ge_floor", "traded_below_floor", "quote_only",
-              "counter_reset", "unknown_no_observations")
+              "counter_reset", "candle_unquantified", "unknown_no_observations")
     counts = {s: 0 for s in states}
     gave_back = 0
     held = 0

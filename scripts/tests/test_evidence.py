@@ -71,6 +71,29 @@ def test_counter_reset_is_null_not_negative():
     check(ev["contracts_traded"] is None, "a reset interval must leave contracts_traded null")
 
 
+def test_candle_backfill_point_is_never_differenced():
+    # Candlestick volume_fp is documented as "the number of contracts bought on the market
+    # during the candlestick period" -- a per-period count, not the cumulative volume_fp on
+    # GET /markets. Subtracting across a candle point would invent a contract count.
+    a = alert(T0, T1, 0.55, 0.65)
+    o0 = obs(T0, 0.55, 10.0)
+    o1 = obs(T1, 0.65, 20.0)
+    o1["source"] = "candle"
+    ev = E.evaluate(a, [o0, o1])
+    check(ev["state"] == "candle_unquantified", f"candle_unquantified expected, got {ev['state']}")
+    check(ev["contracts_traded"] is None, "a candle-derived interval must leave the count null")
+    check(ev["observation_sources"] == ["rest", "candle"], "the row must name the observation sources")
+
+
+def test_candle_point_on_the_from_side_also_blocks_the_count():
+    a = alert(T0, T1, 0.55, 0.65)
+    o0 = obs(T0, 0.55, 10.0)
+    o0["source"] = "candle"
+    ev = E.evaluate(a, [o0, obs(T1, 0.65, 20.0)])
+    check(ev["state"] == "candle_unquantified", f"candle_unquantified expected, got {ev['state']}")
+    check(ev["contracts_traded"] is None, "the count must stay null")
+
+
 def test_missing_volume_field_is_null():
     a = alert(T0, T1, 0.55, 0.65)
     ev = E.evaluate(a, [{"t": T0, "last": 0.55}, {"t": T1, "last": 0.65}])
@@ -139,7 +162,7 @@ def test_every_state_is_reachable_and_summarized():
     evaluated = [{"evidence": E.evaluate(a, hist)} for a in rows]
     s = E.summarize(evaluated)
     for state in ("traded_ge_floor", "traded_below_floor", "quote_only",
-                  "counter_reset", "unknown_no_observations"):
+                  "counter_reset", "candle_unquantified", "unknown_no_observations"):
         check(state in s, f"summary must always carry {state}")
     check(s["unknown_no_observations"] == 1, "one alert has no observations")
     check(s["floor_contracts"] == E.DEFAULT_FLOOR, "summary must state the floor")

@@ -314,6 +314,7 @@ window.KDL = (() => {
       traded_below_floor: { t: "thin", c: "warn", tip: "Contracts traded in the interval, but below this project's floor" },
       quote_only: { t: "no trades", c: "bad", tip: "The reported last price changed with ZERO contracts traded in the interval" },
       counter_reset: { t: "volume n/a", c: "dim", tip: "The cumulative volume field did not increase between the two reads, so the interval's contract count cannot be derived" },
+      candle_unquantified: { t: "candle-sourced", c: "dim", tip: "Bounded by a candle-backfill read: candlestick volume is per period, not cumulative, so the contract count cannot be derived" },
       unknown_no_observations: { t: "no history", c: "dim", tip: "The two observations that bound this swing are not in the committed history" },
     };
     const ev = a.evidence_state ? EV[a.evidence_state] : null;

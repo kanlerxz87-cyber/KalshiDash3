@@ -188,6 +188,7 @@ function renderAlerts() {
     traded_below_floor: ["thin", "warn", "Contracts traded in the interval, below this project's floor"],
     quote_only: ["no trades", "bad", "The reported last price changed with ZERO contracts traded in the interval"],
     counter_reset: ["volume n/a", "dim", "The cumulative volume field did not increase across the two reads, so the contract count is unknowable"],
+    candle_unquantified: ["candle-sourced", "dim", "Bounded by a candle-backfill read; candlestick volume is per period, not cumulative, so the count is unknowable"],
     unknown_no_observations: ["no history", "dim", "The two observations that bound this swing are not in the committed history"],
   };
   const evidenceChip = (a) => {
@@ -221,7 +222,7 @@ function renderAlerts() {
   const evNote = ev
     ? ` Of the ${all.length} swings served: ${ev.traded_ge_floor || 0} traded at or above the ${ev.floor_contracts} -contract floor, `
       + `${ev.traded_below_floor || 0} traded below it, ${ev.quote_only || 0} had ZERO contracts traded in the interval, `
-      + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
+      + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase), ${ev.candle_unquantified || 0} are bounded by a candle-backfill read (candlestick volume is per period) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
       + `The floor is a project rule, not a Kalshi field (F-76).`
     : "";
   KD.$("#alertFreshness").textContent = (feedGen

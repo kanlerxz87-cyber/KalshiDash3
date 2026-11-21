@@ -57,6 +57,7 @@ COMPATIBLE = {
 
 errors: list[str] = []
 archive_only = 0
+candle_only = 0
 ev_counts: dict = {}
 
 
@@ -84,7 +85,7 @@ def iso_z(v: str) -> bool:
 
 
 def main() -> int:
-    global archive_only
+    global archive_only, candle_only
     alerts_doc = load(LIVE / "alerts.json")
     archive_doc = load(LIVE / "alerts_archive.json")
     rules = load(RULES)
@@ -136,7 +137,7 @@ def main() -> int:
     hist_for_evidence = load(LIVE / "price_history.json") or {}
     ev_series = hist_for_evidence.get("series") or {}
     ev_states = ("traded_ge_floor", "traded_below_floor", "quote_only",
-                 "counter_reset", "unknown_no_observations")
+                 "counter_reset", "candle_unquantified", "unknown_no_observations")
     ev_counts.clear()
     ev_counts.update({s: 0 for s in ev_states})
     floor = float((rules.get("evidence") or {}).get("floor_contracts", 100.0))
@@ -169,6 +170,13 @@ def main() -> int:
             except (TypeError, ValueError):
                 return None
         v0, v1 = fnum(p0.get("volume_fp")), fnum(p1.get("volume_fp"))
+        if (p0.get("source") or "rest") != "rest" or (p1.get("source") or "rest") != "rest":
+            check(state == "candle_unquantified",
+                  f"{tag} is bounded by a candle-backfill observation, so it must be labelled "
+                  f"candle_unquantified (got {state!r}): candlestick volume_fp is per period")
+            check(ev.get("contracts_traded") is None,
+                  f"{tag} candle-derived interval count must stay null")
+            continue
         if v0 is None or v1 is None or v1 < v0:
             check(state == "counter_reset", f"{tag} volume does not increase but is labelled {state!r}")
             check(ev.get("contracts_traded") is None,
@@ -239,7 +247,7 @@ def main() -> int:
         check(ev_pub.get("counter_reset") == ev_counts["counter_reset"],
               f"counts.evidence.counter_reset {ev_pub.get('counter_reset')} != recomputed {ev_counts['counter_reset']}")
         check(n_traded + ev_counts["quote_only"] + ev_counts["counter_reset"]
-              + ev_counts["unknown_no_observations"] == len(archive),
+              + ev_counts["candle_unquantified"] + ev_counts["unknown_no_observations"] == len(archive),
               "counts.evidence states must partition the whole archive")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
@@ -283,15 +291,26 @@ def main() -> int:
                   f"between collections); the flag is verified against each entry's own stored inputs.")
 
     # ---- provenance: recompute swings from the committed observations ----
+    # One exclusion, stated rather than silent: a pair of observations is only re-derived when
+    # both are REST reads of last_price_dollars. A candle-backed point carries the candle CLOSE
+    # for that period, which is not the same quantity as a REST last_price read at a minute
+    # boundary (a closed market's final candle can print a settlement-side close), so a swing
+    # across one is verified by the archive itself and NOT re-derived here. The number of
+    # excluded pairs is printed, and every such alert still has to pass the evidence block
+    # above, which forces it to say that its contract count is unquantifiable.
     hist = load(LIVE / "price_history.json")
     if hist:
         recomputed: dict[tuple, dict] = {}
+        candle_pairs: set = set()
         for ticker, entry in (hist.get("series") or {}).items():
             obs = sorted(entry.get("observations") or [], key=lambda o: o.get("t") or "")
             for prev, cur in zip(obs, obs[1:]):
                 p0, p1 = prev.get("last"), cur.get("last")
                 t0, t1 = prev.get("t"), cur.get("t")
                 if p0 is None or p1 is None or not t0 or not t1 or t1 <= t0:
+                    continue
+                if (prev.get("source") or "rest") != "rest" or (cur.get("source") or "rest") != "rest":
+                    candle_pairs.add((ticker, t0, t1))
                     continue
                 d = round(float(p1) - float(p0), 6)
                 if abs(d) + 1e-9 >= threshold:
@@ -301,7 +320,10 @@ def main() -> int:
             key = (a.get("ticker"), a.get("from_time"), a.get("to_time"))
             truth = recomputed.pop(key, None)
             if truth is None:
-                archive_only += 1  # market pruned from price history — the archive's purpose
+                if key in candle_pairs:
+                    candle_only += 1     # verified via the archive; see the note above
+                else:
+                    archive_only += 1    # market pruned from price history — the archive's purpose
                 continue
             fresh += 1
             tag = f"archive:{a['ticker']}@{a['to_time']}"
@@ -326,10 +348,12 @@ def finish(total: int, fresh: int) -> int:
         ev_note = (f"evidence: {ev_counts['traded_ge_floor']} traded >= floor, "
                    f"{ev_counts['traded_below_floor']} thin, {ev_counts['quote_only']} quote-only, "
                    f"{ev_counts['counter_reset']} volume-n/a, "
+                   f"{ev_counts['candle_unquantified']} candle-sourced, "
                    f"{ev_counts['unknown_no_observations']} no-history; ")
     print(f"OK: {total} archived alerts provenance-checked "
           f"({ev_note}"
-          f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned from history), "
+          f"({fresh} re-derived from price_history.json, {archive_only} archive-only — market pruned "
+          f"from history, {candle_only} bounded by a candle-backfill read), "
           f"feeds and high_roi screen reproduce from alert_rules.json")
     return 0
 

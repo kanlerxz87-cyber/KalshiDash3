@@ -91,7 +91,9 @@
     <span class="badge warn">thin</span> (some contracts, below the floor),
     <span class="badge bad">no trades</span> (<b>zero</b> contracts — the printed price changed on its own),
     <span class="badge dim">volume n/a</span> (the cumulative field did not increase across the reads, so the count
-    is unknowable and is left blank) and <span class="badge dim">no history</span> (the two observations are no longer
+    is unknowable and is left blank), <span class="badge dim">candle-sourced</span> (the swing is bounded by a
+    candle-backfill read, whose <code>volume_fp</code> is a <i>per-period</i> count rather than a cumulative one, so
+    differencing would invent a number) and <span class="badge dim">no history</span> (the two observations are no longer
     in the committed history). The floor is a <b>project rule, not a Kalshi field</b> — Kalshi publishes no per-move
     significance field — and every alert shows the exact contract count so you can apply your own. Full method:
     <code>scripts/alert_evidence.py</code>; <a href="flagged.html">F-76</a>.
@@ -267,6 +269,7 @@ function renderEvidenceBar(total, shown) {
     + chip("thin", c.traded_below_floor || 0, "color:#ffd88a")
     + chip("no trades", c.quote_only || 0, "color:#ffb3a7")
     + chip("volume n/a", c.counter_reset || 0, "")
+    + chip("candle-sourced", c.candle_unquantified || 0, "")
     + chip("no history", c.unknown_no_observations || 0, "")
     + `<span class="kchip">traded floor: ${c.floor_contracts ?? "—"} contracts (project rule, not a Kalshi field)</span>`;
 }
