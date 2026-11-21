@@ -226,7 +226,11 @@ def main() -> int:
         if p.get("quote_bid") is not None and p.get("quote_ask") is not None \
                 and (p["quote_ask"] - p["quote_bid"]) > max_spread + 1e-9:
             # The entry quote breached the spread rule (possible only for fills made before the rule existed).
-            p.update(status="voided", outcome="void", mark_note=f"entry spread above {max_spread:.2f}: not a tradable quote")
+            p.update(
+                status="voided", outcome="void",
+                bid_now=None, unrealized_net=None, realized_net=None,
+                mark_note=f"entry spread above {max_spread:.2f}: not a tradable quote",
+            )
             bump(counters, p["strategy"], "voided")
             closed.append(p)
             del positions[pid]
@@ -273,6 +277,13 @@ def main() -> int:
             exit_fee = taker_fee(bid, contracts, multiplier_for(p.get("series_ticker"), strat))
             p["unrealized_net"] = round(bid - p["entry_price"] - p["entry_fee"] - exit_fee, 4)
 
+    # Normalize carried-forward voided rows so a stale open mark can never survive.
+    for p in closed:
+        if p.get("status") == "voided":
+            p["bid_now"] = None
+            p["unrealized_net"] = None
+            p["realized_net"] = None
+
     # 3) Summaries and state for the next run.
     open_list = sorted(positions.values(), key=lambda p: p["entered_at"], reverse=True)[:MAX_OPEN_KEPT]
     closed_list = sorted(closed, key=lambda p: p.get("settled_at") or "", reverse=True)[:MAX_CLOSED_KEPT]
@@ -295,8 +306,7 @@ def main() -> int:
         summaries.append({
             "id": st["id"], "name": st["name"], "side_rule": st["side_rule"],
             "signal_filter": st["signal_filter"], "description": st["description"],
-            "signals": c["signals"], "not_filled": c["not_filled"], "not_filled_wide_spread": c["not_filled_wide_spread"],
-            "voided": c["voided"],
+            "signals": c["signals"], "not_filled": c["not_filled"],
             "not_filled_no_quote": c["not_filled_no_quote"], "not_filled_bad_price": c["not_filled_bad_price"],
             "not_filled_wide_spread": c["not_filled_wide_spread"], "voided": c["voided"],
             "skipped_duplicate": c["skipped_duplicate"],

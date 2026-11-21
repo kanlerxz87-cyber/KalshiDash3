@@ -217,6 +217,40 @@ class SimulateTest(unittest.TestCase):
         self.assertEqual(self._strat(doc, "S1")["voided"], 1)
         self.assertEqual(self._strat(doc, "S1")["settled"], 0)
 
+    def test_voided_position_clears_stale_open_mark_and_carry_forward_mark(self):
+        # Both a newly voided position with a previous mark AND a carried-forward
+        # closed voided row with a stale mark must end up with bid_now=None,
+        # unrealized_net=None, realized_net=None.
+        self._write([], {})
+        open_stale = {
+            "id": "S1|open-void|yes", "strategy": "S1", "alert_key": "open-void", "ticker": "KXAAAGASM-X-1",
+            "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "yes",
+            "trade_type": "gas | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
+            "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
+            "status": "open", "outcome": None, "settled_at": None, "settled_result": None,
+            "realized_net": None, "bid_now": 0.0, "unrealized_net": -1.0, "mark_note": None, "source": None,
+        }
+        closed_stale = {
+            "id": "S2|carried-void|no", "strategy": "S2", "alert_key": "carried-void", "ticker": "KXAAAGASM-X-1",
+            "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "no",
+            "trade_type": "gas | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
+            "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
+            "status": "voided", "outcome": "void", "settled_at": None, "settled_result": None,
+            "realized_net": -1.0, "bid_now": 0.0, "unrealized_net": -1.0,
+            "mark_note": "entry spread above 0.10: not a tradable quote", "source": None,
+        }
+        simulate.OUT.write_text(json.dumps({"state": {
+            "processed_alert_ids": [], "open": [open_stale], "closed": [closed_stale], "counters": {}
+        }}))
+        doc = self._run()
+        by_id = {p["id"]: p for p in doc["settled_positions"]}
+        for pid in ("S1|open-void|yes", "S2|carried-void|no"):
+            self.assertIn(pid, by_id)
+            self.assertEqual(by_id[pid]["status"], "voided")
+            self.assertIsNone(by_id[pid]["bid_now"])
+            self.assertIsNone(by_id[pid]["unrealized_net"])
+            self.assertIsNone(by_id[pid]["realized_net"])
+
     def test_open_position_is_marked_to_bid_and_fee_is_charged_at_exit(self):
         self._write([self._alert("up")], {"KXAAAGASM-X-1": self._obs(0.49, 0.50)},
                     open_rows=[{"ticker": "KXAAAGASM-X-1", "yes_bid_dollars": 0.60, "no_bid_dollars": 0.38,

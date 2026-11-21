@@ -41,9 +41,10 @@
     <label>Category <select id="catFilter"><option value="">All five</option></select></label>
     <label>Chart window
       <select id="window">
-        <option value="s">Seconds (snapshot observations)</option>
-        <option value="m" selected>Minutes</option>
-        <option value="h">Hours</option>
+        <option value="s">Seconds (snapshot + live polls)</option>
+        <option value="m" selected>Minutes (1m candles)</option>
+        <option value="h">Hours (60m candles)</option>
+        <option value="d">Days (1440m candles)</option>
         <option value="all">All collected</option>
       </select>
     </label>
@@ -110,10 +111,98 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/engine.js"></script>
 <script>
 KD.nav("dashboard.html");
-const state = { snap: null, hist: null, alerts: null, sel: null, cat: "" };
+const state = { snap: null, hist: null, alerts: null, sel: null, cat: "", candles: new Map() };
 const live = { obs: new Map(), markers: new Map(), on: false };
 
-const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, all: Infinity };
+const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, d: 30 * 86400e3, all: Infinity };
+// Documented candlestick intervals ONLY: 1 (1 min), 60 (1 hour), 1440 (1 day).
+// https://docs.kalshi.com/api-reference/market/get-market-candlesticks
+// https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks
+const CANDLE_CFG = {
+  m: { period: 1, lookbackSec: 6 * 3600, label: "1-minute" },
+  h: { period: 60, lookbackSec: 72 * 3600, label: "1-hour" },
+  d: { period: 1440, lookbackSec: 30 * 86400, label: "1-day" },
+};
+
+function parseCandlePrice(v) {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function seriesOfTicker(row) {
+  if (row.series_ticker) return row.series_ticker;
+  const t = String(row.ticker || "");
+  return t.includes("-") ? t.split("-")[0] : t;
+}
+
+function normalizeCandles(rawList) {
+  const out = [];
+  for (const c of rawList || []) {
+    const endTs = Number(c && c.end_period_ts);
+    if (!Number.isFinite(endTs)) continue;
+    const t = endTs * 1000;
+    const pObj = c.price || {};
+    const bObj = c.yes_bid || {};
+    const aObj = c.yes_ask || {};
+    const last = parseCandlePrice(pObj.close_dollars ?? pObj.close);
+    const bid = parseCandlePrice(bObj.close_dollars ?? bObj.close);
+    const ask = parseCandlePrice(aObj.close_dollars ?? aObj.close);
+    // Keep only points that actually carry a price; never coerce "" or missing blocks to 0.
+    if (last === null && bid === null && ask === null) continue;
+    out.push({ t, last, bid, ask });
+  }
+  out.sort((a, b) => a.t - b.t);
+  return out;
+}
+
+async function fetchCandles(row, winKey) {
+  const cfg = CANDLE_CFG[winKey];
+  if (!cfg || !row || !row.ticker) return null;
+  const cacheKey = `${row.ticker}|${winKey}`;
+  const cached = state.candles.get(cacheKey);
+  if (cached && Date.now() - cached.at < 60_000) return cached;
+  if (cached && cached.inflight) return cached.inflight;
+
+  const endTs = Math.floor(Date.now() / 1000);
+  const startTs = endTs - cfg.lookbackSec;
+  const series = seriesOfTicker(row);
+  const params = { start_ts: startTs, end_ts: endTs, period_interval: cfg.period };
+
+  const inflight = (async () => {
+    let points = [];
+    let endpoint = null;
+    let error = null;
+    const livePath = `/series/${encodeURIComponent(series)}/markets/${encodeURIComponent(row.ticker)}/candlesticks`;
+    try {
+      const d = await KDL.get(livePath, params);
+      points = normalizeCandles(d && d.candlesticks);
+      endpoint = `GET ${livePath}`;
+    } catch (e) {
+      error = e && e.message ? e.message : "candlesticks unavailable";
+    }
+    if (!points.length) {
+      const histPath = `/historical/markets/${encodeURIComponent(row.ticker)}/candlesticks`;
+      try {
+        const d2 = await KDL.get(histPath, params);
+        const histPts = normalizeCandles(d2 && d2.candlesticks);
+        if (histPts.length) {
+          points = histPts;
+          endpoint = `GET ${histPath}`;
+          error = null;
+        }
+      } catch (e2) {
+        if (!error) error = e2 && e2.message ? e2.message : "historical candlesticks unavailable";
+      }
+    }
+    const entry = { at: Date.now(), period: cfg.period, label: cfg.label, points, endpoint, error };
+    state.candles.set(cacheKey, entry);
+    if (state.sel === row.ticker && KD.$("#window").value === winKey) drawChart();
+    return entry;
+  })();
+  state.candles.set(cacheKey, { at: 0, inflight });
+  return inflight;
+}
 
 function pickInitialTicker() {
   const h = decodeURIComponent(location.hash.replace("#", ""));
@@ -182,11 +271,16 @@ function renderAlerts() {
       <span class="alert-market">${KD.esc(title)}</span>
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
-      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+      <div><button class="ghost" data-chart-t="${KD.esc(a.ticker)}" style="padding:1px 7px;font-size:11px;margin-right:6px">Chart</button><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
     </article>`;
   }).join("") : `<div class="alert-empty">${emptyText}</div>`;
   KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");
   KD.$("#modelAlerts").innerHTML = renderFeed(screen, "No qualifying alerts meet the experimental screen.");
+  document.querySelectorAll("[data-chart-t]").forEach(b => b.addEventListener("click", () => {
+    select(b.dataset.chartT);
+    const card = KD.$("#chartCard");
+    if (card && card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }));
   KD.$("#allAlertCount").textContent = `${all.length} shown`;
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
@@ -293,10 +387,40 @@ function select(ticker) {
   drawLiq();
 }
 
+function archiveRowFor(ticker) {
+  const feed = state.alerts?.all_events || state.alerts?.alerts || [];
+  const hits = feed.filter(a => a.ticker === ticker);
+  if (!hits.length) return null;
+  const a = hits.slice().sort((x, y) => Date.parse(y.to_time || "") - Date.parse(x.to_time || ""))[0];
+  return {
+    ticker: a.ticker,
+    event_ticker: a.event_ticker || null,
+    series_ticker: a.series_ticker || (String(a.ticker).includes("-") ? String(a.ticker).split("-")[0] : a.ticker),
+    title: a.title || a.ticker,
+    category_id: a.category_id || null,
+    category_basis: a.category_basis || null,
+    status: a.status || "archived",
+    result: a.result || null,
+    last_price_dollars: a.to_price !== undefined ? Number(a.to_price) : null,
+    volume_fp: a.volume_24h_fp !== undefined ? Number(a.volume_24h_fp) : null,
+    open_interest_fp: null,
+    source: a.market_source || a.source || null,
+    _fromArchive: true,
+  };
+}
+
 function currentRow() {
   if (!state.sel) return null;
-  return (state.snap?.open_markets || []).concat(state.snap?.settled_markets || [])
-    .find(r => r.ticker === state.sel) || null;
+  const snapRow = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || [])
+    .find(r => r.ticker === state.sel);
+  return snapRow || archiveRowFor(state.sel);
+}
+
+function obsField(o, key) {
+  if (!o) return null;
+  if (key === "bid") return o.bid !== undefined ? o.bid : o.yes_bid;
+  if (key === "ask") return o.ask !== undefined ? o.ask : o.yes_ask;
+  return o.last;
 }
 
 function drawChart() {
@@ -316,18 +440,42 @@ function drawChart() {
     foot.textContent = "";
     return;
   }
+
+  const key = KD.$("#seriesSel").value;
+  const winKey = KD.$("#window").value;
+  const win = WINDOWS[winKey] || Infinity;
+  const now = Date.now();
+
+  // Official Kalshi candlesticks for Minutes (1m), Hours (60m), and Days (1440m).
+  const cfg = CANDLE_CFG[winKey] || null;
+  let candleEntry = null;
+  if (cfg) {
+    const cacheKey = `${row.ticker}|${winKey}`;
+    const c = state.candles.get(cacheKey);
+    if (!c || (c.at && Date.now() - c.at >= 60_000)) {
+      fetchCandles(row, winKey);
+    } else if (c.at) {
+      candleEntry = c;
+    }
+  }
+
+  const candlePts = (candleEntry && candleEntry.points || [])
+    .map(p => ({ t: p.t, v: p[key] }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+
   const histObs = (state.hist?.series?.[row.ticker]?.observations) || [];
   const liveObs = live.obs.get(row.ticker) || [];
   const series = histObs.concat(liveObs);
-  const key = KD.$("#seriesSel").value;
-  const win = WINDOWS[KD.$("#window").value] || Infinity;
-  const now = Date.now();
-  const pts = series
-    .map(o => ({ t: Date.parse(o.t), v: o[key] }))
+  const obsPts = series
+    .map(o => ({ t: typeof o.t === "number" ? o.t : Date.parse(o.t), v: obsField(o, key) }))
     .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v))
     .filter(p => win === Infinity || now - p.t <= win);
 
-  meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
+  const usingCandles = candlePts.length > 0;
+  const pts = usingCandles ? candlePts : obsPts;
+
+  const archTag = row._fromArchive ? ' <span class="badge warn">from alert archive</span>' : "";
+  meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code>${archTag} · ` +
     `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis)} · ` +
     `status ${KD.statusBadge(row.status)} · result ${KD.resultBadge(row.result)} · ` +
     `last ${KD.cents(row.last_price_dollars)} · ${KD.num(row.volume_fp)} contracts traded · ` +
@@ -344,15 +492,68 @@ function drawChart() {
   }
   ctx.fillText("price", 6, pad.t - 4);
 
+  // Build swing list for this market: prefer consecutive observations in price_history,
+  // and include any archived alerts for the ticker so pruned markets still display their swings + leads.
+  const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
+    .map(o => ({ t: Date.parse(o.t), v: o.last }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+  const swings = [];
+  const seenSwingT = new Set();
+  for (let i = 1; i < obsLast.length; i++) {
+    const delta = obsLast[i].v - obsLast[i - 1].v;
+    if (Math.abs(delta) >= 0.10 - 1e-9) {
+      swings.push({ t: obsLast[i].t, v: obsLast[i].v, prior: obsLast[i - 1].v, delta, mag: Math.abs(delta) });
+      seenSwingT.add(obsLast[i].t);
+    }
+  }
+  const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
+  for (const a of allAlerts) {
+    if (a.ticker !== row.ticker) continue;
+    const t = Date.parse(a.to_time || a.observed_at || "");
+    if (!Number.isFinite(t) || seenSwingT.has(t)) continue;
+    const prior = Number(a.from_price), v = Number(a.to_price);
+    const delta = Number.isFinite(Number(a.delta)) ? Number(a.delta) : (v - prior);
+    if (!Number.isFinite(prior) || !Number.isFinite(v) || Math.abs(delta) < 0.10 - 1e-9) continue;
+    swings.push({ t, v, prior, delta, mag: Math.abs(delta), fromArchive: true });
+    seenSwingT.add(t);
+  }
+  swings.sort((a, b) => b.t - a.t);
+  const alertFor = (t) => allAlerts.find(
+    a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
+    || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
+  const renderSwings = () => {
+    const swingHost = KD.$("#swings");
+    if (!swings.length) {
+      swingHost.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between collected observations for this market. Sharp jumps (≥ $0.10) are marked on the chart when it plots the last price.</p>';
+    } else {
+      swingHost.innerHTML = swings.map(s => {
+        const a = alertFor(s.t);
+        const at = new Date(s.t);
+        const time = at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const dir = s.delta > 0 ? "up" : "down";
+        const deltaTxt = (s.delta > 0 ? "+" : "−") + KD.cents(Math.abs(s.delta));
+        const ev = a && a.event_ticker
+          ? " · " + KD.srcLink(String(a.market_source || a.source || "").replace(/\/markets\/.*$/, "") + "/events/" + a.event_ticker, "event")
+          : "";
+        return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
+          `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
+          `<span>${KD.esc(time)}${ev} ${leadHtml(row.ticker, s.t)}</span></div>`;
+      }).join("");
+    }
+  };
+
   if (pts.length < 1) {
     ctx.fillStyle = mut; ctx.font = "13px system-ui";
     ctx.fillText("No observations in this window yet.", pad.l + 12, pad.t + 26);
     ctx.font = "11px ui-monospace,monospace";
-    foot.innerHTML = `Seconds-resolution history cannot be requested from Kalshi: candlesticks only support
-      1, 60 and 1440-minute intervals (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>).
-      This chart therefore plots <b>one observation per collector run</b> from
-      <code>data/live/price_history.json</code>; widen the window or wait for more runs.`;
-    KD.$("#swings").innerHTML = "";
+    const candleMsg = cfg
+      ? (candleEntry
+          ? `Official ${cfg.label} candlesticks (period_interval=${cfg.period}) returned 0 priced bars${candleEntry.error ? " (" + KD.esc(candleEntry.error) + ")" : ""}. `
+          : `Requesting official ${cfg.label} candlesticks (period_interval=${cfg.period})… `)
+      : `Seconds-resolution history cannot be requested from Kalshi: candlesticks only support 1, 60 and 1440-minute intervals (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>). `;
+    foot.innerHTML = candleMsg +
+      `Fallback plots accumulated observations from <code>data/live/price_history.json</code>; widen the window or switch to All collected.`;
+    renderSwings();
     return;
   }
   const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
@@ -391,23 +592,6 @@ function drawChart() {
   ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
     Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
 
-  // Swing markers: |Δ last price| >= $0.10 between consecutive observations.
-  // Uses the `last` field (the alert rule) and is independent of the series
-  // selector, so a swing is marked even when the chart plots bid/ask. Event and
-  // market links come from the canonical alert feed (data/live/alerts.json);
-  // what sits beside each swing is the market's OWN settlement reference and a fetched reading of it
-  // (data/live/catalysts.json). Kalshi has no cause feed, so a link is never called a cause: the
-  // state word comes from the file, whose builder refuses causal wording (scripts/catalysts.py).
-  const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
-    .map(o => ({ t: Date.parse(o.t), v: o.last }))
-    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
-  const swings = [];
-  for (let i = 1; i < obsLast.length; i++) {
-    const delta = obsLast[i].v - obsLast[i - 1].v;
-    if (Math.abs(delta) >= 0.10 - 1e-9) {
-      swings.push({ t: obsLast[i].t, v: obsLast[i].v, prior: obsLast[i - 1].v, delta, mag: Math.abs(delta) });
-    }
-  }
   if (key === "last") {
     swings.filter(s => s.t >= t0 && s.t <= t1).forEach(s => {
       ctx.fillStyle = s.delta > 0 ? "#f0b429" : "#f2695c";
@@ -415,33 +599,23 @@ function drawChart() {
       ctx.strokeStyle = css.getPropertyValue("--panel"); ctx.lineWidth = 1.2; ctx.stroke();
     });
   }
-  const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
-  const alertFor = (t) => allAlerts.find(
-    a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
-    || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
-  const swingHost = KD.$("#swings");
-  if (!swings.length) {
-    swingHost.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between collected observations for this market. Sharp jumps (≥ $0.10) are marked on the chart when it plots the last price.</p>';
-  } else {
-    swingHost.innerHTML = swings.map(s => {
-      const a = alertFor(s.t);
-      const at = new Date(s.t);
-      const time = at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-      const dir = s.delta > 0 ? "up" : "down";
-      const deltaTxt = (s.delta > 0 ? "+" : "−") + KD.cents(Math.abs(s.delta));
-      const ev = a && a.event_ticker
-        ? " · " + KD.srcLink(String(a.market_source || a.source || "").replace(/\/markets\/.*$/, "") + "/events/" + a.event_ticker, "event")
-        : "";
-      return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
-        `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
-        `<span>${KD.esc(time)}${ev} ${leadHtml(row.ticker, s.t)}</span></div>`;
-    }).join("");
-  }
+  renderSwings();
 
-  foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
-    ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
-    Y axis is the contract price in dollars, bounded 0–1. Collected by
-    <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
+  if (usingCandles) {
+    foot.innerHTML = `${pts.length} official ${KD.esc(candleEntry.label)} candlestick${pts.length === 1 ? "" : "s"}
+      (<code>period_interval=${candleEntry.period}</code>) between
+      ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC) from
+      <code>${KD.esc(candleEntry.endpoint || "")}</code>
+      (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">candlesticks docs</a> ·
+       <a href="https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks" target="_blank" rel="noopener">historical fallback</a>).
+      Candles with no price block are skipped rather than plotted as $0.00.`;
+  } else {
+    foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between
+      ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
+      Y axis is the contract price in dollars, bounded 0–1. Collected by
+      <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>` +
+      (cfg && candleEntry ? ` (official ${KD.esc(candleEntry.label)} candlesticks unavailable${candleEntry.error ? ": " + KD.esc(candleEntry.error) : ""}; showing collector observations).` : ".");
+  }
 }
 
 // One lead row per swing: the reference the market settles on, and the published numbers beside
@@ -526,9 +700,10 @@ async function load() {
   sel.value = state.cat;
   renderTables(); renderResolved(); renderPending();
   const available = (state.snap.open_markets || []).concat(state.snap.settled_markets || []);
-  if (!state.sel || !available.some(r => r.ticker === state.sel)) {
+  const hasTicker = (t) => !!t && (available.some(r => r.ticker === t) || !!archiveRowFor(t));
+  if (!state.sel || !hasTicker(state.sel)) {
     const preferred = pickInitialTicker();
-    state.sel = available.some(r => r.ticker === preferred) ? preferred : (available[0]?.ticker || null);
+    state.sel = hasTicker(preferred) ? preferred : (available[0]?.ticker || null);
   }
   drawChart(); drawLiq();
   loading = false;

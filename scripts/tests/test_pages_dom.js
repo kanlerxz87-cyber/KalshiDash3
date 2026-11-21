@@ -86,7 +86,10 @@ function mkFetch(mode, state) {
           rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
         })) });
       }
-      if (u.includes("/candlesticks")) return send({ ticker: "x", candlesticks: [] });
+      if (u.includes("/candlesticks")) {
+        if (state.candlePayload) return send(state.candlePayload);
+        return send({ ticker: "x", candlesticks: [] });
+      }
       return send({});
     }
     // same-origin files: read from the repo
@@ -114,12 +117,12 @@ function inlineAssets(html) {
   });
 }
 
-async function loadPage(file, mode) {
+async function loadPage(file, mode, opts = {}) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0, badBookQuery: null };
+  const state = { calls: [], blocked: 0, badBookQuery: null, candlePayload: opts.candlePayload || null };
   const errors = [];
   const dom = new JSDOM(html, {
-    url: "https://kalshidash3.invalid/" + file,
+    url: "https://kalshidash3.invalid/" + file + (opts.hash || ""),
     runScripts: "dangerously",
     pretendToBeVisual: true,
     beforeParse(window) {
@@ -133,7 +136,7 @@ async function loadPage(file, mode) {
   // let the boot sequence, a couple of poll cycles and the 60s-snapshot timer all run
   // long enough in api mode to cover one full poll cycle (the page polls every 6s), so a
   // live-tick alert — not just a snapshot-history alert — is exercised
-  await new Promise(r => setTimeout(r, mode === "api" ? 7500 : 900));
+  await new Promise(r => setTimeout(r, opts.waitMs || (mode === "api" ? 7500 : 900)));
   const doc = dom.window.document;
   // The test inlines the page's own JS into the document, so script source must be excluded
   // before asserting on visible text — otherwise "undefined" in the code reads as a leak.
@@ -285,6 +288,59 @@ function commonAsserts(label, r) {
     }
     console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
     r.close();
+  }
+
+  /* --- G. dashboard.html candlesticks: documented period_interval + skip price-less candle --- */
+  {
+    const nowSec = Math.floor(Date.now() / 1000);
+    const candlePayload = {
+      ticker: "TEST",
+      candlesticks: [
+        { end_period_ts: nowSec - 180, price: { close_dollars: "0.4200" }, volume_fp: "10.00" },
+        // Real demo shape: zero-volume bar carrying previous_dollars with empty close_dollars.
+        { end_period_ts: nowSec - 120, price: { previous_dollars: "0.4200", close_dollars: "" }, volume_fp: "0.00" },
+        { end_period_ts: nowSec - 60, price: { close_dollars: "0.5500" }, volume_fp: "15.00" },
+      ],
+    };
+    const r = await loadPage("dashboard.html", "api", { candlePayload, waitMs: 1200 });
+    commonAsserts("dashboard.html (candlesticks)", r);
+    const candleCall = r.state.calls.find(u => u.includes("/candlesticks"));
+    check(!!candleCall, "dashboard.html must request official Kalshi candlesticks in Minutes/Hours/Days windows");
+    if (candleCall) {
+      const qs = new URL(candleCall).searchParams;
+      check(["1", "60", "1440"].includes(qs.get("period_interval")),
+        `candlestick period_interval must be one of 1/60/1440 (got ${qs.get("period_interval")})`);
+      check(Number(qs.get("start_ts")) > 0 && Number(qs.get("end_ts")) > Number(qs.get("start_ts")),
+        "candlestick request must send valid start_ts < end_ts");
+    }
+    const foot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+    check(/2 official 1-minute candlesticks/.test(foot),
+      `candlestick footer must report 2 priced candles (skipping the empty "" bar, got: ${foot.slice(0, 140)})`);
+    check(/period_interval=1/.test(foot),
+      "candlestick footer must name the documented period_interval");
+    console.log("  G candlesticks  ok  (official /candlesticks called with period_interval=1, price-less bar skipped)");
+    r.close();
+  }
+
+  /* --- H. dashboard.html archive deep link (#TICKER outside open/settled markets) --- */
+  {
+    const alertsDoc = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8")); } catch { return null; } })();
+    const snapTickers = new Set(((markets && markets.open_markets) || []).concat((markets && markets.settled_markets) || []).map(x => x.ticker));
+    const archOnly = ((alertsDoc && (alertsDoc.all_events || alertsDoc.alerts)) || []).find(a => a.ticker && !snapTickers.has(a.ticker));
+    if (archOnly) {
+      const r = await loadPage("dashboard.html", "snapshot", { hash: "#" + encodeURIComponent(archOnly.ticker) });
+      commonAsserts("dashboard.html (archive deep link)", r);
+      const metaTxt = (r.doc.querySelector("#chartMeta") || {}).textContent || "";
+      const swingsTxt = (r.doc.querySelector("#swings") || {}).textContent || "";
+      check(metaTxt.includes(archOnly.ticker),
+        `archive deep link must select ${archOnly.ticker} (got: ${metaTxt.slice(0, 120)})`);
+      check(/from alert archive/i.test(metaTxt),
+        "archive-only chart must be labelled 'from alert archive'");
+      check(/UP|DOWN/.test(swingsTxt),
+        "archive-only chart must still display its archived swing row");
+      console.log(`  H archive link  ok  (#${archOnly.ticker} opened with 'from alert archive' label + swing row)`);
+      r.close();
+    }
   }
 
   if (problems.length) {
