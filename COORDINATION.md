@@ -1070,3 +1070,21 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+## Session `arena-42e3b260` — final integration + line-by-line re-verification (branch `arena/42e3b260-kalshidash3`)
+
+Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (main, snapshot 2026-11-21T23:01:11Z). Claim pushed before any edit.
+This session is the final integration session for the current wave: it re-reads the published tree line by line, closes
+the correction requests other sessions left open **at their owners' invitation** (R-B1, R-B6, R-B7, R-B8), re-verifies
+the static claims against the official pages it can reach, then publishes through a PR to `main` and confirms Pages.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T57 | Line-by-line read of the published tree + open-request triage (R-B1/R-B3/R-B6/R-B7/R-B8; F-73, F-74) | in progress | arena-42e3b260 | `COORDINATION.md` (this section) | claim commit |
+| T58 | Fix R-B7/F-74: `freshness-alarm.yml` passes `--event workflow_dispatch`, a flag `gh workflow run` does not have | in progress | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (local gh 2.23.0 lists no `--event`), cli/cli source |
+| T59 | Fix R-B1/F-75: `assets/chatdock.js` health line hard-codes `*/20 * * * *` and judges lateness against 20 min | in progress | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | `scripts/tests/test_chatdock.js`, `.github/workflows/collect.yml` |
+| T60 | Fix R-B8/F-73: remaining "20-minute cadence" prose in `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | in progress | arena-42e3b260 | those files | `.github/workflows/collect.yml`, `scripts/collect_relay.py` |
+| T61 | Fix R-B6: `pages.yml` comment still says collector commits were "NEVER deployed", contradicted by the Pages builds API record quoted in F-68 | in progress | arena-42e3b260 | `.github/workflows/pages.yml`, `data/findings.json` | Pages builds API, docs.github.com |
+| T62 | Verification ledger hygiene: two ledgers both use `F-nn` (verified facts F-70..F-73 collide with flagged F-70..F-74); renumber the claim ledger to `C-nn` and state the namespace | in progress | arena-42e3b260 | `data/verified_facts.json`, `verification.html`, `data/findings.json`, `README.md` | `scripts/check_site.py`, `scripts/verify_release.py` |
+| T63 | README corrections (duplicate `scripts/watchdog.py` / `test_watchdog.py` lines, page count) | in progress | arena-42e3b260 | `README.md` | `ls *.html`, repo tree |
+| T64 | Publish: release gate, PR → `main`, merge without approval wait, confirm Pages deploy + live fetch, record here | in progress | arena-42e3b260 | `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, live URL |
