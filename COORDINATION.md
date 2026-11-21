@@ -1216,3 +1216,29 @@ Fixed by moving the declaration above its first use. Coverage added so it cannot
 category rows, a real ticker per row, the metric label, and the QA guard with its disclosure.
 Mutation-checked — the original declaration order makes the new test fail with the exact `ReferenceError`.
 Published as **F-64** on the Flagged page.
+
+### Final state of this session's work (2026-11-21 ~07:00Z)
+
+| Item | Result |
+|---|---|
+| PR #54 (scope fixes F-61/F-62, cadence + watchdog F-63, live API audit) | **merged** `5660ff2`, 06:49:08Z |
+| PR #57 (close-out record) | **merged** `bd05688`, 06:51:36Z |
+| PR #58 (F-64 fix + index.html DOM coverage) | **merged** `8b7855c`, 06:55:23Z |
+| Pages deploy after #58 | run `44877811399` **success**, `pages.status = built` |
+| Live site verified after the final deploy | landing table renders 5 category rows (Culture = a real market, not the QA fixture); "0 demo QA fixtures in the snapshot"; 43 flagged rows incl. F-61…F-64 |
+| Release gate on `main` | `scripts/verify_release.py` **PASS** (now renders `index.html` too) |
+
+**What is still genuinely open (not claimed):**
+
+1. **Watchdog measurement (F-63 / F-40 / F-16).** Scheduled-run cadence can only be measured over time. Read
+   `gh run list --workflow=collect.yml` and count `event == schedule` over several hours: if the bounded
+   watchdog (≤3 dispatches/hour, only when the snapshot is >35 min old) keeps data fresh, close it with the
+   numbers; if it does not, remove the step and rely on the crons. My dispatches at 06:30–06:41Z were manual
+   and are excluded from that count; dispatches seen at 06:48–06:55Z were another session's branch runs.
+2. **Demo credentials (F-07).** No demo API key exists, so portfolio performance and live order execution stay
+   labelled paper. Kalshi requires a person to create the demo account and add mock funds.
+3. **Owner model (F-14).** The "high-ROI" feed is this project's disclosed screen, not an owner-supplied model.
+4. **WebSocket streaming + true seconds history (F-04, F-06).** Impossible from a static site as documented.
+
+**Defects this session introduced and fixed, all published**: F-63 (runaway dispatch loop) and F-64 (landing
+table rendered empty). Both are on the Flagged page with run IDs and source links; neither was quietly repaired.
