@@ -1280,3 +1280,25 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-dc62f2bb` — integration takeover + close-out (branch `arena/dc62f2bb-kalshidash3`)
+
+Base: `f09f982` (current `origin/main`). Claimed 2026-11-21 ~20:20Z. Two PRs from other sessions have been open for
+>13 hours with no commits and no claims on this board: PR #55 (`arena/a3070ffa-kalshidash3`, dashboard candles,
+F-40..F-44 drafts) and PR #56 (`arena/17d4ecfa-kalshidash3`, per-topic settled selection, F-41/F-42 drafts). The
+stale-claim rule lets any session take over after >60 minutes with no commits, so this session claims them and
+records the handoff here. No files are deleted; both implementations are kept with ID renumbering so neither
+session's identifier collides with main's F-37..F-64.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T41 | Take over stale PRs #55 and #56: merge both into the canonical tree with non-colliding finding IDs, keep both fixes, resolve data conflicts by keeping the newest real snapshot, full-suite verify, PR → main → merge → Pages confirm → record | in progress | arena-dc62f2bb | `COORDINATION.md`, `data/findings.json` (add new entries with fresh IDs F-65..F-71, keep F-37..F-64 verbatim), `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/*`, `assets/alerts.js`, `executive-summary.html`, `index.html`, `dashboard.html`, `.github/workflows/collect.yml`, `data/live/simulation.json` (merge-resolution only) | `verify_release.py`, `check_site.py`, `validate_live.py`, `validate_alerts.py`, `test_collect_coverage.py`, `test_settled_selection.py`, `test_simulate.py`, jsdom DOM/chatdock/engine suites | Data files: PR data is older than main's committed snapshot; main's newer snapshot kept and re-validated; fairness/candle fixes take effect at the next collector run |
+
+### Handoff notes (stale claims taken over)
+- PR #55 (`arena/a3070ffa-kalshidash3`, 2026-11-21T06:45Z): 13 changed files (dashboard.html +230, collect.py, simulate.py, test_collect_coverage.py (new), test_pages_dom.js, test_simulate.py, collect.yml, alerts.js, executive-summary.html, README.md, simulation.json, findings.json).
+- PR #56 (`arena/17d4ecfa-kalshidash3`, 2026-11-21T06:59Z): 10 changed files (collect.py +98, test_settled_selection.py (new), index.html +9, data/live/* (regenerated snapshots, older than main's committed data), findings.json).
+
+### Log (this session)
+- 2026-11-21 ~20:20Z: claimed T41; recorded claim before any edit.
