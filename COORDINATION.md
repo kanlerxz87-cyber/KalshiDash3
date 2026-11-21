@@ -1070,3 +1070,23 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+---
+
+## Session `arena-86046b80` — F-65×F-72 Test-series leak fix, post-20:30Z official catalyst reviews, and open site-hygiene requests (R-2..R-6, R-B1, R-B4, R-B8)
+
+Branch `arena/86046b80-kalshidash3`, branched from `58a8801` (`origin/main`, 2026-11-21T23:01Z snapshot). Active parallel session checked before claiming: PR #76 (`arena/9b8246da-kalshidash3`) owns `.github/workflows/freshness-alarm.yml`, `scripts/tests/test_freshness_alarm.py`, and `F-74` in `data/findings.json` — none of those are touched here.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T60 | Fix F-65×F-72 category-integrity bypass: withhold unassigned (`category_id: null`) candle-backfilled alerts whose official `GET /series` categories have zero overlap with the five topics (stops 8 `KXDEMOFUTHOURLY-*` `["Test"]` leaks from appearing in `alerts.json` and `catalysts.json`) | in progress | arena-86046b80 | `scripts/build_alerts.py`, `scripts/catalysts.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_alerts.py`, `data/live/alerts.json`, `data/live/catalysts.json` | Pending | F-75 |
+| T61 | Official-source catalyst review for newest post-20:30Z swings (`KXPGATOUR-THRC26-MTHO` ×2, `KXAAAGASM-26DEC31-3.30` @ 23:01Z) + official-record BRTI notes for `KXBTCY-27JAN0100-B32500`/`B52500` | in progress | arena-86046b80 | `data/catalyst_review.json`, `data/live/catalysts.json` | Pending | — |
+| T62 | Resolve open site copy, cross-reference, resolution-note, and chatdock health requests (R-2..R-6, R-B1, R-B4, R-B8) | in progress | arena-86046b80 | `executive-summary.html`, `portfolio.html`, `assets/live.js`, `assets/chatdock.js`, `index.html`, `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js` | Pending | F-73, F-76 |
+| T63 | Record findings F-75 & F-76 and update F-73 status in `data/findings.json` (leaving F-74 untouched for PR #76) | in progress | arena-86046b80 | `data/findings.json` | Pending | F-73, F-75, F-76 |
+| T64 | Full verification gate (`verify_release.py`), PR → `main`, merge, GitHub Pages deploy confirm, live URL re-fetch, and close-out | in progress | arena-86046b80 | `COORDINATION.md` | Pending | — |
+
+### Log (this session)
+- 2026-11-21 ~23:12Z: Inspected repo, board, PR #76 (`arena-9b8246da`), and live demo/official endpoints; claimed T60–T64 with non-overlapping scope before editing any implementation file.
+
