@@ -152,6 +152,38 @@ def main() -> int:
     alerts = archive.get("alerts", [])
     archive_keys = {alert_key(a) for a in alerts}
 
+    # F-65: the chats and the lead table withhold a swing whose own GET /series record puts it
+    # outside its topic, so the paper simulator must not trade that swing either — otherwise the
+    # portfolio would report profits from a demo Test instrument that the rest of the site says
+    # is not a market in that topic. The archive is untouched; only the signal set is filtered,
+    # and the count is published under counts.excluded_category_conflict.
+    _ledger = markets.get("series_index") or {}
+    _compatible = {
+        "gas": {"Economics", "Commodities", "Financials"},
+        "elections": {"Elections", "Politics", "World", "International"},
+        "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+        "crypto": {"Crypto", "Financials"},
+        "golf": {"Sports", "Golf"},
+    }
+    _rows = {r.get("ticker"): r for r in (markets.get("open_markets") or []) + (markets.get("settled_markets") or [])}
+    excluded_signals = 0
+
+    def _topic_ok(a: dict) -> bool:
+        nonlocal excluded_signals
+        ticker = a.get("ticker") or ""
+        row = _rows.get(ticker) or {}
+        official = [str(c) for c in (row.get("series_categories") or a.get("series_categories") or [])]
+        if not official:
+            series = row.get("series_ticker") or (ticker.split("-")[0] if "-" in ticker else ticker)
+            official = [str(c) for c in ((_ledger.get(series) or {}).get("categories") or [])]
+        ok = _compatible.get(row.get("category_id") or a.get("category_id") or "", set())
+        if not official or not ok or any(o in ok for o in official):
+            return True
+        excluded_signals += 1
+        return False
+
+    alerts = [a for a in alerts if _topic_ok(a)]
+
     processed = set(state.get("processed_alert_ids", []))
     positions = {p["id"]: p for p in state.get("open", [])}
     closed = list(state.get("closed", []))
@@ -356,6 +388,10 @@ def main() -> int:
             "new_signals_this_run": len(fresh),
             "open_positions": len(open_list),
             "settled_positions_kept": len(closed_list),
+            # F-65: archived swings not traded because their own official series record puts them
+            # outside the topic (published so the exclusion is auditable, not silent).
+            "excluded_category_conflict": excluded_signals,
+            "signals_considered_total": len(processed) + excluded_signals,
         },
         "strategies": summaries,
         "trade_types": trade_types,

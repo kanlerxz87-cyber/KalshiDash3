@@ -8,12 +8,30 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # F-68 (verified 2026-11-21): a push made with the repository's GITHUB_TOKEN does not trigger
+  # a Pages build. GitHub states it verbatim: "Commits pushed by a GitHub Actions workflow that
+  # uses the GITHUB_TOKEN do not trigger a GitHub Pages build."
+  #   https://docs.github.com/en/actions/concepts/security/github_token
+  # The scheduled collector (collect.yml) commits data/live with exactly that token, so every
+  # snapshot it produced was committed and then NEVER deployed: the branch had fresh data while
+  # the published site kept serving an older one. That is the real reason the site reported a
+  # 5h-old snapshot (F-67) even though runs were succeeding.
+  # workflow_run is the documented way to chain on a completed run regardless of the token that
+  # pushed: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run
+  # The deploy gate below is unchanged: only refs/heads/main and only non-PR runs may deploy, so
+  # a completed collect run on main re-publishes, and one on any other branch does nothing.
+  workflow_run:
+    workflows: ["Collect Kalshi demo data", "Live desk scan (ROI screen + swing alerts)"]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
 
 concurrency:
   group: pages-${{ github.event_name == 'pull_request' && github.ref || 'release' }}
+  # A workflow_run deploy must not cancel a publish already in flight; the newest artifact wins
+  # on the next run because release deploys are serialised by this group.
   cancel-in-progress: false
 
 jobs:
@@ -40,12 +58,12 @@ jobs:
           cp -R assets data _site/
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request')
         with:
           path: _site
 
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request')
     needs: build
     permissions:
       pages: write

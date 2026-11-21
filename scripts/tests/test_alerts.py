@@ -139,6 +139,83 @@ class FeedTests(unittest.TestCase):
         self.assertTrue(self.feed.get("disclaimers"))
 
 
+class CategoryIntegrityTests(unittest.TestCase):
+    """F-65: an archived swing whose series is officially a Test/demo instrument, or officially
+    filed under a category the topic cannot contain, must not be served in the live chats.
+
+    The bug this pins, found on the deployed site 2026-11-21: KXDEMOFUTHOURLY is officially
+    `categories: ["Test"]` (GET /trade-api/v2/series/KXDEMOFUTHOURLY) yet 8 of the 23 archived
+    >= $0.10 swings were that series, shown inside Crypto. The first version of the guard that
+    was written here read the snapshot's open_markets — which is backwards, because the
+    collector DROPS the conflicting row, so a row-membership check would have kept exactly the
+    alerts it was meant to remove. The guard therefore reads the published series_index ledger.
+    """
+
+    TICKER = "KXDEMOFUTHOURLY-26NOV21H16-UP"
+
+    def _run(self, ledger_categories):
+        snap = {
+            "collected_at": "2026-11-21T15:21:23Z",
+            "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
+            # The conflicting row is NOT in open_markets: that is what the fixed collector does.
+            "open_markets": [],
+            "series_index": {
+                "KXDEMOFUTHOURLY": {
+                    "categories": ledger_categories,
+                    "title": "Demo hourly event contract futures",
+                    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+                }
+            },
+        }
+        hist = {"series": {self.TICKER: {"observations": [
+            {"t": "2026-11-21T15:16:38Z", "last": 0.65},
+            {"t": "2026-11-21T15:21:23Z", "last": 0.45},
+        ]}}}
+        archive = {"schema": 1, "alerts": [{
+            "ticker": self.TICKER, "event_ticker": "KXDEMOFUTHOURLY-26NOV21H16",
+            "title": "Demo BTC at or above 60237.37 USD", "category_id": "crypto",
+            "category_basis": "keyword", "status": "active",
+            "from_time": "2026-11-21T15:16:38Z", "to_time": "2026-11-21T15:21:23Z",
+            "from_price": 0.65, "to_price": 0.45, "delta": -0.2, "direction": "down",
+            "volume_24h_fp": 2236.0, "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/" + self.TICKER,
+            "to_yes_bid": 0.01, "to_yes_ask": 1.0,
+            "cause_link": None, "cause_status": "unverified: no official cause source collected",
+            "first_seen_at": "2026-11-21T15:21:23Z", "high_roi": False,
+        }]}
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_live = Path(tmp)
+            mf, hf = tmp_live / "markets.json", tmp_live / "price_history.json"
+            af = tmp_live / "alerts_archive.json"
+            mf.write_text(json.dumps(snap), encoding="utf-8")
+            hf.write_text(json.dumps(hist), encoding="utf-8")
+            af.write_text(json.dumps(archive), encoding="utf-8")
+            with mock.patch.object(build_alerts, "LIVE", tmp_live), \
+                 mock.patch.object(sys, "argv", ["build_alerts.py", "--markets", str(mf), "--history", str(hf)]):
+                self.assertEqual(build_alerts.main(), 0)
+            return json.loads((tmp_live / "alerts.json").read_text()), \
+                json.loads(af.read_text())
+
+    def test_test_series_alert_is_withheld_from_both_feeds(self):
+        feed, archive = self._run(["Test"])
+        self.assertEqual(feed["all_events"], [], "a Test-series swing must not be served")
+        self.assertEqual(feed["high_roi"], [])
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
+        self.assertEqual(feed["counts"]["archive_total"], 1,
+                         "history is never rewritten: the alert stays in the archive")
+        self.assertEqual(len(archive["alerts"]), 1)
+
+    def test_compatible_series_alert_is_served(self):
+        feed, _ = self._run(["Crypto"])
+        self.assertEqual(len(feed["all_events"]), 1)
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
+
+    def test_unknown_categories_are_not_a_contradiction(self):
+        feed, _ = self._run(None)
+        self.assertEqual(len(feed["all_events"]), 1,
+                         "a null categories answer is unknown and must not withhold an alert")
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
+
+
 class HighRoiFreezeTests(unittest.TestCase):
     """Regression for the 2026-11-20T19:42Z scheduled collector failure (run
     44803531445, F-39): KXBTCY-27JAN0100-B47500 swung at 19:30:14Z with
