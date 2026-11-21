@@ -313,7 +313,7 @@ const KDCHAT = (() => {
   }
 
   /* -------------------- freshness / cron health (T32) -------------------- */
-  // The collector's cron is unreliable (F-16: `*/20` fired once in 5.5 hours).
+  // The collector's cron is unreliable (measured 2026-11-21: `*/20` fired once in 5.75 hours; F-40).
   // Instead of hiding that, measure it: read the last N runs of collect.yml from
   // the public GitHub REST API (CORS `*` verified on 2026-11-21) and say how
   // often the schedule actually fired. No token, no secret, no writes.
@@ -371,7 +371,7 @@ const KDCHAT = (() => {
           `collector cron <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
           `${h.scheduled} of the last ${h.runs} runs were scheduled` +
           (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (late ? " · <b>GitHub is throttling the schedule (F-16)</b>" : "") +
+          (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
           ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
           `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
