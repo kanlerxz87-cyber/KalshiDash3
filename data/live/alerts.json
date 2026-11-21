@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T06:32:46Z",
- "snapshot_collected_at": "2026-11-21T06:32:46Z",
+ "generated_at": "2026-11-21T06:34:11Z",
+ "snapshot_collected_at": "2026-11-21T06:34:10Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -10,12 +10,56 @@
   "require_volume_24h_gt": 0
  },
  "counts": {
-  "all_events": 15,
-  "high_roi": 4,
-  "archive_total": 15,
-  "new_this_run": 0
+  "all_events": 17,
+  "high_roi": 5,
+  "archive_total": 17,
+  "new_this_run": 2
  },
  "all_events": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-21T06:32:46Z",
+   "to_time": "2026-11-21T06:34:10Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 95695.8,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.97,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:34:11Z",
+   "high_roi": true
+  },
+  {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "event_ticker": "KXBTC15M-26NOV210145",
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-21T06:32:46Z",
+   "to_time": "2026-11-21T06:34:10Z",
+   "from_price": 0.65,
+   "to_price": 0.82,
+   "delta": 0.17,
+   "direction": "up",
+   "volume_24h_fp": 0.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "to_yes_bid": 0.79,
+   "to_yes_ask": 0.82,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:34:11Z",
+   "high_roi": false
+  },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
    "event_ticker": "KXAAAGASM-26DEC31",
@@ -332,6 +376,28 @@
   }
  ],
  "high_roi": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-21T06:32:46Z",
+   "to_time": "2026-11-21T06:34:10Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 95695.8,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.97,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:34:11Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
    "event_ticker": "KXAAAGASM-26DEC31",
