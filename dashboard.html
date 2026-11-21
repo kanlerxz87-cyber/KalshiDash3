@@ -209,11 +209,17 @@ function renderAlerts() {
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
       ${evidenceChip(a)}
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
-      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+      <div><button class="ghost" data-t="${KD.esc(a.ticker)}" style="padding:2px 8px;font-size:11.5px;margin-right:8px">Chart &amp; swings</button><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
     </article>`;
   }).join("") : `<div class="alert-empty">${emptyText}</div>`;
   KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");
   KD.$("#modelAlerts").innerHTML = renderFeed(screen, "No qualifying alerts meet the experimental screen.");
+  for (const host of [KD.$("#allAlerts"), KD.$("#modelAlerts")]) {
+    host.querySelectorAll("[data-t]").forEach(b => b.addEventListener("click", () => {
+      select(b.dataset.t);
+      KD.$("#chartCard")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+    }));
+  }
   KD.$("#allAlertCount").textContent = `${all.length} shown`;
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
@@ -343,7 +349,7 @@ function rowFromAlert(ticker) {
     category_id: a.category_id || null,
     category_basis: a.category_basis || null,
     status: a.status || null,
-    result: a.status === "finalized" ? null : null,
+    result: a.result_as_returned ?? null,
     last_price_dollars: a.to_price ?? null,
     volume_fp: null,
     open_interest_fp: null,
@@ -726,7 +732,6 @@ function drawLiq() {
   host.innerHTML =
     `<div><h3>YES bids — contracts a seller can hit</h3><div class="book">${ladder(ob.yes_bids, "bid")}</div></div>` +
     `<div><h3>YES asks, implied — contracts a buyer can lift</h3><div class="book">${ladder(ob.no_bids, "ask")}</div></div>`;
-  KD.$("#chartFoot").innerHTML += "";
 }
 
 let loading = false;
@@ -760,9 +765,10 @@ async function load() {
   sel.value = state.cat;
   renderTables(); renderResolved(); renderPending();
   const available = (state.snap.open_markets || []).concat(state.snap.settled_markets || []);
-  if (!state.sel || !available.some(r => r.ticker === state.sel)) {
+  const isKnown = (t) => !!t && (available.some(r => r.ticker === t) || !!rowFromAlert(t));
+  if (!isKnown(state.sel)) {
     const preferred = pickInitialTicker();
-    state.sel = available.some(r => r.ticker === preferred) ? preferred : (available[0]?.ticker || null);
+    state.sel = isKnown(preferred) ? preferred : (available[0]?.ticker || null);
   }
   drawChart(); drawLiq();
   loading = false;
