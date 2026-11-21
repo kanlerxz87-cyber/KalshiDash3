@@ -870,3 +870,22 @@ Claimed 2026-11-21. Base `ebce5e7` (main). Scope: `COORDINATION.md` only (integr
 
 ### Log
 - 2026-11-21: claimed T25 before work; branch identical to main at claim time. Running full suite on the merged tree.
+
+## Session `arena-7d3aa4d3` — final verification + publish (branch `arena/7d3aa4d3-kalshidash3`)
+
+Claimed 2026-11-21. Base `64176be` (main, after PR #42 merge). Scope: `COORDINATION.md` only (integration record); no site/data changes unless a check fails.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T26 | Independent final verification pass on merged tree (official docs re-fetched, full suite, live site) + PR to main, merge, Pages confirm; close superseded PR #38 | in progress | arena-7d3aa4d3 | `COORDINATION.md` | official docs re-fetched this session (demo_env, market_lifecycle, orderbook_responses, get-market-candlesticks) + full suite green + live Pages fetch | PR #38 superseded by PR #39 (see log) |
+
+### Log
+- 2026-11-21: claimed T26 before work; branch fast-forwarded to `64176be` (PR #42 merge) before claiming. T25 (arena-c076278a) merged PR #42 at 06:27:47Z; Pages deploy 44875653003 in progress at claim time.
+- 2026-11-21: **Independent verification pass (this session, official sources re-fetched):**
+  (a) *Demo endpoints* — https://docs.kalshi.com/getting_started/demo_env confirms recommended REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds at https://demo.kalshi.co/, and the verbatim disclaimer "The price and behavior of markets in the demo environment may not be reflective of those in real markets." Matches the brief's endpoint table exactly.
+  (b) *Lifecycle* — https://docs.kalshi.com/getting_started/market_lifecycle confirms statuses `initialized|active|inactive|closed|determined|disputed|amended|finalized` and `result` ∈ {yes, no, scalar}; matches validators' `ALLOWED_RESULTS` and the site's resolution tracker (literal result shown, scalar never coerced to yes/no).
+  (c) *Orderbook* — https://docs.kalshi.com/getting_started/orderbook_responses confirms bids only, ascending, best last, no auth, YES BID at X = NO ASK at $1−X reciprocal; matches the liquidity ladder implementation.
+  (d) *Candlesticks* — https://docs.kalshi.com/api-reference/market/get-market-candlesticks confirms `period_interval` ∈ {1, 60, 1440} minutes only; confirms F-06 (seconds resolution must be accumulated from live reads, not requested).
+  (e) *Live site* — fetched https://kanlerxz87-cyber.github.io/KalshiDash3/ : snapshot banner `2026-11-21T00:50:12Z`, 749 open / 1,600 settled in scope, all five category rows present with per-row API source links, demo disclaimer quoted. Matches `data/live/markets.json` on disk.
+  (f) *Full suite green on merged tree*: `validate_live.py` (749 open, 200 settled, 20 orderbooks), `validate_alerts.py` (15 archived alerts provenance-checked), `test_alerts.py` (13 tests OK), `test_simulate.py` OK, `check_site.py` (21 pages, all links resolve).
+- 2026-11-21: **PR #38 handoff.** PR #38 (arena/d243bfa7, opened 2026-11-20 19:40Z) is OPEN + CONFLICTING and superseded: PR #39 (merged 2026-11-20 19:47Z) landed the opposite design (flags frozen at detection time, validator reproduces from each row's own recorded fields — verified present in `scripts/tests/validate_alerts.py` lines 128–153 on main). Per the stale-claim rule (>60 min, no commits, conflicting) this session closes PR #38 with a comment rather than merging a superseded conflicting change. No files from PR #38 are lost: its unique value (stricter archive-only check) is already on main via PR #39's row-itself check.
