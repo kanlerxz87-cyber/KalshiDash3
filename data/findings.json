@@ -819,6 +819,33 @@
     "https://kanlerxz87-cyber.github.io/KalshiDash3/",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html"
    ]
+  },
+  {
+   "id": "F-65",
+   "severity": "high",
+   "item": "Resolution history was 92% crypto: the published settled rows were the newest 200 overall, so gas, elections, culture and golf resolutions were silently cut off",
+   "why": "Measured on the deployed site and in data/live/markets.json at 2026-11-21T06:42:56Z: of the 200 published settled rows, 184 were crypto and 16 were other topics (gas 9, culture 7, elections 0, golf 0) \u2014 every row of the new 'How the live events resolved' table was Crypto. Cause: scripts/collect.py sorted all settled rows by settlement_ts and published `[:200]`. The demo exchange lists 15-minute crypto markets (KXBTC15M, KXETH15M, ...) that settle ~96 times a day, so a newest-first cap is structurally starved of every slower topic. Every category page reads `settled_markets`, so all four affected topics lost their resolution feed, not just the landing page. Same shape as F-35 (capped ranking) but on the settled side. Re-checked after merging main's scope fix (44319b8): that commit excludes natural-gas futures and demo QA fixtures and adds `settled_excluded_off_topic_or_qa`, but it does NOT address the settled-row cap, so this finding stands on its own. [Integration note: this entry originally used draft id F-41; main already published its own F-41/F-42 (different items) while this PR was open, so it is numbered F-65 here to keep identifiers collision-free.]",
+   "action": "FIXED same day: added `select_settled()` to scripts/collect.py \u2014 a round-robin selection across the five topics over a newest-first sort inside each topic \u2014 and published the allocation (`counts.settled_published`, `counts.settled_published_cap`, `counts.settled_published_by_category`, `counts.settled_in_scope_total`) so the cap can be audited instead of assumed. The landing page now says the published set is chosen per topic and names the count field. Locked down by scripts/tests/test_settled_selection.py, whose fixture reproduces the real shape (400 fast crypto rows + 5 rows in each other topic): all five topics survive, the rare topics keep all their rows, crypto takes the leftover capacity, and the published set stays newest-first. The corrected allocation appears at the next collect.yml run; the committed snapshot at the time of writing still shows the old skew.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ],
+   "status": "fixed (collector); verified by test, pending next data run"
+  },
+  {
+   "id": "F-66",
+   "severity": "medium",
+   "item": "Elections has no resolution history on the site even though the exchange has a settled elections market: it settled before the documented historical cutoff",
+   "why": "Measured against official sources this session. GET /historical/cutoff returns market_settled_ts = 2026-09-21T00:00:00Z, and the only settled market in the seeded elections series is KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z with result \"no\" \u2014 before the cutoff. Kalshi documents that markets settled before the cutoff are only available via GET /historical/markets and stop appearing in GET /markets. Confirmed live both ways: GET /markets?series_ticker=KXELECTIRAN&status=settled also returns it, but GET /markets?status=settled paging (30,456 newer settled rows, capped at 25,000) never reaches it, so the snapshot showed culture 7 / crypto 97 / golf 96 settled rows and zero elections rows. The topic therefore looked like it had never resolved anything. [Integration note: this entry originally used draft id F-42; main already published its own F-41/F-42 (different items) while this PR was open, so it is numbered F-66 here to keep identifiers collision-free.]",
+   "action": "PARTIAL, and stated as partial. scripts/collect.py now (a) reads GET /historical/cutoff and publishes it as counts.historical_cutoff_market_settled_ts, and (b) performs a bounded /historical/markets lookup per seeded series (one request each, at most 40 settled rows per series, failures non-fatal), publishing counts.historical_backfill_rows. That backfill demonstrably fetches rows (216 in the 2026-11-21T06:56Z run) but the elections row did NOT reach the published snapshot in that run, and this session could not read the collector's stdout (the GitHub logs endpoint returned EOF) to prove which filter dropped it. It is NOT claimed fixed. What IS verified: the endpoint returns the market with the documented shape, https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN returns KXELECTIRAN-26JUL01 with result \"no\". Next step is to read one collect.yml log's 'historical <series>' lines; until then the site shows no elections resolutions and says so rather than inventing one.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN"
+   ],
+   "status": "partially implemented, NOT confirmed on the site"
   }
  ]
 }
