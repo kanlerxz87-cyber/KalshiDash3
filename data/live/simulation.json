@@ -2,15 +2,15 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-21T00:50:12Z",
- "snapshot_collected_at": "2026-11-21T00:50:12Z",
+ "generated_at": "2026-11-21T06:32:46Z",
+ "snapshot_collected_at": "2026-11-21T06:32:46Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
  "endpoint": "https://external-api.demo.kalshi.co/trade-api/v2",
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
   "signals_processed_total": 15,
-  "new_signals_this_run": 1,
+  "new_signals_this_run": 0,
   "open_positions": 6,
   "settled_positions_kept": 1
  },
@@ -217,7 +217,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -249,7 +249,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   },
   {
    "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -281,7 +281,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   },
   {
    "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -313,7 +313,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   },
   {
    "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -345,7 +345,7 @@
    "unrealized_net": -0.05,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -377,7 +377,7 @@
    "unrealized_net": 0.03,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T00:50:12Z"
+   "mark_at": "2026-11-21T06:32:46Z"
   }
  ],
  "settled_positions": [
@@ -472,7 +472,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -504,7 +504,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    },
    {
     "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -536,7 +536,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    },
    {
     "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -568,7 +568,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    },
    {
     "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -600,7 +600,7 @@
     "unrealized_net": -0.05,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -632,7 +632,7 @@
     "unrealized_net": 0.03,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T00:50:12Z"
+    "mark_at": "2026-11-21T06:32:46Z"
    }
   ],
   "closed": [
