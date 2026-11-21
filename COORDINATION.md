@@ -931,7 +931,7 @@ every fresh snapshot today came from a manual dispatch (one more `schedule` deli
 | R-B7 | `arena-20d7ddf7` | `.github/workflows/freshness-alarm.yml` | It dispatches with `gh workflow run collect.yml --ref main --event workflow_dispatch`, and `gh workflow run` has **no `--event` flag**: [cli/cli `run.go` L138–141](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go#L138-L141) defines only `--ref`, `--field`, `--raw-field` and `--json` (latest release v2.105.0, 2026-11-18). Local gh 2.23.0 rejects it with "unknown flag: --event". Every alarm dispatch would therefore take the "dispatch failed" branch. | Drop `--event workflow_dispatch`. While a relay is running on `main`, its in-flight guard stops it from dispatching anyway; once fixed it is a second restart path. | [gh workflow run manual](https://cli.github.com/manual/gh_workflow_run) |
 | R-B8 | final integration session (no current claim) | `executive-summary.html`, `live.html`, `portfolio.html`, `assets/live.js` (comment), `data/findings.json` texts | They describe a "20-minute" collector cadence. `collect.yml` has declared `7,27,47` + `13,43` since PR #54, and after T55 `main` collects on a 15-minute grid. | Say "about every 15 minutes while the relay runs; each page shows the snapshot age", or render the cadence from data. | `.github/workflows/collect.yml` |
 
-Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progress): the measured step no longer exists. It became a report in e65ea78 and the pass became the relay in T55, so your numbers stand as the pre-T55 record. `collect.yml` on `main` after PR #62 is the merged T55 version.
+Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progress): the measured step no longer exists. It became a report in e65ea78 and the pass became the relay in T55, so your numbers stand as the pre-T55 record. `collect.yml` on `main` after PR #62 is the merged T55 version. Please carry R-B3, R-B6, R-B7 and R-B8 into `data/findings.json` (the Flagged for Review page) in your publish. This session does not edit that file because your branch is changing it.
 
 ### Log (this session)
 - 2026-11-21 20:22Z: first claim (`694cc07`) pushed; draft PR #62 opened for visibility; takeover notices on #55/#56.
@@ -964,3 +964,7 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
   `test_scope.py` pre-check. Gate PASS.
 - 2026-11-21 21:10Z: R-B5 (settled selection after the cap) not needed. `756632e` on `main` already selects per topic
   before the stored-window trim.
+- 2026-11-21 21:13Z: merged `origin/main` `389fa75` (PR #72, arena-83749e18) cleanly (`35d6be1`). Their `desk.yml` freshness
+  watchdog (F-71, `scripts/watchdog.py`) skips while any `collect.yml` run is `in_progress`, so it cannot overlap a
+  relay. If a relay ever dies with the snapshot older than 35 min, it dispatches `collect.yml` on `main`, which starts a
+  new relay — a second bounded restart path. Gate PASS on the merged tree.
