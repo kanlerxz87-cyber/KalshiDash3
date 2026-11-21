@@ -358,6 +358,19 @@
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
    ]
+  },
+  {
+   "id": "G21",
+   "suggestion": "Rank and filter the alert chats by contracts actually traded, and show the traded/quote-only ratio as a headline number instead of burying it in prose",
+   "why_it_helps_decisions": "On the 2026-11-21T23:01:10Z snapshot only 11 of the 48 served swings traded at or above the 100-contract floor, 19 traded below it and 13 are candle-sourced, so a trader reading the raw chat spends most of their attention on prints nobody could have executed. Sorting the chat by contracts traded (with the >= $0.10 rule unchanged) puts the executable swings first without hiding anything, and the ratio tells the reader at a glance whether today is a thin day (F-75).",
+   "effort": "Shipped in T66 as the per-row evidence chip, the published counts.evidence ratio and the 'traded only' filter; sorting the chat by contracts traded is the remaining step",
+   "risk": "A floor is a judgement call and could hide a genuine move in a thin market; mitigated by never deleting a row (the filter states how many it hid) and by printing the exact contract count on every row so a reader can apply their own threshold.",
+   "success_metric": "Within one week, the share of archived swings whose state is traded_ge_floor is visible on the page and either rises or is explained; no swing disappears without the hidden count being printed.",
+   "status": "implemented",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/demo_env"
+   ]
   }
  ],
  "flagged": [
