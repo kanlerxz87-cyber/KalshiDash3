@@ -1088,6 +1088,52 @@ Base: `58a8801` (`origin/main`, snapshot 2026-11-21T23:01Z). Relay run 449505538
 - 2026-11-21 23:13Z: Integrated the parallel F-74 repair (PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), merged as `d52f44c` at 23:13:11Z) after its release gate passed. Kept its five workflow-shell mock tests and fail-closed dispatch behavior; reconciled the overlapping workflow/findings edits with T57's cadence changes. PR #76 verified the official gh CLI manual and explicitly leaves successful live stale-dispatch verification flagged.
 - 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
 
+## Session `arena-42e3b260` — final integration, five-topic alert scope, verification ledger hygiene (branch `arena/42e3b260-kalshidash3`)
+
+Base `58a88016` (main, snapshot 2026-11-21T23:01:11Z). Claim `938045c` was pushed before any edit. While this session
+worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge below kept their work, not a rewrite of it.
+
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T57 | Line-by-line re-read of the published tree; triage of R-B1/R-B3/R-B6/R-B7/R-B8, F-73/F-74 | done | arena-42e3b260 | `COORDINATION.md` | this section |
+| T58 | R-B7/F-74 invalid `gh --event` flag | done — **merged with arena-2a7c58f1's fix** (`88c282d`/`908052e`); their version and its new `scripts/tests/test_freshness_alarm.py` are kept verbatim | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (gh 2.23.0: only `-r/--ref`, `-f`, `-F`, `--json`), cli/cli `run.go` |
+| T59 | R-B1/F-75 chat-dock health line | done | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | health line now names no cron and no expected interval; new assertions |
+| T60 | R-B8/F-73 remaining 20-minute prose | done — **arena-2a7c58f1's wording kept**; this session's only amendment is the chat-dock line above | both | `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | grep + gate |
+| T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
+| T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
+| T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+
+### Defects found and fixed in this session (published on the Flagged page)
+
+| ID | What was wrong | Evidence | Fix |
+|----|----------------|----------|-----|
+| F-75 | Chat-dock health line hard-coded a cron expression and judged "throttling" against 20 min | `assets/chatdock.js`, `collect.yml` | names no cadence; reports newest run + measured gap |
+| F-76 | All-events chat showed 20 archived swings outside the five topics (all `KXDEMOFUTHOURLY` Test/Demo; 13 rows had no topic at all) | [`GET /series/KXDEMOFUTHOURLY`](https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY) → categories `["Test"]`, tags `["Demo"]` | topics restored from `GET /series` when unambiguous; out-of-scope swings withheld **and counted** in both the feed and the paper simulator; chat dock filters identically |
+| F-77 | 25 of 31 model picks were BTC year-end range markets oscillating ~2¢↔99¢ | [1-minute candles](https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1) show close 0.03 / 0.99 / 0.03 within minutes | disclosed on `alerts.html` from the committed feed; re-scoring left to the owner (F-26) |
+
+### Live checks (official endpoints, 2026-11-21 23:10–23:50Z)
+| Check | Result |
+|---|---|
+| `GET /markets/KXNEAR15M-26NOV211800-00` | `result: yes`, `settlement_ts 2026-11-21T23:00:05.181907Z`, `status finalized` — matches the committed row |
+| `GET /markets/KXELECTIRAN-26JUL01` | `result: no`, `settlement_ts 2026-07-01T15:24:15.984157Z` — matches the committed row |
+| `GET /markets/KXNOTAREALTICKER/orderbook` | `200` with empty arrays (C-53 confirmed) |
+| `GET /markets?series_ticker=KXELECTIRAN` | no `series_ticker` key at all (C-45 re-worded from "null" to "absent") |
+| Fee schedule PDF (July 7, 2026) | general taker `roundup(M×0.07×C×P×(1−P))`, no settlement fee, no membership fee, `KXAAAGASM`, `KXPGATOUR`, `KXPGARYDER`, `KXPGASOLHEIM`, `KXELECTIRAN`, `KXBTCY`, `KXETHY` all present |
+| `api_keys` / `historical_data` | Ed25519 default, RSA-PSS/SHA-256 alternative; `market_settled_ts` partition wording verbatim |
+| Collect dry run on this branch after the changes | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) — success (full pipeline incl. build_alerts/simulate/validators against the live demo API) |
+
+### Merge record (no work discarded)
+- `git merge origin/main` (`9e2d4b0`) conflicted in 10 files. Resolutions: **theirs** for `freshness-alarm.yml`
+  (arena-2a7c58f1's fix + its new test), `assets/live.js`, `portfolio.html`, `executive-summary.html` (then re-applied
+  this session's R-5 dynamic counts and the "Twenty suggestions" correction), `data/findings.json` (then re-added
+  F-75/F-76/F-77 and amended F-73/F-74), and the generated `data/live/alerts.json` / `simulation.json` (then
+  regenerated from their newer snapshot with this session's scope rule); **ours** for `assets/chatdock.js` and
+  `scripts/tests/test_chatdock.js`, where this session's stricter R-B1 fix supersedes their 15-minute string — their
+  intent and their F-73/F-74 records are kept, and the supersession is recorded in F-73's action.
+- Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
+  `test_freshness_alarm.py` and COORDINATION sections are all preserved.
+
 ## Session `arena-c09bf8f4` — verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)
 
 Base: `58a8801` (branch created equal to `main` — no drift at claim time; `gh run list` shows `main` collecting

@@ -57,13 +57,13 @@
           <td>The dashboard scans consecutive committed observations (the collector commits about every 15 minutes while its relay runs, and each page prints both the snapshot age and the measured cadence, so this is not tick-level streaming). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
-          <td><span data-count="suggestions">suggestions</span> across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
+          <td><span data-count="suggestions">Suggestions</span> across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
       <tr><td>A clear list of questions, information and answers needed before a decision</td>
           <td><span class="badge ok">done</span></td><td><a href="questions.html">Questions</a></td>
           <td><span data-count="questions">questions</span>; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td><span data-count="claims">72 claims</span> checked; <span data-count="unverified">1</span> deliberately blank. <span data-count="flagged">irregularities</span> found and listed across all sessions, each carrying its own open/fixed status (<a href="flagged.html">flagged</a>).</td></tr>
+          <td><span id="verifiedCounts"><span data-count="claims">claims</span> checked against an official page; <span data-count="unverified">1</span> deliberately left blank. <span data-count="flagged">irregularities</span> found and listed across all sessions, each with its source; the ones closed in the final integration are marked fixed in their entry.</span> (<a href="verification.html">claims</a> · <a href="flagged.html">flagged</a>)</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>
@@ -125,26 +125,25 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 </div></footer>
 <script src="assets/chatdock.js" defer></script>
 <script src="assets/site.js"></script>
-<script>KD.nav("executive-summary.html");</script>
 <script>
-/* Counts are read from the data the count-bearing pages render, so a count in this prose can never
-   drift from the ledger again (it already had: the page said 50 irregularities when 53 were listed).
-   If the fetch fails the sentence keeps its static text rather than showing a wrong number. */
+KD.nav("executive-summary.html");
+// R-5: the counts on this row were typed by hand and went stale (they said "50 irregularities" when the
+// ledger held more). Render them from the committed files instead, and fall back to a link, never a number.
 (async () => {
-  const put = (sel, n, one, many) => {
-    const el = document.querySelector(`[data-count="${sel}"]`);
-    if (el && Number.isFinite(n)) el.textContent = `${n} ${n === 1 ? one : many}`;
-  };
+  const host = document.getElementById("verifiedCounts");
+  if (!host) return;
   try {
-    const [f, v] = await Promise.all([KD.json("data/findings.json"), KD.json("data/verified_facts.json")]);
-    put("suggestions", (f.suggestions || []).length, "suggestion", "suggestions");
-    put("questions", (f.questions || []).length, "question", "questions");
-    put("flagged", (f.flagged || []).length, "irregularity", "irregularities");
-    const facts = v.facts || [];
-    put("claims", facts.length, "claim", "claims");
-    const blank = document.querySelector('[data-count="unverified"]');
-    if (blank && facts.length) blank.textContent = String(facts.filter((x) => !x.verified).length);
-  } catch (e) { /* keep the static text */ }
+    const [findings, facts] = await Promise.all([
+      KD.json("data/findings.json"), KD.json("data/verified_facts.json"),
+    ]);
+    const claims = (facts.facts || []).length;
+    const blanks = (facts.facts || []).filter((x) => !x.verified).length;
+    host.textContent = `${claims} claims checked against an official page; ${blanks} deliberately left blank. `
+      + `${(findings.flagged || []).length} irregularities found and listed across all sessions, `
+      + `each with its source; the ones closed in the final integration are marked fixed in their entry.`;
+  } catch (e) {
+    host.textContent = "Counts unavailable from the committed ledgers; open the claims and flagged pages directly.";
+  }
 })();
 </script>
 </body></html>

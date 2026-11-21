@@ -22,14 +22,17 @@ left blank and listed on the *Flagged for Review* page.
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
 | `dashboard.html` | Price chart (X = time, Y = contract price): official candles at 1/60/1440 minutes plus the collector's observations, a pointer readout of the exact plotted price/time/period volume, archived ≥ $0.10 swings marked and deep-linkable, liquidity ladder, resolution tracker, optional in-browser live polling |
 | `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `live.html` | In-browser live desk: polls the public demo API directly, swings ≥ 10¢ ranked by modelled ROI after fees |
+| `roi.html` | The high-ROI model definition, its parameters and its out-of-sample measurement |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
-| `suggestions.html` | Eighteen proposals; each with its effort, risk and success metric |
+| `suggestions.html` | Twenty proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | every claim, each with the official page it was checked against (72 at build time; the page renders the count from `data/verified_facts.json`) |
-| `flagged.html` | every irregularity found, each with its open/fixed status, plus every value deliberately left blank (53 at build time; the page renders the count from `data/findings.json`) |
+| `verification.html` | every claim (C-nn), each with the official page it was checked against — the page renders the count from `data/verified_facts.json` and a 24-row official-link table |
+| `flagged.html` | every irregularity (F-nn) with its open/fixed status, plus every value deliberately left blank — the page renders the count from `data/findings.json` |
+
 | `sources.html` | The complete source list |
 
 ## Repository layout
@@ -78,7 +81,7 @@ certify profitability, or authenticate a demo account.
 
 Two site behaviours are derived rather than typed, because typed copies had already drifted: the
 collector **cadence** shown in the snapshot banner (F-73) and the **counts** in the executive summary
-(F-76) are computed from `data/live/price_history.json`, `data/findings.json` and
+(D-01) are computed from `data/live/price_history.json`, `data/findings.json` and
 `data/verified_facts.json` at render time. Official endpoint and authentication
 references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
 [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).
@@ -147,6 +150,10 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
   `to_yes_ask` (request R-2, implemented 2026-11-20); entries written before that still have no quote and
   stay unfilled, as do quotes whose spread exceeds the 0.10 cap (Flagged F-19, F-23).
 - Paper results on demo prices are not evidence that a strategy would make money in real markets (Kalshi: demo prices may not reflect real markets).
+- The alert chats cover the five topics only. An archived swing whose series the exchange's own
+  `GET /series` record files under Test/Demo, or for which no single topic can be confirmed, is
+  withheld from both chats and from the paper simulator, counted under
+  `counts.withheld_out_of_scope` / `counts.excluded_out_of_scope`, and left in the archive (F-76).
 
 ## Sources
 

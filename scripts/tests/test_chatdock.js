@@ -123,9 +123,15 @@ function counts(w) {
 
   check(!!panel && !panel.hasAttribute("hidden"), "the dock mounts and opens on a category page");
   const c = counts(w);
-  const realGe10 = archiveWithDecoy.alerts.filter((a) => Math.abs(Number(a.delta)) >= 0.10 - 1e-9).length;
+  // F-76: a ≥$0.10 row is replayed only when it is in one of the five topics. Rows whose series
+  // GET /series files under Test/Demo, or with no confirmed topic, are withheld and counted.
+  const inScope = archiveWithDecoy.alerts.filter((a) => {
+    const cats = (a.series_categories || []).map(String);
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).length;
   check(c.all > 0, `history replay rendered ${c.all} rows`);
-  check(c.all === Math.min(realGe10, 80), `row count equals the ≥$0.10 archive rows (${realGe10})`);
+  check(c.all === Math.min(inScope, 80), `row count equals the in-scope ≥$0.10 archive rows (${inScope})`);
   const text = panel.textContent;
   check(!text.includes("sub-threshold decoy"), "the 0.09 decoy row is refused (threshold is ≥ $0.10)");
   check(/NaN|undefined|\[object Object\]/.test(text) === false, "no NaN/undefined/object leakage");
@@ -199,21 +205,19 @@ function counts(w) {
   check(env3.w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length > 0,
     "history rows are still rendered when the demo API refuses the browser");
 
-  /* -------------------------------------------------- H: health line (T32, F-73 cadence) */
-  console.log("\nT32 — relay health line");
+  /* -------------------------------------------------- H: health line (T32) */
+  console.log("\nT32 — run health line (R-B1: no cron name, no expected interval)");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector relay|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
-  // F-73: the panel must not resurrect the stale cadence it used to hard-code. It may carry a
-  // human-readable relay label (main's version does), but never the old 20-minute claim, and
-  // the label must agree with the grid Collect actually runs.
-  check(!/\*\/20|every 20m|cron \*\//.test(health),
-        "health line never claims the old */20 cron or a 20-minute interval");
-  check(/15-min relay grid/.test(health),
-        "the cadence label names the 15-minute relay grid, not a guessed interval");
-  // The warning is measured, not asserted: it needs the scheduled gap AND the observed spacing.
-  const healthSrc = SRC.slice(SRC.indexOf("collector health (T32"));
+  // R-B1 + F-73 together: the panel must report what it can prove (the newest run, how many of
+  // the last N were scheduled, the last success), must never resurrect the 20-minute claim, and
+  // must not turn a fixed interval into a pass/fail judgement about the relay itself.
+  check(/collector relay|collector:|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(!/\*\/20|cronExpression|every 20m/.test(health), "health line names no cron and no expected interval (R-B1, F-73)");
+  check(/newest run|no runs in the last|API not reachable/.test(health), "health line reports the newest run (R-B1)");
+  check(/15-min relay grid/.test(health), "the relay label names the 15-minute grid the collector actually runs (F-73)");
+  const healthSrc = SRC.slice(SRC.indexOf("freshness / run health"));
   check(/observedMinutes/.test(healthSrc) && /gap > observed \* 2/.test(healthSrc),
-        "throttling warning compares the scheduled gap against measured spacing (F-40 signal kept)");
+        "the throttling warning compares the scheduled gap against measured spacing (F-40 signal kept)");
 
   console.log("");
   teardown();
