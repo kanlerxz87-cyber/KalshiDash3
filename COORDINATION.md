@@ -1065,3 +1065,139 @@ commit newer than main at claim time, so nothing below overlaps an open claim.
   by KEEPING BOTH sides (arena-d60abf08's section and this one); no other session's record was removed.
 
 - 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
+
+> **ID note (parallel sessions):** `main` adopted F-38/F-39/F-40 and T26-T33 for other records while this session
+> was open (F-38 there is the same Culture QA fixture, left as an owner decision; this session implemented the
+> decision). This session's records were renumbered on rebase to F-61/F-62/F-63 and T34-T37 exactly once, and the
+> existing F-38 row now links F-61 so the trail is unbroken. No record from either side was dropped.
+
+## Session `arena-cf49f42a` — freshness/liveness repair + independent line-by-line audit (branch `arena/cf49f42a-kalshidash3`)
+
+Base: `ebce5e7` (main). Claimed 2026-11-21 06:35Z. Single active session; no other claim is in progress
+(PR #38 is abandoned/conflicting and its fix is already on main via PR #39 — checked below).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T34 | Collector cadence: a public repo's `*/20` schedule is throttled to ~hourly by GitHub, so the site's snapshot layer ages out. Add a bounded fallback cadence and prove the run rate from the Actions API. | in progress | arena-cf49f42a | `.github/workflows/collect.yml`, `.github/workflows/desk.yml` | `gh run list --workflow=collect.yml` event counts before/after; workflow YAML validated by the same local runners | see log |
+| T35 | Liveness audit: verify the deployed site's live-polling/CORS claim and the alert chats against the official demo API from outside the sandbox | in progress | arena-cf49f42a | `data/live/cors.json` (read-only), `flagged.html`, `data/findings.json` (append only) | official demo API response headers; docs.kalshi.com pages | — |
+| T36 | Line-by-line audit of the deployed numbers vs the official API (top market per category, alert rows, resolved results) | in progress | arena-cf49f42a | read-only; `COORDINATION.md` records | direct GET per ticker | — |
+| T37 | Integration close-out: full suite, PR → main, merge, Pages deploy confirm, record here | unclaimed | — | `COORDINATION.md`, `README.md` | live URL fetch | — |
+
+### Log (this session)
+- 2026-11-21 06:35Z: claimed T34–T36. Full local suite is green (12/12: validate_live, validate_alerts,
+  validate_roi, validate_catalysts, test_alerts, test_simulate, test_fees, test_roi_parity, test_roi_scan_offline,
+  test_roi_scan_snapshot, test_engine_node, test_pages_dom) and `check_site.py` passes on 21 pages.
+- 2026-11-21 06:36Z: evidence for T34 — `gh run list --workflow=collect.yml`: of the last 20 runs **1** was
+  `schedule` (00:49Z) and 19 were `workflow_dispatch`; `desk.yml` shows the same pattern. CORRECTION (same session, after reading the official page): GitHub does NOT document an hourly cap —
+  `https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule`
+  states the shortest supported interval is once every 5 minutes, and that scheduled runs "can be delayed"
+  and "some queued jobs may be dropped" under load. The measured 2-in-10h is therefore best-effort dropping,
+  not a documented rate limit; the freshness item (main records it as F-40) records the measured numbers and cites the doc for the delay/drop wording. The site itself labels snapshots stale after 45 minutes, so
+  it showed a stale-fallback banner most of the time. Fix in T34; will record the observed cadence after the
+  next scheduled windows.
+
+#### T36 — line-by-line audit of the deployed numbers vs the official demo API (2026-11-21 ~06:40Z)
+
+Every headline figure on the landing page was re-fetched from the official API this session, not copied from
+the snapshot. Five category leaders + one resolved row, all exact:
+
+| Category | Ticker | Snapshot (est. $ / volume / OI / last) | Official API `GET /markets/<ticker>` | Result |
+|---|---|---|---|---|
+| Crypto | `KXBTCY-27JAN0100-B147500` | 64,029,608.53 / 65,336,335.23 / 6,920,631.49 / 0.98 | `last_price_dollars 0.9800`, `volume_fp 65336335.23`, `open_interest_fp 6920631.49`; 65,336,335.23 × 0.98 = 64,029,608.53 | ✔ exact |
+| Golf | `KXPGATOUR-THRC26-MPEN` | 37,989.89 / 431,703.35 / 419,786.51 / 0.088 | `last 0.0880`, `volume_fp 434504.17` (live, moved since collection), `open_interest_fp 419786.51` | ✔ OI + price exact; volume is point-in-time |
+| Gas | `KXAAAGASM-26NOV30-3.90` | 23,270.64 / 31,027.52 / 24,988.65 / 0.75 | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` | ✔ exact |
+| Elections | `KXELECTIRAN-27JAN01` | 2.87 / 3.19 / 0.02 / 0.90 | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`; rules confirm "Iran … presidential election before January 1, 2027" | ✔ exact |
+| Culture | `KXGRAMMYNOMROTY-QA7CECC5-QA` | 5.00 / 10.00 / 10.00 / 0.50 | `title "Portfolio cash out QA 5"`, `rules_primary "Demo portfolio test only."` | ✔ numbers exact — **but it is a QA fixture → F-61** |
+| Settled | `KXNATGAS15M-26NOV201945-45` | `result yes`, settlement 1.0000, finalized | `result "yes"`, `settlement_value_dollars "1.0000"`, `settlement_ts 2026-11-21T00:45:47Z`, `expiration_value 3.77666` vs floor 3.77177 | ✔ exact — **but it is natural-gas futures inside Gas Prices → F-61** |
+
+Method check on the ranking metric itself: "dollars traded (est.)" is `volume_fp × last_price_dollars`, a
+project-computed estimate (Kalshi has no dollars-traded field), and the page says so. The audit confirms the
+arithmetic is right; it cannot make the metric official.
+
+Defects raised and fixed this session: **F-62** (settled-row cap mislabelled as in-scope total — the open
+F-37), **F-61** (high: natural-gas futures classified as Gas Prices; demo QA fixture headlining Culture),
+**the freshness item (main records it as F-40)** (medium: `*/20` cron delivered 2 scheduled runs in ~10h, so the snapshot layer was stale most of the day).
+
+| Task | Status | Evidence |
+|---|---|---|
+| T34 cadence | done (code) — pending measurement after merge | `collect.yml`: two off-peak crons + chained `workflow_dispatch` (documented `GITHUB_TOKEN` exception) + `actions: write`; `desk.yml` unaffected; YAML validated |
+| T35 liveness | done | see below |
+| T36 audit | done | table above |
+
+#### T35 — liveness check (what is actually live, and what cannot be)
+
+- The browser polls the demo API directly (`assets/live.js`, `assets/engine.js`, base
+  `https://external-api.demo.kalshi.co/trade-api/v2`), CORS-probes first, and falls back to the committed
+  snapshot — that is real, and `data/live/cors.json` records the observed header
+  (`access_control_allow_origin: https://kanlerxz87-cyber.github.io`, status 200 at 2026-11-21T00:50:12Z).
+- WebSocket streaming is **not** possible for a static site: the handshake requires an API key
+  (https://docs.kalshi.com/getting_started/quick_start_websockets). Already flagged; unchanged.
+- Second-resolution charts cannot be *requested* from Kalshi (candlesticks accept 1/60/1440-minute intervals:
+  https://docs.kalshi.com/api-reference/market/get-market-candlesticks); seconds on the X-axis therefore come
+  from accumulated observations plus in-browser poll points, and the page says which.
+
+#### T34/T35/T36 post-fix verification (this session, live run — not a claim, a measurement)
+
+- `collect.yml` dispatched on this branch (`gh workflow run collect.yml --ref arena/cf49f42a-kalshidash3`),
+  run **44876177777**, conclusion **success** at ~06:36Z. It committed `e2b8a58`
+  `data: demo snapshot 2026-11-21T06:34Z` (`collected_at 2026-11-21T06:34:55Z`).
+- The snapshot proves the scope fix on real data: `open_excluded_off_topic_or_qa: 8`,
+  `settled_excluded_off_topic_or_qa: 96`, `excluded_series_reasons: {"KXNATGAS15M": "natural-gas futures
+  (Commodities, Pyth NATGAS), not retail gasoline prices"}`, and **0** natural-gas rows and **0** QA-fixture
+  rows remain, versus 11 and 1 before. `seed_markets_found` is unchanged at 5,825, i.e. no confirmed market
+  was lost by the correction.
+- Culture's headline market changed from the QA fixture to a real one, verified at the official API:
+  `GET /markets/KXFEATURE-26GTA6SCORE-ZEDD` -> title "Will Zedd be featured on Grand Theft Auto VI: The
+  Original Score?", `rules_primary` "If Zedd is featured on the album ... then the market resolves to Yes.",
+  `volume_fp 0.00`, `last 0.0000` (the page shows $0 and 0 contracts; nothing is invented).
+- Crypto's headline also re-verified after the price moved: `GET /markets/KXBTCY-27JAN0100-B97500` ->
+  `last 0.0100`, `volume_fp 72319449.06` => estimate $723,194.49 at the new price; the previous
+  `KXBTCY-27JAN0100-B147500` row still exists (`volume_fp 65336335.23`, `last 0.9800`).
+- the freshness item (main records it as F-40) remains **partially** verified: the code change is live, but whether the chained dispatch raises the
+  observed run rate can only be measured from scheduled runs after this merges. Not claimed as verified.
+
+#### T34 incident (this session, 06:34–06:45Z): runaway dispatch loop — contained, documented as F-63
+
+The first freshness fallback in `collect.yml` queued the next collection unconditionally. It chained:
+`44876177777` (06:34:21Z) → `44876253177` (06:35:20Z) → `44876330331` (06:36:17Z) → `44876426619`
+(06:37:36Z) → `44876553969` (06:39:14Z) — a collection and commit every 1–2 minutes. All runs were green
+and nothing false was published, but it is not a cadence. Contained by `gh api PUT
+.../actions/workflows/collect.yml/disable` (state `disabled_manually`) plus cancelling the in-flight run;
+the run list then stayed flat, verified over ~2 minutes. The step is now a bounded watchdog (stale >35 min,
+zero in flight, ≤3 dispatches/hour, each branch logging its decision) and the guards were exercised locally
+in three constructed states. Filed as **F-63** with the run IDs. Re-enabling on `main` after merge is a
+deliberate follow-up recorded here, not something this session will leave implicit.
+
+Data conflict policy used this session (so nothing is hand-edited): `data/live/markets.json`,
+`price_history.json`, `alerts_archive.json` and `cors.json` are written by `collect.yml` only; when they
+conflicted with `main`, this session took the newer collector-produced file and then regenerated the derived
+artefacts with their own scripts (`build_alerts.py`, `catalysts.py`, `simulate.py`). The snapshot it kept is
+the one produced by the run with the scope fix (`06:34:55Z`, `open_excluded_off_topic_or_qa: 8`,
+`settled_excluded_off_topic_or_qa: 96`, 0 natural-gas and 0 QA rows).
+
+### T34–T37 status: done — merge result, deploy confirmation, and the one thing still open
+
+- **PR:** https://github.com/kanlerxz87-cyber/KalshiDash3/pull/54 — merge commit `5660ff2` at 2026-11-21T06:49:08Z.
+- **Deploy:** Pages workflow run `44877341063` completed **success**; `GET /repos/.../pages` → `status: built`.
+- **Live verification after deploy** (platform fetch, not asserted): `data/live/markets.json` serves
+  `collected_at 2026-11-21T06:42:56Z` with `open_excluded_off_topic_or_qa: 10`,
+  `excluded_series_reasons: {"KXNATGAS15M": ...}`, and **0** natural-gas and **0** QA-fixture rows;
+  `flagged.html` serves F-38 … F-63. The rendered landing table said Culture = `KXFEATURE-26GTA6SCORE-ZEDD`
+  at first fetch, then an edge-cached copy still showed the QA row minutes later. Both observations are
+  recorded here rather than only the flattering one: GitHub Pages is fronted by a CDN, so a page can lag a
+  deploy. The underlying file (`assets/site.js` exports `isQaRow`, `index.html` skips QA rows) is correct on
+  `main` and was confirmed in the repo after the merge.
+- **Alert archive check:** no archived alert references an excluded market (0 rows for `KXNATGAS15M`, 0 for the
+  QA fixture), so the correction did not silently widen into the alert feeds.
+- **Still open (not claimed as done):** whether the bounded watchdog raises the *observed* scheduled run rate can
+  only be measured over the next hours of scheduled runs. The watchdog is bounded at 3 dispatches/hour and only
+  fires on a snapshot older than 35 minutes, and one live run after the fix did not chain. Measurement window:
+  from 07:00Z; a follow-up session should read `gh run list --workflow=collect.yml` and close F-16/F-40 with the
+  numbers, or withdraw the watchdog if it does not help.
+
+**Conflict history (nothing discarded):** this session merged `origin/main` three times. Snapshot files
+(`markets.json`, `price_history.json`, `alerts_archive.json`, `cors.json`) are written only by `collect.yml`, so
+each time the newer collector file was taken and the derived artefacts were regenerated by their own scripts
+(`build_alerts.py`, `catalysts.py`, `simulate.py`) — no JSON was hand-edited. Where a parallel session had
+already fixed the same defect (F-38 wording, F-37 label), their fix was kept, this session's duplicate was
+dropped, and the existing F-38 row was linked to the implementation record F-61 instead of being re-published.
