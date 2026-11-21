@@ -81,7 +81,10 @@ jobs:
           # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
           if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
           if [ "$recent" -ge 1 ]; then echo "this monitor already dispatched within the hour; waiting for the cron"; exit 0; fi
-          gh workflow run collect.yml --ref main --event workflow_dispatch \
+          # F-74 fixed 2026-11-21 (arena-2a7c58f1): `gh workflow run` has no --event flag
+          # (only --ref/--field/--raw-field/--json per https://cli.github.com/manual/gh_workflow_run);
+          # the command itself creates the workflow_dispatch event.
+          gh workflow run collect.yml --ref main \
             && echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection" \
             || echo "::warning::dispatch failed; the cron schedules remain the only trigger"
 

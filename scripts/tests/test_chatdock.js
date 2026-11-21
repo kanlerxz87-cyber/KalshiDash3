@@ -199,10 +199,10 @@ function counts(w) {
   check(env3.w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length > 0,
     "history rows are still rendered when the demo API refuses the browser");
 
-  /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32 — cron health line");
+  /* -------------------------------------------------- H: health line (T32, F-73 cadence) */
+  console.log("\nT32 — relay health line");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector cron|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(/collector relay|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
 
   console.log("");
   teardown();
