@@ -149,7 +149,13 @@ const KDCHAT = (() => {
       if (r.ok) doc = await r.json();
     } catch { doc = null; }
     S.histLoaded = true;
+    S.histSkipped = 0;
     for (const a of (doc && doc.alerts) || []) {
+      // Scope: the chats cover the five topics only. A row whose series GET /series files under
+      // Test/Demo, or whose topic was never confirmed, is withheld and counted here rather than
+      // shown under no topic (F-76). The archive keeps it; only this view excludes it.
+      const cats = (a.series_categories || []).map(String);
+      if (cats.includes("Test") || cats.includes("Demo") || !a.category_id) { S.histSkipped += 1; continue; }
       const to = Date.parse(a.to_time || "");
       const from = fnum(a.from_price);
       const toP = fnum(a.to_price);
@@ -314,14 +320,12 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- freshness / relay health (T32, cadence fixed F-73) -------------------- */
-  // The collector's cron is unreliable (measured 2026-11-21: `*/20` fired once in 5.75 hours; F-40).
-  // Since PR #62 the cadence on main is a bounded relay on a fixed 15-minute grid
-  // (scripts/collect_relay.py INTERVAL_DEFAULT_MIN=15; collect.yml header), with the two
-  // declared crons (7,27,47 + 13,43) as the restart path only. Instead of hiding that,
-  // measure it: read the last N runs of collect.yml from the public GitHub REST API
-  // (CORS `*` verified on 2026-11-21) and say how often the schedule actually fired.
-  // No token, no secret, no writes.
+  /* -------------------- freshness / run health (T32, R-B1) -------------------- */
+  // The collector's schedule is unreliable (measured 2026-11-21: 4 schedule deliveries in ~20 h;
+  // F-40), and since PR #62 a run on main is a 15-minute relay rather than one cron tick. So this
+  // line names no cron and judges no expected interval (R-B1): it reports the newest run and how
+  // often the schedule actually fired, and leaves freshness to the snapshot-age line below.
+  // Read-only: public GitHub REST API (CORS `*` verified 2026-11-21). No token, no writes.
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -342,14 +346,21 @@ const KDCHAT = (() => {
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      const newest = runs.find((x) => !Number.isNaN(x.at)) || null;
       S.health = {
         runs: runs.length,
         scheduled: sched.length,
         scheduleGapMinutes: gap,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
-        cronExpression: "15-min grid (cron restart: 7,27,47 + 13,43)",
-        expectedMinutes: 15,
+        newest: newest
+          ? {
+              event: newest.event,
+              status: newest.status || "unknown",
+              conclusion: newest.conclusion || "",
+              at: newest.at,
+            }
+          : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
       };
     } catch (e) {
@@ -370,13 +381,15 @@ const KDCHAT = (() => {
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
       } else {
         const gap = h.scheduleGapMinutes;
-        const late = gap !== null && gap > h.expectedMinutes * 2;
+        const n = h.newest;
+        const newestText = n
+          ? `newest run ${esc(n.status)}${n.conclusion ? " · " + esc(n.conclusion) : ""} (${esc(n.event)}, ${esc(ago(n.at))})`
+          : "no runs in the last 20";
         host.innerHTML =
-          `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector relay <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
+          `<span class="cd-health ok">` +
+          `collector: ${newestText} · ` +
           `${h.scheduled} of the last ${h.runs} runs were scheduled` +
           (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
           ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
           `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
@@ -392,6 +405,12 @@ const KDCHAT = (() => {
 
   /* ----------------------------- rendering ----------------------------- */
   function render() {
+    const scope = document.getElementById("kdScope");
+    if (scope) {
+      scope.textContent = S.histSkipped
+        ? ` ${S.histSkipped} archived swing(s) are withheld here because they are not in the five topics (F-76).`
+        : "";
+    }
     const all = S.feed;
     const model = all.filter((a) => Math.abs(a.delta) / Math.max(a.from, 0.05) >= 0.25 && (a.volume24 || 0) >= 100);
     const cat = S.filter;
@@ -484,6 +503,7 @@ const KDCHAT = (() => {
       News links are search leads, never asserted causes (<a href="flagged.html">F-25</a>).
       Topic labels on <b>history</b> rows are the collector's verified category; a market first seen by the live
       poller is matched by its series prefix, a keyword heuristic (<a href="flagged.html">flagged</a>).
+      <span id="kdScope"></span>
     </footer>
   </section>
 </div>`;
