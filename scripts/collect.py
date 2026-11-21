@@ -648,8 +648,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         "counts": {
             "open_total_scanned": len(raw["open"]),
             "settled_total_scanned": len(raw["settled"]),
+            # What this page/table actually PUBLISHES (kept for schema compatibility). These are
+            # not totals: the scan finds far more, which is why the totals below are published
+            # separately and every page labels the difference (F-72).
             "open_in_scope": len(rows["open"]),
             "settled_in_scope": len(rows["settled"]),
+            "open_published_rows": len(rows["open"]),
+            "settled_published_rows": len(rows["settled"]),
             "open_out_of_scope": unclassified["open"],
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],

@@ -889,6 +889,29 @@
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
     "https://kanlerxz87-cyber.github.io/KalshiDash3/roi.html"
    ]
+  },
+  {
+   "id": "F-71",
+   "severity": "high",
+   "item": "A dropped collector schedule left the site showing a 5-hour-old snapshot, and the freshness fallback could not run because it lived inside the collector",
+   "why": "collect.yml's freshness step only executes when a collection runs, so it cannot revive a collector that GitHub's scheduler skipped. Measured with `gh run list --workflow=collect.yml` on 2026-11-21: scheduled runs at 00:49Z, ~06:0xZ, 15:15:48Z and 15:20:32Z, then nothing until a manual dispatch at 20:26Z — about five hours on a 20-minute cron, with the committed snapshot at 15:21:23Z while the page was live. GitHub documents that scheduled runs may be delayed and that queued jobs may be dropped, so this is documented platform behaviour, not a cron-expression bug. The earlier attempt to fix a similar symptom (F-63) shipped an unconditional dispatch and chained five runs in five minutes, so any fallback has to be bounded.",
+   "action": "Added scripts/watchdog.py: a pure decision function (no network) that dispatches only when the snapshot is at least 35 minutes old, no collection is in flight, and fewer than 3 dispatches have happened in the last hour. Unit-tested by scripts/tests/test_watchdog.py (46 checks) with the anti-chain case pinned explicitly ('a fresh snapshot must never dispatch'). desk.yml — a different workflow on its own schedule, so it survives a dropped collect run — now runs it as its final step with actions:write. Verified by executing the extracted workflow step locally with `gh` stubbed: stale snapshot -> 'queued exactly one collection'; fresh, in-flight, and cap-reached -> skip with the reason printed. Whether the cadence actually improves can only be measured over hours, so this is recorded as fixed-in-code / pending measurement, not as proven.",
+   "sources": [
+    "https://docs.github.com/en/actions/reference/workflows-and-events/events-that-trigger-workflows",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/watchdog.py"
+   ]
+  },
+  {
+   "id": "F-72",
+   "severity": "medium",
+   "item": "After the topic-fair fix, the banner printed the PUBLISHED settled-row count (600) as 'In scope: ... 600 settled' while the scan had found 19,584",
+   "why": "counts.settled_in_scope had always meant 'rows kept for publication', but every page read it as the in-scope total. Before the fix the two were close enough (200 rows against a stated 1,600) that the mismatch was easy to miss; with the settlement allocation publishing 600 rows against 19,584 found, the banner became plainly wrong. A reader would conclude the topic pages had lost 97% of their history. Nothing was withheld — the rows simply were not the total — but the label said otherwise.",
+   "action": "scripts/collect.py now publishes settled_in_scope_total (the scan total), settled_published, settled_published_by_category and explicit open_published_rows / settled_published_rows, keeping the old keys for schema compatibility. assets/site.js prints the in-scope total and names the published count separately; categories.html and verification.html show the scan total, the published count and the open published count as three distinct rows. The multivariate counters are relabelled as what they now measure (combos still present after the API's mve_filter=exclude, measured 0) rather than implying the combo volume. scripts/tests/test_scope.py asserts the collector publishes both numbers and that the pages read the total for the 'in scope' figure.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/categories.html"
+   ]
   }
  ]
 }
