@@ -315,7 +315,10 @@ const KDCHAT = (() => {
   }
 
   /* -------------------- freshness / cron health (T32) -------------------- */
-  // The collector's cron is unreliable (measured 2026-11-21: `*/20` fired once in 5.75 hours; F-40).
+  // The collector's cron is unreliable (measured 2026-11-21: the then-declared `*/20` cron fired once in
+  // 5.75 hours; F-40). collect.yml no longer declares `*/20`: it runs 7,27,47 + 13,43 and, on main, a
+  // bounded 15-minute relay (PR #62). So the label below names the measured scheduled gap rather than
+  // claiming a cadence — 20 here was stale, F-73.)
   // Instead of hiding that, measure it: read the last N runs of collect.yml from
   // the public GitHub REST API (CORS `*` verified on 2026-11-21) and say how
   // often the schedule actually fired. No token, no secret, no writes.
@@ -337,16 +340,28 @@ const KDCHAT = (() => {
       }));
       const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
+      const stamped = runs.filter((x) => !Number.isNaN(x.at)).sort((a, b) => b.at - a.at);
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      let observedMinutes = null;
+      if (stamped.length >= 2) {
+        const intervals = [];
+        for (let i = 1; i < Math.min(stamped.length, 7); i++) {
+          const g = Math.round((stamped[i - 1].at - stamped[i].at) / 60000);
+          if (g > 0) intervals.push(g);
+        }
+        if (intervals.length) {
+          const sorted = intervals.slice().sort((a, b) => a - b);
+          observedMinutes = sorted[Math.floor(sorted.length / 2)];
+        }
+      }
       S.health = {
         runs: runs.length,
         scheduled: sched.length,
         scheduleGapMinutes: gap,
+        observedMinutes,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
-        cronExpression: "*/20 * * * *",
-        expectedMinutes: 20,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
       };
     } catch (e) {
@@ -367,11 +382,15 @@ const KDCHAT = (() => {
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
       } else {
         const gap = h.scheduleGapMinutes;
-        const late = gap !== null && gap > h.expectedMinutes * 2;
+        // Late = the measured gap between the last two scheduled runs is more than double the
+        // interval between the most recent runs of any kind. Nothing is hard-coded: the schedule
+        // has changed twice (F-40, F-73), and a fixed number here went stale both times.
+        const observed = h.observedMinutes;
+        const late = gap !== null && observed !== null && gap > observed * 2;
         host.innerHTML =
           `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector cron <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
-          `${h.scheduled} of the last ${h.runs} runs were scheduled` +
+          `collector workflow: ${h.scheduled} of the last ${h.runs} runs were scheduled` +
+          (observed !== null ? `, recent runs about every ${observed}m apart` : "") +
           (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
           (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
           ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +

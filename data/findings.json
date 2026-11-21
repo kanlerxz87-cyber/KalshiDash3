@@ -944,23 +944,39 @@
    "severity": "low",
    "item": "Site copy still describes a '20-minute' collector cadence; collect.yml declared 7,27,47 + 13,43 since PR #54, and main now sweeps on a 15-minute relay grid (R-B8)",
    "why": "executive-summary.html, live.html, portfolio.html, an assets/live.js comment and data/findings.json texts still say 'every 20 minutes' in places. collect.yml has declared two off-peak crons since PR #54, and PR #62 (merged 2026-11-21T21:13:41Z) replaces the declared cron behaviour on main with a bounded relay (one run, fixed 15-minute grid, <= 5.5 h, one queued successor, pages.yml per committed pass). The pages' own snapshot-age banner is the accurate signal; the hard-coded prose is not.",
-   "action": "Not edited in this PR (the named files belong to other in-flight scopes; the request is explicitly a findings carry-over). Correction: say 'about every 15 minutes while the relay runs; each page shows the snapshot age', or render the cadence from data. Flagged for the final integration session / page owners; first flagged 2026-11-21T21:20Z (arena-d60d648c, carrying R-B8).",
+   "action": "Fixed 2026-11-21 by session arena-c09bf8f4, after re-measuring: the last 7 distinct observation intervals in data/live/price_history.json are exactly 15.0 min apart, so the '20 minutes' prose was wrong by a third. Rather than swap one hard-coded number for another, the site now derives the cadence from data: assets/site.js cadence() computes the median of the last 10 observation intervals and snapshotBanner() renders 'Cadence: about every N min (median of the last K observation intervals; distinct gaps seen: ..., N observation times on record)' on every page that shows the snapshot banner, plus a warning when the snapshot is >= 3 intervals behind. Hard-coded cadence removed from executive-summary.html (2 places), portfolio.html and assets/live.js; assets/chatdock.js no longer labels a cron expression it does not read - its health line now says how many of the last runs were scheduled and the measured spacing between recent runs, and flags throttling only when the scheduled gap exceeds twice the observed spacing. Same source of truth as the banner, so F-40 and F-73 cannot disagree again. Verified offline with a Node DOM stub: banner prints 'about every 15 min' on the committed data and fires the behind-cadence warning on a snapshot doctored to be 3 h old; test_chatdock.js passes (its assertion follows the new label).",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md"
-   ]
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/price_history.json"
+   ],
+   "status": "fixed 2026-11-21 (arena-c09bf8f4)"
   },
   {
    "id": "F-74",
    "severity": "medium",
    "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
    "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops.",
-   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
+   "action": "Fixed by session arena-9b8246da in PR #76 (merged to main): the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning; scripts/tests/test_freshness_alarm.py executes the workflow's own shell with a fake gh across five cases. Independently re-verified 2026-11-21 by session arena-c09bf8f4: read cli/cli trunk pkg/cmd/workflow/run/run.go through the GitHub API (the command registers only --ref, --field/-F, --raw-field/-f and --json), reproduced 'unknown flag: --event' with the installed gh 2.23.0 and with a stub gh on PATH, and confirmed no `--event` remains anywhere under .github/. arena-c09bf8f4's parallel edit of the same line was discarded in favour of PR #76's stricter version - nothing was lost, and the overlap is recorded on the board. The successful stale-data dispatch against the live service has still not been observed.",
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
+   ],
+   "status": "fixed 2026-11-21 (arena-9b8246da, PR #76; independently re-verified by arena-c09bf8f4)"
+  },
+  {
+   "id": "F-75",
+   "severity": "low",
+   "item": "Counts printed in prose had drifted from the ledgers they describe (executive summary said 50 irregularities while 53 were listed; README said the same), and README duplicated one line",
+   "why": "Measured 2026-11-21 by session arena-c09bf8f4: data/findings.json listed 53 flagged entries and 20 suggestions, while executive-summary.html said '50 irregularities' and 'Eighteen suggestions' and README.md said '50 irregularities'. The verification count (72 claims, 1 unverified) happened to be correct but was typed too. README.md also listed scripts/tests/test_watchdog.py twice with two different descriptions. No market number was affected - these are counts of this repository's own records - but a page that misstates its own ledger undermines the rest of the verification.",
+   "action": "Fixed: executive-summary.html now renders the four counts (claims, deliberately blank, suggestions, questions, irregularities) from data/verified_facts.json and data/findings.json at load time, with the static text kept only as a fallback if the fetch fails; verified with a Node DOM stub - it printed 20 suggestions, 9 questions, 53 irregularities, 72 claims, 1 blank, matching the ledgers. README.md now states the counts as 'at build time' with the file each page reads, and the duplicate line is removed. This is the same failure mode as F-73 (typed copy drifting from data) and gets the same answer: render it from the source.",
+   "status": "fixed 2026-11-21 (arena-c09bf8f4)",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/findings.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/verified_facts.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/executive-summary.html"
    ]
   }
  ]

@@ -202,7 +202,7 @@ function counts(w) {
   /* -------------------------------------------------- H: health line (T32) */
   console.log("\nT32 — cron health line");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector cron|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(/collector workflow|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
 
   console.log("");
   teardown();

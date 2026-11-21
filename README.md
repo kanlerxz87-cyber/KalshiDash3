@@ -28,8 +28,8 @@ left blank and listed on the *Flagged for Review* page.
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
 | `suggestions.html` | Eighteen proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 72 claims, each with the official page it was checked against |
-| `flagged.html` | 50 irregularities found, plus every value deliberately left blank |
+| `verification.html` | every claim, each with the official page it was checked against (72 at build time; the page renders the count from `data/verified_facts.json`) |
+| `flagged.html` | every irregularity found, each with its open/fixed status, plus every value deliberately left blank (53 at build time; the page renders the count from `data/findings.json`) |
 | `sources.html` | The complete source list |
 
 ## Repository layout
@@ -44,7 +44,6 @@ data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector (includes official-candle backfill for lost alert history)
 scripts/watchdog.py   bounded freshness decision: stale-only, no overlap, hourly cap (topic-fair resolution history,
                       alert-aware price-history retention, official-candle backfill)
-scripts/watchdog.py   bounded freshness decision (stale-only, no overlap, hourly cap)
 scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
 scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
 scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
@@ -53,7 +52,6 @@ scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
 scripts/tests/test_watchdog.py  freshness limits (a fresh snapshot must never dispatch)
 scripts/tests/test_settled_selection.py  topic-fair settlement allocation + retention contract
-scripts/tests/test_watchdog.py  the freshness limits (fresh must never dispatch)
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
@@ -76,7 +74,12 @@ This single offline command checks Python, shared and inline browser-script synt
 all committed-data validators; alert, fee, ROI and simulation regressions; engine and
 DOM behavior; and internal links across the 21 pages. Missing Node or jsdom is a failure,
 not a silent skip. It does not fetch fresh prices, verify external URL availability,
-certify profitability, or authenticate a demo account. Official endpoint and authentication
+certify profitability, or authenticate a demo account.
+
+Two site behaviours are derived rather than typed, because typed copies had already drifted: the
+collector **cadence** shown in the snapshot banner (F-73) and the **counts** in the executive summary
+(F-75) are computed from `data/live/price_history.json`, `data/findings.json` and
+`data/verified_facts.json` at render time. Official endpoint and authentication
 references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
 [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).
 

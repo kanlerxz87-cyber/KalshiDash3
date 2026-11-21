@@ -542,7 +542,7 @@ async function runAuto() {
     saveAuto(auto);
     renderAuto();
     meta.textContent = result.trades.length + result.open.length === 0
-      ? `session complete: no rule triggered in ${result.events} collected observations yet — an honest zero, not an error; history accumulates every 20 minutes`
+      ? `session complete: no rule triggered in ${result.events} collected observations yet — an honest zero, not an error; history accumulates at the collector cadence shown in the snapshot banner above`
       : `session complete: ${result.trades.length} closed, ${result.open.length} open`;
   } catch (e) {
     meta.textContent = "could not run: " + (e && e.message ? e.message : e);
