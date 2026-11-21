@@ -1071,9 +1071,23 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
 
+## Session `arena-9b8246da` — freshness alarm repair and release check
+
+| Task | Status | Owner | Scope | Notes |
+|---|---|---|---|---|
+| R-B7 / F-74 | done — [PR #76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), merged | arena-9b8246da | `.github/workflows/freshness-alarm.yml`, `scripts/tests/test_freshness_alarm.py`, `data/findings.json` (F-74 only), `COORDINATION.md` (this section) | Takeover of the request addressed to arena-20d7ddf7: their PR #71 merged at 20:54Z, over 60 minutes ago; no open PR. Verify CLI syntax against https://cli.github.com/manual/gh_workflow_run. Preserve the in-flight and hourly bounds. |
+
+### Verification and limitations (arena-9b8246da)
+- 2026-11-21: Read the [official GitHub CLI manual](https://cli.github.com/manual/gh_workflow_run): `gh workflow run` itself creates `workflow_dispatch` and documents `--ref`, not `--event`. The repository's `collect.yml` declares `workflow_dispatch`. Removed the unsupported flag and made a failed dispatch fail the Actions step rather than silently succeed.
+- `scripts/tests/test_freshness_alarm.py`: five offline tests execute the actual workflow shell with a fake `gh`: correct command, running/queued guard, hourly guard, dispatch failure, and the stale-step condition. No real collection was dispatched by the tests.
+- `python3 scripts/verify_release.py`: PASS, including all Python and browser tests and local internal-link checks across 21 pages. This does not verify external links or live market/account access. The alarm's successful stale-data recovery remains **unverified against GitHub**, and F-74 remains on the review page.
+- GitHub Pages API reported `built` at https://kanlerxz87-cyber.github.io/KalshiDash3/; latest `pages.yml` main runs were successful before the change. Pages is configured as legacy branch publishing, which can bypass the Actions release gate; see existing review finding F-18. The schedule is not guaranteed: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule.
+
+- PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76): first Actions release-gate run [44960394426](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960394426) passed. This session did not independently verify every existing site row against its official source, nor test a demo account or a live stale-data dispatch, so the requested all-tasks final integration/merge condition is not established by this narrow repair.
+
 ## Session `arena-981efed5` — defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)
 
-Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`). Checked in-flight branches (`arena/42e3b260-kalshidash3` T57–T64, PR #76 `arena/9b8246da-kalshidash3`); scopes below are strictly non-overlapping.
+Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `origin/main` (`3a91413`). Checked in-flight branches (`arena/42e3b260-kalshidash3` T57–T64, PR #76 `arena/9b8246da-kalshidash3`); scopes below are strictly non-overlapping.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
@@ -1087,5 +1101,5 @@ Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`). Checked in-flight bra
 
 ### Log (`arena-981efed5`)
 - 2026-11-21 23:12Z: Claimed T65–T68 (`0de746d`) after checking `arena-42e3b260` and PR #76 scopes to keep files strictly non-overlapping.
-- 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/J/K). Full `scripts/verify_release.py` PASS on the merged tree (21/21 pages rendered in jsdom with 0 errors and 0 NaN/undefined leaks).
+- 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/J/K). Merged `origin/main` (`3a91413`, PR #76 + 23:16Z snapshot), keeping both `COORDINATION.md` blocks verbatim.
 
