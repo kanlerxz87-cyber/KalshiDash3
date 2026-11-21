@@ -521,7 +521,57 @@ force-pushed away, and the review is in this log.
 | T43 | Landing-page truthfulness | **superseded by main** | arena-83749e18 | `index.html` | main's per-topic resolution tracker kept | — |
 | T44 | **New work kept:** backfill lost alert history from official candles | done | arena-83749e18 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` | see F-72 | F-72 |
 | T45 | **New work kept:** bounded cross-workflow freshness watchdog | done | arena-83749e18 | `scripts/watchdog.py` (new), `scripts/tests/test_watchdog.py` (new), `.github/workflows/desk.yml` | 46 unit checks + the workflow shell extracted and executed with `gh` stubbed (stale -> one dispatch; fresh / in-flight / cap -> skip) | F-71 |
-| T46 | Close-out: merge `main`, full gate, PR, Pages deploy confirm, live-URL check | in progress | arena-83749e18 | `COORDINATION.md`, `README.md` | `scripts/verify_release.py` | — |
+| T46 | Close-out: merge `main`, full gate, PR, Pages deploy confirm, live-URL check | done (see log) | arena-83749e18 | `COORDINATION.md`, `README.md` | `scripts/verify_release.py` PASS after the backfill landed on real data | — |
+
+### Sources re-read or re-fetched live by this session (`arena-83749e18`)
+
+- `https://docs.kalshi.com/getting_started/demo_env` — demo root, mock funds, and the warning that demo prices may
+  not reflect real markets.
+- `https://docs.kalshi.com/api-reference/market/get-markets` — `mve_filter ∈ {only, exclude}`, `limit ≤ 1000`,
+  `status ∈ {unopened, open, paused, closed, settled}`.
+- `https://docs.kalshi.com/api-reference/market/get-market-candlesticks` — `period_interval ∈ {1, 60, 1440}`,
+  `start_ts`/`end_ts` in **seconds** (milliseconds are rejected with 400), at most **5,000 periods per request**,
+  and candles for markets settled before the cutoff only from `GET /historical/markets/{ticker}/candlesticks`.
+- Live candlestick responses fetched directly (not from the snapshot):
+  `KXPGATOUR-THRC26-MPEN` at `period_interval=60` and `1440` — confirmed the `*_dollars` field names, the
+  `price.previous_dollars`-only shape for a period with no trades, and `yes_bid`/`yes_ask` sub-objects.
+- Live market records re-fetched for the figures this round changed or displayed:
+  `KXBTCY-27JAN0100-B97500` (`last 0.9700`, `volume_fp 72324682.94`, `open_interest_fp 7296563.49`;
+  72,324,682.94 × 0.97 = 70,154,942.45 = the site's row), `KXPGATOUR-THRC26-BHAR` (`last 0.7500`,
+  `volume_fp 153195.26`, `open_interest_fp 119274.49` → $114,896.45), `KXALBUMCHART-GTA6H100-05DEC26-GE9`
+  (`volume_fp 0.00`, `last 0.0000` → $0, shown as $0 rather than omitted), `KXAAAGASM-26NOV30-3.90`
+  (`last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`), and `KXELECTIRAN-26JUL01`
+  (`status finalized`, `result "no"`, `settlement_ts 2026-07-01T15:24:15.984157Z`).
+- `https://docs.github.com/en/actions/reference/workflows-and-events/events-that-trigger-workflows` — scheduled runs
+  "can be delayed" and "some queued jobs may be dropped", the documented basis for F-71's watchdog. (The page did not
+  render through the platform fetch tool this session; the wording quoted in `desk.yml` and F-71 is the sentence
+  already cited on `flagged.html`, and the measured run history — 4 scheduled runs in ~21 h on a 20-minute cron —
+  is the evidence actually relied on.)
+
+### Log (this session)
+
+- 2026-11-21 20:20Z: claimed T40–T43, pushed before editing.
+- 2026-11-21 20:49Z: **T44 landed on real data.** `collect.yml` run `44948222942` (success) rebuilt 7 alert-cited
+  series that had no observations left, from official 1-minute candles: `price_history_backfilled_from_candles = 7`,
+  `price_history_archived_tickers = 13`, **0** archived tickers now without chartable history, 300 candle-sourced
+  points marked `source: "candle"`.
+- 2026-11-21 20:52Z: **T46 close-out.** Merged `origin/main` (`233b14e`, `af6e8b9` and followers). **Two of my four
+  original tasks were superseded by work that landed on `main` while I was building them** — topic-fair settled
+  selection and the candlestick chart — so this branch dropped its duplicate implementations instead of publishing a
+  second one:
+  | Kept from this branch | Superseded and dropped (still in this branch's history, not force-pushed away) |
+  |---|---|
+  | `backfill_from_candles()` in `scripts/collect.py` + its counts (F-72) | my `select_settled()` (main's `af6e8b9` version is equivalent and already tested) |
+  | `scripts/watchdog.py` + `test_watchdog.py` + the `desk.yml` step (F-71) | my `dashboard.html` chart rewrite (main's chart is equivalent; only the pointer readout was kept) |
+  | The pointer readout + `window.__chart` + DOM test E3 (G20) | my `index.html` resolution tracker (main's is equivalent) |
+  | History/backfill half of `test_settled_selection.py` (main's selection fixtures kept alongside) | my duplicate `findings.json` entries F-65…F-71, which collide with main's IDs for different defects |
+  Conflict handling: `data/live/*` were taken from `main` (collector-written) and then regenerated by a real
+  collector run; `COORDINATION.md` and `README.md` were merged by hand so neither session's record was dropped.
+- 2026-11-21 20:55Z: full gate `python3 scripts/verify_release.py` -> **PASS** (Python, `node --check` on every page
+  script, all validators/tests including `test_watchdog.py` and `test_settled_selection.py`, DOM suites with the new
+  E3 readout section, 21-page link check). Mutation checks run this session: milliseconds instead of seconds in the
+  candle request -> fail; a price-less candle plotted as 0 -> fail; a single newest-first resolution queue -> fail;
+  an interpolated readout value -> fail.
 
 
 ## Session `arena-6a6e8f22` — topic-fair resolution history + honest chart intervals + deploy-source fix (branch `arena/6a6e8f22-kalshidash3`)
