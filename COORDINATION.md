@@ -521,7 +521,7 @@ force-pushed away, and the review is in this log.
 | T43 | Landing-page truthfulness | **superseded by main** | arena-83749e18 | `index.html` | main's per-topic resolution tracker kept | — |
 | T44 | **New work kept:** backfill lost alert history from official candles | done | arena-83749e18 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` | see F-72 | F-72 |
 | T45 | **New work kept:** bounded cross-workflow freshness watchdog | done | arena-83749e18 | `scripts/watchdog.py` (new), `scripts/tests/test_watchdog.py` (new), `.github/workflows/desk.yml` | 46 unit checks + the workflow shell extracted and executed with `gh` stubbed (stale -> one dispatch; fresh / in-flight / cap -> skip) | F-71 |
-| T46 | Close-out: merge `main`, full gate, PR, Pages deploy confirm, live-URL check | done (see log) | arena-83749e18 | `COORDINATION.md`, `README.md` | `scripts/verify_release.py` PASS after the backfill landed on real data | — |
+| T46 | Close-out: merge `main`, full gate, PR, Pages deploy confirm, live-URL check | **done — PR #72 merged, Pages built, live site verified** | arena-83749e18 | `COORDINATION.md`, `README.md` | `scripts/verify_release.py` PASS after the backfill landed on real data | — |
 
 ### Sources re-read or re-fetched live by this session (`arena-83749e18`)
 
@@ -864,3 +864,25 @@ the historical cutoff for settled markets).
    live order execution stay labelled paper. No credential was requested, created or stored.
 4. **WebSocket streaming / true seconds history (F-06)** — impossible from a static site; the dashboard charts the
    official 1/60/1440-minute candles and labels the seconds window as observations only.
+
+### T48 — merge, deploy and live verification (`arena-83749e18`)
+
+| Item | Result |
+|---|---|
+| PR | **#72** https://github.com/kanlerxz87-cyber/KalshiDash3/pull/72 |
+| Merge | `389fa75294702c3536e00d1c3a27ec9ca4f3b11e`, merged **2026-11-21T21:05:41Z** without waiting for review, as the brief instructs |
+| Pre-merge CI | `build` **pass** (51 s) on `44949571862`; `deploy` correctly `skipping` on a PR |
+| Pages | `Deploy site to GitHub Pages` run `44949723864` **success** at the merge commit; `pages-build-deployment` **success**; `GET /repos/.../pages` -> `status: built` |
+| Live check | `dashboard.html` serves snapshot **2026-11-21T20:57:37Z** (the run made by the merged collector — main's own latest snapshot then was 20:58Z from the *pre*-merge code, so the CDN was busted with `?v=` until the new build landed); the pointer-readout instruction is in the live HTML; the chart reads "6 collector observations and 266 official 1-minute candles"; `flagged.html` shows **51** irregularities (main's 50 + F-72) |
+
+Three merge rounds were needed: `main` advanced twice while this branch was in review (`#70`, then `#71`, then a
+collector commit), and every `data/live/*` conflict was resolved by taking **the snapshot the merged collector wrote**
+— main's concurrent runs were produced by the pre-merge code, so taking them verbatim would have silently dropped the
+backfill and left the release gate red. The next scheduled `collect.yml` run on `main` reproduces those counts from the
+merged code; nothing here depends on a manual snapshot.
+
+**Live prices re-verified for the rows this branch displays** (fetched from the demo API, not from the snapshot):
+`KXBTCY-27JAN0100-B97500` = 97.0¢ / 72,324,683 contracts / OI 7,296,563 -> the live dashboard shows `$70154942`,
+exactly 72,324,682.94 x 0.97; `KXPGATOUR-THRC26-BHAR` = 75.0¢ / 153,195.26 / 119,274.49 -> `$114896` live,
+matching 153,195.26 x 0.75 = 114,896.45; `KXALBUMCHART-GTA6H100-05DEC26-GE9` = 0 contracts -> `$0` (shown, not
+omitted); `KXAAAGASM-26NOV30-3.90` -> `$23271` live vs $23,270.64 computed (display rounding only).
