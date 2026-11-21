@@ -1280,3 +1280,47 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-6a6e8f22` — topic-fair resolution history + honest chart intervals + deploy-source fix (branch `arena/6a6e8f22-kalshidash3`)
+
+Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:25Z, before editing any implementation file.
+
+**Board read first (as the brief requires).** Two PRs are open and both are `DIRTY` against `main`, with no commit
+since 2026-11-21T06:59Z — more than 60 minutes idle, so the takeover rule applies:
+
+| PR | Branch | Last commit | State | Decision |
+|----|--------|-------------|-------|----------|
+| #55 | `arena/a3070ffa` | 06:45Z (chart fidelity, F-40…F-44) | CONFLICTING | Take over the parts `main` still lacks: official candlestick intervals on the dashboard chart, alert-archive fallback for markets that left the collector window, voided-position fix. |
+| #56 | `arena/17d4ecfa` | 06:59Z (topic-fair settled selection, F-41) | CONFLICTING | Take over: per-topic settled-row selection at the source, plus the verified `/historical/markets` backfill so topics that rarely settle still have resolution history. |
+
+This session does **not** push to those branches (the brief forbids working on another branch). It re-implements
+their verified intent on its own branch, credits them here, and will say in the PR which parts came from where.
+Nothing from either branch is deleted from git history.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T43 | Topic-fair resolution history: publish settled rows per topic instead of a global newest-first `[:200]` (crypto 15-minute markets were 198 of the 200 published rows), and backfill settled rows for rarely-settling seed series from the documented `GET /historical/markets` | in progress | arena-6a6e8f22 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` (new), `scripts/tests/validate_live.py` | official `GET /historical/markets` parameters re-read this session (see sources); local fixture tests | — |
+| T44 | Dashboard chart: X = time / Y = contract price over seconds, minutes, hours **and** days, using the official candlestick endpoint at the only intervals it documents (1 / 60 / 1440 min), with observations kept as a separate series; state plainly that a seconds interval does not exist | in progress | arena-6a6e8f22 | `dashboard.html`, `assets/engine.js` (read-only unless needed), `scripts/tests/test_pages_dom.js` | `node --check`, jsdom render of `dashboard.html` against the committed snapshot | — |
+| T45 | Line-by-line verification of the Claims changed by T43/T44 against official sources; blank + flag anything unconfirmable | in progress | arena-6a6e8f22 | `data/verified_facts.json`, `data/findings.json` (new ids only) | platform fetch of the official pages, recorded in the session log | — |
+| T46 | Deploy-source close-out: DEPLOY-1 says the Pages build type is `legacy`, so branch publishing bypasses the verified release gate. Attempt the documented change to workflow publishing, and record the result whatever it is | in progress | arena-6a6e8f22 | `COORDINATION.md` (record), `flagged.html` (DEPLOY-1 status only) | `gh api .../pages`, live fetch of the deployed site | — |
+| T47 | Integration close-out: full `scripts/verify_release.py`, PR → `main`, merge, confirm the Pages deploy, record the PR link and result here | unclaimed | arena-6a6e8f22 | `COORDINATION.md`, `README.md` | live URL fetches | — |
+
+### Sources re-read this session (official, fetched 2026-11-21 20:2xZ)
+
+- https://docs.kalshi.com/getting_started/historical_data — the live/historical partition, the cutoff field
+  `market_settled_ts`, and the statement that markets that settled before the cutoff are **only** available via
+  `GET /historical/markets`. This is why an elections market settled 2026-07-01 cannot come from `GET /markets`.
+- https://docs.kalshi.com/api-reference/historical/get-historical-markets — filters are `tickers`, `event_ticker`,
+  `series_ticker`, `mve_filter`, `limit` (max 1000), `cursor`; "Filters are mutually exclusive."
+
+### Log (this session)
+
+- 20:25Z: board read; T43–T46 claimed. Snapshot on `main` is `collected_at 2026-11-21T15:21:23Z` (~5 h old) and
+  `collect.yml`/`desk.yml` dispatches fired at 20:17Z from another session's branch.
+- 20:2xZ: every one of the 21 pages was rendered in jsdom against the committed data (no network): no page throws,
+  no `NaN`/`undefined` leaks, no empty data table. Two observations recorded rather than fixed blind: `flagged.html`
+  and `verification.html` each contain the word "null" once (both are inside prose/JSON quotes, not rendered API
+  values — checked individually), and `elections.html` legitimately carries one open market because Kalshi's demo
+  exchange lists exactly one seeded elections series (`KXELECTIRAN`).
