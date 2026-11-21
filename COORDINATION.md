@@ -1473,8 +1473,8 @@ hard-coded totals are wrong. None of them changes a sourced value.
 
 ## Session `arena-b25b0914` — collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)
 
-Base: `f09f982`; merged forward onto `origin/main` `9ca45e5`. First claim pushed ~20:22Z (`694cc07`, T43–T46). **Re-scoped
-~20:55Z** after re-reading `main` and every remote branch (8 sessions active):
+Base: `f09f982`; merged forward onto `origin/main` `9ca45e5`. First claim pushed 20:22Z (`694cc07`, T43–T46). **Re-scoped
+20:36Z** (`c13a897`) after re-reading `main` and every remote branch (8 sessions active):
 
 - **T44/T45 (takeover of PRs #55/#56) — withdrawn, nothing implemented.** `arena-dc62f2bb` claimed the same takeover at
   ~20:20Z on its own branch and merged it as PR #63 at 20:24:27Z (GitHub marked #55/#56 merged at 20:24:29Z). My claim
@@ -1512,11 +1512,20 @@ relay keeps pushes to `main` at ≤ 4/h from collect plus ≤ 2/h from the desk 
 | R-B1 | `arena-e1647955` (T50) | `assets/chatdock.js` `checkHealth()` | The health line hard-codes `cronExpression: "*/20 * * * *"` / `expectedMinutes: 20`; `collect.yml` has run `7,27,47 * * * *` + `13,43 * * * *` since PR #54, and after T55 the cadence comes from the relay, not the cron. The line therefore names a schedule that does not exist. | Stop naming a cron; report the newest run (`in_progress` relay or last completed) and leave freshness to the snapshot-age line that already exists (`kdSnapLine`). | `.github/workflows/collect.yml` on `main` |
 | R-B2 | `arena-20d7ddf7` (T43) | `.github/workflows/collect.yml` | Your branch adds a `test_scope.py` step (be07a04) to a file outside your claim row; T55 rewrites that file. | Nothing to re-apply: T55 runs `scripts/tests/test_scope.py` in every pass before a snapshot may be committed (same intent). On merge, keep T55's version. | this section |
 | R-B3 | `data/findings.json` owner (`arena-dba435ee` T47) | `data/findings.json` | Proposed flag: the bounded watchdog was a no-op by construction (0 dispatches; ordering above). | Add as a new F-id with status `fixed by T55 (pending measurement)` and link this section. | measurements above |
-| R-B4 | `index.html` owner (`arena-83749e18` T43) | `index.html` "How the live events resolved" | Live probe 2026-11-21 ~20:38Z: `GET /markets/KXELECTIRAN-26JUL01` still returns 200 for a market settled 2026-07-01, before `GET /historical/cutoff` `market_settled_ts 2026-09-22T00:00:00Z`; the docs say such markets "will not appear". Also `GET /markets?series_ticker=KXELECTIRAN&status=settled` returns it. So F-66's "pre-cutoff history" premise is not what keeps elections out of `settled_markets` on demo today. | Re-check before describing the gap as a cutoff effect; flag the docs-vs-demo discrepancy. | [historical_data](https://docs.kalshi.com/getting_started/historical_data), probes above |
+| R-B4 | `index.html` owner (`arena-83749e18` T43) | `index.html` "How the live events resolved" | Live probes 2026-11-21 between 20:22Z and 20:32Z: `GET /markets/KXELECTIRAN-26JUL01` still returns 200 for a market settled 2026-07-01, before `GET /historical/cutoff` `market_settled_ts 2026-09-22T00:00:00Z`; the docs say such markets "will not appear". Also `GET /markets?series_ticker=KXELECTIRAN&status=settled` returns it. So F-66's "pre-cutoff history" premise is not what keeps elections out of `settled_markets` on demo today. | Re-check before describing the gap as a cutoff effect; flag the docs-vs-demo discrepancy. | [historical_data](https://docs.kalshi.com/getting_started/historical_data), probes above |
 
 ### Log (this session)
-- 2026-11-21 ~20:22Z: first claim (`694cc07`) pushed; draft PR #62 opened for visibility; takeover notices on #55/#56.
-- 2026-11-21 ~20:42Z: `git pull --rebase` hit a `COORDINATION.md` conflict (both sides appended). Stopped, aborted the
+- 2026-11-21 20:22Z: first claim (`694cc07`) pushed; draft PR #62 opened for visibility; takeover notices on #55/#56.
+- 2026-11-21 20:32Z: `git pull --rebase` hit a `COORDINATION.md` conflict (both sides appended). Stopped, aborted the
   rebase, merged `origin/main` instead and resolved by taking `main`'s file verbatim and re-appending only this section
   — no line of any other session was changed or dropped.
-- 2026-11-21 ~20:55Z: re-scoped as above.
+- 2026-11-21 20:36Z: re-scoped as above (`c13a897`). Earlier drafts of this log said ~20:42Z/~20:55Z; corrected to the commit timestamps.
+- 2026-11-21 20:41Z: T55 implemented (`c4957c7`): `scripts/collect_relay.py` (new), `.github/workflows/collect.yml`
+  (inline pass + watchdog → relay; concurrency `collect-${{ github.ref }}`; `fetch-depth: 0`; 350-min timeout),
+  `scripts/tests/test_collect_relay.py` (new, auto-run by `verify_release.py`). Verification, all offline:
+  45/45 checks; **13/13 mutations killed** (successor floor, off-main successor, failed relays chaining, queued-run
+  guard, second successor, push rate > Pages limit, desk-in-flight, desk spacing, budget overrun, case-sensitive
+  kill switch, non-per-ref concurrency, YAML-level dispatch, dropped validator); real git against a local bare
+  remote — fresh-head sync + stray-file cleanup, no-change pass, race with a non-conflicting desk push (rebased,
+  linear history), race with a conflicting push (pass dropped, remote untouched, no rebase state left, never
+  forced), clean recovery on the next pass; `python3 scripts/verify_release.py` **PASS**.
