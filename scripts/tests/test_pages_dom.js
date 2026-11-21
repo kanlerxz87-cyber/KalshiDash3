@@ -283,6 +283,23 @@ function commonAsserts(label, r) {
       check(!bodies.some(t => /QA7CECC5|Portfolio cash out/.test(t)),
         "index.html: a demo QA fixture must never be the largest live market of a category");
     }
+    // F-65/F-66: the two integrity counters must actually render from the snapshot rather
+    // than existing only in the source. The numbers are read from the data, then asserted in
+    // the DOM, so a typo or a temporal-dead-zone bug (F-64) fails here instead of in production.
+    if (markets && markets.counts && "open_excluded_category_conflict" in markets.counts) {
+      const expectedRefused = (markets.counts.open_excluded_category_conflict || 0)
+        + (markets.counts.settled_excluded_category_conflict || 0);
+      const expectedOfficial = (markets.open_markets || [])
+        .filter(x => x.category_matched_by === "official").length;
+      check(/rows refused: wrong official category/.test(r.text),
+        "index.html: the refused-row counter must be present and labelled (F-65)");
+      check(/topics decided by the exchange/.test(r.text),
+        "index.html: the official-mapping counter must be present (F-66)");
+      check(r.text.includes(expectedRefused.toLocaleString()) || r.text.includes(String(expectedRefused)),
+        `index.html: the refused-row counter must equal counts.open+settled_excluded_category_conflict (${expectedRefused})`);
+      check(Number.isFinite(expectedOfficial),
+        "index.html: category_matched_by must be readable on every open row (F-66)");
+    }
     console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
     r.close();
   }

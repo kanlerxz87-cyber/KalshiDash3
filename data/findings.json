@@ -819,6 +819,36 @@
     "https://kanlerxz87-cyber.github.io/KalshiDash3/",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html"
    ]
+  },
+  {
+   "id": "F-65",
+   "severity": "high",
+   "item": "Two of the five topics contained markets the exchange itself files under another category \u2014 including Culture's headline market",
+   "why": "Culture's largest open market on the deployed landing page was KXEPLFIRSTGOAL-26NOV21MCIFUL-FULOBOBB14, \"Oscar Bobb: First Goalscorer\". The collector's keyword fallback matched the word \"oscar\" inside the PLAYER'S NAME, so an EPL soccer prop was published as a Culture market; the official series record files it as categories [\"Sports\"], tags [\"Soccer\"] (https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLFIRSTGOAL). In the same snapshot KXDEMOFUTHOURLY (\"Demo hourly event contract futures\", official categories [\"Test\"], tags [\"Demo\"]) sat inside Crypto, and 8 of the 23 archived >= $0.10 swing alerts were that test instrument \u2014 i.e. the live alert chats were partly reporting a demo fixture as a market move.",
+   "action": "Every row now records series_categories, the official GET /series categories for its series, and the snapshot publishes a series_index ledger for every series it saw. A row whose known official categories cannot belong to its topic is dropped and COUNTED (counts.open_excluded_category_conflict / settled_\u2026, with the reason and the count per reason), never published. An absent categories field is treated as unknown and never drops a row. build_alerts.py withholds an archived alert from both chats when the ledger says its series is not in that topic; the archive itself is never rewritten (counts.withheld_category_conflict). On the 2026-11-21T20:34:40Z snapshot this refused 5 open and 45 settled rows (34 Test, 16 Sports-award) and withheld 12 archived Test-series swings, leaving 14 legitimate alerts.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLFIRSTGOAL",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLAST",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ]
+  },
+  {
+   "id": "F-66",
+   "severity": "medium",
+   "item": "Topic membership rested entirely on a fee-schedule ticker or a title keyword, which both mis-filed and under-filled the topics",
+   "why": "The two documented-looking paths were weak in opposite directions. Over-inclusive: the Ballon d'Or is in the official fee schedule and was treated as Culture, but the exchange files KXBALLONDOR as categories [\"Sports\"], tags [\"Soccer\"] (https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR) \u2014 a football award, not a culture market. Under-inclusive: Culture had almost no rows while Kalshi lists thousands of official Entertainment series (Emmys, SAG Awards, CMA Awards, BET Awards, Billboard, Rotten Tomatoes). The API documents the filter that answers this exactly \u2014 \"Return series whose categories list contains this value ... exact and case-sensitive\" \u2014 and this project had never used it.",
+   "action": "data/categories.json now declares official_categories/official_tags per topic and the collector builds a series -> topic map from GET /series?category=\u2026 / ?tags=\u2026. Verified live on 2026-11-21 and recorded with each call's URL and series count: Elections 2,710, Entertainment 2,631, Crypto 321, tags=Golf 134. Two filters were checked and REJECTED because they are too broad: ?category=Sports returns 4,243 series (it would put every other sport inside Golf) and ?tags=Oil & Gas returns WTI crude, heating oil and Pyth WTI futures rather than retail gasoline, so Gas has no official filter and says so. Two narrow per-topic series exclusions are cited to their official records (KXBALLONDOR, KXGOLFTENNISMAJORS). Every row also carries category_matched_by (official|seed|keyword) so a reader can see which path decided its topic.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Elections",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series?category=Entertainment",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series?tags=Golf",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
   }
  ]
 }
