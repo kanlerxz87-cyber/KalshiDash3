@@ -10,12 +10,14 @@ name: Collect Kalshi demo data
 #   20:17Z on 2026-11-21, and the old "freshness watchdog" step could never fire (it ran right
 #   after a commit, when the snapshot was ~0 minutes old). So the cadence no longer depends on the
 #   scheduler: on main, one run is a bounded RELAY — scripts/collect_relay.py repeats the pass
-#   (probe -> collect -> alerts -> catalysts -> simulation -> validators -> commit) every 15 minutes
-#   for at most 5.5 hours, then dispatches exactly one successor. Every bound (default branch only,
-#   >= 2 h of work before a successor, never while another run is queued, COLLECT_RELAY=off kill
-#   switch, <= 6 pushes/hour) is enforced in that script and pinned by
+#   (probe -> collect -> alerts -> catalysts -> simulation -> validators -> commit) on a fixed
+#   15-minute grid for at most 5.5 hours and queues exactly one successor right before its final
+#   pass (the concurrency group holds it until this run ends, even by timeout). Every bound (default
+#   branch only, >= 2 h of work before a successor, never while another run is queued,
+#   COLLECT_RELAY=off kill switch, <= 6 pushes/hour) is enforced in that script and pinned by
 #   scripts/tests/test_collect_relay.py. On any other branch a run is a single pass, as before.
 #   The per-pass validator list lives in scripts/collect_relay.py (VALIDATORS).
+#   Stop a running relay: set COLLECT_RELAY=off, then `gh run cancel <run id>`.
 on:
   workflow_dispatch:
     inputs:

@@ -15,19 +15,26 @@ Why this exists
 What one run does
   pass  = probe the demo REST root -> collect.py -> build_alerts.py -> catalysts.py -> simulate.py
           -> every validator in VALIDATORS -> commit data/live -> push (retried, never forced).
-  relay = on the default branch, repeat the pass every INTERVAL minutes until RELAY minutes have
-          elapsed, then dispatch exactly one successor run of collect.yml. Anywhere else: one pass.
+  relay = on the default branch, repeat the pass on a fixed grid (pass k starts at t0 + k*INTERVAL;
+          a pass that overruns skips the slots it missed instead of bursting to catch up) while
+          k*INTERVAL <= RELAY, and dispatch exactly one successor run of collect.yml right before the
+          final pass. The concurrency group holds that successor pending until this run ends, however
+          it ends (even a job timeout in the final pass), so the chain never depends on a schedule
+          event. Anywhere else: one pass.
 
 Bounds (each is enforced below and pinned by scripts/tests/test_collect_relay.py)
   1. A successor is dispatched only from the default branch, only after the loop ran for at least
      MIN_ELAPSED_FOR_SUCCESSOR minutes, only if at least one pass succeeded, at most once per run, and
      never while another collect.yml run for the branch is queued, pending, waiting or in progress.
+     It is evaluated right before the final pass and, only if not sent then, once after it.
      (The first watchdog in this repository dispatched unconditionally after ~1-minute runs and looped,
      F-63; a successor that can only follow >= 2 h of work cannot do that.)
   2. The workflow's concurrency group is per ref. GitHub runs at most one run per group and keeps at
      most one pending, a newer pending run replacing the older one
      (https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
   3. Repository variable COLLECT_RELAY=off turns the relay and both dispatches off without a code change.
+     It is read when a run starts. To stop a relay that is already running: set the variable, then cancel
+     the run (`gh run cancel <id>`); whatever run is pending behind it then makes one pass and stops.
   4. desk.yml (the only writer of data/live/roi.json) is dispatched only when roi.json is older than
      DESK_STALE_MIN, no desk.yml run is in flight for the branch, and this run has not dispatched one in
      the last DESK_STALE_MIN minutes. desk.yml dispatches nothing itself, so this cannot loop.
@@ -135,14 +142,26 @@ def make_plan(ref: str, relay_in=None, interval_in=None, commit_in=None, kill=No
     )
 
 
-def next_pass_start(t0: float, pass_started: float, plan: Plan):
-    """Epoch seconds at which the next pass should start, or None when the run should stop."""
+def is_final_slot(slot: int, plan: Plan) -> bool:
+    """True when no later slot fits the relay budget (always true for a single-pass run)."""
+    return plan.relay_minutes <= 0 or (slot + 1) * plan.interval_minutes > plan.relay_minutes
+
+
+def next_slot(t0: float, slot: int, now: float, plan: Plan):
+    """(k, start_epoch) of the next pass on the fixed grid t0 + k*interval, or None when the run should stop.
+
+    Slots are counted, not derived from the previous pass's start time: a real sleep() overshoots by a few
+    milliseconds, and chaining `previous start + interval` drifted the boundary pass out of the budget
+    (a 4-min/2-min dry run made 2 passes instead of 3; the branch run of 2026-11-21 20:42Z). k is always
+    > slot (a slot never runs twice, even if the wall clock reads early after a sleep) and is the first
+    slot after `now` (a pass that overran skips the slots it missed; it never bursts to catch up)."""
     if plan.relay_minutes <= 0:
         return None
-    nxt = pass_started + plan.interval_minutes * 60
-    if nxt - t0 > plan.relay_minutes * 60:
+    step = plan.interval_minutes * 60
+    k = max(slot + 1, int((now - t0) // step) + 1)
+    if k * plan.interval_minutes > plan.relay_minutes:
         return None
-    return nxt
+    return k, t0 + k * step
 
 
 def successor_decision(plan: Plan, elapsed_min: float, ok_passes: int, other_active: int,
@@ -196,7 +215,26 @@ def run_relay(plan: Plan, *, clock, sleep, do_pass, active_runs, dispatch, roi_a
     res = RelayResult()
     t0 = clock()
     last_desk = None
+    slot = 0
+    sent = False
+
+    def consider_successor(stage: str):
+        nonlocal sent
+        ok = sum(1 for _, o, _ in res.passes if o in OK_OUTCOMES)
+        go, why = successor_decision(plan, (clock() - t0) / 60.0, ok, active_runs("collect.yml"), sent)
+        if go:
+            sent = dispatch("collect.yml")
+            why = why if sent else "dispatch failed; the cron schedules remain the restart path"
+        res.successor = (sent, why)
+        log(f"successor ({stage}): {why}")
+
+    if not plan.successor_allowed:
+        res.successor = (False, "successor not allowed for this run (branch, dry run, single pass or COLLECT_RELAY=off)")
     while True:
+        if plan.successor_allowed and not sent and is_final_slot(slot, plan):
+            # Queue the successor before the final pass: it waits in the concurrency group and starts
+            # when this run ends, even if the final pass hangs until the job timeout.
+            consider_successor("before the final pass")
         started = clock()
         outcome, detail = do_pass(len(res.passes) + 1)
         res.passes.append((started, outcome, detail))
@@ -211,21 +249,18 @@ def run_relay(plan: Plan, *, clock, sleep, do_pass, active_runs, dispatch, roi_a
                 last_desk = now
                 res.desk_dispatches.append(now)
 
-        nxt = next_pass_start(t0, started, plan)
+        nxt = next_slot(t0, slot, clock(), plan)
         if nxt is None:
             break
-        wait = nxt - clock()
+        slot, start = nxt
+        wait = start - clock()
         if wait > 0:
             sleep(wait)
 
-    ok = sum(1 for _, o, _ in res.passes if o in OK_OUTCOMES)
-    go, why = successor_decision(plan, (clock() - t0) / 60.0, ok, active_runs("collect.yml"), False)
-    if go:
-        sent = dispatch("collect.yml")
-        res.successor = (sent, why if sent else "dispatch failed; the cron schedules remain the restart path")
-    else:
-        res.successor = (False, why)
-    log(f"successor: {res.successor[1]}")
+    if plan.successor_allowed and not sent:
+        # Not sent before the final pass (no pass had succeeded yet, the run ended early after an overrun,
+        # or the dispatch failed): one more evaluation now that every pass is done.
+        consider_successor("after the final pass")
     return res
 
 
@@ -238,10 +273,17 @@ def sh(args, timeout=600, check=False):
     return p
 
 
-def annotate(level: str, title: str, text: str = "", lines: int = 12):
-    print(f"::{level}::{title}")
-    for line in (text or "").strip().splitlines()[:lines]:
-        print(f"::{level}::{line.replace('%', '%25').replace(chr(13), '%0D')}")
+def _cmd_escape(value: str, prop: bool = False) -> str:
+    # Workflow-command escaping: %, CR and LF in the message; also ':' and ',' in a property value.
+    value = value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+    return value.replace(":", "%3A").replace(",", "%2C") if prop else value
+
+
+def annotate(level: str, title: str, text: str = "", tail: int = 15):
+    """One annotation per call (title + the tail of `text`). One command per line would spend the
+    per-step annotation allowance on a single failure and hide the ones after it."""
+    body = "\n".join((text or "").strip().splitlines()[-tail:])
+    print(f"::{level} title={_cmd_escape(title, prop=True)}::{_cmd_escape(body or title)}")
 
 
 def probe_api() -> tuple[bool, str]:
@@ -377,6 +419,20 @@ def write_summary(plan: Plan, res: RelayResult):
     if path:
         with open(path, "a", encoding="utf-8") as fh:
             fh.write(text + "\n")
+    counts: dict[str, int] = {}
+    for _, o, _ in res.passes:
+        counts[o] = counts.get(o, 0) + 1
+    annotate("notice",
+             f"relay on {plan.ref}: {len(res.passes)} pass(es) — "
+             + ", ".join(f"{v} {k}" for k, v in counts.items()),
+             "\n".join([
+                 "; ".join(f"{i} {datetime.fromtimestamp(t, timezone.utc).strftime('%H:%M:%SZ')} {o}"
+                           + (f" ({d})" if d and o != "validated" else "")
+                           for i, (t, o, d) in enumerate(res.passes, 1)),
+                 f"plan: relay {plan.relay_minutes} min, every {plan.interval_minutes} min, commit {plan.commit}",
+                 f"desk.yml dispatches: {len(res.desk_dispatches)}",
+                 f"successor: {res.successor[1]}",
+             ]))
 
 
 def main() -> int:

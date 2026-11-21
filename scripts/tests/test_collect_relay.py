@@ -35,31 +35,40 @@ def check(cond, msg):
 class FakeWorld:
     """A clock plus recorders for every side effect run_relay can cause."""
 
-    def __init__(self, outcomes=None, pass_seconds=70, active=None, roi_age=None):
+    def __init__(self, outcomes=None, pass_seconds=70, active=None, roi_age=None, overshoot=0.0,
+                 dispatch_ok=None):
         self.now = 1_800_000_000.0
         self.outcomes = outcomes            # callable(n) -> (outcome, detail)
-        self.pass_seconds = pass_seconds
+        self.pass_seconds = pass_seconds    # seconds, or callable(n) -> seconds
         self.active = active or {}          # workflow -> count of other active runs
         self.roi_age = roi_age              # callable(now) -> minutes | None
+        self.overshoot = overshoot          # added to every sleep: > 0 late wake-up, < 0 clock reads early
+        self.dispatch_ok = dispatch_ok      # callable(attempt) -> bool
         self.dispatched: list[tuple[float, str]] = []
-        self.slept = 0.0
+        self.attempts: list[tuple[float, str]] = []
+        self.pass_starts: list[float] = []
 
     def clock(self):
         return self.now
 
     def sleep(self, s):
         assert s >= 0
-        self.slept += s
-        self.now += s
+        self.now += max(0.0, s + self.overshoot)
 
     def do_pass(self, n):
-        self.now += self.pass_seconds
+        if len(self.pass_starts) >= 200:     # 330/10 + 1 = 34 is the most a relay may ever make
+            raise RuntimeError("runaway relay: more than 200 passes")
+        self.pass_starts.append(self.now)
+        self.now += self.pass_seconds(n) if callable(self.pass_seconds) else self.pass_seconds
         return self.outcomes(n) if self.outcomes else ("committed", f"sha{n}")
 
     def active_runs(self, wf):
         return self.active.get(wf, 0)
 
     def dispatch(self, wf):
+        self.attempts.append((self.now, wf))
+        if self.dispatch_ok and not self.dispatch_ok(len(self.attempts)):
+            return False
         self.dispatched.append((self.now, wf))
         return True
 
@@ -111,10 +120,57 @@ def main() -> int:
     check(len(res.passes) == 23, f"330 min / 15 min -> 23 passes (got {len(res.passes)})")
     check(gaps == {900}, f"passes start exactly 15 min apart (gaps {sorted(gaps)})")
     check(starts[-1] - starts[0] <= 330 * 60, "no pass starts after the relay budget")
-    succ = [x for x in w.dispatched if x[1] == "collect.yml"]
-    check(len(succ) == 1 and w.dispatched[-1][1] == "collect.yml", "exactly one successor, dispatched last")
+    succ = [t for t, wf in w.dispatched if wf == "collect.yml"]
+    check(len(succ) == 1 and starts[-2] < succ[0] <= starts[-1],
+          "exactly one successor, queued right before the final pass")
+    check(succ and succ[0] - starts[0] >= R.MIN_ELAPSED_FOR_SUCCESSOR * 60, "... and only after >= 120 min of looping")
     check(res.successor[0] is True, f"successor recorded ({res.successor[1]})")
     check(not any(wf == "desk.yml" for _, wf in w.dispatched), "fresh roi.json -> no desk dispatch")
+
+    print("real clocks (the 2026-11-21 20:42Z branch dry run made 2 passes where 3 were due)")
+    for label, over in (("sleep overshoots 5 ms", 0.005), ("sleep overshoots 3 s", 3.0),
+                        ("wall clock reads 5 ms early", -0.005)):
+        w = FakeWorld(overshoot=over)
+        res = w.run(p)
+        g = [b - a for a, b in zip(w.pass_starts, w.pass_starts[1:])]
+        check(len(res.passes) == 23 and min(g) > 890, f"{label}: still 23 passes, none repeated (min gap {min(g):.3f}s)")
+    w = FakeWorld(overshoot=-0.005, pass_seconds=0, outcomes=lambda n: ("failed", "API probe URLError"))
+    res = w.run(p)
+    g = [b - a for a, b in zip(w.pass_starts, w.pass_starts[1:])]
+    check(len(res.passes) == 23 and min(g) > 890,
+          f"instant failing passes + an early clock: no slot runs twice ({len(res.passes)} passes, min gap {min(g):.3f}s)")
+    w = FakeWorld(overshoot=0.005)
+    res = w.run(R.make_plan("arena/x-kalshidash3", relay_in="4", interval_in="2", commit_in="false"))
+    check(len(res.passes) == 3, f"4-min / 2-min dry run with a real-ish clock -> 3 passes (got {len(res.passes)})")
+
+    print("overruns")
+    w = FakeWorld(pass_seconds=lambda n: 40 * 60 if n == 3 else 70)
+    res = w.run(p)
+    g = [b - a for a, b in zip(w.pass_starts, w.pass_starts[1:])]
+    check(min(g) >= 900, f"a 40-min pass skips missed slots instead of bursting (min gap {min(g):.0f}s)")
+    check(len(res.passes) == 21, f"... and the two slots it covered are dropped (got {len(res.passes)} passes)")
+    check(all(round((t - w.pass_starts[0]) % 900) == 0 for t in w.pass_starts), "... and later passes stay on the grid")
+    w = FakeWorld(pass_seconds=lambda n: 60 * 60 if n == 23 else 70)
+    res = w.run(p)
+    succ = [t for t, wf in w.dispatched if wf == "collect.yml"]
+    check(len(succ) == 1 and succ[0] <= w.pass_starts[-1],
+          "a final pass that hangs into the job timeout still leaves one successor queued")
+
+    print("successor retries")
+    w = FakeWorld(outcomes=lambda n: ("committed", "x") if n == 23 else ("failed", "collect"))
+    res = w.run(p)
+    succ = [t for t, wf in w.dispatched if wf == "collect.yml"]
+    check(len(succ) == 1 and succ[0] > w.pass_starts[-1], "only the final pass succeeded -> one successor, after it")
+    w = FakeWorld(dispatch_ok=lambda attempt: attempt > 1)
+    res = w.run(p)
+    tries = [t for t, wf in w.attempts if wf == "collect.yml"]
+    sent = [t for t, wf in w.dispatched if wf == "collect.yml"]
+    check(len(tries) == 2 and len(sent) == 1 and res.successor[0],
+          "a failed dispatch before the final pass is retried exactly once, after it")
+    w = FakeWorld(dispatch_ok=lambda attempt: False)
+    res = w.run(p)
+    check(len([1 for _, wf in w.attempts if wf == "collect.yml"]) == 2 and not res.successor[0]
+          and "cron" in res.successor[1], "two failed dispatches -> give up; the crons stay the restart path")
 
     print("desk dispatch spacing")
     w = FakeWorld(roi_age=lambda now: 999.0)          # roi.json never gets fresher (desk keeps failing)
@@ -134,7 +190,7 @@ def main() -> int:
           "a relay where every pass failed does not chain (crons restart it)")
     w = FakeWorld(active={"collect.yml": 1})
     res = w.run(p)
-    check(not any(wf == "collect.yml" for _, wf in w.dispatched), "no successor while another collect run is queued")
+    check(not any(wf == "collect.yml" for _, wf in w.attempts), "no successor while another collect run is queued")
     short = R.make_plan("main", relay_in="60")
     w = FakeWorld()
     res = w.run(short)
@@ -147,7 +203,7 @@ def main() -> int:
     for label, plan in (("branch", b), ("branch relay", b2), ("kill switch", k), ("dry run", d)):
         w = FakeWorld(roi_age=lambda now: 999.0)
         res = w.run(plan)
-        check(w.dispatched == [], f"{label}: zero dispatches ({len(res.passes)} pass(es))")
+        check(w.attempts == [], f"{label}: zero dispatches ({len(res.passes)} pass(es))")
     w = FakeWorld()
     res = w.run(d)
     check(len(res.passes) == 4, f"dry run 6 min / 2 min -> 4 passes (got {len(res.passes)})")
@@ -174,6 +230,7 @@ def main() -> int:
     print("script invariants")
     src = (ROOT / "scripts" / "collect_relay.py").read_text()
     check(src.count('"workflow", "run"') == 1, "exactly one place can issue `gh workflow run` (gh_dispatch)")
+    check(src.count('dispatch("collect.yml")') == 1, "one code path dispatches a successor (consider_successor)")
     check(len(re.findall(r"\bgh_dispatch\(", src)) == 2, "gh_dispatch is only reachable through run_relay's guarded callback")
     check("--force" not in src and "push -f" not in src, "pushes are never forced")
     old = {"validate_live.py", "validate_alerts.py", "test_alerts.py", "test_collect_coverage.py",
