@@ -92,6 +92,10 @@
     Demo data is for building and testing, not for real trading decisions.
   </div>
 
+
+  <h2 id="resolved">How the live events resolved</h2>
+  <div id="resolutions"></div>
+
 </main>
 <footer><div class="wrap">
 KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock funds) ·
@@ -99,6 +103,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <a href="sources.html">every source</a> ·
 <a href="flagged.html">flagged for review</a>
 </div></footer>
+<script src="assets/chatdock.js" defer></script>
 <script src="assets/site.js"></script>
 <script>
 KD.nav("");
@@ -119,7 +124,8 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " stored settled rows (" + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " in scope)"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows in this snapshot"
+      + " (of " + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " settled in scope)"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); never used as a headline</p></div>`;
@@ -160,6 +166,39 @@ KD.nav("");
      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
      “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.
      A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`;
+
+  // ---- resolution tracker (brief: follow events until they resolve, YES or NO) ----
+  // Every row here is a settled market the collector stored, shown newest-first with
+  // the API's literal `result`. Rows whose result is not yes/no are NOT coerced:
+  // they are counted separately and the label says so.
+  const resRows = settled.slice()
+    .sort((a, b) => Date.parse(b.settlement_ts || b.close_time || 0) - Date.parse(a.settlement_ts || a.close_time || 0));
+  const yn = resRows.filter(r => r.result === "yes" || r.result === "no");
+  const other = resRows.length - yn.length;
+  const resHost = KD.$("#resolutions");
+  if (resHost) {
+    resHost.innerHTML =
+      `<p class="small mut">Showing the ${KD.num(resRows.length)} most recent settled rows stored in this snapshot,
+        newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
+        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
+        collector stores ${KD.num(resRows.length)} of them to keep the page fast
+        (<code>counts.settled_rows_trimmed_for_size</code>). Full list on
+        <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
+      KD.table(
+        [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
+         { key: "title", label: "Market" }, { key: "res", label: "Result" },
+         { key: "px", label: "Final price", num: true }, { key: "src", label: "Source" }],
+        yn.slice(0, 25).map(r => ({
+          t: `<span class="mono small">${KD.esc((r.settlement_ts || r.close_time || "").replace("T", " ").replace("Z", ""))}</span>`,
+          cat: KD.esc(KD.CAT_LABEL[r.category_id] || r.category_id || "—"),
+          title: `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 62))}</a>` +
+                 `<div class="small mut mono">${KD.esc(r.ticker)}</div>`,
+          res: KD.resultBadge(r.result),
+          px: KD.cents(r.last_price_dollars),
+          src: KD.srcLink(r.source, "API"),
+        }))
+      );
+  }
 })();
 </script>
 </body></html>

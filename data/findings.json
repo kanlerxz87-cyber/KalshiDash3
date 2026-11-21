@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T07:00:00Z",
+ "generated": "2026-11-21T07:05:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label).",
  "questions": [
   {
@@ -721,58 +721,88 @@
   },
   {
    "severity": "low",
-   "item": "Index card labels the stored settled-row cap as 'settled markets in scope', contradicting the banner on the same page",
-   "why": "index.html renders 'of ' + settled.length + ' settled markets in scope', where settled.length is the number of STORED rows (200 \u2014 the collector's per-category cap), while the snapshot's own counts.settled_in_scope shown in the banner on the same page was 1473 at the 19:30:14Z deploy and 1600 in the 19:48Z snapshot. The page therefore prints two different 'settled in scope' figures and mislabels the stored cap as the in-scope total. Every individual number is real; only the label is wrong. Found by session arena-2aac8000's deployed-site audit at ~19:50Z.",
-   "action": "Belongs to the index.html owner (integration): either label the denominator 'stored' or render counts.settled_in_scope. Not corrected in the same pass so the audit stays separate from the code it audits; does not block publication.",
+   "item": "Index printed the stored settled-row cap (200) as 'settled markets in scope', contradicting the banner on the same page",
+   "why": "index.html rendered 'of ' + settled.length + ' settled markets in scope', i.e. the number of STORED rows (collector keep-cap 200, collect.py:496 `rows['settled'][:200]`), while counts.settled_in_scope in the same snapshot was 1,600. Two different 'settled in scope' figures on one page. Found by arena-2aac8000's deployed-site audit at ~19:50Z on 2026-11-20; PR #40 recorded it as verified clean, but the code still shipped the defect \u2014 arena-17d4ecfa re-checked the deployed page on 2026-11-21 and found the same contradiction, so the earlier 'verified clean' note was wrong.",
+   "action": "FIXED 2026-11-21 by arena-17d4ecfa: the KPI now reads 'of N settled rows in this snapshot (of M settled in scope)', so a stored cap can never again be printed as an in-scope total. A resolution table was added to the same page (newest-first, literal API result, per-row API link); it also states the stored/in-scope relationship and points at counts.settled_rows_trimmed_for_size. Verified by rendering the page in jsdom against data/live/markets.json: KPI rendered 'of 200 settled rows in this snapshot (of 1,600 settled in scope)' and 25 resolution rows.",
    "sources": [
     "https://kanlerxz87-cyber.github.io/KalshiDash3/",
-    "https://docs.kalshi.com/api-reference/market/get-markets"
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_settlement"
    ],
-   "id": "F-37"
+   "id": "F-37",
+   "status": "fixed"
   },
   {
    "id": "F-38",
    "severity": "medium",
-   "item": "Landing page labelled the stored settled-row cap as 'settled markets in scope' (F-37 was raised but not fixed)",
-   "why": "index.html rendered 'of ' + settled.length + ' settled markets in scope', where settled.length is the number of rows the collector stores (capped at 200 for the settled table) while the same page's banner printed counts.settled_in_scope = 1,600 for the 2026-11-21T00:50:12Z snapshot. Two different totals appeared under the same words on one screen. F-37 had recorded this and left it for the integration owner; this session is that pass.",
-   "action": "Fixed. The card now reads 'of N settled markets stored; M were in scope when collected', rendering both numbers from the snapshot instead of labelling one as the other. Pinned by scripts/tests/test_scope.py.",
+   "item": "Culture's largest market is a $5 QA test market, not a culture event",
+   "why": "The landing page's largest-Culture row is KXGRAMMYNOMROTY-QA7CECC5-QA (\"Portfolio cash out QA 5\", rules_primary \"Demo portfolio test only.\", volume_fp 10.00, last_price_dollars 0.5000, dollars-traded estimate $5). It inherits Culture by keyword: its series KXGRAMMYNOMROTY is titled \"Grammy nominees for Record of the Year\" (categories Entertainment, tags Music/Awards/Grammys), so the word-boundary keyword \"grammy\" matches the series title even though the market's own title and rules contain no culture content. Every confirmed Culture seed market in the same snapshot (KXBALLONDOR, KXEMMY*) shows $0 traded, so the QA market tops the category. Verified live 2026-11-21 against GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA and GET /series/KXGRAMMYNOMROTY; snapshot values match the live record exactly. Only one QA/test market is in scope (searched rules_primary for \"test only\" and ticker/title for QA/portfolio-cash-out).",
+   "action": "Ranking rule left unchanged (no silent exclusion invented): the row stays labelled keyword, not confirmed, and disclosures were added on index.html and culture.html pointing here. Owner decision needed: exclude test/QA markets (rules_primary indicating test only) from the largest-per-category ranking, or keep them with the keyword label. Until then, do not treat a keyword top as a real event without reading its rules text. Decision recorded and implemented as F-61 (natural-gas futures excluded too).",
    "sources": [
-    "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=1000",
-    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
-   ]
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGRAMMYNOMROTY-QA7CECC5-QA",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXGRAMMYNOMROTY",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ],
+   "status": "open (owner decision needed)"
   },
   {
    "id": "F-39",
    "severity": "high",
-   "item": "Topic purity: natural-gas futures counted as Gas Prices, and a Kalshi demo QA fixture shown as the largest live Culture market",
-   "why": "Two independent scope errors, both verified against the official demo API on 2026-11-21. (a) The gas category's keyword fallback matched the word 'gas' in natural-gas futures: GET /series/KXNATGAS15M returns categories ['Commodities'], title 'Natural Gas 15-minute', product_metadata.scope 'Natural Gas', settlement source 'Pyth - NATGAS', whereas the confirmed seed series GET /series/KXAAAGASM returns categories ['Economics'], title 'US gas price', product_metadata.scope 'Gasoline', settlement source 'AAA'. 11 natural-gas markets therefore sat inside Gas Prices in the 2026-11-21T00:50:12Z snapshot. (b) GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA returns title 'Portfolio cash out QA 5' and rules_primary 'Demo portfolio test only.'; because its series ticker contains 'GRAMMY' it matched Culture by keyword, and at $5.00 estimated dollars it was the LARGEST open Culture market, so the landing page presented a test fixture as culture's biggest live event.",
-   "action": "Fixed in scripts/collect.py (the only writer of the snapshot): KXNATGAS15M is excluded from keyword classification with the official series record quoted in the source, and demo QA titles/rules are refused for every category. Seed series are never excluded, so the AAA series (KXAAAGASM) is unaffected and still classifies as confirmed; the daily AAA series (KXAAAGASD) still classifies by keyword. Exclusions are published as counts.open_excluded_off_topic_or_qa / counts.settled_excluded_off_topic_or_qa and counts.excluded_series_reasons so nothing is dropped silently. Defence in depth: assets/site.js refuses a QA row when picking a largest market, and the landing page now reports how many QA fixtures the snapshot contains. Rows already in the committed snapshot are dropped by the next scheduled collection, which is the only thing allowed to write that file.",
+   "item": "Collector validation re-judged a detection-time high_roi flag against a later snapshot (PR #38 value, renumbered)",
+   "why": "scripts/build_alerts.py decides high_roi from the snapshot it is reading and the archive is append-only, but the pre-fix validate_alerts.py re-derived the same screen from the CURRENT data/live/markets.json and failed the run when the two disagreed. volume_24h_fp moves every collection, so one archived alert crossing the '> 0' boundary was enough: collect.yml run 44803531445 (2026-11-20T19:35Z) failed with 'archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True' \u2014 the entry recorded volume_24h_fp 0.0, the market started trading afterwards. Because the workflow only commits a snapshot that validates, every later run would fail the same way. The committed files pass either way, which is why no local check showed it. Main's PR #39 fixed the core (verify against the row's own recorded inputs); PR #38's remaining value (HighRoiFreezeTests, decided_at docs, drift note) was never merged and its F-34 id collides with main's F-34 (a different item: swing size vs conviction), so this session ports that value renumbered as F-39.",
+   "action": "Ported by session arena-968ce6ec: data/alert_rules.json states the freeze semantics (decided_at) next to the rule, validate_alerts.py reports current-snapshot disagreement as a drift note instead of failing, and scripts/tests/test_alerts.py HighRoiFreezeTests pins all three behaviours (drift allowed + reported, contradicted flag rejected, inputs present on every entry). scripts/build_alerts.py deliberately not changed \u2014 its behaviour is the correct one. PR #38 to be closed as superseded by this port.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44803531445",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/alerts_archive.json",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/markets.json",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ],
+   "status": "done"
+  },
+  {
+   "id": "F-40",
+   "severity": "high",
+   "item": "The 20-minute collector cron is throttled by GitHub: 1 scheduled run in 5.75 h although ~17 were due",
+   "why": "Measured from the public GitHub REST run list this session, not inferred: collect.yml is configured `cron: \"*/20 * * * *\"`, yet between the 2026-11-21T00:49:31Z scheduled run and the manual dispatch at 06:35Z there were no further scheduled runs. desk.yml (`*/10`) showed the same pattern: 2 scheduled runs in the same window. Effect: the committed snapshot the pages render can legitimately be hours old, so a reader could mistake a stale price for a live one \u2014 the exact failure this project exists to avoid. (ID F-40: F-38/F-39 were taken on main by session arena-968ce6ec while this branch was open.)",
+   "action": "Mitigated on the site, not hidden: (1) every page's snapshot banner already marks a snapshot older than 45 min as a stale fallback; (2) the new chat dock prints the MEASURED cadence, read live from the public GitHub REST API, next to the snapshot age \u2014 'N of the last M runs were scheduled \u00b7 last two scheduled runs Xm apart'; (3) the browser poller keeps prices current without the collector. Root-cause fix (longer cron interval plus an external trigger) was NOT applied because the workflow files are shared with other sessions; recorded here for the integration owner.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml",
+    "https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule",
+    "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml/runs?per_page=20"
+   ],
+   "status": "mitigated"
+  },
+  {
+   "id": "F-61",
+   "severity": "high",
+   "item": "Owner decision recorded on F-38 was implemented: demo QA fixtures and natural-gas futures no longer enter a topic category",
+   "why": "F-38 left the Culture QA fixture ('Portfolio cash out QA 5', rules_primary 'Demo portfolio test only.') as an owner decision and kept it ranked. The same audit pass found a second, larger scope error: natural-gas futures were counted as Gas Prices. Verified against the official demo API on 2026-11-21: GET /series/KXNATGAS15M returns categories ['Commodities'], title 'Natural Gas 15-minute', product_metadata.scope 'Natural Gas', settlement source 'Pyth - NATGAS'; the confirmed seed GET /series/KXAAAGASM returns categories ['Economics'], title 'US gas price', scope 'Gasoline', settlement source 'AAA'. The keyword fallback matched 'gas' in both, so 11 natural-gas markets sat inside Gas Prices in the 2026-11-21T00:50:12Z snapshot.",
+   "action": "Implemented in scripts/collect.py, the only writer of the snapshot. Natural-gas futures are excluded from keyword classification (the official series record is quoted in the source) and demo QA titles/rules are refused for every category. Seed series can never be excluded, so AAA gas markets are unaffected. Exclusions are published, never silent: counts.open_excluded_off_topic_or_qa, counts.settled_excluded_off_topic_or_qa and counts.excluded_series_reasons. Defence in depth: assets/site.js refuses a QA row when picking a largest market, and the landing page reports how many QA fixtures the snapshot contains. Pinned by scripts/tests/test_scope.py, wired into the Pages build.",
    "sources": [
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGAS15M",
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGRAMMYNOMROTY-QA7CECC5-QA",
-    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90",
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   },
   {
-   "id": "F-40",
+   "id": "F-62",
    "severity": "medium",
-   "item": "The published snapshot was stale for most of the day: the collector's */20 cron delivered 2 scheduled runs in ~10 hours",
-   "why": "GitHub documents that the schedule event is best-effort: 'The schedule event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped.' Measured on this repository (gh run list --workflow=collect.yml, 2026-11-20/21): 23 runs, of which 21 were manual workflow_dispatch and only 2 arrived from the schedule (2026-11-20T19:14Z and 2026-11-21T00:49Z). desk.yml, on a */10 cron, similarly produced 2 scheduled runs out of 16. The effects compound: pushes made with the repository's GITHUB_TOKEN do not start workflows, so each committed snapshot never triggered the Pages deploy workflow either. The site was correct about being stale (its banner appears after 45 minutes) but a dashboard labelled 'live' was showing hours-old prices.",
-   "action": "Partially fixed and honestly documented. collect.yml now uses two off-peak crons (7,27,47 and 13,43 \u2014 minutes deliberately away from the top of the hour, per the same doc) instead of a single */20. The stale banner now says how old the snapshot is and links the reason, instead of implying no collector exists. See F-41 for what the first attempt at an automated freshness fallback got wrong, and for the bounded version that replaced it.",
+   "item": "Settled-row label (F-37) verified again: stored cap and in-scope total must both be shown, not one labelled as the other",
+   "why": "index.html printed the stored settled-row cap as 'settled markets in scope' while the banner printed counts.settled_in_scope (200 vs 1,600 for the 2026-11-21T00:50:12Z snapshot). A sibling session fixed the wording on main at the same time as this one; both versions show both numbers.",
+   "action": "Kept main's wording ('of N stored settled rows (M in scope)') and relaxed this session's regression test to pin the contract (both numbers present and distinct) rather than one session's phrasing. No duplicate fix was pushed.",
    "sources": [
-    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule",
-    "https://docs.github.com/en/actions/concepts/security/github_token",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml"
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   },
   {
-   "id": "F-41",
+   "id": "F-63",
    "severity": "high",
-   "item": "Self-inflicted defect: the first freshness fallback dispatched collections back-to-back (a runaway loop), caught and fixed within minutes",
-   "why": "To work around GitHub's best-effort schedule, the first version of the last step in collect.yml queued the next collection unconditionally using workflow_dispatch (documented to always create a run when called with GITHUB_TOKEN). Because the dispatched run also ran that step, it chained with no delay. Measured from the Actions API after dispatching it once on branch arena/cf49f42a-kalshidash3 on 2026-11-21: runs 44876177777 (06:34:21Z) -> 44876253177 (06:35:20Z) -> 44876330331 (06:36:17Z) -> 44876426619 (06:37:36Z) -> 44876553969 (06:39:14Z), i.e. a new collection and commit every 1-2 minutes. Nothing false was published and every run was green, but it is not a cadence, it consumes shared Actions capacity, and unchecked it would have run indefinitely.",
-   "action": "Contained, then replaced. The workflow was disabled on the default branch (gh api PUT .../disable, state now disabled_manually) and the in-flight run was cancelled, which stopped the chain; verified by watching the run list stay unchanged. The step is now a bounded watchdog: it reads data/live/markets.json, and dispatches at most one run only if the committed snapshot is older than 35 minutes AND no collect run is queued or in progress AND fewer than 3 dispatches have happened in the last hour; otherwise it exits without dispatching. The guard logic was exercised locally against three constructed states (stale/0-in-flight/0-recent -> dispatch; one in flight -> no; hourly cap reached -> no), and every branch logs its decision. It is still not a clock: the cron schedules remain the primary trigger. Re-enabling on the default branch is a deliberate step recorded on the coordination board.",
+   "item": "Self-inflicted defect: the first freshness fallback dispatched collections back-to-back (runaway loop), caught and bounded within minutes",
+   "why": "Mitigating F-40, the first version of the last step in collect.yml queued the next collection unconditionally with workflow_dispatch (documented to always create a run when called with GITHUB_TOKEN). The dispatched run ran the same step, so it chained with no delay. Measured from the Actions API after one manual dispatch on branch arena/cf49f42a-kalshidash3: runs 44876177777 (06:34:21Z) -> 44876253177 (06:35:20Z) -> 44876330331 (06:36:17Z) -> 44876426619 (06:37:36Z) -> 44876553969 (06:39:14Z) \u2014 a collection and commit every 1-2 minutes. Every run was green and nothing false was published, but it is not a cadence and it consumes shared capacity.",
+   "action": "Contained, then replaced. The workflow was disabled on the default branch (state disabled_manually) and the in-flight run cancelled; the run list then stayed flat, verified over several minutes. The step is now a bounded watchdog: it reads data/live/markets.json and dispatches at most one run only if the snapshot is older than 35 minutes AND nothing is queued or in flight AND fewer than 3 dispatches happened in the last hour; every branch logs its decision. Guards exercised locally in three constructed states, and a live run afterwards did not chain. Recorded on the coordination board; re-enabling on main after merge is an explicit follow-up.",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml",
     "https://docs.github.com/en/actions/concepts/security/github_token",
