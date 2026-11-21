@@ -1388,9 +1388,15 @@ Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:17Z before editing a
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T40 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
-| T41 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
-| T42 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
+| T44 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
+| T45 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
+| T46 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
 
 ### Log (this session)
 - 2026-11-21 20:17Z: claimed T40–T42 on `arena/dba435ee-kalshidash3` (base `f09f982` == main). Snapshot `collected_at 2026-11-21T15:21:23Z` is ~5h old (stale banner at 45 min); desk scan `2026-11-21T17:57Z` is ~2.3h old. Starting verification.
+- 2026-11-21 20:24Z: **Task-ID collision detected and resolved.** `arena-83749e18` claimed T40–T43 at 20:20Z
+  (`80c22c8`, branch `arena/83749e18-kalshidash3`) after my 20:17Z claim of T40–T42. Renumbered my tasks to T44–T46.
+  Their file scope (`scripts/collect.py`, `scripts/roi_scan.py`, `scripts/roi_model.py`, `dashboard.html`,
+  `assets/engine.js`, `assets/site.js`, `index.html`, `roi.html`, `scripts/tests/*`) does **not** overlap my scope
+  (`COORDINATION.md`, `data/verified_facts.json`, `data/findings.json`, `README.md`), so both can proceed. I will not
+  edit their files; anything I find in them is logged as a request in this file instead.
