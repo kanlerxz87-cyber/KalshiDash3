@@ -20,7 +20,7 @@ left blank and listed on the *Flagged for Review* page.
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, optional in-browser live polling |
+| `dashboard.html` | Price chart (X = time, Y = contract price): official 1/60/1440-minute candles for minutes/hours/days, accumulated observations for seconds; liquidity ladder, resolution tracker, optional in-browser live polling |
 | `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
@@ -41,13 +41,17 @@ data/categories.json  the five topics and their confirmed seed series
 data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py)
-scripts/collect.py    credential-free demo data collector
+scripts/collect.py    credential-free demo data collector (topic-fair resolution history,
+                      alert-aware price-history retention, official-candle backfill)
+scripts/watchdog.py   bounded freshness decision (stale-only, no overlap, hourly cap)
 scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
 scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
 scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
+scripts/tests/test_settled_selection.py  topic-fair settlement allocation + retention contract
+scripts/tests/test_watchdog.py  the freshness limits (fresh must never dispatch)
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
