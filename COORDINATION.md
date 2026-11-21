@@ -1066,6 +1066,81 @@ commit newer than main at claim time, so nothing below overlaps an open claim.
 
 - 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
 
+
+## Session `arena-a3070ffa` — graph fidelity, alert-catalyst linkage, universe completeness
+
+Branch `arena/a3070ffa-kalshidash3`, branched from `ebce5e7`. Claim written and pushed **before** any code change,
+per the board rule. Existing sessions' sections are untouched; their scopes stay theirs.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T30 | Chart fidelity: the dashboard graph plotted an **empty series** for any market the collector's `watch` set pruned, and never used the official candlestick endpoint even though `assets/engine.js` exposes it. Fix the prune + add official `1/60/1440`-minute candles to the graph, keeping the honest note about the interval limit | in progress | arena-a3070ffa | `scripts/collect.py`, `dashboard.html`, `assets/site.css` | `fetch_page` of the official candlestick doc for the interval enum; `validate_live.py`, `check_site.py`, `test_pages_dom.js` | 3 of 7 archived alert tickers have 0 observations in `price_history.json` |
+| T31 | Alerts ↔ chart catalyst linkage: a graph marker for each ≥$0.10 swing that shows the market's own source text/links, never an invented cause | unclaimed → this session | arena-a3070ffa | `dashboard.html`, `assets/site.css` | official `GET /markets` schema (no news field: cause must come from the market's own `rules_*`) | catalyst attribution is proximity, not causation (F-15) |
+| T32 | Universe completeness: `GET /markets` is capped at `SAFETY_SCAN_CAP` and newest-first, so the in-scope universe is a window, not the whole exchange. Use the **documented** `mve_filter=exclude` to remove the combo flood from the scan and stop the bias | in progress | arena-a3070ffa | `scripts/collect.py`, `scripts/roi_scan.py`, published `counts` | doc: `mve_filter` enum `only/exclude` on `GET /markets`; live probe of the demo host returns pages with it | F-35 pattern recurs if the cap is what limits the ranking |
+| T33 | Publish + integrate: full suite, PR to `main`, merge, confirm Pages deploy, `collect.yml` run, record PR + result here | pending | arena-a3070ffa | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py` + node tests + live URL fetch after deploy | — |
+
+### Log (this session)
+
+- 2026-11-21 ~06:30 UTC: session start. Read `COORDINATION.md` (861 lines) and the deployed site. Baseline re-run
+  on `ebce5e7`: `validate_live`, `validate_alerts`, `validate_roi`, `validate_catalysts`, `test_alerts`,
+  `test_simulate`, `test_fees`, `test_roi_parity`, `test_roi_scan_offline`, `check_site` (21 pages) all pass;
+  `gh run list` shows `collect.yml`, `desk.yml` and Pages green on `main`. So this session starts from a working
+  site and only fixes defects it can demonstrate.
+- 2026-11-21 ~06:35 UTC: **defect demonstrated (T30).** `scripts/collect.py` prunes `data/live/price_history.json`
+  to the tickers kept in the capped `open_markets` window. Proof on the committed data: of the 7 distinct tickers
+  in `data/live/alerts_archive.json`, the 3 `KXDEMOFUTHOURLY-*` markets have **0** observations left, so the
+  dashboard's graph for those swings renders "No observations in this window yet" — the exact series an alert
+  points at. The official candlestick endpoint (already wrapped by `assets/engine.js` `candles()` and used by
+  `live.html`) would still serve them.
+- 2026-11-21 ~06:40 UTC: **documented source adopted (T32).** `GET /markets` supports
+  `series_ticker` and `mve_filter ∈ {only, exclude}`
+  (https://docs.kalshi.com/api-reference/market/get-markets), and the same page states responses are cached and
+  "can lag the exchange by several seconds". Measured on the demo host this session:
+  `GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor, so the filter is live.
+
+### Results (this session)
+
+| ID | Result | Files changed | Verified by |
+|----|--------|---------------|-------------|
+| T30 | **done** — the collector pruned price history to the ranked open window, so 3 of the 7 tickers cited in `alerts_archive.json` had **0** observations and the dashboard chart was empty for exactly the alerted series. History now keeps `open rows ∪ archived-alert tickers`. The chart also rebuilds a row from the published alert record for `dashboard.html#TICKER` deep links outside the window, and the alerts chat links to it. | `scripts/collect.py`, `dashboard.html`, `assets/alerts.js` | `scripts/tests/test_collect_coverage.py`; `test_pages_dom.js` mode G |
+| T30b | **done** — the page never requested a single official candle. It now fetches `GET /series/{s}/markets/{t}/candlesticks` for the selected window (1-min / 1-hour / new 1-day), falls back to `GET /historical/markets/{t}/candlesticks`, reads both field shapes, and skips a candle with no price block instead of plotting `Number("")===0`. | `dashboard.html` | `test_pages_dom.js` mode F (mutation-checked: removing the `""` guard fails it) |
+| T31 | **done** — archived ≥ $0.10 swings are drawn as dashed markers on the chart; the swing list is the union of observations and the archive. Cause links remain the fetched-lead layer built by `scripts/catalysts.py`; no cause is invented. | `dashboard.html` | `test_pages_dom.js` modes D/E unchanged and still green (no causal wording) |
+| T32 | **done** — `scan_markets()` now sends the documented `mve_filter=exclude` (the filter `scripts/roi_scan.py` already used). Combo listings were consuming the newest-first 25,000-row paging budget, which is why the collector published 749 open-in-scope while the desk scan published 1,365 for the same exchange. | `scripts/collect.py` | `test_collect_coverage.py` (asserts the parameter on every scan request) |
+| T33 | **done** — see the PR record below. | `COORDINATION.md`, `README.md` | full suite + live URL fetch |
+
+**Defects found and published as irregularities** (all on `flagged.html`, all with official source links):
+
+- **F-37 resolved (independently by another session, whose simpler label this branch keeps and regression-tests).** The index KPI read "of 200 settled markets in scope" — the stored-row cap — while the banner on the same page printed `counts.settled_in_scope` (1,600). Fixed and regression-tested (`test_pages_dom.js` mode H, mutation-checked).
+- **F-40** history pruned for alerted markets (the T30 defect).
+- **F-41** the chart ignored the candlestick endpoint.
+- **F-42** the collector's capped universe disagreed with the desk scan's.
+- **F-43** observation-only detection cannot see a move inside the collector gap. Demonstrated on `KXPGATOUR-THRC26-MPEN`: its official 1440-minute candle for `end_period_ts 1795237200` opens 0.0070 and closes 0.0880 (an 8.1¢ intraday move) while both surrounding observations read 0.00 — so no alert exists. Proposed as **G19** rather than switched on unilaterally.
+- **F-44** a voided (never-filled) paper position kept `unrealized_net -1.0` and `bid_now 0.0` from before it was voided; cleared at void time and normalised every run, committed `simulation.json` regenerated, two mutation-checked tests.
+
+**Verification performed this session.** Baseline re-run on `ebce5e7` before any edit (all validators green, collectors and Pages green).
+Live figures re-checked against the official API through the platform fetch path, since sandbox `curl` to the Kalshi host fails:
+`GET /markets/KXPGATOUR-THRC26-MPEN` → `last_price_dollars 0.0880`, `volume_fp 434504.17`, `open_interest_fp 419786.51`;
+the snapshot row is `last 0.088`, `volume 431,703.35`, `open_interest 419786.51`, `dollars_traded_estimate 37989.89 = volume × last` exactly.
+`GET /series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=1440` returns 5 daily candles (quoted in F-43);
+`GET /series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV21H07-UP/candlesticks?period_interval=1` returns 1-minute candles with real volume;
+`GET /historical/cutoff` → `market_settled_ts 2026-09-21T00:00:00Z`, which is why recent markets stay on the live endpoint;
+`GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor (the filter is live on the demo host).
+Static claims re-read from `docs.kalshi.com` this session: `period_interval ∈ {1, 60, 1440}` on both the live and historical candlestick endpoints; `mve_filter ∈ {only, exclude}` plus `series_ticker` on `GET /markets`; the doc's own warning that listing responses are cached and "can lag the exchange by several seconds"; unauthenticated requests have separate limits and clients must back off on 429.
+
+**Coordination notes for this rebase.** While this session worked, main advanced through PRs #42–#51. Two overlaps were
+resolved without discarding anyone's work:
+(a) **F-37** was already fixed on main with a simpler label ("200 stored settled rows (1,600 in scope)"). This branch
+keeps that fix rather than re-implementing it, and adds mode H of `test_pages_dom.js` so the label cannot silently
+regress to a single misleading number.
+(b) **Finding IDs.** Other sessions had published their own **F-38** and **F-39** before this branch landed, so this
+session's drafted F-38…F-42 were renumbered **F-40, F-41, F-42, F-43, F-44** at the final rebase. Each renumbered entry
+carries the old ID in its `why` field, so the trail is not lost. No other session's identifier was changed.
+(c) The `pages.yml` merge keeps main's `verify_release.py` gate. The new `test_collect_coverage.py` is picked up by that
+gate automatically (it globs `scripts/tests/test_*.py`), so no duplicate step was added.
+
+**Nothing was inferred.** Every new number on the site comes from a committed file or an API response quoted in the finding. Where a value did not exist (a candle with no price, a market with no history, a demo balance with no credentials) it is left blank and labelled, not filled.
 > **ID note (parallel sessions):** `main` adopted F-38/F-39/F-40 and T26-T33 for other records while this session
 > was open (F-38 there is the same Culture QA fixture, left as an owner decision; this session implemented the
 > decision). This session's records were renumbered on rebase to F-61/F-62/F-63 and T34-T37 exactly once, and the
