@@ -859,3 +859,29 @@ does not touch their scopes.
   (`20:01:03Z`, 10,342 order books fetched with the repeated-param form, 0 picks on the strict screen).
   Full suite re-run green on that fresh data: validate_live/alerts/roi, test_alerts/simulate/fees/roi_parity/
   roi_scan_offline, check_site (21 pages). Open PR #38 left to its author with the coordination comment.
+
+## Session `arena-6cd4eabb` — audit + defect repair (branch `arena/6cd4eabb-kalshidash3`)
+
+Base commit `ebce5e7415501e7576482e91ec598b3a0a535952`. Read the board first (no other claim was active;
+PR #38 from `arena/d243bfa7` is still open but its scope — `validate_alerts.py` high_roi re-derivation — was
+superseded by #39, see T24).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T25 | **Defect**: the two swing chats flag price *disagreements* as price *moves*. `build_alerts.py` pairs consecutive `last_price_dollars` observations with no continuity bound, so a market whose `last` flips (0.99 → 0.02) between two collector runs produces a "$0.97 crash" alert even when the official record shows `updated_time` never advanced and the official tape shows steady 2¢ prints. Fix: carry `previous_price_dollars` + `updated_time` into every observation, classify a consecutive-observation difference as a **restatement** when the exchange's own `updated_time` did not advance, and route restatements out of the ≥$0.10 feed into a separately labelled section. | in progress | arena-6cd4eabb | `scripts/collect.py` (observation fields only), `scripts/build_alerts.py`, `data/live/price_history.json` + `data/live/alerts*.json` (regenerated), `scripts/tests/test_alerts.py`, `scripts/tests/validate_alerts.py` (consistency only) | evidence below, re-derivable from the official API and the committed history | F-38, F-39 |
+| T26 | **Gap**: the alert system is not tick-level. `collect.yml` runs every 20 min and `price_history.json` keeps ~14 observations, so a "$0.10 swing" chat can neither see a swing inside a 20-minute gap nor show a swing that happened and reversed. Fix: add the **official trade tape** (`GET /markets/trades`, `ticker`/`min_ts`/`max_ts`, documented 1000-row pages) as a second, executed-print alert stream in the browser live layer, so a ≥$0.10 move between two consecutive *trades* is detected in near real time, with the absolute trade timestamp and the API query as its source. | in progress | arena-6cd4eabb | `assets/live.js`, `assets/engine.js`, `alerts.html`/`live.html`/`dashboard.html` (render only) | official endpoint docs + a live page of the tape fetched this session | F-40 |
+| T27 | Integration close-out: full suite, PR → main → merge, dispatch `collect.yml`/`desk.yml`, confirm Pages build, record PR link + merge result here | pending | arena-6cd4eabb | `COORDINATION.md`, `README.md`, `data/findings.json` | `scripts/tests/*`, `scripts/check_site.py`, `node --check`, live Pages fetch | — |
+
+### Evidence for T25/T26 (collected this session, each item re-fetchable)
+
+- `GET /markets/KXBTCY-27JAN0100-B87500` → `last_price_dollars "0.0200"`, `previous_price_dollars "0.0200"`,
+  `updated_time "2026-04-28T02:27:21.580016Z"`, `yes_bid_size_fp "1015997.66"`.
+- `GET /markets/trades?ticker=KXBTCY-27JAN0100-B87500&limit=20` → 20 prints, **all** at
+  `yes_price_dollars "0.0200"`, from `2026-11-21T06:26:17Z` to `06:28:12Z`. No 99¢ print exists.
+- The committed archive still carries `KXBTCY-27JAN0100-B87500 0.99 → 0.02 (Δ −0.97)` and `0.04 → 0.99 (Δ +0.95)`,
+  and `data/live/price_history.json` shows the source: `19:48:19Z last=0.99` sandwiched between `19:30:14Z last=0.04`
+  and `20:01:29Z last=0.02`, while the exchange's own `updated_time` for that market is April.
+- **Counter-example that must not be suppressed**: `KXAAAGASM-26DEC31-3.30`. The committed history shows
+  `20:01:29Z last=0.71` → `2026-11-21T00:50:12Z last=0.29`, a real −$0.42. The official tape confirms it was a
+  genuine repricing (NO lifted at 0.70 on `2026-11-21T02:42:40Z`, `02:48:03Z`, `02:53:20Z`). A restatement filter
+  must keep this alert; a "de-duplicate identical printed moves" rule would have wrongly deleted the first one.
