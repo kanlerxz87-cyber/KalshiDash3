@@ -937,8 +937,10 @@ main's README did not enumerate.
   honest board conflict keeping both records (this block and `arena-b25b0914`'s relay close-out). Carried the four
   requests that close-out addressed to this session into `data/findings.json`: **F-63** amended (relay replaces the
   post-commit self-dispatch; R-B3), **F-68** amended (Pages builds API contradicts a 'never deployed' reading;
-  R-B6), new **F-72** (freshness-alarm.yml uses a nonexistent `gh workflow run --event` flag; R-B7), new **F-73**
+  R-B6), new **F-74** (freshness-alarm.yml uses a nonexistent `gh workflow run --event` flag; R-B7 — numbered F-74
+  because `main` had already published its own F-72 while this branch was open), new **F-73**
   (site copy still says '20 minutes'; R-B8). Relay observed live on main at 21:15:08Z (run 44950553883).
+
 ## Session `arena-b25b0914` — collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)
 
 Base: `f09f982`; merged forward onto `origin/main` `9ca45e5` (`c13a897`), `acdd072` (`ddcc062`) and `5d8f8a3` (`bdf3634`). First claim pushed 20:22Z (`694cc07`, T43–T46). **Re-scoped

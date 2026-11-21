@@ -56,7 +56,6 @@ scripts/tests/test_settled_selection.py  topic-fair settlement allocation + rete
 scripts/tests/test_watchdog.py  the freshness limits (fresh must never dispatch)
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
-scripts/tests/test_settled_selection.py  offline: the published settled window is topic-fair (round-robin), newest-first, and older slow-topic settlements survive
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
