@@ -496,6 +496,27 @@
    "how": "Read this session. Because no number is published, the chat dock polls slowly (12 s) and pauses while the tab is hidden rather than claiming a safe rate."
   },
   {
+   "id": "F-61",
+   "claim": "Candlestick request size and timestamp units",
+   "value": "At most 5,000 periods per request (else 400 bad_request with details); start_ts/end_ts in SECONDS, millisecond values rejected with 400",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
+   "id": "F-62",
+   "claim": "Candlesticks for markets settled before the historical cutoff",
+   "value": "Only available via GET /historical/markets/{ticker}/candlesticks",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
+   "id": "F-63",
+   "claim": "Candlestick data freshness",
+   "value": "The most recent candlesticks can be a few seconds behind the latest trades and quotes",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
    "id": "F-70",
    "claim": "Markets that settled before GET /historical/cutoff's market_settled_ts are only reachable through GET /historical/markets",
    "value": "market_settled_ts partitions markets and their candlesticks; \"Settled markets and their candlesticks older than the cutoff will not appear\" in GET /markets",
@@ -528,8 +549,8 @@
   }
  ],
  "counts": {
-  "total": 69,
-  "verified": 68,
+  "total": 72,
+  "verified": 71,
   "unverified": 1
  }
 }
