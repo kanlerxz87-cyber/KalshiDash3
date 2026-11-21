@@ -314,11 +314,14 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- freshness / cron health (T32) -------------------- */
+  /* -------------------- freshness / relay health (T32, cadence fixed F-73) -------------------- */
   // The collector's cron is unreliable (measured 2026-11-21: `*/20` fired once in 5.75 hours; F-40).
-  // Instead of hiding that, measure it: read the last N runs of collect.yml from
-  // the public GitHub REST API (CORS `*` verified on 2026-11-21) and say how
-  // often the schedule actually fired. No token, no secret, no writes.
+  // Since PR #62 the cadence on main is a bounded relay on a fixed 15-minute grid
+  // (scripts/collect_relay.py INTERVAL_DEFAULT_MIN=15; collect.yml header), with the two
+  // declared crons (7,27,47 + 13,43) as the restart path only. Instead of hiding that,
+  // measure it: read the last N runs of collect.yml from the public GitHub REST API
+  // (CORS `*` verified on 2026-11-21) and say how often the schedule actually fired.
+  // No token, no secret, no writes.
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -345,8 +348,8 @@ const KDCHAT = (() => {
         scheduleGapMinutes: gap,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
-        cronExpression: "*/20 * * * *",
-        expectedMinutes: 20,
+        cronExpression: "15-min grid (cron restart: 7,27,47 + 13,43)",
+        expectedMinutes: 15,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
       };
     } catch (e) {
@@ -370,7 +373,7 @@ const KDCHAT = (() => {
         const late = gap !== null && gap > h.expectedMinutes * 2;
         host.innerHTML =
           `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector cron <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
+          `collector relay <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
           `${h.scheduled} of the last ${h.runs} runs were scheduled` +
           (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
           (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
