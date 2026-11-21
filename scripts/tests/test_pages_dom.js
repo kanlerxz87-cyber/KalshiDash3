@@ -459,6 +459,21 @@ function commonAsserts(label, r) {
     check(r.text.includes(archivedTicker), "the deep-linked market's own ticker must be shown");
     console.log(`  G deep link     ok  (#${archivedTicker} from the alert archive opens a chart)`);
     r.close();
+
+    // Archive-only ticker NOT in markets.json must still resolve via rowFromAlert() without being overwritten.
+    const snapTickers = new Set([...(markets.open_markets || []), ...(markets.settled_markets || [])].map(m => m.ticker));
+    const archiveOnly = publishedFeed.all_events.find(e => !snapTickers.has(e.ticker));
+    if (archiveOnly) {
+      const r2 = await loadPage("dashboard.html", "snapshot", { hash: archiveOnly.ticker });
+      commonAsserts("dashboard.html archive-only deep link", r2);
+      const chartMeta = (r2.doc.querySelector("#chartMeta") || {}).textContent || "";
+      check(chartMeta.includes(archiveOnly.ticker),
+        `#${archiveOnly.ticker} (archive-only, absent from markets.json) must stay selected in #chartMeta (got: ${chartMeta.slice(0, 120)})`);
+      check(/from alert archive/.test(chartMeta),
+        `#${archiveOnly.ticker} must display the "from alert archive" badge in #chartMeta`);
+      console.log(`  G2 archive-only ok  (#${archiveOnly.ticker} absent from markets.json still opens via rowFromAlert)`);
+      r2.close();
+    }
   }
 
   /* --- H. index.html: the settled KPI must state both numbers, labelled ---
@@ -525,6 +540,7 @@ function commonAsserts(label, r) {
       check(afterCount === beforeCount + 1,
         `dashboard.html Seconds window must plot numeric-timestamp live poll ticks (before=${beforeCount}, after=${afterCount}, foot=${secFoot.slice(0, 120)})`);
       console.log(`  I obs+live fix  ok  (${sampleTicker} plots yes_bid, yes_ask, and numeric live poll ticks: ${beforeCount} -> ${afterCount})`);
+      await new Promise(res => setTimeout(res, 30));
       r.close();
     }
   }
@@ -585,6 +601,34 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- K. suggestions.html: handles missing status (G19) and multi-word status (G9) --- */
+  {
+    const r = await loadPage("suggestions.html", "snapshot");
+    commonAsserts("suggestions.html", r);
+    const implRows = r.doc.querySelectorAll("#impl tbody tr");
+    const propRows = r.doc.querySelectorAll("#prop tbody tr");
+    check(implRows.length > 0, `suggestions.html must populate #impl (got ${implRows.length})`);
+    check(propRows.length > 0, `suggestions.html must populate #prop (got ${propRows.length})`);
+    const implText = (r.doc.querySelector("#impl") || {}).textContent || "";
+    const propText = (r.doc.querySelector("#prop") || {}).textContent || "";
+    check(implText.includes("G9"), "suggestions.html must classify G9 (implemented ...) under #impl");
+    check(propText.includes("G19"), "suggestions.html must render G19 safely under #prop");
+    check(!r.text.includes("`data/findings.json`"), "suggestions.html must not contain raw markdown backticks");
+    console.log(`  K suggestions   ok  (${implRows.length} implemented, ${propRows.length} proposed)`);
+    r.close();
+  }
+
+  /* --- L. Full-site render sweep across all remaining HTML pages --- */
+  {
+    const remaining = fs.readdirSync(ROOT).filter(f => f.endsWith(".html") &&
+      !["live.html", "roi.html", "alerts.html", "dashboard.html", "index.html", "suggestions.html"].includes(f)).sort();
+    for (const page of remaining) {
+      const r = await loadPage(page, "snapshot");
+      commonAsserts(page, r);
+      r.close();
+    }
+    console.log(`  L all pages     ok  (${remaining.length} additional pages rendered with 0 errors and 0 NaN/undefined leaks)`);
+  }
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);

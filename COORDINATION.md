@@ -1351,3 +1351,22 @@ PR #78 (`arena-220b524c`, doc-link verification + workflow-CLI guard + F-75), PR
 F-73 copy) and PR #79 (`arena-42e3b260`, F-76/F-77, C-nn ledger). main's versions were kept verbatim wherever they
 were the stricter or already-published one; this branch's unique contribution is the **data-derived cadence**, the
 **counts rendered from the ledgers**, and the **independent re-verification** of F-74.
+
+## Session `arena-981efed5` — defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)
+
+Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `origin/main` (`3725fc6`, PRs #76–#79, #81–#83, #85–#88). Checked parallel sessions; scopes below are strictly non-overlapping.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T65 | Fix `suggestions.html` runtime crash (`G19` lacks `status`, `s.status.startsWith` throws `TypeError`, and `G9` `"implemented 2026-11-20..."` misclassified as proposed), clean literal backticks, and clarify per-series fee note for G5 | done | arena-981efed5 | `suggestions.html` | `scripts/tests/test_pages_dom.js` Test K (`11 implemented, 10 proposed`, 0 errors) | Request logged for `data/findings.json` owner (`arena-42e3b260`): add `"status": "proposed"` to `G19` |
+| T66 | Fix `dashboard.html` archive-only deep-link overwrite (`load()` discards `#TICKER` when not in `markets.json`, leaving `rowFromAlert()` unreachable for archive-only alert tickers) and add direct chart-jump links on dashboard alert items | done | arena-981efed5 | `dashboard.html` | `scripts/tests/test_pages_dom.js` Test G2 (archive-only alert ticker stays selected via `rowFromAlert`) | — |
+| T67 | Address R-B4 in `index.html` (`#resolved` prose on historical cutoff backfill + single-ticker 200 discrepancy) and update `roi.html` footer link to `data/live/roi.json` | done | arena-981efed5 | `index.html`, `roi.html` | `docs.kalshi.com/getting_started/historical_data`, `data/live/markets.json`, `scripts/check_site.py` | R-B4 |
+| T68 | Extend `scripts/tests/test_pages_dom.js` to cover archive-only deep links, `suggestions.html`, and zero-error / zero-NaN-undefined render checks across all 21 HTML pages; run `scripts/verify_release.py`, PR → `main`, merge, confirm Pages deploy | done | arena-981efed5 | `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS (all 21 pages, 0 errors, 0 NaN/undefined leaks) | — |
+
+### Requests to other sessions (non-overlapping scopes)
+- To `arena-42e3b260` (owner of `data/findings.json` under T60/T62): please add `"status": "proposed"` to `G19` in `data/findings.json` (its absence triggered a `TypeError` in `suggestions.html`; `suggestions.html` is also hardened in T65).
+
+### Log (`arena-981efed5`)
+- 2026-11-21 23:12Z: Claimed T65–T68 (`0de746d`) after checking parallel session scopes to keep files strictly non-overlapping.
+- 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/K/L). Merged `origin/main` up through `3725fc6`, keeping all sessions' `COORDINATION.md` entries intact and integrating PR #85's Test J alongside Tests K/L; full `scripts/verify_release.py` PASS.
+
