@@ -969,12 +969,13 @@
    "severity": "medium",
    "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
    "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops. ID namespace (resolved 2026-11-21): this page's F-nn now always means a flagged irregularity; the verification ledger was renumbered to C-nn, so the old collision between verified_facts F-70..F-73 and these entries is gone.",
-   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
+   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped. arena-c09bf8f4 independently re-verified the defect and the fix: read cli/cli trunk pkg/cmd/workflow/run/run.go through the GitHub API (only --ref, --field/-F, --raw-field/-f and --json are registered), reproduced 'unknown flag: --event' with the installed gh 2.23.0 and with a stub gh on PATH, and confirmed that no `--event` remains anywhere under .github/. Its own parallel edit of the same line was discarded in favour of PR #76's stricter version - nothing was lost, and the four-way overlap is recorded on the board.",
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
-   ]
+   ],
+   "status": "fixed 2026-11-21 (PR #76; repo-wide guard PR #78; independently re-verified by arena-c09bf8f4)"
   },
   {
    "id": "F-75",
@@ -1013,39 +1014,66 @@
    ]
   },
   {
+   "id": "D-01",
+   "severity": "low",
+   "item": "Counts printed in prose had drifted from the ledgers they describe, and README duplicated a line",
+   "why": "Measured 2026-11-21 by arena-c09bf8f4: data/findings.json listed 53 flagged entries and 20 suggestions while executive-summary.html said '50 irregularities' and 'Eighteen suggestions' and README.md said '50 irregularities'. The published page (fetched from the live URL the same day) still carried that text. README.md also listed scripts/tests/test_watchdog.py twice with different descriptions. No market number was affected - these count this repository's own records - but a page that misstates its own ledger weakens the rest of the verification. Filed under a D-nn id rather than F-nn because four sessions were minting F-nn numbers concurrently on 2026-11-21 (F-73/F-74 were each fixed by three or four branches) and the count-drift item had already been renumbered twice.",
+   "action": "Fixed two ways, and both are live: main's PR #79 renders the claims/blank/irregularity counts from data/verified_facts.json + data/findings.json into #verifiedCounts, and this branch makes executive-summary.html render the suggestion and question counts too, with every span carrying data-count so a missing fetch keeps static text rather than a wrong number (verified with a Node DOM stub: 20 suggestions, 9 questions, 56 irregularities, 72 claims, 1 blank - matching the ledgers). README now states what each page renders instead of a frozen number, and the duplicate watchdog line is gone.",
+   "status": "fixed 2026-11-21 (arena-c09bf8f4)",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/findings.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/verified_facts.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/executive-summary.html"
+   ]
+  },
+  {
+   "id": "F-78",
+   "severity": "medium",
+   "item": "Two different, silently divergent definitions of the 'model' exist in the shipped JavaScript; the one that never runs carries a docstring claiming it is the published one",
+   "why": [
+    "`assets/engine.js` defines the scorer that actually produces every 'model picks' bubble and the `model N.NN` chip: `MODEL.weights = { liquidity: 0.30, band: 0.25, momentum: 0.30, spread: 0.15 }`, `MODEL.threshold = 0.55`, integer score 0-1, with `modeled_roi_if_yes_at_ask`. `assets/alerts.js` defines a second, unrelated scorer: `weights = { magnitude: 0.35, relative: 0.25, liquidity: 0.20, volume: 0.20 }`, `threshold_score: 55`, score 0-100, and a different component set (no price band, no spread). Only `assets/alerts.js` also carries the comment 'Weights and components are published verbatim on alerts.html and strategies.html' — but the page publishes engine.js's weights, and `assets/alerts.js` is loaded only by portfolio.html, which uses just `loadJSON`, `replayStrategies` and `indexLiquidity` from it. `KDA.scoreAlert` and its `MODEL` are therefore dead code on every page. Verified by instrumenting alerts.html in jsdom: `KDL.MODEL.weights` is the 0.30/0.25/0.30/0.15 object, 60 of 60 alerts are scored by the engine, 39 pass 0.55, and the rendered 'model picks' count reads 39; no page references `KDA.scoreAlert`."
+   ],
+   "action": "NOT fixed in this branch — deleting or merging exports from `assets/alerts.js` is a functional change to a file another session owns and to a page (portfolio.html) that does load it, so it needs an owner who can re-run the replay tests. Recommended correction, in order of preference: (1) delete `MODEL` and `scoreAlert` from `assets/alerts.js` and have portfolio.html keep using the engine's, so exactly one scorer exists; or (2) if the second scorer is wanted, rename it (`REPLAY_MODEL`) and document that it is not the chat ranking. Interim advice to a reader: the numbers on `alerts.html` and `strategies.html` are the engine's and are the correct ones. Flagged rather than silently edited because the brief requires unverified or risky changes to be surfaced, not guessed at.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/alerts.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/alerts.html"
+   ]
+  },
+  {
    "severity": "medium",
    "item": "Most >= $0.10 swings in the demo environment are not moves anyone could have traded: on the 2026-11-21T23:01:10Z snapshot, 21 of the 25 swings of >= 50c traded fewer than 200 contracts in the interval (quantitative companion to F-77)",
-   "why": "Measured from data/live/price_history.json alone, by differencing the documented cumulative volume_fp (Kalshi: \"String representation of the market volume in contracts\", https://docs.kalshi.com/api-reference/market/get-markets) across the two observations that bound each archived swing. Before the T66 fix, 43 of the 48 served swings had both bounding observations present and 5 were archive-only; of the 25 whose price moved >= 50c, 21 had fewer than 200 contracts traded between the reads and 4 of those had fewer than 20. Concrete example, entirely from committed data: KXAAAGASM-26DEC31-3.30 printed 0.29 -> 0.71 (a 42c move) between 2026-11-21T22:46:10Z and 23:01:10Z while volume_fp rose 409.50 -> 410.86, i.e. 1.36 contracts. The same market earlier printed 0.29 -> 0.71 with volume_fp unchanged at 385.82 across 2026-11-20T13:50:26Z -> 15:19:53Z: one contract printed the whole 42c round trip in both directions. This is the demo environment's liquidity, not a bug in the API — but a dashboard that shows such a print as \"the price moved 42c\" invites a trader to act on a quote nobody traded. [Renumbered from F-75 at merge: main published its own F-75..F-77 in PR #79 while this branch was open, including F-77 ('Demo BTC year-end range markets oscillate between about 2c and 99c'). This entry is the same phenomenon measured across the whole archive and expressed as contracts traded per swing, so it is kept as the quantitative companion to F-77 rather than a second narrative.]",
+   "why": "Measured from data/live/price_history.json alone, by differencing the documented cumulative volume_fp (Kalshi: \"String representation of the market volume in contracts\", https://docs.kalshi.com/api-reference/market/get-markets) across the two observations that bound each archived swing. Before the T66 fix, 43 of the 48 served swings had both bounding observations present and 5 were archive-only; of the 25 whose price moved >= 50c, 21 had fewer than 200 contracts traded between the reads and 4 of those had fewer than 20. Concrete example, entirely from committed data: KXAAAGASM-26DEC31-3.30 printed 0.29 -> 0.71 (a 42c move) between 2026-11-21T22:46:10Z and 23:01:10Z while volume_fp rose 409.50 -> 410.86, i.e. 1.36 contracts. The same market earlier printed 0.29 -> 0.71 with volume_fp unchanged at 385.82 across 2026-11-20T13:50:26Z -> 15:19:53Z: one contract printed the whole 42c round trip in both directions. This is the demo environment's liquidity, not a bug in the API — but a dashboard that shows such a print as \"the price moved 42c\" invites a trader to act on a quote nobody traded. [Renumbered from F-75, then from F-78: main published its own F-75..F-77 in PR #79 while this branch was open, including F-77 ('Demo BTC year-end range markets oscillate between about 2c and 99c'). This entry is the same phenomenon measured across the whole archive and expressed as contracts traded per swing, so it is kept as the quantitative companion to F-77 rather than a second narrative.] [Renumbered again to F-79: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
    "action": "Published, not hidden: every alert now carries evidence.state and the exact contract count (scripts/alert_evidence.py, T66), both chats and the dashboard show a traded / thin / no trades chip per row, the \"traded only\" filter can hide the thin ones while stating how many it hid, and counts.evidence publishes the ratio for the whole feed. The floor (100 contracts) is a project rule and is labelled as such everywhere; Kalshi publishes no significance field.",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
     "https://docs.kalshi.com/getting_started/demo_env",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
    ],
-   "id": "F-78"
+   "id": "F-79"
   },
   {
    "severity": "medium",
    "item": "The alert rule could not distinguish a traded move from a quoted one, because no per-alert evidence was published (fixed in T66; the evidence layer is new and still has no settled-outcome check)",
-   "why": "The >= $0.10 rule compares consecutive observations of last_price_dollars. Kalshi defines that field as \"Price for the last traded YES contract on this market in dollars\", so two reads can differ while nothing at all traded in between (a thin book, a late reference, or demo-side behaviour). Until T66 the alert row carried only prices and times, so a reader had no way to tell which kind of event they were looking at, and the high-ROI screen scores momentum from the swing size alone. F-34 raised the symptom for one gas market; this entry records the measured scale across the whole archive and the missing field. [Renumbered from F-76. Cross-reference: main's F-77 describes the oscillation this field makes measurable.]",
+   "why": "The >= $0.10 rule compares consecutive observations of last_price_dollars. Kalshi defines that field as \"Price for the last traded YES contract on this market in dollars\", so two reads can differ while nothing at all traded in between (a thin book, a late reference, or demo-side behaviour). Until T66 the alert row carried only prices and times, so a reader had no way to tell which kind of event they were looking at, and the high-ROI screen scores momentum from the swing size alone. F-34 raised the symptom for one gas market; this entry records the measured scale across the whole archive and the missing field. [Renumbered from F-76. Cross-reference: main's F-77 describes the oscillation this field makes measurable.] [Renumbered again to F-80: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
    "action": "Fixed in T66: scripts/alert_evidence.py classifies every swing from the documented fields only, scripts/build_alerts.py freezes the classification at first detection (like high_roi) so the feeds stay reproducible, and scripts/tests/validate_alerts.py recomputes the contract count independently and refuses a contradictory state. Still open: the evidence is descriptive, not predictive — no settled-outcome test has been run to show that a 'traded' swing is more likely to resolve in the direction of the move than a 'quote-only' one. That test needs a larger settled sample and is left on the board (T65 note in COORDINATION.md).",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
     "https://docs.kalshi.com/getting_started/market_lifecycle"
    ],
-   "id": "F-79"
+   "id": "F-80"
   },
   {
    "severity": "low",
    "item": "Candlestick volume_fp is a per-period count, not the cumulative volume GET /markets reports, so differencing across a candle-backfill observation would invent a contract count",
-   "why": "scripts/collect.py backfills a market's missing price history from official 1-minute candlesticks (period_interval=1) and marks those points \"source\": \"candle\". The candlestick schema documents volume_fp as \"String representation of the number of contracts bought on the market during the candlestick period\", while GET /markets documents it as \"String representation of the market volume in contracts\" — a cumulative total. The two are different quantities. Measured on the committed snapshot: 7 of 484 series in data/live/price_history.json are candle-sourced (93 observations), and 13 of the 60 archived swings are bounded by at least one candle point. Differencing there produced arithmetic such as a negative contract count on KXAAAGASD-26NOV21-3.6600 (volume_fp 10.00 -> 4.00 across 2026-11-20T13:47Z -> 14:37Z, i.e. two candles 50 minutes apart whose per-minute counts are not comparable). Caught while implementing T66 and fixed before publishing. [Renumbered from F-77. A separate defect from main's F-77 (demo oscillation); the collision is noted so the two are not conflated.]",
+   "why": "scripts/collect.py backfills a market's missing price history from official 1-minute candlesticks (period_interval=1) and marks those points \"source\": \"candle\". The candlestick schema documents volume_fp as \"String representation of the number of contracts bought on the market during the candlestick period\", while GET /markets documents it as \"String representation of the market volume in contracts\" — a cumulative total. The two are different quantities. Measured on the committed snapshot: 7 of 484 series in data/live/price_history.json are candle-sourced (93 observations), and 13 of the 60 archived swings are bounded by at least one candle point. Differencing there produced arithmetic such as a negative contract count on KXAAAGASD-26NOV21-3.6600 (volume_fp 10.00 -> 4.00 across 2026-11-20T13:47Z -> 14:37Z, i.e. two candles 50 minutes apart whose per-minute counts are not comparable). Caught while implementing T66 and fixed before publishing. [Renumbered from F-77. A separate defect from main's F-77 (demo oscillation); the collision is noted so the two are not conflated.] [Renumbered again to F-81: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
    "action": "Fixed: a sixth evidence state, candle_unquantified, is emitted whenever either bounding observation is not a REST read, with a null contract count and the observation sources named on the row. The validator rejects any other label for such a pair. Provenance re-derivation now skips candle-backed pairs explicitly and prints how many it skipped, instead of silently failing or silently accepting them.",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
     "https://docs.kalshi.com/api-reference/market/get-markets",
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD/markets/KXAAAGASD-26NOV21-3.6600/candlesticks?start_ts=1795182000&end_ts=1795185000&period_interval=1"
    ],
-   "id": "F-80"
+   "id": "F-81"
   }
  ]
 }

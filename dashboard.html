@@ -182,7 +182,7 @@ function renderAlerts() {
     .slice(0, 100);
   // T66. "no trades" is the case a trader must not mistake for a market move: the reported last
   // price changed and the documented cumulative volume field did not. Labels are short and the
-  // tooltip states the exact meaning; the full method is on alerts.html and F-78/F-79.
+  // tooltip states the exact meaning; the full method is on alerts.html and F-79/F-80.
   const EVIDENCE_LABEL = {
     traded_ge_floor: ["traded", "ok", "Contracts traded in the interval at or above this project's floor"],
     traded_below_floor: ["thin", "warn", "Contracts traded in the interval, below this project's floor"],
@@ -223,7 +223,7 @@ function renderAlerts() {
     ? ` Of the ${all.length} swings served: ${ev.traded_ge_floor || 0} traded at or above the ${ev.floor_contracts} -contract floor, `
       + `${ev.traded_below_floor || 0} traded below it, ${ev.quote_only || 0} had ZERO contracts traded in the interval, `
       + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase), ${ev.candle_unquantified || 0} are bounded by a candle-backfill read (candlestick volume is per period) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
-      + `The floor is a project rule, not a Kalshi field (F-78).`
+      + `The floor is a project rule, not a Kalshi field (F-79).`
     : "";
   KD.$("#alertFreshness").textContent = (feedGen
     ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record. Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`

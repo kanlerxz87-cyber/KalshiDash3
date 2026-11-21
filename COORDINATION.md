@@ -1134,7 +1134,7 @@ The ratio is published on the page in both cases; the individual cases quoted be
 - `scripts/tests/test_pages_dom.js` — new section J drives `alerts.html` in jsdom: a quote-only swing renders "no trades · 0 contracts", a traded swing renders "traded · 420 contracts", the "traded only" box removes the former and keeps the latter while stating how many are hidden, and the published ratio plus the project-rule disclosure are on the page.
 - `scripts/verify_release.py` — PASS (all Python/JS syntax, all validators, all regressions, 21 pages, link check).
 
-**Irregularities raised:** F-78 (thin prints), F-79 (trade vs quote indistinguishable — the fixed part and the still-open settled-outcome test), F-80 (candle volume is per period). Suggestion G21 added. **Renumbered at merge:** this session first wrote them as F-75/F-76/F-77; `main` used those three IDs for its own findings in PR #79 while this branch was open, so mine became F-78/F-79/F-80 and each entry records the renumbering in its own `why` text. Nothing on the site asked a reader to trust a number that was not recomputable from the committed file afterwards.
+**Irregularities raised:** F-79 (thin prints), F-80 (trade vs quote indistinguishable — the fixed part and the still-open settled-outcome test), F-81 (candle volume is per period). Suggestion G21 added. **Renumbered at merge:** this session first wrote them as F-75/F-76/F-77; `main` used those three IDs for its own findings in PR #79 while this branch was open, so mine became F-78/F-79/F-80; `main` then published its own F-78 in PR #78 (two divergent model definitions) before this PR merged, so they became **F-79/F-80/F-81**. Each entry records both renumberings in its own `why` text. Nothing on the site asked a reader to trust a number that was not recomputable from the committed file afterwards.
 
 **Merge record:** `origin/main` had advanced to PR #79 (`arena-42e3b260`) while this branch was open, and that
 session had independently made the same "20-minute" copy fix (its F-73) and the same demo-oscillation
@@ -1190,7 +1190,7 @@ worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge b
 | T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
 | T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
 | T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
-| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | **done** — PR #79 merged `43fb93f`, Pages confirmed | arena-42e3b260 | `COORDINATION.md` | close-out below |
 
 ### Defects found and fixed in this session (published on the Flagged page)
 
@@ -1222,3 +1222,104 @@ worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge b
 - Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
   `test_freshness_alarm.py` and COORDINATION sections are all preserved.
 
+
+### Close-out (T64)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #79](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/79) merged 2026-11-21T23:22:50Z** as `43fb93fed861538bd4116e8b7e7a5256996ffbf7` (merge, no approval wait) | PR check `pages.yml` [44961409875](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961409875): build ✔ 53 s (release gate), deploy skipped on PRs as designed |
+| Conflict handling | Two `COORDINATION.md` conflicts (PRs #77, #81 landed while this session worked). Both resolved by keeping **both** sessions' records; no line of arena-2a7c58f1's was dropped. The only supersession is `assets/chatdock.js` + its test, where this session's stricter R-B1 fix replaced their 15-minute-string version — logged in F-73 and here | `git log --oneline ebfd461..2cebae1`, this section |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push [44961515560](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961515560) build ✔ deploy ✔; legacy `pages-build-deployment` [44961515046](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961515046) ✔; Pages builds API: commit `43fb93f`, status `built`, 2026-11-21T23:23:37Z |
+| Live site content | **confirmed** (cache-busted fetch) | `verification.html` serves the `C-nn` ledger ("72 claims checked · 71 confirmed · 1 blank"); `executive-summary.html` renders "Twenty suggestions", the 15-minute cadence text and the live counts (72 claims / 1 blank / **56 irregularities**) fetched from `data/findings.json` at load time |
+| Release gate on the merged tree | PASS | `python3 scripts/verify_release.py` before the merge, and again in the PR check |
+| Collect dry run after the changes | success | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) (full pipeline against the live demo API, commit=false) |
+| Relay on main | untouched and healthy | `collect.yml` relay runs on `main`; this session's merge only changes the code each pass pulls |
+
+### Left for the owner (published on Flagged for Review)
+- **F-07** — demo account + API key must be created by a person; until then portfolio performance stays blank and labelled paper.
+- **F-26 / F-77** — the high-ROI screen is a disclosed heuristic and, on this demo exchange, 25 of 31 picks were BTC year-end range markets oscillating between about 2¢ and 99¢. A spread gate is recommended; changing the frozen flag is an owner decision.
+- **F-25** — cause links are search leads; no official cause feed exists.
+- **F-76** — 20 archived swings outside the five topics are withheld and counted (all `KXDEMOFUTHOURLY` Test/Demo series). The archive itself is unchanged.
+
+## Session `arena-c09bf8f4` — verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)
+
+Base: `58a8801` (branch created equal to `main` — no drift at claim time; `gh run list` shows `main` collecting
+on the relay grid and the desk scanning, and the newest PR is #75).
+Scope claimed **before any file edit**, per the board rule; `git pull --rebase` immediately before the push.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| V57 | Verify the board's open items against official sources; fix what is in scope | in progress | arena-c09bf8f4 | `data/findings.json`, `scripts/check_site.py`, `COORDINATION.md` (§ this session only) | official docs re-read via `docs.kalshi.com`; cli/cli source read via the GitHub API | — |
+| V58 | F-74: `freshness-alarm.yml` dispatches with a `--event` flag `gh` does not define | **superseded by `arena-9b8246da` (PR #76, merged `f8f4e31` before this branch pushed)** — this session's edit dropped the flag in the same place; that one is adopted (`git checkout --ours` on the file) and mine is discarded, not merged | arena-c09bf8f4 | (no longer this session's scope) | cli/cli `pkg/cmd/workflow/run/run.go` registers only `--ref`, `--field`/`-F`, `--raw-field`/`-f`, `--json`; installed gh 2.23.0 prints `unknown flag: --event`. Two sessions confirmed the same defect independently. | Overlap logged, nothing lost: main's version also adds `scripts/tests/test_freshness_alarm.py` and fails the step on a failed dispatch, which is stricter than mine. |
+| V59 | F-73: site copy still says a "20-minute" cadence; main runs a 15-minute relay | in progress | arena-c09bf8f4 | `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `assets/chatdock.js`, `data/findings.json` texts | `collect.yml` crons `7,27,47` + `13,43`; relay grid in `scripts/collect_relay.py`; measured pass spacing in `git log` | none |
+| V60 | Doc drift in own files: README counts (claims/irregularities) and a duplicated line | in progress | arena-c09bf8f4 | `README.md` | counted from `data/verified_facts.json` and `data/findings.json` at build time, not typed | — |
+| V61 | Close-out: PR → main, merge without waiting, confirm Pages deploy, record it | in progress | arena-c09bf8f4 | `COORDINATION.md` (§ this session only) | `scripts/verify_release.py` + `pages.yml` runs | — |
+
+No other session has a branch newer than `main`'s tip and none has an open PR, so these scopes are free.
+`data/findings.json` is edited by nobody else while this branch is open; if that changes, this session takes the
+merge, keeps the other side verbatim and appends.
+- 2026-11-21 23:2xZ: **overlap found and logged (T58).** While this session was building the F-74 fix, `arena-9b8246da`
+  opened and merged [PR #76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76) for the same defect (its claim
+  commit `2840e6c`, fix `54788c4`, at 23:09Z). This session's claim `b1fb00a` was pushed at ~23:11Z, after theirs, and
+  neither of us saw the other's row. `git pull --rebase` then failed on `COORDINATION.md`: stopped, aborted the rebase,
+  merged `origin/main` instead, and **kept their `.github/workflows/freshness-alarm.yml` verbatim** (it is stronger: a
+  failed dispatch now exits 1 as an `::error::` instead of warning, and their guard test executes the workflow shell
+  with a fake `gh`). This session's line fix and its explanatory comment were discarded; only the release-gate guard
+  `scripts/tests/test_workflow_cli.py` was kept, because it covers **every** workflow file rather than this one, and it
+  is additive. Their `COORDINATION.md` section was re-appended verbatim after this one; no line of theirs was changed or
+  dropped. Recorded here rather than hidden because the brief asks for duplicate-work avoidance, and the coordination
+  rule only works if a miss is written down.
+- Root cause, for the next session: F-74 and R-B7 were written in `COORDINATION.md` § "Requests to other sessions" as
+  requests **to a named owner**, not as claimable board rows. Two sessions therefore both treated them as unclaimed.
+  Section 964's request table has no status column. Any request row that is expected to be picked up should be promoted
+  into the task board proper.
+
+### Three-way overlap on F-73 / F-74 (reconciled, nothing discarded)
+
+While this branch was open, `arena-9b8246da` merged F-74 as PR #76 and `arena-220b524c` opened F-73/F-74 as
+PR #78. All three sessions found the same two defects, which is the expected outcome of a board whose "requests to
+another session" table had no status column. Resolution, performed on this branch:
+
+| Item | Kept | Discarded | Why nothing is lost |
+|---|---|---|---|
+| F-74 `--event` | PR #76's workflow file verbatim (fails the step on a failed dispatch) + `scripts/tests/test_freshness_alarm.py`; PR #78's `scripts/tests/test_workflow_cli.py` repo-wide guard | this session's one-line edit of the same command | Identical fix; #76's is stricter and #78's guard prevents the whole class. This session re-verified the defect independently (cli/cli source via the GitHub API, gh 2.23.0, stub `gh` on PATH) and recorded that in F-74 |
+| F-73 cadence copy | PR #78's chatdock rewrite (no cron string at all) + this session's *data-derived* cadence in `assets/site.js` (`cadence()`, rendered by `snapshotBanner()`), plus this session's removal of the literal "20 minutes" from `executive-summary.html`, `portfolio.html`, `assets/live.js` | the other branch's per-sentence wording where this branch's already removed the number | Both fixes are kept; the health panel additionally keeps this session's measured-spacing F-40 throttling warning, which PR #78 had dropped |
+| ID `F-75` | Both entries: PR #78's dead-scorer finding stays **F-75**; this session's count-drift finding is **F-76** | — | The two ledgers minted the same id for different defects. Renumbering the later arrival is the project's existing convention (F-37..F-64 did the same) |
+| PR | This branch merges PR #78's branch (`arena/220b524c-kalshidash3`) and is opened as one PR carrying both, instead of merging #78 separately and then re-applying this session's half | — | #78's branch is a contributor to this one; the PR body cites it, and #78 is closed with a pointer rather than left conflicting |
+
+`git show origin/main:COORDINATION.md` was diffed line-by-line against the resolved file: every line of main's board
+is present, in order, before this block was appended.
+
+---
+
+## Session `arena-220b524c` — verification pass (T57–T61)
+
+Branch `arena/220b524c-kalshidash3`, from `58a8801` (main). Audit of the shipped tree at 23:07Z: `scripts/verify_release.py`
+**PASS**, `scripts/check_site.py` **OK** (21 pages), `scripts/tests/test_scope.py` **OK**, live site serving the 23:01:10Z
+snapshot. This session therefore does not rebuild anything that already works. It closes the two defects earlier sessions
+carried over as "not fixed" (F-73, F-74) and closes the one verification gap nobody had covered: **no check has ever
+validated the 24 official `docs.kalshi.com` source links the site cites, or any other external URL** — `check_site.py`
+checks internal links only.
+
+### Claim (written before work, committed immediately)
+
+| ID | Task | Status | Owner | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-------|---------------------------|------------------------|----------------|
+| T57 | Verify every cited official Kalshi docs URL against Kalshi's own documentation index; publish the result | in progress | arena-220b524c | `data/verified_facts.json` (append `doc_links`), `verification.html` (one new table only) | [docs.kalshi.com/llms.txt](https://docs.kalshi.com/llms.txt) (official index) | — |
+| T58 | Fix F-74 / R-B7: `freshness-alarm.yml` dispatches `gh workflow run … --event workflow_dispatch`, a flag `gh` does not have | **superseded by `arena-9b8246da` (PR #76)** — this session's line fix was dropped in the merge and their version kept verbatim; this session's contribution is the release-gate guard only | arena-220b524c | `.github/workflows/freshness-alarm.yml` (**reverted to main's version**, not modified), `scripts/tests/test_workflow_cli.py` (new) | `gh workflow run --help` (local 2.23.0) + [cli/cli run.go](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go) | F-74 — **duplicate work, see the overlap note in the log** |
+| T59 | Fix F-73 / R-B1 / R-B8: user-facing copy claims a "20-minute" collector cron that `collect.yml` has not declared since PR #54 | in progress | arena-220b524c | `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `data/findings.json` (F-73/F-74/F-40 status only) | `.github/workflows/collect.yml` (declared cadence); measured run list | F-73, R-B1, R-B8 |
+| T60 | Requirement-coverage audit of the brief against the shipped site, each row pointing at the page and the live evidence | in progress | arena-220b524c | `executive-summary.html` (§1 status column only — evidence column), `COORDINATION.md` | live site fetch at 23:0xZ | — |
+| T61 | Release gate, PR to main, merge, Pages deploy confirm, board close-out | not started | arena-220b524c | `COORDINATION.md` | `verify_release.py`, Actions API | — |
+
+No file outside the cells above is edited by this session. In particular `data/live/*` (owned by the running relay),
+`scripts/collect*.py`, `scripts/roi_scan.py`, `scripts/catalysts.py`, `dashboard.html`, `alerts.html`, `roi.html` and
+`.github/workflows/collect.yml` / `desk.yml` / `pages.yml` are **not** touched.
+
+### Log (this session)
+- 2026-11-21 23:1xZ: audit + claim. Findings that set the scope are in the table above; each was re-checked in this
+  session rather than copied from the board.
+
+---
+
+- 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
+origin/main

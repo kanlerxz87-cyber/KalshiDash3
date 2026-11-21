@@ -50,9 +50,9 @@
     },
     "candle_note": "A candidate state added mid-session: candlestick volume_fp is documented as the number of contracts bought DURING the candlestick period (https://docs.kalshi.com/api-reference/market/get-market-candlesticks), whereas GET /markets volume_fp is the market's cumulative volume in contracts. Differencing a candle point against a REST read would subtract unlike quantities, so such a swing is labelled candle_unquantified with a null count.",
     "findings": [
-      "F-78",
       "F-79",
-      "F-80"
+      "F-80",
+      "F-81"
     ]
   }
 }

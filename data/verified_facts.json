@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T20:44:00Z",
+ "generated": "2026-11-21T23:20:00Z",
  "note": "Every row was checked against the official Kalshi source named in `source`. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp. ID scheme (2026-11-21, session arena-42e3b260): claims are numbered C-nn in this ledger; irregularities keep the F-nn namespace on data/findings.json and flagged.html. The two ledgers previously both used F-nn, so F-70..F-73 meant different things depending on the page (flagged F-74). V-nn rows record project-local requirements, not Kalshi claims.",
  "facts": [
   {
@@ -551,6 +551,253 @@
  "counts": {
   "total": 72,
   "verified": 71,
-  "unverified": 1
- }
+  "unverified": 1,
+  "doc_links": {
+   "total": 24,
+   "in_official_index": 24
+  }
+ },
+ "doc_links": [
+  {
+   "id": "L-01",
+   "url": "https://docs.kalshi.com/api-reference/events/get-events",
+   "page_title": "Get Events",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Events](https://docs.kalshi.com/api-reference/events/get-events.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-02",
+   "url": "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
+   "page_title": "Get Historical Market Candlesticks",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Historical Market Candlesticks](https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-03",
+   "url": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "page_title": "Get Market Candlesticks",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md)\")",
+   "cited_times": 8,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-04",
+   "url": "https://docs.kalshi.com/api-reference/market/get-market-orderbook",
+   "page_title": "Get Market Orderbook",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Market Orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-05",
+   "url": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "page_title": "Get Markets",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Markets](https://docs.kalshi.com/api-reference/market/get-markets.md)\")",
+   "cited_times": 21,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-06",
+   "url": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks",
+   "page_title": "Get Multiple Market Orderbooks",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Multiple Market Orderbooks](https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks.md)\")",
+   "cited_times": 4,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-07",
+   "url": "https://docs.kalshi.com/api-reference/market/get-series-list",
+   "page_title": "Get Series List",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-08",
+   "url": "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+   "page_title": "Create Order (V2)",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Create Order (V2)](https://docs.kalshi.com/api-reference/orders/create-order-v2.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-09",
+   "url": "https://docs.kalshi.com/api-reference/portfolio/get-balance",
+   "page_title": "Get Balance",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-10",
+   "url": "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+   "page_title": "Get Fills",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Fills](https://docs.kalshi.com/api-reference/portfolio/get-fills.md)\")",
+   "cited_times": 2,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-11",
+   "url": "https://docs.kalshi.com/api-reference/portfolio/get-positions",
+   "page_title": "Get Positions",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Get Positions](https://docs.kalshi.com/api-reference/portfolio/get-positions.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-12",
+   "url": "https://docs.kalshi.com/getting_started/api_environments",
+   "page_title": "API Environments and Endpoints",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[API Environments and Endpoints](https://docs.kalshi.com/getting_started/api_environments.md)\")",
+   "cited_times": 2,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-13",
+   "url": "https://docs.kalshi.com/getting_started/api_keys",
+   "page_title": "API Keys",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[API Keys](https://docs.kalshi.com/getting_started/api_keys.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-14",
+   "url": "https://docs.kalshi.com/getting_started/demo_env",
+   "page_title": "Test In The Demo Environment",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Test In The Demo Environment](https://docs.kalshi.com/getting_started/demo_env.md)\")",
+   "cited_times": 33,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-15",
+   "url": "https://docs.kalshi.com/getting_started/historical_data",
+   "page_title": "Historical Data",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Historical Data](https://docs.kalshi.com/getting_started/historical_data.md)\")",
+   "cited_times": 4,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-16",
+   "url": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "page_title": "Market Lifecycle",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Market Lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-17",
+   "url": "https://docs.kalshi.com/getting_started/market_settlement",
+   "page_title": "Market Settlement",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Market Settlement](https://docs.kalshi.com/getting_started/market_settlement.md)\")",
+   "cited_times": 15,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-18",
+   "url": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "page_title": "Orderbook Responses",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses.md)\")",
+   "cited_times": 10,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-19",
+   "url": "https://docs.kalshi.com/getting_started/pagination",
+   "page_title": "Understanding Pagination",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Understanding Pagination](https://docs.kalshi.com/getting_started/pagination.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-20",
+   "url": "https://docs.kalshi.com/getting_started/quick_start_create_order",
+   "page_title": "Quick Start: Create your first order",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Quick Start: Create your first order](https://docs.kalshi.com/getting_started/quick_start_create_order.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-21",
+   "url": "https://docs.kalshi.com/getting_started/quick_start_market_data",
+   "page_title": "Quick Start: Market Data",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Quick Start: Market Data](https://docs.kalshi.com/getting_started/quick_start_market_data.md)\")",
+   "cited_times": 3,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-22",
+   "url": "https://docs.kalshi.com/getting_started/quick_start_websockets",
+   "page_title": "Quick Start: WebSockets",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Quick Start: WebSockets](https://docs.kalshi.com/getting_started/quick_start_websockets.md)\")",
+   "cited_times": 5,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-23",
+   "url": "https://docs.kalshi.com/getting_started/rate_limits",
+   "page_title": "Rate Limits and Tiers",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Rate Limits and Tiers](https://docs.kalshi.com/getting_started/rate_limits.md)\")",
+   "cited_times": 8,
+   "verified": true,
+   "checked": "2026-11-21"
+  },
+  {
+   "id": "L-24",
+   "url": "https://docs.kalshi.com/welcome",
+   "page_title": "Introduction",
+   "in_official_index": true,
+   "confirmed_via": "https://docs.kalshi.com/llms.txt (section list: \"[Introduction](https://docs.kalshi.com/welcome.md)\")",
+   "cited_times": 1,
+   "verified": true,
+   "checked": "2026-11-21"
+  }
+ ],
+ "doc_links_note": "T57 (arena-220b524c). Every distinct docs.kalshi.com URL cited in the published pages and assets, checked on 2026-11-21 against Kalshi's own documentation index at https://docs.kalshi.com/llms.txt. `in_official_index` is true when the page is listed there; `confirmed_via` records exactly what was read. `cited_times` is the number of times the URL appears in *.html and assets/*.js, i.e. how much of the site would point at a dead page if it broke. This is a link-integrity check of the citation layer only: it does not re-verify the prose on each page, and it does not prove the endpoint is live (see the separate rows and scripts/collect.py output for observed responses)."
 }
