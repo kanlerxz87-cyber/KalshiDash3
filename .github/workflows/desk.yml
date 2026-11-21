@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # only for the bounded freshness step at the bottom (dispatch collect.yml)
 
 concurrency:
   group: desk
@@ -103,3 +104,60 @@ jobs:
           git commit -m "data: live-desk scan $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      # ---------------------------------------------------------------------------------
+      # Bounded freshness watchdog — the fix for a STUCK collector, not a slow one.
+      #
+      # collect.yml has its own freshness step, but that step only runs inside a collection.
+      # Measured on 2026-11-21 with `gh run list --workflow=collect.yml`: scheduled collect
+      # runs at 00:49Z, 06:0xZ, 15:15:48Z and 15:20:32Z, then nothing until a manual
+      # dispatch at 20:26Z — about five hours with a 20-minute cron. GitHub documents that
+      # scheduled runs may be delayed and that "some queued jobs may be dropped"
+      # (https://docs.github.com/en/actions/reference/workflows-and-events/events-that-trigger-workflows),
+      # so when the scheduler drops collect runs there is nothing left to revive them.
+      # This step runs in a DIFFERENT workflow with its own cron, so it survives that.
+      #
+      # All three limits are enforced by scripts/watchdog.py, which is unit-tested offline
+      # (scripts/tests/test_watchdog.py) precisely because an earlier version of this idea
+      # shipped without them and chained five collect runs in five minutes (F-63).
+      # ---------------------------------------------------------------------------------
+      - name: "Freshness watchdog — dispatch ONE collection if the snapshot is stale"
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STALE_MIN: "35"      # minutes; see scripts/watchdog.py for why 35
+          MAX_PER_HOUR: "3"    # hard cap on collector dispatches from this step
+        run: |
+          set -uo pipefail
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "gh unavailable in this runner; the cron schedules remain the only trigger"
+            exit 0
+          fi
+          collected=$(python3 - <<'PY'
+          import json, pathlib
+          try:
+              print(json.loads(pathlib.Path("data/live/markets.json").read_text()).get("collected_at", ""))
+          except Exception:
+              print("")
+          PY
+          )
+          in_flight=$(gh run list --workflow=collect.yml --limit 20 --json status \
+            -q '[.[] | select(.status == "in_progress" or .status == "queued")] | length' 2>/dev/null || echo 0)
+          now=$(date -u +%s)
+          recent=$(gh run list --workflow=collect.yml --limit 60 --json createdAt,event \
+            -q "[.[] | select(.event == \"workflow_dispatch\") | .createdAt | fromdateiso8601 | select(. > $now - 3600)] | length" 2>/dev/null || echo 0)
+          echo "snapshot collected_at=${collected:-<none>} in_flight=${in_flight} dispatches_last_hour=${recent}"
+          decision=$(python3 scripts/watchdog.py --collected-at "$collected" \
+            --in-flight "${in_flight:-0}" --dispatches-last-hour "${recent:-0}" \
+            --stale-min "${STALE_MIN:-35}" --max-per-hour "${MAX_PER_HOUR:-3}")
+          echo "watchdog: $decision"
+          case "$decision" in
+            dispatch)
+              gh workflow run collect.yml --ref "${GITHUB_REF_NAME}" \
+                && echo "queued exactly one collection" \
+                || echo "::warning::dispatch failed; the cron schedules remain the trigger"
+              ;;
+            *)
+              echo "not dispatching: ${decision#skip: }"
+              ;;
+          esac

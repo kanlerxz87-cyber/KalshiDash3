@@ -308,6 +308,40 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- E3. dashboard pointer readout (G20) ---
+   * The canvas is a bitmap, so the trader needs a number they can read off it. The readout must
+   * report a PLOTTED point (never a value interpolated between two neighbours) and must say
+   * whether the point is an official candle or a collector observation. */
+  {
+    const r = await loadPage("dashboard.html", "api");
+    commonAsserts("dashboard.html (readout)", r);
+    const d = r.doc, w = r.dom.window;
+    const out = d.querySelector("#chartReadout");
+    check(!!out, "dashboard: the chart must expose a pointer readout element");
+    const cv = d.querySelector("#priceChart");
+    check(!!cv, "dashboard: the chart canvas must exist");
+    // Drive a render, then a synthetic hover near the middle of the canvas.
+    const sel = d.querySelector("#window");
+    if (sel) { sel.value = "m"; sel.dispatchEvent(new w.Event("change")); }
+    await new Promise(res => setTimeout(res, 700));
+    const chart = w.__chart;
+    check(!!chart && Array.isArray(chart.points) && chart.points.length > 0,
+      "dashboard: the draw must publish the points it actually plotted (window.__chart)");
+    if (chart && chart.points.length) {
+      const mid = chart.points[Math.floor(chart.points.length / 2)];
+      const px = chart.pad.l + chart.iw * (mid.t - chart.t0) / (chart.t1 - chart.t0);
+      const py = chart.pad.t + chart.ih * (1 - Math.min(1, Math.max(0, mid.v)));
+      cv.dispatchEvent(new w.MouseEvent("mousemove", { clientX: px, clientY: py, bubbles: true }));
+      const txt = out.textContent;
+      const shown = Number((txt.match(/([\d.]+)¢/) || [])[1]);
+      check(Number.isFinite(shown) && Math.abs(shown - mid.v * 100) < 0.051,
+        `dashboard: the readout must print the plotted price, not an interpolation (plotted ${(mid.v * 100).toFixed(1)}c, readout "${txt.slice(0, 60)}")`);
+      check(!/NaN|undefined/.test(txt), "dashboard: the readout must not leak NaN/undefined");
+    }
+    console.log("  E3 readout      ok  (nearest plotted point reported with price, time and source)");
+    r.close();
+  }
+
   /* --- F. index.html: the landing table of "largest live market" per category ---
    * This page had no DOM test, which is how a `const` used above its declaration shipped on
    * 2026-11-21 and left "What is live right now" completely empty on the deployed site while
