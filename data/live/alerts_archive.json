@@ -2,6 +2,28 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H16",
+   "title": "Demo BTC at or above 60237.37 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-21T15:16:38Z",
+   "to_time": "2026-11-21T15:21:23Z",
+   "from_price": 0.65,
+   "to_price": 0.45,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": 2236.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T15:21:23Z",
+   "high_roi": false
+  },
+  {
    "ticker": "KXPGATOUR-THRC26-BHAR",
    "event_ticker": "KXPGATOUR-THRC26",
    "title": "The RSM Classic: Brian Harman wins",

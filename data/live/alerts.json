@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T15:16:38Z",
- "snapshot_collected_at": "2026-11-21T15:16:38Z",
+ "generated_at": "2026-11-21T15:21:23Z",
+ "snapshot_collected_at": "2026-11-21T15:21:23Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,12 +11,34 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 22,
+  "all_events": 23,
   "high_roi": 7,
-  "archive_total": 22,
+  "archive_total": 23,
   "new_this_run": 1
  },
  "all_events": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H16",
+   "title": "Demo BTC at or above 60237.37 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-21T15:16:38Z",
+   "to_time": "2026-11-21T15:21:23Z",
+   "from_price": 0.65,
+   "to_price": 0.45,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": 2236.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T15:21:23Z",
+   "high_roi": false
+  },
   {
    "ticker": "KXPGATOUR-THRC26-BHAR",
    "event_ticker": "KXPGATOUR-THRC26",
