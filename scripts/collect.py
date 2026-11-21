@@ -54,6 +54,7 @@ SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays br
 # is therefore chosen PER TOPIC (see `select_settled`), which is what the brief asks for
 # ("keep topics separate but keep events within the same topic organized together").
 SETTLED_PUBLISH_CAP = 200
+HISTORICAL_BACKFILL_PER_SEED = 40  # settled rows pulled per seeded series from /historical/markets
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
@@ -441,6 +442,47 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                         break
                 print(f"  seed {seed['ticker']:<16} {status:<8} -> {got} market(s)")
     print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
+
+    # ---- topic coverage for TOPICS THAT DO NOT SETTLE OFTEN -------------------
+    # A settled market older than the documented cutoff is only available from
+    # GET /historical/markets, so a topic whose last settlement predates the cutoff
+    # looks like it has no resolution history at all. Measured 2026-11-21:
+    #   GET /historical/cutoff -> market_settled_ts 2026-09-21T00:00:00Z
+    #   the seeded elections series KXELECTIRAN has exactly one settled market,
+    #   KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z (result "no") — before the
+    #   cutoff, so GET /markets?status=settled can never return it.
+    # Official sources: https://docs.kalshi.com/getting_started/historical_data
+    #                   https://docs.kalshi.com/api-reference/historical/get-historical-markets
+    # Bounded on purpose: at most HISTORICAL_BACKFILL_PER_SEED markets per seeded series,
+    # one request per series, failures never fatal (the live scan already succeeded).
+    try:
+        cutoff, _ = get("/historical/cutoff", retries=2)
+        historical_cutoff = cutoff.get("market_settled_ts")
+    except RuntimeError as e:
+        historical_cutoff = None
+        print(f"  ! /historical/cutoff unavailable ({e})", file=sys.stderr)
+    backfill_rows: dict[str, dict] = {}
+    for c in cats["categories"]:
+        for seed in c["seed_series"]:
+            try:
+                d, _ = get("/historical/markets", {"limit": 1000, "series_ticker": seed["ticker"]}, retries=2)
+                batch = d.get("markets") or []
+            except RuntimeError:
+                continue  # the endpoint rejects unknown filter combinations; not fatal
+            got = 0
+            for m in batch:
+                if str(m.get("status") or "").lower() not in ("finalized", "settled", "determined", "closed"):
+                    continue
+                if not m.get("result"):
+                    continue
+                backfill_rows[m["ticker"]] = m
+                got += 1
+                if got >= HISTORICAL_BACKFILL_PER_SEED:
+                    break
+            if got:
+                print(f"  historical {seed['ticker']:<16} -> {got} settled market(s) from the archive")
+    for t, m in backfill_rows.items():
+        seeded["settled"].setdefault(t, m)
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
         raw[status].extend([m for t, m in seeded[status].items() if t not in have])
@@ -575,6 +617,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_published": len(settled_published),
             "settled_published_cap": SETTLED_PUBLISH_CAP,
             "settled_published_by_category": settled_published_by_cat,
+            "historical_cutoff_market_settled_ts": historical_cutoff,
+            "historical_backfill_rows": len(backfill_rows),
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
         },
