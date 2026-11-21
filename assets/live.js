@@ -235,6 +235,50 @@ const KDLIVE = (() => {
     return out;
   }
 
+  /**
+   * Tick-level swing detector over the OFFICIAL TRADE TAPE.
+   *
+   * detectSwings() above compares price snapshots, and a snapshot can restate an old trade
+   * instead of reporting a new one (measured 2026-11-21: KXBTCY-27JAN0100-B87500 read 0.04,
+   * 0.99, 0.02 across three collector runs while every print on its tape was 0.02). A pair
+   * of consecutive PRINTS cannot restate anything: each one is a completed transaction, so a
+   * >= threshold difference between them is a move by construction, with the exact trade ids
+   * and timestamps that prove it.
+   *
+   * GET /markets/trades?ticker=&min_ts=&max_ts=&limit=  (public, no key)
+   * https://docs.kalshi.com/api-reference/market/get-trades
+   */
+  function detectTapeSwings(trades, threshold, opts = {}) {
+    const clean = (trades || [])
+      .map((t) => ({ ...t, price: num(t.yes_price_dollars ?? t.price), ts: Date.parse(t.created_time || t.ts || "") }))
+      .filter((t) => t.price !== null && Number.isFinite(t.ts))
+      .sort((a, b) => a.ts - b.ts);
+    const out = [];
+    const since = num(opts.sinceMs);
+    for (let i = 1; i < clean.length; i++) {
+      const prev = clean[i - 1], cur = clean[i];
+      const delta = cur.price - prev.price;
+      if (Math.abs(delta) + 1e-12 < threshold) continue;
+      // "from" is the older print of the pair, so the alert's direction matches its timestamps.
+      // A pair counts as new only when BOTH prints are new; if the earlier print predates the
+      // cursor it was already read on an earlier poll and its move may already be in the chat.
+      if (since !== null && prev.ts < since) continue;
+      out.push({
+        from: prev.price, to: cur.price, delta,
+        direction: delta > 0 ? "up" : "down",
+        cents: Math.round(Math.abs(delta) * 1000) / 10,
+        t: new Date(cur.ts).toISOString(),
+        previous_t: new Date(prev.ts).toISOString(),
+        from_trade_id: prev.trade_id ?? null,
+        to_trade_id: cur.trade_id ?? null,
+        count_fp: cur.count_fp ?? null,
+        taker_side: cur.taker_outcome_side ?? cur.taker_side ?? null,
+        n_prints: clean.length,
+      });
+    }
+    return out;
+  }
+
   /** URLs that appear literally in a market's own official text fields. Never invented. */
   const URL_RE = /https?:\/\/[^\s"'<>()]+/g;
   function catalystLinks(m) {
@@ -292,7 +336,7 @@ const KDLIVE = (() => {
       pollMs: opts.pollMs || 6000,
       bookMs: opts.bookMs || 30000,
       snapshotMs: opts.snapshotMs || 60000,
-      lastBookAt: 0, lastSnapshotAt: 0,
+      lastBookAt: 0, lastSnapshotAt: 0, lastTapeAt: 0, lastTapeError: null,
       snapshotAge: null,
       cut: null,                   // GET /historical/cutoff, read live when reachable
     };
@@ -343,7 +387,7 @@ const KDLIVE = (() => {
       saveTicks();
     }
 
-    function addAlert(ticker, prev, obs) {
+    function addAlert(ticker, prev, obs, extra) {
       const m = S.markets.get(ticker) || {};
       const delta = obs.last - prev.last;
       const a = {
@@ -360,12 +404,21 @@ const KDLIVE = (() => {
         bid: obs.yes_bid, ask: obs.yes_ask,
         close_time: m.close_time || null,
         source: `${base}/markets/${ticker}`,
-        origin: S.mode === "live-api" ? "live tick" : "committed snapshot",
+        origin: (extra && extra.origin) || (S.mode === "live-api" ? "live tick" : "committed snapshot"),
+        verification: (extra && extra.verification) || "snapshot-difference",
+        verification_detail: (extra && extra.verification_detail) || null,
+        tape_source: (extra && extra.tape_source) || null,
+        trade_from_id: (extra && extra.trade_from_id) || null,
+        trade_to_id: (extra && extra.trade_to_id) || null,
         catalysts: m.__catalysts || catalystLinks(m),   // computed here too: the first alert can arrive before scoring
         roi: m.__roi || null,
       };
-      // De-duplicate the same printed move (a retraded poll must not spam the chat).
-      if (S.alerts.some((x) => x.ticker === a.ticker && x.from === a.from && x.to === a.to)) return;
+      // De-duplicate the same printed move (a retraded poll must not spam the chat). Alerts
+      // proven by two distinct trade ids are kept separately, because two separate pairs of
+      // prints can legitimately produce the same 0.29 -> 0.71 move twice.
+      if (a.trade_from_id || a.trade_to_id) {
+        if (S.alerts.some((x) => x.ticker === a.ticker && x.trade_from_id === a.trade_from_id && x.trade_to_id === a.trade_to_id)) return;
+      } else if (S.alerts.some((x) => x.ticker === a.ticker && x.from === a.from && x.to === a.to)) return;
       S.alerts.unshift(a);
       if (S.alerts.length > 200) S.alerts.length = 200;
       emit("alert", a);
@@ -628,6 +681,58 @@ const KDLIVE = (() => {
       }
     }
 
+    /* ---- trade tape: tick-level alerts from executed prints ---- */
+    const TAPE_KEY = opts.tapeKey || "kd.live.tape.v1";
+    function loadTapeCursor() {
+      if (!store) return null;
+      try { const raw = store.getItem(TAPE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+    }
+    function saveTapeCursor(cur) { if (!store) return; try { store.setItem(TAPE_KEY, JSON.stringify(cur)); } catch (e) { /* quota */ } }
+
+    /**
+     * For each watched market, read the recent prints and raise an alert for every >= threshold
+     * move between consecutive prints that happened since the last poll. Costs one request per
+     * market per tape cycle (default 25 s), which is deliberately slower than the price poll.
+     */
+    async function pollTape(watch) {
+      if (!watch.length) return 0;
+      const thr = S.model ? S.model.swing_alert.threshold_dollars : 0.1;
+      const cursor = loadTapeCursor() || {};
+      // First run: look back TAPE_LOOKBACK_MS and do not backfill the chat with old prints.
+      const firstRun = !cursor.initialised;
+      const sinceMs = firstRun ? Date.now() - (opts.tapeLookbackMs || 15 * 60e3) : (cursor.last_poll_ms || 0);
+      let raised = 0;
+      const next = { initialised: true, last_poll_ms: Date.now(), per_ticker: {} };
+      for (const t of watch) {
+        const prevSeen = (cursor.per_ticker && cursor.per_ticker[t]) || [];
+        let doc;
+        try {
+          doc = await api(`/markets/trades?ticker=${encodeURIComponent(t)}&min_ts=${Math.floor(sinceMs / 1000)}&limit=200`);
+        } catch (e) { S.lastTapeError = `${t}: ${e.message || e}`; continue; }
+        const trades = (doc && doc.trades) || [];
+        const seen = new Set(prevSeen);
+        for (const sw of detectTapeSwings(trades, thr, { sinceMs })) {
+          const id = `${t}|tape|${sw.from_trade_id}|${sw.to_trade_id}`;
+          if (seen.has(id)) continue;
+          seen.add(id);
+          const m = S.markets.get(t) || {};
+          addAlert(t, { t: sw.previous_t, last: sw.from }, { t: sw.t, last: sw.to }, {
+            origin: "live tape",
+            trade_from_id: sw.from_trade_id, trade_to_id: sw.to_trade_id,
+            verification: "tape-confirmed",
+            verification_detail: `two consecutive prints ${sw.previous_t} -> ${sw.t} (trade ids ${sw.from_trade_id} and ${sw.to_trade_id}), taker side ${sw.taker_side || "n/a"}, ${sw.count_fp || "n/a"} contracts`,
+            tape_source: `${base}/markets/trades?ticker=${encodeURIComponent(t)}&min_ts=${Math.floor(sinceMs / 1000)}&limit=200`,
+          });
+          raised += 1;
+          void m;
+        }
+        next.per_ticker[t] = Array.from(seen).slice(-60);
+      }
+      S.lastTapeAt = Date.now();
+      saveTapeCursor(next);
+      return raised;
+    }
+
     /* ---- main loop ---- */
     async function tick() {
       if (!S.model) return;
@@ -640,6 +745,7 @@ const KDLIVE = (() => {
         if (watch.length) {
           try { await pollMarkets(watch); } catch (e) { S.lastError = String(e.message || e); }
           if (Date.now() - S.lastBookAt > S.bookMs) { S.lastBookAt = Date.now(); try { await pollBooks(watch); } catch (e) { /* books are optional depth */ } }
+          if (Date.now() - (S.lastTapeAt || 0) > (opts.tapeMs || 25000)) { try { await pollTape(watch); } catch (e) { S.lastTapeError = String(e.message || e); } }
         }
       }
       if (Date.now() - S.lastSnapshotAt > S.snapshotMs) await loadSnapshot(S.snapshotUrls);
@@ -673,11 +779,11 @@ const KDLIVE = (() => {
     function seriesFor(ticker) { return S.ticks.get(ticker) || []; }
 
     return { BASE, S, on, emit, start, stop, tick, probe, discover, setWatch, seriesFor, scoreAll, api,
-             candles, score, detectSwings, catalystLinks, takerFee, makerFee, takerFeeUnit, microprice, ceilCent,
+             candles, score, detectSwings, detectTapeSwings, pollTape, catalystLinks, takerFee, makerFee, takerFeeUnit, microprice, ceilCent,
              fetchJson, classifyTicker };
   }
 
-  const api = { create, score, detectSwings, catalystLinks, takerFee, makerFee, takerFeeUnit, microprice, ceilCent, BASE, UA_NOTE };
+  const api = { create, score, detectSwings, detectTapeSwings, catalystLinks, takerFee, makerFee, takerFeeUnit, microprice, ceilCent, BASE, UA_NOTE };
   if (typeof module !== "undefined" && module.exports) module.exports = api;   // node tests
   return api;
 })();

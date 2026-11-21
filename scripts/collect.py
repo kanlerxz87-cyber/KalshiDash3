@@ -273,6 +273,21 @@ def update_price_history(hist, rows):
     only support 1/60/1440-minute intervals (F-29). So the only way to have a
     seconds-resolution series is to accumulate REST observations over time,
     which is exactly what this file does on every run.
+
+    `updated_time`, `previous_price_dollars` and the two quoted sizes are stored
+    with every observation because `last_price_dollars` alone cannot distinguish
+    an executed move from a restatement of the previous trade:
+
+      * `updated_time` is the exchange's own stamp for the last time anything
+        about the market changed (GET /markets). If it did not advance between
+        two observations, the reported `last` cannot be a new print, whatever
+        the number says, so a difference between the two is NOT a move.
+      * `previous_price_dollars` is the prior last price carried *by the
+        exchange*, so the price before a real print is checkable even when this
+        collector missed the observation in between.
+
+    Both fields are part of the documented market object; neither is derived.
+    https://docs.kalshi.com/api-reference/market/get-markets
     """
     now = utcnow()
     for m in rows:
@@ -289,6 +304,11 @@ def update_price_history(hist, rows):
                 "yes_bid": fnum(m.get("yes_bid_dollars")),
                 "yes_ask": fnum(m.get("yes_ask_dollars")),
                 "volume_fp": m.get("volume_fp"),
+                # Provenance for the move/restatement decision (build_alerts.py).
+                "updated_time": m.get("updated_time"),
+                "previous_price": fnum(m.get("previous_price_dollars")),
+                "yes_bid_size_fp": m.get("yes_bid_size_fp"),
+                "yes_ask_size_fp": m.get("yes_ask_size_fp"),
             }
         )
         series["observations"] = obs[-PRICE_HISTORY_LIMIT:]
@@ -321,6 +341,11 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
         "settlement_ts": m.get("settlement_ts"),
         "settlement_value_dollars": fnum(m.get("settlement_value_dollars")),
         "notional_value_dollars": fnum(m.get("notional_value_dollars")),
+        # The exchange's own stamps, so a reader can tell a print from a restatement:
+        # updated_time is the last time anything about this market changed, and
+        # previous_price_dollars is the last price the exchange itself carried.
+        "updated_time": m.get("updated_time"),
+        "previous_price_dollars": fnum(m.get("previous_price_dollars")),
         "source": f"{BASE}/markets/{m.get('ticker')}",
     }
     # `rules_primary` / `rules_secondary` are where Kalshi records what a market settles on,

@@ -123,3 +123,8 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 44px;colo
 .swing-item .dir.down{color:var(--bad);font-weight:700}
 .swing-item .cause{color:var(--mut);font-style:italic;font-size:11.5px}
 .swing-empty{color:var(--mut);font-size:12.5px;padding:6px 0}
+
+/* A difference between two snapshot reads that the exchange's trade tape shows was NOT a trade.
+   Kept visible (deleting it would rewrite history) but marked so it never reads as a live move. */
+tr.row-restated td { background: rgba(255, 196, 0, .06); }
+tr.row-restated td:first-child { border-left: 3px solid var(--warn, #b8860b); }

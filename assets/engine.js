@@ -314,7 +314,10 @@ window.KDL = (() => {
         <span class="mono chat-ticker">${esc(a.ticker)}</span>
         ${modelBit}
         <span class="badge dim">${esc(cat)}</span>
-        <span class="badge ${a.origin === "live" ? "live" : "dim"}" title="${a.origin === "live" ? "Detected in your browser from the live demo API" : "Recovered from the collector's committed price history"}">${a.origin}</span>
+        <span class="badge ${a.origin === "live tape" || a.origin === "live" ? "live" : "dim"}" title="${
+          a.origin === "live tape" ? "Detected in your browser from two consecutive executed prints on the official trade tape"
+          : a.origin === "live" ? "Detected in your browser from the live demo API"
+          : "Recovered from the collector's committed price history"}">${a.origin}</span>
       </div>
       <div class="chat-title">${esc(a.title)}</div>
       ${why}
@@ -323,7 +326,9 @@ window.KDL = (() => {
         <a href="${esc(l.api_orderbook || "#")}" target="_blank" rel="noopener" title="Live order book from the demo API">book</a>
         <a href="${esc(l.demo_ui || "#")}" target="_blank" rel="noopener" title="Kalshi demo trading UI">demo UI</a>
         <a href="${esc(l.news_google || "#")}" target="_blank" rel="noopener" title="Possible-cause lead: news search for this market title — unverified">news leads ▸</a>
+        ${a.tape_source ? `<a href="${esc(a.tape_source)}" target="_blank" rel="noopener" title="The trade-tape query that confirms these executed prints">tape ▸</a>` : ""}
       </div>
+      ${a.verification === "tape-confirmed" && a.verification_detail ? `<div class="chat-why">✔ executed prints: ${esc(a.verification_detail)}</div>` : ""}
     </div>`;
   }
 
@@ -437,6 +442,9 @@ window.KDL = (() => {
     if (!Number.isNaN(t)) full.ts = t;
     full.high_roi_screen = a.high_roi === true;
     full.ts_source = a.to_time || null;
+    full.verification = a.verification || null;
+    full.verification_detail = a.verification_detail || null;
+    full.tape_source = a.tape_source || null;
     return full;
   }
 
@@ -449,6 +457,14 @@ window.KDL = (() => {
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
       for (const a of entries) {
         if (!a || !a.ticker || num(a.delta) === null) continue;
+        // Only a difference the official trade tape confirms as executed prints is a SWING.
+        // `restatement` = the tape shows the price never actually moved (or no prints exist in
+        // the window); such a row is published in its own section on dashboard.html and must
+        // not appear in these chats as a move. Rows written before the verdict field existed
+        // carry `kind: "legacy-unverifiable"` and ARE still shown, labelled, because deleting
+        // them would silently rewrite history and hiding them would lose real moves like the
+        // confirmed 0.71 -> 0.29 repricing on KXAAAGASM-26DEC31-3.30.
+        if (a.kind === "restatement") continue;
         const full = collectorAlertFromEntry(a);
         if (known.has(full.id)) continue;
         known.add(full.id);

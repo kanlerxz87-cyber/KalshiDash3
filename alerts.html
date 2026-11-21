@@ -106,7 +106,11 @@
   </div>
 
   <section class="panel" id="leadsPanel">
-    <h2>Fetched source leads beside each recorded swing</h2>
+    <h2>Fetched source leads beside each confirmed swing</h2>
+    <p class="small mut"><b>Only a move the exchange's own trade tape confirms gets a cause lead.</b> A difference
+    between two snapshot reads is not evidence of a trade: on 2026-11-21 a market whose tape held nothing but 2¢
+    prints was being reported as a 97¢ crash. Rows the tape shows to be a restatement are kept in this table,
+    marked as not a move, and left without a cause search (<a href="flagged.html">F-38</a>).</p>
     <p class="small mut">One row per swing in the persistent archive (<code>data/live/alerts_archive.json</code>,
     threshold $0.10). A "lead" is the reference the market itself settles on — quoted from its own record —
     next to the published numbers that reference carried when it was fetched. No link here is a proven cause:
@@ -127,7 +131,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script>
 KD.nav("alerts.html");
 
-const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null };
+const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null, archive: [] };
 
 const LEAD_STATE_LABEL = {
   external_move_coincides: "the index this market settles on crossed its strike in the same minutes",
@@ -144,6 +148,10 @@ function leadHost(u) { try { return new URL(u).hostname.replace(/^www\./, ""); }
 async function loadLeads() {
   try { state.leads = await KD.json(`data/live/catalysts.json?refresh=${Date.now()}`); }
   catch { state.leads = null; }
+  try {
+    const arch = await KD.json(`data/live/alerts_archive.json?refresh=${Date.now()}`);
+    state.archive = arch.alerts || [];
+  } catch { state.archive = []; }
   renderLeads();
 }
 
@@ -156,6 +164,13 @@ function renderLeads() {
     return;
   }
   const rows = state.leads.alerts.filter(r => !state.cat || r.category_id === state.cat);
+  // A "lead" explains a move. If the official trade tape shows the change was a restatement of
+  // an earlier print, there is nothing to explain, so the row is labelled instead of being given
+  // a cause search that would imply a jump happened. Verdicts live in the archive.
+  const verdict = new Map();
+  for (const a of (state.archive || [])) verdict.set(`${a.ticker}|${a.to_time}`, a.kind || "");
+  const tapProof = new Map();
+  for (const a of (state.archive || [])) if (a.tape_source) tapProof.set(`${a.ticker}|${a.to_time}`, a);
   box.innerHTML = `<table class="tbl"><thead><tr><th>Swing recorded at</th><th>Market</th><th>Move</th>`
     + `<th>What the record says</th><th>Links fetched (not assumed)</th></tr></thead><tbody>`
     + rows.map(r => {
@@ -170,12 +185,20 @@ function renderLeads() {
         ? `<details><summary>settlement reference, verbatim</summary><p class="small">${KD.esc(r.settlement_reference_text)}`
           + ` <a href="${KD.esc(r.settlement_reference_source || r.market_source || "#")}" target="_blank" rel="noopener">the market's own record</a></p></details>`
         : `<span class="small mut">not carried in the collected record for this market</span>`;
-      return `<tr><td>${KD.esc(r.to_time || "")}</td>`
+      const k = `${r.ticker}|${r.to_time}`;
+      const kind = verdict.get(k) || "";
+      const proof = tapProof.get(k);
+      const verdictCell = kind === "restatement"
+        ? `<div class="small"><b>not a move:</b> the exchange's trade tape shows the price did not move in this window, so this difference is a restatement of an earlier print and not a swing. No cause is searched for it.</div>`
+        : kind === "move"
+          ? `<div class="small"><b>confirmed print move</b>${proof ? ` (<a href="${KD.esc(proof.tape_source)}" target="_blank" rel="noopener">trade tape</a>)` : ""}</div>`
+          : `<div class="small mut">no tape verdict recorded for this difference</div>`;
+      return `<tr class="${kind === "restatement" ? "row-restated" : ""}"><td>${KD.esc(r.to_time || "")}</td>`
         + `<td><a href="${KD.esc(r.market_source || "#")}" target="_blank" rel="noopener">${KD.esc(r.ticker)}</a>`
         + `<div class="small mut">${KD.esc(r.title || "")}</div></td>`
         + `<td>${r.direction === "up" ? "▲" : "▼"} ${KD.esc(String(r.from_price))} → ${KD.esc(String(r.to_price))}`
         + ` <b>${(r.delta || 0) > 0 ? "+" : "−"}${(Math.abs(r.delta || 0) * 100).toFixed(0)}¢</b></td>`
-        + `<td><b>${KD.esc(LEAD_STATE_LABEL[r.state] || r.state || "")}</b>${numbers}${ref}</td>`
+        + `<td>${verdictCell}<b>${KD.esc(LEAD_STATE_LABEL[r.state] || r.state || "")}</b>${numbers}${ref}</td>`
         + `<td>${links || '<span class="small mut">none</span>'}`
         + `<div class="small">${KD.esc(r.note || "")}</div></td></tr>`;
     }).join("") + `</tbody></table>`

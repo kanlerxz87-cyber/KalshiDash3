@@ -21,7 +21,80 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T00:50:12Z",
-   "high_roi": true
+   "high_roi": true,
+   "kind": "move",
+   "verification": "tape-confirmed",
+   "verification_detail": "two consecutive exchange prints moved 0.71 -> 0.29 (2026-11-20T14:26:53.438355Z -> 2026-11-20T22:27:19.138991Z); trade ids 0727f898-7cf9-b0dc-a8a8-9e830458809b and 0727f267-9b41-b893-e8e3-01d9d3f13119 (tape window fetched 2026-11-21T06:33:00Z)",
+   "tape_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXAAAGASM-26DEC31-3.30&min_ts=1795204799&max_ts=1795222302&limit=1000",
+   "tape_prints": [
+    {
+     "trade_id": "0727fb2b-7529-b7af-885c-ea9f8e3182dc",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.7,
+     "count_fp": "3.3",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f89d-d229-b40e-8dcf-cb79e96473ea",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.71,
+     "count_fp": "5.29",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f898-7cf9-b0dc-a8a8-9e830458809b",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.71,
+     "count_fp": "1.47",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f267-9b41-b893-e8e3-01d9d3f13119",
+     "created_time": "2026-11-20T22:27:19.138991Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "2.8",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0727f263-49b1-ba21-ce35-670b3971b740",
+     "created_time": "2026-11-20T22:27:19.138991Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "7.26",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0727f2af-7ce1-ae4f-a8c1-91baae1e4509",
+     "created_time": "2026-11-20T22:42:22.696491Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "1.0",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0726140b-f991-ade6-b851-d4fbb46656de",
+     "created_time": "2026-11-21T02:42:40.875644Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.44",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "07260bf8-2771-bf0a-8dab-a3fb5f2105e2",
+     "created_time": "2026-11-21T02:48:03.646865Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.37",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "07260bec-c991-bc8e-d0f3-a257fd77ea12",
+     "created_time": "2026-11-21T02:53:20.136369Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.19",
+     "taker_side": "no"
+    }
+   ],
+   "from_updated_time": null,
+   "to_updated_time": null,
+   "to_previous_price": null,
+   "to_volume_fp": "406.94"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -43,7 +116,16 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T20:01:29Z",
-   "high_roi": true
+   "high_roi": true,
+   "kind": "unverified",
+   "verification": "unverified",
+   "verification_detail": "the trade tape query failed (RuntimeError: --offline: the trade tape was not queried), so no verdict is claimed",
+   "tape_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795204009&max_ts=1795204979&limit=1000",
+   "tape_prints": [],
+   "from_updated_time": null,
+   "to_updated_time": null,
+   "to_previous_price": null,
+   "to_volume_fp": "58440442.25"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -65,7 +147,16 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:48:19Z",
-   "high_roi": true
+   "high_roi": true,
+   "kind": "unverified",
+   "verification": "unverified",
+   "verification_detail": "the trade tape query failed (RuntimeError: --offline: the trade tape was not queried), so no verdict is claimed",
+   "tape_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&min_ts=1795202924&max_ts=1795204189&limit=1000",
+   "tape_prints": [],
+   "from_updated_time": null,
+   "to_updated_time": null,
+   "to_previous_price": null,
+   "to_volume_fp": "58440365.55"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -87,7 +178,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:48:19Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B47500",
@@ -109,7 +202,16 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:30:14Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "unverified",
+   "verification": "unverified",
+   "verification_detail": "the trade tape query failed (RuntimeError: --offline: the trade tape was not queried), so no verdict is claimed",
+   "tape_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B47500&min_ts=1795202472&max_ts=1795203104&limit=1000",
+   "tape_prints": [],
+   "from_updated_time": null,
+   "to_updated_time": null,
+   "to_previous_price": null,
+   "to_volume_fp": "80178732.11"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
@@ -131,7 +233,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:30:14Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -153,7 +257,16 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T15:19:53Z",
-   "high_roi": true
+   "high_roi": true,
+   "kind": "restatement",
+   "verification": "no-prints-in-window",
+   "verification_detail": "the exchange's trade tape returns no prints for this market in this window, so the change between the two snapshots was not an executed move (tape window fetched 2026-11-21T06:32:39Z)",
+   "tape_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXAAAGASM-26DEC31-3.30&min_ts=1795182536&max_ts=1795188083&limit=1000",
+   "tape_prints": [],
+   "from_updated_time": null,
+   "to_updated_time": null,
+   "to_previous_price": null,
+   "to_volume_fp": "395.88"
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -173,7 +286,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -193,7 +308,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -213,7 +330,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:35:54Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
@@ -233,7 +352,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:32:25Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -253,7 +374,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -273,7 +396,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -293,7 +418,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
@@ -313,7 +440,9 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "kind": "legacy-unverifiable",
+   "kind_reason": "archived before the move/restatement provenance was recorded, and the observations behind it are no longer in price_history.json; kept and shown with no claim either way"
   }
  ]
 }

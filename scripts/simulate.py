@@ -150,6 +150,11 @@ def main() -> int:
     bands = strat["trade_type_bands"]
     contracts = int(strat["contracts_per_signal"])
     alerts = archive.get("alerts", [])
+    # Trade on CONFIRMED moves only. A row whose difference the official trade tape shows to be a
+    # restatement (no executed print moved the price) is not a signal: trading it would model an
+    # entry at a price nobody transacted. Rows with no verdict yet keep their old behaviour so
+    # the committed simulation can be reproduced from history.
+    alerts = [a for a in alerts if a.get("kind") != "restatement"]
     archive_keys = {alert_key(a) for a in alerts}
 
     processed = set(state.get("processed_alert_ids", []))

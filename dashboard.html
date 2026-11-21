@@ -145,27 +145,17 @@ function renderAlerts() {
         change: Number(a.delta),
         time: a.to_time,
         screened: Boolean(a.high_roi),
+        tapeSource: a.tape_source || null,
+        verified: a.verification_detail || null,
       });
     }
   } else {
-    const marketRows = (state.snap?.open_markets || []).concat(state.snap?.settled_markets || []);
-    const byTicker = new Map(marketRows.map(row => [row.ticker, row]));
-    for (const [ticker, data] of Object.entries(state.hist?.series || {})) {
-      const market = byTicker.get(ticker);
-      if (!market || (state.cat && market.category_id !== state.cat)) continue;
-      const points = (data.observations || [])
-        .filter(p => Number.isFinite(Date.parse(p.t)) && p.last !== null && p.last !== undefined && Number.isFinite(Number(p.last)))
-        .slice().sort((a, b) => Date.parse(a.t) - Date.parse(b.t));
-      for (let i = 1; i < points.length; i++) {
-        const before = Number(points[i - 1].last), after = Number(points[i].last);
-        const change = after - before;
-        if (Math.abs(change) + 1e-9 < 0.10) continue;
-        alerts.push({
-          ticker, market, before, after, change, time: points[i].t, previousTime: points[i - 1].t,
-          screened: market.category_basis === "seed" && Number(market.volume_24h_fp) > 0,
-        });
-      }
-    }
+    // Deliberately NOT recomputed from price_history.json any more. A difference between two
+    // consecutive snapshots of `last_price_dollars` is not evidence of a trade: on 2026-11-21
+    // KXBTCY-27JAN0100-B87500 reported 0.04, then 0.99, then 0.02 while the official tape
+    // showed nothing but 2c prints, so a recomputed "swing" was an artefact. The feed above is
+    // the only source of alerts, and every row in it is backed by executed prints from
+    // GET /markets/trades. If the feed cannot be loaded, say so rather than invent swings.
   }
   alerts.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
   const all = alerts.slice(0, 100);
@@ -181,7 +171,10 @@ function renderAlerts() {
       <span class="alert-market">${KD.esc(title)}</span>
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
-      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
+      <div><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a>${
+        a.tapeSource ? ` · <a href="${KD.esc(a.tapeSource)}" target="_blank" rel="noopener" title="The exact trade-tape query that confirms this move">trade tape</a>` : ""
+      }</div>
+      ${a.verified ? `<div class="small mut">${KD.esc(a.verified)}</div>` : ""}
     </article>`;
   }).join("") : `<div class="alert-empty">${emptyText}</div>`;
   KD.$("#allAlerts").innerHTML = renderFeed(all, "No qualifying swings in the retained observations.");
@@ -190,8 +183,12 @@ function renderAlerts() {
   KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
   const fetched = state.snap?.collected_at;
   const feedGen = state.alerts?.generated_at;
+  const c = state.alerts?.counts || {};
+  const funnel = Array.isArray(feed) && Object.keys(c).length
+    ? ` ${c.all_events ?? all.length} confirmed by the exchange's own print record (trade tape); ${c.restatements_excluded ?? 0} candidate difference(s) excluded as restatements of an earlier trade; ${c.unverified_excluded ?? 0} could not be checked against the tape and are listed separately rather than shown as moves.`
+    : "";
   KD.$("#alertFreshness").textContent = feedGen
-    ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record. Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`
+    ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record.${funnel} Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`
     : fetched
       ? `Alert scan uses consecutive snapshots through ${fetched} UTC (archive feed unavailable — recomputed from retained history). The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
       : "Alert feeds are empty until a sourced snapshot is available.";

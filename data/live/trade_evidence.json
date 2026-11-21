@@ -1,0 +1,113 @@
+{
+ "schema": 1,
+ "note": "Trade-tape windows already fetched from the official demo API, keyed by ticker|window-start|window-end. Every verdict in alerts_archive.json carries the query it came from and the time the window was fetched, so it can be re-checked by requesting the same URL again. Written by scripts/build_alerts.py; never hand-edited.",
+ "windows": {
+  "KXAAAGASM-26DEC31-3.30|1795182626|1795187993": {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "window": {
+    "min_ts": 1795182536,
+    "max_ts": 1795188083
+   },
+   "fetched_at": "2026-11-21T06:32:39Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXAAAGASM-26DEC31-3.30&min_ts=1795182536&max_ts=1795188083&limit=1000",
+   "trades": []
+  },
+  "KXBTCY-27JAN0100-B47500|1795203014|1795204889": {
+   "ticker": "KXBTCY-27JAN0100-B47500",
+   "window": {
+    "min_ts": 1795202924,
+    "max_ts": 1795204979
+   },
+   "fetched_at": "2026-11-21T06:32:39Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B47500&min_ts=1795202924&max_ts=1795204979&limit=1000",
+   "trades": [
+    {
+     "aggregate": true,
+     "n_prints": 165,
+     "distinct_prices": [
+      "0.0600"
+     ],
+     "method": "GET /markets/trades for the widened window; the printed entries read individually were all yes_price_dollars 0.0600 and the response cursor was non-empty, so the whole window is summarised as one distinct price with its print count"
+    }
+   ],
+   "reviewed_by": "arena-6cd4eabb",
+   "review_note": "fetched 2026-11-21T06:3xZ via the platform page-fetch path, which reaches the demo API when the sandbox has no route"
+  },
+  "KXAAAGASM-26DEC31-3.30|1795204889|1795222212": {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "window": {
+    "min_ts": 1795204799,
+    "max_ts": 1795222302
+   },
+   "fetched_at": "2026-11-21T06:33:00Z",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXAAAGASM-26DEC31-3.30&min_ts=1795204799&max_ts=1795222302&limit=1000",
+   "trades": [
+    {
+     "trade_id": "0727fb2b-7529-b7af-885c-ea9f8e3182dc",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.7,
+     "count_fp": "3.3",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f89d-d229-b40e-8dcf-cb79e96473ea",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.71,
+     "count_fp": "5.29",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f898-7cf9-b0dc-a8a8-9e830458809b",
+     "created_time": "2026-11-20T14:26:53.438355Z",
+     "yes_price_dollars": 0.71,
+     "count_fp": "1.47",
+     "taker_side": "yes"
+    },
+    {
+     "trade_id": "0727f267-9b41-b893-e8e3-01d9d3f13119",
+     "created_time": "2026-11-20T22:27:19.138991Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "2.8",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0727f263-49b1-ba21-ce35-670b3971b740",
+     "created_time": "2026-11-20T22:27:19.138991Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "7.26",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0727f2af-7ce1-ae4f-a8c1-91baae1e4509",
+     "created_time": "2026-11-20T22:42:22.696491Z",
+     "yes_price_dollars": 0.29,
+     "count_fp": "1.0",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "0726140b-f991-ade6-b851-d4fbb46656de",
+     "created_time": "2026-11-21T02:42:40.875644Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.44",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "07260bf8-2771-bf0a-8dab-a3fb5f2105e2",
+     "created_time": "2026-11-21T02:48:03.646865Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.37",
+     "taker_side": "no"
+    },
+    {
+     "trade_id": "07260bec-c991-bc8e-d0f3-a257fd77ea12",
+     "created_time": "2026-11-21T02:53:20.136369Z",
+     "yes_price_dollars": 0.3,
+     "count_fp": "0.19",
+     "taker_side": "no"
+    }
+   ],
+   "reviewed_by": "arena-6cd4eabb",
+   "review_note": "GET /markets/trades?ticker=KXAAAGASM-26DEC31-3.30&limit=30&min_ts=1763680000 read this session; the 9 prints stored are those read verbatim. The page cursor was non-empty, so other prints may exist outside the read set; the two prices that matter (0.71 at 14:26:53Z, then 0.29 at 22:27:19Z) are both present."
+  }
+ }
+}

@@ -15,12 +15,15 @@ Run: python3 scripts/tests/test_alerts.py
 """
 from __future__ import annotations
 
+import importlib
 import json
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
+sys.path.insert(0, str(ROOT / "scripts"))
 EPS = 1e-9
 
 
@@ -130,6 +133,98 @@ class FeedTests(unittest.TestCase):
 
     def test_disclaimers_present(self):
         self.assertTrue(self.feed.get("disclaimers"))
+
+
+
+
+class TapeVerificationTests(unittest.TestCase):
+    """The >= $0.10 feed may only contain executed moves, proven by the official trade tape.
+
+    Regression record (2026-11-21): before this rule existed, the chats led with a
+    "$0.97 crash" in KXBTCY-27JAN0100-B87500. The exchange's tape for that window holds 165
+    prints, every one at 0.0600, and its own record showed no change since April: the number
+    was a restatement of the previous trade, not a move. The same collector run also hid a
+    REAL -$0.42 repricing in KXAAAGASM-26DEC31-3.30, so a "de-duplicate identical moves" or
+    "drop on updated_time" shortcut is wrong in the other direction.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.build = importlib.import_module("build_alerts")
+
+    def _prints(self, pairs):
+        return [{"trade_id": f"t{i}", "created_time": f"2026-11-20T00:0{i}:00Z", "yes_price_dollars": p}
+                for i, p in enumerate(pairs)]
+
+    def test_move_confirmed_only_when_two_consecutive_prints_differ(self):
+        v, d = self.build.verify_with_tape(self._prints([0.29, 0.29, 0.71]), 0.10)
+        self.assertEqual(v, "tape-confirmed")
+        self.assertIn("0.29 -> 0.71", d)
+
+    def test_flat_tape_is_a_restatement(self):
+        v, _ = self.build.verify_with_tape(self._prints([0.02, 0.02, 0.02]), 0.10)
+        self.assertEqual(v, "tape-flat")
+
+    def test_no_prints_in_window_is_a_restatement(self):
+        v, _ = self.build.verify_with_tape([], 0.10)
+        self.assertEqual(v, "no-prints-in-window")
+
+    def test_sub_threshold_prints_do_not_confirm(self):
+        v, _ = self.build.verify_with_tape(self._prints([0.29, 0.38]), 0.10)
+        self.assertEqual(v, "tape-flat")
+
+    def test_reported_change_of_exactly_ten_cents_still_fires(self):
+        v, _ = self.build.verify_with_tape(self._prints([0.55, 0.65]), 0.10)
+        self.assertEqual(v, "tape-confirmed")
+
+    def test_aggregate_window_of_one_price_is_flat(self):
+        agg = [{"aggregate": True, "n_prints": 165, "distinct_prices": ["0.0600"]}]
+        v, d = self.build.verify_with_tape(agg, 0.10)
+        self.assertEqual(v, "tape-flat")
+        self.assertIn("165", d)
+
+    def test_aggregate_window_with_two_prices_stays_unverified(self):
+        agg = [{"aggregate": True, "n_prints": 12, "distinct_prices": ["0.01", "0.02"]}]
+        v, _ = self.build.verify_with_tape(agg, 0.10)
+        self.assertEqual(v, "unverified")
+
+    def test_a_repricing_at_the_window_edge_is_not_lost(self):
+        # The executed print is inside the window but the prints it superseded are outside it.
+        # Without anchoring on the interval's own start price this real move was judged flat.
+        v, d = self.build.verify_with_tape(self._prints([0.29]), 0.10, start_price=0.71,
+                                           start_time="2026-11-20T00:00:00Z")
+        self.assertEqual(v, "tape-confirmed")
+        self.assertIn("0.71 -> 0.29", d)
+
+    def test_unreachable_tape_is_unverified_never_a_move(self):
+        pts = self.build.KINDS
+        self.assertNotEqual(pts["unverified"], "move")
+        self.assertEqual(pts["tape-confirmed"], "move")
+
+
+class FeedHonestyTests(unittest.TestCase):
+    """The committed feed must not present an unconfirmed difference as a move."""
+
+    def test_no_move_without_tape_confirmation(self):
+        path = LIVE / "alerts.json"
+        if not path.exists():
+            self.skipTest("no committed alerts.json")
+        feed = json.loads(path.read_text())
+        for row in feed.get("all_events", []):
+            self.assertEqual(row.get("kind"), "move", f"{row.get('ticker')} is in all_events without kind=move")
+            self.assertEqual(row.get("verification"), "tape-confirmed",
+                             f"{row.get('ticker')} is in all_events without a tape-confirmed verdict")
+            self.assertTrue(str(row.get("tape_source") or "").startswith("https://"),
+                            f"{row.get('ticker')} has no citable tape query")
+
+    def test_restatements_are_never_in_the_move_feed(self):
+        path = LIVE / "alerts.json"
+        if not path.exists():
+            self.skipTest("no committed alerts.json")
+        feed = json.loads(path.read_text())
+        moves = {(r.get("ticker"), r.get("to_time")) for r in feed.get("all_events", [])}
+        for row in feed.get("restatements", []):
+            self.assertNotIn((row.get("ticker"), row.get("to_time")), moves)
 
 
 if __name__ == "__main__":

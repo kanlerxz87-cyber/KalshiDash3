@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T19:50:00Z",
+ "generated": "2026-11-21T06:50:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
  "questions": [
   {
@@ -729,6 +729,42 @@
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ],
    "id": "F-37"
+  },
+  {
+   "id": "F-38",
+   "severity": "high",
+   "item": "The \u2265$0.10 alert chats were reporting price RESTATEMENTS as price MOVES",
+   "why": "scripts/build_alerts.py paired two consecutive snapshot reads of last_price_dollars and called any difference \u2265 $0.10 a swing. A snapshot's last price can restate an earlier trade instead of reporting a new one, so the chats led with moves that never happened. Measured 2026-11-21 on the official demo API: KXBTCY-27JAN0100-B87500 was reported as a \u2212$0.97 crash (0.99 \u2192 0.02) and a +$0.95 spike (0.04 \u2192 0.99) across three collector runs, while GET /markets/trades?ticker=KXBTCY-27JAN0100-B87500&limit=20 returned 20 consecutive prints all at 0.0200 \u2014 no 99\u00a2 print exists \u2014 and the market's own record showed updated_time 2026-04-28. A second row, KXBTCY-27JAN0100-B47500 (\u2212$0.92), sat on a window whose tape holds 165 prints, every one at 0.0600. The exposure was 3 of 15 archived 'swings' plus the entire lower half of the feed, and the same recomputation was duplicated in dashboard.html's fallback, assets/live.js's history import and scripts/simulate.py's signal list, so the defect reached the chats, the price-move model and the paper-trading results.",
+   "action": "Fixed: no row is a move unless the official trade tape shows two consecutive PRINTS differing by at least the threshold. build_alerts.py now fetches GET /markets/trades?ticker=&min_ts=&max_ts= for every candidate, stores the exact query and the prints that decided it on the row, and publishes three separately labelled sections \u2014 all_events (tape-confirmed moves only), restatements (the tape shows the price did not actually move, or there are no prints in the window) and unverified (the tape could not be read). dashboard.html no longer recomputes swings from raw snapshots, assets/engine.js refuses to render a restatement as a swing, and simulate.py no longer trades one. Regression tests: scripts/tests/test_alerts.py (TapeVerificationTests, FeedHonestyTests) and scripts/tests/test_tape_node.js.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-trades",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXBTCY-27JAN0100-B87500&limit=20",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ]
+  },
+  {
+   "id": "F-39",
+   "severity": "high",
+   "item": "A real \u2212$0.42 repricing would have been DELETED by the obvious fix to F-38",
+   "why": "The first repair attempt classified a change as a restatement when the exchange's updated_time had not advanced. That rule is wrong in both directions. It would have hidden KXAAAGASM-26DEC31-3.30's genuine 0.71 \u2192 0.29 (\u2212$0.42) repricing, whose prints the official tape confirms at 2026-11-20T14:26:53Z (0.71) then 2026-11-20T22:27:19Z / 22:42:22Z (0.29) and again at 2026-11-21T02:42:40Z / 02:48:03Z / 02:53:20Z (0.30 NO lifted). It is also unsound as a test: KXAAAGASW-26NOV23-3.6200 printed at 0.9700 on 2026-11-21T06:28:37Z while its updated_time still read 2026-11-15T21:34:40Z, so updated_time does NOT advance on a trade. A second version of the same shortcut ('de-duplicate identical printed moves') would have deleted the first of the two 0.71 rows. Both were discarded before release; the trade tape is now the only authority.",
+   "action": "Fixed by design: verification uses executed prints, never updated_time. Two regression tests pin it \u2014 test_a_repricing_at_the_window_edge_is_not_lost (the executing print is inside the window while the prints it superseded are outside, so the interval's own start price is used as the anchor) and the 0.71 \u2192 0.29 row now appears in all_events as tape-confirmed rather than being suppressed. Recorded here because a wrong 'fix' that hides real alerts is the more dangerous failure of the two.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-trades",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/trades?ticker=KXAAAGASM-26DEC31-3.30&limit=5",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASW-26NOV23-3.6200"
+   ]
+  },
+  {
+   "id": "F-40",
+   "severity": "medium",
+   "item": "The alert chats were not tick-level: a swing between two 20-minute collector runs was invisible",
+   "why": "collect.yml runs on a 20-minute schedule and data/live/price_history.json retains roughly 14 observations per market, so a \u2265$0.10 move that happened and reversed inside one gap was never detected, and the in-browser detector (assets/live.js detectSwings) only compared its own poll points. requests WS streaming is unavailable to a static page because the WebSocket handshake requires an API key (https://docs.kalshi.com/getting_started/quick_start_websockets), so a static site cannot subscribe to ticker channels at all.",
+   "action": "Implemented without any key: the browser now reads the official trade tape per watched market (GET /markets/trades?ticker=&min_ts=&limit=, public) on a 25-second cycle and raises an alert whenever two consecutive executed prints differ by \u2265 $0.10, carrying both trade ids, both timestamps, the taker side and the exact query as the alert's evidence. A persisted cursor stops a reload from replaying the chat. Covers every watched market rather than one socket subscription per market. Tests: node scripts/tests/test_tape_node.js (11 checks). Sources/first-fetch timings are recorded per alert.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-trades",
+    "https://docs.kalshi.com/getting_started/quick_start_websockets"
+   ]
   }
  ]
 }
