@@ -141,9 +141,10 @@
    "id": "F-20",
    "claim": "Live market values (prices, volumes, resolutions) in this repo",
    "value": "",
-   "source": "",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
    "verified": false,
-   "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL."
+   "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL.",
+   "checked_against": "each live value is re-fetched from the demo Trade API at collection time; the field names and enum values above are what the official Get Markets reference documents"
   },
   {
    "id": "F-21",
@@ -494,11 +495,32 @@
    "verified": true,
    "checked_on": "2026-11-21",
    "how": "Read this session. Because no number is published, the chat dock polls slowly (12 s) and pauses while the tab is hidden rather than claiming a safe rate."
+  },
+  {
+   "id": "F-61",
+   "claim": "Candlestick request size and timestamp units",
+   "value": "At most 5,000 periods per request (else 400 bad_request with details); start_ts/end_ts in SECONDS, millisecond values rejected with 400",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
+   "id": "F-62",
+   "claim": "Candlesticks for markets settled before the historical cutoff",
+   "value": "Only available via GET /historical/markets/{ticker}/candlesticks",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
+  },
+  {
+   "id": "F-63",
+   "claim": "Candlestick data freshness",
+   "value": "The most recent candlesticks can be a few seconds behind the latest trades and quotes",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true
   }
  ],
  "counts": {
-  "total": 65,
-  "verified": 64,
+  "total": 68,
+  "verified": 67,
   "unverified": 1
  }
 }

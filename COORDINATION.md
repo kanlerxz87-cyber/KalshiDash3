@@ -1369,7 +1369,7 @@ session's identifier collides with main's F-37..F-64.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T41 | Take over stale PRs #55 and #56: merge both into the canonical tree with non-colliding finding IDs, keep both fixes, resolve data conflicts by keeping the newest real snapshot, full-suite verify, PR → main → merge → Pages confirm → record | done (merged, CI suite green) | arena-dc62f2bb | `COORDINATION.md`, `data/findings.json` (add new entries with fresh IDs F-65..F-71, keep F-37..F-64 verbatim), `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/*`, `assets/alerts.js`, `executive-summary.html`, `index.html`, `dashboard.html`, `.github/workflows/collect.yml`, `data/live/simulation.json` (merge-resolution only) | `verify_release.py`, `check_site.py`, `validate_live.py`, `validate_alerts.py`, `test_collect_coverage.py`, `test_settled_selection.py`, `test_simulate.py`, jsdom DOM/chatdock/engine suites | Data files: PR data is older than main's committed snapshot; main's newer snapshot kept and re-validated; fairness/candle fixes take effect at the next collector run |
+| T41 | Take over stale PRs #55 and #56: merge both into the canonical tree with non-colliding finding IDs, keep both fixes, resolve data conflicts by keeping the newest real snapshot, full-suite verify, PR → main → merge → Pages confirm → record | done — merged as PR #63 (`16b6f8e`); Pages green; fresh data committed | arena-dc62f2bb | `COORDINATION.md`, `data/findings.json` (add new entries with fresh IDs F-65..F-71, keep F-37..F-64 verbatim), `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/*`, `assets/alerts.js`, `executive-summary.html`, `index.html`, `dashboard.html`, `.github/workflows/collect.yml`, `data/live/simulation.json` (merge-resolution only) | `verify_release.py`, `check_site.py`, `validate_live.py`, `validate_alerts.py`, `test_collect_coverage.py`, `test_settled_selection.py`, `test_simulate.py`, jsdom DOM/chatdock/engine suites | Data files: PR data is older than main's committed snapshot; main's newer snapshot kept and re-validated; fairness/candle fixes take effect at the next collector run |
 
 ### Handoff notes (stale claims taken over)
 - PR #55 (`arena/a3070ffa-kalshidash3`, 2026-11-21T06:45Z): 13 changed files (dashboard.html +230, collect.py, simulate.py, test_collect_coverage.py (new), test_pages_dom.js, test_simulate.py, collect.yml, alerts.js, executive-summary.html, README.md, simulation.json, findings.json).
@@ -1377,22 +1377,124 @@ session's identifier collides with main's F-37..F-64.
 
 ### Log (this session)
 - 2026-11-21 ~20:20Z: claimed T41; recorded claim before any edit.
+- 2026-11-21 ~20:25Z: integration PR **#63** (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/63) merged as merge commit `16b6f8e4b5a1ff7c0ff764df7c2839e7d165c622` (2026-11-21T20:24:27Z). Both stale PRs (#55 → `af6e8b9`, #56 → `af8776b`) merged with it; their findings renumbered to F-65..F-71.
+- 2026-11-21 ~20:26Z: Pages deploys after the merge confirmed green (`Deploy site to GitHub Pages` run `44946118013`; `pages-build-deployment` run `44946117400`, both `success`, `pages.status=built`).
+- 2026-11-21 ~20:27Z: fresh collector run on `main` (collect run `44946255522`, desk run `44946257966` — both `success`) committed `c43667f` (`data: demo snapshot 2026-11-21T20:27Z`) and `d29bf84` (`data: live-desk scan 2026-11-21T20:28Z`). Pages re-deployed green on both commits (`44946373332`, `44946447045`). Fresh snapshot: `open_in_scope 561`, `settled_in_scope_total 19680` (of 1600 stored / 200 published), `settled_published_by_category {gas: 17, culture: 5, crypto: 178}` — elections/golf still zero (F-66, not claimed fixed), `historical_cutoff 2026-09-22T00:00:00Z`, `historical_backfill_rows 216`, `open_paging_truncated_at_safety_cap true`.
 - 2026-11-21 ~20:40Z: merged PR #56 (settled-selection) then PR #55 (candles/coverage). Conflicts resolved without deleting either implementation: `COORDINATION.md` kept both session sections; findings renumbered fresh (F-65/F-66 ← PR #56's F-41/F-42; F-67..F-71 ← PR #55's F-40..F-44); data files kept from main (15:21:23Z snapshot), so PR #56's older 06:56:14Z archives were dropped (the auto-merged archive mixed two snapshots and failed both validators); test_pages_dom.js kept main's F-64 index mode AND PR #55's candles/deep-link modes; mode H rewritten for main's KPI wording.
 - 2026-11-21 ~20:45Z: `verify_release.py` PASS on the merged tree (compile, node --check, all validators and tests, jsdom suites, 21-page check). `test_settled_selection.py` 10/10 checks including the [:1600] ordering regression and the control. `test_collect_coverage.py` + `test_simulate.py` + `test_pages_dom.js` all green.
 
 ---
 
-## Session `arena-e1647955` — official-source catalyst review for newest swings + live-chart observation bugfix + chatdock chart links & sources hygiene (branch `arena/e1647955-kalshidash3`)
+## Session `arena-dba435ee` — line-by-line verification + freshness refresh + integration close-out (branch `arena/dba435ee-kalshidash3`)
 
-Base: `f09f982`, merged forward onto `d29bf84` (`origin/main`, after PR #63). Initially claimed T43–T45 at 2026-11-21 20:20Z before editing any implementation file. While this session worked, PR #63 (`16b6f8e`, `arena-dc62f2bb`) merged PRs #55/#56 to `main`; per the non-overlapping-scope and merge-conflict rules, this session adopted PR #63's implementations of `scripts/collect.py`, `scripts/simulate.py`, `dashboard.html` candlesticks/deep-links, and their tests verbatim, and narrowed its scope to the remaining non-overlapping defects below (renumbered T50–T52 to avoid colliding with parallel sessions `arena-b25b0914` and `arena-dba435ee`).
+Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:17Z before editing any implementation file. No other session shows an in-progress claim on the board; scopes below are this session's only.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T50 | Fix remaining dashboard/chatdock/sources defects on `main`: (1) `dashboard.html` silently dropped live poll ticks (`Date.parse(nowMs) === NaN`) and `bid`/`ask` observation series (`o["bid"]` vs `o.yes_bid`/`o.yes_ask`); (2) add `dashboard.html#TICKER` chart link to `assets/chatdock.js` alert bubbles; (3) fix `sources.html` broken filename `scripts/alerts.py` → `scripts/build_alerts.py` (logged request from `arena-617e3472`) | in progress | arena-e1647955 | `dashboard.html`, `assets/chatdock.js`, `sources.html`, `scripts/tests/test_pages_dom.js`, `scripts/tests/test_chatdock.js` | `scripts/verify_release.py`, jsdom DOM & chatdock regression tests | — |
-| T51 | Official-source catalyst review for all 3 unreviewed swings added after 06:42Z (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`) + rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | in progress | arena-e1647955 | `data/catalyst_review.json`, `data/live/catalysts.json` | Direct live fetches of Kalshi demo API, Coinbase Exchange BTC-USD 1m candles, PGA Tour official RSM Classic leaderboard, `validate_catalysts.py` | `KXPGATOUR-THRC26-BHAR` printed +74.5¢ on demo while official PGA Tour leaderboard lists Brian Harman as `CUT` (+1, 71-72=143) and Round 3 suspended Saturday |
-| T52 | Full verification gate, PR → main, merge, GitHub Pages deploy confirm, and live URL re-fetch | unclaimed | arena-e1647955 | `COORDINATION.md` | `scripts/verify_release.py`, live site fetch, `gh api .../pages` | — |
+| T47 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
+| T48 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
+| T49 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
+
+### Log (this session)
+- 2026-11-21 20:17Z: claimed T40–T42 on `arena/dba435ee-kalshidash3` (base `f09f982` == main). Snapshot `collected_at 2026-11-21T15:21:23Z` is ~5h old (stale banner at 45 min); desk scan `2026-11-21T17:57Z` is ~2.3h old. Starting verification.
+- 2026-11-21 20:24Z: **Task-ID collision detected and resolved.** `arena-83749e18` claimed T40–T43 at 20:20Z
+  (`80c22c8`, branch `arena/83749e18-kalshidash3`) after my 20:17Z claim of T40–T42. Renumbered my tasks to T44–T46.
+  Their file scope (`scripts/collect.py`, `scripts/roi_scan.py`, `scripts/roi_model.py`, `dashboard.html`,
+  `assets/engine.js`, `assets/site.js`, `index.html`, `roi.html`, `scripts/tests/*`) does **not** overlap my scope
+  (`COORDINATION.md`, `data/verified_facts.json`, `data/findings.json`, `README.md`), so both can proceed. I will not
+  edit their files; anything I find in them is logged as a request in this file instead.
+
+### T44 verification log (arena-dba435ee, 2026-11-21)
+
+Official pages re-fetched live this session and checked line by line (all 200, content matched):
+`getting_started/demo_env`, `getting_started/api_environments`, `getting_started/market_settlement`,
+`getting_started/orderbook_responses`, `getting_started/market_lifecycle`,
+`getting_started/quick_start_websockets`, `getting_started/rate_limits`, `api-reference/market/get-markets`,
+`api-reference/market/get-market-candlesticks`, `api-reference/orders/create-order-v2`,
+`kalshi.com/docs/kalshi-fee-schedule.pdf` (both chunks), plus
+`help.kalshi.com/.../13823775-creating-and-using-a-demo-account`.
+
+**Confirmed against `data/verified_facts.json` — no correction needed:** F-01…F-08 (all four demo/prod REST and WS
+roots, mock funds, credentials not shared, demo-price warning), F-11/F-12 (status vocabulary and the
+`?status=` filter mapping — `closed` = "any market past close_time that is not yet finalized"), F-13/F-14/F-37
+($1 per winning contract, net positions, "There is no settlement fee." / "There is no membership fee."),
+F-15/F-16/F-27/F-28 (bids only, ascending, best bid last, YES ask = 1 − best NO bid), F-17/F-29/F-30 (1/60/1440
+minute intervals; `end_period_ts`, `yes_bid{…_dollars}`, `price{open…}`, `volume_fp`, `open_interest_fp`),
+F-22/F-23/F-24/F-54 (`notional_value_dollars` is a per-contract settlement value, `volume_fp` / `volume_24h_fp` /
+`open_interest_fp` are fixed-point contract counts, `result` ∈ yes|no|scalar|""), F-31 (every WS session is
+key-authenticated, including for public channels), F-36 (taker `ceil(M × 0.07 × C × P × (1−P))`, maker
+`ceil(M × 0.0175 × C × P × (1−P))` — reproduced exactly by `scripts/roi_model.py`, checked against all 21 rows of
+the PDF's General Trading Fees Table by `scripts/tests/test_fees.py`), F-38 (demo has no preloaded funds), F-39
+(unauthenticated requests are rate-limited separately), F-53 (unknown ticker → 200 with empty arrays), F-55–F-60.
+All **13** seed series in `data/categories.json` were re-checked against the PDF's Non-Standard Fees table:
+`KXAAAGASM` (US gas price), `KXELECTIRAN`, `KXEMMYCACTO` / `KXEMMYCACTR` / `KXEMMYCSERIES` / `KXBALLONDOR` /
+`KXSUPERBOWLHEADLINE` (the last hyphenated across lines in the PDF as "KXSUPERBOWLHEADL" + "INE"), `KXBTCMAX150` /
+`KXBTCY` / `KXETHY`, `KXPGATOUR` / `KXPGARYDER` / `KXPGASOLHEIM`. All present, all descriptions match.
+`KXPGATOUR`'s "PGA Tour … 1 1" row sits in the PDF's row-continuation block on page 2 — verified there.
+
+**Two documented limits were missing from the fact table — added, not inferred:**
+- F-61: one candlestick request spans **at most 5,000 periods**; `start_ts`/`end_ts` are **seconds** and
+  millisecond values are rejected with `400 bad_request` (`api-reference/market/get-market-candlesticks`).
+- F-62: candlesticks for markets settled **before the historical cutoff** are only available via
+  `GET /historical/markets/{ticker}/candlesticks` (same page).
+- F-63: the most recent candlesticks "can be a few seconds behind the latest trades and quotes" (same page).
+- F-20 (the one deliberately blank row) now carries the official endpoint it is checked against
+  (`api-reference/market/get-markets`) instead of an empty `source`; its `value` is still blank and it is still
+  marked unverified, because live values are collection outputs, not static facts.
+
+**Checked and clean — no action needed:** every window on `live.html` (`5m` = 1-min candles × 300, `60m` = 60-min × 72,
+`1440m` = 1440-min × 30) and on `assets/live.js` (`candles()`) stays inside both the 1/60/1440 interval enum and the
+new 5,000-period cap, so the cap is recorded but not breached. `index.html` already discloses that it shows only the
+settled rows stored in the snapshot and prints `counts.settled_rows_trimmed_for_size` next to them (1,600 in scope,
+200 stored, 16,555 trimmed in the 20:18Z snapshot) — the disclosure is accurate and I did not change it.
+
+**Irregularities found in files outside my scope → logged as requests, not edited** (owner: `arena-83749e18`, who
+claimed `index.html`, `dashboard.html`, `assets/*.js`; `executive-summary.html` is unclaimed):
+
+| R-id | File | What is wrong | Correction | Source |
+|---|---|---|---|---|
+| R-2 | `executive-summary.html` | §1 row "Live alerting … (F-14)" cites F-14 (the high-ROI-model gap) for the browser-polling/CORS point. The CORS finding is **F-24**. | point the link at F-24 | `data/findings.json` F-24 |
+| R-3 | `executive-summary.html` | §1 row "Live interactive dashboard" cites **F-06** for "candlesticks only go down to one minute" and **F-14** for browser polling. F-06 is that candlestick claim, but the polling link should be F-24; the candlestick row should also cite **F-61/F-62** for the 5,000-period cap and the historical cutoff. | F-06 → keep, add F-61/F-62, F-14 → F-24 | `api-reference/market/get-market-candlesticks` |
+| R-4 | `executive-summary.html` | "Automate simulated trades (S1–S4 replay)" row says "the alerts-page auto-sim (G13)", but `alerts.html` contains no simulator — the auto-sim is `trading.html` (G13's own text says so). | "the auto-sim on Auto-sim trading (`trading.html`)" | `trading.html` `<title>`; `data/findings.json` G13 |
+| R-5 | `executive-summary.html` | §1 "Verified throughout" cell hard-codes "59 claims checked; 1 deliberately blank" and "Thirty-eight irregularities". The fact table is now **68 claims, 67 verified, 1 blank**; `data/findings.json` holds **43** flagged irregularities. | render the counts from `data/verified_facts.json` / `data/findings.json` instead of typing them | `data/verified_facts.json`, `data/findings.json` |
+| R-6 | `executive-summary.html` | §1 says "the arena-f068786c integration added F-29"; F-29 is present, but the same cell cites "F-05" for the five-sessions-one-tree finding — check that id still points at the canonical-tree finding after the F-6x additions. | re-check the F-05 anchor | `data/findings.json` |
+
+I verified the *substance* of every R-2…R-6 row against official sources while doing this; only the ids and the two
+hard-coded totals are wrong. None of them changes a sourced value.
+
+- 2026-11-21 20:30Z: **second task-ID collision.** `arena-b25b0914` claimed T43–T46 at ~20:22Z (`694cc07`). My tasks
+  moved again, to **T47–T49**. Critically, their T44 scope explicitly includes `executive-summary.html`, which is
+  the file my requests R-2…R-6 point at — so I will **not** touch it; those five requests stand for them to apply.
+  Three sessions are now live (`arena-83749e18`, `arena-b25b0914`, `arena-dba435ee`) and all three intend to merge
+  to `main`. To avoid duplicate/conflicting merges I am keeping my diff to `data/verified_facts.json` (facts only,
+  no shared output) plus this log, and running `git pull --rebase` immediately before every push.
+
+---
+
+## Session `arena-e1647955` — official-source catalyst review for newest swings + live-chart observation bugfix + chatdock chart links & sources hygiene (branch `arena/e1647955-kalshidash3`)
+
+Base: `f09f982`, merged forward onto `9ca45e5` (`origin/main`, after PRs #63, #64, #65). Initially claimed T43–T45 at 2026-11-21 20:20Z before editing any implementation file. While this session worked, PR #63 (`16b6f8e`, `arena-dc62f2bb`) merged PRs #55/#56 to `main` and PR #64 (`9ca45e5`, `arena-dba435ee`) updated `data/verified_facts.json`; per the non-overlapping-scope and merge-conflict rules, this session adopted PR #63's and PR #64's changes verbatim (zero work discarded) and narrowed its scope to T50–T52 below.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T50 | Fix remaining dashboard/chatdock/sources defects on `main`: (1) `dashboard.html` silently dropped numeric-timestamp live poll ticks (`Date.parse(nowMs) === NaN`) and `bid`/`ask` observation series (`o["bid"]` vs `o.yes_bid`/`o.yes_ask`); (2) add `dashboard.html#TICKER` chart link to `assets/chatdock.js` alert bubbles; (3) fix `sources.html` broken filename `scripts/alerts.py` → `scripts/build_alerts.py` (logged request from `arena-617e3472`) | done | arena-e1647955 | `dashboard.html`, `assets/chatdock.js`, `sources.html`, `scripts/tests/test_pages_dom.js`, `scripts/tests/test_chatdock.js` | `scripts/verify_release.py` PASS (new DOM test I proves `yes_bid`/`yes_ask` plot and numeric live poll tick increments count `1 -> 2`; `test_chatdock.js` proves `dashboard.html#TICKER` link) | — |
+| T51 | Official-source catalyst review for all 3 unreviewed swings added after 06:42Z (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`) + rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-e1647955 | `data/catalyst_review.json`, `data/live/catalysts.json` | Direct live fetches of Kalshi demo API (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`, `series/KXPGATOUR`), Coinbase Exchange BTC-USD 1m candles (`15:14Z–15:24Z`), PGA Tour official RSM Classic leaderboard; `validate_catalysts.py` PASS (16/25 reviewed, 33 traceable links, 9 BRTI swings with explicit reasons) | `KXPGATOUR-THRC26-BHAR` printed +74.5¢ on demo (`0.005 -> 0.75`) while official PGA Tour leaderboard lists Brian Harman as `CUT` (+1, R1 71, R2 72, total 143) and Round 3 suspended Saturday after rain/saturated course conditions |
+| T52 | Full verification gate, PR → main, merge, GitHub Pages deploy confirm, and live URL re-fetch | in progress | arena-e1647955 | `COORDINATION.md` | `scripts/verify_release.py` PASS; pending PR merge + live Pages check | — |
+
+### Sources fetched and verified live in this session (`arena-e1647955`, 2026-11-21)
+- `https://docs.kalshi.com/api-reference/market/get-markets` — verified `mve_filter ∈ {only, exclude}` and query parameters.
+- `https://docs.kalshi.com/api-reference/market/get-market-candlesticks` — verified `period_interval ∈ {1, 60, 1440}` and `*_dollars` response block.
+- `https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks` — verified archived endpoint path and unsuffixed price fields.
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=2&mve_filter=exclude` — live 200 OK response with cursor.
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP` — finalized `result: "no"` at `2026-11-21T16:01:32.910945Z`, strike `60237.37 USD`, Coinbase Exchange BTC-USD settlement rules.
+- `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z` — 11 one-minute candles (`15:16Z` close `59901.74`, `15:18Z` close `59727.25` / low `59581.53`, `15:21Z` close `60144.14` — below strike `60237.37` throughout).
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR` — `"The RSM Classic: Brian Harman wins"`, `last_price_dollars: "0.7500"`, `previous_price_dollars: "0.0050"`, `yes_bid_dollars: "0.0000"`, `yes_ask_dollars: "1.0000"`.
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR` — official settlement sources include PGA Tour (`https://www.pgatour.com/`), ESPN, Fox Sports.
+- `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` — Round 3 suspended Saturday (no Saturday play; rescheduled Sunday 9:10–11:00 a.m. ET); Brian Harman listed `CUT` (`+1`, R1 `71`, R2 `72`, total `143`).
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500` — CF Benchmarks BRTI settlement (75000–79999.99), `last_price_dollars: "0.9800"`, `yes_bid_dollars: "0.0200"`, `yes_ask_dollars: "0.9800"`, `updated_time: "2026-04-28T02:27:21.580016Z"`.
 
 ### Log (`arena-e1647955`)
 - 2026-11-21 20:20Z: Claimed initial tasks on `arena/e1647955-kalshidash3` (base `f09f982`).
-- 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, containing PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63's `scripts/collect.py`, `scripts/simulate.py`, `dashboard.html` candlesticks, and tests verbatim (nothing from PR #63 discarded); narrowed scope to T50–T52. Confirmed `origin/main`'s `dashboard.html` still passes numeric `nowMs` into `Date.parse(o.t)` (producing `NaN` and dropping every live poll point) and indexes `o["bid"]`/`o["ask"]` instead of `yes_bid`/`yes_ask` (producing empty bid/ask observation series).
+- 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63 verbatim; narrowed scope to T50–T52.
+- 2026-11-21 20:32Z: Completed T50 (`dashboard.html` live-tick + `yes_bid`/`yes_ask` fix, `assets/chatdock.js` chart links, `sources.html` `scripts/build_alerts.py` fix, regression tests) and T51 (16/25 swings reviewed, 33 traceable links, 9 BRTI swings with official-record reasons). Merged `origin/main` (`9ca45e5`, PRs #64/#65) keeping `data/verified_facts.json` and both board records verbatim. `scripts/verify_release.py` PASS.
 
