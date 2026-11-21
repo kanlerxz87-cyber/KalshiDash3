@@ -2,6 +2,28 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H07",
+   "title": "Demo BTC at or above 55704.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-21T06:42:56Z",
+   "to_time": "2026-11-21T06:49:12Z",
+   "from_price": 0.65,
+   "to_price": 0.45,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": 6665.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:49:13Z",
+   "high_roi": false
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",

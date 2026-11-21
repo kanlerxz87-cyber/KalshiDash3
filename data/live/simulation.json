@@ -2,17 +2,17 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-21T06:42:57Z",
- "snapshot_collected_at": "2026-11-21T06:42:56Z",
+ "generated_at": "2026-11-21T06:49:13Z",
+ "snapshot_collected_at": "2026-11-21T06:49:13Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
  "endpoint": "https://external-api.demo.kalshi.co/trade-api/v2",
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
-  "signals_processed_total": 21,
-  "new_signals_this_run": 2,
-  "open_positions": 10,
-  "settled_positions_kept": 1
+  "signals_processed_total": 22,
+  "new_signals_this_run": 1,
+  "open_positions": 8,
+  "settled_positions_kept": 3
  },
  "strategies": [
   {
@@ -21,30 +21,30 @@
    "side_rule": "follow",
    "signal_filter": "all",
    "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going.",
-   "signals": 21,
-   "not_filled": 17,
-   "not_filled_wide_spread": 9,
+   "signals": 22,
+   "not_filled": 18,
+   "not_filled_wide_spread": 10,
    "voided": 0,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 4,
    "skipped_duplicate": 1,
    "filled": 3,
-   "open": 3,
-   "settled": 0,
-   "wins": 0,
+   "open": 2,
+   "settled": 1,
+   "wins": 1,
    "losses": 0,
-   "hit_rate": null,
-   "realized_net": 0.0,
-   "unrealized_net_open": 0.07,
-   "avg_realized_per_settled": null,
-   "conclusion": "Insufficient sample: 0 settled of 30 needed.",
+   "hit_rate": 1.0,
+   "realized_net": 0.16,
+   "unrealized_net_open": -0.06,
+   "avg_realized_per_settled": 0.16,
+   "conclusion": "Insufficient sample: 1 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 3,
-     "settled": 0,
-     "wins": 0,
+     "settled": 1,
+     "wins": 1,
      "losses": 0,
-     "realized_net": 0.0
+     "realized_net": 0.16
     }
    }
   },
@@ -54,30 +54,30 @@
    "side_rule": "fade",
    "signal_filter": "all",
    "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses.",
-   "signals": 21,
-   "not_filled": 14,
-   "not_filled_wide_spread": 8,
+   "signals": 22,
+   "not_filled": 15,
+   "not_filled_wide_spread": 9,
    "voided": 1,
    "not_filled_no_quote": 4,
    "not_filled_bad_price": 2,
    "skipped_duplicate": 2,
    "filled": 5,
-   "open": 4,
-   "settled": 0,
+   "open": 3,
+   "settled": 1,
    "wins": 0,
-   "losses": 0,
-   "hit_rate": null,
-   "realized_net": 0.0,
-   "unrealized_net_open": -0.227,
-   "avg_realized_per_settled": null,
-   "conclusion": "Insufficient sample: 0 settled of 30 needed.",
+   "losses": 1,
+   "hit_rate": 0.0,
+   "realized_net": -0.23,
+   "unrealized_net_open": 0.01,
+   "avg_realized_per_settled": -0.23,
+   "conclusion": "Insufficient sample: 1 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 5,
-     "settled": 0,
+     "settled": 1,
      "wins": 0,
-     "losses": 0,
-     "realized_net": 0.0
+     "losses": 1,
+     "realized_net": -0.23
     }
    }
   },
@@ -170,11 +170,11 @@
   {
    "trade_type": "crypto | move up | entry high",
    "filled": 4,
-   "settled": 0,
-   "wins": 0,
+   "settled": 1,
+   "wins": 1,
    "losses": 0,
-   "realized_net": 0.0,
-   "hit_rate": null
+   "realized_net": 0.16,
+   "hit_rate": 1.0
   },
   {
    "trade_type": "crypto | move up | entry low",
@@ -188,11 +188,11 @@
   {
    "trade_type": "crypto | move up | entry mid",
    "filled": 1,
-   "settled": 0,
+   "settled": 1,
    "wins": 0,
-   "losses": 0,
-   "realized_net": 0.0,
-   "hit_rate": null
+   "losses": 1,
+   "realized_net": -0.23,
+   "hit_rate": 0.0
   }
  ],
  "open_positions": [
@@ -226,7 +226,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S4|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -258,71 +258,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T06:42:56Z"
-  },
-  {
-   "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
-   "strategy": "S1",
-   "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
-   "ticker": "KXBTC15M-26NOV210145-45",
-   "title": "BTC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_ticker": "KXBTC15M",
-   "direction": "up",
-   "side": "yes",
-   "trade_type": "crypto | move up | entry high",
-   "band": "high",
-   "entry_price": 0.82,
-   "entry_fee": 0.02,
-   "taker_multiplier": 1,
-   "contracts": 1,
-   "entered_at": "2026-11-21T06:34:10Z",
-   "quote_bid": 0.79,
-   "quote_ask": 0.82,
-   "quote_source": "archive",
-   "status": "open",
-   "outcome": null,
-   "settled_at": null,
-   "settled_result": null,
-   "realized_net": null,
-   "bid_now": 0.98,
-   "unrealized_net": 0.13,
-   "mark_note": null,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-   "mark_at": "2026-11-21T06:42:56Z"
-  },
-  {
-   "id": "S2|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|no",
-   "strategy": "S2",
-   "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
-   "ticker": "KXBTC15M-26NOV210145-45",
-   "title": "BTC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_ticker": "KXBTC15M",
-   "direction": "up",
-   "side": "no",
-   "trade_type": "crypto | move up | entry mid",
-   "band": "mid",
-   "entry_price": 0.21,
-   "entry_fee": 0.02,
-   "taker_multiplier": 1,
-   "contracts": 1,
-   "entered_at": "2026-11-21T06:34:10Z",
-   "quote_bid": 0.79,
-   "quote_ask": 0.82,
-   "quote_source": "archive",
-   "status": "open",
-   "outcome": null,
-   "settled_at": null,
-   "settled_result": null,
-   "realized_net": null,
-   "bid_now": 0.003,
-   "unrealized_net": -0.237,
-   "mark_note": null,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S1|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -354,7 +290,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -386,7 +322,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -418,7 +354,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -450,7 +386,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -482,7 +418,7 @@
    "unrealized_net": -0.05,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -514,10 +450,74 @@
    "unrealized_net": 0.03,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T06:42:56Z"
+   "mark_at": "2026-11-21T06:49:13Z"
   }
  ],
  "settled_positions": [
+  {
+   "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
+   "strategy": "S1",
+   "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_ticker": "KXBTC15M",
+   "direction": "up",
+   "side": "yes",
+   "trade_type": "crypto | move up | entry high",
+   "band": "high",
+   "entry_price": 0.82,
+   "entry_fee": 0.02,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T06:34:10Z",
+   "quote_bid": 0.79,
+   "quote_ask": 0.82,
+   "quote_source": "archive",
+   "status": "settled",
+   "outcome": "win",
+   "settled_at": "2026-11-21T06:45:02.913537Z",
+   "settled_result": "yes",
+   "realized_net": 0.16,
+   "bid_now": 0.98,
+   "unrealized_net": null,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "mark_at": "2026-11-21T06:42:56Z"
+  },
+  {
+   "id": "S2|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|no",
+   "strategy": "S2",
+   "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_ticker": "KXBTC15M",
+   "direction": "up",
+   "side": "no",
+   "trade_type": "crypto | move up | entry mid",
+   "band": "mid",
+   "entry_price": 0.21,
+   "entry_fee": 0.02,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T06:34:10Z",
+   "quote_bid": 0.79,
+   "quote_ask": 0.82,
+   "quote_source": "archive",
+   "status": "settled",
+   "outcome": "loss",
+   "settled_at": "2026-11-21T06:45:02.913537Z",
+   "settled_result": "yes",
+   "realized_net": -0.23,
+   "bid_now": 0.003,
+   "unrealized_net": null,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "mark_at": "2026-11-21T06:42:56Z"
+  },
   {
    "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
    "strategy": "S2",
@@ -582,7 +582,8 @@
    "KXDEMOFUTHOURLY-26NOV20H20-UP@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z",
    "KXDEMOFUTHOURLY-26NOV20H20-UP@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z",
    "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:34:10Z>2026-11-21T06:39:48Z",
-   "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z"
+   "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z",
+   "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:42:56Z>2026-11-21T06:49:12Z"
   ],
   "open": [
    {
@@ -615,7 +616,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S4|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -647,71 +648,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T06:42:56Z"
-   },
-   {
-    "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
-    "strategy": "S1",
-    "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
-    "ticker": "KXBTC15M-26NOV210145-45",
-    "title": "BTC price up in next 15 mins?",
-    "category_id": "crypto",
-    "category_basis": "keyword",
-    "series_ticker": "KXBTC15M",
-    "direction": "up",
-    "side": "yes",
-    "trade_type": "crypto | move up | entry high",
-    "band": "high",
-    "entry_price": 0.82,
-    "entry_fee": 0.02,
-    "taker_multiplier": 1,
-    "contracts": 1,
-    "entered_at": "2026-11-21T06:34:10Z",
-    "quote_bid": 0.79,
-    "quote_ask": 0.82,
-    "quote_source": "archive",
-    "status": "open",
-    "outcome": null,
-    "settled_at": null,
-    "settled_result": null,
-    "realized_net": null,
-    "bid_now": 0.98,
-    "unrealized_net": 0.13,
-    "mark_note": null,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-    "mark_at": "2026-11-21T06:42:56Z"
-   },
-   {
-    "id": "S2|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|no",
-    "strategy": "S2",
-    "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
-    "ticker": "KXBTC15M-26NOV210145-45",
-    "title": "BTC price up in next 15 mins?",
-    "category_id": "crypto",
-    "category_basis": "keyword",
-    "series_ticker": "KXBTC15M",
-    "direction": "up",
-    "side": "no",
-    "trade_type": "crypto | move up | entry mid",
-    "band": "mid",
-    "entry_price": 0.21,
-    "entry_fee": 0.02,
-    "taker_multiplier": 1,
-    "contracts": 1,
-    "entered_at": "2026-11-21T06:34:10Z",
-    "quote_bid": 0.79,
-    "quote_ask": 0.82,
-    "quote_source": "archive",
-    "status": "open",
-    "outcome": null,
-    "settled_at": null,
-    "settled_result": null,
-    "realized_net": null,
-    "bid_now": 0.003,
-    "unrealized_net": -0.237,
-    "mark_note": null,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S1|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -743,7 +680,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -775,7 +712,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -807,7 +744,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -839,7 +776,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -871,7 +808,7 @@
     "unrealized_net": -0.05,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -903,10 +840,74 @@
     "unrealized_net": 0.03,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T06:42:56Z"
+    "mark_at": "2026-11-21T06:49:13Z"
    }
   ],
   "closed": [
+   {
+    "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
+    "strategy": "S1",
+    "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
+    "ticker": "KXBTC15M-26NOV210145-45",
+    "title": "BTC price up in next 15 mins?",
+    "category_id": "crypto",
+    "category_basis": "keyword",
+    "series_ticker": "KXBTC15M",
+    "direction": "up",
+    "side": "yes",
+    "trade_type": "crypto | move up | entry high",
+    "band": "high",
+    "entry_price": 0.82,
+    "entry_fee": 0.02,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T06:34:10Z",
+    "quote_bid": 0.79,
+    "quote_ask": 0.82,
+    "quote_source": "archive",
+    "status": "settled",
+    "outcome": "win",
+    "settled_at": "2026-11-21T06:45:02.913537Z",
+    "settled_result": "yes",
+    "realized_net": 0.16,
+    "bid_now": 0.98,
+    "unrealized_net": null,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+    "mark_at": "2026-11-21T06:42:56Z"
+   },
+   {
+    "id": "S2|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|no",
+    "strategy": "S2",
+    "alert_key": "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
+    "ticker": "KXBTC15M-26NOV210145-45",
+    "title": "BTC price up in next 15 mins?",
+    "category_id": "crypto",
+    "category_basis": "keyword",
+    "series_ticker": "KXBTC15M",
+    "direction": "up",
+    "side": "no",
+    "trade_type": "crypto | move up | entry mid",
+    "band": "mid",
+    "entry_price": 0.21,
+    "entry_fee": 0.02,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T06:34:10Z",
+    "quote_bid": 0.79,
+    "quote_ask": 0.82,
+    "quote_source": "archive",
+    "status": "settled",
+    "outcome": "loss",
+    "settled_at": "2026-11-21T06:45:02.913537Z",
+    "settled_result": "yes",
+    "realized_net": -0.23,
+    "bid_now": 0.003,
+    "unrealized_net": null,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+    "mark_at": "2026-11-21T06:42:56Z"
+   },
    {
     "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
     "strategy": "S2",
@@ -942,31 +943,31 @@
   ],
   "counters": {
    "S1": {
-    "signals": 21,
-    "not_filled": 17,
+    "signals": 22,
+    "not_filled": 18,
     "not_filled_no_quote": 4,
     "not_filled_bad_price": 4,
     "skipped_duplicate": 1,
     "filled": 3,
-    "settled": 0,
-    "wins": 0,
+    "settled": 1,
+    "wins": 1,
     "losses": 0,
-    "realized_net": 0.0,
-    "not_filled_wide_spread": 9
+    "realized_net": 0.16,
+    "not_filled_wide_spread": 10
    },
    "S2": {
-    "signals": 21,
-    "not_filled": 14,
+    "signals": 22,
+    "not_filled": 15,
     "not_filled_no_quote": 4,
     "not_filled_bad_price": 2,
     "skipped_duplicate": 2,
     "filled": 5,
-    "settled": 0,
+    "settled": 1,
     "wins": 0,
-    "losses": 0,
-    "realized_net": 0.0,
+    "losses": 1,
+    "realized_net": -0.23,
     "voided": 1,
-    "not_filled_wide_spread": 8
+    "not_filled_wide_spread": 9
    },
    "_cat|S2|crypto": {
     "signals": 0,
@@ -975,18 +976,18 @@
     "not_filled_bad_price": 0,
     "skipped_duplicate": 0,
     "filled": 5,
-    "settled": 0,
+    "settled": 1,
     "wins": 0,
-    "losses": 0,
-    "realized_net": 0.0
+    "losses": 1,
+    "realized_net": -0.23
    },
    "_trade_types": {
     "crypto | move up | entry high": {
      "filled": 4,
-     "settled": 0,
-     "wins": 0,
+     "settled": 1,
+     "wins": 1,
      "losses": 0,
-     "realized_net": 0.0
+     "realized_net": 0.16
     },
     "crypto | move down | entry high": {
      "filled": 1,
@@ -1011,10 +1012,10 @@
     },
     "crypto | move up | entry mid": {
      "filled": 1,
-     "settled": 0,
+     "settled": 1,
      "wins": 0,
-     "losses": 0,
-     "realized_net": 0.0
+     "losses": 1,
+     "realized_net": -0.23
     }
    },
    "S3": {
@@ -1034,7 +1035,10 @@
     "not_filled_bad_price": 1
    },
    "_cat|S1|crypto": {
-    "filled": 3
+    "filled": 3,
+    "settled": 1,
+    "wins": 1,
+    "realized_net": 0.16
    },
    "_cat|S3|crypto": {
     "filled": 1
