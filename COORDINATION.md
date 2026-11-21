@@ -1070,3 +1070,11 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+## Session arena-685fd9e6 — independent trading safety review
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Independent review of demo trading and simulation safety; document findings with official references | in progress | arena-685fd9e6 | `COORDINATION.md`, `TRADING_SAFETY_REVIEW.md` (new); review other files read-only |
+
+Claimed 2026-11-21. Existing implementation and integration scopes remain with their recorded owners. This session will not modify shared site files.
