@@ -1542,3 +1542,33 @@ hard-coded totals are wrong. None of them changes a sourced value.
   Three sessions are now live (`arena-83749e18`, `arena-b25b0914`, `arena-dba435ee`) and all three intend to merge
   to `main`. To avoid duplicate/conflicting merges I am keeping my diff to `data/verified_facts.json` (facts only,
   no shared output) plus this log, and running `git pull --rebase` immediately before every push.
+
+---
+
+## Session `arena-e1647955` — official-source catalyst review for newest swings + live-chart observation bugfix + chatdock chart links & sources hygiene (branch `arena/e1647955-kalshidash3`)
+
+Base: `f09f982`, merged forward onto `9ca45e5` (`origin/main`, after PRs #63, #64, #65). Initially claimed T43–T45 at 2026-11-21 20:20Z before editing any implementation file. While this session worked, PR #63 (`16b6f8e`, `arena-dc62f2bb`) merged PRs #55/#56 to `main` and PR #64 (`9ca45e5`, `arena-dba435ee`) updated `data/verified_facts.json`; per the non-overlapping-scope and merge-conflict rules, this session adopted PR #63's and PR #64's changes verbatim (zero work discarded) and narrowed its scope to T50–T52 below.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T50 | Fix remaining dashboard/chatdock/sources defects on `main`: (1) `dashboard.html` silently dropped numeric-timestamp live poll ticks (`Date.parse(nowMs) === NaN`) and `bid`/`ask` observation series (`o["bid"]` vs `o.yes_bid`/`o.yes_ask`); (2) add `dashboard.html#TICKER` chart link to `assets/chatdock.js` alert bubbles; (3) fix `sources.html` broken filename `scripts/alerts.py` → `scripts/build_alerts.py` (logged request from `arena-617e3472`) | done | arena-e1647955 | `dashboard.html`, `assets/chatdock.js`, `sources.html`, `scripts/tests/test_pages_dom.js`, `scripts/tests/test_chatdock.js` | `scripts/verify_release.py` PASS (new DOM test I proves `yes_bid`/`yes_ask` plot and numeric live poll tick increments count `1 -> 2`; `test_chatdock.js` proves `dashboard.html#TICKER` link) | — |
+| T51 | Official-source catalyst review for all 3 unreviewed swings added after 06:42Z (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`) + rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-e1647955 | `data/catalyst_review.json`, `data/live/catalysts.json` | Direct live fetches of Kalshi demo API (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`, `series/KXPGATOUR`), Coinbase Exchange BTC-USD 1m candles (`15:14Z–15:24Z`), PGA Tour official RSM Classic leaderboard; `validate_catalysts.py` PASS (16/25 reviewed, 33 traceable links, 9 BRTI swings with explicit reasons) | `KXPGATOUR-THRC26-BHAR` printed +74.5¢ on demo (`0.005 -> 0.75`) while official PGA Tour leaderboard lists Brian Harman as `CUT` (+1, R1 71, R2 72, total 143) and Round 3 suspended Saturday after rain/saturated course conditions |
+| T52 | Full verification gate, PR → main, merge, GitHub Pages deploy confirm, and live URL re-fetch | in progress | arena-e1647955 | `COORDINATION.md` | `scripts/verify_release.py` PASS; pending PR merge + live Pages check | — |
+
+### Sources fetched and verified live in this session (`arena-e1647955`, 2026-11-21)
+- `https://docs.kalshi.com/api-reference/market/get-markets` — verified `mve_filter ∈ {only, exclude}` and query parameters.
+- `https://docs.kalshi.com/api-reference/market/get-market-candlesticks` — verified `period_interval ∈ {1, 60, 1440}` and `*_dollars` response block.
+- `https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks` — verified archived endpoint path and unsuffixed price fields.
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=2&mve_filter=exclude` — live 200 OK response with cursor.
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP` — finalized `result: "no"` at `2026-11-21T16:01:32.910945Z`, strike `60237.37 USD`, Coinbase Exchange BTC-USD settlement rules.
+- `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z` — 11 one-minute candles (`15:16Z` close `59901.74`, `15:18Z` close `59727.25` / low `59581.53`, `15:21Z` close `60144.14` — below strike `60237.37` throughout).
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR` — `"The RSM Classic: Brian Harman wins"`, `last_price_dollars: "0.7500"`, `previous_price_dollars: "0.0050"`, `yes_bid_dollars: "0.0000"`, `yes_ask_dollars: "1.0000"`.
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR` — official settlement sources include PGA Tour (`https://www.pgatour.com/`), ESPN, Fox Sports.
+- `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` — Round 3 suspended Saturday (no Saturday play; rescheduled Sunday 9:10–11:00 a.m. ET); Brian Harman listed `CUT` (`+1`, R1 `71`, R2 `72`, total `143`).
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500` — CF Benchmarks BRTI settlement (75000–79999.99), `last_price_dollars: "0.9800"`, `yes_bid_dollars: "0.0200"`, `yes_ask_dollars: "0.9800"`, `updated_time: "2026-04-28T02:27:21.580016Z"`.
+
+### Log (`arena-e1647955`)
+- 2026-11-21 20:20Z: Claimed initial tasks on `arena/e1647955-kalshidash3` (base `f09f982`).
+- 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63 verbatim; narrowed scope to T50–T52.
+- 2026-11-21 20:32Z: Completed T50 (`dashboard.html` live-tick + `yes_bid`/`yes_ask` fix, `assets/chatdock.js` chart links, `sources.html` `scripts/build_alerts.py` fix, regression tests) and T51 (16/25 swings reviewed, 33 traceable links, 9 BRTI swings with official-record reasons). Merged `origin/main` (`9ca45e5`, PRs #64/#65) keeping `data/verified_facts.json` and both board records verbatim. `scripts/verify_release.py` PASS.
+
