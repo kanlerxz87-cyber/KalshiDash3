@@ -862,6 +862,18 @@
     "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow",
     "https://kanlerxz87-cyber.github.io/KalshiDash3/"
    ]
+  },
+  {
+   "id": "F-68",
+   "severity": "high",
+   "item": "Fresh collector data was committed but never deployed \u2014 a GITHUB_TOKEN push does not trigger a Pages build",
+   "why": "This is the root cause behind the 'stale snapshot' symptoms (F-40, F-67) and it made the dashboard's freshness claims structurally wrong. GitHub states it verbatim: \"Commits pushed by a GitHub Actions workflow that uses the GITHUB_TOKEN do not trigger a GitHub Pages build.\" The scheduled collector commits data/live with exactly that token, and .github/workflows/pages.yml was triggered only on push/pull_request, so each successful collection updated the branch and then stopped: the repository had a fresh snapshot while the published site kept serving the previous one. Nothing in the pipeline was failing \u2014 the last link was missing.",
+   "action": "pages.yml now also triggers on workflow_run for the two scheduled data workflows (completed, main only), which is the documented way to chain a workflow on a completed run regardless of the token that pushed. The deploy gates are unchanged and remain exclusive to main and to non-PR runs; a completed run on any other branch deploys nothing. Verified after merge by comparing the collected_at in data/live/markets.json on the branch with the value the deployed page serves.",
+   "sources": [
+    "https://docs.github.com/en/actions/concepts/security/github_token",
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ]
   }
  ]
 }
