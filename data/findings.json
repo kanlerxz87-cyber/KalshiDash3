@@ -329,6 +329,69 @@
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
    ]
+  },
+  {
+   "id": "G19",
+   "suggestion": "Move the board to Kalshi's own WebSocket feed with a tiny server-side relay, so swings are detected on the exchange's tick stream instead of on REST polls.",
+   "why_it_helps_decisions": "The alert chats are the core of the brief. Today the fastest path is a browser REST poll (10 s default) plus a collector run every 20-47 min, so a swing that happens and reverses inside a poll gap is invisible. The ticker and trade channels push every change, which removes the gap instead of sampling it.",
+   "effort": "Medium — roughly one small always-on process (Cloudflare Worker, Fly.io or a tiny VM) plus a secret for the demo key.",
+   "risk": "The WebSocket handshake requires signed headers (KALSHI-ACCESS-KEY / -SIGNATURE / -TIMESTAMP) even for public channels, so the key must live server-side; a static GitHub Pages site cannot do it. Adds a service to run and monitor.",
+   "success_metric": "A swing that occurs between two polls appears in the chat within one second, and the number of >= $0.10 moves detected per day rises to the count measured from candlesticks (today the observation layer sees only 1-2 per hour).",
+   "status": "proposed",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/quick_start_websockets",
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
+  },
+  {
+   "id": "G20",
+   "suggestion": "SHIPPED: the dashboard chart now plots Kalshi's official candlesticks (1 / 60 / 1440-minute) for Minutes/Hours/Days, keeps accumulated observations for Seconds, marks >= $0.10 swings on the chart, and shows a pointer readout of price, time, period volume and open interest.",
+   "why_it_helps_decisions": "A trader can see the actual move and its size on the same axis as the price, and can tell a candle-derived move from an archived alert, instead of reading one dot per collector run.",
+   "effort": "Done in this session",
+   "risk": "Candle closes are not the same as collector observations, so a candle-derived swing can exist with no archived alert (labelled). Seconds resolution still cannot be requested from Kalshi.",
+   "success_metric": "Choosing Minutes issues one documented candlestick request and draws the returned candles; a candle with no price block is skipped, not plotted as $0.00 (pinned by scripts/tests/test_pages_dom.js section I, mutation-checked).",
+   "status": "implemented",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
+  },
+  {
+   "id": "G21",
+   "suggestion": "Give the resolution tracker a per-topic history view with a date filter and a one-click export, instead of a fixed newest-N table.",
+   "why_it_helps_decisions": "The brief asks to follow events until they resolve and to keep topics separate. Now that every topic has a resolution history (gas 154, golf 154, crypto 155, culture 136, elections 1 stored), a trader evaluating a strategy wants 'how did this series resolve over the last 30 days', which the current newest-first table cannot answer.",
+   "effort": "Small — the data is already in data/live/markets.json; this is a filter, a date control and a CSV button.",
+   "risk": "Only the published per-topic allocation is on the page; a full history would need a larger committed file or an on-demand query.",
+   "success_metric": "A reader can list every stored settlement for one topic and download it; the count on screen matches counts.settled_published_by_category.",
+   "status": "proposed",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
+  },
+  {
+   "id": "G22",
+   "suggestion": "Add a per-market 'why did this move' panel that shows the market's own settlement source next to a timestamped reading of that source (AAA national average for gas, the BRTI index for crypto), aligned to the swing's minute.",
+   "why_it_helps_decisions": "This is the brief's 'website links that may have caused a sharp jump'. A verified reference reading beside the move is evidence a trader can act on; a news search link is only a lead.",
+   "effort": "Medium — a small fetcher per topic with its own timestamp, plus the alignment logic the catalysts page already has.",
+   "risk": "Kalshi has no cause field, so the link can only ever be correlated. CF Benchmarks' BRTI has no free public time series, so crypto rows would stay blank (already disclosed). AAA publishes one national average per day, which cannot explain a move inside a day.",
+   "success_metric": "For each archived swing, the panel shows either a fetched reference reading within the same hour or an explicit 'no free public series for this settlement source' — never a guess.",
+   "status": "proposed",
+   "sources": [
+    "https://gasprices.aaa.com/",
+    "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
+  },
+  {
+   "id": "G23",
+   "suggestion": "Publish the alert chat as an append-only JSON feed with a permalink per alert (stable ID, exact query, price before/after), so an alert can be cited outside the page.",
+   "why_it_helps_decisions": "A trader reviewing a decision later needs the exact alert they saw. The archive already stores every swing; a stable ID and permalink make each row citable in a note or a message.",
+   "effort": "Small — the archive keys each alert by ticker@from_time>to_time already.",
+   "risk": "None material; the feed grows with the archive and is trimmed only beyond 5,000 entries.",
+   "success_metric": "Every row in both chats opens a URL that renders that single alert with its source link, and the URL survives later collector runs.",
+   "status": "proposed",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
   }
  ],
  "flagged": [
