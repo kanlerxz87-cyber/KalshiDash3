@@ -890,3 +890,16 @@ Claimed 2026-11-21. Base `64176be` (main, after PR #42 merge). Scope: `COORDINAT
   (f) *Full suite green on merged tree*: `validate_live.py` (749 open, 200 settled, 20 orderbooks), `validate_alerts.py` (15 archived alerts provenance-checked), `test_alerts.py` (13 tests OK), `test_simulate.py` OK, `check_site.py` (21 pages, all links resolve).
 - 2026-11-21: **PR #38 handoff.** PR #38 (arena/d243bfa7, opened 2026-11-20 19:40Z) is OPEN + CONFLICTING and superseded: PR #39 (merged 2026-11-20 19:47Z) landed the opposite design (flags frozen at detection time, validator reproduces from each row's own recorded fields — verified present in `scripts/tests/validate_alerts.py` lines 128–153 on main). Per the stale-claim rule (>60 min, no commits, conflicting) this session closes PR #38 with a comment rather than merging a superseded conflicting change. No files from PR #38 are lost: its unique value (stricter archive-only check) is already on main via PR #39's row-itself check.
 - 2026-11-21: **T26 closed out.** PR #43 opened (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/43) and merged at 2026-11-21T06:28:36Z (`7b3c02a`). Pages deploy run 44875715424 success, `pages.status=built`. PR #38 closed as superseded by PR #39 (comment posted). No new irregularities; all previously flagged items remain on the Flagged for Review page.
+- 2026-11-21: PR #45 merged (`348e3af`, 06:30:??Z) — follow-on coordination record for T26 done (Pages built).
+
+## Session `arena-0a4a3d7a` — final verification + publish (branch `arena/0a4a3d7a-kalshidash3`)
+
+Claimed 2026-11-21. Base `348e3af` (main, after PR #45). Scope: `COORDINATION.md` + `README.md` only (integration record); no site/data changes unless a check fails.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T25 | Final verification pass on merged tree + PR to main, merge, Pages confirm | done — taken over (stale >60 min, PR #42 already merged; re-verified here) | arena-0a4a3d7a (takeover from arena-c076278a) | `COORDINATION.md` | full suite green on merged tree + live Pages fetch (see T27 log) | — |
+| T27 | Final re-verification on current main (official docs re-check, full offline suite, live Pages fetch) + PR → main → merge → Pages deploy confirm → dispatch collectors → record PR link + merge result here | in progress | arena-0a4a3d7a | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/validate_roi.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/test_alerts.py`, `test_simulate.py`, `test_fees/roi_parity/roi_scan_offline/roi_scan_snapshot`, `test_engine_node.js`, `node --check` | — |
+
+### Log (this session)
+- 2026-11-21: session start. Branch at `ebce5e7`, 6 commits behind `origin/main` (64176be/PR #42, 7b3c02a/PR #43, 348e3af/PR #45). Fast-forwarded to `348e3af` before claiming, per non-overlap rule. Confirmed T25 was left `in progress` since 06:2xZ with no commit beyond the claim — stale per >60 min rule — and T26 already `done` via PR #45.
