@@ -208,9 +208,16 @@ function counts(w) {
   /* -------------------------------------------------- H: health line (T32) */
   console.log("\nT32 — run health line (R-B1: no cron name, no expected interval)");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector:|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
-  check(!/\*\/20|cronExpression|every 20m/.test(health), "health line names no cron and no expected interval (R-B1)");
+  // R-B1 + F-73 together: the panel must report what it can prove (the newest run, how many of
+  // the last N were scheduled, the last success), must never resurrect the 20-minute claim, and
+  // must not turn a fixed interval into a pass/fail judgement about the relay itself.
+  check(/collector relay|collector:|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(!/\*\/20|cronExpression|every 20m/.test(health), "health line names no cron and no expected interval (R-B1, F-73)");
   check(/newest run|no runs in the last|API not reachable/.test(health), "health line reports the newest run (R-B1)");
+  check(/15-min relay grid/.test(health), "the relay label names the 15-minute grid the collector actually runs (F-73)");
+  const healthSrc = SRC.slice(SRC.indexOf("freshness / run health"));
+  check(/observedMinutes/.test(healthSrc) && /gap > observed \* 2/.test(healthSrc),
+        "the throttling warning compares the scheduled gap against measured spacing (F-40 signal kept)");
 
   console.log("");
   teardown();

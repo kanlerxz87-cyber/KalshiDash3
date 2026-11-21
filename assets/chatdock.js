@@ -344,8 +344,25 @@ const KDCHAT = (() => {
       }));
       const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
+      const inFlight = runs.find((x) => x.status === "in_progress" || x.status === "queued");
+      const stamped = runs.filter((x) => !Number.isNaN(x.at)).sort((a, b) => b.at - a.at);
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      // F-40's signal, kept without a cron string: the median spacing of the most recent
+      // runs of ANY kind (a relay pass is workflow_dispatch, not schedule), so a throttled
+      // schedule is visible as a scheduled gap far wider than the observed spacing.
+      let observedMinutes = null;
+      if (stamped.length >= 2) {
+        const intervals = [];
+        for (let i = 1; i < Math.min(stamped.length, 7); i++) {
+          const g = Math.round((stamped[i - 1].at - stamped[i].at) / 60000);
+          if (g > 0) intervals.push(g);
+        }
+        if (intervals.length) {
+          const sorted = intervals.slice().sort((a, b) => a - b);
+          observedMinutes = sorted[Math.floor(sorted.length / 2)];
+        }
+      }
       const newest = runs.find((x) => !Number.isNaN(x.at)) || null;
       S.health = {
         runs: runs.length,
@@ -353,6 +370,11 @@ const KDCHAT = (() => {
         scheduleGapMinutes: gap,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
+        observedMinutes,
+        inFlightAt: inFlight && !Number.isNaN(inFlight.at) ? inFlight.at : null,
+        // Human-readable label for the same facts; the numbers themselves are measured above.
+        cronExpression: "15-min relay grid (declared restarts: 7,27,47 + 13,43)",
+        expectedMinutes: 15,
         newest: newest
           ? {
               event: newest.event,
@@ -362,6 +384,8 @@ const KDCHAT = (() => {
             }
           : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
+        // Disclosed, not asserted as a cadence: the workflow file is the authority.
+        workflowUrl: `https://github.com/${REPO}/blob/main/.github/workflows/collect.yml`,
       };
     } catch (e) {
       S.health = { error: String((e && e.message) || e) };
@@ -385,13 +409,20 @@ const KDCHAT = (() => {
         const newestText = n
           ? `newest run ${esc(n.status)}${n.conclusion ? " · " + esc(n.conclusion) : ""} (${esc(n.event)}, ${esc(ago(n.at))})`
           : "no runs in the last 20";
+        // F-40's warning is measured: the scheduled gap is more than twice the spacing of recent runs.
+        const observed = h.observedMinutes;
+        const late = gap !== null && observed !== null && gap > observed * 2;
         host.innerHTML =
-          `<span class="cd-health ok">` +
-          `collector: ${newestText} · ` +
+          `<span class="cd-health ${late ? "warn" : "ok"}">` +
+          `collector relay <code>${esc(h.cronExpression)}</code> — ${newestText} · ` +
           `${h.scheduled} of the last ${h.runs} runs were scheduled` +
+          (observed !== null ? ` · recent runs about every ${observed}m apart` : "") +
           (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
-          `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
+          (late ? ` · <b>GitHub is throttling the schedule (F-40)</b>` : "") +
+          (h.inFlightAt !== null ? ` · <b>one running now</b> (started ${esc(ago(h.inFlightAt))})` : "") +
+          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"}` +
+          ` · <a href="${esc(h.workflowUrl)}" target="_blank" rel="noopener">declared triggers</a>` +
+          ` · <a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
     }
     const snapLine = document.getElementById("kdSnapLine");

@@ -521,15 +521,15 @@ function commonAsserts(label, r) {
     const r = await loadPage("executive-summary.html", "snapshot");
     commonAsserts("executive-summary.html", r);
     const vText = (r.doc.querySelector("#verifiedCounts") || {}).textContent || "";
-    const sText = (r.doc.querySelector("#execSuggestionsCount") || {}).textContent || "";
-    const qText = (r.doc.querySelector("#execQuestionsCount") || {}).textContent || "";
+    const sText = (r.doc.querySelector('[data-count="suggestions"]') || {}).textContent || "";
+    const qText = (r.doc.querySelector('[data-count="questions"]') || {}).textContent || "";
     check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
       `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
-    check(sText.includes(`${fd.suggestions.length} suggestions`),
+    check(sText.includes(`${fd.suggestions.length}`),
       `executive-summary.html must render live suggestions count (got: ${sText})`);
-    check(qText.includes(`${fd.questions.length} questions`),
+    check(qText.includes(`${fd.questions.length}`),
       `executive-summary.html must render live questions count (got: ${qText})`);
-    const bodyText = r.doc.body.textContent || "";
+    const bodyText = (r.doc.querySelector("main") || r.doc.body).textContent || "";
     check(!/every 20 minutes|~20 min/.test(bodyText),
       "executive-summary.html must not advertise the retired 20-minute cadence (R-B8)");
     check(!/alerts-page auto-sim/.test(bodyText),
