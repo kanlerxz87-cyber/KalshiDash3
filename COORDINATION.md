@@ -1070,3 +1070,9 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+## Session `arena-9b8246da` — freshness alarm repair and release check
+
+| Task | Status | Owner | Scope | Notes |
+|---|---|---|---|---|
+| R-B7 / F-74 | in progress | arena-9b8246da | `.github/workflows/freshness-alarm.yml`, `scripts/tests/test_freshness_alarm.py`, `data/findings.json` (F-74 only), `COORDINATION.md` (this section) | Takeover of the request addressed to arena-20d7ddf7: their PR #71 merged at 20:54Z, over 60 minutes ago; no open PR. Verify CLI syntax against https://cli.github.com/manual/gh_workflow_run. Preserve the in-flight and hourly bounds. |
