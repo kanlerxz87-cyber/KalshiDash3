@@ -166,17 +166,29 @@ def main() -> int:
         "golf": {"Sports", "Golf"},
     }
     _rows = {r.get("ticker"): r for r in (markets.get("open_markets") or []) + (markets.get("settled_markets") or [])}
+    # Same scope rule as scripts/build_alerts.py (F-76): an exchange test/demo series, or a
+    # swing whose topic was never confirmed, is not one of the five topics, so it is not traded
+    # and is counted separately rather than silently dropped.
+    _never = {"Test", "Demo"}
     excluded_signals = 0
+    excluded_scope = 0
 
     def _topic_ok(a: dict) -> bool:
-        nonlocal excluded_signals
+        nonlocal excluded_signals, excluded_scope
         ticker = a.get("ticker") or ""
         row = _rows.get(ticker) or {}
         official = [str(c) for c in (row.get("series_categories") or a.get("series_categories") or [])]
         if not official:
             series = row.get("series_ticker") or (ticker.split("-")[0] if "-" in ticker else ticker)
             official = [str(c) for c in ((_ledger.get(series) or {}).get("categories") or [])]
-        ok = _compatible.get(row.get("category_id") or a.get("category_id") or "", set())
+        if any(o in _never for o in official):
+            excluded_scope += 1
+            return False
+        cat = row.get("category_id") or a.get("category_id")
+        if not cat:
+            excluded_scope += 1
+            return False
+        ok = _compatible.get(cat, set())
         if not official or not ok or any(o in ok for o in official):
             return True
         excluded_signals += 1
@@ -391,7 +403,8 @@ def main() -> int:
             # F-65: archived swings not traded because their own official series record puts them
             # outside the topic (published so the exclusion is auditable, not silent).
             "excluded_category_conflict": excluded_signals,
-            "signals_considered_total": len(processed) + excluded_signals,
+            "excluded_out_of_scope": excluded_scope,
+            "signals_considered_total": len(processed) + excluded_signals + excluded_scope,
         },
         "strategies": summaries,
         "trade_types": trade_types,
