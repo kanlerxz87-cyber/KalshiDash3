@@ -323,6 +323,34 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- H. index.html: the settled KPI must state both numbers, labelled ---
+   * F-37 was raised twice: the card read "of <stored rows> settled markets in scope" — the
+   * collector's stored-row cap (200) — while the banner on the same page printed
+   * counts.settled_in_scope (1,600). Main's fix labels the stored count as "stored settled rows"
+   * and prints the in-scope total beside it; this asserts both are present and correctly labelled,
+   * whichever of the two accepted wordings a future edit picks.
+   */
+  if (markets && markets.counts && markets.counts.settled_in_scope) {
+    const r = await loadPage("index.html", "snapshot");
+    commonAsserts("index.html", r);
+    const inScope = markets.counts.settled_in_scope;
+    const stored = (markets.settled_markets || []).length;
+    const flat = r.text.replace(/\s+/g, " ");
+    const statesInScope = new RegExp("of the " + inScope.toLocaleString() + " settled markets in scope").test(flat)
+      // main's wording: "<stored> stored settled rows (<in-scope> in scope)". Escape the paren
+      // so it is a literal character, not a regex group.
+      || flat.includes(stored.toLocaleString() + " stored settled rows (" + inScope.toLocaleString() + " in scope")
+      || new RegExp("of " + inScope.toLocaleString() + " settled markets in scope").test(flat);
+    check(statesInScope,
+      `the settled KPI must state the published in-scope total (${inScope}); stored rows (${stored}) may be named but not used as its label`);
+    if (stored !== inScope) {
+      check(flat.includes(stored.toLocaleString()),
+        `when the snapshot stores fewer rows (${stored}) than are in scope (${inScope}), the page must show both numbers`);
+    }
+    console.log(`  H index KPI     ok  (${stored} stored rows named, ${inScope} in scope stated)`);
+    r.close();
+  }
+
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);
