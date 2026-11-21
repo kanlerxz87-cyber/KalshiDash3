@@ -328,7 +328,9 @@ window.KDL = (() => {
         <a href="${esc(l.news_google || "#")}" target="_blank" rel="noopener" title="Possible-cause lead: news search for this market title — unverified">news leads ▸</a>
         ${a.tape_source ? `<a href="${esc(a.tape_source)}" target="_blank" rel="noopener" title="The trade-tape query that confirms these executed prints">tape ▸</a>` : ""}
       </div>
-      ${a.verification === "tape-confirmed" && a.verification_detail ? `<div class="chat-why">✔ executed prints: ${esc(a.verification_detail)}</div>` : ""}
+      ${a.verification === "tape-confirmed" && a.verification_detail
+        ? `<div class="chat-why">✔ executed prints: ${esc(a.verification_detail)}</div>`
+        : `<div class="chat-why">no trade-tape verdict for this difference yet — shown so a real move is never hidden, but not counted as confirmed until the tape is checked</div>`}
     </div>`;
   }
 

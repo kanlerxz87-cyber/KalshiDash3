@@ -396,6 +396,10 @@ def main() -> int:
             )
         else:
             verdict, detail, prints, source = verify_candidate(base, a.get("ticker"), prev_o, cur_o, tape_get, threshold, evidence["windows"])
+            # Never downgrade a row that already had a verdict to `unverified`: an offline run must
+            # not erase evidence it simply could not re-fetch this time.
+            if verdict == "unverified" and a.get("kind") in ("move", "restatement"):
+                continue
             a["kind"] = KINDS[verdict]
             a["verification"] = verdict
             a["verification_detail"] = detail

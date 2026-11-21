@@ -247,6 +247,18 @@ function commonAsserts(label, r) {
     }
     check(!/\bcaused\b|\btriggered by\b|\bdue to\b/i.test(r.text),
       "the rendered alerts page must not use causal wording — a public quote cannot see why a price moved");
+    // F-38: a difference the exchange's trade tape shows to be a restatement must be labelled as
+    // not-a-move in the lead table, and must never be given a cause lead of its own.
+    const archivedRows = (() => { try {
+      return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8")).alerts;
+    } catch (e) { return []; } })();
+    const restated = archivedRows.filter(a => a.kind === "restatement");
+    const marked = r.doc.querySelectorAll("#leads tbody tr.row-restated").length;
+    check(marked === restated.length,
+      `every restatement in the archive must be marked in the lead table (marked ${marked}, archive ${restated.length})`);
+    if (restated.length) {
+      check(/not a move/.test(r.text), "a restatement row must say it is not a move rather than imply a jump happened");
+    }
     console.log(`  D alerts page   ok  (${leadsRows} lead rows rendered, both feeds present, no causal wording)`);
     r.close();
   }
@@ -257,6 +269,18 @@ function commonAsserts(label, r) {
     commonAsserts("dashboard.html", r);
     check(/cause blank/.test(r.text) === false,
       "the old 'cause blank — flagged' placeholder must be replaced by the fetched lead (or an explicit 'no lead' state)");
+    // F-38: the dashboard feed may only contain tape-confirmed moves, and it must disclose the
+    // funnel (how many candidate differences were excluded as restatements / could not be checked).
+    const feed = (() => { try {
+      return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
+    } catch (e) { return null; } })();
+    if (feed) {
+      const shown = r.doc.querySelectorAll("#allAlerts .alert-item").length;
+      check(shown === Math.min(feed.all_events.length, 100),
+        `the dashboard must show exactly the tape-confirmed moves (shown ${shown}, feed ${feed.all_events.length})`);
+      check(/confirmed by the exchange/.test(r.text), "the dashboard must disclose that moves are tape-confirmed");
+      check(/restatements of an earlier trade/.test(r.text), "the dashboard must disclose the excluded restatements");
+    }
     console.log("  E dashboard     ok  (chart + swing list render with the lead column wired)");
     r.close();
   }
