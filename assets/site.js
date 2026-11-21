@@ -94,6 +94,46 @@ const KD = (() => {
     return `<div class="tw"><table><thead><tr>${th}</tr></thead><tbody>${tb}</tbody></table></div>`;
   }
 
+  /* F-73 (2026-11-21): prose said "every 20 minutes" while the collector moved to a 15-minute
+   * relay grid, so any hard-coded cadence goes stale the next time the schedule changes. Compute
+   * it instead, from the observation timestamps the collector already commits:
+   *   - cadence = median of the last up-to-10 observation intervals
+   *   - lag     = snapshot age expressed in multiples of that median (what makes a gap visible)
+   * Returns null rather than guessing when the history is too short to measure. */
+  async function cadence() {
+    try {
+      const [hist, meta] = await Promise.all([json("data/live/price_history.json"), json("data/live/markets.json")]);
+      const times = new Set();
+      for (const s of Object.values((hist && hist.series) || {})) {
+        for (const o of (s && s.observations) || []) if (o && o.t) times.add(o.t);
+      }
+      const ts = Array.from(times).map((t) => Date.parse(t)).filter((n) => !Number.isNaN(n)).sort((a, b) => a - b);
+      if (ts.length < 2) return null;
+      const gaps = [];
+      for (let i = 1; i < ts.length; i++) {
+        const g = (ts[i] - ts[i - 1]) / 60000;
+        if (g > 0) gaps.push(g);
+      }
+      const window = gaps.slice(-10);
+      const sorted = window.slice().sort((a, b) => a - b);
+      if (!sorted.length) return null;
+      const median = sorted[Math.floor(sorted.length / 2)];
+      const snapshotAt = meta && meta.collected_at;
+      const age = snapshotAt ? Math.max(0, (Date.now() - Date.parse(snapshotAt)) / 60000) : null;
+      return {
+        median,
+        sampleSize: window.length,
+        distinctGaps: Array.from(new Set(window.map((g) => Math.round(g)))).sort((a, b) => a - b),
+        age,
+        behind: age === null ? null : Math.floor(age / median),
+        snapshotAt,
+        observations: ts.length,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
   function snapshotBanner(meta) {
     const host = $("#snapshotBanner");
     if (!host) return;
@@ -122,7 +162,26 @@ const KD = (() => {
           `(<a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule" target="_blank" rel="noopener">GitHub Actions: schedule</a>) — ` +
           `and the site shows the snapshot age instead of implying it is current. The alert chats on the <a href="live.html">Live Desk</a> still poll the demo API directly when CORS allows.`
         : "") +
+      `<span class="kd-cadence"></span>` +
       `</div>`;
+    // F-73: the cadence is measured from the committed observations, never typed into the page.
+    // It is rendered after the banner so a slow history fetch cannot delay the snapshot line.
+    const slot = host.querySelector(".kd-cadence");
+    if (slot) {
+      cadence().then((c) => {
+        if (!c) {
+          slot.innerHTML = ` · <b>Cadence:</b> not measurable from the committed observations yet`;
+          return;
+        }
+        slot.innerHTML =
+          ` · <b>Cadence:</b> about every ${num(Math.round(c.median))} min` +
+          ` <span class="mut">(median of the last ${num(c.sampleSize)} observation intervals; distinct gaps seen: ` +
+          `${esc(c.distinctGaps.join(", "))} min; ${num(c.observations)} observation times on record)</span>` +
+          (c.behind !== null && c.behind >= 3
+            ? ` · <b class="warn">snapshot is ${num(c.behind)} collection intervals behind</b> — the collector is not keeping its cadence, so read every price here as of <code>${esc(c.snapshotAt)}</code>`
+            : "");
+      });
+    }
   }
 
   function nav(active) {
@@ -151,5 +210,5 @@ const KD = (() => {
       items.map(([h, l]) => `<a href="${h}"${h === active ? ' class="on"' : ""}>${l}</a>`).join("");
   }
 
-  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav };
+  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, cadence };
 })();

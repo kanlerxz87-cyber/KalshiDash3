@@ -83,7 +83,8 @@ def main() -> int:
     for path in sorted(tests.glob("validate_*.py")) + sorted(tests.glob("test_*.py")):
         if not run(sys.executable, str(path.relative_to(ROOT))):
             failed.append(path.name)
-    for name in ("engine.test.js", "test_engine_node.js", "test_pages_dom.js", "test_chatdock.js"):
+    for name in ("engine.test.js", "test_engine_node.js", "test_pages_dom.js", "test_chatdock.js",
+                 "test_verification_links.js"):
         if not run("node", f"scripts/tests/{name}"):
             failed.append(name)
     if not run(sys.executable, "scripts/check_site.py"):
