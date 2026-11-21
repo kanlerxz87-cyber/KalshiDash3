@@ -16,7 +16,7 @@
       "id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
       "publisher": "Kalshi demo Trade API (the market's own official record)",
       "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
-      "fetched_at": "2026-11-20T19:33Z",
+      "fetched_at": "2026-11-21T23:11Z",
       "observed": {
         "rules_primary": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
         "last_price_dollars": "0.7100",
@@ -26,7 +26,16 @@
         "volume_24h_fp": "20.14",
         "open_interest_fp": "209.00",
         "status": "active",
-        "updated_time": "2026-04-28T04:57:33.180373Z"
+        "updated_time": "2026-04-28T04:57:33.180373Z",
+        "re_read_2026_11_21T23_11Z": {
+          "last_price_dollars": "0.7100",
+          "previous_price_dollars": "0.2900",
+          "yes_bid_dollars": "0.2900",
+          "yes_ask_dollars": "0.7100",
+          "volume_24h_fp": "3.92",
+          "open_interest_fp": "209.92",
+          "volume_fp": "410.86"
+        }
       }
     },
     {
@@ -160,13 +169,20 @@
       "id": "AAA_NATIONAL_AVERAGE",
       "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
       "url": "https://gasprices.aaa.com/",
-      "fetched_at": "2026-11-20T19:25Z",
+      "fetched_at": "2026-11-21T23:11Z",
       "observed": {
         "national_average_regular": 3.6898,
         "price_as_of": "11/20/26",
         "yesterday_average_regular": 3.7212,
         "week_ago_average_regular": 3.8724,
         "month_ago_average_regular": 4.2786,
+        "re_read_2026_11_21T23_11Z": {
+          "national_average_regular": 3.6594,
+          "price_as_of": "11/21/26",
+          "yesterday_average_regular": 3.6898,
+          "week_ago_average_regular": 3.8406,
+          "month_ago_average_regular": 4.2644
+        },
         "headline": "Gas Prices Keep Dropping as Thanksgiving Approaches",
         "headline_url": "https://gasprices.aaa.com/gas-prices-keep-dropping-as-thanksgiving-approaches/"
       }
@@ -508,16 +524,24 @@
       "id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
       "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
       "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
-      "fetched_at": "2026-11-21T20:23Z",
+      "fetched_at": "2026-11-21T23:11Z",
       "observed": {
         "tournament": "The RSM Classic (Nov 19 - 22, 2026, Sea Island Golf Club, St. Simons Island, Georgia)",
-        "round_status": "R3 Suspended — no Saturday play after rain and saturated course conditions; Round 3 rescheduled Sunday 9:10 - 11:00 a.m. ET",
+        "round_status": "R3 Suspended — no Saturday play after rain and saturated course conditions; Round 3 rescheduled Sunday 9:10 - 11:00 a.m. ET; Final Round Monday 7:20 - 9:10 a.m. ET",
         "brian_harman": {
           "pos": "CUT",
           "to_par": "+1",
           "r1": 71,
           "r2": 72,
           "strokes": 143
+        },
+        "michael_thorbjornsen": {
+          "pos": "T1",
+          "to_par": "-9",
+          "r1": 64,
+          "r2": 69,
+          "strokes": 133,
+          "odds_to_win": "+440"
         }
       }
     },
@@ -540,6 +564,70 @@
         "volume_24h_fp": "9508.62",
         "volume_fp": "39586020.10",
         "open_interest_fp": "5968212.66",
+        "updated_time": "2026-04-28T02:27:21.580016Z"
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+      "fetched_at": "2026-11-21T23:11Z",
+      "observed": {
+        "rules_primary": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
+        "title": "The RSM Classic: Michael Thorbjornsen wins",
+        "status": "active",
+        "result": "",
+        "last_price_dollars": "0.1800",
+        "previous_price_dollars": "0.1700",
+        "yes_bid_dollars": "0.1700",
+        "yes_ask_dollars": "0.1800",
+        "volume_24h_fp": "10200.02",
+        "volume_fp": "97879.39",
+        "open_interest_fp": "62730.85",
+        "updated_time": "2026-11-16T01:34:34.569351Z"
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+      "fetched_at": "2026-11-21T23:11Z",
+      "observed": {
+        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+        "title": "BTC price  on Jan 1, 2027?",
+        "status": "active",
+        "result": "",
+        "floor_strike": 30000,
+        "cap_strike": 34999.99,
+        "last_price_dollars": "0.0200",
+        "previous_price_dollars": "0.0200",
+        "yes_bid_dollars": "0.0100",
+        "yes_ask_dollars": "0.0200",
+        "volume_24h_fp": "8976.71",
+        "volume_fp": "35511092.26",
+        "open_interest_fp": "6354325.99",
+        "updated_time": "2026-04-28T02:27:21.580016Z"
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
+      "fetched_at": "2026-11-21T23:11Z",
+      "observed": {
+        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+        "title": "BTC price  on Jan 1, 2027?",
+        "status": "active",
+        "result": "",
+        "floor_strike": 50000,
+        "cap_strike": 54999.99,
+        "last_price_dollars": "0.1000",
+        "previous_price_dollars": "0.1300",
+        "yes_bid_dollars": "0.0900",
+        "yes_ask_dollars": "0.1000",
+        "volume_24h_fp": "13393.93",
+        "volume_fp": "61738868.31",
+        "open_interest_fp": "7788363.75",
         "updated_time": "2026-04-28T02:27:21.580016Z"
       }
     }
@@ -940,6 +1028,132 @@
         "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
       ],
       "note": "The market printed up 74.5c (0.005 to 0.75) between 06:42:56Z and 15:16:38Z on a wide empty demo book (to_yes_bid 0.001, to_yes_ask 1.00; re-read at 20:22Z with yes_bid_dollars 0.0000, yes_ask_dollars 1.0000). The official PGA Tour leaderboard for The RSM Classic (a named settlement source in GET /series/KXPGATOUR) lists Brian Harman as CUT (+1; R1 71, R2 72, total 143) and states Round 3 play was suspended Saturday after rain and saturated course conditions with no Saturday play. Recorded as no external move supporting this swing."
+    },
+    {
+      "ticker": "KXPGATOUR-THRC26-MTHO",
+      "alert_to_time": "2026-11-21T20:34:40Z",
+      "source_ids": [
+        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+        "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+        "KALSHI_SERIES_KXPGATOUR"
+      ],
+      "window_from": "2026-11-21T20:30:54Z",
+      "window_to": "2026-11-21T20:34:40Z",
+      "comparison": {
+        "kind": "tournament_play_suspended",
+        "strike": null,
+        "reference_side": "yes",
+        "value_before": null,
+        "value_before_at": "2026-11-21",
+        "value_after": null,
+        "value_after_at": "2026-11-21"
+      },
+      "verdict_override": "no_external_move_supporting_this_swing",
+      "links": [
+        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+      ],
+      "note": "The market printed up 40c (0.17 to 0.57) between 20:30:54Z and 20:34:40Z while the resting book remained at yes_bid 0.16 / yes_ask 0.17 (24h volume 10126.17). On the official PGA Tour RSM Classic leaderboard (fetched 2026-11-21T23:11Z), Michael Thorbjornsen sits T1 at -9 (R1 64, R2 69, total 133), and Round 3 was suspended all Saturday after rain and saturated course conditions with no Saturday play (rescheduled Sunday 9:10-11:00 a.m. ET). No on-course score change occurred during this window; recorded as no external move supporting this swing."
+    },
+    {
+      "ticker": "KXPGATOUR-THRC26-MTHO",
+      "alert_to_time": "2026-11-21T20:57:37Z",
+      "source_ids": [
+        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+        "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+        "KALSHI_SERIES_KXPGATOUR"
+      ],
+      "window_from": "2026-11-21T20:34:40Z",
+      "window_to": "2026-11-21T20:57:37Z",
+      "comparison": {
+        "kind": "tournament_play_suspended",
+        "strike": null,
+        "reference_side": "yes",
+        "value_before": null,
+        "value_before_at": "2026-11-21",
+        "value_after": null,
+        "value_after_at": "2026-11-21"
+      },
+      "verdict_override": "no_external_move_supporting_this_swing",
+      "links": [
+        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+      ],
+      "note": "The market printed back down 40c (0.57 to 0.17) between 20:34:40Z and 20:57:37Z, returning to its resting quote (yes_bid 0.16, yes_ask 0.17; re-read at 23:11Z at last 0.18, yes_bid 0.17, yes_ask 0.18). The official PGA Tour leaderboard shows no Saturday play at The RSM Classic (Round 3 suspended after rain; Michael Thorbjornsen unchanged at T1, -9). Recorded as no external move supporting this swing."
+    },
+    {
+      "ticker": "KXAAAGASM-26DEC31-3.30",
+      "alert_to_time": "2026-11-21T23:01:10Z",
+      "source_ids": [
+        "AAA_NATIONAL_AVERAGE",
+        "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+      ],
+      "window_from": "2026-11-21T22:46:10Z",
+      "window_to": "2026-11-21T23:01:10Z",
+      "comparison": {
+        "kind": "published_value_above_strike",
+        "strike": 3.3,
+        "reference_side": "yes",
+        "value_before": 3.6594,
+        "value_before_at": "2026-11-21",
+        "value_after": 3.6594,
+        "value_after_at": "2026-11-21"
+      },
+      "links": [
+        "https://gasprices.aaa.com/",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
+      ],
+      "note": "The market printed up 41c (0.30 to 0.71) between 22:46:10Z and 23:01:10Z on thin demo volume (volume_24h_fp 3.92; resting yes_bid_dollars 0.2900, yes_ask_dollars 0.7100). AAA publishes once daily, not intraday: its national regular average for 11/21/26 is $3.6594 (0.3594 above the $3.30 strike, down from $3.6898 on 11/20/26 and $3.8406 a week ago)."
+    },
+    {
+      "ticker": "KXAAAGASD-26NOV21-3.6600",
+      "alert_to_time": "2026-11-20T22:04:00Z",
+      "source_ids": [
+        "AAA_NATIONAL_AVERAGE",
+        "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+      ],
+      "window_from": "2026-11-20T21:42:00Z",
+      "window_to": "2026-11-20T22:04:00Z",
+      "comparison": {
+        "kind": "published_value_above_strike",
+        "strike": 3.66,
+        "reference_side": "yes",
+        "value_before": 3.6898,
+        "value_before_at": "2026-11-20",
+        "value_after": 3.6898,
+        "value_after_at": "2026-11-20"
+      },
+      "links": [
+        "https://gasprices.aaa.com/",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
+      ],
+      "note": "Candle-backfilled 1-minute close moved down 10c (0.19 to 0.09) on a wide book (yes_bid 0.09, yes_ask 1.00) on the evening before the Nov 21 AAA daily print. AAA publishes once daily: the 11/20/26 regular average was $3.6898 (0.0298 above the $3.6600 strike), down from $3.7212 the prior day."
+    },
+    {
+      "ticker": "KXAAAGASD-26NOV21-3.6600",
+      "alert_to_time": "2026-11-20T22:41:00Z",
+      "source_ids": [
+        "AAA_NATIONAL_AVERAGE",
+        "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+      ],
+      "window_from": "2026-11-20T22:10:00Z",
+      "window_to": "2026-11-20T22:41:00Z",
+      "comparison": {
+        "kind": "published_value_above_strike",
+        "strike": 3.66,
+        "reference_side": "yes",
+        "value_before": 3.6898,
+        "value_before_at": "2026-11-20",
+        "value_after": 3.6898,
+        "value_after_at": "2026-11-20"
+      },
+      "links": [
+        "https://gasprices.aaa.com/",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
+      ],
+      "note": "Candle-backfilled 1-minute close moved up 14c (0.07 to 0.21; yes_bid 0.21, yes_ask 0.24) on the evening before the Nov 21 AAA daily print. AAA's 11/20/26 regular average was $3.6898 (above the $3.6600 strike; the next day's 11/21/26 print later came in at $3.6594)."
     }
   ],
   "sources_of_method": {
@@ -950,16 +1164,18 @@
     "coinbase_market_data": "https://docs.cdp.coinbase.com/exchange/reference/apireference",
     "pgatour_leaderboard": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard"
   },
-  "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary; golf tournament status and Brian Harman's CUT score are copied from the official PGA Tour leaderboard.",
+  "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary; AAA averages are copied from gasprices.aaa.com; golf tournament status and player scores are copied from the official PGA Tour leaderboard.",
   "swings_in_archive_not_reviewed": {
-    "count_expected": 9,
-    "note": "Every alert in data/live/alerts_archive.json whose settlement reference has a public source (Coinbase BTC-USD, AAA National Average, or PGA Tour official leaderboard) has a review entry (16/25). The remaining 9 BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
+    "count_expected": 31,
+    "note": "Every served in-scope alert in data/live/alerts_archive.json whose settlement reference has a public source (AAA National Average or PGA Tour official leaderboard) has a review entry (9/9 served non-BRTI swings; 20 KXDEMOFUTHOURLY Test-series rows are withheld per F-65/F-75). The remaining 31 served BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit official-record not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
   },
   "not_reviewed_reasons": {
+    "KXBTCY-27JAN0100-B32500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z — the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
     "KXBTCY-27JAN0100-B47500": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
+    "KXBTCY-27JAN0100-B52500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
     "KXBTCY-27JAN0100-B77500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
     "KXBTCY-27JAN0100-B87500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
     "KXBTCY-27JAN0100-B97500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-    "KXBTC15M-26NOV210145-45": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted."
+    "KXBTC15M-26NOV210145-45": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted."
   }
 }
