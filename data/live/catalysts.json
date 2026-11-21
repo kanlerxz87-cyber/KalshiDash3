@@ -1,19 +1,19 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T23:31:12Z",
+ "generated_at": "2026-11-21T23:36:54Z",
  "snapshot_collected_at": "2026-11-21T23:31:12Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-6f158ab7",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 50,
-  "reviewed": 4,
-  "not_reviewed": 46,
+  "archive_total": 42,
+  "reviewed": 9,
+  "not_reviewed": 33,
   "external_move_coincides": 0,
-  "no_external_move_supporting": 1,
-  "links_shown": 9,
-  "withheld_category_conflict": 12
+  "no_external_move_supporting": 3,
+  "links_shown": 21,
+  "withheld_category_conflict": 20
  },
  "alerts": [
   {
@@ -97,7 +97,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -136,11 +136,45 @@
    "result_as_returned": null,
    "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+     "source_id": "AAA_NATIONAL_AVERAGE",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.3,
+    "before": 3.6594,
+    "before_at": "2026-11-21",
+    "after": 3.6594,
+    "after_at": "2026-11-21",
+    "reference_side": "yes",
+    "change": 0.0,
+    "distance_to_strike_before": 0.3594,
+    "distance_to_strike_after": 0.3594,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "The market printed up 41c (0.30 to 0.71) between 22:46:10Z and 23:01:10Z on thin demo volume (volume_24h_fp 3.92; resting yes_bid_dollars 0.2900, yes_ask_dollars 0.7100). AAA publishes once daily, not intraday: its national regular average for 11/21/26 is $3.6594 (0.3594 above the $3.30 strike, down from $3.6898 on 11/20/26 and $3.8406 a week ago).",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+   ],
+   "window": {
+    "from": "2026-11-21T22:46:10Z",
+    "to": "2026-11-21T23:01:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -160,7 +194,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -181,7 +215,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -244,7 +278,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -265,7 +299,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -307,7 +341,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
    "reviewed_at": null
   },
   {
@@ -349,7 +383,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
    "reviewed_at": null
   },
   {
@@ -391,7 +425,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
    "reviewed_at": null
   },
   {
@@ -451,11 +485,49 @@
    "result_as_returned": null,
    "settlement_reference_text": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+     "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
+     "source_id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
+     "publisher": "Kalshi demo Trade API (series record listing official settlement sources)",
+     "source_id": "KALSHI_SERIES_KXPGATOUR",
+     "fetched_at": "2026-11-21T20:23Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "tournament_play_suspended",
+    "strike": null,
+    "before": null,
+    "before_at": "2026-11-21",
+    "after": null,
+    "after_at": "2026-11-21",
+    "reference_side": "yes",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "The market printed back down 40c (0.57 to 0.17) between 20:34:40Z and 20:57:37Z, returning to its resting quote (yes_bid 0.16, yes_ask 0.17; re-read at 23:11Z at last 0.18, yes_bid 0.17, yes_ask 0.18). The official PGA Tour leaderboard shows no Saturday play at The RSM Classic (Round 3 suspended after rain; Michael Thorbjornsen unchanged at T1, -9). Recorded as no external move supporting this swing.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+    "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+    "KALSHI_SERIES_KXPGATOUR"
+   ],
+   "window": {
+    "from": "2026-11-21T20:34:40Z",
+    "to": "2026-11-21T20:57:37Z"
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
@@ -472,11 +544,49 @@
    "result_as_returned": null,
    "settlement_reference_text": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+     "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
+     "source_id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
+     "publisher": "Kalshi demo Trade API (series record listing official settlement sources)",
+     "source_id": "KALSHI_SERIES_KXPGATOUR",
+     "fetched_at": "2026-11-21T20:23Z"
+    }
+   ],
+   "state": "no_external_move_supporting_this_swing",
+   "relation": {
+    "kind": "tournament_play_suspended",
+    "strike": null,
+    "before": null,
+    "before_at": "2026-11-21",
+    "after": null,
+    "after_at": "2026-11-21",
+    "reference_side": "yes",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "The market printed up 40c (0.17 to 0.57) between 20:30:54Z and 20:34:40Z while the resting book remained at yes_bid 0.16 / yes_ask 0.17 (24h volume 10126.17). On the official PGA Tour RSM Classic leaderboard (fetched 2026-11-21T23:11Z), Michael Thorbjornsen sits T1 at -9 (R1 64, R2 69, total 133), and Round 3 was suspended all Saturday after rain and saturated course conditions with no Saturday play (rescheduled Sunday 9:10-11:00 a.m. ET). No on-course score change occurred during this window; recorded as no external move supporting this swing.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+    "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+    "KALSHI_SERIES_KXPGATOUR"
+   ],
+   "window": {
+    "from": "2026-11-21T20:30:54Z",
+    "to": "2026-11-21T20:34:40Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -560,48 +670,6 @@
    "state": "not_reviewed",
    "relation": null,
    "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "to_time": "2026-11-21T15:25:00Z",
-   "from_time": "2026-11-21T15:24:00Z",
-   "from_price": 0.55,
-   "to_price": 0.65,
-   "delta": 0.1,
-   "direction": "up",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "to_time": "2026-11-21T15:24:00Z",
-   "from_time": "2026-11-21T15:23:00Z",
-   "from_price": 0.65,
-   "to_price": 0.55,
-   "delta": -0.1,
-   "direction": "down",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
    "reviewed_at": null
   },
   {
@@ -624,7 +692,7 @@
      "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
      "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
      "source_id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
-     "fetched_at": "2026-11-21T20:23Z"
+     "fetched_at": "2026-11-21T23:11Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
@@ -652,7 +720,7 @@
     "strike_side_after": "below"
    },
    "note": "The market printed up 74.5c (0.005 to 0.75) between 06:42:56Z and 15:16:38Z on a wide empty demo book (to_yes_bid 0.001, to_yes_ask 1.00; re-read at 20:22Z with yes_bid_dollars 0.0000, yes_ask_dollars 1.0000). The official PGA Tour leaderboard for The RSM Classic (a named settlement source in GET /series/KXPGATOUR) lists Brian Harman as CUT (+1; R1 71, R2 72, total 143) and states Round 3 play was suspended Saturday after rain and saturated course conditions with no Saturday play. Recorded as no external move supporting this swing.",
-   "reviewed_at": "2026-11-21T20:23Z",
+   "reviewed_at": "2026-11-21T23:11Z",
    "source_ids": [
     "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
     "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
@@ -702,7 +770,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted.",
+   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
    "reviewed_at": null
   },
   {
@@ -723,7 +791,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted.",
+   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
    "reviewed_at": null
   },
   {
@@ -765,7 +833,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted.",
+   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
    "reviewed_at": null
   },
   {
@@ -786,49 +854,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "to_time": "2026-11-21T06:34:00Z",
-   "from_time": "2026-11-21T06:33:00Z",
-   "from_price": 0.55,
-   "to_price": 0.65,
-   "delta": 0.1,
-   "direction": "up",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "to_time": "2026-11-21T06:33:00Z",
-   "from_time": "2026-11-21T06:32:00Z",
-   "from_price": 0.65,
-   "to_price": 0.55,
-   "delta": -0.1,
-   "direction": "down",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
    "reviewed_at": null
   },
   {
@@ -849,7 +875,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted.",
+   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
    "reviewed_at": null
   },
   {
@@ -872,13 +898,13 @@
      "url": "https://gasprices.aaa.com/",
      "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
      "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-20T19:25Z"
+     "fetched_at": "2026-11-21T23:11Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
      "source_id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
-     "fetched_at": "2026-11-20T19:33Z"
+     "fetched_at": "2026-11-21T23:11Z"
     }
    ],
    "state": "published_reference_on_the_other_side_of_the_strike",
@@ -897,7 +923,7 @@
     "strike_side_after": "at_or_above"
    },
    "note": "The market price reverted from 0.71 to 0.29 (-42c), back to the resting yes_bid_dollars of 0.2900 against a 0.6700-0.7100 yes_ask_dollars on 20.14 contracts of 24h volume. AAA's published US regular average (3.6898 as of 11/20/26) sits 0.3898 above the 3.30 strike, while AAA's page also reports a falling trend from 3.7212 yesterday and 3.8724 a week ago.",
-   "reviewed_at": "2026-11-20T19:33Z",
+   "reviewed_at": "2026-11-21T23:11Z",
    "source_ids": [
     "AAA_NATIONAL_AVERAGE",
     "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
@@ -920,13 +946,47 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
    "market_status": "finalized",
    "result_as_returned": "no",
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+     "source_id": "AAA_NATIONAL_AVERAGE",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "before": 3.6898,
+    "before_at": "2026-11-20",
+    "after": 3.6898,
+    "after_at": "2026-11-20",
+    "reference_side": "yes",
+    "change": 0.0,
+    "distance_to_strike_before": 0.0298,
+    "distance_to_strike_after": 0.0298,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "Candle-backfilled 1-minute close moved up 14c (0.07 to 0.21; yes_bid 0.21, yes_ask 0.24) on the evening before the Nov 21 AAA daily print. AAA's 11/20/26 regular average was $3.6898 (above the $3.6600 strike; the next day's 11/21/26 print later came in at $3.6594).",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window": {
+    "from": "2026-11-20T22:10:00Z",
+    "to": "2026-11-20T22:41:00Z"
+   }
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -941,13 +1001,47 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
    "market_status": "finalized",
    "result_as_returned": "no",
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+     "source_id": "AAA_NATIONAL_AVERAGE",
+     "fetched_at": "2026-11-21T23:11Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600",
+     "fetched_at": "2026-11-20T19:25Z"
+    }
+   ],
+   "state": "published_reference_on_the_other_side_of_the_strike",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "before": 3.6898,
+    "before_at": "2026-11-20",
+    "after": 3.6898,
+    "after_at": "2026-11-20",
+    "reference_side": "yes",
+    "change": 0.0,
+    "distance_to_strike_before": 0.0298,
+    "distance_to_strike_after": 0.0298,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "Candle-backfilled 1-minute close moved down 10c (0.19 to 0.09) on a wide book (yes_bid 0.09, yes_ask 1.00) on the evening before the Nov 21 AAA daily print. AAA publishes once daily: the 11/20/26 regular average was $3.6898 (0.0298 above the $3.6600 strike), down from $3.7212 the prior day.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window": {
+    "from": "2026-11-20T21:42:00Z",
+    "to": "2026-11-20T22:04:00Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -992,48 +1086,6 @@
    "reviewed_at": null
   },
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "to_time": "2026-11-20T19:40:00Z",
-   "from_time": "2026-11-20T19:39:00Z",
-   "from_price": 0.45,
-   "to_price": 0.65,
-   "delta": 0.2,
-   "direction": "up",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "to_time": "2026-11-20T19:39:00Z",
-   "from_time": "2026-11-20T19:38:00Z",
-   "from_price": 0.65,
-   "to_price": 0.45,
-   "delta": -0.2,
-   "direction": "down",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
-  },
-  {
    "ticker": "KXBTCY-27JAN0100-B47500",
    "to_time": "2026-11-20T19:30:14Z",
    "from_time": "2026-11-20T19:22:42Z",
@@ -1074,13 +1126,13 @@
      "url": "https://gasprices.aaa.com/",
      "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
      "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-20T19:25Z"
+     "fetched_at": "2026-11-21T23:11Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
      "source_id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
-     "fetched_at": "2026-11-20T19:33Z"
+     "fetched_at": "2026-11-21T23:11Z"
     }
    ],
    "state": "published_reference_on_the_same_side_as_the_move",
@@ -1099,7 +1151,7 @@
     "strike_side_after": "at_or_above"
    },
    "note": "The largest swing in the archive: 0.29 to 0.71. AAA's current national average (3.6898) is 0.3898 above the 3.30 strike, so the YES side was already in the money on the published figure; the size of the print says more about the book than about the news, because 24h volume on this market is 20.14 contracts and the yes bid stayed at 0.2900 while the last traded price is 0.7100. Flagged as F-31: a 10c rule on last_price_dollars can be moved by one small trade in a demo book.",
-   "reviewed_at": "2026-11-20T19:33Z",
+   "reviewed_at": "2026-11-21T23:11Z",
    "source_ids": [
     "AAA_NATIONAL_AVERAGE",
     "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
@@ -1129,7 +1181,7 @@
      "url": "https://gasprices.aaa.com/",
      "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
      "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-20T19:25Z"
+     "fetched_at": "2026-11-21T23:11Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
@@ -1154,7 +1206,7 @@
     "strike_side_after": "at_or_above"
    },
    "note": "This market settles on AAA's US average regular price for Nov 21, 2026; the published national average at the time of the swing was 3.6898, which is 0.0298 above the 3.6600 strike. AAA also printed a falling trend on the same page (yesterday 3.7212, week ago 3.8724). The market itself stayed thinly traded: 48 contracts in 24h, and a 1.0000 yes ask against a 0.1900 yes bid when re-read at 19:25Z.",
-   "reviewed_at": "2026-11-20T19:25Z",
+   "reviewed_at": "2026-11-21T23:11Z",
    "source_ids": [
     "AAA_NATIONAL_AVERAGE",
     "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
@@ -1163,48 +1215,6 @@
     "from": "2026-11-20T13:35:00Z",
     "to": "2026-11-20T13:50:26Z"
    }
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "to_time": "2026-11-20T13:48:00Z",
-   "from_time": "2026-11-20T13:47:00Z",
-   "from_price": 0.55,
-   "to_price": 0.65,
-   "delta": 0.1,
-   "direction": "up",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "to_time": "2026-11-20T13:46:00Z",
-   "from_time": "2026-11-20T13:45:00Z",
-   "from_price": 0.65,
-   "to_price": 0.55,
-   "delta": -0.1,
-   "direction": "down",
-   "category_id": null,
-   "title": null,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "market_status": null,
-   "result_as_returned": null,
-   "settlement_reference_text": null,
-   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
   }
  ],
  "disclaimers": [

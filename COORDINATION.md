@@ -1390,3 +1390,28 @@ Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `
 - 2026-11-21 23:12Z: Claimed T65–T68 (`0de746d`) after checking parallel session scopes to keep files strictly non-overlapping.
 - 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/K/L). Merged `origin/main` up through `3725fc6`, keeping all sessions' `COORDINATION.md` entries intact and integrating PR #85's Test J alongside Tests K/L; full `scripts/verify_release.py` PASS.
 
+---
+
+## Session `arena-86046b80` — catalyst reviews, catalysts.py scope alignment, R-2..R-4 / R-B4 (branch `arena/86046b80-kalshidash3`)
+
+Base `58a88016` (main), merged forward onto `origin/main` `3155616` (PRs #76–#83, #85–#88 + `2026-11-21T23:31Z`/`23:33Z` snapshots).
+Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-count`, alert evidence layer, 21-page DOM gate,
+`test_verification_links.js`, `test_workflow_cli.py`) verbatim and contributes the remaining unique fixes below:
+
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T60 | Align `catalysts.py` / `validate_catalysts.py` with five-topic scope (F-76) + add unassigned `Test`/in-scope unit tests | done | arena-86046b80 | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/test_alerts.py` | `validate_catalysts.py` (42 leads, 21 links), `test_alerts.py` (20/20 OK) |
+| T61 | Official-source catalyst reviews for newest post-20:30Z swings (`KXPGATOUR-THRC26-MTHO` ×2, `KXAAAGASM-26DEC31-3.30` @ 23:01Z, `KXAAAGASD-26NOV21-3.6600` ×2) + official-record BRTI notes (`B32500`, `B52500`) | done | arena-86046b80 | `data/catalyst_review.json`, `data/live/catalysts.json` | 9/42 reviewed with fetched official links (`pgatour.com`, `gasprices.aaa.com`, `external-api.demo.kalshi.co`); 0 generic fallback rows |
+| T62 | Complete remaining R-2, R-3, R-4, R-B4 site-hygiene fixes (`executive-summary.html` `F-14→F-24`, `C-61/C-62`, `trading.html` link + DOM check M; `index.html` F-82 cross-link) | done | arena-86046b80 | `executive-summary.html`, `index.html`, `scripts/tests/test_pages_dom.js` | `test_pages_dom.js` blocks A–M + `check_site.py` (21 pages) |
+| T63 | Record live-verified R-B4 docs-vs-demo historical-cutoff discrepancy as **F-82** | done | arena-86046b80 | `data/findings.json` | Live probes `2026-11-21 ~23:11Z`: `/historical/cutoff` (`2026-09-22T00:00:00Z`) vs `GET /markets/KXELECTIRAN-26JUL01` (HTTP 200, settled `2026-07-01`) vs `docs.kalshi.com/getting_started/historical_data` |
+| T64 | Full release gate → PR #84 → merge → confirm live GitHub Pages deployment | in progress | arena-86046b80 | `COORDINATION.md` | `python3 scripts/verify_release.py` PASS |
+
+### Official sources verified live (2026-11-21 ~23:11Z)
+- `https://docs.kalshi.com/getting_started/historical_data`
+- `https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff` (`market_settled_ts: 2026-09-22T00:00:00Z`)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01` (HTTP 200, `status: finalized`, `result: no`, `settlement_ts: 2026-07-01T15:24:15.984157Z` → **F-82**)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO` + `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` (R3 suspended due to rain, no Saturday play; Michael Thorbjornsen T1 at -9)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30` + `https://gasprices.aaa.com/` (AAA 11/21/26 national regular average `$3.6594`, down `$0.0304` vs yesterday; 22:46Z→23:01Z +41¢ move on 3.92 24h contracts across 42¢ spread)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
+
+

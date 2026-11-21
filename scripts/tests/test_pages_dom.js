@@ -629,6 +629,30 @@ function commonAsserts(label, r) {
     }
     console.log(`  L all pages     ok  (${remaining.length} additional pages rendered with 0 errors and 0 NaN/undefined leaks)`);
   }
+
+  /* --- M. executive-summary.html: dynamic counts from JSON + R-2..R-5/R-B8 hygiene --- */
+  {
+    const vf = JSON.parse(fs.readFileSync(path.join(ROOT, "data/verified_facts.json"), "utf8"));
+    const fd = JSON.parse(fs.readFileSync(path.join(ROOT, "data/findings.json"), "utf8"));
+    const r = await loadPage("executive-summary.html", "snapshot");
+    commonAsserts("executive-summary.html", r);
+    const vText = (r.doc.querySelector("#verifiedCounts") || {}).textContent || "";
+    const sText = (r.doc.querySelector('[data-count="suggestions"]') || {}).textContent || "";
+    const qText = (r.doc.querySelector('[data-count="questions"]') || {}).textContent || "";
+    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
+      `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
+    check(sText.includes(`${fd.suggestions.length}`),
+      `executive-summary.html must render live suggestions count (got: ${sText})`);
+    check(qText.includes(`${fd.questions.length}`),
+      `executive-summary.html must render live questions count (got: ${qText})`);
+    const bodyText = (r.doc.querySelector("main") || r.doc.body).textContent || "";
+    check(!/every 20 minutes|~20 min/.test(bodyText),
+      "executive-summary.html must not advertise the retired 20-minute cadence (R-B8)");
+    check(!/alerts-page auto-sim/.test(bodyText),
+      "executive-summary.html must point auto-sim references at trading.html, not alerts.html (R-4)");
+    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, ${fd.suggestions.length} suggestions, ${fd.questions.length} questions)`);
+    r.close();
+  }
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);

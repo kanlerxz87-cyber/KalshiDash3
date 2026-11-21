@@ -196,7 +196,7 @@ KD.nav("");
         (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) will not appear in
         <code>GET /markets</code> and must be read from <code>GET /historical/markets</code>, which the collector now
         backfills per seeded series (bringing pre-cutoff settlements such as <code>KXELECTIRAN-26JUL01</code> into this
-        snapshot). Note from live probing (<a href="flagged.html">F-66</a> / R-B4): single-ticker
+        snapshot). Note from live probing (<a href="flagged.html">F-66</a>, <a href="flagged.html">F-82</a> / R-B4): single-ticker
         <code>GET /markets/KXELECTIRAN-26JUL01</code> still returned HTTP 200 on demo on 2026-11-21 while bulk
         <code>GET /markets?status=settled</code> pagination never reaches it. Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +

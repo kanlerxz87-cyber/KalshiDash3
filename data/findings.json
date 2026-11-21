@@ -1074,6 +1074,18 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD/markets/KXAAAGASD-26NOV21-3.6600/candlesticks?start_ts=1795182000&end_ts=1795185000&period_interval=1"
    ],
    "id": "F-81"
+  },
+  {
+   "id": "F-82",
+   "severity": "low",
+   "item": "Demo GET /markets/{ticker} still returns a market settled 12 weeks before market_settled_ts, contradicting the Historical Data documentation (R-B4)",
+   "why": "On 2026-11-21 (~23:11Z), GET /historical/cutoff on external-api.demo.kalshi.co returned market_settled_ts = 2026-09-22T00:00:00Z. The official Historical Data guide states that for GET /markets and GET /markets/{ticker}, 'Settled markets and their candlesticks older than the cutoff will not appear' and 'Markets and their candlesticks that settled before this timestamp are only available via GET /historical/markets'. Live-probing GET /markets/KXELECTIRAN-26JUL01 on the same demo host immediately returned HTTP 200 with status 'finalized', result 'no', and settlement_ts = 2026-07-01T15:24:15.984157Z (~12 weeks before the cutoff).",
+   "action": "Recorded verbatim without guessing whether demo lags production archiving or whether single-ticker lookups bypass the cutoff on demo. The collector continues to query GET /historical/markets for pre-cutoff rows as documented, and index.html now states both the documented rule and the live-observed demo exception (resolving R-B4).",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01"
+   ]
   }
  ]
 }
