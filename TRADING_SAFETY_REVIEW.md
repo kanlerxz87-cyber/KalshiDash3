@@ -1,0 +1,17 @@
+# Independent demo trading safety review
+
+Reviewed 2026-11-21 against the repository at the start of session `arena-685fd9e6` and the official sources below. This is a scoped review, not a line-by-line certification of the repository or a live trading test. No account credentials or real orders were used.
+
+## Findings requiring review
+
+| Finding | Evidence and impact | Recommended action | Official reference |
+|---|---|---|---|
+| Client demo-host guard accepts arbitrary addresses | `scripts/kalshi_client.py` `base_url()` treats any URL containing lowercase `demo` as demo. Offline reproduction: `KALSHI_BASE=http://demo.example.invalid/trade-api/v2` was accepted without the production opt-in. Authenticated calls would send the key ID, timestamp and signed request headers to the configured endpoint; the private key itself is not transmitted. This requires a bad or malicious environment configuration; no actual exposure was tested. | Parse and strictly allowlist the two documented HTTPS demo origins and exact API path; reject userinfo, query, fragment, unexpected ports, and any other base by default. Require explicit separate production opt-in for known production endpoints. Add negative tests. | [API environments](https://docs.kalshi.com/getting_started/api_environments), [API keys](https://docs.kalshi.com/getting_started/api_keys) |
+| Redirects can forward authentication headers | `request()` uses `urllib.request.urlopen`, whose default redirect handler copies ordinary headers to a redirected request. An offline `HTTPRedirectHandler.redirect_request` test using dummy values showed both `KALSHI-ACCESS-KEY` and `KALSHI-ACCESS-SIGNATURE` preserved on a cross-origin 302 GET redirect. No network, credentials, or live redirect were used; this does not establish that Kalshi sends such redirects. | Disable redirects for authenticated requests or validate each redirect and reject any cross-origin or HTTPS downgrade before forwarding credentials. Add tests using dummy headers. | [Python urllib.request](https://docs.python.org/3/library/urllib.request.html#urllib.request.HTTPRedirectHandler), [Kalshi API keys](https://docs.kalshi.com/getting_started/api_keys) |
+| Paper results are not account execution | `scripts/simulate.py` explicitly says it places no orders and uses no account; `desk.yml` says its workflow is credential-free. This does not validate authenticated order placement, fills, or portfolio performance. | Continue to label simulated results as paper; test account access and execution only in the documented demo environment with appropriately protected credentials. | [Kalshi demo environment](https://docs.kalshi.com/getting_started/demo_env), [Create Order V2](https://docs.kalshi.com/api-reference/orders/create-order-v2) |
+
+## Checks
+
+- Official documentation confirms separate demo and production credentials; demo prices and behavior may differ from real markets. The two documented demo REST roots are `https://external-api.demo.kalshi.co/trade-api/v2` and `https://demo-api.kalshi.co/trade-api/v2`.
+- `python3 scripts/verify_release.py` passed after installing its documented local `jsdom@26` test dependency. Its own result explicitly excludes certification of the live API, account access and external URLs. The first attempt failed because jsdom was absent; no dependency files were committed.
+- This review does not assert that deployed Pages, every source link, or authenticated trading were verified. The two security findings above remain uncorrected pending the client owner's changes.
