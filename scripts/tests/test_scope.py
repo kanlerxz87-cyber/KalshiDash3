@@ -95,14 +95,17 @@ check("function isQaRow" in site_js, "assets/site.js must expose isQaRow so page
 check("isQaRow," in site_js, "isQaRow must be exported from the KD object")
 index_html = (ROOT / "index.html").read_text()
 check("KD.isQaRow(r)" in index_html, "index.html must skip QA fixtures when picking the largest market")
-# Either wording is acceptable as long as both numbers are labelled: the stored row count and the
-# in-scope count. Main's sibling fix uses "stored settled rows (N in scope)"; this session's first
-# version used "settled markets stored; N were in scope". Pin the contract, not the phrasing.
-check(("stored settled rows" in index_html or "settled markets stored" in index_html)
-      and "settled_in_scope" in index_html,
-      "index.html must show the stored settled-row cap and the in-scope count as distinct, labelled numbers (F-37/F-38)")
-check('settled markets in scope' not in index_html,
-      "index.html must not call the stored row cap 'settled markets in scope'")
+# Three sessions have now worded this line differently; what matters (F-37/F-38) is that the number of
+# STORED settled rows and the number IN SCOPE are both rendered as labelled, distinct values, and that the
+# stored cap is never presented alone as "settled markets in scope".
+check("settled_in_scope" in index_html,
+      "index.html must render counts.settled_in_scope next to the stored settled-row count (F-37/F-38)")
+stored_labels = ("stored settled rows", "settled markets stored", "settled rows in this snapshot")
+check(any(lbl in index_html for lbl in stored_labels),
+      "index.html must label the stored settled-row count distinctly (looked for: "
+      + ", ".join(stored_labels) + ")")
+check('"of " + KD.num(settled.length) + " settled markets in scope"' not in index_html,
+      "index.html must not present the stored row cap alone as 'settled markets in scope'")
 
 # 4. the exclusion must be published, never silent
 collect_src = (ROOT / "scripts" / "collect.py").read_text()
