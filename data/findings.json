@@ -353,6 +353,19 @@
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
    ]
+  },
+  {
+   "id": "G21",
+   "suggestion": "Rank and filter the alert chats by contracts actually traded, and show the traded/quote-only ratio as a headline number instead of burying it in prose",
+   "why_it_helps_decisions": "On the 2026-11-21T23:01:10Z snapshot only 11 of the 48 served swings traded at or above the 100-contract floor, 19 traded below it and 13 are candle-sourced, so a trader reading the raw chat spends most of their attention on prints nobody could have executed. Sorting the chat by contracts traded (with the >= $0.10 rule unchanged) puts the executable swings first without hiding anything, and the ratio tells the reader at a glance whether today is a thin day (F-75).",
+   "effort": "Shipped in T66 as the per-row evidence chip, the published counts.evidence ratio and the 'traded only' filter; sorting the chat by contracts traded is the remaining step",
+   "risk": "A floor is a judgement call and could hide a genuine move in a thin market; mitigated by never deleting a row (the filter states how many it hid) and by printing the exact contract count on every row so a reader can apply their own threshold.",
+   "success_metric": "Within one week, the share of archived swings whose state is traded_ge_floor is visible on the page and either rises or is explained; no swing disappears without the hidden count being printed.",
+   "status": "implemented",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/demo_env"
+   ]
   }
  ],
  "flagged": [
@@ -1028,7 +1041,42 @@
    ]
   },
   {
-   "id": "F-79",
+   "severity": "medium",
+   "item": "Most >= $0.10 swings in the demo environment are not moves anyone could have traded: on the 2026-11-21T23:01:10Z snapshot, 21 of the 25 swings of >= 50c traded fewer than 200 contracts in the interval (quantitative companion to F-77)",
+   "why": "Measured from data/live/price_history.json alone, by differencing the documented cumulative volume_fp (Kalshi: \"String representation of the market volume in contracts\", https://docs.kalshi.com/api-reference/market/get-markets) across the two observations that bound each archived swing. Before the T66 fix, 43 of the 48 served swings had both bounding observations present and 5 were archive-only; of the 25 whose price moved >= 50c, 21 had fewer than 200 contracts traded between the reads and 4 of those had fewer than 20. Concrete example, entirely from committed data: KXAAAGASM-26DEC31-3.30 printed 0.29 -> 0.71 (a 42c move) between 2026-11-21T22:46:10Z and 23:01:10Z while volume_fp rose 409.50 -> 410.86, i.e. 1.36 contracts. The same market earlier printed 0.29 -> 0.71 with volume_fp unchanged at 385.82 across 2026-11-20T13:50:26Z -> 15:19:53Z: one contract printed the whole 42c round trip in both directions. This is the demo environment's liquidity, not a bug in the API — but a dashboard that shows such a print as \"the price moved 42c\" invites a trader to act on a quote nobody traded. [Renumbered from F-75, then from F-78: main published its own F-75..F-77 in PR #79 while this branch was open, including F-77 ('Demo BTC year-end range markets oscillate between about 2c and 99c'). This entry is the same phenomenon measured across the whole archive and expressed as contracts traded per swing, so it is kept as the quantitative companion to F-77 rather than a second narrative.] [Renumbered again to F-79: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
+   "action": "Published, not hidden: every alert now carries evidence.state and the exact contract count (scripts/alert_evidence.py, T66), both chats and the dashboard show a traded / thin / no trades chip per row, the \"traded only\" filter can hide the thin ones while stating how many it hid, and counts.evidence publishes the ratio for the whole feed. The floor (100 contracts) is a project rule and is labelled as such everywhere; Kalshi publishes no significance field.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
+   ],
+   "id": "F-79"
+  },
+  {
+   "severity": "medium",
+   "item": "The alert rule could not distinguish a traded move from a quoted one, because no per-alert evidence was published (fixed in T66; the evidence layer is new and still has no settled-outcome check)",
+   "why": "The >= $0.10 rule compares consecutive observations of last_price_dollars. Kalshi defines that field as \"Price for the last traded YES contract on this market in dollars\", so two reads can differ while nothing at all traded in between (a thin book, a late reference, or demo-side behaviour). Until T66 the alert row carried only prices and times, so a reader had no way to tell which kind of event they were looking at, and the high-ROI screen scores momentum from the swing size alone. F-34 raised the symptom for one gas market; this entry records the measured scale across the whole archive and the missing field. [Renumbered from F-76. Cross-reference: main's F-77 describes the oscillation this field makes measurable.] [Renumbered again to F-80: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
+   "action": "Fixed in T66: scripts/alert_evidence.py classifies every swing from the documented fields only, scripts/build_alerts.py freezes the classification at first detection (like high_roi) so the feeds stay reproducible, and scripts/tests/validate_alerts.py recomputes the contract count independently and refuses a contradictory state. Still open: the evidence is descriptive, not predictive — no settled-outcome test has been run to show that a 'traded' swing is more likely to resolve in the direction of the move than a 'quote-only' one. That test needs a larger settled sample and is left on the board (T65 note in COORDINATION.md).",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_lifecycle"
+   ],
+   "id": "F-80"
+  },
+  {
+   "severity": "low",
+   "item": "Candlestick volume_fp is a per-period count, not the cumulative volume GET /markets reports, so differencing across a candle-backfill observation would invent a contract count",
+   "why": "scripts/collect.py backfills a market's missing price history from official 1-minute candlesticks (period_interval=1) and marks those points \"source\": \"candle\". The candlestick schema documents volume_fp as \"String representation of the number of contracts bought on the market during the candlestick period\", while GET /markets documents it as \"String representation of the market volume in contracts\" — a cumulative total. The two are different quantities. Measured on the committed snapshot: 7 of 484 series in data/live/price_history.json are candle-sourced (93 observations), and 13 of the 60 archived swings are bounded by at least one candle point. Differencing there produced arithmetic such as a negative contract count on KXAAAGASD-26NOV21-3.6600 (volume_fp 10.00 -> 4.00 across 2026-11-20T13:47Z -> 14:37Z, i.e. two candles 50 minutes apart whose per-minute counts are not comparable). Caught while implementing T66 and fixed before publishing. [Renumbered from F-77. A separate defect from main's F-77 (demo oscillation); the collision is noted so the two are not conflated.] [Renumbered again to F-81: main published its own F-78 (two divergent 'model' definitions in the shipped JavaScript) in PR #78 before this PR merged.]",
+   "action": "Fixed: a sixth evidence state, candle_unquantified, is emitted whenever either bounding observation is not a REST read, with a null contract count and the observation sources named on the row. The validator rejects any other label for such a pair. Provenance re-derivation now skips candle-backed pairs explicitly and prints how many it skipped, instead of silently failing or silently accepting them.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD/markets/KXAAAGASD-26NOV21-3.6600/candlesticks?start_ts=1795182000&end_ts=1795185000&period_interval=1"
+   ],
+   "id": "F-81"
+  },
+  {
+   "id": "F-82",
    "severity": "low",
    "item": "Demo GET /markets/{ticker} still returns a market settled 12 weeks before market_settled_ts, contradicting the Historical Data documentation (R-B4)",
    "why": "On 2026-11-21 (~23:11Z), GET /historical/cutoff on external-api.demo.kalshi.co returned market_settled_ts = 2026-09-22T00:00:00Z. The official Historical Data guide states that for GET /markets and GET /markets/{ticker}, 'Settled markets and their candlesticks older than the cutoff will not appear' and 'Markets and their candlesticks that settled before this timestamp are only available via GET /historical/markets'. Live-probing GET /markets/KXELECTIRAN-26JUL01 on the same demo host immediately returned HTTP 200 with status 'finalized', result 'no', and settlement_ts = 2026-07-01T15:24:15.984157Z (~12 weeks before the cutoff).",
