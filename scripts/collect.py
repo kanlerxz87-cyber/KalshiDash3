@@ -645,18 +645,27 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         settled_total_method = "exact: this run paged the settled scan to exhaustion"
     else:
         base = prev_counts.get("settled_in_scope_total")
+        prev_method = str(prev_counts.get("settled_in_scope_total_method") or "")
         if isinstance(base, int) and base > 0:
-            since = prev_counts.get("collected_at") or None
-            known = {r.get("ticker") for r in prev_settled}
-            known |= {r.get("ticker") for r in rows["settled"]}
-            new_ticks = {r.get("ticker") for r in rows["settled"]} - {r.get("ticker") for r in prev_settled}
-            settled_total_published = base + len(new_ticks)
-            settled_total_method = (
-                "carried forward: the settled scan was truncated by the %d-row safety cap, so the "
-                "previous run's exact total (%s) plus the %d settled tickers this run had not seen "
-                "before. Tickers settled in the capped gap and never observed are not counted."
-                % (SAFETY_SCAN_CAP, f"{base:,}", len(new_ticks)))
-            del since, known
+            # A carry-forward is only as good as what it carries. A previous value that was
+            # itself produced from a truncated window is a lower bound, so this stays a lower
+            # bound and says so -- the sum can understate but can never overstate.
+            new_ticks = len({r.get("ticker") for r in rows["settled"]} - {r.get("ticker") for r in prev_settled})
+            if prev_method.startswith("exact"):
+                settled_total_published = base + new_ticks
+                settled_total_method = (
+                    "carried forward from an exact total: the settled scan was truncated by the "
+                    "%d-row safety cap, so the previous run's exact total (%s) plus the %d settled "
+                    "tickers this run had not seen before. A ticker that settled inside the capped "
+                    "gap and was never observed is not counted, so this is a lower bound."
+                    % (SAFETY_SCAN_CAP, f"{base:,}", new_ticks))
+            else:
+                settled_total_published = max(base, settled_in_scope_total)
+                settled_total_method = (
+                    "lower bound, carried forward: the settled scan was truncated by the %d-row "
+                    "safety cap in this run and the stored previous value (%s) was itself a lower "
+                    "bound, so the larger of the two is shown. The true in-scope total is at least "
+                    "this. It is never inflated to look complete." % (SAFETY_SCAN_CAP, f"{base:,}"))
         else:
             settled_total_published = settled_in_scope_total
             settled_total_method = (

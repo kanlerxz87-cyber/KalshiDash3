@@ -91,6 +91,28 @@ check(len(published2) == 1 and per_cat2 == {"golf": 1}, "a single settled row mu
 published3, per_cat3 = C.select_settled([])
 check(published3 == [] and per_cat3 == {}, "an empty settled list must stay empty")
 
+# ------------------------------------------- 1b. the settled TOTAL may understate, never overstate
+# The scan hits a 25,000-row safety cap, so a run can only see a window. The published total is
+# either exact (paging ran to exhaustion) or carried forward. A carried-forward total must never
+# claim completeness, and must never be larger than what the evidence supports.
+src_collect = (ROOT / "scripts" / "collect.py").read_text()
+check("settled_in_scope_total_method" in src_collect,
+      "the collector must publish HOW the settled total was obtained, next to the number")
+check("lower bound, carried forward" in src_collect,
+      "a carry-forward from a previous lower bound must stay labelled a lower bound")
+check("carried forward from an exact total" in src_collect,
+      "a carry-forward from an exact total must say so")
+check("It is never inflated to look complete." in src_collect,
+      "the code must state the no-inflation rule it implements")
+# The old wording claimed the previous value was exact unconditionally; that was wrong whenever
+# the previous value was itself a lower bound.
+# The "exact total" wording must sit inside the branch that has checked the previous method,
+# so a previous lower bound can never be described as exact.
+exact_phrase_at = src_collect.find("carried forward from an exact total")
+guard_at = src_collect.find('if prev_method.startswith("exact")')
+check(exact_phrase_at > guard_at >= 0,
+      "the 'exact total' wording must be inside the branch that verifies the previous value was exact")
+
 # ---------------------------------------------------------------- 2. collector contract
 src = (ROOT / "scripts" / "collect.py").read_text()
 check('"mve_filter": "exclude"' in src,
