@@ -12,7 +12,7 @@
    ],
    "status": "active",
    "from_time": "2026-11-21T20:34:40Z",
-   "to_time": "2026-11-21T20:58:43Z",
+   "to_time": "2026-11-21T20:57:37Z",
    "from_price": 0.57,
    "to_price": 0.17,
    "delta": -0.4,
@@ -23,7 +23,7 @@
    "to_yes_ask": 0.17,
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-21T20:58:44Z",
+   "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": true
   },
   {
@@ -152,6 +152,58 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:30:54Z",
    "high_roi": true
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T15:24:00Z",
+   "to_time": "2026-11-21T15:25:00Z",
+   "from_price": 0.55,
+   "to_price": 0.65,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T15:23:00Z",
+   "to_time": "2026-11-21T15:24:00Z",
+   "from_price": 0.65,
+   "to_price": 0.55,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
   },
   {
    "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
@@ -310,6 +362,32 @@
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
   },
   {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T06:37:00Z",
+   "to_time": "2026-11-21T06:38:00Z",
+   "from_price": 0.82,
+   "to_price": 0.95,
+   "delta": 0.13,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "to_yes_bid": 0.94,
+   "to_yes_ask": 0.95,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",
@@ -362,6 +440,110 @@
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
   },
   {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T06:33:00Z",
+   "to_time": "2026-11-21T06:34:00Z",
+   "from_price": 0.7,
+   "to_price": 0.82,
+   "delta": 0.12,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "to_yes_bid": 0.79,
+   "to_yes_ask": 0.82,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T06:33:00Z",
+   "to_time": "2026-11-21T06:34:00Z",
+   "from_price": 0.55,
+   "to_price": 0.65,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T06:32:00Z",
+   "to_time": "2026-11-21T06:33:00Z",
+   "from_price": 0.65,
+   "to_price": 0.55,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": null,
+   "from_time": "2026-11-21T06:31:00Z",
+   "to_time": "2026-11-21T06:32:00Z",
+   "from_price": 0.5,
+   "to_price": 0.65,
+   "delta": 0.15,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "to_yes_bid": 0.52,
+   "to_yes_ask": 0.7,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+  },
+  {
    "ticker": "KXAAAGASM-26DEC31-3.30",
    "event_ticker": "KXAAAGASM-26DEC31",
    "title": "Will average **gas prices** be above $3.30?",
@@ -386,6 +568,58 @@
     "Economics"
    ],
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Economics"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T22:10:00Z",
+   "to_time": "2026-11-20T22:41:00Z",
+   "from_price": 0.07,
+   "to_price": 0.21,
+   "delta": 0.14,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+   "to_yes_bid": 0.21,
+   "to_yes_ask": 0.24,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Economics"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T21:42:00Z",
+   "to_time": "2026-11-20T22:04:00Z",
+   "from_price": 0.19,
+   "to_price": 0.09,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+   "to_yes_bid": 0.09,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -463,6 +697,58 @@
    "series_categories": [
     "Test"
    ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T19:39:00Z",
+   "to_time": "2026-11-20T19:40:00Z",
+   "from_price": 0.45,
+   "to_price": 0.65,
+   "delta": 0.2,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T19:38:00Z",
+   "to_time": "2026-11-20T19:39:00Z",
+   "from_price": 0.65,
+   "to_price": 0.45,
+   "delta": -0.2,
+   "direction": "down",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
   },
   {
@@ -589,6 +875,58 @@
    "series_categories": [
     "Test"
    ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T13:47:00Z",
+   "to_time": "2026-11-20T13:48:00Z",
+   "from_price": 0.55,
+   "to_price": 0.65,
+   "delta": 0.1,
+   "direction": "up",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "event_ticker": null,
+   "title": null,
+   "category_id": null,
+   "category_basis": null,
+   "series_categories": [
+    "Test"
+   ],
+   "status": null,
+   "from_time": "2026-11-20T13:45:00Z",
+   "to_time": "2026-11-20T13:46:00Z",
+   "from_price": 0.65,
+   "to_price": 0.55,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": null,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "to_yes_bid": 0.65,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:57:38Z",
+   "high_roi": false,
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
   },
   {

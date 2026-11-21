@@ -52,10 +52,16 @@ KD.nav("categories.html");
       { k: "Open markets inside the five categories", v: KD.num(snap.counts.open_in_scope) },
       { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
       { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
-      { k: "Settled markets inside the five categories", v: KD.num(snap.counts.settled_in_scope) },
+      { k: "Settled markets inside the five categories (scan total)", v: KD.num(snap.counts.settled_in_scope_total ?? "—") +
+          (snap.counts.settled_in_scope_total_method ? `<div class="small mut">${KD.esc(snap.counts.settled_in_scope_total_method)}</div>` : "") },
+      { k: "Settled markets in this run's paging window", v: KD.num(snap.counts.settled_in_scope_this_run_window ?? snap.counts.settled_in_scope) },
+      { k: "Settled rows published, allocated across the five topics", v: KD.num(snap.counts.settled_published ?? snap.counts.settled_in_scope) },
+      { k: "Open rows published (largest first, per category)", v: KD.num(snap.counts.open_published_rows ?? snap.counts.open_in_scope) },
       { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) },
-      { k: "Open multivariate combos excluded", v: KD.num(snap.counts.open_excluded_multivariate) },
-      { k: "Settled multivariate combos excluded", v: KD.num(snap.counts.settled_excluded_multivariate) },
+      // The scan now sends mve_filter=exclude, so combos are filtered by the API before they are
+      // counted; these two counters therefore show what still slipped through, not the combo volume.
+      { k: "Multivariate combos still present after the API's mve_filter=exclude (open)", v: KD.num(snap.counts.open_excluded_multivariate) },
+      { k: "Multivariate combos still present after the API's mve_filter=exclude (settled)", v: KD.num(snap.counts.settled_excluded_multivariate) },
       { k: "Confirmed (seed) series markets found", v: KD.num(snap.counts.seed_markets_found) }
     ]);
 })();
