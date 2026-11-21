@@ -153,7 +153,7 @@ class CategoryIntegrityTests(unittest.TestCase):
 
     TICKER = "KXDEMOFUTHOURLY-26NOV21H16-UP"
 
-    def _run(self, ledger_categories):
+    def _run(self, ledger_categories, category_id="crypto"):
         snap = {
             "collected_at": "2026-11-21T15:21:23Z",
             "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
@@ -173,8 +173,8 @@ class CategoryIntegrityTests(unittest.TestCase):
         ]}}}
         archive = {"schema": 1, "alerts": [{
             "ticker": self.TICKER, "event_ticker": "KXDEMOFUTHOURLY-26NOV21H16",
-            "title": "Demo BTC at or above 60237.37 USD", "category_id": "crypto",
-            "category_basis": "keyword", "status": "active",
+            "title": "Demo BTC at or above 60237.37 USD", "category_id": category_id,
+            "category_basis": "keyword" if category_id else None, "status": "active" if category_id else None,
             "from_time": "2026-11-21T15:16:38Z", "to_time": "2026-11-21T15:21:23Z",
             "from_price": 0.65, "to_price": 0.45, "delta": -0.2, "direction": "down",
             "volume_24h_fp": 2236.0, "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/" + self.TICKER,
@@ -203,6 +203,23 @@ class CategoryIntegrityTests(unittest.TestCase):
         self.assertEqual(feed["counts"]["archive_total"], 1,
                          "history is never rewritten: the alert stays in the archive")
         self.assertEqual(len(archive["alerts"]), 1)
+
+    def test_unassigned_test_series_candle_alert_is_withheld(self):
+        # F-75: F-72 candle backfill creates archive rows with category_id=None for closed
+        # tickers. Official ["Test"] categories still have zero overlap with the five project
+        # topics and must be withheld rather than slipping past the guard.
+        feed, archive = self._run(["Test"], category_id=None)
+        self.assertEqual(feed["all_events"], [], "an unassigned Test-series swing must not be served")
+        self.assertEqual(feed["high_roi"], [])
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
+        self.assertIn("unassigned", feed["counts"]["withheld_reasons"])
+        self.assertEqual(len(archive["alerts"]), 1)
+
+    def test_unassigned_in_scope_series_candle_alert_is_served(self):
+        feed, _ = self._run(["Crypto"], category_id=None)
+        self.assertEqual(len(feed["all_events"]), 1,
+                         "an unassigned row whose official series is in-scope stays served")
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
 
     def test_compatible_series_alert_is_served(self):
         feed, _ = self._run(["Crypto"])

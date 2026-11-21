@@ -141,11 +141,13 @@ def main() -> int:
         series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
         return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
 
+    all_compatible = set().union(*COMPATIBLE.values())
+
     def _served(a: dict) -> bool:
-        compatible = COMPATIBLE.get(a.get("category_id") or "", set())
         cats = _official(a.get("ticker") or "")
-        if not cats or not compatible:
+        if not cats:
             return True
+        compatible = COMPATIBLE.get(a.get("category_id") or "") or all_compatible
         return any(c in compatible for c in cats)
 
     counts = alerts_doc.get("counts") or {}

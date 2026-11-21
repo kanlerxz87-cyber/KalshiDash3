@@ -80,6 +80,7 @@ def main() -> int:
         "golf": {"Sports", "Golf"},
     }
 
+    all_compatible = set().union(*compatible.values())
     archive_cat = {(a.get("ticker"), a.get("to_time")): a.get("category_id")
                    for a in archive.get("alerts") or []}
 
@@ -90,11 +91,15 @@ def main() -> int:
         if not official:
             series = snap.get("series_ticker") or ticker.upper().split("-")[0]
             official = [str(c) for c in ((ledger_series.get(series) or {}).get("categories") or [])]
+        if not official:
+            return False
         # The snapshot row may have been dropped by the collector precisely because it conflicted,
-        # so the archived alert's own recorded topic is the fallback.
+        # so the archived alert's own recorded topic is the fallback; when both are absent
+        # (F-75: candle-backfilled row for a closed ticker), check against the union of the five
+        # in-scope topics so official ["Test"] series are still withheld.
         cat = snap.get("category_id") or archive_cat.get(key)
-        ok = compatible.get(cat or "", set())
-        return bool(official and ok and not any(o in ok for o in official))
+        ok = compatible.get(cat or "") or all_compatible
+        return not any(o in ok for o in official)
 
     expected_missing = {k for k in archive_keys if _withheld(k)}
     if (doc.get("counts") or {}).get("withheld_category_conflict") != len(expected_missing):

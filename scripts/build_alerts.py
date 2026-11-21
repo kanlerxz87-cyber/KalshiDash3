@@ -193,16 +193,19 @@ def main() -> int:
         entry = ledger.get((row or {}).get("series_ticker") or series_of_ticker(ticker)) or {}
         return [str(c) for c in (entry.get("categories") or [])]
 
+    all_compatible = set().union(*CATEGORY_COMPATIBLE.values())
+
     def publishable(a) -> bool:
         cats = official_for(a.get("ticker") or "")
-        cat = a.get("category_id")
-        compatible = CATEGORY_COMPATIBLE.get(cat or "", set())
-        if not cats or not compatible:
+        if not cats:
             return True
+        cat = a.get("category_id")
+        compatible = CATEGORY_COMPATIBLE.get(cat or "") or all_compatible
         if any(c in compatible for c in cats):
             return True
-        conflicts.setdefault(cat, {}).setdefault(str(cats), 0)
-        conflicts[cat][str(cats)] += 1
+        bucket = cat or "unassigned"
+        conflicts.setdefault(bucket, {}).setdefault(str(cats), 0)
+        conflicts[bucket][str(cats)] += 1
         return False
 
     served = [a for a in archive["alerts"] if publishable(a)]

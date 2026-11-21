@@ -287,6 +287,7 @@ def build() -> dict:
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},
     }
+    all_compatible = set().union(*compatible.values())
     withheld = []
 
     def _keep(r: dict) -> bool:
@@ -296,9 +297,11 @@ def build() -> dict:
         if not official:
             series = snap.get("series_ticker") or ticker.upper().split("-")[0]
             official = [str(c) for c in ((ledger_series.get(series) or {}).get("categories") or [])]
+        if not official:
+            return True
         cat = r.get("category_id") or snap.get("category_id")
-        ok = compatible.get(cat or "", set())
-        if not official or not ok or any(o in ok for o in official):
+        ok = compatible.get(cat or "") or all_compatible
+        if any(o in ok for o in official):
             return True
         withheld.append(ticker)
         return False
