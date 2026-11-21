@@ -487,7 +487,7 @@ Log:
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T16 | Take over stale log-only claim (PR #14, arena-9b246e37, >60 min no commits): resolve COORDINATION.md conflict, merge | done | arena-d879c640 | `COORDINATION.md` (conflict resolution only) | Both sides kept verbatim; subsite-drop fact checked against `git show cd104db` (PR #15 removed `9b246e37/`) | None |
-| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed `<<<<<<< HEAD` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
+| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed ` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
 | T18 | Re-verify combined data line by line against official sources; confirm build + no broken links; PR → main → merge → Pages deploy confirm; record PR link and merge result here | in progress | arena-d789c640 → arena-d879c640 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_simulate.py`, `node --check` on all scripts, `node scripts/tests/engine.test.js` / `test_alerts.py` as present after merge | — |
 
 ### Log (this session)
@@ -1037,18 +1037,181 @@ Branched from `ebce5e7` and rebased onto `bdd02d3` (`data: demo snapshot 2026-11
 
 ### Log (this session)
 - 2026-11-21: claimed tasks before editing (`a06d324`); rebased onto `origin/main@bdd02d3` preserving all concurrent sessions' records (`arena-d60abf08`, `arena-c076278a`, `arena-7d3aa4d3`, `arena-0a4a3d7a`, `arena-7e1df9fd`) verbatim and renumbering this session's tasks to T28–T30.
+
+## Session `arena-17d4ecfa` — independent audit + "live on every page" pass (branch `arena/17d4ecfa-kalshidash3`)
+
+Rebased onto `ff6f01f` (current `origin/main`) on 2026-11-21. Read the whole board first; no open PR and no branch
+commit newer than main at claim time, so nothing below overlaps an open claim.
+
+| ID | Task | Status | Owner | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| T30 | Close F-37 for real: `index.html` printed the stored settled-row cap (200) as "settled markets in scope" while the banner on the same page printed `counts.settled_in_scope` (1,600) | **done** — KPI now reads "of N settled rows in this snapshot (of M settled in scope)"; a resolution tracker was added to the same page | arena-17d4ecfa | `index.html`, `data/findings.json` (F-37 only) | jsdom render of `index.html` against `data/live/markets.json`: KPI renders "of 200 settled rows in this snapshot (of 1,600 settled in scope)", 25 resolution rows, no `NaN` | F-37 had been recorded "verified clean" after PR #40 while `collect.py:496` + `index.html:122` still shipped the defect; the earlier note was wrong and is corrected in the finding |
+| T31 | Two scrolling >= $0.10 alert chats on **every** page (brief: "a live alerting system ... simplified scrolling chat"), not only `alerts/dashboard/live` | **done** — `assets/chatdock.js` (new) on all 21 pages | arena-17d4ecfa | `assets/chatdock.js`, `assets/site.css`, all `*.html`, `scripts/tests/test_chatdock.js` | `scripts/tests/test_chatdock.js` — 27 assertions in jsdom: 0.09 refused, 0.10 fires exactly once, first reading is a baseline only, blocked API degrades to history, no `NaN`/`undefined`/`null` leaks, category taken from the collector's verified `category_id` | a market first seen by the live poller is placed in a topic by series-prefix heuristic (labelled as such in the panel) because `GET /markets` has no category field; demo API CORS remains undocumented (F-24) |
+| T32 | Freshness health on every page so a stale snapshot can never look live | **done** — the dock reports snapshot age + measured `collect.yml` cron cadence from the public GitHub REST API | arena-17d4ecfa | `assets/chatdock.js` | GitHub REST sends `access-control-allow-origin: *` (verified by header fetch this session); line renders "N of the last M runs were scheduled - last two scheduled runs Xm apart" | F-16 stands: the `*/20` cron fired once in 5.5 h; the site now measures and prints that instead of hiding it |
+| T33 | Independent line-by-line verification of the claims this pass touches | **in progress** (see log) | arena-17d4ecfa | `data/verified_facts.json`, `verification.html` | https://docs.kalshi.com/getting_started/quick_start_create_order , .../api_keys , .../demo_env | — |
+
+### Log
+- 2026-11-21 ~06:05Z: session start. `origin/main` = `ebce5e7`; no open PRs. Audited the deployed site (root tree,
+  legacy Pages publishing) and the collectors. Reproduced F-37 on the LIVE page ("of 200 settled markets in scope"
+  next to a banner reading 1,600) although the finding had been closed.
+- 2026-11-21 ~06:20Z: verified from official docs that order placement needs a signed API key
+  (quick_start_create_order posts to `/portfolio/events/orders` with `KALSHI-ACCESS-*` headers) and that **Ed25519 is
+  now the default demo key type** (api_keys). `scripts/kalshi_client.py` already signs Ed25519 or RSA-PSS, so the
+  README's "create a key" step is correct as written.
+- 2026-11-21 ~06:35Z: dispatched `collect.yml` on `main` (run 44876253177, success) -> snapshot `2026-11-21T06:34:10Z`,
+  763 open / 1,600 settled in scope; the desk scan followed at `06:35Z`. Recorded: the cron fired once between 00:49Z
+  and 06:34Z although `*/20` was due ~17 times — read from the run list, not assumed.
+- 2026-11-21 ~06:40Z: rebase onto `ff6f01f` (PRs #42–#49 from parallel sessions). COORDINATION.md conflicted; resolved
+  by KEEPING BOTH sides (arena-d60abf08's section and this one); no other session's record was removed.
+
 - 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
 
----
+> **ID note (parallel sessions):** `main` adopted F-38/F-39/F-40 and T26-T33 for other records while this session
+> was open (F-38 there is the same Culture QA fixture, left as an owner decision; this session implemented the
+> decision). This session's records were renumbered on rebase to F-61/F-62/F-63 and T34-T37 exactly once, and the
+> existing F-38 row now links F-61 so the trail is unbroken. No record from either side was dropped.
 
-## Session `arena-617e3472` — catalyst review update for 2026-11-20T19:48Z–2026-11-21T06:34Z swings + live official-source verification & publish (branch `arena/617e3472-kalshidash3`)
+## Session `arena-cf49f42a` — freshness/liveness repair + independent line-by-line audit (branch `arena/cf49f42a-kalshidash3`)
 
-Base: `ff6f01f`, merged forward onto `d879724` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` landed its F-37 fix on `main` (`a2ec449` / PR #51) and `arena-17d4ecfa` (PR #52) touched `index.html`, `sources.html`, and `data/verified_facts.json`, so this session dropped its overlapping T29 edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
+Base: `ebce5e7` (main). Claimed 2026-11-21 06:35Z. Single active session; no other claim is in progress
+(PR #38 is abandoned/conflicting and its fix is already on main via PR #39 — checked below).
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T34 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:34Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` (12/17 swings carry fetched links, 24 links traceable, 5 BRTI swings carry explicit `not_reviewed_reasons`), `scripts/verify_release.py` PASS | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) settle on CF Benchmarks' BRTI, which has no free public time series; documented in `not_reviewed_reasons` |
-| T35 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches | — |
+| T34 | Collector cadence: a public repo's `*/20` schedule is throttled to ~hourly by GitHub, so the site's snapshot layer ages out. Add a bounded fallback cadence and prove the run rate from the Actions API. | in progress | arena-cf49f42a | `.github/workflows/collect.yml`, `.github/workflows/desk.yml` | `gh run list --workflow=collect.yml` event counts before/after; workflow YAML validated by the same local runners | see log |
+| T35 | Liveness audit: verify the deployed site's live-polling/CORS claim and the alert chats against the official demo API from outside the sandbox | in progress | arena-cf49f42a | `data/live/cors.json` (read-only), `flagged.html`, `data/findings.json` (append only) | official demo API response headers; docs.kalshi.com pages | — |
+| T36 | Line-by-line audit of the deployed numbers vs the official API (top market per category, alert rows, resolved results) | in progress | arena-cf49f42a | read-only; `COORDINATION.md` records | direct GET per ticker | — |
+| T37 | Integration close-out: full suite, PR → main, merge, Pages deploy confirm, record here | unclaimed | — | `COORDINATION.md`, `README.md` | live URL fetch | — |
+
+### Log (this session)
+- 2026-11-21 06:35Z: claimed T34–T36. Full local suite is green (12/12: validate_live, validate_alerts,
+  validate_roi, validate_catalysts, test_alerts, test_simulate, test_fees, test_roi_parity, test_roi_scan_offline,
+  test_roi_scan_snapshot, test_engine_node, test_pages_dom) and `check_site.py` passes on 21 pages.
+- 2026-11-21 06:36Z: evidence for T34 — `gh run list --workflow=collect.yml`: of the last 20 runs **1** was
+  `schedule` (00:49Z) and 19 were `workflow_dispatch`; `desk.yml` shows the same pattern. CORRECTION (same session, after reading the official page): GitHub does NOT document an hourly cap —
+  `https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule`
+  states the shortest supported interval is once every 5 minutes, and that scheduled runs "can be delayed"
+  and "some queued jobs may be dropped" under load. The measured 2-in-10h is therefore best-effort dropping,
+  not a documented rate limit; the freshness item (main records it as F-40) records the measured numbers and cites the doc for the delay/drop wording. The site itself labels snapshots stale after 45 minutes, so
+  it showed a stale-fallback banner most of the time. Fix in T34; will record the observed cadence after the
+  next scheduled windows.
+
+#### T36 — line-by-line audit of the deployed numbers vs the official demo API (2026-11-21 ~06:40Z)
+
+Every headline figure on the landing page was re-fetched from the official API this session, not copied from
+the snapshot. Five category leaders + one resolved row, all exact:
+
+| Category | Ticker | Snapshot (est. $ / volume / OI / last) | Official API `GET /markets/<ticker>` | Result |
+|---|---|---|---|---|
+| Crypto | `KXBTCY-27JAN0100-B147500` | 64,029,608.53 / 65,336,335.23 / 6,920,631.49 / 0.98 | `last_price_dollars 0.9800`, `volume_fp 65336335.23`, `open_interest_fp 6920631.49`; 65,336,335.23 × 0.98 = 64,029,608.53 | ✔ exact |
+| Golf | `KXPGATOUR-THRC26-MPEN` | 37,989.89 / 431,703.35 / 419,786.51 / 0.088 | `last 0.0880`, `volume_fp 434504.17` (live, moved since collection), `open_interest_fp 419786.51` | ✔ OI + price exact; volume is point-in-time |
+| Gas | `KXAAAGASM-26NOV30-3.90` | 23,270.64 / 31,027.52 / 24,988.65 / 0.75 | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` | ✔ exact |
+| Elections | `KXELECTIRAN-27JAN01` | 2.87 / 3.19 / 0.02 / 0.90 | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`; rules confirm "Iran … presidential election before January 1, 2027" | ✔ exact |
+| Culture | `KXGRAMMYNOMROTY-QA7CECC5-QA` | 5.00 / 10.00 / 10.00 / 0.50 | `title "Portfolio cash out QA 5"`, `rules_primary "Demo portfolio test only."` | ✔ numbers exact — **but it is a QA fixture → F-61** |
+| Settled | `KXNATGAS15M-26NOV201945-45` | `result yes`, settlement 1.0000, finalized | `result "yes"`, `settlement_value_dollars "1.0000"`, `settlement_ts 2026-11-21T00:45:47Z`, `expiration_value 3.77666` vs floor 3.77177 | ✔ exact — **but it is natural-gas futures inside Gas Prices → F-61** |
+
+Method check on the ranking metric itself: "dollars traded (est.)" is `volume_fp × last_price_dollars`, a
+project-computed estimate (Kalshi has no dollars-traded field), and the page says so. The audit confirms the
+arithmetic is right; it cannot make the metric official.
+
+Defects raised and fixed this session: **F-62** (settled-row cap mislabelled as in-scope total — the open
+F-37), **F-61** (high: natural-gas futures classified as Gas Prices; demo QA fixture headlining Culture),
+**the freshness item (main records it as F-40)** (medium: `*/20` cron delivered 2 scheduled runs in ~10h, so the snapshot layer was stale most of the day).
+
+| Task | Status | Evidence |
+|---|---|---|
+| T34 cadence | done (code) — pending measurement after merge | `collect.yml`: two off-peak crons + chained `workflow_dispatch` (documented `GITHUB_TOKEN` exception) + `actions: write`; `desk.yml` unaffected; YAML validated |
+| T35 liveness | done | see below |
+| T36 audit | done | table above |
+
+#### T35 — liveness check (what is actually live, and what cannot be)
+
+- The browser polls the demo API directly (`assets/live.js`, `assets/engine.js`, base
+  `https://external-api.demo.kalshi.co/trade-api/v2`), CORS-probes first, and falls back to the committed
+  snapshot — that is real, and `data/live/cors.json` records the observed header
+  (`access_control_allow_origin: https://kanlerxz87-cyber.github.io`, status 200 at 2026-11-21T00:50:12Z).
+- WebSocket streaming is **not** possible for a static site: the handshake requires an API key
+  (https://docs.kalshi.com/getting_started/quick_start_websockets). Already flagged; unchanged.
+- Second-resolution charts cannot be *requested* from Kalshi (candlesticks accept 1/60/1440-minute intervals:
+  https://docs.kalshi.com/api-reference/market/get-market-candlesticks); seconds on the X-axis therefore come
+  from accumulated observations plus in-browser poll points, and the page says which.
+
+#### T34/T35/T36 post-fix verification (this session, live run — not a claim, a measurement)
+
+- `collect.yml` dispatched on this branch (`gh workflow run collect.yml --ref arena/cf49f42a-kalshidash3`),
+  run **44876177777**, conclusion **success** at ~06:36Z. It committed `e2b8a58`
+  `data: demo snapshot 2026-11-21T06:34Z` (`collected_at 2026-11-21T06:34:55Z`).
+- The snapshot proves the scope fix on real data: `open_excluded_off_topic_or_qa: 8`,
+  `settled_excluded_off_topic_or_qa: 96`, `excluded_series_reasons: {"KXNATGAS15M": "natural-gas futures
+  (Commodities, Pyth NATGAS), not retail gasoline prices"}`, and **0** natural-gas rows and **0** QA-fixture
+  rows remain, versus 11 and 1 before. `seed_markets_found` is unchanged at 5,825, i.e. no confirmed market
+  was lost by the correction.
+- Culture's headline market changed from the QA fixture to a real one, verified at the official API:
+  `GET /markets/KXFEATURE-26GTA6SCORE-ZEDD` -> title "Will Zedd be featured on Grand Theft Auto VI: The
+  Original Score?", `rules_primary` "If Zedd is featured on the album ... then the market resolves to Yes.",
+  `volume_fp 0.00`, `last 0.0000` (the page shows $0 and 0 contracts; nothing is invented).
+- Crypto's headline also re-verified after the price moved: `GET /markets/KXBTCY-27JAN0100-B97500` ->
+  `last 0.0100`, `volume_fp 72319449.06` => estimate $723,194.49 at the new price; the previous
+  `KXBTCY-27JAN0100-B147500` row still exists (`volume_fp 65336335.23`, `last 0.9800`).
+- the freshness item (main records it as F-40) remains **partially** verified: the code change is live, but whether the chained dispatch raises the
+  observed run rate can only be measured from scheduled runs after this merges. Not claimed as verified.
+
+#### T34 incident (this session, 06:34–06:45Z): runaway dispatch loop — contained, documented as F-63
+
+The first freshness fallback in `collect.yml` queued the next collection unconditionally. It chained:
+`44876177777` (06:34:21Z) → `44876253177` (06:35:20Z) → `44876330331` (06:36:17Z) → `44876426619`
+(06:37:36Z) → `44876553969` (06:39:14Z) — a collection and commit every 1–2 minutes. All runs were green
+and nothing false was published, but it is not a cadence. Contained by `gh api PUT
+.../actions/workflows/collect.yml/disable` (state `disabled_manually`) plus cancelling the in-flight run;
+the run list then stayed flat, verified over ~2 minutes. The step is now a bounded watchdog (stale >35 min,
+zero in flight, ≤3 dispatches/hour, each branch logging its decision) and the guards were exercised locally
+in three constructed states. Filed as **F-63** with the run IDs. Re-enabling on `main` after merge is a
+deliberate follow-up recorded here, not something this session will leave implicit.
+
+Data conflict policy used this session (so nothing is hand-edited): `data/live/markets.json`,
+`price_history.json`, `alerts_archive.json` and `cors.json` are written by `collect.yml` only; when they
+conflicted with `main`, this session took the newer collector-produced file and then regenerated the derived
+artefacts with their own scripts (`build_alerts.py`, `catalysts.py`, `simulate.py`). The snapshot it kept is
+the one produced by the run with the scope fix (`06:34:55Z`, `open_excluded_off_topic_or_qa: 8`,
+`settled_excluded_off_topic_or_qa: 96`, 0 natural-gas and 0 QA rows).
+
+### T34–T37 status: done — merge result, deploy confirmation, and the one thing still open
+
+- **PR:** https://github.com/kanlerxz87-cyber/KalshiDash3/pull/54 — merge commit `5660ff2` at 2026-11-21T06:49:08Z.
+- **Deploy:** Pages workflow run `44877341063` completed **success**; `GET /repos/.../pages` → `status: built`.
+- **Live verification after deploy** (platform fetch, not asserted): `data/live/markets.json` serves
+  `collected_at 2026-11-21T06:42:56Z` with `open_excluded_off_topic_or_qa: 10`,
+  `excluded_series_reasons: {"KXNATGAS15M": ...}`, and **0** natural-gas and **0** QA-fixture rows;
+  `flagged.html` serves F-38 … F-63. The rendered landing table said Culture = `KXFEATURE-26GTA6SCORE-ZEDD`
+  at first fetch, then an edge-cached copy still showed the QA row minutes later. Both observations are
+  recorded here rather than only the flattering one: GitHub Pages is fronted by a CDN, so a page can lag a
+  deploy. The underlying file (`assets/site.js` exports `isQaRow`, `index.html` skips QA rows) is correct on
+  `main` and was confirmed in the repo after the merge.
+- **Alert archive check:** no archived alert references an excluded market (0 rows for `KXNATGAS15M`, 0 for the
+  QA fixture), so the correction did not silently widen into the alert feeds.
+- **Still open (not claimed as done):** whether the bounded watchdog raises the *observed* scheduled run rate can
+  only be measured over the next hours of scheduled runs. The watchdog is bounded at 3 dispatches/hour and only
+  fires on a snapshot older than 35 minutes, and one live run after the fix did not chain. Measurement window:
+  from 07:00Z; a follow-up session should read `gh run list --workflow=collect.yml` and close F-16/F-40 with the
+  numbers, or withdraw the watchdog if it does not help.
+
+**Conflict history (nothing discarded):** this session merged `origin/main` three times. Snapshot files
+(`markets.json`, `price_history.json`, `alerts_archive.json`, `cors.json`) are written only by `collect.yml`, so
+each time the newer collector file was taken and the derived artefacts were regenerated by their own scripts
+(`build_alerts.py`, `catalysts.py`, `simulate.py`) — no JSON was hand-edited. Where a parallel session had
+already fixed the same defect (F-38 wording, F-37 label), their fix was kept, this session's duplicate was
+dropped, and the existing F-38 row was linked to the implementation record F-61 instead of being re-published.
+
+---
+
+## Session `arena-617e3472` — catalyst review update for 2026-11-20T19:48Z–2026-11-21T06:42Z swings + live official-source verification & publish (branch `arena/617e3472-kalshidash3`)
+
+Base: `ff6f01f`, merged forward onto `bd05688` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52) landed F-37 and `verified_facts.json` changes on `main`, so this session dropped its overlapping file edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T38 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:42Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXDEMOFUTHOURLY-26NOV21H07-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` (14/21 swings carry fetched links, 28 links traceable, 7 BRTI swings carry explicit `not_reviewed_reasons`), `scripts/verify_release.py` PASS | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) settle on CF Benchmarks' BRTI, which has no free public time series; documented in `not_reviewed_reasons` |
+| T39 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches | — |
 
 ### Sources fetched and verified live in this session (`arena-617e3472`, 2026-11-21)
 
@@ -1059,6 +1222,7 @@ Base: `ff6f01f`, merged forward onto `d879724` (main). Claimed 2026-11-21 06:36Z
 - `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` — confirmed `exchange_active: true`, `trading_active: true` across all 4 demo shards.
 - Live market records fetched directly from `https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}`:
   - `KXDEMOFUTHOURLY-26NOV20H20-UP`: `status: "finalized"`, `result: "yes"`, `settlement_value_dollars: "1.0000"`, `settlement_ts: "2026-11-20T20:01:18.417962Z"`, strike `58337.51 USD`.
+  - `KXDEMOFUTHOURLY-26NOV21H07-UP`: `status: "active"`, `last_price_dollars: "0.5500"`, `yes_bid_dollars: "0.0100"`, `yes_ask_dollars: "0.9900"`, `volume_24h_fp: "6665.00"`, `open_interest_fp: "100.00"`, strike `55704.83 USD`.
   - `KXAAAGASM-26DEC31-3.30`: `status: "active"`, `last_price_dollars: "0.3000"`, `yes_bid_dollars: "0.2900"`, `yes_ask_dollars: "0.7100"`, `volume_24h_fp: "22.13"`, `open_interest_fp: "209.00"`.
   - `KXAAAGASM-26NOV30-3.90`: `status: "active"`, `last_price_dollars: "0.7500"`, `volume_fp: "31027.52"`, `open_interest_fp: "24988.65"`.
   - `KXPGATOUR-THRC26-MPEN`: `status: "active"`, `last_price_dollars: "0.0880"`, `yes_bid_dollars: "0.0830"`, `yes_ask_dollars: "0.0880"`, `volume_fp: "434504.17"`, `open_interest_fp: "419786.51"`.
@@ -1067,10 +1231,10 @@ Base: `ff6f01f`, merged forward onto `d879724` (main). Claimed 2026-11-21 06:36Z
   - `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`, `KXBTC15M-26NOV210145-45`: confirmed CF Benchmarks BRTI settlement rules and quotes.
 - Reference publishers fetched directly:
   - `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z` — 33 one-minute candles recorded in `data/catalyst_review.json` (`19:30Z` close `58111.03`, crossed `58337.51` strike up at `19:38Z` `58388.07`, `19:48Z` close `58481.38`).
+  - `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z` — 15 one-minute candles recorded in `data/catalyst_review.json` (`06:34Z` close `56355.0`, `06:39Z` close `56578.4`, `06:42Z` close `56826.05`).
   - `https://gasprices.aaa.com/` — confirmed current national average regular `$3.6898` as of `11/20/26` (yesterday `$3.7212`, week ago `$3.8724`).
-- Request logged for `sources.html` / `data/verified_facts.json` owner (`arena-17d4ecfa`, PR #52): in `sources.html`'s "Project-local computations" table, update `scripts/alerts.py` to `scripts/build_alerts.py`; in `data/verified_facts.json`, consider adding `"source": "https://docs.kalshi.com/api-reference/market/get-markets"` on unverified row `F-20` (while keeping `value: ""` and `verified: false`).
+- Request logged for `sources.html` / `data/verified_facts.json` owner: in `sources.html`'s "Project-local computations" table, update `scripts/alerts.py` to `scripts/build_alerts.py`; in `data/verified_facts.json`, consider adding `"source": "https://docs.kalshi.com/api-reference/market/get-markets"` on unverified row `F-20` (while keeping `value: ""` and `verified: false`).
 
 ### Log (this session)
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
-- 2026-11-21 06:44Z: merged `origin/main` (`d879724`), dropped overlapping T29 file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, and ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS).
-
+- 2026-11-21 06:48Z: merged `origin/main` (`bd05688`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, and ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS).

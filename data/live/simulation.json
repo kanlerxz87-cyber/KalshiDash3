@@ -2,7 +2,7 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-21T06:42:57Z",
+ "generated_at": "2026-11-21T06:44:38Z",
  "snapshot_collected_at": "2026-11-21T06:42:56Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
@@ -10,9 +10,9 @@
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
   "signals_processed_total": 21,
-  "new_signals_this_run": 2,
+  "new_signals_this_run": 21,
   "open_positions": 10,
-  "settled_positions_kept": 1
+  "settled_positions_kept": 0
  },
  "strategies": [
   {
@@ -23,10 +23,10 @@
    "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going.",
    "signals": 21,
    "not_filled": 17,
-   "not_filled_wide_spread": 9,
+   "not_filled_wide_spread": 7,
    "voided": 0,
-   "not_filled_no_quote": 4,
-   "not_filled_bad_price": 4,
+   "not_filled_no_quote": 8,
+   "not_filled_bad_price": 2,
    "skipped_duplicate": 1,
    "filled": 3,
    "open": 3,
@@ -55,13 +55,13 @@
    "signal_filter": "all",
    "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses.",
    "signals": 21,
-   "not_filled": 14,
-   "not_filled_wide_spread": 8,
-   "voided": 1,
-   "not_filled_no_quote": 4,
-   "not_filled_bad_price": 2,
+   "not_filled": 15,
+   "not_filled_wide_spread": 6,
+   "voided": 0,
+   "not_filled_no_quote": 8,
+   "not_filled_bad_price": 1,
    "skipped_duplicate": 2,
-   "filled": 5,
+   "filled": 4,
    "open": 4,
    "settled": 0,
    "wins": 0,
@@ -73,7 +73,7 @@
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
     "crypto": {
-     "filled": 5,
+     "filled": 4,
      "settled": 0,
      "wins": 0,
      "losses": 0,
@@ -169,7 +169,7 @@
   },
   {
    "trade_type": "crypto | move up | entry high",
-   "filled": 4,
+   "filled": 3,
    "settled": 0,
    "wins": 0,
    "losses": 0,
@@ -517,40 +517,7 @@
    "mark_at": "2026-11-21T06:42:56Z"
   }
  ],
- "settled_positions": [
-  {
-   "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
-   "strategy": "S2",
-   "alert_key": "KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z",
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "title": "Demo BTC at or above 61498.92 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_ticker": "KXDEMOFUTHOURLY",
-   "direction": "up",
-   "side": "no",
-   "trade_type": "crypto | move up | entry high",
-   "band": "high",
-   "entry_price": 0.99,
-   "entry_fee": 0.01,
-   "taker_multiplier": 1,
-   "contracts": 1,
-   "entered_at": "2026-11-20T13:32:25Z",
-   "quote_bid": 0.01,
-   "quote_ask": 1.0,
-   "quote_source": "price_history",
-   "status": "voided",
-   "outcome": "void",
-   "settled_at": null,
-   "settled_result": null,
-   "realized_net": null,
-   "bid_now": 0.0,
-   "unrealized_net": -1.0,
-   "mark_note": "entry spread above 0.10: not a tradable quote",
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "mark_at": "2026-11-20T13:32:25Z"
-  }
- ],
+ "settled_positions": [],
  "disclaimers": [
   "PAPER ONLY. No orders are placed and no account is used. Results are what the fixed rules would have produced at observed prices.",
   "Demo prices may not reflect real markets (https://docs.kalshi.com/getting_started/demo_env).",
@@ -906,88 +873,46 @@
     "mark_at": "2026-11-21T06:42:56Z"
    }
   ],
-  "closed": [
-   {
-    "id": "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no",
-    "strategy": "S2",
-    "alert_key": "KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z",
-    "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-    "title": "Demo BTC at or above 61498.92 USD",
-    "category_id": "crypto",
-    "category_basis": "keyword",
-    "series_ticker": "KXDEMOFUTHOURLY",
-    "direction": "up",
-    "side": "no",
-    "trade_type": "crypto | move up | entry high",
-    "band": "high",
-    "entry_price": 0.99,
-    "entry_fee": 0.01,
-    "taker_multiplier": 1,
-    "contracts": 1,
-    "entered_at": "2026-11-20T13:32:25Z",
-    "quote_bid": 0.01,
-    "quote_ask": 1.0,
-    "quote_source": "price_history",
-    "status": "voided",
-    "outcome": "void",
-    "settled_at": null,
-    "settled_result": null,
-    "realized_net": null,
-    "bid_now": 0.0,
-    "unrealized_net": -1.0,
-    "mark_note": "entry spread above 0.10: not a tradable quote",
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-    "mark_at": "2026-11-20T13:32:25Z"
-   }
-  ],
+  "closed": [],
   "counters": {
    "S1": {
     "signals": 21,
     "not_filled": 17,
-    "not_filled_no_quote": 4,
-    "not_filled_bad_price": 4,
-    "skipped_duplicate": 1,
+    "not_filled_no_quote": 8,
+    "not_filled_wide_spread": 7,
     "filled": 3,
-    "settled": 0,
-    "wins": 0,
-    "losses": 0,
-    "realized_net": 0.0,
-    "not_filled_wide_spread": 9
+    "skipped_duplicate": 1,
+    "not_filled_bad_price": 2
    },
    "S2": {
     "signals": 21,
-    "not_filled": 14,
-    "not_filled_no_quote": 4,
-    "not_filled_bad_price": 2,
+    "not_filled": 15,
+    "not_filled_no_quote": 8,
+    "not_filled_wide_spread": 6,
+    "filled": 4,
     "skipped_duplicate": 2,
-    "filled": 5,
-    "settled": 0,
-    "wins": 0,
-    "losses": 0,
-    "realized_net": 0.0,
-    "voided": 1,
-    "not_filled_wide_spread": 8
+    "not_filled_bad_price": 1
    },
-   "_cat|S2|crypto": {
-    "signals": 0,
-    "not_filled": 0,
-    "not_filled_no_quote": 0,
-    "not_filled_bad_price": 0,
-    "skipped_duplicate": 0,
-    "filled": 5,
-    "settled": 0,
-    "wins": 0,
-    "losses": 0,
-    "realized_net": 0.0
+   "S3": {
+    "signals": 6,
+    "not_filled": 4,
+    "not_filled_wide_spread": 3,
+    "filled": 1,
+    "skipped_duplicate": 1,
+    "not_filled_bad_price": 1
+   },
+   "S4": {
+    "signals": 6,
+    "not_filled": 3,
+    "not_filled_wide_spread": 2,
+    "filled": 2,
+    "skipped_duplicate": 1,
+    "not_filled_bad_price": 1
+   },
+   "_cat|S1|crypto": {
+    "filled": 3
    },
    "_trade_types": {
-    "crypto | move up | entry high": {
-     "filled": 4,
-     "settled": 0,
-     "wins": 0,
-     "losses": 0,
-     "realized_net": 0.0
-    },
     "crypto | move down | entry high": {
      "filled": 1,
      "settled": 0,
@@ -1009,6 +934,13 @@
      "losses": 0,
      "realized_net": 0.0
     },
+    "crypto | move up | entry high": {
+     "filled": 3,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
     "crypto | move up | entry mid": {
      "filled": 1,
      "settled": 0,
@@ -1017,24 +949,8 @@
      "realized_net": 0.0
     }
    },
-   "S3": {
-    "signals": 6,
-    "not_filled": 4,
-    "not_filled_wide_spread": 3,
-    "filled": 1,
-    "skipped_duplicate": 1,
-    "not_filled_bad_price": 1
-   },
-   "S4": {
-    "signals": 6,
-    "not_filled": 3,
-    "not_filled_wide_spread": 2,
-    "filled": 2,
-    "skipped_duplicate": 1,
-    "not_filled_bad_price": 1
-   },
-   "_cat|S1|crypto": {
-    "filled": 3
+   "_cat|S2|crypto": {
+    "filled": 4
    },
    "_cat|S3|crypto": {
     "filled": 1

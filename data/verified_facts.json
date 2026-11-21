@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20",
+ "generated": "2026-11-21T06:38:13Z",
  "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
  "facts": [
   {
@@ -303,7 +303,7 @@
   {
    "id": "F-42",
    "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
-   "value": "\"The RSM Classic: Bill Haas wins\" \u2014 \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
+   "value": "\"The RSM Classic: Bill Haas wins\" — \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
    "verified": true
   },
@@ -430,11 +430,11 @@
    "value": "project requirement (brief), enforced in assets/engine.js ALERT_THRESHOLD and scripts/collect.py compute_alerts; the validator refuses any committed alert with a smaller delta",
    "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
    "verified": true,
-   "note": "Not an API field \u2014 recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
+   "note": "Not an API field — recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
   },
   {
    "id": "F-54",
-   "claim": "GET /markets responses include volume_24h_fp (contracts traded in the last 24h), a fixed-point string \u2014 used by the alert model's volume factor",
+   "claim": "GET /markets responses include volume_24h_fp (contracts traded in the last 24h), a fixed-point string — used by the alert model's volume factor",
    "value": "volume_24h_fp (string, fixed-point, e.g. \"10.00\")",
    "source": "https://docs.kalshi.com/api-reference/market/get-markets",
    "verified": true,
@@ -449,11 +449,56 @@
    "verified": true,
    "checked_on": "2026-11-20",
    "how": "Read the parameter spec on the official endpoint page (Required array length 1-100; Maximum string length 200), then both forms were issued against the official demo API on 2026-11-20: https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30&tickers=KXBTCY-27JAN0100-B47500 returned both books, while https://external-api.demo.kalshi.co/trade-api/v2/markets/orderbooks?tickers=KXAAAGASM-26DEC31-3.30%2CKXBTCY-27JAN0100-B47500 returned HTTP 200 with ONE entry whose ticker was the whole joined string and both arrays empty. GET /markets?tickers=A%2CB by contrast returned both markets, so the two endpoints genuinely differ. Empty-vs-unknown behaviour is documented at https://docs.kalshi.com/getting_started/orderbook_responses (a ticker that does not match any market returns 200 with empty arrays, not 404)."
+  },
+  {
+   "id": "F-56",
+   "claim": "Placing any order requires a signed request (an API key); the public demo market-data endpoints do not",
+   "value": "Order creation POSTs to /portfolio/events/orders with KALSHI-ACCESS-KEY, KALSHI-ACCESS-SIGNATURE and KALSHI-ACCESS-TIMESTAMP headers. Public GET /markets needs none.",
+   "source": "https://docs.kalshi.com/getting_started/quick_start_create_order",
+   "verified": true,
+   "checked_on": "2026-11-21",
+   "how": "Read the official quick start this session: Step 1 uses a bare requests.get on .../markets?limit=1&status=open ('no auth required for public market data'); Step 2 builds a signed POST to /portfolio/events/orders. Combined with https://docs.kalshi.com/getting_started/api_keys, which states every trading request must be signed. This is why automated order placement in this project needs a key a human must create (F-07), while every price, alert and paper-trade number on the site does not."
+  },
+  {
+   "id": "F-57",
+   "claim": "A newly created Kalshi API key is Ed25519 by default; RSA-PSS with SHA-256 is the alternative",
+   "value": "Ed25519 (PKCS#8, 64-byte signature) is selected by default. RSA 2048-bit with RSA-PSS/SHA-256 is for clients limited to RSA-PSS, including SDKs before 3.31.0.",
+   "source": "https://docs.kalshi.com/getting_started/api_keys",
+   "verified": true,
+   "checked_on": "2026-11-21",
+   "how": "Read the key-types table this session. The executor scripts/kalshi_client.py detects the parsed key type and signs Ed25519 or RSA-PSS accordingly, so either key type works; the timestamp must be within 30 s of Kalshi's clock and the signature covers timestamp+method+path WITHOUT query parameters, both as documented there."
+  },
+  {
+   "id": "F-58",
+   "claim": "GET /markets responses are cached server-side and can lag the exchange by several seconds",
+   "value": "'Responses are cached for a short time, so prices, sizes and status can lag the exchange by several seconds, and filtered listings can lag longer than a read of a single market.' The docs point to the WebSocket API for current state.",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "checked_on": "2026-11-21",
+   "how": "Read verbatim in the official Get Markets description this session. Consequence for this project: a browser poll is near-real-time, not tick-level, and no page claims otherwise. A truly tick-level feed needs the WebSocket API, whose handshake requires a key. Observed supporting evidence the same day: GET /markets?tickers=KXAAAGASM-26NOV30-3.90 returned last_price_dollars 0.7500 with updated_time 2026-10-27T20:34:13Z and volume_24h_fp '0.00'."
+  },
+  {
+   "id": "F-59",
+   "claim": "When `tickers` is the ONLY filter, GET /markets returns every matching market in one response and ignores `limit`",
+   "value": "Every matching market is returned in one response, in no guaranteed order; `limit` is not applied and the returned cursor is empty.",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "verified": true,
+   "checked_on": "2026-11-21",
+   "how": "Read in the official Paging and ordering section this session. The chat dock relies on exactly this: it sends only repeated `tickers=` parameters and therefore needs no paging loop. A live call with one ticker returned {\"cursor\":\"\",\"markets\":[...]} as documented."
+  },
+  {
+   "id": "F-60",
+   "claim": "Unauthenticated public requests have separate, undocumented limits; clients must back off on 429",
+   "value": "Not quantified by Kalshi ('subject to separate limits'). Back off on 429.",
+   "source": "https://docs.kalshi.com/getting_started/rate_limits",
+   "verified": true,
+   "checked_on": "2026-11-21",
+   "how": "Read this session. Because no number is published, the chat dock polls slowly (12 s) and pauses while the tab is hidden rather than claiming a safe rate."
   }
  ],
  "counts": {
-  "total": 60,
-  "verified": 59,
+  "total": 65,
+  "verified": 64,
   "unverified": 1
  }
 }

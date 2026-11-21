@@ -46,6 +46,17 @@ const KD = (() => {
 
   const CAT_LABEL = { gas: "Gas Prices", elections: "Elections", culture: "Culture", crypto: "Crypto", golf: "Golf" };
 
+  // Defect F-39 (2026-11-21): the 2026-11-21T00:50Z snapshot's largest open Culture market by
+  // dollars estimate was the Kalshi demo QA fixture "Portfolio cash out QA 5" (GET
+  // /markets/KXGRAMMYNOMROTY-QA7CECC5-QA -> rules_primary "Demo portfolio test only."), so the
+  // landing page presented a test instrument as a live culture event. scripts/collect.py now
+  // excludes these from every category and publishes the counts; this guard keeps a stale or
+  // hand-edited snapshot from putting one back at the top of a "largest live market" table.
+  const QA_RE = /demo portfolio test|portfolio cash out|\bqa\s*\d/i;
+  function isQaRow(r) {
+    return !r || QA_RE.test(String((r.title || "") + " " + (r.rules_primary || "")));
+  }
+
   function basisBadge(b) {
     return b === "seed"
       ? '<span class="badge ok" title="Series ticker appears in the official Kalshi fee schedule">confirmed</span>'
@@ -102,7 +113,12 @@ const KD = (() => {
       `<b>Endpoint:</b> <code>${esc(meta.base_url)}</code> · ` +
       `<b>Scanned:</b> ${num(meta.counts?.open_total_scanned)} open / ${num(meta.counts?.settled_total_scanned)} settled · ` +
       `<b>In scope:</b> ${num(meta.counts?.open_in_scope)} open / ${num(meta.counts?.settled_in_scope)} settled` +
-      (stale ? ` · <b>Stale fallback:</b> the scheduled collector has not run recently, so these numbers may be out of date.` : "") +
+      (stale
+        ? ` · <b>Stale fallback:</b> no collection has committed for ${ago(meta.collected_at).replace(" ago", "")}, so these numbers may be out of date. ` +
+          `GitHub's scheduler is best-effort — its docs say scheduled runs "can be delayed" and "some queued jobs may be dropped" ` +
+          `(<a href="https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule" target="_blank" rel="noopener">GitHub Actions: schedule</a>) — ` +
+          `and the site shows the snapshot age instead of implying it is current. The alert chats on the <a href="live.html">Live Desk</a> still poll the demo API directly when CORS allows.`
+        : "") +
       `</div>`;
   }
 
@@ -132,5 +148,5 @@ const KD = (() => {
       items.map(([h, l]) => `<a href="${h}"${h === active ? ' class="on"' : ""}>${l}</a>`).join("");
   }
 
-  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav };
+  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav };
 })();
