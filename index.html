@@ -181,11 +181,16 @@ KD.nav("");
   const resHost = KD.$("#resolutions");
   if (resHost) {
     resHost.innerHTML =
-      `<p class="small mut">Showing the ${KD.num(resRows.length)} most recent settled rows stored in this snapshot,
-        newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
-        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
-        collector stores ${KD.num(resRows.length)} of them to keep the page fast
-        (<code>counts.settled_rows_trimmed_for_size</code>). Full list on
+      `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows published in this snapshot,
+        newest first, chosen <b>per topic</b> so a fast 15-minute crypto series cannot crowd out gas,
+        elections, culture or golf (<code>counts.settled_published_by_category</code>). ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
+        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets in scope; the
+        collector publishes ${KD.num(resRows.length)} of them to keep the page fast
+        (<code>counts.settled_published</code> / <code>counts.settled_rows_trimmed_for_size</code>).
+        Settled markets older than the exchange's published historical cutoff
+        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
+        <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing
+        here — that is a gap in the archive, not a market that never resolved (<a href="flagged.html">F-42</a>). Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },

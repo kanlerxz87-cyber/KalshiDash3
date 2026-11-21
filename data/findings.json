@@ -329,6 +329,19 @@
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
    ]
+  },
+  {
+   "id": "G19",
+   "suggestion": "EVALUATE (owner decision): a candle-derived >= $0.10 detector using the official 1-minute candlestick endpoint, as a second alert source next to the observation rule.",
+   "why_it_helps_decisions": "The observation rule is blind to moves that happen and reverse inside the collector gap (F-46, demonstrated on KXPGATOUR-THRC26-MPEN: an 8.1-cent intraday candle against two 0.00 observations). The API publishes candles only at 1/60/1440-minute intervals, so period_interval=1 is as fine as the exchange offers without a WebSocket (which stays impossible for a static site, F-04).",
+   "effort": "Medium: a collector step that pages 1-minute candles for in-scope series and archives any candle whose |close-open| >= $0.10, clearly labelled as candle-derived and distinct from the observation feeds, plus a parity check in CI.",
+   "risk": "Candle ranges are not the same statistic as consecutive observations; it will fire on wicks the observation rule would never see, and it changes nothing about F-04 (no tick-level streaming). Without an owner-tolerated false-positive budget this could make the alert chats noisier, which is worse for trading decisions.",
+   "success_metric": "On the same 14-day demo window: every candle-derived alert also visible in observations is deduped; the net new alerts are inspectable rows with source URLs; the false-positive rate is measured and published, not assumed.",
+   "status": "proposed (not adopted; needs owner decision)",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55"
+   ]
   }
  ],
  "flagged": [
@@ -818,6 +831,98 @@
    "sources": [
     "https://kanlerxz87-cyber.github.io/KalshiDash3/",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html"
+   ]
+  },
+  {
+   "id": "F-41",
+   "severity": "high",
+   "item": "The published resolution history was globally newest-first, so crypto starved the other four topics (fixed)",
+   "why": "The landing page's resolution table and every category page read settled_markets. scripts/collect.py sorted ALL settled markets newest-first and published [:200]. The demo exchange lists 15-minute crypto markets that settle ~96 times a day, so at 2026-11-21 the published set was 184/200 crypto (9 gas, 7 culture, 0 elections, 0 golf) \u2014 measured on the committed 2026-11-21T00:50Z snapshot. Every topic page therefore lost its resolution feed, not just the landing page. (NOTE on IDs: the two stale PRs this integration takes over used F-40..F-44; all of those are either taken on main or renumbered here to F-41..F-48.)",
+   "action": "Fixed in this integration: select_settled() in scripts/collect.py chooses the published set round-robin across gas/elections/culture/crypto/golf, newest-first inside each topic, choosing from the FULL in-scope set (before the size cap \u2014 see F-48). The allocation is published, not hidden: counts.settled_published, counts.settled_published_cap, counts.settled_published_by_category, counts.settled_in_scope_total. Regression test scripts/tests/test_settled_selection.py (wired into collect.yml). The fix takes effect in the published snapshot at the next collect.yml run; the committed file at the time of this merge still shows the old skew, which is why this row stays flagged until a fresh snapshot is live.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/56",
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ]
+  },
+  {
+   "id": "F-42",
+   "severity": "medium",
+   "item": "A topic whose last settlement predates the exchange's historical cutoff cannot be shown by the live endpoints (partially fixed, not claimed closed)",
+   "why": "GET /markets?status=settled only returns markets settled after the exchange's published historical cutoff (GET /historical/cutoff -> market_settled_ts 2026-09-21T00:00:00Z, measured 2026-11-21). The seeded elections series KXELECTIRAN has exactly one settled market, KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z (result 'no') \u2014 before the cutoff \u2014 so the live endpoint can never return it, and the per-topic fix (F-41) alone would still publish zero elections rows.",
+   "action": "scripts/collect.py now backfills up to HISTORICAL_BACKFILL_PER_SEED=40 settled markets per seeded series from GET /historical/markets (bounded, one request per series, failures non-fatal) and publishes historical_cutoff_market_settled_ts and historical_backfill_rows in counts. The elections row is therefore expected to appear at the next collector run. NOT claimed fixed until a live snapshot shows it: the backfill's page size and the endpoint's own paging semantics are only exercised for real by the workflow, and any market older than what the endpoint returns in one page remains invisible. Flagged for review rather than closed.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-markets",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-cutoff",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/56"
+   ]
+  },
+  {
+   "id": "F-43",
+   "severity": "high",
+   "item": "The dashboard chart never requested a single official candle; the Minutes/Hours selector plotted one point per collector run (fixed)",
+   "why": "assets/live.js already wrapped GET /series/{s}/markets/{t}/candlesticks for live.html, but dashboard.html never called it \u2014 its Minutes/Hours windows plotted only the collector's observations (1-14 points per market). The fix fetches candles through the unauthenticated demo root: 1-minute for Minutes, 1-hour for Hours, a new 1-day option at 1440 minutes, with a fallback to the documented archived endpoint GET /historical/markets/{ticker}/candlesticks for settled markets. The response's archived field-name shape (price.open/low/high/close, no _dollars suffix) and the live *_dollars shape are both read. A candle with NO price block stays missing rather than plotting Number('')===0 \u2014 measured live on KXDEMOFUTHOURLY-26NOV20H20-UP, whose 06:00Z 1-hour candle carries only price.previous_dollars with volume_fp '0.00'.",
+   "action": "Fixed in this integration (dashboard.html): candles are fetched lazily per (ticker, interval), cached 55s, drawn as a muted line under the collector observations, and the footer says exactly which series is which. Dashed markers now draw archived >= $0.10 swings from data/live/alerts.json, and the swing table is the union of observations and the archive. Deep links dashboard.html#TICKER resolve even for markets that left the ranked window (row rebuilt from the published alert record, labelled 'from alert archive'). Regression coverage: scripts/tests/test_pages_dom.js modes G (candle request shape, exactly 1 of 3 stub candles plotted) and H (deep link opens a chart).",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55"
+   ]
+  },
+  {
+   "id": "F-44",
+   "severity": "high",
+   "item": "Price history was pruned to the ranked window, so the chart was empty for exactly the markets its alerts were about (fixed)",
+   "why": "scripts/collect.py pruned data/live/price_history.json to the tickers in the capped ranked window (rows['open']). A market rotating out of that window lost its observations while the >= $0.10 swing archived for it stayed in alerts_archive.json. Measured on the committed 2026-11-21T00:50Z files: of the 7 distinct tickers in alerts_archive.json, the 3 KXDEMOFUTHOURLY-* markets had 0 observations left, so dashboard.html rendered 'No observations in this window yet' for exactly the series an alert pointed at.",
+   "action": "Fixed in this integration: the watch set is now open rows UNION every ticker cited by data/live/alerts_archive.json (alerts are read, never written, by collect.py). scripts/tests/test_collect_coverage.py asserts the rule offline and is wired into collect.yml. Observations deleted before this fix cannot be resurrected; the next collector runs rebuild them, which is why the coverage test reports (not fails) legacy damage but fails on any market STILL OPEN that loses its history.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/dashboard.html"
+   ]
+  },
+  {
+   "id": "F-45",
+   "severity": "medium",
+   "item": "The collector's universe scan never sent the documented mve_filter, so combo listings consumed the newest-first safety cap (fixed)",
+   "why": "GET /markets accepts mve_filter with 'only' or 'exclude' (docs: 'only' returns only multivariate events, 'exclude' excludes multivariate events). scripts/roi_scan.py already sent it; collect.py did not, so its 25,000-row newest-first window counted combo listings it then excluded anyway. Measured: the 2026-11-21T00:50Z collector snapshot reported open_paging_truncated_at_safety_cap=true and 749 open markets in scope, where the desk scan of the same exchange (which sends the filter) reported 1,365.",
+   "action": "Fixed in this integration: scan_markets() sends mve_filter=exclude on every GET /markets page. Offline test in scripts/tests/test_collect_coverage.py (wired into collect.yml) asserts the parameter on every request and that an unpaginated response is not reported as truncated. The open_in_scope total is expected to move toward the desk-scan figure at the next collector run; not claimed verified until a live snapshot shows it.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55"
+   ]
+  },
+  {
+   "id": "F-46",
+   "severity": "medium",
+   "item": "Observation-only detection cannot see a move inside the collector gap (open \u2014 not fixed, proposed for owner decision)",
+   "why": "The >= $0.10 alert rule is defined on the collector's observations (~20 min cadence) and on in-browser poll points where CORS allows. A move that happens and reverses between two runs is invisible to it. Demonstrated on KXPGATOUR-THRC26-MPEN: its official 1440-minute candle for end_period_ts 1795237200 opens 0.0070 and closes 0.0880 (an 8.1-cent intraday move) while both surrounding collector observations read 0.00, so no alert exists for the largest documented move of the period.",
+   "action": "Not fixed unilaterally. Proposed as suggestion G19: evaluate candle-derived threshold detection (1-minute candles, period_interval=1) against the observation rule before adopting, and decide the false-positive tolerance with the owner. The candle endpoints, the KXPGATOUR candle figures above, and the anchor date are recorded in PR #55; do not switch the alerting rule on this without an owner decision, because it changes the definition of the published alert feeds.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55"
+   ]
+  },
+  {
+   "id": "F-47",
+   "severity": "medium",
+   "item": "A voided (never-filled) paper position kept a -$1.00 unrealised mark (fixed)",
+   "why": "scripts/simulate.py carries positions and closed rows forward in data/live/simulation.json state. The bid_now 0.0 / unrealized_net -1.0 written while a row was still open survived after the row was voided for an untradable entry quote. Measured on the committed 2026-11-21T00:50Z file: S2|KXDEMOFUTHOURLY-26NOV20H14-UP@...|no had status voided, outcome void, mark_note 'entry spread above 0.10: not a tradable quote' and unrealized_net -1.0 \u2014 a $1.00 loss no fill produced. The same summary dict also wrote three not_filled_* counters and 'voided' twice each (second copy silently winning), and the committed file no longer contains the row (it rotated out of settled_kept at the 15:21Z run).",
+   "action": "Fixed in this integration: voiding clears bid_now / unrealized_net / mark_at / realized_net, and every run normalises carried-forward voided rows (a void-time fix alone cannot repair rows already in state). Duplicate keys removed. The committed simulation.json was regenerated with scripts/simulate.py; at integration time the state carried no voided row, so the published effect of the fix is the key-order/dedup normalisation plus the guard for future rows. Regression tests added to scripts/tests/test_simulate.py (mutation-checked by the author in PR #55).",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/55",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
+  {
+   "id": "F-48",
+   "severity": "medium",
+   "item": "PR #56's 'selection before the cap' fix selected AFTER the 1,600-row cap, contradicting its own commit message (found and fixed during takeover)",
+   "why": "Commit b22544c ('fix(F-41): select published settled rows before the row cap, not after') kept `rows['settled'] = rows['settled'][:SETTLED_KEEP]` BEFORE select_settled(rows['settled']), while its inline comment and commit message state the selection must come from the FULL in-scope set. Selecting over the 1,600 newest (almost all crypto) could still leave a slow topic with no rows \u2014 the exact defect the commit describes fixing.",
+   "action": "Fixed in this integration: select_settled() is applied to the full in-scope set BEFORE the size cap. The cap now only bounds the settled_rows_trimmed_for_size accounting; the published window comes from settled_published. Fixture 4b in scripts/tests/test_settled_selection.py covers exactly this ordering, including the KXELECTIRAN-26JUL01 pre-cutoff case.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/56",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/commit/b22544c690c44da771d3864805f9b2b844bae47a"
    ]
   }
  ]
