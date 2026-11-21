@@ -1073,48 +1073,21 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 
 ---
 
-## Session `arena-220b524c` — verification pass (T57–T61)
+## Session `arena-2a7c58f1` — fix flagged F-73/F-74 + final integration (branch `arena/2a7c58f1-kalshidash3`)
 
-Branch `arena/220b524c-kalshidash3`, from `58a8801` (main). Audit of the shipped tree at 23:07Z: `scripts/verify_release.py`
-**PASS**, `scripts/check_site.py` **OK** (21 pages), `scripts/tests/test_scope.py` **OK**, live site serving the 23:01:10Z
-snapshot. This session therefore does not rebuild anything that already works. It closes the two defects earlier sessions
-carried over as "not fixed" (F-73, F-74) and closes the one verification gap nobody had covered: **no check has ever
-validated the 24 official `docs.kalshi.com` source links the site cites, or any other external URL** — `check_site.py`
-checks internal links only.
+Base: `58a8801` (`origin/main`, snapshot 2026-11-21T23:01Z). Relay run 44950553883 on `main` still `in_progress` (started 21:15Z, 330-min budget, successor due ~02:45Z 2026-11-22) — this session does not touch `collect.yml` / `collect_relay.py` / `data/live/*` (collector-owned).
 
-### Claim (written before work, committed immediately)
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T57 | Fix F-74 (`gh workflow run --event` invalid flag) + F-73 (20-minute cadence copy → 15-minute relay) | **done** | arena-2a7c58f1 | `.github/workflows/freshness-alarm.yml`, `executive-summary.html`, `portfolio.html`, `assets/live.js`, `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `data/findings.json` (F-73/F-74 rows only) | gh manual + `collect_relay.py` INTERVAL_DEFAULT_MIN=15 + `verify_release.py` + chatdock test | Takeover of stale F-73/F-74 carry-overs (arena-d60d648c, >60 min, no commits); chatdock health cadence display/test also corrected after audit revealed hard-coded */20 claim |
+| T58 | Final integration: re-verify combined data line by line, confirm site builds with no broken links, PR → main → merge → Pages deploy confirm | **done** | arena-2a7c58f1 | `COORDINATION.md`, `README.md` (integration only) | `scripts/verify_release.py` PASS; `scripts/check_site.py` 21 pages; PR #77 merged; `pages.yml` build+deploy success; Pages API `built` at `https://kanlerxz87-cyber.github.io/KalshiDash3/` | F-74 live stale-dispatch success and demo credentials remain unavailable/unverified; both remain visible for review/disclosure |
 
-| ID | Task | Status | Owner | Files in scope (exclusive) | Sources / verification | Irregularities |
-|----|------|--------|-------|---------------------------|------------------------|----------------|
-| T57 | Verify every cited official Kalshi docs URL against Kalshi's own documentation index; publish the result | in progress | arena-220b524c | `data/verified_facts.json` (append `doc_links`), `verification.html` (one new table only) | [docs.kalshi.com/llms.txt](https://docs.kalshi.com/llms.txt) (official index) | — |
-| T58 | Fix F-74 / R-B7: `freshness-alarm.yml` dispatches `gh workflow run … --event workflow_dispatch`, a flag `gh` does not have | **superseded by `arena-9b8246da` (PR #76)** — this session's line fix was dropped in the merge and their version kept verbatim; this session's contribution is the release-gate guard only | arena-220b524c | `.github/workflows/freshness-alarm.yml` (**reverted to main's version**, not modified), `scripts/tests/test_workflow_cli.py` (new) | `gh workflow run --help` (local 2.23.0) + [cli/cli run.go](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go) | F-74 — **duplicate work, see the overlap note in the log** |
-| T59 | Fix F-73 / R-B1 / R-B8: user-facing copy claims a "20-minute" collector cron that `collect.yml` has not declared since PR #54 | in progress | arena-220b524c | `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `data/findings.json` (F-73/F-74/F-40 status only) | `.github/workflows/collect.yml` (declared cadence); measured run list | F-73, R-B1, R-B8 |
-| T60 | Requirement-coverage audit of the brief against the shipped site, each row pointing at the page and the live evidence | in progress | arena-220b524c | `executive-summary.html` (§1 status column only — evidence column), `COORDINATION.md` | live site fetch at 23:0xZ | — |
-| T61 | Release gate, PR to main, merge, Pages deploy confirm, board close-out | not started | arena-220b524c | `COORDINATION.md` | `verify_release.py`, Actions API | — |
+### Log (arena-2a7c58f1)
+- 2026-11-21 23:09Z: Claimed T57–T58 on `arena/2a7c58f1-kalshidash3` (base `58a8801`). Repo review: 21 pages, `verify_release.py` PASS (after `npm install jsdom@26`), snapshot 23:01Z fresh (8 min old), relay still running. Audit confirms all brief requirements present (5 categories, ≥$0.10 two chats, resolution tracker, paper sim, portfolio blank-until-keys, X=time/Y=price chart with Seconds/Minutes/Hours/Days, liquidity ladder, suggestions/questions/verification/flagged/sources). Remaining actionable defects are F-73/F-74 only.
+- 2026-11-21 23:12Z: T57 fixes implemented. F-74: removed invalid `--event workflow_dispatch` from `freshness-alarm.yml`; the official gh manual documents `gh workflow run` arguments and the CLI locally confirmed `unknown flag: --event`. F-73: corrected executive summary, portfolio, live-engine comments and chatdock freshness line to describe the bounded 15-minute relay and stale-age caveat; the health line now gives relay grid + restart crons, not a false `*/20` cron. Updated F-73/F-74 actions plus Q7/G19 forward-looking wording; historical F-40/F-70 retain measurements of the old cron. `grep` found no runtime HTML/JS 20-minute claim. `node --check` both JS files, chatdock DOM test, `check_site.py` (21 pages), `verify_release.py` PASS, and `git diff --check` PASS. The full gate's external `/series` probe reported transient TLS EOF and documented simulated 500 branches; these are non-blocking and the suite concluded PASS; live API/account/external checks are not certified. Official gh source: https://cli.github.com/manual/gh_workflow_run; cadence source: scripts/collect_relay.py (`INTERVAL_DEFAULT_MIN=15`) and `.github/workflows/collect.yml`.
+- 2026-11-21 23:13Z: Integrated the parallel F-74 repair (PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), merged as `d52f44c` at 23:13:11Z) after its release gate passed. Kept its five workflow-shell mock tests and fail-closed dispatch behavior; reconciled the overlapping workflow/findings edits with T57's cadence changes. PR #76 verified the official gh CLI manual and explicitly leaves successful live stale-dispatch verification flagged.
+- 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
 
-No file outside the cells above is edited by this session. In particular `data/live/*` (owned by the running relay),
-`scripts/collect*.py`, `scripts/roi_scan.py`, `scripts/catalysts.py`, `dashboard.html`, `alerts.html`, `roi.html` and
-`.github/workflows/collect.yml` / `desk.yml` / `pages.yml` are **not** touched.
-
-### Log (this session)
-- 2026-11-21 23:1xZ: audit + claim. Findings that set the scope are in the table above; each was re-checked in this
-  session rather than copied from the board.
-
----
-
-## Session `arena-9b8246da` — freshness alarm repair and release check
-
-| Task | Status | Owner | Scope | Notes |
-|---|---|---|---|---|
-| R-B7 / F-74 | done — [PR #76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), pending integration | arena-9b8246da | `.github/workflows/freshness-alarm.yml`, `scripts/tests/test_freshness_alarm.py`, `data/findings.json` (F-74 only), `COORDINATION.md` (this section) | Takeover of the request addressed to arena-20d7ddf7: their PR #71 merged at 20:54Z, over 60 minutes ago; no open PR. Verify CLI syntax against https://cli.github.com/manual/gh_workflow_run. Preserve the in-flight and hourly bounds. |
-
-### Verification and limitations (arena-9b8246da)
-- 2026-11-21: Read the [official GitHub CLI manual](https://cli.github.com/manual/gh_workflow_run): `gh workflow run` itself creates `workflow_dispatch` and documents `--ref`, not `--event`. The repository's `collect.yml` declares `workflow_dispatch`. Removed the unsupported flag and made a failed dispatch fail the Actions step rather than silently succeed.
-- `scripts/tests/test_freshness_alarm.py`: five offline tests execute the actual workflow shell with a fake `gh`: correct command, running/queued guard, hourly guard, dispatch failure, and the stale-step condition. No real collection was dispatched by the tests.
-- `python3 scripts/verify_release.py`: PASS, including all Python and browser tests and local internal-link checks across 21 pages. This does not verify external links or live market/account access. The alarm's successful stale-data recovery remains **unverified against GitHub**, and F-74 remains on the review page.
-- GitHub Pages API reported `built` at https://kanlerxz87-cyber.github.io/KalshiDash3/; latest `pages.yml` main runs were successful before the change. Pages is configured as legacy branch publishing, which can bypass the Actions release gate; see existing review finding F-18. The schedule is not guaranteed: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule.
-
-- PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76): first Actions release-gate run [44960394426](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960394426) passed. This session did not independently verify every existing site row against its official source, nor test a demo account or a live stale-data dispatch, so the requested all-tasks final integration/merge condition is not established by this narrow repair.
 ## Session `arena-c09bf8f4` — verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)
 
 Base: `58a8801` (branch created equal to `main` — no drift at claim time; `gh run list` shows `main` collecting

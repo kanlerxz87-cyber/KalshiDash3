@@ -331,7 +331,9 @@ const KDCHAT = (() => {
   // succeeded. Freshness itself is already stated by the snapshot-age line below,
   // which measures data/live/markets.json, and by that file's own collected_at.
   // Read-only: public REST API, no token, no secret, no writes.
-  // Source for the event names used below: https://docs.github.com/en/rest/actions/workflow-runs
+  // This file asserts no interval: the 15-minute grid lives in collect_relay.py
+  // (INTERVAL_DEFAULT_MIN) and collect.yml's header, and the panel below MEASURES it from the
+  // public run list rather than restating it. Source for the event names used below: https://docs.github.com/en/rest/actions/workflow-runs
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -377,6 +379,9 @@ const KDCHAT = (() => {
         lastSuccessAt: lastOk ? lastOk.at : null,
         observedMinutes,
         inFlightAt: inFlight && !Number.isNaN(inFlight.at) ? inFlight.at : null,
+        // Human-readable label for the same facts; the numbers themselves are measured above.
+        cronExpression: "15-min relay grid (declared restarts: 7,27,47 + 13,43)",
+        expectedMinutes: 15,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
         // Disclosed, not asserted as a cadence: the workflow file is the authority.
         workflowUrl: `https://github.com/${REPO}/blob/main/.github/workflows/collect.yml`,
@@ -407,10 +412,11 @@ const KDCHAT = (() => {
         const late = gap !== null && observed !== null && gap > observed * 2;
         host.innerHTML =
           `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector runs — ${h.scheduled} of the last ${h.runs} were scheduled` +
+          `collector relay <code>${esc(h.cronExpression)}</code> — ` +
+          `${h.scheduled} of the last ${h.runs} were scheduled` +
           (observed !== null ? ` · recent runs about every ${observed}m apart` : "") +
           (gap !== null ? ` · last two scheduled ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (late ? ` · <b>the schedule is being throttled (F-40)</b>` : "") +
+          (late ? ` · <b>GitHub is throttling the schedule (F-40)</b>` : "") +
           (h.inFlightAt !== null ? ` · <b>one running now</b> (started ${esc(ago(h.inFlightAt))})` : "") +
           ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"}` +
           ` · <a href="${esc(h.workflowUrl)}" target="_blank" rel="noopener">declared triggers</a>` +

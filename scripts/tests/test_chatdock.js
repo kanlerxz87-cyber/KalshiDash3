@@ -199,21 +199,21 @@ function counts(w) {
   check(env3.w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length > 0,
     "history rows are still rendered when the demo API refuses the browser");
 
-  /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32/T59 — collector health line names no cron");
+  /* -------------------------------------------------- H: health line (T32, F-73 cadence) */
+  console.log("\nT32 — relay health line");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector runs|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
-  // T59: the panel used to hard-code cronExpression "*/20 * * * *" and
-  // expectedMinutes 20 and compare the measured gap against that made-up interval,
-  // so it reported a schedule collect.yml had not declared since PR #54 (F-73,
-  // R-B1). It must now state only measured facts and point at the workflow file.
-  check(!/\*\/20|every 20m|cron /.test(health),
-        "health line no longer asserts a cron string or a 20-minute interval (F-73/R-B1)");
-  check(/declared triggers/.test(health),
-        "health line links the workflow file as the authority on cadence");
+  check(/collector relay|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  // F-73: the panel must not resurrect the stale cadence it used to hard-code. It may carry a
+  // human-readable relay label (main's version does), but never the old 20-minute claim, and
+  // the label must agree with the grid Collect actually runs.
+  check(!/\*\/20|every 20m|cron \*\//.test(health),
+        "health line never claims the old */20 cron or a 20-minute interval");
+  check(/15-min relay grid/.test(health),
+        "the cadence label names the 15-minute relay grid, not a guessed interval");
+  // The warning is measured, not asserted: it needs the scheduled gap AND the observed spacing.
   const healthSrc = SRC.slice(SRC.indexOf("collector health (T32"));
-  check(!/cronExpression|expectedMinutes/.test(healthSrc),
-        "checkHealth() carries no cronExpression / expectedMinutes field at all");
+  check(/observedMinutes/.test(healthSrc) && /gap > observed \* 2/.test(healthSrc),
+        "throttling warning compares the scheduled gap against measured spacing (F-40 signal kept)");
 
   console.log("");
   teardown();
