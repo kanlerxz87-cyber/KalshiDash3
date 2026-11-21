@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T20:32:16Z",
- "snapshot_collected_at": "2026-11-21T20:32:15Z",
+ "generated_at": "2026-11-21T20:36:05Z",
+ "snapshot_collected_at": "2026-11-21T20:36:04Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-6f158ab7",
  "threshold_dollars": 0.1,
@@ -587,8 +587,8 @@
    "category_id": "gas",
    "title": "Will average **gas prices** be above $3.6600?",
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
-   "market_status": "active",
-   "result_as_returned": null,
+   "market_status": "finalized",
+   "result_as_returned": "no",
    "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
    "links": [
