@@ -635,8 +635,9 @@ const KDLIVE = (() => {
       let watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
       if (S.mode === "live-api") {
         // Discover on the first live pass even when a snapshot already seeded the list: the
-        // committed file can be stale (about 15 minutes old while the relay runs, older if the
-        // schedule stalls), and a market opened since then must be watched.
+        // Discover on the first live pass even when a snapshot already seeded the list: the
+        // committed file is only as fresh as the last collector pass, and a market opened since
+        // then must still be watched (the banner prints the interval it measures).
         if (!S.discoveredAt || Date.now() - S.discoveredAt > (opts.discoverMs || 300000) || !watch.length) await discover(!watch.length);
         watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
         if (watch.length) {
