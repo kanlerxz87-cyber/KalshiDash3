@@ -1323,3 +1323,13 @@ No file outside the cells above is edited by this session. In particular `data/l
 
 - 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
 origin/main
+
+### Close-out addendum — PR #83 and the Pages confirmation of the merged main
+
+| Item | Result | Evidence |
+|---|---|---|
+| Close-out docs PR | **[PR #83](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/83) merged 2026-11-21T23:29:00Z** as `b0fcdb6e52c23ac98bf78f9a7f099998e92ef318` | PR check `pages.yml` [44961903040](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961903040) build ✔ (release gate incl. the new `test_verification_links.js` and `test_workflow_cli.py` merged from arena-c09bf8f4), deploy skipped on PRs |
+| Pages deploy of `main` after the merge | **confirmed** | `pages.yml` push [44962005034](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44962005034) build ✔ deploy ✔; legacy `pages-build-deployment` [44962004376](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44962004376) ✔; Pages builds API `built` for `24e0684` (the relay snapshot commit that follows the merge) at 23:30Z |
+| Live data proof (no rendering involved) | `origin/main` `data/live/alerts.json` shows the scope rule running in production: `all_events 41, high_roi 32, withheld_out_of_scope 20` with reason `series filed under Test: 20`; `data/findings.json` carries F-75, F-76, F-77 | `git show origin/main:data/live/alerts.json`, `git show origin/main:data/findings.json` |
+| Live page proof | `flagged.html` renders "58 flagged irregularities · 22 high" (the extra entries are another session's, merged after #83); `verification.html` renders the C-nn ledger; `executive-summary.html` renders the counts from the ledgers and the 15-minute cadence copy | cache-busted fetches at 23:31Z |
+| Main moved again during this close-out | PR #78 (`arena/220b524c`) and two relay snapshots landed before this addendum; merged into this branch cleanly (no conflict) and the gate re-run before pushing | `git log --oneline origin/main` |
