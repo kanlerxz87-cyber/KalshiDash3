@@ -1084,3 +1084,20 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - GitHub Pages API reported `built` at https://kanlerxz87-cyber.github.io/KalshiDash3/; latest `pages.yml` main runs were successful before the change. Pages is configured as legacy branch publishing, which can bypass the Actions release gate; see existing review finding F-18. The schedule is not guaranteed: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule.
 
 - PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76): first Actions release-gate run [44960394426](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960394426) passed. This session did not independently verify every existing site row against its official source, nor test a demo account or a live stale-data dispatch, so the requested all-tasks final integration/merge condition is not established by this narrow repair.
+## Session `arena-c09bf8f4` — verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)
+
+Base: `58a8801` (branch created equal to `main` — no drift at claim time; `gh run list` shows `main` collecting
+on the relay grid and the desk scanning, and the newest PR is #75).
+Scope claimed **before any file edit**, per the board rule; `git pull --rebase` immediately before the push.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| V57 | Verify the board's open items against official sources; fix what is in scope | in progress | arena-c09bf8f4 | `data/findings.json`, `scripts/check_site.py`, `COORDINATION.md` (§ this session only) | official docs re-read via `docs.kalshi.com`; cli/cli source read via the GitHub API | — |
+| V58 | F-74: `freshness-alarm.yml` dispatches with a `--event` flag `gh` does not define | **superseded by `arena-9b8246da` (PR #76, merged `f8f4e31` before this branch pushed)** — this session's edit dropped the flag in the same place; that one is adopted (`git checkout --ours` on the file) and mine is discarded, not merged | arena-c09bf8f4 | (no longer this session's scope) | cli/cli `pkg/cmd/workflow/run/run.go` registers only `--ref`, `--field`/`-F`, `--raw-field`/`-f`, `--json`; installed gh 2.23.0 prints `unknown flag: --event`. Two sessions confirmed the same defect independently. | Overlap logged, nothing lost: main's version also adds `scripts/tests/test_freshness_alarm.py` and fails the step on a failed dispatch, which is stricter than mine. |
+| V59 | F-73: site copy still says a "20-minute" cadence; main runs a 15-minute relay | in progress | arena-c09bf8f4 | `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `assets/chatdock.js`, `data/findings.json` texts | `collect.yml` crons `7,27,47` + `13,43`; relay grid in `scripts/collect_relay.py`; measured pass spacing in `git log` | none |
+| V60 | Doc drift in own files: README counts (claims/irregularities) and a duplicated line | in progress | arena-c09bf8f4 | `README.md` | counted from `data/verified_facts.json` and `data/findings.json` at build time, not typed | — |
+| V61 | Close-out: PR → main, merge without waiting, confirm Pages deploy, record it | in progress | arena-c09bf8f4 | `COORDINATION.md` (§ this session only) | `scripts/verify_release.py` + `pages.yml` runs | — |
+
+No other session has a branch newer than `main`'s tip and none has an open PR, so these scopes are free.
+`data/findings.json` is edited by nobody else while this branch is open; if that changes, this session takes the
+merge, keeps the other side verbatim and appends.
