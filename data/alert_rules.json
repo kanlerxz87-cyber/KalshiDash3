@@ -8,7 +8,8 @@
   "high_roi": {
     "description": "EXPERIMENTAL SCREEN, NOT AN ROI MODEL. Identical to the dashboard's 'Model watch' filter: category_basis == 'seed' (series in the official fee schedule) and volume_24h_fp > 0. The owner's model was not supplied (F-14).",
     "require_category_basis": "seed",
-    "require_volume_24h_gt": 0
+    "require_volume_24h_gt": 0,
+    "decided_at": "detection time — build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector — see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
   },
   "sources": {
     "price_observations": "data/live/price_history.json (written by scripts/collect.py from GET /markets last_price_dollars)",

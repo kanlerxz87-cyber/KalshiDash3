@@ -119,7 +119,7 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled markets stored; " + KD.num(snap.counts?.settled_in_scope) + " were in scope when collected"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " stored settled rows (" + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " in scope)"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); never used as a headline</p></div>`;
@@ -158,7 +158,8 @@ KD.nav("");
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
-     “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.</p>`;
+     “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.
+     A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`;
 })();
 </script>
 </body></html>
