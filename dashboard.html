@@ -390,6 +390,10 @@ function currentRow() {
  * with no returned price is a gap in the line, not a zero.
  */
 let chartModel = null;          // what is currently drawn, for the crosshair
+// Published for the DOM test (scripts/tests/test_pages_dom.js), which asserts the values the
+// chart actually plots rather than scraping the canvas bitmap: a bug that drew a price-less
+// candle at $0.00 was invisible to a text-based check.
+function publishChartModel() { try { window.__chartModel = chartModel; } catch (e) { /* non-browser */ } }
 let chartRequest = 0;           // guards against an out-of-order async render
 
 function drawChart() {
@@ -406,7 +410,7 @@ function drawChart() {
     meta.textContent = "Pick a market from the tables below.";
     if (srcLine) srcLine.textContent = "";
     foot.textContent = "";
-    chartModel = null;
+    chartModel = null; publishChartModel();
     return;
   }
   meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
@@ -528,6 +532,7 @@ function drawChart() {
     }
 
     chartModel = { kind: "candle", row, t0, t1, pad, W, H, iw, ih, points: plot.map(p => ({ t: p.t, v: p.close, volume: p.volume, oi: p.oi, bid: p.yes_bid, ask: p.yes_ask })), candles: c };
+    publishChartModel();
     if (srcLine) srcLine.innerHTML = candleSourceLine(c);
     foot.innerHTML = `${shown.length} official ${c.interval}-minute candle${shown.length === 1 ? "" : "s"} from ${KD.esc(new Date(t0).toISOString())} to ${KD.esc(new Date(t1).toISOString())} (UTC). ` +
       `Y axis is the contract price in dollars, bounded 0–1. Empty periods stay empty. ` +
@@ -608,6 +613,7 @@ function drawChart() {
       Math.min(X(lastP.t) + 6, W - 90), Math.max(Y(lastP.v) - 6, 12));
 
     chartModel = { kind: "observation", row, t0, t1, pad, W, H, iw, ih, points: pts.map(p => ({ t: p.t, v: p.v })) };
+    publishChartModel();
     if (srcLine) srcLine.innerHTML = fellBack
       ? `Kalshi's candlestick request returned nothing usable for this market (it may be past the historical cutoff or blocked by CORS), so this is the project's own observation series.`
       : `Source: this project's observations (<code>data/live/price_history.json</code>, one point per collector run, plus live ticks in this browser session). Seconds are only possible by accumulation — <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">candlesticks only support 1/60/1440-minute intervals</a>.`;
