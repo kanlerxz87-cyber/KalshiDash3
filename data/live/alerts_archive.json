@@ -2,6 +2,28 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "event_ticker": "KXAAAGASM-26DEC31",
+   "title": "Will average **gas prices** be above $3.30?",
+   "category_id": "gas",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-20T20:01:29Z",
+   "to_time": "2026-11-21T00:50:12Z",
+   "from_price": 0.71,
+   "to_price": 0.29,
+   "delta": -0.42,
+   "direction": "down",
+   "volume_24h_fp": 21.13,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "to_yes_bid": 0.29,
+   "to_yes_ask": 0.71,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T00:50:12Z",
+   "high_roi": true
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B87500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",
