@@ -46,7 +46,10 @@ UA = "KalshiDash3-collector/1.0 (+https://github.com/kanlerxz87-cyber/KalshiDash
 PRICE_HISTORY_LIMIT = 120  # points kept per market
 PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
 SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
-SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
+SETTLED_KEEP = 1600        # most recent settled rows kept per status window, so the file stays browser-sized
+SETTLED_PUBLISH_CAP = 200  # settled rows PUBLISHED, chosen per topic (see select_settled)
+HISTORICAL_PER_SEED = 40   # settled rows pulled per seeded series from GET /historical/markets
+HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
@@ -366,6 +369,89 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
     return row
 
 
+DEFAULT_CATS = ("gas", "elections", "culture", "crypto", "golf")
+
+
+def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=DEFAULT_CATS):
+    """Choose which settled rows to publish, fairly across the five topics.
+
+    The published set used to be `rows[:200]` after one global newest-first sort. That
+    silently starved four of the five topics: 15-minute crypto markets settle dozens of
+    times a day, so of the 200 rows the landing page showed on 2026-11-21, 198 were crypto
+    and gas/elections/culture/golf had no resolution history at all — even though the
+    snapshot held 1,600 settled in-scope rows. The brief asks for live events tracked
+    "until the events have resolved" with topics kept separate, so the cap is now spent
+    per topic.
+
+    Round-robin, newest-first inside each topic. A topic with less history simply stops
+    contributing and the others take the remaining capacity. Returns the picked rows plus
+    the per-topic split, so the snapshot can publish exactly how the cap was spent.
+    """
+    by_cat = {}
+    for r in sorted(rows, key=lambda r: (r.get("settlement_ts") or ""), reverse=True):
+        by_cat.setdefault(r.get("category_id") or "other", []).append(r)
+    order = [c for c in cats if c in by_cat] + [c for c in by_cat if c not in cats]
+    picked, taken = [], {c: 0 for c in order}
+    while len(picked) < cap:
+        progressed = False
+        for c in order:
+            if len(picked) >= cap:
+                break
+            if taken[c] < len(by_cat[c]):
+                picked.append(by_cat[c][taken[c]])
+                taken[c] += 1
+                progressed = True
+        if not progressed:
+            break
+    picked.sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
+    return picked, {c: n for c, n in taken.items()}
+
+
+def historical_settled(seed_tickers, per_seed=HISTORICAL_PER_SEED):
+    """Settled rows for seeded series that the live endpoints can no longer return.
+
+    Documented behaviour: markets that settled before GET /historical/cutoff's
+    `market_settled_ts` "are only available via GET /historical/markets"
+    (https://docs.kalshi.com/getting_started/historical_data), and `GET /markets` stops
+    returning them. So a topic that settles rarely — the seeded elections series
+    KXELECTIRAN is the clear case — can look like it has no resolution history at all
+    even though the exchange settled some of its markets months ago.
+
+    Parameters used here are the ones the endpoint documents
+    (https://docs.kalshi.com/api-reference/historical/get-historical-markets):
+    `series_ticker` (one series per call; the filters are mutually exclusive),
+    `limit` (max 1000) and `cursor` for pagination.
+
+    Bounded on purpose: one request per seeded series, at most `per_seed` settled rows
+    kept, and a failure is reported and skipped — the live scan already succeeded, so a
+    historical hiccup must never fail the collection.
+    """
+    got_rows, report = {}, {}
+    for ticker in seed_tickers:
+        try:
+            d, url = get("/historical/markets", {"series_ticker": ticker, "limit": HISTORICAL_PAGE}, retries=2)
+        except RuntimeError as e:
+            report[ticker] = {"error": str(e), "kept": 0}
+            print(f"  ! historical {ticker}: {e}", file=sys.stderr)
+            continue
+        batch = d.get("markets") or []
+        kept = 0
+        for m in batch:
+            if not m.get("result"):          # only a resolved market has a result
+                continue
+            t = m.get("ticker")
+            if not t or t in got_rows:
+                continue
+            got_rows[t] = m
+            kept += 1
+            if kept >= per_seed:
+                break
+        report[ticker] = {"returned": len(batch), "kept": kept, "url": url}
+        if kept:
+            print(f"  historical {ticker:<16} -> {kept} settled market(s) from the archive")
+    return got_rows, report
+
+
 def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     cats = load_categories()
     started = utcnow()
@@ -401,7 +487,21 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                     if not cursor or not batch or got >= 5000:
                         break
                 print(f"  seed {seed['ticker']:<16} {status:<8} -> {got} market(s)")
-    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
+
+    # Topics that settle rarely: pull their archived settled markets as well. See
+    # historical_settled() for the documented reason this is necessary.
+    hist_cutoff, hist_report = None, {}
+    try:
+        cutoff_payload, _ = get("/historical/cutoff", retries=2)
+        hist_cutoff = cutoff_payload.get("market_settled_ts")
+    except RuntimeError as e:
+        print(f"  ! /historical/cutoff unavailable ({e})", file=sys.stderr)
+    seed_tickers = [s["ticker"] for c in cats["categories"] for s in c["seed_series"]]
+    hist_rows, hist_report = historical_settled(seed_tickers)
+    for t, m in hist_rows.items():
+        seeded["settled"].setdefault(t, m)
+    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}"
+          f" (historical backfill: {len(hist_rows)})")
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
         raw[status].extend([m for t, m in seeded[status].items() if t not in have])
@@ -463,8 +563,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     trimmed = len(rows["open"]) - len(kept)
     rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
-    settled_trimmed = max(0, len(rows["settled"]) - SETTLED_KEEP)
+    settled_in_scope_total = len(rows["settled"])
+    settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
+    # The published set is chosen from the kept window, per topic. Selecting after a global
+    # newest-first cut was the second half of F-41: that window is itself almost all crypto
+    # 15-minute markets, so a per-topic split of it would still have no elections rows.
+    settled_published, settled_by_cat = select_settled(rows["settled"])
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -525,11 +630,21 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
             "safety_scan_cap": SAFETY_SCAN_CAP,
             "settled_rows_trimmed_for_size": settled_trimmed,
+            # What was published out of what was in scope, and the per-topic split:
+            # the row cap must never be spent by one high-frequency topic alone.
+            "settled_in_scope_total": settled_in_scope_total,
+            "settled_kept_window": len(rows["settled"]),
+            "settled_published": len(settled_published),
+            "settled_publish_cap": SETTLED_PUBLISH_CAP,
+            "settled_published_by_category": settled_by_cat,
+            "historical_cutoff_market_settled_ts": hist_cutoff,
+            "historical_backfill_rows": len(hist_rows),
+            "historical_backfill_report": hist_report,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
         },
         "open_markets": rows["open"],
-        "settled_markets": rows["settled"][:200],
+        "settled_markets": settled_published,
         "liquidity": depth_rows,
         "disclaimers": [
             "All values are from the Kalshi DEMO environment (mock funds). The official docs warn that demo prices and behaviour may not reflect real markets.",

@@ -730,6 +730,7 @@ window.KDL = (() => {
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
     esc, num, cents, money, takerFee, bandOf,
+    BASE,                       // exposed so a page can print the exact official URL it queried
     markets: S.markets
   };
 })();
