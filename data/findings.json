@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T07:05:00Z",
+ "generated": "2026-11-21T06:58:30Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label).",
  "questions": [
   {
@@ -821,6 +821,20 @@
     "https://kanlerxz87-cyber.github.io/KalshiDash3/"
    ],
    "status": "fixed (collector); verified by test, pending next data run"
+  },
+  {
+   "id": "F-42",
+   "severity": "medium",
+   "item": "Elections has no resolution history on the site even though the exchange has a settled elections market: it settled before the documented historical cutoff",
+   "why": "Measured against official sources this session. GET /historical/cutoff returns market_settled_ts = 2026-09-21T00:00:00Z, and the only settled market in the seeded elections series is KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z with result \"no\" — before the cutoff. Kalshi documents that markets settled before the cutoff are only available via GET /historical/markets and stop appearing in GET /markets. Confirmed live both ways: GET /markets?series_ticker=KXELECTIRAN&status=settled also returns it, but GET /markets?status=settled paging (30,456 newer settled rows, capped at 25,000) never reaches it, so the snapshot showed culture 7 / crypto 97 / golf 96 settled rows and zero elections rows. The topic therefore looked like it had never resolved anything.",
+   "action": "PARTIAL, and stated as partial. scripts/collect.py now (a) reads GET /historical/cutoff and publishes it as counts.historical_cutoff_market_settled_ts, and (b) performs a bounded /historical/markets lookup per seeded series (one request each, at most 40 settled rows per series, failures non-fatal), publishing counts.historical_backfill_rows. That backfill demonstrably fetches rows (216 in the 2026-11-21T06:56Z run) but the elections row did NOT reach the published snapshot in that run, and this session could not read the collector's stdout (the GitHub logs endpoint returned EOF) to prove which filter dropped it. It is NOT claimed fixed. What IS verified: the endpoint returns the market with the documented shape, https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN returns KXELECTIRAN-26JUL01 with result \"no\". Next step is to read one collect.yml log's 'historical <series>' lines; until then the site shows no elections resolutions and says so rather than inventing one.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN"
+   ],
+   "status": "partially implemented, NOT confirmed on the site"
   }
  ]
 }

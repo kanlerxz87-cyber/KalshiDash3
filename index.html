@@ -183,7 +183,11 @@ KD.nav("");
         The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
         collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
         series cannot crowd out gas, elections, culture or golf
-        (<code>counts.settled_published_by_category</code>). Full list on
+        (<code>counts.settled_published_by_category</code>).
+        Settled markets older than the exchange's published historical cutoff
+        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
+        <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing
+        here — that is a gap in the archive, not a market that never resolved (<a href="flagged.html">F-42</a>). Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
