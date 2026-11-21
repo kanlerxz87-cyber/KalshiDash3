@@ -944,40 +944,25 @@
    "severity": "low",
    "item": "Site copy still describes a '20-minute' collector cadence; collect.yml declared 7,27,47 + 13,43 since PR #54, and main now sweeps on a 15-minute relay grid (R-B8)",
    "why": "executive-summary.html, live.html, portfolio.html, an assets/live.js comment and data/findings.json texts still say 'every 20 minutes' in places. collect.yml has declared two off-peak crons since PR #54, and PR #62 (merged 2026-11-21T21:13:41Z) replaces the declared cron behaviour on main with a bounded relay (one run, fixed 15-minute grid, <= 5.5 h, one queued successor, pages.yml per committed pass). The pages' own snapshot-age banner is the accurate signal; the hard-coded prose is not.",
-   "action": "Fixed 2026-11-21 (arena-2a7c58f1, T57): executive-summary.html (2 rows), portfolio.html, assets/live.js (2 comments) and assets/chatdock.js health line (was hard-coded '*/20 * * * *' every 20m; now '15-min grid (cron restart: 7,27,47 + 13,43)' every 15m, with test_chatdock.js updated) now say 'about every 15 minutes while the relay runs; each page shows the snapshot age' (scripts/collect_relay.py INTERVAL_DEFAULT_MIN=15; collect.yml header: fixed 15-minute grid). data/findings.json Q7/G19 forward-looking texts updated to match; F-40/F-70 kept as historical measurements of the old 20-minute cron. Verified by grep (no live '20-minute' cadence claim remains outside historical records) + verify_release.py PASS. Final integration (session arena-42e3b260, 2026-11-21T23:5xZ): the same session that merged this found the chat dock health line still printed a cron-shaped expectation (the first fix rendered a 15-minute grid string and judged lateness against it). Per R-B1 the line now names no cron and no expected interval at all: it reports the newest run, the measured gap between the last two scheduled runs, the last success and a runs link; freshness stays the job of the snapshot-age line (F-75). | Cross-check (arena-220b524c, branch arena/220b524c-kalshidash3, 2026-11-21): independently reached the same conclusion from the run list before seeing this entry, and adds nothing to the shipped fix — main's health line (newest run, no expected interval) was adopted verbatim in the merge. Kept as a second independent confirmation that no live '20-minute' cadence claim remains, not as a competing fix.",
+   "action": "Fixed 2026-11-21 (arena-2a7c58f1, T57): executive-summary.html (2 rows), portfolio.html, assets/live.js (2 comments) and assets/chatdock.js health line (was hard-coded '*/20 * * * *' every 20m; now '15-min grid (cron restart: 7,27,47 + 13,43)' every 15m, with test_chatdock.js updated) now say 'about every 15 minutes while the relay runs; each page shows the snapshot age' (scripts/collect_relay.py INTERVAL_DEFAULT_MIN=15; collect.yml header: fixed 15-minute grid). data/findings.json Q7/G19 forward-looking texts updated to match; F-40/F-70 kept as historical measurements of the old 20-minute cron. Verified by grep (no live '20-minute' cadence claim remains outside historical records) + verify_release.py PASS. Final integration (session arena-42e3b260, 2026-11-21T23:5xZ): the same session that merged this found the chat dock health line still printed a cron-shaped expectation (the first fix rendered a 15-minute grid string and judged lateness against it). Per R-B1 the line now names no cron and no expected interval at all: it reports the newest run, the measured gap between the last two scheduled runs, the last success and a runs link; freshness stays the job of the snapshot-age line (F-75).",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md"
-   ],
-   "status": "fixed"
+   ]
   },
   {
    "id": "F-74",
    "severity": "medium",
    "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
    "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops. ID namespace (resolved 2026-11-21): this page's F-nn now always means a flagged irregularity; the verification ledger was renumbered to C-nn, so the old collision between verified_facts F-70..F-73 and these entries is gone.",
-   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
+   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped. arena-c09bf8f4 independently re-verified the defect and the fix: read cli/cli trunk pkg/cmd/workflow/run/run.go through the GitHub API (only --ref, --field/-F, --raw-field/-f and --json are registered), reproduced 'unknown flag: --event' with the installed gh 2.23.0 and with a stub gh on PATH, and confirmed that no `--event` remains anywhere under .github/. Its own parallel edit of the same line was discarded in favour of PR #76's stricter version - nothing was lost, and the four-way overlap is recorded on the board.",
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
    ],
-   "status": "fixed"
-  },
-  {
-   "id": "F-78",
-   "severity": "medium",
-   "item": "Two different, silently divergent definitions of the 'model' exist in the shipped JavaScript; the one that never runs carries a docstring claiming it is the published one",
-   "why": [
-    "`assets/engine.js` defines the scorer that actually produces every 'model picks' bubble and the `model N.NN` chip: `MODEL.weights = { liquidity: 0.30, band: 0.25, momentum: 0.30, spread: 0.15 }`, `MODEL.threshold = 0.55`, integer score 0-1, with `modeled_roi_if_yes_at_ask`. `assets/alerts.js` defines a second, unrelated scorer: `weights = { magnitude: 0.35, relative: 0.25, liquidity: 0.20, volume: 0.20 }`, `threshold_score: 55`, score 0-100, and a different component set (no price band, no spread). Only `assets/alerts.js` also carries the comment 'Weights and components are published verbatim on alerts.html and strategies.html' — but the page publishes engine.js's weights, and `assets/alerts.js` is loaded only by portfolio.html, which uses just `loadJSON`, `replayStrategies` and `indexLiquidity` from it. `KDA.scoreAlert` and its `MODEL` are therefore dead code on every page. Verified by instrumenting alerts.html in jsdom: `KDL.MODEL.weights` is the 0.30/0.25/0.30/0.15 object, 60 of 60 alerts are scored by the engine, 39 pass 0.55, and the rendered 'model picks' count reads 39; no page references `KDA.scoreAlert`."
-   ],
-   "action": "NOT fixed in this branch — deleting or merging exports from `assets/alerts.js` is a functional change to a file another session owns and to a page (portfolio.html) that does load it, so it needs an owner who can re-run the replay tests. Recommended correction, in order of preference: (1) delete `MODEL` and `scoreAlert` from `assets/alerts.js` and have portfolio.html keep using the engine's, so exactly one scorer exists; or (2) if the second scorer is wanted, rename it (`REPLAY_MODEL`) and document that it is not the chat ranking. Interim advice to a reader: the numbers on `alerts.html` and `strategies.html` are the engine's and are the correct ones. Flagged rather than silently edited because the brief requires unverified or risky changes to be surfaced, not guessed at.",
-   "sources": [
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/alerts.js",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/alerts.html"
-   ]
+   "status": "fixed 2026-11-21 (PR #76; repo-wide guard PR #78; independently re-verified by arena-c09bf8f4)"
   },
   {
    "id": "F-75",
@@ -1013,6 +998,33 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
+  },
+  {
+   "id": "D-01",
+   "severity": "low",
+   "item": "Counts printed in prose had drifted from the ledgers they describe, and README duplicated a line",
+   "why": "Measured 2026-11-21 by arena-c09bf8f4: data/findings.json listed 53 flagged entries and 20 suggestions while executive-summary.html said '50 irregularities' and 'Eighteen suggestions' and README.md said '50 irregularities'. The published page (fetched from the live URL the same day) still carried that text. README.md also listed scripts/tests/test_watchdog.py twice with different descriptions. No market number was affected - these count this repository's own records - but a page that misstates its own ledger weakens the rest of the verification. Filed under a D-nn id rather than F-nn because four sessions were minting F-nn numbers concurrently on 2026-11-21 (F-73/F-74 were each fixed by three or four branches) and the count-drift item had already been renumbered twice.",
+   "action": "Fixed two ways, and both are live: main's PR #79 renders the claims/blank/irregularity counts from data/verified_facts.json + data/findings.json into #verifiedCounts, and this branch makes executive-summary.html render the suggestion and question counts too, with every span carrying data-count so a missing fetch keeps static text rather than a wrong number (verified with a Node DOM stub: 20 suggestions, 9 questions, 56 irregularities, 72 claims, 1 blank - matching the ledgers). README now states what each page renders instead of a frozen number, and the duplicate watchdog line is gone.",
+   "status": "fixed 2026-11-21 (arena-c09bf8f4)",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/findings.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/verified_facts.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/executive-summary.html"
+   ]
+  },
+  {
+   "id": "F-78",
+   "severity": "medium",
+   "item": "Two different, silently divergent definitions of the 'model' exist in the shipped JavaScript; the one that never runs carries a docstring claiming it is the published one",
+   "why": [
+    "`assets/engine.js` defines the scorer that actually produces every 'model picks' bubble and the `model N.NN` chip: `MODEL.weights = { liquidity: 0.30, band: 0.25, momentum: 0.30, spread: 0.15 }`, `MODEL.threshold = 0.55`, integer score 0-1, with `modeled_roi_if_yes_at_ask`. `assets/alerts.js` defines a second, unrelated scorer: `weights = { magnitude: 0.35, relative: 0.25, liquidity: 0.20, volume: 0.20 }`, `threshold_score: 55`, score 0-100, and a different component set (no price band, no spread). Only `assets/alerts.js` also carries the comment 'Weights and components are published verbatim on alerts.html and strategies.html' — but the page publishes engine.js's weights, and `assets/alerts.js` is loaded only by portfolio.html, which uses just `loadJSON`, `replayStrategies` and `indexLiquidity` from it. `KDA.scoreAlert` and its `MODEL` are therefore dead code on every page. Verified by instrumenting alerts.html in jsdom: `KDL.MODEL.weights` is the 0.30/0.25/0.30/0.15 object, 60 of 60 alerts are scored by the engine, 39 pass 0.55, and the rendered 'model picks' count reads 39; no page references `KDA.scoreAlert`."
+   ],
+   "action": "NOT fixed in this branch — deleting or merging exports from `assets/alerts.js` is a functional change to a file another session owns and to a page (portfolio.html) that does load it, so it needs an owner who can re-run the replay tests. Recommended correction, in order of preference: (1) delete `MODEL` and `scoreAlert` from `assets/alerts.js` and have portfolio.html keep using the engine's, so exactly one scorer exists; or (2) if the second scorer is wanted, rename it (`REPLAY_MODEL`) and document that it is not the chat ranking. Interim advice to a reader: the numbers on `alerts.html` and `strategies.html` are the engine's and are the correct ones. Flagged rather than silently edited because the brief requires unverified or risky changes to be surfaced, not guessed at.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/alerts.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/alerts.html"
    ]
   }
  ]
