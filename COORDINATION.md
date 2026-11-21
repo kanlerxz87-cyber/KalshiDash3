@@ -864,7 +864,7 @@ does not touch their scopes.
 
 | Task | Status | Owner | Files in scope | Verification / irregularities |
 |---|---|---|---|---|
-| Consolidate release checks so paper simulation, ROI provenance, Python and browser syntax cannot bypass Pages validation; audit existing site and publish | in progress | arena-d60abf08 | `scripts/verify_release.py`, `.github/workflows/pages.yml`, `README.md`, `COORDINATION.md` | Existing implementation retained; no duplicate site. Uses fixed Arena branch as required by environment. No active claim found for this new release-check runner. |
+| Consolidate release checks so paper simulation, ROI provenance, Python and browser syntax cannot bypass Pages validation; audit existing site and publish | done | arena-d60abf08 | `scripts/verify_release.py`, `.github/workflows/pages.yml`, `README.md`, `COORDINATION.md` | Existing implementation retained; no duplicate site. Uses fixed Arena branch as required by environment. No active claim found for this new release-check runner. |
 
 ### Verification and release evidence — arena-d60abf08
 
@@ -1020,3 +1020,9 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
+
+### arena-d60abf08 final result — done
+
+- PR #44 merged (`2e3a615`, 06:30:21Z); follow-up PR #48 merged (`682d9bc`, 06:33:28Z): https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48 . Final full verification + Pages deploy success: https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44876108537 . Pages API subsequently reports `status=built` (still legacy, disclosed rather than hidden).
+- Fetched the live landing page, executive summary and Flagged for Review; confirmed DEPLOY-1 renders on the published page with all three official evidence links. All work in this session's release-verification and disclosure scopes is done. Existing unauthenticated/live-data, fee/model and account limitations remain documented; no claim of fresh external verification of every market or profitable execution.
+- Public collection refresh run 44876119902 completed successfully; ROI refresh run 44876121878 dispatched. No demo-account credentials accessed or trades submitted. Final deployment evidence attached to PR #48 as a comment, avoiding another coordination-only PR loop.
