@@ -17,9 +17,8 @@ name: Freshness alarm (independent monitor)
 # schedule, which is what this file is.
 #
 # Honest limit, stated here rather than discovered later: this monitor runs on the same
-# `schedule` mechanism, so it is exposed to the same delays and drops. It reduces the blast
-# radius (two independent crons must both miss) but it does not make the platform guarantee
-# anything. The site is built to say "snapshot is N hours old" rather than to pretend otherwise,
+# `schedule` mechanism, so it is exposed to the same delays and drops. Both schedules
+# may be delayed or dropped together; this monitor does not guarantee collection. The site is built to say "snapshot is N hours old" rather than to pretend otherwise,
 # and that disclosure is the real protection.
 
 on:
@@ -76,14 +75,17 @@ jobs:
             '[.[] | select(.event == "workflow_dispatch") | .createdAt | fromdateiso8601
                   | select(. > (now - 3600))] | length')
           echo "snapshot age ${AGE_MIN}m; in flight ${in_flight}; dispatches in the last hour ${recent}"
-          # Bounded exactly like the step it replaces: never more than one dispatch per hour from
-          # this monitor, and never while a collection is already in flight. The runaway loop this
+          # Conservatively skip when any collector dispatch was created in the past hour,
+          # or while a collection is already in flight. The runaway loop this
           # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
           if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
-          if [ "$recent" -ge 1 ]; then echo "this monitor already dispatched within the hour; waiting for the cron"; exit 0; fi
-          gh workflow run collect.yml --ref main --event workflow_dispatch \
-            && echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection" \
-            || echo "::warning::dispatch failed; the cron schedules remain the only trigger"
+          if [ "$recent" -ge 1 ]; then echo "a collector dispatch was created within the hour; waiting for the cron"; exit 0; fi
+          if gh workflow run collect.yml --ref main; then
+            echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection"
+          else
+            echo "::error::dispatch failed; collection was not queued by this monitor"
+            exit 1
+          fi
 
       - name: Note the state in the job summary
         if: always()

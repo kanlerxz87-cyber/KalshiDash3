@@ -954,9 +954,9 @@
   {
    "id": "F-74",
    "severity": "medium",
-   "item": "freshness-alarm.yml dispatches with a flag gh does not have \u2014 every alarm dispatch takes its 'dispatch failed' branch (R-B7)",
-   "why": ".github/workflows/freshness-alarm.yml (still on main at the time of writing) dispatches the collector with `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI `workflow run` command defines no `--event` flag \u2014 only `--ref`, `--field`, `--raw-field` and `--json` (cli/cli, pkg/cmd/workflow/run/run.go; latest release v2.105.0, 2026-11-18), and local gh 2.23.0 rejects the invocation with 'unknown flag: --event'. Every alarm dispatch therefore fails, and the workflow file has been in that state since it was written. Note (ID namespace): this project numbers several ledgers in parallel (verified_facts.json and findings.json both use F-nn); verified_facts.json also has an F-72 (candlestick path parameters).",
-   "action": "Not fixed in this PR (the file's newest owner is arena-b25b0914, whose T55 makes the alarm a secondary restart path once fixed; F-75.. may be taken by other in-flight sessions). Correction per the source: drop the invalid `--event workflow_dispatch` argument. While a relay is running on main, its in-flight guard stops the alarm from dispatching anyway. Flagged for the owner or the next integration session; first flagged 2026-11-21T21:20Z (arena-d60d648c, carrying R-B7).",
+   "item": "freshness-alarm.yml previously used an unsupported gh flag (R-B7); repair awaits live stale-dispatch verification",
+   "why": "The prior alarm invoked `gh workflow run collect.yml --ref main --event workflow_dispatch`. The GitHub CLI manual specifies that `gh workflow run` creates a workflow_dispatch event and lists no `--event` option; local gh 2.23.0 rejects that flag. This prevented the alarm from dispatching. The fix removes it. The monitor remains subject to scheduled-run delays and drops.",
+   "action": "Fixed in the freshness alarm: the invalid flag is removed, and a dispatch failure now fails the step instead of only logging a warning. Offline mock tests exercise both guards and success/failure. A successful stale-data dispatch against the live service has not been observed; the monitor and collector schedules can still be delayed or dropped.",
    "sources": [
     "https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go",
     "https://cli.github.com/manual/gh_workflow_run",
