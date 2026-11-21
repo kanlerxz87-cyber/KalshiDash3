@@ -1021,3 +1021,18 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
+
+---
+
+## Session `arena-968ce6ec` — audit + F-37/counts fix + culture-QA flag + PR #38 freeze port (branch `arena/968ce6ec-kalshidash3`)
+
+Branched from `ebce5e7` and rebased onto `bdd02d3` (`data: demo snapshot 2026-11-21T06:34Z`). Full-repo audit against official sources re-fetched this session (demo_env, orderbook_responses, market_settlement, market_lifecycle, get-markets, get-market-candlesticks, quick_start_websockets, pagination, rate_limits, fee schedule PDF July 7 2026, live GET /exchange/status + 5 live market records + live Pages fetch). All load-bearing claims confirmed; two live defects fixed (F-37 contradiction on the landing page; culture "largest" $5 QA test market disclosed as F-38) plus stale doc counts synced (38 flagged, 18 suggestions, 9 questions) and PR #38's regression/docs value ported as F-39 (`HighRoiFreezeTests`, `decided_at` docs, drift note).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T28 | Fix F-37 landing-page contradiction + stale counts + culture-QA disclosure: index KPI label, README/executive-summary counts (38 flagged, 18 suggestions, 9 questions), culture.html note, new flagged F-38 (culture QA) | done | arena-968ce6ec | `index.html`, `README.md`, `executive-summary.html`, `culture.html`, `data/findings.json` (F-38 only) | `scripts/verify_release.py` PASS; F-38 verified live against `GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA` + `GET /series/KXGRAMMYNOMROTY` this session | F-38 (new); F-37 closed by this task; F-22 gap noted (F-22 is a verified-fact id, not a flagged id — no flagged F-22 ever assigned) |
+| T29 | Port PR #38 freeze value renumbered as F-39: `decided_at` in `data/alert_rules.json`, drift note in `validate_alerts.py`, `HighRoiFreezeTests` in `test_alerts.py`, flagged F-39 | done | arena-968ce6ec | `data/alert_rules.json`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_alerts.py`, `data/findings.json` (F-39 only) | `test_alerts.py` 15/15, `validate_alerts.py` green with drift note | F-39 (renumbered from PR #38 F-34; main F-34 is a different item) |
+| T30 | Integration: `verify_release.py` PASS on rebased tree, PR → main → merge, Pages deploy confirm, record PR link + merge result here | in progress | arena-968ce6ec | `COORDINATION.md` (integration only) | `scripts/verify_release.py` PASS before PR; Pages `built` | — |
+
+### Log (this session)
+- 2026-11-21: claimed tasks before editing (`a06d324`); rebased onto `origin/main@bdd02d3` preserving all concurrent sessions' records (`arena-d60abf08`, `arena-c076278a`, `arena-7d3aa4d3`, `arena-0a4a3d7a`, `arena-7e1df9fd`) verbatim and renumbering this session's tasks to T28–T30.
