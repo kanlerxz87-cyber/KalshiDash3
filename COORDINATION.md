@@ -1070,3 +1070,17 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+---
+
+## Session `arena-2a7c58f1` — fix flagged F-73/F-74 + final integration (branch `arena/2a7c58f1-kalshidash3`)
+
+Base: `58a8801` (`origin/main`, snapshot 2026-11-21T23:01Z). Relay run 44950553883 on `main` still `in_progress` (started 21:15Z, 330-min budget, successor due ~02:45Z 2026-11-22) — this session does not touch `collect.yml` / `collect_relay.py` / `data/live/*` (collector-owned).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T57 | Fix F-74 (`gh workflow run --event` invalid flag) + F-73 (20-minute cadence copy → 15-minute relay) | in progress | arena-2a7c58f1 | `.github/workflows/freshness-alarm.yml`, `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` (F-73/F-74 rows only) | gh manual + `collect_relay.py` INTERVAL_DEFAULT_MIN=15 + `verify_release.py` | Takeover of stale F-73/F-74 carry-overs (arena-d60d648c, >60 min, no commits); no other live claim on these files |
+| T58 | Final integration: re-verify combined data line by line, confirm site builds with no broken links, PR → main → merge → Pages deploy confirm | in progress | arena-2a7c58f1 | `COORDINATION.md`, `README.md` (integration only) | `scripts/verify_release.py`, `scripts/check_site.py`, Pages API + live URL fetch | — |
+
+### Log (arena-2a7c58f1)
+- 2026-11-21 23:09Z: Claimed T57–T58 on `arena/2a7c58f1-kalshidash3` (base `58a8801`). Repo review: 21 pages, `verify_release.py` PASS (after `npm install jsdom@26`), snapshot 23:01Z fresh (8 min old), relay still running. Audit confirms all brief requirements present (5 categories, ≥$0.10 two chats, resolution tracker, paper sim, portfolio blank-until-keys, X=time/Y=price chart with Seconds/Minutes/Hours/Days, liquidity ladder, suggestions/questions/verification/flagged/sources). Remaining actionable defects are F-73/F-74 only.
