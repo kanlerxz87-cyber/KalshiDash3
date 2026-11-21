@@ -1085,21 +1085,32 @@ per the board rule. Existing sessions' sections are untouched; their scopes stay
 
 **Defects found and published as irregularities** (all on `flagged.html`, all with official source links):
 
-- **F-37 resolved.** The index KPI read "of 200 settled markets in scope" — the stored-row cap — while the banner on the same page printed `counts.settled_in_scope` (1,600). Fixed and regression-tested (`test_pages_dom.js` mode H, mutation-checked).
-- **F-38** history pruned for alerted markets (the T30 defect).
-- **F-39** the chart ignored the candlestick endpoint.
-- **F-40** the collector's capped universe disagreed with the desk scan's.
-- **F-41** observation-only detection cannot see a move inside the collector gap. Demonstrated on `KXPGATOUR-THRC26-MPEN`: its official 1440-minute candle for `end_period_ts 1795237200` opens 0.0070 and closes 0.0880 (an 8.1¢ intraday move) while both surrounding observations read 0.00 — so no alert exists. Proposed as **G19** rather than switched on unilaterally.
-- **F-42** a voided (never-filled) paper position kept `unrealized_net -1.0` and `bid_now 0.0` from before it was voided; cleared at void time and normalised every run, committed `simulation.json` regenerated, two mutation-checked tests.
+- **F-37 resolved (independently by another session, whose simpler label this branch keeps and regression-tests).** The index KPI read "of 200 settled markets in scope" — the stored-row cap — while the banner on the same page printed `counts.settled_in_scope` (1,600). Fixed and regression-tested (`test_pages_dom.js` mode H, mutation-checked).
+- **F-40** history pruned for alerted markets (the T30 defect).
+- **F-41** the chart ignored the candlestick endpoint.
+- **F-42** the collector's capped universe disagreed with the desk scan's.
+- **F-43** observation-only detection cannot see a move inside the collector gap. Demonstrated on `KXPGATOUR-THRC26-MPEN`: its official 1440-minute candle for `end_period_ts 1795237200` opens 0.0070 and closes 0.0880 (an 8.1¢ intraday move) while both surrounding observations read 0.00 — so no alert exists. Proposed as **G19** rather than switched on unilaterally.
+- **F-44** a voided (never-filled) paper position kept `unrealized_net -1.0` and `bid_now 0.0` from before it was voided; cleared at void time and normalised every run, committed `simulation.json` regenerated, two mutation-checked tests.
 
 **Verification performed this session.** Baseline re-run on `ebce5e7` before any edit (all validators green, collectors and Pages green).
 Live figures re-checked against the official API through the platform fetch path, since sandbox `curl` to the Kalshi host fails:
 `GET /markets/KXPGATOUR-THRC26-MPEN` → `last_price_dollars 0.0880`, `volume_fp 434504.17`, `open_interest_fp 419786.51`;
 the snapshot row is `last 0.088`, `volume 431,703.35`, `open_interest 419786.51`, `dollars_traded_estimate 37989.89 = volume × last` exactly.
-`GET /series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=1440` returns 5 daily candles (quoted in F-41);
+`GET /series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=1440` returns 5 daily candles (quoted in F-43);
 `GET /series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV21H07-UP/candlesticks?period_interval=1` returns 1-minute candles with real volume;
 `GET /historical/cutoff` → `market_settled_ts 2026-09-21T00:00:00Z`, which is why recent markets stay on the live endpoint;
 `GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor (the filter is live on the demo host).
 Static claims re-read from `docs.kalshi.com` this session: `period_interval ∈ {1, 60, 1440}` on both the live and historical candlestick endpoints; `mve_filter ∈ {only, exclude}` plus `series_ticker` on `GET /markets`; the doc's own warning that listing responses are cached and "can lag the exchange by several seconds"; unauthenticated requests have separate limits and clients must back off on 429.
+
+**Coordination notes for this rebase.** While this session worked, main advanced through PRs #42–#51. Two overlaps were
+resolved without discarding anyone's work:
+(a) **F-37** was already fixed on main with a simpler label ("200 stored settled rows (1,600 in scope)"). This branch
+keeps that fix rather than re-implementing it, and adds mode H of `test_pages_dom.js` so the label cannot silently
+regress to a single misleading number.
+(b) **Finding IDs.** Other sessions had published their own **F-38** and **F-39** before this branch landed, so this
+session's drafted F-38…F-42 were renumbered **F-40, F-41, F-42, F-43, F-44** at the final rebase. Each renumbered entry
+carries the old ID in its `why` field, so the trail is not lost. No other session's identifier was changed.
+(c) The `pages.yml` merge keeps main's `verify_release.py` gate. The new `test_collect_coverage.py` is picked up by that
+gate automatically (it globs `scripts/tests/test_*.py`), so no duplicate step was added.
 
 **Nothing was inferred.** Every new number on the site comes from a committed file or an API response quoted in the finding. Where a value did not exist (a candle with no price, a market with no history, a demo balance with no credentials) it is left blank and labelled, not filled.
