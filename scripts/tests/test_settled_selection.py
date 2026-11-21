@@ -71,6 +71,18 @@ def main() -> int:
     check(len(picked3) == 3 and len({r["ticker"] for r in picked3}) == 3,
           "a tiny cap yields distinct rows, no duplicates")
 
+    # Fixture 4b — REGRESSION for the second half of the bug: selecting AFTER a
+    # newest-first row cap leaves nothing for a slow topic whose history is older
+    # than the cap. The selection must be handed the full in-scope set.
+    flood = [row(f"KXBTC15M-{i}", "crypto", f"2026-11-21T05:{i % 60:02d}:00.000000Z") for i in range(500)]
+    old_elections = [row("KXELECTIRAN-26JUL01", "elections", "2026-07-01T15:24:15.984157Z")]
+    as_selected_before_cap, _ = collect.select_settled(flood + old_elections, cap=200)
+    check(any(r["category_id"] == "elections" for r in as_selected_before_cap),
+          "a slow topic with OLDER settlements survives the selection (the [:1600] ordering bug)")
+    capped = sorted(flood + old_elections, key=lambda r: r["settlement_ts"], reverse=True)[:200]
+    check(not any(r["category_id"] == "elections" for r in capped),
+          "control: selecting after a newest-first [:200] cap would have dropped it (the original defect)")
+
     # Fixture 5 — the committed snapshot, if present, must be topic-diverse.
     snap_path = ROOT / "data" / "live" / "markets.json"
     if snap_path.exists():

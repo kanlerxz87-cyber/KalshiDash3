@@ -473,6 +473,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     settled_in_scope_total = len(rows["settled"])
     settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
+    # Choose the published set from the FULL in-scope set, BEFORE the row cap. Selecting
+    # after `[:SETTLED_KEEP]` was the second half of F-41: the 1,600 most recent rows were
+    # already almost all crypto, so a per-topic round robin over that window had no
+    # elections rows to choose from (confirmed: an elections market settles —
+    # KXELECTIRAN-26JUL01, result "no", settlement_ts 2026-07-01T15:24:15Z — yet none appeared).
     settled_published, settled_published_by_cat = select_settled(rows["settled"])
 
     # Liquidity depth for the top few open markets per category.
