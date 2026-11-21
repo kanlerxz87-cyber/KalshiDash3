@@ -29,6 +29,8 @@ jobs:
           node-version: "22"
       - name: Install test-only DOM dependency
         run: npm install --no-save --package-lock=false jsdom@26
+      - name: Run the scope tests (five topics only; no demo QA fixtures as headlines)
+        run: python3 scripts/tests/test_scope.py
       - name: Verify release (offline, no account or orders)
         run: python3 scripts/verify_release.py
       - name: Stage only public site files

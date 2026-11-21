@@ -49,6 +49,27 @@ SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-do
 SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
+# The brief limits this dashboard to listed topics. Two corrections are applied to the
+# keyword fallback only — a series that is explicitly a seed can never be excluded, because
+# the fee schedule is the authority for it.
+#
+# 1. Natural gas is not "gas prices" in the sense the brief means (retail petrol prices).
+#    Verified against the official series record on 2026-11-21:
+#      GET /series/KXNATGAS15M -> {"categories":["Commodities"],"title":"Natural Gas 15-minute",
+#        "product_metadata":{"scope":"Natural Gas"},"settlement_sources":[{"name":"Pyth - NATGAS"}]}
+#      GET /series/KXAAAGASM   -> {"categories":["Economics"],"title":"US gas price",
+#        "product_metadata":{"scope":"Gasoline"},"settlement_sources":[{"name":"AAA"}]}
+#    The old keyword "gas" therefore let a natural-gas futures market sit inside Gas Prices
+#    (11 such rows in the 2026-11-21T00:50Z snapshot), which mislabels the topic on the page.
+# 2. Kalshi's own demo QA fixtures ("Demo portfolio test only.", "Portfolio cash out QA 5")
+#    are test instruments, not live events. One of them was the largest open Culture market
+#    in the 2026-11-21T00:50Z snapshot and was therefore shown as culture's headline market.
+#    Verified: GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA -> rules_primary "Demo portfolio test only."
+EXCLUDE_KEYWORD_SERIES: dict[str, str] = {
+    "KXNATGAS15M": "natural-gas futures (Commodities, Pyth NATGAS), not retail gasoline prices",
+}
+EXCLUDE_TITLE_RE = re.compile(r"demo portfolio test|portfolio cash out|\bqa\s*\d", re.I)
+
 
 def utcnow() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -142,6 +163,11 @@ def classify(cats, series_ticker, series_title, series_categories, market_title)
     hay = " ".join(
         x for x in [series_ticker or "", series_title or "", series_categories or "", market_title or ""] if x
     ).lower()
+    # Demo QA fixtures are never a live event, whichever keyword they happen to match.
+    if EXCLUDE_TITLE_RE.search(" ".join(x for x in [market_title or "", series_title or ""] if x)):
+        return None, None
+    if st in EXCLUDE_KEYWORD_SERIES:
+        return None, None
     for c in cats["categories"]:
         for kw in c["keyword_fallback"]:
             if re.search(r"(?<![a-z0-9])" + re.escape(kw.lower()) + r"(?![a-z0-9])", hay):
@@ -383,6 +409,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     rows = {"open": [], "settled": []}
     unclassified = {"open": 0, "settled": 0}
     excluded_mve = {"open": 0, "settled": 0}
+    excluded_topic = {"open": 0, "settled": 0}
     wrong_bucket = 0
     for status in ("open", "settled"):
         for m in raw[status]:
@@ -390,6 +417,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                 excluded_mve[status] += 1
                 continue
             st = series_of(m)
+            if st in EXCLUDE_KEYWORD_SERIES or EXCLUDE_TITLE_RE.search(
+                " ".join(x for x in [m.get("title") or "", (series_index.get(st, {}) or {}).get("title") or ""] if x)
+            ):
+                excluded_topic[status] += 1
+                continue
             s = series_index.get(st, {})
             cat_id, basis = classify(
                 cats,
@@ -483,6 +515,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],
             "settled_excluded_multivariate": excluded_mve["settled"],
+            # Published, never silent: scope corrections the brief requires.
+            "open_excluded_off_topic_or_qa": excluded_topic["open"],
+            "settled_excluded_off_topic_or_qa": excluded_topic["settled"],
+            "excluded_series_reasons": dict(EXCLUDE_KEYWORD_SERIES),
             "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
             # Scan completeness, published: what the ranking below could see at all.
             "open_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("open")),
@@ -500,6 +536,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "dollars_traded_estimate = volume_fp x last_price_dollars. It is an estimate computed here, not an official Kalshi field.",
             "category_basis=keyword rows are heuristic word-boundary matches and are flagged for review; only basis=seed rows are confirmed by the official fee schedule.",
             "Multivariate (combo) markets are excluded from every category: they combine unrelated legs and have their own lifecycle channel.",
+            "Two scope corrections are published in counts: natural-gas futures (KXNATGAS15M, official series category Commodities / Pyth NATGAS) are not retail gas prices and Kalshi demo QA fixtures are not live events. Seed series can never be excluded by these rules.",
             "result can be yes, no, scalar, or empty. Nothing is coerced to yes/no.",
         ],
     }

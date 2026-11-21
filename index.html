@@ -127,12 +127,15 @@ KD.nav("");
     ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows in this snapshot"
       + " (of " + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " settled in scope)"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
-  ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("");
+  ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
+    + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); never used as a headline</p></div>`;
 
   // Highest dollars-traded estimate per category, 1 row each.
   const top = {};
+  const qaRows = open.filter(KD.isQaRow).length + settled.filter(KD.isQaRow).length;
   for (const r of open) {
     if (r.dollars_traded_estimate === null || r.dollars_traded_estimate === undefined) continue;
+    if (KD.isQaRow(r)) continue;   // demo QA fixtures are not live events (F-39)
     if (!top[r.category_id] || r.dollars_traded_estimate > top[r.category_id].dollars_traded_estimate) top[r.category_id] = r;
   }
   const rows = Object.keys(live).map(id => {
