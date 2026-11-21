@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T06:35:53Z",
- "snapshot_collected_at": "2026-11-21T06:35:53Z",
+ "generated_at": "2026-11-21T06:37:12Z",
+ "snapshot_collected_at": "2026-11-21T06:37:12Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -10,12 +10,34 @@
   "require_volume_24h_gt": 0
  },
  "counts": {
-  "all_events": 18,
+  "all_events": 19,
   "high_roi": 5,
-  "archive_total": 18,
-  "new_this_run": 0
+  "archive_total": 19,
+  "new_this_run": 1
  },
  "all_events": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H07",
+   "title": "Demo BTC at or above 55704.83 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "status": "active",
+   "from_time": "2026-11-21T06:35:53Z",
+   "to_time": "2026-11-21T06:37:12Z",
+   "from_price": 0.55,
+   "to_price": 0.45,
+   "delta": -0.1,
+   "direction": "down",
+   "volume_24h_fp": 5180.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T06:37:12Z",
+   "high_roi": false
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
