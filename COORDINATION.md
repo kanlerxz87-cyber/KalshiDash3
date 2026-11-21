@@ -1379,3 +1379,18 @@ session's identifier collides with main's F-37..F-64.
 - 2026-11-21 ~20:20Z: claimed T41; recorded claim before any edit.
 - 2026-11-21 ~20:40Z: merged PR #56 (settled-selection) then PR #55 (candles/coverage). Conflicts resolved without deleting either implementation: `COORDINATION.md` kept both session sections; findings renumbered fresh (F-65/F-66 ← PR #56's F-41/F-42; F-67..F-71 ← PR #55's F-40..F-44); data files kept from main (15:21:23Z snapshot), so PR #56's older 06:56:14Z archives were dropped (the auto-merged archive mixed two snapshots and failed both validators); test_pages_dom.js kept main's F-64 index mode AND PR #55's candles/deep-link modes; mode H rewritten for main's KPI wording.
 - 2026-11-21 ~20:45Z: `verify_release.py` PASS on the merged tree (compile, node --check, all validators and tests, jsdom suites, 21-page check). `test_settled_selection.py` 10/10 checks including the [:1600] ordering regression and the control. `test_collect_coverage.py` + `test_simulate.py` + `test_pages_dom.js` all green.
+
+---
+
+## Session `arena-dba435ee` — line-by-line verification + freshness refresh + integration close-out (branch `arena/dba435ee-kalshidash3`)
+
+Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:17Z before editing any implementation file. No other session shows an in-progress claim on the board; scopes below are this session's only.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T40 | Line-by-line verification of every static claim on the site against official sources (`docs.kalshi.com`, demo API docs, fee schedule, GitHub Pages docs); blank + flag anything unconfirmable | in progress | arena-dba435ee | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` | `scripts/verify_release.py`, live URL fetches | — |
+| T41 | Refresh stale snapshot (collect + desk scan via workflow dispatch) and verify the live site serves fresh data | in progress | arena-dba435ee | `COORDINATION.md`, `data/live/*` (via workflows only) | `gh run list`, live URL fetches | — |
+| T42 | Integration close-out: full suite green, PR → main, merge, Pages deploy confirm, record here | unclaimed | arena-dba435ee | `COORDINATION.md`, `README.md` | live URL fetch | — |
+
+### Log (this session)
+- 2026-11-21 20:17Z: claimed T40–T42 on `arena/dba435ee-kalshidash3` (base `f09f982` == main). Snapshot `collected_at 2026-11-21T15:21:23Z` is ~5h old (stale banner at 45 min); desk scan `2026-11-21T17:57Z` is ~2.3h old. Starting verification.
