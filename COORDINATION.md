@@ -1280,3 +1280,25 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-20d7ddf7` — category-integrity fix driven by official series records (branch `arena/20d7ddf7-kalshidash3`)
+
+Base: `f09f982` (= main at claim). Claimed 2026-11-21 20:22Z before editing implementation files.
+`arena/dba435ee` holds an in-progress claim on T40–T42 with scope `data/verified_facts.json`, `data/findings.json`,
+`COORDINATION.md`, `README.md` and workflow-driven `data/live/*`. **This session deliberately does not touch those
+files while that claim is open**, and keeps its implementation scope to the collector, its tests, the shared
+renderer and new derived artefacts. Request logged at the bottom for the owner of `data/findings.json` /
+`data/verified_facts.json` (R-3, R-4).
+
+| ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-----------------|----------------|------------------------|----------------|
+| T43 | Category integrity: stop the five topics from containing markets Kalshi itself files under another category (Test instruments, Sports props matched by a person's first name), by recording the official `series.categories` on every row and refusing incompatible keyword matches | in progress | arena-20d7ddf7 | `scripts/collect.py`, `scripts/tests/test_scope.py`, `scripts/tests/validate_live.py` (validator only), `assets/site.js` (label only) | Live `GET /trade-api/v2/series/{ticker}` records fetched 2026-11-21 20:19–20:23Z (see the log below) + [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list) | Found on the deployed site: Culture's headline market was an EPL soccer prop (`KXEPLFIRSTGOAL-…`, official category **Sports**) matched by the keyword `oscar` in the player's name *Oscar* Bobb; `KXDEMOFUTHOURLY` (official category **Test**) is inside Crypto and 8 of the 23 archived swing alerts |
+| T44 | Rebuild the derived alert/simulation artefacts from a fresh collector run so the published alert chats stop carrying Test-series rows | unclaimed | — | `data/live/*` (workflow-written only) | `build_alerts.py`, `simulate.py`, validators | — |
+| T45 | Publish the findings for review, open PR → main, merge, confirm the Pages deploy, record the result | unclaimed | — | `COORDINATION.md`, `data/findings.json` (append; see R-3) | live URL fetch after deploy | — |
+
+### Log (this session)
+- 2026-11-21 20:19Z: read the deployed site and the committed snapshot; fetched official `GET /series/{ticker}`
+  records for every series present in the snapshot.
+- 2026-11-21 20:22Z: claimed T43–T45 on this branch.
