@@ -868,9 +868,9 @@ superseded by #39, see T24).
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T25 | **Defect**: the two swing chats flag price *disagreements* as price *moves*. `build_alerts.py` pairs consecutive `last_price_dollars` observations with no continuity bound, so a market whose `last` flips (0.99 → 0.02) between two collector runs produces a "$0.97 crash" alert even when the official record shows `updated_time` never advanced and the official tape shows steady 2¢ prints. Fix: carry `previous_price_dollars` + `updated_time` into every observation, classify a consecutive-observation difference as a **restatement** when the exchange's own `updated_time` did not advance, and route restatements out of the ≥$0.10 feed into a separately labelled section. | in progress | arena-6cd4eabb | `scripts/collect.py` (observation fields only), `scripts/build_alerts.py`, `data/live/price_history.json` + `data/live/alerts*.json` (regenerated), `scripts/tests/test_alerts.py`, `scripts/tests/validate_alerts.py` (consistency only) | evidence below, re-derivable from the official API and the committed history | F-38, F-39 |
-| T26 | **Gap**: the alert system is not tick-level. `collect.yml` runs every 20 min and `price_history.json` keeps ~14 observations, so a "$0.10 swing" chat can neither see a swing inside a 20-minute gap nor show a swing that happened and reversed. Fix: add the **official trade tape** (`GET /markets/trades`, `ticker`/`min_ts`/`max_ts`, documented 1000-row pages) as a second, executed-print alert stream in the browser live layer, so a ≥$0.10 move between two consecutive *trades* is detected in near real time, with the absolute trade timestamp and the API query as its source. | in progress | arena-6cd4eabb | `assets/live.js`, `assets/engine.js`, `alerts.html`/`live.html`/`dashboard.html` (render only) | official endpoint docs + a live page of the tape fetched this session | F-40 |
-| T27 | Integration close-out: full suite, PR → main → merge, dispatch `collect.yml`/`desk.yml`, confirm Pages build, record PR link + merge result here | pending | arena-6cd4eabb | `COORDINATION.md`, `README.md`, `data/findings.json` | `scripts/tests/*`, `scripts/check_site.py`, `node --check`, live Pages fetch | — |
+| T25 | **done** — see the log below. **Defect**: the two swing chats flag price *disagreements* as price *moves*. `build_alerts.py` pairs consecutive `last_price_dollars` observations with no continuity bound, so a market whose `last` flips (0.99 → 0.02) between two collector runs produces a "$0.97 crash" alert even when the official record shows `updated_time` never advanced and the official tape shows steady 2¢ prints. Fix: carry `previous_price_dollars` + `updated_time` into every observation, classify a consecutive-observation difference as a **restatement** when the exchange's own `updated_time` did not advance, and route restatements out of the ≥$0.10 feed into a separately labelled section. | done | arena-6cd4eabb | `scripts/collect.py` (observation fields only), `scripts/build_alerts.py`, `data/live/price_history.json` + `data/live/alerts*.json` (regenerated), `scripts/tests/test_alerts.py`, `scripts/tests/validate_alerts.py` (consistency only) | evidence below, re-derivable from the official API and the committed history | F-38, F-39 |
+| T26 | **done** — see the log below. **Gap**: the alert system is not tick-level. `collect.yml` runs every 20 min and `price_history.json` keeps ~14 observations, so a "$0.10 swing" chat can neither see a swing inside a 20-minute gap nor show a swing that happened and reversed. Fix: add the **official trade tape** (`GET /markets/trades`, `ticker`/`min_ts`/`max_ts`, documented 1000-row pages) as a second, executed-print alert stream in the browser live layer, so a ≥$0.10 move between two consecutive *trades* is detected in near real time, with the absolute trade timestamp and the API query as its source. | done | arena-6cd4eabb | `assets/live.js`, `assets/engine.js`, `alerts.html`/`live.html`/`dashboard.html` (render only) | official endpoint docs + a live page of the tape fetched this session | F-40 |
+| T27 | Integration close-out: full suite, PR → main → merge, dispatch `collect.yml`/`desk.yml`, confirm Pages build, record PR link + merge result here | in progress | arena-6cd4eabb | `COORDINATION.md`, `README.md`, `data/findings.json` | `scripts/tests/*`, `scripts/check_site.py`, `node --check`, live Pages fetch | — |
 
 ### Evidence for T25/T26 (collected this session, each item re-fetchable)
 
@@ -885,3 +885,51 @@ superseded by #39, see T24).
   `20:01:29Z last=0.71` → `2026-11-21T00:50:12Z last=0.29`, a real −$0.42. The official tape confirms it was a
   genuine repricing (NO lifted at 0.70 on `2026-11-21T02:42:40Z`, `02:48:03Z`, `02:53:20Z`). A restatement filter
   must keep this alert; a "de-duplicate identical printed moves" rule would have wrongly deleted the first one.
+
+### Log (session arena-6cd4eabb)
+
+- 2026-11-21 ~06:27 UTC: read the board and every open branch. No other claim was active (PR #38 from
+  `arena/d243bfa7` is still open, but its scope was superseded by #39 per T24). Repo was green: all 12 test
+  files and `check_site.py` passed on `ebce5e7` before any edit. Note on tooling: bash/`curl` has no route to
+  Kalshi from this sandbox (TLS closed), but the platform page-fetch path returns real JSON from the demo API,
+  so every API fact below was fetched directly rather than taken from the committed snapshot.
+- 2026-11-21 ~06:30 UTC: **T25 diagnosed with evidence, not inference.** `GET /markets/KXBTCY-27JAN0100-B87500`
+  and `GET /markets/trades?ticker=KXBTCY-27JAN0100-B87500&limit=20` together show the archive's "−97¢ crash" and
+  "+95¢ spike" cannot be trades: 20 consecutive prints, all `yes_price_dollars 0.0200`, and `updated_time`
+  `2026-04-28T02:27:21Z`. `GET /markets/trades?ticker=KXBTCY-27JAN0100-B47500&min_ts=…&max_ts=…` for the archived
+  window returns **165 prints, every one at 0.0600**. The gas row `KXAAAGASM-26DEC31-3.30 … 13:50→15:19` returns
+  **zero prints**. So 3 of 15 archived swings, plus the whole lower half of the feed, were restatements.
+- 2026-11-21 ~06:35 UTC: **Two wrong fixes found and discarded before release (F-39).** (a) Classifying by
+  `updated_time` suppressed the genuine `KXAAAGASM-26DEC31-3.30` 0.71 → 0.29 repricing, whose prints the tape
+  confirms at `14:26:53Z` (0.71) and `22:27:19Z`/`22:42:22Z` (0.29), with further NO lifts at
+  `2026-11-21T02:42:40Z/02:48:03Z/02:53:20Z`. (b) It is also unsound: `KXAAAGASW-26NOV23-3.6200` printed at
+  `0.9700` on `2026-11-21T06:28:37Z` while its `updated_time` still read `2026-11-15T21:34:40Z`. The obvious
+  "dedupe identical moves" rule would likewise have deleted the first of the two 0.71 rows. The trade tape is
+  therefore the only authority. A third trap was found by test: the executing print can fall inside the window
+  while the prints it superseded fall outside, so the interval's own start price is used as the anchor
+  (`test_a_repricing_at_the_window_edge_is_not_lost`).
+- 2026-11-21 ~06:45 UTC: **T25 shipped.** `build_alerts.py` verifies every candidate against
+  `GET /markets/trades` and publishes `all_events` (tape-confirmed moves only), `restatements` and `unverified`
+  as separate sections, each row carrying `verification`, `verification_detail`, `tape_source` and the prints that
+  decided it. Already-fetched windows are cached in `data/live/trade_evidence.json` (same reviewed-ledger pattern
+  as `data/catalyst_review.json`) so a sandbox with no route can still rebuild deterministically; an offline run
+  never downgrades an existing verdict. `dashboard.html` no longer recomputes swings from raw snapshots (that path
+  was the phantom-alert source), `assets/engine.js` refuses to render a restatement as a swing, `simulate.py` no
+  longer trades one, and `alerts.html` marks restatement rows and withholds a cause lead for them.
+- 2026-11-21 ~06:55 UTC: **T26 shipped.** `detectTapeSwings()` in `assets/live.js` raises an alert only when two
+  consecutive executed prints differ by ≥ $0.10, carrying both trade ids, both timestamps, the taker side and the
+  exact query. `pollTape()` runs a 25 s cycle over the watched markets with a persisted cursor so a reload does not
+  replay the chat. This closes the 20-minute gap that made a swing-and-reversal invisible, without any API key
+  (WS handshake still requires one: https://docs.kalshi.com/getting_started/quick_start_websockets).
+- 2026-11-21 ~07:05 UTC: **F-41 found while auditing the resolution tracker.** The keyword classifier read only
+  title/`yes_sub_title`, so the 2028 presidential field (titled "Who will win the next presidential election?" with
+  the candidate in `yes_sub_title`) was invisible: the snapshot had 37 elections rows, 36 of them empty
+  `KXVANHOLLENBACKERS` placeholders, while `KXPRESPERSON-28-RPAU` (790,337 contracts, 61,177 in 24 h) was trading.
+  Fixed by letting the heuristic read title/`yes_sub_title`/`no_sub_title`/`subtitle` only; seed confirmation is
+  untouched. `scripts/tests/test_classify.py` (7 tests) pins both directions, all 13 fee-schedule series and the
+  F-12 "vegas" word-boundary trap.
+- 2026-11-21 ~07:10 UTC: **Verification before opening the PR.** All 7 Python test files, all 4 validators, all 5
+  Node test files (including the new 11-check `test_tape_node.js`) and `check_site.py` (21 pages) pass. jsdom modes
+  A–E pass, including the new assertions that the dashboard shows exactly the tape-confirmed moves, discloses the
+  excluded restatements, and marks every restatement in the lead table. A negative control was run: an `--offline`
+  rebuild with no tape access leaves `all_events` empty of anything unconfirmed.
