@@ -314,14 +314,24 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- freshness / cron health (T32) -------------------- */
-  // The collector's cron is unreliable (measured 2026-11-21: the then-declared `*/20` cron fired once in
-  // 5.75 hours; F-40). collect.yml no longer declares `*/20`: it runs 7,27,47 + 13,43 and, on main, a
-  // bounded 15-minute relay (PR #62). So the label below names the measured scheduled gap rather than
-  // claiming a cadence — 20 here was stale, F-73.)
-  // Instead of hiding that, measure it: read the last N runs of collect.yml from
-  // the public GitHub REST API (CORS `*` verified on 2026-11-21) and say how
-  // often the schedule actually fired. No token, no secret, no writes.
+  /* -------------------- collector health (T32, corrected T59) -------------------- */
+  // What this line is allowed to say.
+  //
+  // The collector is no longer a cron. collect.yml has declared two off-peak crons
+  // (`7,27,47` and `13,43`) since PR #54, and on main a run is a bounded RELAY that
+  // collects on a 15-minute grid from inside one long run and queues a
+  // workflow_dispatch successor for itself (COORDINATION.md T55). Hard-coding
+  // `*/20 * * * *` therefore described a schedule that had not existed for hours:
+  // the panel showed a cadence nobody was running. It said `*/20` "fired once in
+  // 5.75 h", but the run list shows that string was never what main was on.
+  //
+  // So this panel names NO cron. It reports only what the public run list proves —
+  // how many of the last N runs were scheduled, how far apart the last two scheduled
+  // runs were if there are two, whether a run is in flight, and when the last one
+  // succeeded. Freshness itself is already stated by the snapshot-age line below,
+  // which measures data/live/markets.json, and by that file's own collected_at.
+  // Read-only: public REST API, no token, no secret, no writes.
+  // Source for the event names used below: https://docs.github.com/en/rest/actions/workflow-runs
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -340,9 +350,13 @@ const KDCHAT = (() => {
       }));
       const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
+      const inFlight = runs.find((x) => x.status === "in_progress" || x.status === "queued");
       const stamped = runs.filter((x) => !Number.isNaN(x.at)).sort((a, b) => b.at - a.at);
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      // F-40's signal, kept without a cron string: the median spacing of the most recent
+      // runs of ANY kind (a relay pass is workflow_dispatch, not schedule), so a throttled
+      // schedule is visible as a scheduled gap far wider than the observed spacing.
       let observedMinutes = null;
       if (stamped.length >= 2) {
         const intervals = [];
@@ -359,10 +373,13 @@ const KDCHAT = (() => {
         runs: runs.length,
         scheduled: sched.length,
         scheduleGapMinutes: gap,
-        observedMinutes,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
+        observedMinutes,
+        inFlightAt: inFlight && !Number.isNaN(inFlight.at) ? inFlight.at : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
+        // Disclosed, not asserted as a cadence: the workflow file is the authority.
+        workflowUrl: `https://github.com/${REPO}/blob/main/.github/workflows/collect.yml`,
       };
     } catch (e) {
       S.health = { error: String((e && e.message) || e) };
@@ -382,19 +399,22 @@ const KDCHAT = (() => {
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
       } else {
         const gap = h.scheduleGapMinutes;
-        // Late = the measured gap between the last two scheduled runs is more than double the
-        // interval between the most recent runs of any kind. Nothing is hard-coded: the schedule
-        // has changed twice (F-40, F-73), and a fixed number here went stale both times.
+        // No cron string and no "expected" interval: the workflow file is the only
+        // authority on cadence, and a run on main is a relay rather than a schedule.
+        // The one warning kept (F-40) is measured, not assumed: the scheduled gap is
+        // more than double the spacing of the recent runs of any kind.
         const observed = h.observedMinutes;
         const late = gap !== null && observed !== null && gap > observed * 2;
         host.innerHTML =
           `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector workflow: ${h.scheduled} of the last ${h.runs} runs were scheduled` +
-          (observed !== null ? `, recent runs about every ${observed}m apart` : "") +
-          (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
-          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
-          `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
+          `collector runs — ${h.scheduled} of the last ${h.runs} were scheduled` +
+          (observed !== null ? ` · recent runs about every ${observed}m apart` : "") +
+          (gap !== null ? ` · last two scheduled ${gap}m apart` : " · fewer than two scheduled runs in that window") +
+          (late ? ` · <b>the schedule is being throttled (F-40)</b>` : "") +
+          (h.inFlightAt !== null ? ` · <b>one running now</b> (started ${esc(ago(h.inFlightAt))})` : "") +
+          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"}` +
+          ` · <a href="${esc(h.workflowUrl)}" target="_blank" rel="noopener">declared triggers</a>` +
+          ` · <a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
     }
     const snapLine = document.getElementById("kdSnapLine");

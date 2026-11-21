@@ -1,9 +1,11 @@
 /* KalshiDash3 — browser-live layer (T13/T14/T15, session arena-d022c8de)
  *
  * Why this file exists: every other surface on this site renders a snapshot
- * committed by a scheduled collector (https://.../actions/workflows/collect.yml,
- * currently a 15-minute relay grid while a relay run is live — the page measures and prints the
- * cadence it actually observes; earlier text said 20 minutes, corrected under F-73). This layer talks to
+ * committed by the collector workflow (.github/workflows/collect.yml, which on main
+ * collects on a ~15-minute grid from inside one bounded run — see COORDINATION.md
+ * T55; the GITHUB_TOKEN docs say a token push does not trigger a Pages build, so
+ * each committed pass dispatches pages.yml instead). The snapshot banner measures the
+ * interval it actually observes rather than repeating it here (F-73). This layer talks to
  * the official public demo REST API directly from the page, so the alert chat and
  * the price chart move on a tick cadence, and it degrades to the committed
  * snapshot when the browser cannot reach the API.
@@ -635,7 +637,9 @@ const KDLIVE = (() => {
       let watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
       if (S.mode === "live-api") {
         // Discover on the first live pass even when a snapshot already seeded the list: the
-        // committed file can be a full collector interval old, and a market opened since then must be watched.
+        // Discover on the first live pass even when a snapshot already seeded the list: the
+        // committed file is only as fresh as the last collector pass, and a market opened since
+        // then must still be watched (the banner prints the measured interval).
         if (!S.discoveredAt || Date.now() - S.discoveredAt > (opts.discoverMs || 300000) || !watch.length) await discover(!watch.length);
         watch = (S.watch.length ? S.watch : Array.from(S.markets.keys())).slice(0, opts.watchMax || 60);
         if (watch.length) {

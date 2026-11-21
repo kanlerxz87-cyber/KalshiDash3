@@ -29,6 +29,19 @@
   </div>
   <div id="facts"></div>
 
+  <h2>Are the official source links themselves real? (T57)</h2>
+  <p class="small mut" style="max-width:70ch">
+    The table above checks what each claim <i>says</i>. It cannot catch a citation that has moved or was
+    mistyped — a dead source link silently removes the evidence for a row. So every distinct
+    <code>docs.kalshi.com</code> page cited anywhere on this site was opened on 2026-11-21 and matched
+    against Kalshi's own documentation index, <a href="https://docs.kalshi.com/llms.txt" target="_blank" rel="noopener">https://docs.kalshi.com/llms.txt</a>,
+    which is the authoritative list of pages the vendor publishes. “Cited” is how many times the URL
+    appears in the published pages and scripts, i.e. how much of the site would lose its evidence if the
+    page ever moved. A row here proves the <b>link resolves and is listed by Kalshi</b>; it does not
+    re-verify the endpoint's behaviour, and it says nothing about news or third-party links.
+  </p>
+  <div id="docLinks"></div>
+
   <h2>Data quality of the committed snapshot</h2>
   <div id="dataQuality"></div>
 
@@ -148,6 +161,32 @@ function render() {
         { k: "Markets found by the confirmed seed-series pass", v: KD.num(snap.counts.seed_markets_found) }
       ]);
   } catch (e) { KD.$("#dataQuality").innerHTML = KD.empty("No snapshot committed yet."); }
+  try {
+    const vf = await KD.json("data/verified_facts.json");
+    const links = vf.doc_links || [];
+    const indexed = links.filter(l => l.in_official_index).length;
+    const cites = links.reduce((n, l) => n + (l.cited_times || 0), 0);
+    KD.$("#docLinks").innerHTML =
+      `<div class="grid">` +
+      `<div class="card"><div class="kpi">${links.length}<small>distinct docs.kalshi.com pages cited</small></div></div>` +
+      `<div class="card"><div class="kpi">${indexed}<small>listed in Kalshi's own index</small></div></div>` +
+      `<div class="card"><div class="kpi">${cites}<small>citations covered by this check</small></div></div>` +
+      `</div>` +
+      KD.table([
+        { key: "id", label: "ID" }, { key: "page", label: "Official page" },
+        { key: "url", label: "URL" }, { key: "cited", label: "Cited", num: true },
+        { key: "st", label: "Status" }, { key: "how", label: "Confirmed via" },
+      ], links.map(l => ({
+        id: `<b>${KD.esc(l.id)}</b>`,
+        page: KD.esc(l.page_title),
+        url: `<a href="${KD.esc(l.url)}" target="_blank" rel="noopener">${KD.esc(l.url.replace("https://docs.kalshi.com", ""))}</a>`,
+        cited: l.cited_times,
+        st: l.verified ? '<span class="badge ok">resolves</span>' : '<span class="badge bad">unverified</span>',
+        how: KD.esc(l.in_official_index ? "listed in llms.txt" : (l.confirmed_via || "")),
+      })));
+  } catch (e) {
+    KD.$("#docLinks").innerHTML = KD.empty("data/verified_facts.json (doc_links) missing.");
+  }
   KD.$("#filt").addEventListener("change", render);
   render();
   try {

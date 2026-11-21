@@ -200,9 +200,20 @@ function counts(w) {
     "history rows are still rendered when the demo API refuses the browser");
 
   /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32 — cron health line");
+  console.log("\nT32/T59 — collector health line names no cron");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector workflow|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(/collector runs|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  // T59: the panel used to hard-code cronExpression "*/20 * * * *" and
+  // expectedMinutes 20 and compare the measured gap against that made-up interval,
+  // so it reported a schedule collect.yml had not declared since PR #54 (F-73,
+  // R-B1). It must now state only measured facts and point at the workflow file.
+  check(!/\*\/20|every 20m|cron /.test(health),
+        "health line no longer asserts a cron string or a 20-minute interval (F-73/R-B1)");
+  check(/declared triggers/.test(health),
+        "health line links the workflow file as the authority on cadence");
+  const healthSrc = SRC.slice(SRC.indexOf("collector health (T32"));
+  check(!/cronExpression|expectedMinutes/.test(healthSrc),
+        "checkHealth() carries no cronExpression / expectedMinutes field at all");
 
   console.log("");
   teardown();

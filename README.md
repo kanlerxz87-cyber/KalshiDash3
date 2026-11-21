@@ -78,7 +78,7 @@ certify profitability, or authenticate a demo account.
 
 Two site behaviours are derived rather than typed, because typed copies had already drifted: the
 collector **cadence** shown in the snapshot banner (F-73) and the **counts** in the executive summary
-(F-75) are computed from `data/live/price_history.json`, `data/findings.json` and
+(F-76) are computed from `data/live/price_history.json`, `data/findings.json` and
 `data/verified_facts.json` at render time. Official endpoint and authentication
 references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
 [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).

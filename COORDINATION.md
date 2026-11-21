@@ -1071,6 +1071,37 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
 
+---
+
+## Session `arena-220b524c` — verification pass (T57–T61)
+
+Branch `arena/220b524c-kalshidash3`, from `58a8801` (main). Audit of the shipped tree at 23:07Z: `scripts/verify_release.py`
+**PASS**, `scripts/check_site.py` **OK** (21 pages), `scripts/tests/test_scope.py` **OK**, live site serving the 23:01:10Z
+snapshot. This session therefore does not rebuild anything that already works. It closes the two defects earlier sessions
+carried over as "not fixed" (F-73, F-74) and closes the one verification gap nobody had covered: **no check has ever
+validated the 24 official `docs.kalshi.com` source links the site cites, or any other external URL** — `check_site.py`
+checks internal links only.
+
+### Claim (written before work, committed immediately)
+
+| ID | Task | Status | Owner | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-------|---------------------------|------------------------|----------------|
+| T57 | Verify every cited official Kalshi docs URL against Kalshi's own documentation index; publish the result | in progress | arena-220b524c | `data/verified_facts.json` (append `doc_links`), `verification.html` (one new table only) | [docs.kalshi.com/llms.txt](https://docs.kalshi.com/llms.txt) (official index) | — |
+| T58 | Fix F-74 / R-B7: `freshness-alarm.yml` dispatches `gh workflow run … --event workflow_dispatch`, a flag `gh` does not have | **superseded by `arena-9b8246da` (PR #76)** — this session's line fix was dropped in the merge and their version kept verbatim; this session's contribution is the release-gate guard only | arena-220b524c | `.github/workflows/freshness-alarm.yml` (**reverted to main's version**, not modified), `scripts/tests/test_workflow_cli.py` (new) | `gh workflow run --help` (local 2.23.0) + [cli/cli run.go](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go) | F-74 — **duplicate work, see the overlap note in the log** |
+| T59 | Fix F-73 / R-B1 / R-B8: user-facing copy claims a "20-minute" collector cron that `collect.yml` has not declared since PR #54 | in progress | arena-220b524c | `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `data/findings.json` (F-73/F-74/F-40 status only) | `.github/workflows/collect.yml` (declared cadence); measured run list | F-73, R-B1, R-B8 |
+| T60 | Requirement-coverage audit of the brief against the shipped site, each row pointing at the page and the live evidence | in progress | arena-220b524c | `executive-summary.html` (§1 status column only — evidence column), `COORDINATION.md` | live site fetch at 23:0xZ | — |
+| T61 | Release gate, PR to main, merge, Pages deploy confirm, board close-out | not started | arena-220b524c | `COORDINATION.md` | `verify_release.py`, Actions API | — |
+
+No file outside the cells above is edited by this session. In particular `data/live/*` (owned by the running relay),
+`scripts/collect*.py`, `scripts/roi_scan.py`, `scripts/catalysts.py`, `dashboard.html`, `alerts.html`, `roi.html` and
+`.github/workflows/collect.yml` / `desk.yml` / `pages.yml` are **not** touched.
+
+### Log (this session)
+- 2026-11-21 23:1xZ: audit + claim. Findings that set the scope are in the table above; each was re-checked in this
+  session rather than copied from the board.
+
+---
+
 ## Session `arena-9b8246da` — freshness alarm repair and release check
 
 | Task | Status | Owner | Scope | Notes |
@@ -1101,3 +1132,34 @@ Scope claimed **before any file edit**, per the board rule; `git pull --rebase` 
 No other session has a branch newer than `main`'s tip and none has an open PR, so these scopes are free.
 `data/findings.json` is edited by nobody else while this branch is open; if that changes, this session takes the
 merge, keeps the other side verbatim and appends.
+- 2026-11-21 23:2xZ: **overlap found and logged (T58).** While this session was building the F-74 fix, `arena-9b8246da`
+  opened and merged [PR #76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76) for the same defect (its claim
+  commit `2840e6c`, fix `54788c4`, at 23:09Z). This session's claim `b1fb00a` was pushed at ~23:11Z, after theirs, and
+  neither of us saw the other's row. `git pull --rebase` then failed on `COORDINATION.md`: stopped, aborted the rebase,
+  merged `origin/main` instead, and **kept their `.github/workflows/freshness-alarm.yml` verbatim** (it is stronger: a
+  failed dispatch now exits 1 as an `::error::` instead of warning, and their guard test executes the workflow shell
+  with a fake `gh`). This session's line fix and its explanatory comment were discarded; only the release-gate guard
+  `scripts/tests/test_workflow_cli.py` was kept, because it covers **every** workflow file rather than this one, and it
+  is additive. Their `COORDINATION.md` section was re-appended verbatim after this one; no line of theirs was changed or
+  dropped. Recorded here rather than hidden because the brief asks for duplicate-work avoidance, and the coordination
+  rule only works if a miss is written down.
+- Root cause, for the next session: F-74 and R-B7 were written in `COORDINATION.md` § "Requests to other sessions" as
+  requests **to a named owner**, not as claimable board rows. Two sessions therefore both treated them as unclaimed.
+  Section 964's request table has no status column. Any request row that is expected to be picked up should be promoted
+  into the task board proper.
+
+### Three-way overlap on F-73 / F-74 (reconciled, nothing discarded)
+
+While this branch was open, `arena-9b8246da` merged F-74 as PR #76 and `arena-220b524c` opened F-73/F-74 as
+PR #78. All three sessions found the same two defects, which is the expected outcome of a board whose "requests to
+another session" table had no status column. Resolution, performed on this branch:
+
+| Item | Kept | Discarded | Why nothing is lost |
+|---|---|---|---|
+| F-74 `--event` | PR #76's workflow file verbatim (fails the step on a failed dispatch) + `scripts/tests/test_freshness_alarm.py`; PR #78's `scripts/tests/test_workflow_cli.py` repo-wide guard | this session's one-line edit of the same command | Identical fix; #76's is stricter and #78's guard prevents the whole class. This session re-verified the defect independently (cli/cli source via the GitHub API, gh 2.23.0, stub `gh` on PATH) and recorded that in F-74 |
+| F-73 cadence copy | PR #78's chatdock rewrite (no cron string at all) + this session's *data-derived* cadence in `assets/site.js` (`cadence()`, rendered by `snapshotBanner()`), plus this session's removal of the literal "20 minutes" from `executive-summary.html`, `portfolio.html`, `assets/live.js` | the other branch's per-sentence wording where this branch's already removed the number | Both fixes are kept; the health panel additionally keeps this session's measured-spacing F-40 throttling warning, which PR #78 had dropped |
+| ID `F-75` | Both entries: PR #78's dead-scorer finding stays **F-75**; this session's count-drift finding is **F-76** | — | The two ledgers minted the same id for different defects. Renumbering the later arrival is the project's existing convention (F-37..F-64 did the same) |
+| PR | This branch merges PR #78's branch (`arena/220b524c-kalshidash3`) and is opened as one PR carrying both, instead of merging #78 separately and then re-applying this session's half | — | #78's branch is a contributor to this one; the PR body cites it, and #78 is closed with a pointer rather than left conflicting |
+
+`git show origin/main:COORDINATION.md` was diffed line-by-line against the resolved file: every line of main's board
+is present, in order, before this block was appended.
