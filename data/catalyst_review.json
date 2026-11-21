@@ -423,6 +423,125 @@
         "open_interest_fp": "100.00",
         "updated_time": "2026-11-21T06:00:03.847602Z"
       }
+    },
+    {
+      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+      "fetched_at": "2026-11-21T20:22Z",
+      "observed": {
+        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-21T16:00:00+00:00 closes at or above 60237.37 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-21T15:00:00+00:00. Missing data delays determination.",
+        "title": "Demo BTC at or above 60237.37 USD",
+        "status": "finalized",
+        "result": "no",
+        "settlement_value_dollars": "0.0000",
+        "settlement_ts": "2026-11-21T16:01:32.910945Z",
+        "last_price_dollars": "0.6500",
+        "yes_bid_dollars": "0.0000",
+        "yes_ask_dollars": "1.0000",
+        "volume_24h_fp": "8206.00",
+        "volume_fp": "8206.00",
+        "open_interest_fp": "26.00",
+        "updated_time": "2026-11-21T16:01:33.278542Z"
+      }
+    },
+    {
+      "id": "COINBASE_BTCUSD_1MIN_21_1514_1524",
+      "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
+      "fetched_at": "2026-11-21T20:23Z",
+      "observed": {
+        "schema": "[timestamp_unix, low, high, open, close, volume]",
+        "close_by_minute_utc": {
+          "2026-11-21T15:14:00Z": 60215.51,
+          "2026-11-21T15:15:00Z": 60022.29,
+          "2026-11-21T15:16:00Z": 59901.74,
+          "2026-11-21T15:17:00Z": 59752.35,
+          "2026-11-21T15:18:00Z": 59727.25,
+          "2026-11-21T15:19:00Z": 59951.84,
+          "2026-11-21T15:20:00Z": 60176.12,
+          "2026-11-21T15:21:00Z": 60144.14,
+          "2026-11-21T15:22:00Z": 60063.36,
+          "2026-11-21T15:23:00Z": 60080.64,
+          "2026-11-21T15:24:00Z": 60098.96
+        },
+        "window_low_utc_1518": 59581.53
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+      "fetched_at": "2026-11-21T20:22Z",
+      "observed": {
+        "rules_primary": "If Brian Harman wins the The RSM Classic, then the market resolves to Yes.",
+        "title": "The RSM Classic: Brian Harman wins",
+        "status": "active",
+        "result": "",
+        "last_price_dollars": "0.7500",
+        "previous_price_dollars": "0.0050",
+        "yes_bid_dollars": "0.0000",
+        "yes_ask_dollars": "1.0000",
+        "volume_24h_fp": "7276.38",
+        "volume_fp": "153195.26",
+        "open_interest_fp": "119274.49",
+        "updated_time": "2026-11-16T01:34:34.569351Z"
+      }
+    },
+    {
+      "id": "KALSHI_SERIES_KXPGATOUR",
+      "publisher": "Kalshi demo Trade API (series record listing official settlement sources)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
+      "fetched_at": "2026-11-21T20:23Z",
+      "observed": {
+        "ticker": "KXPGATOUR",
+        "title": "PGA Tour",
+        "category": "Sports",
+        "settlement_sources": [
+          { "name": "Fox Sports", "url": "https://www.foxsports.com" },
+          { "name": "ESPN", "url": "https://www.espn.com/" },
+          { "name": "the Governing League", "url": "https://www.pgatour.com/" }
+        ]
+      }
+    },
+    {
+      "id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+      "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
+      "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+      "fetched_at": "2026-11-21T20:23Z",
+      "observed": {
+        "tournament": "The RSM Classic (Nov 19 - 22, 2026, Sea Island Golf Club, St. Simons Island, Georgia)",
+        "round_status": "R3 Suspended — no Saturday play after rain and saturated course conditions; Round 3 rescheduled Sunday 9:10 - 11:00 a.m. ET",
+        "brian_harman": {
+          "pos": "CUT",
+          "to_par": "+1",
+          "r1": 71,
+          "r2": 72,
+          "strokes": 143
+        }
+      }
+    },
+    {
+      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
+      "publisher": "Kalshi demo Trade API (the market's own official record)",
+      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+      "fetched_at": "2026-11-21T20:28Z",
+      "observed": {
+        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+        "title": "BTC price  on Jan 1, 2027?",
+        "status": "active",
+        "result": "",
+        "floor_strike": 75000,
+        "cap_strike": 79999.99,
+        "last_price_dollars": "0.9800",
+        "previous_price_dollars": "0.0400",
+        "yes_bid_dollars": "0.0200",
+        "yes_ask_dollars": "0.9800",
+        "volume_24h_fp": "9508.62",
+        "volume_fp": "39586020.10",
+        "open_interest_fp": "5968212.66",
+        "updated_time": "2026-04-28T02:27:21.580016Z"
+      }
     }
   ],
   "reviews": [
@@ -770,6 +889,57 @@
         "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP"
       ],
       "note": "The market printed up 30c (0.35 to 0.65) between 06:39:48Z and 06:42:56Z while the Coinbase BTC-USD one-minute candle close rose from 56578.4 at 06:39Z to 56826.05 at 06:42Z, already above the 55704.83 strike."
+    },
+    {
+      "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+      "alert_to_time": "2026-11-21T15:21:23Z",
+      "source_ids": [
+        "COINBASE_BTCUSD_1MIN_21_1514_1524",
+        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP"
+      ],
+      "window_from": "2026-11-21T15:16:00Z",
+      "window_to": "2026-11-21T15:21:00Z",
+      "comparison": {
+        "kind": "published_value_below_strike",
+        "strike": 60237.37,
+        "reference_side": "yes",
+        "value_before": 59901.74,
+        "value_before_at": "2026-11-21T15:16:00Z",
+        "value_after": 60144.14,
+        "value_after_at": "2026-11-21T15:21:00Z"
+      },
+      "links": [
+        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP"
+      ],
+      "note": "The market printed down 20c (0.65 to 0.45) between 15:16:38Z and 15:21:23Z on a wide demo book (to_yes_bid 0.01, to_yes_ask 1.00). Over those minutes the Coinbase BTC-USD one-minute candle close stayed below the 60237.37 strike throughout (59901.74 at 15:16Z, dipping to a 59727.25 close / 59581.53 low at 15:18Z, and 60144.14 at 15:21Z). The market later finalized NO at 16:01:32Z."
+    },
+    {
+      "ticker": "KXPGATOUR-THRC26-BHAR",
+      "alert_to_time": "2026-11-21T15:16:38Z",
+      "source_ids": [
+        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+        "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
+        "KALSHI_SERIES_KXPGATOUR"
+      ],
+      "window_from": "2026-11-21T06:42:56Z",
+      "window_to": "2026-11-21T15:16:38Z",
+      "comparison": {
+        "kind": "player_missed_cut_and_play_suspended",
+        "strike": null,
+        "reference_side": "yes",
+        "value_before": null,
+        "value_before_at": "2026-11-20",
+        "value_after": null,
+        "value_after_at": "2026-11-21"
+      },
+      "verdict_override": "no_external_move_supporting_this_swing",
+      "links": [
+        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+      ],
+      "note": "The market printed up 74.5c (0.005 to 0.75) between 06:42:56Z and 15:16:38Z on a wide empty demo book (to_yes_bid 0.001, to_yes_ask 1.00; re-read at 20:22Z with yes_bid_dollars 0.0000, yes_ask_dollars 1.0000). The official PGA Tour leaderboard for The RSM Classic (a named settlement source in GET /series/KXPGATOUR) lists Brian Harman as CUT (+1; R1 71, R2 72, total 143) and states Round 3 play was suspended Saturday after rain and saturated course conditions with no Saturday play. Recorded as no external move supporting this swing."
     }
   ],
   "sources_of_method": {
@@ -777,15 +947,17 @@
     "demo_environment": "https://docs.kalshi.com/getting_started/demo_env",
     "candlesticks_documented_limit": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
     "aaa_publisher": "https://gasprices.aaa.com/",
-    "coinbase_market_data": "https://docs.cdp.coinbase.com/exchange/reference/apireference"
+    "coinbase_market_data": "https://docs.cdp.coinbase.com/exchange/reference/apireference",
+    "pgatour_leaderboard": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard"
   },
-  "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary.",
+  "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary; golf tournament status and Brian Harman's CUT score are copied from the official PGA Tour leaderboard.",
   "swings_in_archive_not_reviewed": {
-    "count_expected": 7,
-    "note": "Every alert in data/live/alerts_archive.json whose settlement reference has a public series (Coinbase BTC-USD or AAA National Average) has a review entry. The 7 BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
+    "count_expected": 9,
+    "note": "Every alert in data/live/alerts_archive.json whose settlement reference has a public source (Coinbase BTC-USD, AAA National Average, or PGA Tour official leaderboard) has a review entry (16/25). The remaining 9 BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
   },
   "not_reviewed_reasons": {
     "KXBTCY-27JAN0100-B47500": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
+    "KXBTCY-27JAN0100-B77500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
     "KXBTCY-27JAN0100-B87500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
     "KXBTCY-27JAN0100-B97500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
     "KXBTC15M-26NOV210145-45": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external BRTI reading is asserted."
