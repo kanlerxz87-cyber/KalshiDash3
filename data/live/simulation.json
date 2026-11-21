@@ -2,17 +2,19 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-21T20:36:05Z",
- "snapshot_collected_at": "2026-11-21T20:36:04Z",
+ "generated_at": "2026-11-21T20:58:44Z",
+ "snapshot_collected_at": "2026-11-21T20:58:43Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
  "endpoint": "https://external-api.demo.kalshi.co/trade-api/v2",
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
-  "signals_processed_total": 25,
-  "new_signals_this_run": 0,
-  "open_positions": 12,
-  "settled_positions_kept": 0
+  "signals_processed_total": 29,
+  "new_signals_this_run": 1,
+  "open_positions": 16,
+  "settled_positions_kept": 0,
+  "excluded_category_conflict": 12,
+  "signals_considered_total": 41
  },
  "strategies": [
   {
@@ -21,26 +23,33 @@
    "side_rule": "follow",
    "signal_filter": "all",
    "description": "After an up-swing buy YES; after a down-swing buy NO. Tests whether a move that has just happened keeps going.",
-   "signals": 25,
-   "not_filled": 20,
+   "signals": 31,
+   "not_filled": 22,
    "not_filled_no_quote": 8,
    "not_filled_bad_price": 3,
-   "not_filled_wide_spread": 9,
+   "not_filled_wide_spread": 11,
    "voided": 0,
-   "skipped_duplicate": 1,
-   "filled": 4,
-   "open": 4,
+   "skipped_duplicate": 4,
+   "filled": 5,
+   "open": 5,
    "settled": 0,
    "wins": 0,
    "losses": 0,
    "hit_rate": null,
    "realized_net": 0.0,
-   "unrealized_net_open": -0.09,
+   "unrealized_net_open": -0.12,
    "avg_realized_per_settled": null,
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 4,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
+    "golf": {
+     "filled": 1,
      "settled": 0,
      "wins": 0,
      "losses": 0,
@@ -54,26 +63,33 @@
    "side_rule": "fade",
    "signal_filter": "all",
    "description": "After an up-swing buy NO; after a down-swing buy YES. Tests whether a move that has just happened reverses.",
-   "signals": 25,
-   "not_filled": 19,
+   "signals": 31,
+   "not_filled": 23,
    "not_filled_no_quote": 8,
-   "not_filled_bad_price": 4,
-   "not_filled_wide_spread": 7,
+   "not_filled_bad_price": 6,
+   "not_filled_wide_spread": 9,
    "voided": 0,
-   "skipped_duplicate": 2,
-   "filled": 4,
-   "open": 4,
+   "skipped_duplicate": 3,
+   "filled": 5,
+   "open": 5,
    "settled": 0,
    "wins": 0,
    "losses": 0,
    "hit_rate": null,
    "realized_net": 0.0,
-   "unrealized_net_open": 0.01,
+   "unrealized_net_open": -0.02,
    "avg_realized_per_settled": null,
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 4,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
+    "golf": {
+     "filled": 1,
      "settled": 0,
      "wins": 0,
      "losses": 0,
@@ -87,26 +103,33 @@
    "side_rule": "follow",
    "signal_filter": "high_roi",
    "description": "S1 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
-   "signals": 9,
-   "not_filled": 6,
+   "signals": 15,
+   "not_filled": 8,
    "not_filled_no_quote": 0,
    "not_filled_bad_price": 2,
-   "not_filled_wide_spread": 4,
+   "not_filled_wide_spread": 6,
    "voided": 0,
-   "skipped_duplicate": 1,
-   "filled": 2,
-   "open": 2,
+   "skipped_duplicate": 4,
+   "filled": 3,
+   "open": 3,
    "settled": 0,
    "wins": 0,
    "losses": 0,
    "hit_rate": null,
    "realized_net": 0.0,
-   "unrealized_net_open": -0.02,
+   "unrealized_net_open": -0.05,
    "avg_realized_per_settled": null,
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 2,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
+    "golf": {
+     "filled": 1,
      "settled": 0,
      "wins": 0,
      "losses": 0,
@@ -120,26 +143,33 @@
    "side_rule": "fade",
    "signal_filter": "high_roi",
    "description": "S2 restricted to swings that pass the experimental high_roi screen (not an owner-approved ROI model).",
-   "signals": 9,
-   "not_filled": 6,
+   "signals": 15,
+   "not_filled": 10,
    "not_filled_no_quote": 0,
-   "not_filled_bad_price": 3,
-   "not_filled_wide_spread": 3,
+   "not_filled_bad_price": 5,
+   "not_filled_wide_spread": 5,
    "voided": 0,
-   "skipped_duplicate": 1,
-   "filled": 2,
-   "open": 2,
+   "skipped_duplicate": 2,
+   "filled": 3,
+   "open": 3,
    "settled": 0,
    "wins": 0,
    "losses": 0,
    "hit_rate": null,
    "realized_net": 0.0,
-   "unrealized_net_open": -0.02,
+   "unrealized_net_open": -0.05,
    "avg_realized_per_settled": null,
    "conclusion": "Insufficient sample: 0 settled of 30 needed.",
    "by_category": {
     "crypto": {
      "filled": 2,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
+    "golf": {
+     "filled": 1,
      "settled": 0,
      "wins": 0,
      "losses": 0,
@@ -193,9 +223,155 @@
    "losses": 0,
    "realized_net": 0.0,
    "hit_rate": null
+  },
+  {
+   "trade_type": "golf | move up | entry high",
+   "filled": 2,
+   "settled": 0,
+   "wins": 0,
+   "losses": 0,
+   "realized_net": 0.0,
+   "hit_rate": null
+  },
+  {
+   "trade_type": "golf | move up | entry low",
+   "filled": 2,
+   "settled": 0,
+   "wins": 0,
+   "losses": 0,
+   "realized_net": 0.0,
+   "hit_rate": null
   }
  ],
  "open_positions": [
+  {
+   "id": "S1|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|yes",
+   "strategy": "S1",
+   "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_ticker": "KXPGATOUR",
+   "direction": "up",
+   "side": "yes",
+   "trade_type": "golf | move up | entry low",
+   "band": "low",
+   "entry_price": 0.17,
+   "entry_fee": 0.01,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T20:34:40Z",
+   "quote_bid": 0.16,
+   "quote_ask": 0.17,
+   "quote_source": "archive",
+   "status": "open",
+   "outcome": null,
+   "settled_at": null,
+   "settled_result": null,
+   "realized_net": null,
+   "bid_now": 0.16,
+   "unrealized_net": -0.03,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "mark_at": "2026-11-21T20:58:43Z"
+  },
+  {
+   "id": "S2|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|no",
+   "strategy": "S2",
+   "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_ticker": "KXPGATOUR",
+   "direction": "up",
+   "side": "no",
+   "trade_type": "golf | move up | entry high",
+   "band": "high",
+   "entry_price": 0.84,
+   "entry_fee": 0.01,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T20:34:40Z",
+   "quote_bid": 0.16,
+   "quote_ask": 0.17,
+   "quote_source": "archive",
+   "status": "open",
+   "outcome": null,
+   "settled_at": null,
+   "settled_result": null,
+   "realized_net": null,
+   "bid_now": 0.83,
+   "unrealized_net": -0.03,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "mark_at": "2026-11-21T20:58:43Z"
+  },
+  {
+   "id": "S3|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|yes",
+   "strategy": "S3",
+   "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_ticker": "KXPGATOUR",
+   "direction": "up",
+   "side": "yes",
+   "trade_type": "golf | move up | entry low",
+   "band": "low",
+   "entry_price": 0.17,
+   "entry_fee": 0.01,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T20:34:40Z",
+   "quote_bid": 0.16,
+   "quote_ask": 0.17,
+   "quote_source": "archive",
+   "status": "open",
+   "outcome": null,
+   "settled_at": null,
+   "settled_result": null,
+   "realized_net": null,
+   "bid_now": 0.16,
+   "unrealized_net": -0.03,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "mark_at": "2026-11-21T20:58:43Z"
+  },
+  {
+   "id": "S4|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|no",
+   "strategy": "S4",
+   "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_ticker": "KXPGATOUR",
+   "direction": "up",
+   "side": "no",
+   "trade_type": "golf | move up | entry high",
+   "band": "high",
+   "entry_price": 0.84,
+   "entry_fee": 0.01,
+   "taker_multiplier": 1,
+   "contracts": 1,
+   "entered_at": "2026-11-21T20:34:40Z",
+   "quote_bid": 0.16,
+   "quote_ask": 0.17,
+   "quote_source": "archive",
+   "status": "open",
+   "outcome": null,
+   "settled_at": null,
+   "settled_result": null,
+   "realized_net": null,
+   "bid_now": 0.83,
+   "unrealized_net": -0.03,
+   "mark_note": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "mark_at": "2026-11-21T20:58:43Z"
+  },
   {
    "id": "S1|KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z|yes",
    "strategy": "S1",
@@ -226,7 +402,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S3|KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z|yes",
@@ -258,7 +434,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -290,7 +466,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S4|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -322,7 +498,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
@@ -418,7 +594,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -450,7 +626,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -482,7 +658,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -514,7 +690,7 @@
    "unrealized_net": -0.01,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -546,7 +722,7 @@
    "unrealized_net": -0.07,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   },
   {
    "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -578,7 +754,7 @@
    "unrealized_net": 0.03,
    "mark_note": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "mark_at": "2026-11-21T20:36:04Z"
+   "mark_at": "2026-11-21T20:58:43Z"
   }
  ],
  "settled_positions": [],
@@ -599,11 +775,13 @@
    "KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
    "KXBTC15M-26NOV210145-45@2026-11-21T06:34:10Z>2026-11-21T06:39:48Z",
    "KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z",
+   "KXBTCY-27JAN0100-B77500@2026-11-21T15:21:23Z>2026-11-21T20:30:54Z",
    "KXBTCY-27JAN0100-B77500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z",
    "KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z",
    "KXBTCY-27JAN0100-B87500@2026-11-20T19:48:19Z>2026-11-20T20:01:29Z",
    "KXBTCY-27JAN0100-B97500@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z",
    "KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z",
+   "KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:30:54Z",
    "KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z",
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:24:20Z>2026-11-20T11:26:21Z",
    "KXDEMOFUTHOURLY-26NOV20H12-UP@2026-11-20T11:26:21Z>2026-11-20T11:28:31Z",
@@ -617,9 +795,139 @@
    "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:34:10Z>2026-11-21T06:39:48Z",
    "KXDEMOFUTHOURLY-26NOV21H07-UP@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z",
    "KXDEMOFUTHOURLY-26NOV21H16-UP@2026-11-21T15:16:38Z>2026-11-21T15:21:23Z",
-   "KXPGATOUR-THRC26-BHAR@2026-11-21T06:42:56Z>2026-11-21T15:16:38Z"
+   "KXPGATOUR-THRC26-BHAR@2026-11-21T06:42:56Z>2026-11-21T15:16:38Z",
+   "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+   "KXPGATOUR-THRC26-MTHO@2026-11-21T20:34:40Z>2026-11-21T20:58:43Z"
   ],
   "open": [
+   {
+    "id": "S1|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|yes",
+    "strategy": "S1",
+    "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+    "ticker": "KXPGATOUR-THRC26-MTHO",
+    "title": "The RSM Classic: Michael Thorbjornsen wins",
+    "category_id": "golf",
+    "category_basis": "seed",
+    "series_ticker": "KXPGATOUR",
+    "direction": "up",
+    "side": "yes",
+    "trade_type": "golf | move up | entry low",
+    "band": "low",
+    "entry_price": 0.17,
+    "entry_fee": 0.01,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T20:34:40Z",
+    "quote_bid": 0.16,
+    "quote_ask": 0.17,
+    "quote_source": "archive",
+    "status": "open",
+    "outcome": null,
+    "settled_at": null,
+    "settled_result": null,
+    "realized_net": null,
+    "bid_now": 0.16,
+    "unrealized_net": -0.03,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "mark_at": "2026-11-21T20:58:43Z"
+   },
+   {
+    "id": "S2|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|no",
+    "strategy": "S2",
+    "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+    "ticker": "KXPGATOUR-THRC26-MTHO",
+    "title": "The RSM Classic: Michael Thorbjornsen wins",
+    "category_id": "golf",
+    "category_basis": "seed",
+    "series_ticker": "KXPGATOUR",
+    "direction": "up",
+    "side": "no",
+    "trade_type": "golf | move up | entry high",
+    "band": "high",
+    "entry_price": 0.84,
+    "entry_fee": 0.01,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T20:34:40Z",
+    "quote_bid": 0.16,
+    "quote_ask": 0.17,
+    "quote_source": "archive",
+    "status": "open",
+    "outcome": null,
+    "settled_at": null,
+    "settled_result": null,
+    "realized_net": null,
+    "bid_now": 0.83,
+    "unrealized_net": -0.03,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "mark_at": "2026-11-21T20:58:43Z"
+   },
+   {
+    "id": "S3|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|yes",
+    "strategy": "S3",
+    "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+    "ticker": "KXPGATOUR-THRC26-MTHO",
+    "title": "The RSM Classic: Michael Thorbjornsen wins",
+    "category_id": "golf",
+    "category_basis": "seed",
+    "series_ticker": "KXPGATOUR",
+    "direction": "up",
+    "side": "yes",
+    "trade_type": "golf | move up | entry low",
+    "band": "low",
+    "entry_price": 0.17,
+    "entry_fee": 0.01,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T20:34:40Z",
+    "quote_bid": 0.16,
+    "quote_ask": 0.17,
+    "quote_source": "archive",
+    "status": "open",
+    "outcome": null,
+    "settled_at": null,
+    "settled_result": null,
+    "realized_net": null,
+    "bid_now": 0.16,
+    "unrealized_net": -0.03,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "mark_at": "2026-11-21T20:58:43Z"
+   },
+   {
+    "id": "S4|KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z|no",
+    "strategy": "S4",
+    "alert_key": "KXPGATOUR-THRC26-MTHO@2026-11-21T20:30:54Z>2026-11-21T20:34:40Z",
+    "ticker": "KXPGATOUR-THRC26-MTHO",
+    "title": "The RSM Classic: Michael Thorbjornsen wins",
+    "category_id": "golf",
+    "category_basis": "seed",
+    "series_ticker": "KXPGATOUR",
+    "direction": "up",
+    "side": "no",
+    "trade_type": "golf | move up | entry high",
+    "band": "high",
+    "entry_price": 0.84,
+    "entry_fee": 0.01,
+    "taker_multiplier": 1,
+    "contracts": 1,
+    "entered_at": "2026-11-21T20:34:40Z",
+    "quote_bid": 0.16,
+    "quote_ask": 0.17,
+    "quote_source": "archive",
+    "status": "open",
+    "outcome": null,
+    "settled_at": null,
+    "settled_result": null,
+    "realized_net": null,
+    "bid_now": 0.83,
+    "unrealized_net": -0.03,
+    "mark_note": null,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "mark_at": "2026-11-21T20:58:43Z"
+   },
    {
     "id": "S1|KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z|yes",
     "strategy": "S1",
@@ -650,7 +958,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S3|KXBTCY-27JAN0100-B97500@2026-11-21T15:21:23Z>2026-11-21T20:32:15Z|yes",
@@ -682,7 +990,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -714,7 +1022,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S4|KXBTCY-27JAN0100-B97500@2026-11-21T06:39:48Z>2026-11-21T06:42:56Z|yes",
@@ -746,7 +1054,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S1|KXBTC15M-26NOV210145-45@2026-11-21T06:32:46Z>2026-11-21T06:34:10Z|yes",
@@ -842,7 +1150,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -874,7 +1182,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S3|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|yes",
@@ -906,7 +1214,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S4|KXBTCY-27JAN0100-B87500@2026-11-20T19:30:14Z>2026-11-20T19:48:19Z|no",
@@ -938,7 +1246,7 @@
     "unrealized_net": -0.01,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S1|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|no",
@@ -970,7 +1278,7 @@
     "unrealized_net": -0.07,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    },
    {
     "id": "S2|KXBTCY-27JAN0100-B47500@2026-11-20T19:22:42Z>2026-11-20T19:30:14Z|yes",
@@ -1002,44 +1310,44 @@
     "unrealized_net": 0.03,
     "mark_note": null,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-    "mark_at": "2026-11-21T20:36:04Z"
+    "mark_at": "2026-11-21T20:58:43Z"
    }
   ],
   "closed": [],
   "counters": {
    "S1": {
-    "signals": 25,
-    "not_filled": 20,
+    "signals": 31,
+    "not_filled": 22,
     "not_filled_no_quote": 8,
-    "not_filled_wide_spread": 9,
-    "filled": 4,
-    "skipped_duplicate": 1,
+    "not_filled_wide_spread": 11,
+    "filled": 5,
+    "skipped_duplicate": 4,
     "not_filled_bad_price": 3
    },
    "S2": {
-    "signals": 25,
-    "not_filled": 19,
+    "signals": 31,
+    "not_filled": 23,
     "not_filled_no_quote": 8,
-    "not_filled_wide_spread": 7,
-    "filled": 4,
-    "skipped_duplicate": 2,
-    "not_filled_bad_price": 4
+    "not_filled_wide_spread": 9,
+    "filled": 5,
+    "skipped_duplicate": 3,
+    "not_filled_bad_price": 6
    },
    "S3": {
-    "signals": 9,
-    "not_filled": 6,
-    "not_filled_wide_spread": 4,
-    "filled": 2,
-    "skipped_duplicate": 1,
+    "signals": 15,
+    "not_filled": 8,
+    "not_filled_wide_spread": 6,
+    "filled": 3,
+    "skipped_duplicate": 4,
     "not_filled_bad_price": 2
    },
    "S4": {
-    "signals": 9,
-    "not_filled": 6,
-    "not_filled_wide_spread": 3,
-    "filled": 2,
-    "skipped_duplicate": 1,
-    "not_filled_bad_price": 3
+    "signals": 15,
+    "not_filled": 10,
+    "not_filled_wide_spread": 5,
+    "filled": 3,
+    "skipped_duplicate": 2,
+    "not_filled_bad_price": 5
    },
    "_cat|S1|crypto": {
     "filled": 4
@@ -1079,6 +1387,20 @@
      "wins": 0,
      "losses": 0,
      "realized_net": 0.0
+    },
+    "golf | move up | entry low": {
+     "filled": 2,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
+    },
+    "golf | move up | entry high": {
+     "filled": 2,
+     "settled": 0,
+     "wins": 0,
+     "losses": 0,
+     "realized_net": 0.0
     }
    },
    "_cat|S2|crypto": {
@@ -1089,6 +1411,18 @@
    },
    "_cat|S4|crypto": {
     "filled": 2
+   },
+   "_cat|S1|golf": {
+    "filled": 1
+   },
+   "_cat|S2|golf": {
+    "filled": 1
+   },
+   "_cat|S3|golf": {
+    "filled": 1
+   },
+   "_cat|S4|golf": {
+    "filled": 1
    }
   }
  }

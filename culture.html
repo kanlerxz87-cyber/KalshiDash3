@@ -13,13 +13,20 @@
   <h1>Culture — live demo markets</h1>
   <p class="lede">
     Every open and settled Kalshi <b>demo</b> market assigned to Culture in the current snapshot, ranked by the labelled
-    dollars-traded estimate. Category membership starts from the Emmy awards, Ballon d'Or and Super Bowl headline series listed in the official fee schedule. A row marked
-    <span class="badge ok">confirmed</span> comes from that list; a row marked
+    dollars-traded estimate. Category membership starts from the Emmys, SAG Awards, CMA Awards, BET Awards and Billboard/Rotten Tomatoes series that Kalshi itself files under the official <b>Entertainment</b> category, plus the Emmy series named in the fee schedule,
+    the path that decided each row is recorded. A row marked
     <span class="badge warn">keyword</span> is a heuristic title match and is <a href="flagged.html">flagged</a>.
   </p>
 
   <div class="notice warn">
-    <b>Culture ranking note (F-38).</b> In the committed snapshot every confirmed Culture seed market (KXBALLONDOR, KXEMMY*) shows $0 traded, so the largest Culture row is a keyword-matched QA test market (<code>KXGRAMMYNOMROTY-QA7CECC5-QA</code>, rules: “Demo portfolio test only.”) under the Grammy-nominees series. It is labelled <span class="badge warn">keyword</span>, not confirmed — do not treat it as a real culture event. See <a href="flagged.html">Flagged for Review</a>.
+    <b>Culture ranking note (F-38, updated by F-65/F-66).</b> Culture is now filled from the exchange's own
+    <b>Entertainment</b> classification, not from a title keyword, and rows whose official series categories
+    contradict the topic are refused and counted. In the committed snapshot the largest Culture market by the
+    labelled dollars estimate is <b>not</b> a market with traded volume: every Culture row currently shows
+    $0 traded, so the dollar ranking of this topic is meaningless right now and is shown as $0 rather than
+    dressed up. The demo QA fixture that used to headline this page (<code>KXGRAMMYNOMROTY-QA7CECC5-QA</code>,
+    rules “Demo portfolio test only.”) is excluded, and the Ballon d'Or moved out because Kalshi files it
+    under Sports. See <a href="flagged.html">Flagged for Review</a> (F-38, F-65, F-66).
   </div>
 
   <div id="snapshotBanner"></div>
@@ -46,7 +53,7 @@
       <tr><td>Seed series used</td><td><code>KXEMMY*</code></td>
           <td><a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule (PDF)</a></td></tr>
       <tr><td>How a market joins this category</td>
-          <td>The market's <code>series_ticker</code> is checked against the seed list first; only if that fails is a keyword match attempted, and the basis is recorded on every row.</td>
+          <td>Category membership comes first from the exchange's own classification — series returned by <code>GET /series?category=Entertainment</code> — then from the fee-schedule seed list, then a keyword match. The path that decided each row is recorded as its basis and in <code>category_matched_by</code>. The Ballon d'Or is <b>not</b> a Culture market: Kalshi files it under Sports/Soccer (see <a href="flagged.html">F-66</a>).</td>
           <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td></tr>
       <tr><td>Ranking metric</td>
           <td><code>volume_fp × last_price_dollars</code>, an estimate computed by this project. Kalshi has no official dollars-traded field.</td>

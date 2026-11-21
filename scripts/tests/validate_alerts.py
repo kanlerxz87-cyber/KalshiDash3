@@ -37,6 +37,18 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
 RULES = ROOT / "data" / "alert_rules.json"
 
+# F-65: restated rather than imported from scripts/collect.py so this validator can refuse a
+# snapshot written by a broken collector. Values are the official categories/tags recorded by
+# GET /series for each topic; see data/categories.json and
+# https://docs.kalshi.com/api-reference/market/get-series-list
+COMPATIBLE = {
+    "gas": {"Economics", "Commodities", "Financials"},
+    "elections": {"Elections", "Politics", "World", "International"},
+    "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+    "crypto": {"Crypto", "Financials"},
+    "golf": {"Sports", "Golf"},
+}
+
 errors: list[str] = []
 archive_only = 0
 
@@ -112,10 +124,39 @@ def main() -> int:
         check(isinstance(a.get("high_roi"), bool), f"{tag} high_roi must be a boolean")
 
     # ---- feeds reproduce from the archive ----
+    # F-65: build_alerts.py withholds an alert whose series the exchange files outside the topic
+    # (the ledger is data/live/markets.json -> series_index). The rule is reproduced here from
+    # the same ledger so the validator can refuse a feed that silently keeps such a row, and
+    # refuse one that drops a legitimate row. Same failure mode as before: a rule that only the
+    # writer knows about is a rule nobody can audit.
     MAX = 300
-    expected_all = archive[:MAX]
+    state = load(LIVE / "markets.json") or {}
+    ledger = state.get("series_index") or {}
+    row_by_ticker = {r.get("ticker"): r for r in (state.get("open_markets") or [])}
+
+    def _official(ticker: str) -> list:
+        row = row_by_ticker.get(ticker) or {}
+        if row.get("series_categories"):
+            return [str(c) for c in row["series_categories"]]
+        series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
+        return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
+
+    def _served(a: dict) -> bool:
+        compatible = COMPATIBLE.get(a.get("category_id") or "", set())
+        cats = _official(a.get("ticker") or "")
+        if not cats or not compatible:
+            return True
+        return any(c in compatible for c in cats)
+
+    counts = alerts_doc.get("counts") or {}
+    served = [a for a in archive if _served(a)]
+    withheld_expected = len(archive) - len(served)
+    check(counts.get("withheld_category_conflict") == withheld_expected,
+          f"counts.withheld_category_conflict must be {withheld_expected} when reproduced from "
+          f"series_index, got {counts.get('withheld_category_conflict')!r} (F-65)")
+    expected_all = served[:MAX]
     check(alerts_doc.get("all_events") == expected_all, "alerts.json all_events does not reproduce from the archive (order/membership/300 cap)")
-    expected_roi = [a for a in archive if a.get("high_roi")][:MAX]
+    expected_roi = [a for a in served if a.get("high_roi")][:MAX]
     check(alerts_doc.get("high_roi") == expected_roi, "alerts.json high_roi does not reproduce from the archive")
     counts = alerts_doc.get("counts") or {}
     check(counts.get("all_events") == len(alerts_doc.get("all_events") or []), "counts.all_events mismatch")

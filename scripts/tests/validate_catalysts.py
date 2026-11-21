@@ -64,9 +64,46 @@ def main() -> int:
 
     rows = doc.get("alerts") or []
     row_keys = {(r.get("ticker"), r.get("to_time")) for r in rows}
-    if row_keys != archive_keys:
-        check(f"rows must cover the archive exactly; missing {sorted(archive_keys - row_keys)[:3]}, "
-              f"extra {sorted(row_keys - archive_keys)[:3]}")
+    # F-65: a swing whose own GET /series record puts it outside its topic is withheld from the
+    # chats, so this table must omit it too — but the omission has to be COUNTED, not silent.
+    # Reproduce the exclusion from the same series_index ledger the builder reads.
+    _mp = ROOT / "data" / "live" / "markets.json"
+    markets = json.loads(_mp.read_text()) if _mp.exists() else {}
+    ledger_series = markets.get("series_index") or {}
+    row_by_ticker = {r.get("ticker"): r for b in ("open_markets", "settled_markets")
+                     for r in (markets.get(b) or [])}
+    compatible = {
+        "gas": {"Economics", "Commodities", "Financials"},
+        "elections": {"Elections", "Politics", "World", "International"},
+        "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+        "crypto": {"Crypto", "Financials"},
+        "golf": {"Sports", "Golf"},
+    }
+
+    archive_cat = {(a.get("ticker"), a.get("to_time")): a.get("category_id")
+                   for a in archive.get("alerts") or []}
+
+    def _withheld(key) -> bool:
+        ticker = key[0] or ""
+        snap = row_by_ticker.get(ticker) or {}
+        official = [str(c) for c in (snap.get("series_categories") or [])]
+        if not official:
+            series = snap.get("series_ticker") or ticker.upper().split("-")[0]
+            official = [str(c) for c in ((ledger_series.get(series) or {}).get("categories") or [])]
+        # The snapshot row may have been dropped by the collector precisely because it conflicted,
+        # so the archived alert's own recorded topic is the fallback.
+        cat = snap.get("category_id") or archive_cat.get(key)
+        ok = compatible.get(cat or "", set())
+        return bool(official and ok and not any(o in ok for o in official))
+
+    expected_missing = {k for k in archive_keys if _withheld(k)}
+    if (doc.get("counts") or {}).get("withheld_category_conflict") != len(expected_missing):
+        check(f"counts.withheld_category_conflict must equal the swings reproduced from series_index "
+              f"({len(expected_missing)}, F-65)")
+    if row_keys != (archive_keys - expected_missing):
+        check(f"rows must cover the archive exactly except the counted F-65 exclusions; "
+              f"missing {sorted((archive_keys - expected_missing) - row_keys)[:3]}, "
+              f"extra {sorted(row_keys - (archive_keys - expected_missing))[:3]}")
     if len(row_keys) != len(rows):
         check("duplicate rows for one swing")
 

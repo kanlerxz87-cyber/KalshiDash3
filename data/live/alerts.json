@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T20:36:05Z",
- "snapshot_collected_at": "2026-11-21T20:36:04Z",
+ "generated_at": "2026-11-21T20:58:44Z",
+ "snapshot_collected_at": "2026-11-21T20:58:43Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,12 +11,68 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 25,
-  "high_roi": 9,
-  "archive_total": 25,
-  "new_this_run": 0
+  "all_events": 17,
+  "high_roi": 13,
+  "archive_total": 29,
+  "new_this_run": 1,
+  "withheld_category_conflict": 12,
+  "withheld_reasons": {
+   "crypto": {
+    "['Test']": 12
+   }
+  }
  },
  "all_events": [
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:34:40Z",
+   "to_time": "2026-11-21T20:58:43Z",
+   "from_price": 0.57,
+   "to_price": 0.17,
+   "delta": -0.4,
+   "direction": "down",
+   "volume_24h_fp": 10187.91,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:58:44Z",
+   "high_roi": true
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:30:54Z",
+   "to_time": "2026-11-21T20:34:40Z",
+   "from_price": 0.17,
+   "to_price": 0.57,
+   "delta": 0.4,
+   "direction": "up",
+   "volume_24h_fp": 10126.17,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:34:41Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -37,7 +93,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:32:16Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -59,29 +119,61 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:32:16Z",
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T15:21:23Z",
+   "to_time": "2026-11-21T20:30:54Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 39528.73,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:30:54Z",
    "high_roi": true
   },
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H16",
-   "title": "Demo BTC at or above 60237.37 USD",
+   "ticker": "KXBTCY-27JAN0100-B77500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
    "category_id": "crypto",
-   "category_basis": "keyword",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
    "status": "active",
-   "from_time": "2026-11-21T15:16:38Z",
-   "to_time": "2026-11-21T15:21:23Z",
-   "from_price": 0.65,
-   "to_price": 0.45,
-   "delta": -0.2,
-   "direction": "down",
-   "volume_24h_fp": 2236.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-   "to_yes_bid": 0.01,
-   "to_yes_ask": 1.0,
+   "from_time": "2026-11-21T15:21:23Z",
+   "to_time": "2026-11-21T20:30:54Z",
+   "from_price": 0.05,
+   "to_price": 0.98,
+   "delta": 0.93,
+   "direction": "up",
+   "volume_24h_fp": 9508.62,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+   "to_yes_bid": 0.02,
+   "to_yes_ask": 0.98,
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-21T15:21:23Z",
-   "high_roi": false
+   "first_seen_at": "2026-11-21T20:30:54Z",
+   "high_roi": true
   },
   {
    "ticker": "KXPGATOUR-THRC26-BHAR",
@@ -103,7 +195,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T15:16:38Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Sports"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -125,51 +221,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:42:57Z",
-   "high_roi": true
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H07",
-   "title": "Demo BTC at or above 55704.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-21T06:39:48Z",
-   "to_time": "2026-11-21T06:42:56Z",
-   "from_price": 0.35,
-   "to_price": 0.65,
-   "delta": 0.3,
-   "direction": "up",
-   "volume_24h_fp": 5915.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "to_yes_bid": 0.01,
-   "to_yes_ask": 0.99,
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-21T06:42:57Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H07",
-   "title": "Demo BTC at or above 55704.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-21T06:34:10Z",
-   "to_time": "2026-11-21T06:39:48Z",
-   "from_price": 0.65,
-   "to_price": 0.35,
-   "delta": -0.3,
-   "direction": "down",
-   "volume_24h_fp": 5180.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-   "to_yes_bid": 0.01,
-   "to_yes_ask": 0.99,
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-21T06:39:48Z",
-   "high_roi": false
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -191,7 +247,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:39:48Z",
-   "high_roi": false
+   "high_roi": false,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -213,7 +273,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:34:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -235,7 +299,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:34:11Z",
-   "high_roi": false
+   "high_roi": false,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -257,7 +325,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T00:50:12Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Economics"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -279,7 +351,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T20:01:29Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -301,29 +377,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:48:19Z",
-   "high_roi": true
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H20",
-   "title": "Demo BTC at or above 58337.51 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T19:30:14Z",
-   "to_time": "2026-11-20T19:48:19Z",
-   "from_price": 0.65,
-   "to_price": 0.35,
-   "delta": -0.3,
-   "direction": "down",
-   "volume_24h_fp": 6670.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "to_yes_bid": 0.01,
-   "to_yes_ask": 0.99,
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T19:48:19Z",
-   "high_roi": false
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B47500",
@@ -345,29 +403,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:30:14Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H20",
-   "title": "Demo BTC at or above 58337.51 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T19:22:42Z",
-   "to_time": "2026-11-20T19:30:14Z",
-   "from_price": 0.35,
-   "to_price": 0.65,
-   "delta": 0.3,
-   "direction": "up",
-   "volume_24h_fp": 3725.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-   "to_yes_bid": 0.01,
-   "to_yes_ask": 0.99,
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T19:30:14Z",
-   "high_roi": false
+   "high_roi": false,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -389,7 +429,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T15:19:53Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Economics"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
@@ -409,150 +453,64 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
-   "title": "Demo BTC at or above 61498.92 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T13:35:54Z",
-   "to_time": "2026-11-20T13:50:26Z",
-   "from_price": 0.35,
-   "to_price": 0.55,
-   "delta": 0.2,
-   "direction": "up",
-   "volume_24h_fp": 6735.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:50:27Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
-   "title": "Demo BTC at or above 61498.92 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T13:32:25Z",
-   "to_time": "2026-11-20T13:35:54Z",
-   "from_price": 0.55,
-   "to_price": 0.35,
-   "delta": -0.2,
-   "direction": "down",
-   "volume_24h_fp": 5235.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:35:54Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H14",
-   "title": "Demo BTC at or above 61498.92 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T13:18:28Z",
-   "to_time": "2026-11-20T13:32:25Z",
-   "from_price": 0.35,
-   "to_price": 0.55,
-   "delta": 0.2,
-   "direction": "up",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:32:25Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:31:35Z",
-   "to_time": "2026-11-20T11:33:33Z",
-   "from_price": 0.35,
-   "to_price": 0.45,
-   "delta": 0.1,
-   "direction": "up",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:28:31Z",
-   "to_time": "2026-11-20T11:31:35Z",
-   "from_price": 0.55,
-   "to_price": 0.35,
-   "delta": -0.2,
-   "direction": "down",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:26:21Z",
-   "to_time": "2026-11-20T11:28:31Z",
-   "from_price": 0.65,
-   "to_price": 0.55,
-   "delta": -0.1,
-   "direction": "down",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV20H12",
-   "title": "Demo BTC at or above 61985.83 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "status": "active",
-   "from_time": "2026-11-20T11:24:20Z",
-   "to_time": "2026-11-20T11:26:21Z",
-   "from_price": 0.45,
-   "to_price": 0.65,
-   "delta": 0.2,
-   "direction": "up",
-   "volume_24h_fp": 4485.0,
-   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-   "cause_link": null,
-   "cause_status": "unverified: no official cause source collected",
-   "first_seen_at": "2026-11-20T13:20:38Z",
-   "high_roi": false
+   "high_roi": false,
+   "series_categories": [
+    "Economics"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
   }
  ],
  "high_roi": [
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:34:40Z",
+   "to_time": "2026-11-21T20:58:43Z",
+   "from_price": 0.57,
+   "to_price": 0.17,
+   "delta": -0.4,
+   "direction": "down",
+   "volume_24h_fp": 10187.91,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:58:44Z",
+   "high_roi": true
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:30:54Z",
+   "to_time": "2026-11-21T20:34:40Z",
+   "from_price": 0.17,
+   "to_price": 0.57,
+   "delta": 0.4,
+   "direction": "up",
+   "volume_24h_fp": 10126.17,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:34:41Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -573,7 +531,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:32:16Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -595,6 +557,60 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:32:16Z",
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T15:21:23Z",
+   "to_time": "2026-11-21T20:30:54Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 39528.73,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:30:54Z",
+   "high_roi": true
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B77500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T15:21:23Z",
+   "to_time": "2026-11-21T20:30:54Z",
+   "from_price": 0.05,
+   "to_price": 0.98,
+   "delta": 0.93,
+   "direction": "up",
+   "volume_24h_fp": 9508.62,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+   "to_yes_bid": 0.02,
+   "to_yes_ask": 0.98,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:30:54Z",
    "high_roi": true
   },
   {
@@ -617,7 +633,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T15:16:38Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Sports"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -639,7 +659,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:42:57Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -661,7 +685,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T06:34:11Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -683,7 +711,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T00:50:12Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Economics"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -705,7 +737,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T20:01:29Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -727,7 +763,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T19:48:19Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Crypto"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -749,7 +789,11 @@
    "cause_link": null,
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-20T15:19:53Z",
-   "high_roi": true
+   "high_roi": true,
+   "series_categories": [
+    "Economics"
+   ],
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
   }
  ],
  "disclaimers": [
@@ -757,6 +801,7 @@
   "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
   "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
-  "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model."
+  "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
+  "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten."
  ]
 }
