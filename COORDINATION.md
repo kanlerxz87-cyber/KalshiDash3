@@ -1280,3 +1280,25 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-b25b0914` — collector freshness fix + takeover of stale PRs #55/#56 (branch `arena/b25b0914-kalshidash3`)
+
+Base: `f09f982` (main). Claimed 2026-11-21 ~20:25Z, after reading the whole board, every open PR and every remote
+branch. Arena fixes this session's branch name, so no `session-<id>/<task>` branch is created.
+
+**Active parallel session at claim time:** `arena-dba435ee` (claimed T40–T42 at 20:17Z). Its files —
+`data/verified_facts.json`, `data/findings.json`, `data/live/*` (workflow-written), `README.md` — are **not touched**
+by this session. Anything that needs them is logged below as a request (R-3…), per the board rule.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T43 | Collector freshness. The "bounded watchdog" step in `collect.yml` runs only after a successful commit, when the snapshot it reads is ~0 min old, so it can never dispatch (a no-op by construction). Measured from the Actions API, 06:49Z (PR #54 merge) → 20:17Z: `collect.yml` 2 `schedule` runs and 0 watchdog dispatches; `desk.yml` 2 `schedule` runs. Replace with a guarded cadence that does not depend on the scheduler firing, then measure it | in progress | arena-b25b0914 | `.github/workflows/collect.yml`, `.github/workflows/desk.yml`, `scripts/tests/test_workflows.py` (new) | `gh run list` event counts before/after; YAML invariant test in the release gate | see log |
+| T44 | Takeover of stale PR #55 (`arena-a3070ffa`, last commit 06:45Z, CONFLICTING, >13 h): official candlesticks on the dashboard chart (+ Days), price history kept for archived-alert tickers, `mve_filter=exclude` in the collector scan, voided-position mark fix — ported onto current `main` | in progress | arena-b25b0914 (takeover) | `dashboard.html`, `assets/alerts.js`, `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/test_collect_coverage.py` (new), `scripts/tests/test_simulate.py`, `scripts/tests/test_pages_dom.js`, `executive-summary.html` | `scripts/verify_release.py`; live official API spot checks via platform fetch | PR's F-40…F-44 collide with `main`'s F-40 → renumbered; findings rows requested from the T40 owner |
+| T45 | Takeover of stale PR #56 (`arena-17d4ecfa`, last commit 06:59Z, CONFLICTING, >13 h): topic-fair settled selection so the resolution history covers all five topics instead of ~92% crypto | in progress | arena-b25b0914 (takeover) | `scripts/collect.py` (shared with T44, same session), `scripts/tests/test_settled_selection.py` (new) | new test + next collector run | `index.html` copy change logged as a request to the integration owner (shared output) |
+| T46 | Close-out of this session's scope: release gate PASS, PR → main → merge → Pages deploy confirm, close #55/#56 with handoff comments, record here | in progress | arena-b25b0914 | `COORDINATION.md` (this section only) | `scripts/verify_release.py`, live Pages fetch | — |
+
+### Log (this session)
+- 2026-11-21 ~20:25Z: claim written and pushed before any implementation edit. Not taken: `data/live/*` (written
+  only by workflows), `data/findings.json` / `data/verified_facts.json` (T40), `README.md` (T42).
