@@ -376,6 +376,48 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- I. dashboard.html: yes_bid/yes_ask observation mapping + numeric live-poll timestamps ---
+   * Previously drawChart() ran Date.parse(o.t) (which returns NaN for numeric nowMs live ticks)
+   * and indexed o["bid"]/o["ask"] (undefined because observations store yes_bid/yes_ask).
+   */
+  {
+    const sampleTicker = Object.keys(history.series || {}).find(t =>
+      ((history.series[t] || {}).observations || []).some(o => o.yes_bid !== null && o.yes_bid !== undefined && o.yes_ask !== null && o.yes_ask !== undefined)
+    );
+    if (sampleTicker) {
+      const r = await loadPage("dashboard.html", "snapshot", { hash: sampleTicker });
+      commonAsserts("dashboard.html (bid/ask + live tick)", r);
+      const winSel = r.doc.querySelector("#window");
+      const serSel = r.doc.querySelector("#seriesSel");
+      winSel.value = "all";
+      winSel.dispatchEvent(new r.dom.window.Event("change"));
+      serSel.value = "bid";
+      serSel.dispatchEvent(new r.dom.window.Event("change"));
+      const bidFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      check(/\d+\s+(?:collector\s+)?observation/.test(bidFoot) && !/No observations/i.test(bidFoot),
+        `dashboard.html bid series must plot yes_bid observations (got: ${bidFoot.slice(0, 120)})`);
+      serSel.value = "ask";
+      serSel.dispatchEvent(new r.dom.window.Event("change"));
+      const askFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      check(/\d+\s+(?:collector\s+)?observation/.test(askFoot) && !/No observations/i.test(askFoot),
+        `dashboard.html ask series must plot yes_ask observations (got: ${askFoot.slice(0, 120)})`);
+      // Live poll tick with numeric Date.now() timestamp must increase the plotted observation count in Seconds ("s") window.
+      winSel.value = "s";
+      serSel.value = "last";
+      winSel.dispatchEvent(new r.dom.window.Event("change"));
+      const beforeMatch = ((r.doc.querySelector("#chartFoot") || {}).textContent || "").match(/(\d+)\s+(?:collector\s+)?observation/);
+      const beforeCount = beforeMatch ? Number(beforeMatch[1]) : 0;
+      r.dom.window.eval(`onLiveRows([{ ticker: ${JSON.stringify(sampleTicker)}, last_price_dollars: "0.5500", yes_bid_dollars: "0.5400", yes_ask_dollars: "0.5600", volume_fp: "100.00" }])`);
+      const secFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      const afterMatch = secFoot.match(/(\d+)\s+(?:collector\s+)?observation/);
+      const afterCount = afterMatch ? Number(afterMatch[1]) : 0;
+      check(afterCount === beforeCount + 1,
+        `dashboard.html Seconds window must plot numeric-timestamp live poll ticks (before=${beforeCount}, after=${afterCount}, foot=${secFoot.slice(0, 120)})`);
+      console.log(`  I obs+live fix  ok  (${sampleTicker} plots yes_bid, yes_ask, and numeric live poll ticks: ${beforeCount} -> ${afterCount})`);
+      r.close();
+    }
+  }
+
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);
