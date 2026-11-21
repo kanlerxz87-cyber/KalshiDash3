@@ -176,7 +176,10 @@ function counts(w) {
     check(txt.includes(T), "ticker printed verbatim");
     check(/markets\?tickers=/.test(one.querySelector("a").getAttribute("href")), "source link repeats the documented tickers= query");
   }
-  check(w2.document.getElementById("kdChip").textContent.startsWith("live"), "status chip reports live mode");
+  check(/^near-live/.test(w2.document.getElementById("kdChip").textContent),
+    "status chip reports near-live mode (not 'live' — the API caches /markets, F-58)");
+  check(/cached for a few seconds/.test(w2.document.querySelector(".kd-pfoot").innerHTML),
+    "footer discloses the documented caching caveat");
   check(env2.state.polled >= 3, `three polls actually happened (got ${env2.state.polled})`);
   if (rows.length) {
     check(rows[0].querySelector(".cd-cat").textContent === "Gas Prices",

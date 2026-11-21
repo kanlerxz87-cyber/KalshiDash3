@@ -45,6 +45,7 @@ const KDCHAT = (() => {
   // jsdom render test can exercise three polls in milliseconds.
   const POLL_MS = (typeof window !== "undefined" && Number(window.__KDCHAT_POLL_MS)) || 12000;
   const FIRST_POLL_MS = Math.min(POLL_MS, 2500);
+  const POLS = `every ${Math.round(POLL_MS / 1000)}s`;
   const MAX_ROWS = 80;
   const REPO = "kanlerxz87-cyber/KalshiDash3";
 
@@ -415,7 +416,7 @@ const KDCHAT = (() => {
     if (badge) {
       badge.className = "kd-chip " + (S.liveOn ? "live" : S.blocked ? "warn" : "");
       badge.textContent = S.liveOn
-        ? `live · ${S.polls} polls · every ${POLL_MS / 1000}s`
+        ? `near-live · ${S.polls} polls · ${POLS}`
         : S.blocked
         ? "history only · demo API blocked (CORS)"
         : "connecting…";
@@ -472,6 +473,9 @@ const KDCHAT = (() => {
     <footer class="kd-pfoot small">
       Threshold $0.10 is a project requirement, not a Kalshi figure. “live” = two readings of the same contract from the
       public demo API in this browser; “history” = an appended row computed from committed collector observations.
+      “Near-live”, not tick-level: Kalshi documents that <code>GET /markets</code> responses are
+      <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">cached for a few seconds</a>
+      and that the WebSocket feed is the route to current state — but that handshake requires an API key, which a static page cannot hold.
       This is the <b>demo</b> environment (mock funds) — <a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Kalshi warns demo prices may not reflect real markets</a>.
       News links are search leads, never asserted causes (<a href="flagged.html">F-25</a>).
       Topic labels on <b>history</b> rows are the collector's verified category; a market first seen by the live
