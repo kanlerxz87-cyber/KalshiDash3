@@ -1,0 +1,102 @@
+name: Freshness alarm (independent monitor)
+
+# Why this workflow exists — F-67, measured 2026-11-21 on this repository:
+#
+# The data on the site is only as live as the last `collect.yml` run. `collect.yml` already
+# declares 12 scheduled runs per hour, and the GitHub Actions API shows four `schedule`
+# deliveries in ~20 hours on main (gh run list --workflow=collect.yml --jq '[.[]|select(.event=="schedule")]'):
+#   2026-11-20T19:14:35Z, 2026-11-21T00:49:31Z, 2026-11-21T15:15:48Z, 2026-11-21T15:20:32Z
+# The GitHub docs say why that can happen, verbatim:
+#   "The `schedule` event can be delayed during periods of high loads ... High load times include
+#    the start of every hour ... some queued jobs may be dropped."
+#   https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
+# collect.yml used to answer this with a self-dispatch step. That cannot work: its snapshot
+# commit is pushed with the repository's GITHUB_TOKEN, and the docs state such a push does not
+# start a new workflow run, so the step only ever runs when a run is already happening — i.e.
+# exactly when it is not needed. The rescue has to come from a DIFFERENT workflow with its own
+# schedule, which is what this file is.
+#
+# Honest limit, stated here rather than discovered later: this monitor runs on the same
+# `schedule` mechanism, so it is exposed to the same delays and drops. It reduces the blast
+# radius (two independent crons must both miss) but it does not make the platform guarantee
+# anything. The site is built to say "snapshot is N hours old" rather than to pretend otherwise,
+# and that disclosure is the real protection.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Off-peak minutes, per the same documentation guidance quoted in collect.yml.
+    - cron: "23,53 * * * *"
+
+permissions:
+  actions: write   # workflow_dispatch of collect.yml
+  contents: read
+  issues: write    # optional alarm record; unused if the repository has issues disabled
+
+concurrency:
+  group: freshness-alarm
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Measure the age of the committed snapshot
+        id: age
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, datetime
+          p = pathlib.Path("data/live/markets.json")
+          doc = json.loads(p.read_text())
+          stamp = doc.get("collected_at")
+          print("collected_at:", stamp)
+          ts = datetime.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+          age_min = int((datetime.datetime.now(datetime.timezone.utc) - ts).total_seconds() // 60)
+          print(f"age_minutes={age_min}")
+          out = pathlib.Path("age.env")
+          out.write_text(f"AGE_MIN={age_min}\n")
+          # 45 minutes is the staleness threshold the site itself uses for its banner.
+          print("stale=" + ("yes" if age_min >= 45 else "no"))
+          with open("age.env", "a") as f:
+              f.write("STALE=" + ("1" if age_min >= 45 else "0") + "\n")
+          PY
+          cat age.env >> "$GITHUB_ENV"
+
+      - name: Dispatch one collection if (and only if) the snapshot is stale and none is running
+        if: env.STALE == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          in_flight=$(gh run list --workflow=collect.yml --limit 10 --json status \
+            --jq '[.[] | select(.status == "in_progress" or .status == "queued")] | length')
+          recent=$(gh run list --workflow=collect.yml --limit 40 --json createdAt,event --jq \
+            '[.[] | select(.event == "workflow_dispatch") | .createdAt | fromdateiso8601
+                  | select(. > (now - 3600))] | length')
+          echo "snapshot age ${AGE_MIN}m; in flight ${in_flight}; dispatches in the last hour ${recent}"
+          # Bounded exactly like the step it replaces: never more than one dispatch per hour from
+          # this monitor, and never while a collection is already in flight. The runaway loop this
+          # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
+          if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
+          if [ "$recent" -ge 1 ]; then echo "this monitor already dispatched within the hour; waiting for the cron"; exit 0; fi
+          gh workflow run collect.yml --ref main --event workflow_dispatch \
+            && echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection" \
+            || echo "::warning::dispatch failed; the cron schedules remain the only trigger"
+
+      - name: Note the state in the job summary
+        if: always()
+        run: |
+          {
+            echo "### Snapshot freshness"
+            echo ""
+            echo "| field | value |"
+            echo "|---|---|"
+            echo "| snapshot age | ${AGE_MIN} minutes |"
+            echo "| stale (>= 45 min) | ${STALE} |"
+            echo "| threshold source | the staleness banner the site itself renders |"
+            echo ""
+            echo "Recorded as F-67 on \`flagged.html\`. This monitor is itself subject to GitHub's"
+            echo "scheduled-run delays and drops."
+          } >> "$GITHUB_STEP_SUMMARY"
