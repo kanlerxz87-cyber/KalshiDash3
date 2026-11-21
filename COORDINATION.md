@@ -574,6 +574,28 @@ force-pushed away, and the review is in this log.
   an interpolated readout value -> fail.
 
 
+## Session `arena-20d7ddf7` — category-integrity fix driven by official series records (branch `arena/20d7ddf7-kalshidash3`)
+
+Base: `f09f982` (= main at claim). Claimed 2026-11-21 20:22Z before editing implementation files.
+`arena/dba435ee` holds an in-progress claim on T40–T42 with scope `data/verified_facts.json`, `data/findings.json`,
+`COORDINATION.md`, `README.md` and workflow-driven `data/live/*`. **This session deliberately does not touch those
+files while that claim is open**, and keeps its implementation scope to the collector, its tests, the shared
+renderer and new derived artefacts. Request logged at the bottom for the owner of `data/findings.json` /
+`data/verified_facts.json` (R-3, R-4).
+
+| ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-----------------|----------------|------------------------|----------------|
+| T43 | Category integrity: stop the five topics from containing markets Kalshi itself files under another category (Test instruments, Sports props matched by a person's first name), by recording the official `series.categories` on every row and refusing incompatible keyword matches | in progress | arena-20d7ddf7 | `scripts/collect.py`, `scripts/tests/test_scope.py`, `scripts/tests/validate_live.py` (validator only), `assets/site.js` (label only) | Live `GET /trade-api/v2/series/{ticker}` records fetched 2026-11-21 20:19–20:23Z (see the log below) + [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list) | Found on the deployed site: Culture's headline market was an EPL soccer prop (`KXEPLFIRSTGOAL-…`, official category **Sports**) matched by the keyword `oscar` in the player's name *Oscar* Bobb; `KXDEMOFUTHOURLY` (official category **Test**) is inside Crypto and 8 of the 23 archived swing alerts |
+| T44 | Rebuild the derived alert/simulation artefacts from a fresh collector run so the published alert chats stop carrying Test-series rows | unclaimed | — | `data/live/*` (workflow-written only) | `build_alerts.py`, `simulate.py`, validators | — |
+| T45 | Publish the findings for review, open PR → main, merge, confirm the Pages deploy, record the result | unclaimed | — | `COORDINATION.md`, `data/findings.json` (append; see R-3) | live URL fetch after deploy | — |
+
+### Log (this session)
+- 2026-11-21 20:19Z: read the deployed site and the committed snapshot; fetched official `GET /series/{ticker}`
+  records for every series present in the snapshot.
+- 2026-11-21 20:22Z: claimed T43–T45 on this branch.
+
+---
+
 ## Session `arena-6a6e8f22` — topic-fair resolution history + honest chart intervals + deploy-source fix (branch `arena/6a6e8f22-kalshidash3`)
 
 Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:25Z, before editing any implementation file.

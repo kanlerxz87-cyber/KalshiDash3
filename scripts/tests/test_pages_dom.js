@@ -236,7 +236,19 @@ function commonAsserts(label, r) {
       const archived = (() => { try {
         return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8")).alerts.length;
       } catch (e) { return -1; } })();
-      check(leadsRows === archived, `the lead table must show one row per archived swing (table ${leadsRows}, archive ${archived})`);
+      // F-65: the table must show one row per archived swing EXCEPT the counted exclusions whose
+      // official series record puts them outside the topic. The exclusion must be published in
+      // counts.withheld_category_conflict, so a silent drop fails here too.
+      let withheld = 0;
+      try {
+        withheld = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"))
+          .counts.withheld_category_conflict || 0;
+      } catch (e) { withheld = 0; }
+      check(leadsRows === archived - withheld,
+        `the lead table must show one row per archived swing minus the counted F-65 exclusions `
+        + `(table ${leadsRows}, archive ${archived}, withheld ${withheld})`);
+      check(withheld === 0 || /withheld/i.test(fs.readFileSync(path.join(ROOT, "alerts.html"), "utf8")),
+        "alerts.html must disclose that some archived swings are withheld (F-65)");
       r.doc.querySelectorAll("#leads tbody tr").forEach((tr, i) => {
         tr.querySelectorAll("a").forEach(a => {
           check(/^https:\/\//.test(a.getAttribute("href") || ""), `lead row ${i}: every link must be an absolute https URL`);
@@ -351,6 +363,23 @@ function commonAsserts(label, r) {
         "index.html: when the snapshot contains a QA fixture the page must say so");
       check(!bodies.some(t => /QA7CECC5|Portfolio cash out/.test(t)),
         "index.html: a demo QA fixture must never be the largest live market of a category");
+    }
+    // F-65/F-66: the two integrity counters must actually render from the snapshot rather
+    // than existing only in the source. The numbers are read from the data, then asserted in
+    // the DOM, so a typo or a temporal-dead-zone bug (F-64) fails here instead of in production.
+    if (markets && markets.counts && "open_excluded_category_conflict" in markets.counts) {
+      const expectedRefused = (markets.counts.open_excluded_category_conflict || 0)
+        + (markets.counts.settled_excluded_category_conflict || 0);
+      const expectedOfficial = (markets.open_markets || [])
+        .filter(x => x.category_matched_by === "official").length;
+      check(/rows refused: wrong official category/.test(r.text),
+        "index.html: the refused-row counter must be present and labelled (F-65)");
+      check(/topics decided by the exchange/.test(r.text),
+        "index.html: the official-mapping counter must be present (F-66)");
+      check(r.text.includes(expectedRefused.toLocaleString()) || r.text.includes(String(expectedRefused)),
+        `index.html: the refused-row counter must equal counts.open+settled_excluded_category_conflict (${expectedRefused})`);
+      check(Number.isFinite(expectedOfficial),
+        "index.html: category_matched_by must be readable on every open row (F-66)");
     }
     console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
     r.close();
