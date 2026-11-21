@@ -22,9 +22,9 @@
       <tr><td>Dashboard of highest dollar-amount live events, limited to gas prices, elections, culture, crypto, golf</td>
           <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Live dashboard</a></td>
           <td>Ranked by a labelled estimate, because Kalshi has no “dollars traded” field (<a href="questions.html">Q1</a>). Only five categories shown by construction.</td></tr>
-      <tr><td>Track events until resolved, showing how they resolved (yes or no)</td>
-          <td><span class="badge ok">done</span></td><td>Resolution tracker on the dashboard</td>
-          <td>The literal API result is shown; a market can resolve to <code>scalar</code>, which is displayed as such rather than forced to yes/no.</td></tr>
+      <tr><td>Track events until resolved, showing how they resolved (yes or no), <b>kept separate per topic</b></td>
+          <td><span class="badge ok">done</span></td><td>Resolution tracker on the landing page and dashboard</td>
+          <td>The literal API result is shown; a market can resolve to <code>scalar</code>, which is displayed as such rather than forced to yes/no. The stored resolution set is now allocated <b>across</b> the five topics instead of one global newest-first queue — the queue published 198 of 200 rows as crypto and zero gas/elections/golf rows, which is why it was replaced (<a href="flagged.html">F-65</a>). Published per topic on 2026-11-21T20:21Z: gas 154, golf 154, crypto 155, culture 136, elections 1 (the scan found exactly one settled elections market in scope). The page states the stored count per topic and the scan total (19,584) rather than presenting the stored rows as everything (<a href="flagged.html">F-68</a>).</td></tr>
       <tr><td>Track portfolio performance on the demo account</td>
           <td><span class="badge bad">blocked</span></td><td><a href="portfolio.html">Portfolio</a></td>
           <td>No demo account or API key exists. Kalshi requires a human sign-up; the value is left blank rather than invented (<a href="flagged.html">F-07</a>).</td></tr>
@@ -37,9 +37,9 @@
       <tr><td>Automate simulated trades to test different strategies (S1–S4 replay)</td>
           <td><span class="badge ok">done</span></td><td><a href="portfolio.html">Portfolio §4</a></td>
           <td>Deterministic replay of the collected price history through the strategy-page rules: entries at observed asks, exits at observed bids, official general taker fee per fill, strategy × category ledger, equity curve, settlement against the literal API result. Complements the alerts-page auto-sim (G13), which trades the live alert stream instead.</td></tr>
-      <tr><td>Live interactive dashboard with a price graph, time on X, price on Y, seconds/minutes/hours window</td>
+      <tr><td>Live interactive dashboard with a price graph, time on X, price on Y, <b>seconds / minutes / hours / days</b> window</td>
           <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Live dashboard</a></td>
-          <td>Seconds resolution must be accumulated from live reads: candlesticks only go down to one minute (<a href="flagged.html">F-06</a>). The dashboard now also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-14</a>).</td></tr>
+          <td>Minutes/Hours/Days plot <b>Kalshi's own candlesticks</b> (1 / 60 / 1440-minute intervals) and show the exact query, interval and fetch time; a pointer readout gives the exact price, time, period volume and open interest. Seconds cannot be requested from Kalshi at all, so that window is the project's accumulated observations plus in-session live ticks, and the page says so (<a href="flagged.html">F-06</a>, <a href="flagged.html">F-67</a>). The dashboard also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-14</a>).</td></tr>
       <tr><td>Live alerting on swings ≥ $0.10 in either direction, as a simplified scrolling chat viewable in real time</td>
           <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
           <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between its runs (~20 min) (<a href="flagged.html">F-14</a>).</td></tr>
@@ -63,7 +63,7 @@
           <td>Nine questions; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>59 claims checked; 1 deliberately blank. Thirty-eight irregularities found and listed across all sessions; the live/alert/auto-sim layer added F-24–F-28 and the arena-f068786c integration added F-29 (<a href="flagged.html">flagged</a>).</td></tr>
+          <td>59 claims checked; 1 deliberately blank. Forty-nine irregularities found and listed across all sessions; the live/alert/auto-sim layer added F-24–F-28 and the arena-f068786c integration added F-29 (<a href="flagged.html">flagged</a>).</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>
