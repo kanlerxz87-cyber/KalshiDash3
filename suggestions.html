@@ -13,7 +13,7 @@
   <h1>Suggestions — review before anything is built</h1>
   <p class="lede">
     Each proposal states what it improves, what it costs, how it can hurt, and the metric that would prove it worked.
-    Items marked <b>implemented</b> or <b>shipped</b> are live on this site; items marked <b>proposed</b> need your decision. Statuses come verbatim from `data/findings.json`, so several sessions' wordings appear here unchanged.
+    Items marked <b>implemented</b> or <b>shipped</b> are live on this site; items marked <b>proposed</b> need your decision. Statuses come verbatim from <code>data/findings.json</code>, so several sessions' wordings appear here unchanged.
     Nothing in the second group changes behaviour until you choose it.
   </p>
 
@@ -31,10 +31,12 @@
 
   <h2>The decision that unlocks the most</h2>
   <div class="notice warn">
-    <b>G5 (fees) is the highest-value open decision.</b> Every performance number on this site is currently gross of
-    per-series fee differences. At a 50¢ entry the general taker fee is about 2¢ per contract — roughly 4% of the stake —
-    so a strategy that looks break-even gross is a loser net. Until fees are settled, treat any P&amp;L comparison as a
-    ranking of ideas, not of outcomes. Source:
+    <b>G5 (fees) remains open for the browser-side ledgers.</b> <a href="roi.html">ROI model</a> and
+    <a href="simulation.html">Paper trading</a> apply the transcribed per-series multipliers from the fee schedule,
+    while the browser-side <a href="trading.html">Auto-sim</a> and <a href="portfolio.html">Portfolio</a> ledgers
+    still model the general taker rate (<code>M = 1</code>) without per-series overrides. At a 50¢ entry the general
+    taker fee is about 2¢ per contract — roughly 4% of the stake — so a strategy that looks break-even gross is a loser
+    net. Source:
     <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule</a>.
   </div>
 
@@ -52,23 +54,32 @@ KD.nav("suggestions.html");
 (async () => {
   let f;
   try { f = await KD.json("data/findings.json"); } catch { KD.$("#impl").innerHTML = KD.empty("data/findings.json missing."); return; }
-  const rows = f.suggestions.map(s => ({
-    id: `<b>${KD.esc(s.id)}</b>`,
-    s: KD.esc(s.suggestion),
-    why: KD.esc(s.why_it_helps_decisions),
-    effort: KD.esc(s.effort),
-    risk: KD.esc(s.risk),
-    metric: KD.esc(s.success_metric),
-    status: (s.status === "implemented" || s.status.startsWith("shipped")) ? '<span class="badge ok">' + KD.esc(s.status.startsWith("shipped") ? "shipped" : "implemented") + '</span>' : '<span class="badge warn">proposed</span>',
-    src: (s.sources || []).map(u => KD.srcLink(u, u.includes("docs.kalshi") ? "Kalshi docs" : "source")).join(" "),
-  }));
+  const rows = (f.suggestions || []).map(s => {
+    const rawStatus = String(s.status || "proposed").trim();
+    const low = rawStatus.toLowerCase();
+    const isShipped = low.startsWith("shipped");
+    const isImpl = isShipped || low.startsWith("implemented");
+    const badgeLabel = isShipped ? "shipped" : isImpl ? "implemented" : "proposed";
+    const detail = rawStatus.length > badgeLabel.length ? `<div class="small mut">${KD.esc(rawStatus)}</div>` : "";
+    return {
+      _impl: isImpl,
+      id: `<b>${KD.esc(s.id)}</b>`,
+      s: KD.esc(s.suggestion),
+      why: KD.esc(s.why_it_helps_decisions),
+      effort: KD.esc(s.effort),
+      risk: KD.esc(s.risk),
+      metric: KD.esc(s.success_metric),
+      status: `<span class="badge ${isImpl ? "ok" : "warn"}">${badgeLabel}</span>${detail}`,
+      src: (s.sources || []).map(u => KD.srcLink(u, u.includes("docs.kalshi") ? "Kalshi docs" : "source")).join(" "),
+    };
+  });
   const headers = [
     { key: "id", label: "ID" }, { key: "s", label: "Suggestion" }, { key: "why", label: "Why it improves decisions" },
     { key: "effort", label: "Effort" }, { key: "risk", label: "Risk" }, { key: "metric", label: "How you would know it worked" },
     { key: "status", label: "Status" }, { key: "src", label: "Source" },
   ];
-  KD.$("#impl").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("implemented") || r.status.includes("shipped")));
-  KD.$("#prop").innerHTML = KD.table(headers, rows.filter(r => r.status.includes("proposed")));
+  KD.$("#impl").innerHTML = KD.table(headers, rows.filter(r => r._impl));
+  KD.$("#prop").innerHTML = KD.table(headers, rows.filter(r => !r._impl));
 })();
 </script>
 </body></html>
