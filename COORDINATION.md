@@ -1102,7 +1102,7 @@ worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge b
 | T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
 | T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
 | T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
-| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | **done** — PR #79 merged `43fb93f`, Pages confirmed | arena-42e3b260 | `COORDINATION.md` | close-out below |
 
 ### Defects found and fixed in this session (published on the Flagged page)
 
@@ -1133,6 +1133,25 @@ worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge b
   intent and their F-73/F-74 records are kept, and the supersession is recorded in F-73's action.
 - Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
   `test_freshness_alarm.py` and COORDINATION sections are all preserved.
+
+
+### Close-out (T64)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #79](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/79) merged 2026-11-21T23:22:50Z** as `43fb93fed861538bd4116e8b7e7a5256996ffbf7` (merge, no approval wait) | PR check `pages.yml` [44961409875](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961409875): build ✔ 53 s (release gate), deploy skipped on PRs as designed |
+| Conflict handling | Two `COORDINATION.md` conflicts (PRs #77, #81 landed while this session worked). Both resolved by keeping **both** sessions' records; no line of arena-2a7c58f1's was dropped. The only supersession is `assets/chatdock.js` + its test, where this session's stricter R-B1 fix replaced their 15-minute-string version — logged in F-73 and here | `git log --oneline ebfd461..2cebae1`, this section |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push [44961515560](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961515560) build ✔ deploy ✔; legacy `pages-build-deployment` [44961515046](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961515046) ✔; Pages builds API: commit `43fb93f`, status `built`, 2026-11-21T23:23:37Z |
+| Live site content | **confirmed** (cache-busted fetch) | `verification.html` serves the `C-nn` ledger ("72 claims checked · 71 confirmed · 1 blank"); `executive-summary.html` renders "Twenty suggestions", the 15-minute cadence text and the live counts (72 claims / 1 blank / **56 irregularities**) fetched from `data/findings.json` at load time |
+| Release gate on the merged tree | PASS | `python3 scripts/verify_release.py` before the merge, and again in the PR check |
+| Collect dry run after the changes | success | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) (full pipeline against the live demo API, commit=false) |
+| Relay on main | untouched and healthy | `collect.yml` relay runs on `main`; this session's merge only changes the code each pass pulls |
+
+### Left for the owner (published on Flagged for Review)
+- **F-07** — demo account + API key must be created by a person; until then portfolio performance stays blank and labelled paper.
+- **F-26 / F-77** — the high-ROI screen is a disclosed heuristic and, on this demo exchange, 25 of 31 picks were BTC year-end range markets oscillating between about 2¢ and 99¢. A spread gate is recommended; changing the frozen flag is an owner decision.
+- **F-25** — cause links are search leads; no official cause feed exists.
+- **F-76** — 20 archived swings outside the five topics are withheld and counted (all `KXDEMOFUTHOURLY` Test/Demo series). The archive itself is unchanged.
 
 ## Session `arena-c09bf8f4` — verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)
 
