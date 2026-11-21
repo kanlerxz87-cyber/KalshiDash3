@@ -10,6 +10,7 @@
  *   F  when the demo API is blocked, the dock says so and still shows history
  *   G  no 'NaN', 'undefined' or 'null' ever reaches the rendered panel
  *   H  the two chats hold different sets (model view is a strict, explained subset)
+ *   I  collector health reports main's active/latest run, never a guessed cron cadence
  *
  * Run: node scripts/tests/test_chatdock.js      (needs jsdom; installs nothing itself)
  */
@@ -32,8 +33,8 @@ const bad = (m) => { failures++; console.log("  FAIL " + m); };
 const check = (c, m) => (c ? ok(m) : bad(m));
 
 /* ---------------------------------------------------------------- harness */
-function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
-  const state = { calls: [], polled: 0 };
+function makeEnv({ apiMode, archive, snapshot, ticks, pollMs, workflowRuns }) {
+  const state = { calls: [], githubCalls: [], polled: 0 };
   const fnum = (v) => { const n = Number(v); return Number.isNaN(n) ? null : n; };
 
   const fetchImpl = async (url) => {
@@ -41,7 +42,10 @@ function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
     const send = (body, status = 200) => ({ ok: status >= 200 && status < 300, status, json: async () => body });
     if (/^data\/live\/alerts_archive\.json/.test(u)) return send(archive);
     if (/^data\/live\/markets\.json/.test(u)) return send(snapshot);
-    if (/api\.github\.com/.test(u)) return send({ workflow_runs: [] });
+    if (/api\.github\.com/.test(u)) {
+      state.githubCalls.push(u);
+      return send({ workflow_runs: workflowRuns || [] });
+    }
     if (/external-api\.demo\.kalshi\.co/.test(u)) {
       if (apiMode === "blocked") { const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
       state.calls.push(u);
@@ -199,10 +203,56 @@ function counts(w) {
   check(env3.w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length > 0,
     "history rows are still rendered when the demo API refuses the browser");
 
-  /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32 — cron health line");
-  const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector cron|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  /* ------------------------------------------------ I: collector run status */
+  console.log("\nT32 — collector run status, not a guessed cadence");
+  const noRunsHealth = env3.w.document.getElementById("kdHealth").textContent;
+  check(/collector status: no main-branch runs returned/.test(noRunsHealth),
+    `an empty GitHub response is labelled honestly ("${noRunsHealth.slice(0, 70)}…")`);
+  check(!/(cron|every 20m|throttling)/i.test(noRunsHealth), "no stale cron cadence or unsupported throttling diagnosis appears");
+
+  const now = Date.now();
+  const isoAgo = (ms) => new Date(now - ms).toISOString();
+  const activeUrl = "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/901";
+  const activeEnv = makeEnv({
+    apiMode: "blocked", archive: { schema: 1, alerts: [] }, snapshot: SNAPSHOT, ticks: [],
+    workflowRuns: [
+      { id: 901, head_branch: "main", event: "workflow_dispatch", status: "in_progress", conclusion: null,
+        created_at: isoAgo(120000), run_started_at: isoAgo(120000), updated_at: isoAgo(60000), html_url: activeUrl },
+      { id: 900, head_branch: "main", event: "schedule", status: "completed", conclusion: "success",
+        created_at: isoAgo(600000), run_started_at: isoAgo(600000), updated_at: isoAgo(500000),
+        html_url: "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/900" },
+      { id: 999, head_branch: "arena/test", event: "workflow_dispatch", status: "in_progress", conclusion: null,
+        created_at: isoAgo(30000), run_started_at: isoAgo(30000), updated_at: isoAgo(10000),
+        html_url: "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/999" },
+    ],
+  });
+  await sleep(150);
+  const activeHealthNode = activeEnv.w.document.getElementById("kdHealth");
+  const activeHealth = activeHealthNode.textContent;
+  check(/latest collector run: running/.test(activeHealth), "the in-progress main relay takes priority over an older completion");
+  check(/last success/.test(activeHealth), "an active relay also reports the last completed success when available");
+  check(activeHealth.includes("via workflow_dispatch"), "the GitHub event is shown without inventing a schedule");
+  check(activeHealthNode.querySelector("a").href === activeUrl, "the status links to the exact official Actions run");
+  check(activeEnv.state.githubCalls.some((u) => u.includes("branch=main")), "the run request is scoped to the published main branch");
+  check(!/(cron|every 20m|throttling)/i.test(activeHealth), "the active status makes no fixed-cadence or throttling claim");
+
+  const failedUrl = "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/902";
+  const completedEnv = makeEnv({
+    apiMode: "blocked", archive: { schema: 1, alerts: [] }, snapshot: SNAPSHOT, ticks: [],
+    workflowRuns: [
+      { id: 902, head_branch: "main", event: "schedule", status: "completed", conclusion: "failure",
+        created_at: isoAgo(180000), run_started_at: isoAgo(180000), updated_at: isoAgo(60000), html_url: failedUrl },
+      { id: 899, head_branch: "main", event: "schedule", status: "completed", conclusion: "success",
+        created_at: isoAgo(900000), run_started_at: isoAgo(900000), updated_at: isoAgo(800000),
+        html_url: "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/899" },
+    ],
+  });
+  await sleep(150);
+  const completedHealthNode = completedEnv.w.document.getElementById("kdHealth");
+  check(/latest collector run: completed · failure/.test(completedHealthNode.textContent),
+    "when no run is active, the latest completion and its actual conclusion are shown");
+  check(/last success/.test(completedHealthNode.textContent), "a prior success is distinguished from the latest failure");
+  check(completedHealthNode.querySelector("a").href === failedUrl, "the completed status links to its exact Actions run");
 
   console.log("");
   teardown();

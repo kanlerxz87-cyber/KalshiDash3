@@ -314,39 +314,48 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- freshness / cron health (T32) -------------------- */
-  // The collector's cron is unreliable (measured 2026-11-21: `*/20` fired once in 5.75 hours; F-40).
-  // Instead of hiding that, measure it: read the last N runs of collect.yml from
-  // the public GitHub REST API (CORS `*` verified on 2026-11-21) and say how
-  // often the schedule actually fired. No token, no secret, no writes.
+  /* -------------------- collector run status -------------------- */
+  // The main-branch collector now runs as a bounded relay, not a dependable cron.
+  // Report the newest in-progress/queued run or, if none is active, the last
+  // completed run. Snapshot freshness stays on the separate snapshot-age line.
+  // Source: https://docs.github.com/en/rest/actions/workflow-runs#list-workflow-runs-for-a-workflow
   async function checkHealth() {
+    const runsUrl = `https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?branch=main&per_page=10`;
     try {
-      const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
+      const r = await fetch(runsUrl, {
         headers: { Accept: "application/vnd.github+json" },
         cache: "no-store",
       });
       if (!r.ok) throw new Error("HTTP " + r.status);
       const d = await r.json();
-      const runs = (d.workflow_runs || []).map((x) => ({
-        id: x.id,
-        event: x.event,
-        at: Date.parse(x.created_at || ""),
-        ok: x.conclusion === "success",
-        status: x.status,
-        conclusion: x.conclusion,
-      }));
-      const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
-      const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
-      let gap = null;
-      if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      const runs = (d.workflow_runs || [])
+        .filter((x) => x && x.head_branch === "main")
+        .map((x) => {
+          const atText = x.status === "completed"
+            ? (x.updated_at || x.created_at)
+            : (x.run_started_at || x.created_at);
+          const at = Date.parse(atText || "");
+          const url = typeof x.html_url === "string" && /^https:\/\/github\.com\//.test(x.html_url)
+            ? x.html_url
+            : "";
+          return {
+            id: x.id,
+            event: typeof x.event === "string" ? x.event : "",
+            status: typeof x.status === "string" ? x.status : "",
+            conclusion: typeof x.conclusion === "string" ? x.conclusion : "",
+            at: Number.isNaN(at) ? null : at,
+            url: url,
+          };
+        })
+        .filter((x) => x.at !== null)
+        .sort((a, b) => b.at - a.at);
+      const active = runs.find((x) => x.status === "in_progress" || x.status === "queued") || null;
+      const lastCompleted = runs.find((x) => x.status === "completed") || null;
+      const latest = active || lastCompleted || runs[0] || null;
+      const lastSuccess = runs.find((x) => x.status === "completed" && x.conclusion === "success") || null;
       S.health = {
-        runs: runs.length,
-        scheduled: sched.length,
-        scheduleGapMinutes: gap,
-        lastScheduledAt: sched.length ? sched[0].at : null,
-        lastSuccessAt: lastOk ? lastOk.at : null,
-        cronExpression: "*/20 * * * *",
-        expectedMinutes: 20,
+        latestRun: latest,
+        lastSuccessAt: lastSuccess ? lastSuccess.at : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
       };
     } catch (e) {
@@ -360,22 +369,33 @@ const KDCHAT = (() => {
     if (host) {
       const h = S.health;
       if (!h) {
-        host.innerHTML = '<span class="cd-health mut">collector health: checking…</span>';
+        host.innerHTML = '<span class="cd-health mut">collector status: checking…</span>';
       } else if (h.error) {
         host.innerHTML =
-          `<span class="cd-health mut">collector health: GitHub API not reachable from this browser (${esc(h.error)}) — ` +
+          `<span class="cd-health mut">collector status: GitHub API not reachable from this browser (${esc(h.error)}) — ` +
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
-      } else {
-        const gap = h.scheduleGapMinutes;
-        const late = gap !== null && gap > h.expectedMinutes * 2;
+      } else if (!h.latestRun) {
         host.innerHTML =
-          `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `collector cron <code>${esc(h.cronExpression)}</code> (every ${h.expectedMinutes}m): ` +
-          `${h.scheduled} of the last ${h.runs} runs were scheduled` +
-          (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
-          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
+          `<span class="cd-health mut">collector status: no main-branch runs returned · ` +
           `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
+      } else {
+        const run = h.latestRun;
+        const running = run.status === "in_progress";
+        const queued = run.status === "queued";
+        const succeeded = run.status === "completed" && run.conclusion === "success";
+        const label = running ? "running" : queued ? "queued" : run.status === "completed"
+          ? `completed · ${run.conclusion || "unknown"}`
+          : (run.status || "status unknown");
+        const tone = succeeded ? "ok" : running || queued ? "mut" : "warn";
+        const detailUrl = run.url || h.runsUrl;
+        const detailLabel = run.url ? "run details" : "runs";
+        const lastSuccess = h.lastSuccessAt && !succeeded
+          ? ` · last success ${esc(ago(h.lastSuccessAt))}`
+          : "";
+        host.innerHTML =
+          `<span class="cd-health ${tone}">latest collector run: ${esc(label)} ` +
+          `(${esc(ago(run.at))})${run.event ? ` · via ${esc(run.event)}` : ""}${lastSuccess} · ` +
+          `<a href="${esc(detailUrl)}" target="_blank" rel="noopener">${detailLabel}</a></span>`;
       }
     }
     const snapLine = document.getElementById("kdSnapLine");
