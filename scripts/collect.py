@@ -378,6 +378,64 @@ def update_price_history(hist, rows):
     return hist
 
 
+def backfill_from_candles(hist, tickers, max_series=12):
+    """Rebuild a missing observation series from Kalshi's official 1-minute candles.
+
+    Why: an archived >=$0.10 alert whose observations were pruned before the retention fix
+    above can never be charted again by accumulation alone — the market has already settled,
+    so no future GET /markets will ever report it. The move itself is still published by
+    Kalshi, in the market's own candlestick history, so the chart can show the real series
+    around the alert instead of an empty box.
+
+    Only markets that (a) appear in the alert archive and (b) have no observations at all are
+    backfilled, so this never overwrites collected data and costs at most `max_series`
+    requests. Each backfilled point is a candle CLOSE, not a REST last_price observation, and
+    is marked "source": "candle" so the two can be told apart. Documented restrictions used
+    here: period_interval is 1/60/1440 minutes, start_ts/end_ts are seconds, and one request
+    spans at most 5,000 periods (https://docs.kalshi.com/api-reference/market/get-market-candlesticks).
+    A candle with no price block is skipped, never written as 0.
+    """
+    from datetime import datetime, timezone
+    done = 0
+    for ticker in tickers:
+        if done >= max_series:
+            break
+        if hist.get(ticker, {}).get("observations"):
+            continue
+        series_ticker = ticker.split("-")[0]
+        end = int(datetime.now(timezone.utc).timestamp())
+        start = end - 5000 * 60            # 5,000 one-minute periods, the documented maximum
+        path = f"/series/{series_ticker}/markets/{ticker}/candlesticks"
+        try:
+            d, _ = get(path, {"start_ts": start, "end_ts": end, "period_interval": 1})
+        except RuntimeError as e:
+            print(f"  ! candle backfill {ticker}: {e}", file=sys.stderr)
+            continue
+        obs = []
+        for c in d.get("candlesticks") or []:
+            price = c.get("price") or {}
+            close = fnum(price.get("close_dollars", price.get("close")))
+            ts = c.get("end_period_ts")
+            if close is None or ts is None:
+                continue
+            when = datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            obs.append({
+                "t": when,
+                "last": close,
+                "yes_bid": fnum((c.get("yes_bid") or {}).get("close_dollars")),
+                "yes_ask": fnum((c.get("yes_ask") or {}).get("close_dollars")),
+                "volume_fp": c.get("volume_fp"),
+                "source": "candle",
+            })
+        if obs:
+            hist[ticker] = {"observations": obs[-PRICE_HISTORY_LIMIT:],
+                            "backfilled_from": f"{BASE}{path}?start_ts={start}&end_ts={end}&period_interval=1",
+                            "backfilled_at": utcnow()}
+            done += 1
+            print(f"  candle backfill {ticker}: {len(obs)} one-minute closes")
+    return hist, done
+
+
 def public_market_row(m, cat_id, basis, keep_rules=False):
     row = {
         "ticker": m.get("ticker"),
@@ -568,6 +626,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     kept_hist = {k: v for k, v in hist.items() if k in watch}
     hist_pruned = len(hist) - len(kept_hist)
     hist = kept_hist
+    # Tickers an archived alert names but for which no observation survived (pruned before
+    # the retention fix, or collected while the market was outside the open window) are
+    # rebuilt from the market's own official candles, and only those.
+    missing = sorted(t for t in archived_tickers if not hist.get(t, {}).get("observations"))
+    hist, backfilled = backfill_from_candles(hist, missing)
 
     payload = {
         "schema": 1,
@@ -618,6 +681,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "price_history_series_kept": len(hist),
             "price_history_series_pruned": hist_pruned,
             "price_history_kept_for_archived_alerts": len(archived_tickers),
+            "price_history_backfilled_from_candles": backfilled,
+            "price_history_backfill_note": (
+                "Archived-alert tickers with no surviving observation are rebuilt from "
+                "GET /series/{series}/markets/{ticker}/candlesticks (1-minute closes, marked "
+                "source=candle) so a published swing can always be charted."),
         },
         "open_markets": rows["open"],
         "settled_markets": rows["settled"],
