@@ -15,7 +15,8 @@ Why this exists
 What one run does
   pass  = sync to the remote head -> probe the demo REST root -> PRECHECKS (test_scope.py) -> collect.py
           -> build_alerts.py -> catalysts.py -> simulate.py -> every validator in VALIDATORS
-          -> commit data/live -> push (retried, never forced).
+          -> commit data/live -> push (retried, never forced) -> on the default branch, dispatch pages.yml
+          once for that commit (its release gate runs verify_release.py before it deploys).
   relay = on the default branch, repeat the pass on a fixed grid (pass k starts at t0 + k*INTERVAL;
           a pass that overruns skips the slots it missed instead of bursting to catch up) while
           k*INTERVAL <= RELAY, and dispatch exactly one successor run of collect.yml right before the
@@ -33,7 +34,7 @@ Bounds (each is enforced below and pinned by scripts/tests/test_collect_relay.py
   2. The workflow's concurrency group is per ref. GitHub runs at most one run per group and keeps at
      most one pending, a newer pending run replacing the older one
      (https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
-  3. Repository variable COLLECT_RELAY=off turns the relay and both dispatches off without a code change.
+  3. Repository variable COLLECT_RELAY=off turns the relay and every dispatch off without a code change.
      It is read when a run starts. To stop a relay that is already running: set the variable, then cancel
      the run (`gh run cancel <id>`); whatever run is pending behind it then makes one pass and stops.
   4. desk.yml (the only writer of data/live/roi.json) is dispatched only when roi.json is older than
@@ -46,6 +47,13 @@ Bounds (each is enforced below and pinned by scripts/tests/test_collect_relay.py
      committing run cannot loop faster than every INTERVAL_MIN_COMMIT (10) minutes, so collect adds at
      most 6 pushes/h (4/h at the 15-minute default) and the desk dispatch at most 2/h. Only a dry run,
      which pushes nothing, may loop faster (INTERVAL_MIN_DRY_RUN).
+  7. Publishing does not rely on undocumented behaviour. The GITHUB_TOKEN docs say "Commits pushed by a
+     GitHub Actions workflow that uses the GITHUB_TOKEN do not trigger a GitHub Pages build", although
+     GET /repos/{owner}/{repo}/pages/builds on this repository lists 29 of 96 legacy builds pushed by
+     github-actions[bot] (2026-11-21). So each committed pass on the default branch dispatches pages.yml
+     once ("workflow_dispatch ... events always create workflow runs", same page); pages.yml's own
+     concurrency group keeps at most one pending deploy. Nothing is published for a pass that did not
+     commit, from a branch, from a dry run, or with the kill switch on.
 
 Nothing here holds or needs a credential beyond the workflow's own GITHUB_TOKEN; the Kalshi calls are
 the same public, unauthenticated demo endpoints collect.py already uses.
@@ -122,6 +130,7 @@ class Plan:
     commit: bool
     successor_allowed: bool
     desk_allowed: bool
+    publish_allowed: bool
     killed: bool
 
 
@@ -144,6 +153,7 @@ def make_plan(ref: str, relay_in=None, interval_in=None, commit_in=None, kill=No
         # A dry run, a branch run or a switched-off relay never dispatches anything.
         successor_allowed=on_main and relay > 0 and commit and not killed,
         desk_allowed=on_main and commit and not killed,
+        publish_allowed=on_main and commit and not killed,
         killed=killed,
     )
 
@@ -213,6 +223,7 @@ def age_minutes(iso, now_epoch: float):
 class RelayResult:
     passes: list = field(default_factory=list)       # (started_epoch, outcome, detail)
     desk_dispatches: list = field(default_factory=list)
+    publishes: list = field(default_factory=list)   # epochs of pages.yml dispatches (one per committed pass)
     successor: tuple = (False, "")
 
 
@@ -245,6 +256,12 @@ def run_relay(plan: Plan, *, clock, sleep, do_pass, active_runs, dispatch, roi_a
         outcome, detail = do_pass(len(res.passes) + 1)
         res.passes.append((started, outcome, detail))
         log(f"pass {len(res.passes)}: {outcome} {detail}".rstrip())
+
+        if plan.publish_allowed and outcome == "committed":
+            published = dispatch("pages.yml")
+            if published:
+                res.publishes.append(clock())
+            log(f"  publish: pages.yml {'dispatched' if published else 'dispatch failed; the next commit retries'}")
 
         if plan.desk_allowed:
             now = clock()
@@ -428,7 +445,8 @@ def write_summary(plan: Plan, res: RelayResult):
         f"relay {plan.relay_minutes} min · every {plan.interval_minutes} min · commit {plan.commit} · "
         f"successor allowed {plan.successor_allowed} · COLLECT_RELAY off {plan.killed}",
         "", "| pass | started | outcome | detail |", "|---|---|---|---|", *rows, "",
-        f"desk.yml dispatches: {len(res.desk_dispatches)} · successor: {res.successor[1]}",
+        f"pages.yml dispatches: {len(res.publishes)} · desk.yml dispatches: {len(res.desk_dispatches)} · "
+        f"successor: {res.successor[1]}",
     ])
     print(text)
     if path:
@@ -445,7 +463,7 @@ def write_summary(plan: Plan, res: RelayResult):
                            + (f" ({d})" if d and o != "validated" else "")
                            for i, (t, o, d) in enumerate(res.passes, 1)),
                  f"plan: relay {plan.relay_minutes} min, every {plan.interval_minutes} min, commit {plan.commit}",
-                 f"desk.yml dispatches: {len(res.desk_dispatches)}",
+                 f"pages.yml dispatches: {len(res.publishes)} · desk.yml dispatches: {len(res.desk_dispatches)}",
                  f"successor: {res.successor[1]}",
              ]))
 

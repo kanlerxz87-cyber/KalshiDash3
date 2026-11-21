@@ -12,7 +12,9 @@ name: Collect Kalshi demo data
 #   scheduler: on main, one run is a bounded RELAY — scripts/collect_relay.py repeats the pass
 #   (probe -> collect -> alerts -> catalysts -> simulation -> validators -> commit) on a fixed
 #   15-minute grid for at most 5.5 hours and queues exactly one successor right before its final
-#   pass (the concurrency group holds it until this run ends, even by timeout). Every bound (default
+#   pass (the concurrency group holds it until this run ends, even by timeout). Each committed pass
+#   dispatches pages.yml once, so the snapshot is published through the verified release gate (the
+#   GITHUB_TOKEN docs say its pushes do not trigger a Pages build). Every bound (default
 #   branch only, >= 2 h of work before a successor, never while another run is queued,
 #   COLLECT_RELAY=off kill switch, <= 6 pushes/hour) is enforced in that script and pinned by
 #   scripts/tests/test_collect_relay.py. On any other branch a run is a single pass, as before.
@@ -52,7 +54,7 @@ on:
 
 permissions:
   contents: write
-  actions: write   # scripts/collect_relay.py: one collect.yml successor per relay; desk.yml when roi.json is stale
+  actions: write   # scripts/collect_relay.py: one collect.yml successor per relay; pages.yml once per committed pass; desk.yml when roi.json is stale
 
 # Per branch: a relay on main never blocks a single pass dispatched on a session branch (and the
 # other way round). GitHub runs at most one run per group and keeps at most one pending.

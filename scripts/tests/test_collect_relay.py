@@ -67,7 +67,7 @@ class FakeWorld:
 
     def dispatch(self, wf):
         self.attempts.append((self.now, wf))
-        if self.dispatch_ok and not self.dispatch_ok(len(self.attempts)):
+        if self.dispatch_ok and not self.dispatch_ok(wf, sum(1 for _, w in self.attempts if w == wf)):
             return False
         self.dispatched.append((self.now, wf))
         return True
@@ -126,6 +126,19 @@ def main() -> int:
     check(succ and succ[0] - starts[0] >= R.MIN_ELAPSED_FOR_SUCCESSOR * 60, "... and only after >= 120 min of looping")
     check(res.successor[0] is True, f"successor recorded ({res.successor[1]})")
     check(not any(wf == "desk.yml" for _, wf in w.dispatched), "fresh roi.json -> no desk dispatch")
+    pages = [t for t, wf in w.dispatched if wf == "pages.yml"]
+    check(len(pages) == 23 == len(res.publishes), f"one pages.yml dispatch per committed pass ({len(pages)}/23)")
+
+    print("publishing")
+    mixed = {1: ("committed", "a"), 2: ("no change", ""), 3: ("failed", "validators: test_alerts"),
+             4: ("dropped", "push race"), 5: ("committed", "b")}
+    w = FakeWorld(outcomes=lambda n: mixed.get(n, ("no change", "")))
+    res = w.run(p)
+    pages = [t for t, wf in w.dispatched if wf == "pages.yml"]
+    check(len(pages) == 2 and pages[0] < w.pass_starts[1] and w.pass_starts[4] < pages[1] < w.pass_starts[5],
+          "pages.yml only after the two passes that committed (not after no change / failed / dropped)")
+    check(p.publish_allowed and not b.publish_allowed and not k.publish_allowed and not d.publish_allowed,
+          "publishing only from main with commits on and the kill switch off")
 
     print("real clocks (the 2026-11-21 20:42Z branch dry run made 2 passes where 3 were due)")
     for label, over in (("sleep overshoots 5 ms", 0.005), ("sleep overshoots 3 s", 3.0),
@@ -161,13 +174,13 @@ def main() -> int:
     res = w.run(p)
     succ = [t for t, wf in w.dispatched if wf == "collect.yml"]
     check(len(succ) == 1 and succ[0] > w.pass_starts[-1], "only the final pass succeeded -> one successor, after it")
-    w = FakeWorld(dispatch_ok=lambda attempt: attempt > 1)
+    w = FakeWorld(dispatch_ok=lambda wf, attempt: wf != "collect.yml" or attempt > 1)
     res = w.run(p)
     tries = [t for t, wf in w.attempts if wf == "collect.yml"]
     sent = [t for t, wf in w.dispatched if wf == "collect.yml"]
     check(len(tries) == 2 and len(sent) == 1 and res.successor[0],
           "a failed dispatch before the final pass is retried exactly once, after it")
-    w = FakeWorld(dispatch_ok=lambda attempt: False)
+    w = FakeWorld(dispatch_ok=lambda wf, attempt: wf != "collect.yml")
     res = w.run(p)
     check(len([1 for _, wf in w.attempts if wf == "collect.yml"]) == 2 and not res.successor[0]
           and "cron" in res.successor[1], "two failed dispatches -> give up; the crons stay the restart path")
