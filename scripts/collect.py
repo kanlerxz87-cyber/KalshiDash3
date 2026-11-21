@@ -47,6 +47,7 @@ PRICE_HISTORY_LIMIT = 120  # points kept per market
 PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
 SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
 SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
+SETTLED_PUBLISHED_CAP = 200  # published settled rows in markets.json, allocated round-robin across topics
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
@@ -214,7 +215,10 @@ def scan_markets():
         cursor, seen = "", 0
         truncated = False
         while True:
-            d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None})
+            # Documented filter: mve_filter='exclude' omits multivariate combo markets
+            # server-side so the 25,000-row scan budget is not exhausted by combos
+            # (https://docs.kalshi.com/api-reference/market/get-markets).
+            d, _ = get("/markets", {"status": status, "limit": 1000, "mve_filter": "exclude", "cursor": cursor or None})
             batch = d.get("markets") or []
             out[status].extend(batch)
             seen += len(batch)
@@ -290,6 +294,76 @@ def orderbook_summary(ticker, depth=10):
         "source": f"{BASE}/markets/{ticker}/orderbook?depth={depth}",
         "fetched_at": utcnow(),
     }
+
+
+def select_settled(settled_rows: list[dict], cap: int = SETTLED_PUBLISHED_CAP,
+                   category_order: list[str] | None = None) -> tuple[list[dict], dict[str, int]]:
+    """Allocate the published settled window round-robin across topics.
+
+    Without topic-fair selection, 15-minute crypto series (~96 settlements/day)
+    crowd out slower topics — measured on 2026-11-21 at 198/200 crypto, 2 culture,
+    and 0 gas/elections/golf. Round-robin takes newest-first inside each topic,
+    letting high-frequency topics use leftover capacity without ever evicting a
+    slower topic. The resulting list is sorted newest-first by settlement_ts.
+    """
+    buckets: dict[str, list[dict]] = {}
+    for r in settled_rows:
+        cat = r.get("category_id") or "unknown"
+        buckets.setdefault(cat, []).append(r)
+    for rows in buckets.values():
+        rows.sort(key=lambda r: (r.get("settlement_ts") or "", r.get("ticker") or ""), reverse=True)
+
+    order = list(category_order) if category_order else sorted(buckets)
+    for cat in buckets:
+        if cat not in order:
+            order.append(cat)
+
+    chosen: list[dict] = []
+    seen_tickers: set[str] = set()
+    cursors = {cat: 0 for cat in order}
+    while len(chosen) < cap:
+        progressed = False
+        for cat in order:
+            if len(chosen) >= cap:
+                break
+            rows = buckets.get(cat) or []
+            while cursors[cat] < len(rows):
+                cand = rows[cursors[cat]]
+                cursors[cat] += 1
+                t = cand.get("ticker")
+                if t and t in seen_tickers:
+                    continue
+                if t:
+                    seen_tickers.add(t)
+                chosen.append(cand)
+                progressed = True
+                break
+        if not progressed:
+            break
+
+    chosen.sort(key=lambda r: (r.get("settlement_ts") or "", r.get("ticker") or ""), reverse=True)
+    by_cat = {cat: 0 for cat in order}
+    for r in chosen:
+        cat = r.get("category_id") or "unknown"
+        by_cat[cat] = by_cat.get(cat, 0) + 1
+    return chosen, by_cat
+
+
+def archived_alert_tickers(archive_path: Path | None = None) -> set[str]:
+    """Return every ticker referenced by data/live/alerts_archive.json.
+
+    Retaining price_history observations for archived-alert tickers prevents
+    chart data from disappearing when an alerted market rotates out of the
+    open-markets window.
+    """
+    path = archive_path if archive_path is not None else (LIVE / "alerts_archive.json")
+    if not path.exists():
+        return set()
+    try:
+        alerts = json.loads(path.read_text()).get("alerts") or []
+    except (OSError, json.JSONDecodeError):
+        return set()
+    return {str(a["ticker"]) for a in alerts if a.get("ticker")}
 
 
 def update_price_history(hist, rows):
@@ -463,7 +537,12 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     trimmed = len(rows["open"]) - len(kept)
     rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
-    settled_trimmed = max(0, len(rows["settled"]) - SETTLED_KEEP)
+    settled_in_scope_total = len(rows["settled"])
+    cat_order = [c["id"] for c in cats["categories"]]
+    published_settled, settled_by_cat = select_settled(
+        rows["settled"], cap=SETTLED_PUBLISHED_CAP, category_order=cat_order
+    )
+    settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
 
     # Liquidity depth for the top few open markets per category.
@@ -485,11 +564,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         except json.JSONDecodeError:
             hist = {}
     update_price_history(hist, raw["open"])
-    # Only keep history for markets that are actually shown, so the file stays small.
+    # Retain history for every displayed open market AND every archived-alert ticker
+    # so charts for >= $0.10 swings never go blank after a market closes or rotates
+    # out of the open window.
     # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
     # which the collect workflow runs right after this script. This file deliberately
     # does NOT write alerts (one writer, one schema); it only probes CORS headers.
-    watch = {r["ticker"] for r in rows["open"]}
+    watch = {r["ticker"] for r in rows["open"]} | archived_alert_tickers()
     hist = {k: v for k, v in hist.items() if k in watch}
 
 
@@ -511,6 +592,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_total_scanned": len(raw["settled"]),
             "open_in_scope": len(rows["open"]),
             "settled_in_scope": len(rows["settled"]),
+            "settled_in_scope_total": settled_in_scope_total,
+            "settled_published": len(published_settled),
+            "settled_published_cap": SETTLED_PUBLISHED_CAP,
+            "settled_published_by_category": settled_by_cat,
             "open_out_of_scope": unclassified["open"],
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],
@@ -529,7 +614,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "rows_dropped_wrong_status": wrong_bucket,
         },
         "open_markets": rows["open"],
-        "settled_markets": rows["settled"][:200],
+        "settled_markets": published_settled,
         "liquidity": depth_rows,
         "disclaimers": [
             "All values are from the Kalshi DEMO environment (mock funds). The official docs warn that demo prices and behaviour may not reflect real markets.",
