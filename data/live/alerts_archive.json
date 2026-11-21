@@ -2,6 +2,28 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXPGATOUR-THRC26-BHAR",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Brian Harman wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "status": "active",
+   "from_time": "2026-11-21T06:42:56Z",
+   "to_time": "2026-11-21T15:16:38Z",
+   "from_price": 0.005,
+   "to_price": 0.75,
+   "delta": 0.745,
+   "direction": "up",
+   "volume_24h_fp": 9017.71,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+   "to_yes_bid": 0.001,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T15:16:38Z",
+   "high_roi": true
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",
