@@ -175,6 +175,8 @@ function counts(w) {
     check(/▲ 10\.0¢/.test(txt), "delta printed as ▲ 10.0¢");
     check(txt.includes(T), "ticker printed verbatim");
     check(/markets\?tickers=/.test(one.querySelector("a").getAttribute("href")), "source link repeats the documented tickers= query");
+    const hrefs = [...one.querySelectorAll("a")].map((a) => a.getAttribute("href") || "");
+    check(hrefs.includes("dashboard.html#" + encodeURIComponent(T)), "bubble links directly to dashboard.html#TICKER chart");
   }
   check(/^near-live/.test(w2.document.getElementById("kdChip").textContent),
     "status chip reports near-live mode (not 'live' — the API caches /markets, F-58)");
