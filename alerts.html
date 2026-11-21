@@ -100,8 +100,10 @@
       (<a href="flagged.html">F-26</a>).
     </p>
     <p class="small mut">Category tabs filter both chats. Categories stay separate — a market is attributed to one
-      topic only, either by a fee-schedule-confirmed series (<span class="badge ok">confirmed</span>) or a flagged
-      keyword match (<span class="badge warn">keyword</span>).</p>
+      topic only: by the exchange's own series classification (<code>GET /series?category=…</code>, F-66), by a
+      fee-schedule-confirmed series (<span class="badge ok">confirmed</span>), or by a flagged keyword match
+      (<span class="badge warn">keyword</span>).</p>
+    <div id="withheldNote"></div>
     <div class="controls" id="catTabs"></div>
   </div>
 
@@ -127,6 +129,25 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/engine.js"></script>
 <script>
 KD.nav("alerts.html");
+
+// F-65: the chats are not allowed to show a swing the exchange files outside its topic. The archive
+// keeps every swing forever (history is never rewritten); the count of what is being withheld is
+// published by scripts/build_alerts.py, so it is stated here instead of being an invisible filter.
+(async () => {
+  try {
+    const doc = await KD.json("data/live/alerts.json");
+    const c = doc.counts || {};
+    const n = c.withheld_category_conflict;
+    if (!n) return;
+    const reasons = Object.entries(c.withheld_reasons || {}).flatMap(([cat, m]) =>
+      Object.entries(m).map(([cats, cnt]) => `${cat} ← officially ${cats}: ${cnt}`));
+    KD.$("#withheldNote").innerHTML =
+      `<div class="notice warn"><b>${n} archived swing(s) are withheld from both chats (F-65).</b>
+       Their market's own <code>GET /series</code> record files it under a category this topic cannot contain,
+       so the exchange itself says it is not a market in that topic. The archive is not rewritten — only the
+       displayed feeds exclude them. ${KD.esc(reasons.join(" · "))}.</div>`;
+  } catch (e) { /* no feed committed yet: nothing to disclose */ }
+})();
 
 const state = { cat: "", snap: null, alerts: [], timer: null, started: false, paused: false, watchN: 40, leads: null };
 

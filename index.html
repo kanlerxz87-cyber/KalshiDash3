@@ -127,12 +127,17 @@ KD.nav("");
   const qaRows = open.filter(KD.isQaRow).length + settled.filter(KD.isQaRow).length;
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
-    ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
+    ["Confirmed by the exchange", KD.num(confirmed), "series ticker listed in the official fee schedule (basis=seed)"],
     ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows in this snapshot"
       + " (of " + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " settled in scope)"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
-    + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`;
+    + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`
+    // F-65/F-66: rows the topics refused because the exchange's own series record contradicts
+    // the topic, and rows whose topic the exchange itself decided. Both are counted from the
+    // committed snapshot, not typed in, and both are clickable through to the reasons.
+    + `<div class="card"><div class="kpi">${KD.num((snap.counts?.open_excluded_category_conflict || 0) + (snap.counts?.settled_excluded_category_conflict || 0))}<small>rows refused: wrong official category</small></div><p class="small" style="margin-top:6px">the market's own <code>GET /series</code> record files it under a category the topic cannot contain (Test instruments, Sports awards); counted, never published. <a href="flagged.html">F-65</a></p></div>`
+    + `<div class="card"><div class="kpi">${KD.num(open.filter(r => r.category_matched_by === "official").length)}<small>topics decided by the exchange</small></div><p class="small" style="margin-top:6px">open rows whose topic came from the documented <code>GET /series?category=…</code> filter rather than a title keyword. <a href="flagged.html">F-66</a></p></div>`;
 
   // Highest dollars-traded estimate per category, 1 row each.
   const top = {};
@@ -186,7 +191,7 @@ KD.nav("");
         The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
         collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
         series cannot crowd out gas, elections, culture or golf
-        (<code>counts.settled_published_by_category</code>).
+        (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
         Settled markets older than the exchange's published historical cutoff
         (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
         <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing

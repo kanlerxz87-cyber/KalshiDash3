@@ -274,6 +274,37 @@ def build() -> dict:
 
     refuse(problems)
 
+    # F-65: the alert chats withhold a swing whose own GET /series record files it outside its
+    # topic. This lead table must not then list that swing, or the page would contradict itself
+    # (12 of 26 archived swings at the time of the fix were the demo Test series). The ledger is
+    # the authority, the same one scripts/build_alerts.py reads; the archive is left untouched.
+    ledger_series = markets.get("series_index") or {}
+    row_by_ticker = {r.get("ticker"): r for r in rows.values()}
+    compatible = {
+        "gas": {"Economics", "Commodities", "Financials"},
+        "elections": {"Elections", "Politics", "World", "International"},
+        "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+        "crypto": {"Crypto", "Financials"},
+        "golf": {"Sports", "Golf"},
+    }
+    withheld = []
+
+    def _keep(r: dict) -> bool:
+        ticker = r.get("ticker") or ""
+        snap = row_by_ticker.get(ticker) or {}
+        official = [str(c) for c in (snap.get("series_categories") or [])]
+        if not official:
+            series = snap.get("series_ticker") or ticker.upper().split("-")[0]
+            official = [str(c) for c in ((ledger_series.get(series) or {}).get("categories") or [])]
+        cat = r.get("category_id") or snap.get("category_id")
+        ok = compatible.get(cat or "", set())
+        if not official or not ok or any(o in ok for o in official):
+            return True
+        withheld.append(ticker)
+        return False
+
+    out_rows = [r for r in out_rows if _keep(r)]
+
     reviewed = [r for r in out_rows if r["state"] != "not_reviewed"]
     counts = {
         "archive_total": len(out_rows),
@@ -282,6 +313,9 @@ def build() -> dict:
         "external_move_coincides": sum(1 for r in out_rows if r["state"].startswith("external_move_coincides")),
         "no_external_move_supporting": sum(1 for r in out_rows if r["state"].startswith("no_external_move")),
         "links_shown": sum(len(r["links"]) for r in out_rows),
+        # F-65: archived swings whose official series record puts them outside the topic, kept
+        # out of this table as well as out of the chats, and counted so the number is auditable.
+        "withheld_category_conflict": len(withheld),
     }
     return {
         "schema": 1,

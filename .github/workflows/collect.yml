@@ -34,10 +34,19 @@ on:
         required: false
         default: "true"
   schedule:
-    # Restart path only: if a relay ever stops (runner lost, kill switch lifted), the next schedule
-    # event that GitHub does deliver starts a new one. Off the top of the hour on purpose: "High load
-    # times include the start of every hour"
-    # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+    # Why two crons and why the minutes are not zero, from the official docs
+    # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule):
+    #   - "The schedule event can be delayed during periods of high loads ... High load times
+    #      include the start of every hour ... some queued jobs may be dropped. To decrease the
+    #      chance of delay, schedule your workflow to run at a different time of the hour."
+    #   - "The shortest interval you can run scheduled workflows is once every 5 minutes."
+    # Measured on this repository on 2026-11-21 (gh run list --workflow=collect.yml): a */20 cron
+    # produced 2 scheduled runs in ~10 hours while 21 manual dispatches ran normally, i.e. the
+    # snapshot layer aged past its own 45-minute staleness banner most of the day. Two off-peak
+    # crons plus the chained dispatch below (a documented GITHUB_TOKEN exception, see the last
+    # step) keep fresh public data on the page without inventing a cadence the platform offers.
+    # [T55, arena-b25b0914: the chained dispatch is now the relay successor queued by
+    #  scripts/collect_relay.py; on main these crons are the RESTART path if a relay ever stops.]
     - cron: "7,27,47 * * * *"
     - cron: "13,43 * * * *"
 
@@ -71,3 +80,51 @@ jobs:
           COLLECT_RELAY: ${{ vars.COLLECT_RELAY }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: python3 -u scripts/collect_relay.py
+      # ---------------------------------------------------------------------------------
+      # F-67 (measured 2026-11-21, this session): a workflow cannot sustain its own cadence.
+      #
+      # The previous step here was a "bounded freshness watchdog" that dispatched collect.yml
+      # when the snapshot was more than 35 minutes old. It cannot work, for a reason that is
+      # visible in the data rather than in an opinion:
+      #   * the snapshot commit is made with the repository's GITHUB_TOKEN, and the GitHub docs
+      #     state that such a push does not start a run — so it does not trigger this workflow
+      #     at all, and the workflow cannot dispatch from inside a run that never happens;
+      #   * a dispatched run started from inside a run only fires while runs keep happening,
+      #     i.e. while the cron is delivering; the moment the cron stalls, so does the rescue.
+      # Observed schedule deliveries on main (Actions API, gh run list --workflow=collect.yml,
+      # event == schedule): 2026-11-20T19:14:35Z, 2026-11-21T00:49:31Z, 15:15:48Z, 15:20:32Z.
+      # Four deliveries in ~20 hours against a declared cadence of 12/hour. The 15:15/15:20 pair
+      # is the back-to-back conflation the GitHub docs warn about.
+      # So the step is now a REPORT, not a rescue: it prints the measured delivery gaps so the
+      # number is in the run log and on the record, and it changes nothing. A monitor now lives
+      # in .github/workflows/freshness-alarm.yml, which runs on its own cron and can therefore
+      # still act when collect.yml's cron stalls (it is subject to the same platform behaviour,
+      # which is disclosed there).
+      # [T55, arena-b25b0914, merged 2026-11-21: the step above now sustains the cadence from inside one
+      #  long run on main and queues its own successor with workflow_dispatch, which the GITHUB_TOKEN
+      #  docs exempt (https://docs.github.com/en/actions/concepts/security/github_token). This report
+      #  is kept unchanged as the measured record. test_scope.py still runs BEFORE collecting, in every
+      #  pass (PRECHECKS in scripts/collect_relay.py), as be07a04 intended.]
+      - name: "Cadence report — measured schedule deliveries, no self-dispatch"
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          if ! command -v gh >/dev/null 2>&1; then
+            echo "gh unavailable; no cadence measurement in this run"
+            exit 0
+          fi
+          echo "Measured collect.yml schedule deliveries (newest first):"
+          gh run list --workflow=collect.yml --limit 40 --json createdAt,event \
+            --jq '[.[] | select(.event == "schedule") | .createdAt] | .[:8] | .[]' || true
+          python3 - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("data/live/markets.json")
+          try:
+              doc = json.loads(p.read_text())
+              print("snapshot collected_at:", doc.get("collected_at"), "| open rows:", len(doc.get("open_markets") or []))
+          except Exception as e:
+              print("snapshot unreadable:", e)
+          PY
+          echo "Why there is no self-dispatch here: F-67, recorded on flagged.html."

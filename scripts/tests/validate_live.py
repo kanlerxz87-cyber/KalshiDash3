@@ -47,6 +47,27 @@ def check(cond: bool, msg: str) -> None:
         errors.append(msg)
 
 
+def check_by_category(tag: str, row: dict) -> None:
+    # Kept independent of scripts/collect.py on purpose: the validator must be able to refuse a
+    # snapshot produced by a broken collector, so it re-states the rule rather than importing it.
+    compatible = {
+        "gas": {"Economics", "Commodities", "Financials"},
+        "elections": {"Elections", "Politics", "World", "International"},
+        "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+        "crypto": {"Crypto", "Financials"},
+        "golf": {"Sports", "Golf"},
+    }
+    official = [str(c) for c in (row.get("series_categories") or [])]
+    cat = row.get("category_id")
+    if not official or cat not in compatible:
+        return
+    if any(o in compatible[cat] for o in official):
+        return
+    errors.append(
+        f"{tag} published under {cat} but its official series categories are {official} (F-65)"
+    )
+
+
 def check_simulation() -> None:
     """Simulation-only check. Runs only when data/live/simulation.json exists.
 
@@ -135,6 +156,13 @@ def main() -> int:
             check(not missing, f"{tag} missing keys {sorted(missing)}")
             check(r.get("category_id") in CATEGORY_IDS, f"{tag} bad category_id {r.get('category_id')!r}")
             check(r.get("category_basis") in ("seed", "keyword"), f"{tag} bad category_basis")
+            # Category integrity (F-65): the official categories recorded on a row must not
+            # contradict the topic the row is published under. The check is deliberately
+            # one-directional: an absent list is unknown and passes.
+            if "series_categories" in r:
+                cats = r.get("series_categories")
+                check(isinstance(cats, list), f"{tag} series_categories must be a list")
+                check_by_category(tag, r)
             # A market whose series is in the fee-schedule seed list must never be
             # demoted to "keyword": that would understate what is confirmed.
             seed_series = SEED_SERIES

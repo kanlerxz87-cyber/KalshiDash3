@@ -240,6 +240,49 @@ def main() -> int:
     missing = [path for _, path in R.VALIDATORS if not (ROOT / path).exists()]
     check(not missing, f"every listed validator exists (missing: {missing})")
 
+    print("one pass, in order (git, network and subprocesses stubbed)")
+    calls: list[str] = []
+
+    class Done:
+        def __init__(self, rc=0):
+            self.returncode, self.stdout, self.stderr = rc, "", ""
+
+    def fake_sh(args, timeout=600, check=False):
+        calls.append(" ".join(args[1:2]) if args[0] == "python3" else " ".join(args[:2]))
+        return Done(1 if fail_on and args[0] == "python3" and args[1] == fail_on else 0)
+
+    saved = (R.sh, R.sync_to_remote, R.probe_api, R.commit_and_push, R.discard_changes, R.annotate)
+    notes: list[str] = []
+    # No real workflow commands from a test: verify_release.py runs this inside pages.yml, where a printed
+    # "::error::" would become a bogus annotation on the Pages check run.
+    R.annotate = lambda level, title, text="", tail=15: notes.append(f"{level}: {title}")
+    R.sh, R.sync_to_remote, R.probe_api = fake_sh, (lambda ref: "abc1234"), (lambda: (True, "HTTP 200"))
+    R.commit_and_push = lambda ref: (calls.append("commit_and_push"), ("committed", "def5678"))[1]
+    R.discard_changes = lambda: calls.append("discard")
+    try:
+        fail_on = None
+        out = R.make_pass(R.make_plan("main"))(1)
+        order = [c for c in calls if c.startswith("scripts/")]
+        check(out == ("committed", "def5678") and calls[-1] == "commit_and_push", f"a clean pass commits last ({out})")
+        check(order[0] == "scripts/tests/test_scope.py" and order[1] == "scripts/collect.py",
+              "test_scope.py runs BEFORE collect.py (be07a04's intent kept)")
+        check(order.count("scripts/tests/test_scope.py") == 2 and order.index("scripts/tests/validate_live.py") > 1,
+              "... and again after collecting, on the new snapshot, before the commit")
+        calls.clear(); fail_on = "scripts/tests/test_scope.py"
+        out = R.make_pass(R.make_plan("main"))(2)
+        check(out[0] == "failed" and "scripts/collect.py" not in calls and "commit_and_push" not in calls
+              and any("pre-check test_scope FAILED" in x for x in notes),
+              f"a failing pre-check collects and commits nothing, and says so ({out[1]})")
+        calls.clear(); fail_on = "scripts/tests/validate_live.py"
+        out = R.make_pass(R.make_plan("main"))(3)
+        check(out[0] == "failed" and "commit_and_push" not in calls and "discard" in calls,
+              f"a failing validator discards the pass ({out[1]})")
+        calls.clear(); fail_on = None
+        out = R.make_pass(R.make_plan("main", commit_in="false"))(4)
+        check(out[0] == "validated" and "commit_and_push" not in calls, "a dry-run pass validates and commits nothing")
+    finally:
+        R.sh, R.sync_to_remote, R.probe_api, R.commit_and_push, R.discard_changes, R.annotate = saved
+
     print("")
     if FAIL:
         print(f"FAILED: {len(FAIL)} check(s)")

@@ -719,7 +719,7 @@ window.KDL = (() => {
   AT.load();
 
   return {
-    BASE, ALERT_THRESHOLD, MODEL, STRATS,
+    BASE, ALERT_THRESHOLD, MODEL, STRATS,   // BASE lets a page print the exact official URL it queried
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
     feedAlerts, clearFeed, renderFeed, bubble,

@@ -13,8 +13,9 @@ Why this exists
   (0 dispatches in that window). This script replaces it.
 
 What one run does
-  pass  = probe the demo REST root -> collect.py -> build_alerts.py -> catalysts.py -> simulate.py
-          -> every validator in VALIDATORS -> commit data/live -> push (retried, never forced).
+  pass  = sync to the remote head -> probe the demo REST root -> PRECHECKS (test_scope.py) -> collect.py
+          -> build_alerts.py -> catalysts.py -> simulate.py -> every validator in VALIDATORS
+          -> commit data/live -> push (retried, never forced).
   relay = on the default branch, repeat the pass on a fixed grid (pass k starts at t0 + k*INTERVAL;
           a pass that overruns skips the slots it missed instead of bursting to catch up) while
           k*INTERVAL <= RELAY, and dispatch exactly one successor run of collect.yml right before the
@@ -75,14 +76,19 @@ MIN_ELAPSED_FOR_SUCCESSOR = 120  # minutes of looping before a successor may be 
 DESK_STALE_MIN = 30
 ACTIVE_STATUSES = {"queued", "in_progress", "pending", "waiting", "requested"}
 
+# Offline checks that must pass BEFORE anything is collected. arena-20d7ddf7 added test_scope.py as a step
+# ahead of collect.py on main (be07a04: "so an F-65/F-66 regression cannot publish"); a failure skips the pass.
+PRECHECKS = [
+    ("test_scope", "scripts/tests/test_scope.py"),
+]
 PIPELINE = [
     ("collect", ["python3", "scripts/collect.py", "--orderbooks", "4"], 1200),
     ("build_alerts", ["python3", "scripts/build_alerts.py"], 600),
     ("catalysts", ["python3", "scripts/catalysts.py"], 600),
     ("simulate", ["python3", "scripts/simulate.py"], 600),
 ]
-# Every validator that gated a commit in the single-pass workflow, plus test_scope.py (offline
-# classifier + page assertions; arena-20d7ddf7 asked for it to gate collection, see R-B2).
+# Every validator that gated a commit in the single-pass workflow, plus test_scope.py again: it also reads
+# data/live/markets.json, so after collecting it checks the NEW snapshot before anything is committed.
 VALIDATORS = [
     ("test_scope", "scripts/tests/test_scope.py"),
     ("validate_live", "scripts/tests/validate_live.py"),
@@ -341,6 +347,15 @@ def make_pass(plan: Plan):
         if not ok:
             annotate("warning", f"pass {n}: demo REST root unavailable ({why}); nothing collected")
             return "failed", f"API probe {why}"
+        for name, path in PRECHECKS:
+            try:
+                p = sh(["python3", path], timeout=600)
+            except subprocess.TimeoutExpired:
+                annotate("error", f"pass {n}: pre-check {name} timed out; nothing collected")
+                return "failed", f"pre-check {name} timeout"
+            if p.returncode != 0:
+                annotate("error", f"pass {n}: pre-check {name} FAILED; nothing collected", (p.stdout + p.stderr)[-3000:])
+                return "failed", f"pre-check {name}"
         for name, args, timeout in PIPELINE:
             try:
                 p = sh(args, timeout=timeout)

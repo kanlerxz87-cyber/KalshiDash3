@@ -109,8 +109,139 @@ check('"of " + KD.num(settled.length) + " settled markets in scope"' not in inde
 
 # 4. the exclusion must be published, never silent
 collect_src = (ROOT / "scripts" / "collect.py").read_text()
-for token in ("open_excluded_off_topic_or_qa", "settled_excluded_off_topic_or_qa", "excluded_series_reasons"):
+for token in ("open_excluded_off_topic_or_qa", "settled_excluded_off_topic_or_qa", "excluded_series_reasons",
+              "open_excluded_category_conflict", "settled_excluded_category_conflict",
+              "category_conflict_reasons"):
     check(token in collect_src, f"collect.py must publish {token} so exclusions are auditable")
+
+# 4b. CATEGORY INTEGRITY (F-65). Found on the deployed site on 2026-11-21:
+#     a Culture headline market that Kalshi itself files under Sports, matched by the keyword
+#     "oscar" in the player's first name, and Test-series rows inside Crypto. The official
+#     series records below were fetched the same day and are the authority for the expectation:
+#       GET /trade-api/v2/series/KXEPLFIRSTGOAL -> categories ["Sports"], tags ["Soccer"]
+#       GET /trade-api/v2/series/KXEPLAST       -> categories ["Sports"], tags ["Soccer"]
+#       GET /trade-api/v2/series/KXEPLSOA       -> categories ["Sports"], tags ["Soccer"]
+#       GET /trade-api/v2/series/KXDEMOFUTHOURLY-> categories ["Test"],   tags ["Demo"]
+#       GET /trade-api/v2/series/KXAAAGASM      -> categories ["Economics"]
+#       GET /trade-api/v2/series/KXBTCY         -> categories ["Crypto"]
+#       GET /trade-api/v2/series/KXPGATOUR      -> categories ["Sports"], tags ["Golf"]
+#       GET /trade-api/v2/series/KXEMMYCACTO    -> categories ["Entertainment"]
+#       GET /trade-api/v2/series/KXBALLONDOR    -> categories ["Sports"], tags ["Soccer"]
+#     The last line is why the rule cannot be "seeds are always right": KXBALLONDOR is in the
+#     official fee schedule AND filed under Sports, so it is not a Culture market either.
+FOOTBALL_PROP = {"ticker": "KXEPLFIRSTGOAL-26NOV21MCIFUL-FULOBOBB14",
+                 "event_ticker": "KXEPLFIRSTGOAL-26NOV21MCIFUL",
+                 "title": "Oscar Bobb: First Goalscorer", "yes_sub_title": "Oscar Bobb"}
+# The keyword classifier does match it (that is how the bug happened) ...
+check(classify(FOOTBALL_PROP, "EPL 1st Goalscorer", "Sports") == ("culture", "keyword"),
+      "precondition: the keyword fallback really does match 'oscar' in 'Oscar Bobb' (F-65)")
+# ... and the official category is what stops it.
+check(collect.category_conflict("culture", ["Sports"], "keyword") is not None,
+      "a Sports series must not be published inside Culture (F-65)")
+check(collect.category_conflict("crypto", ["Test"], "keyword") is not None,
+      "a Test series must not be published inside Crypto (F-65)")
+check(collect.category_conflict("culture", ["Sports"], "seed") is not None,
+      "the rule must also apply to a fee-schedule seed: KXBALLONDOR is Sports, not Culture (F-65)")
+for cat, cats in (("gas", ["Economics"]), ("crypto", ["Crypto"]), ("golf", ["Sports"]),
+                  ("culture", ["Entertainment"]), ("elections", ["Elections"])):
+    check(collect.category_conflict(cat, cats, "seed") is None,
+          f"the compatible category {cats} must keep {cat} rows (F-65)")
+check(collect.category_conflict("crypto", [], "seed") is None,
+      "an absent categories field is unknown, never a contradiction (F-65)")
+check(collect.official_categories({"category": "Crypto"}) == ["Crypto"],
+      "official_categories must fall back to the singular category field (F-65)")
+check(collect.official_categories(None) == [] and collect.official_categories({"categories": None}) == [],
+      "missing series records must yield [] rather than a guess (F-65)")
+check("series_categories" in collect_src,
+      "every published row must carry the official series_categories it was checked against (F-65)")
+# The five topics' compatible sets must be explicit and cover every topic exactly once.
+check(set(collect.CATEGORY_COMPATIBLE) == {"gas", "elections", "culture", "crypto", "golf"},
+      "CATEGORY_COMPATIBLE must define exactly the brief's five topics (F-65)")
+check("Test" in collect.CATEGORY_NEVER_IN_SCOPE,
+      "the Test category must be named explicitly as never in scope (F-65)")
+
+# 4c. OFFICIAL DISCOVERY (F-66). The five topics use the documented GET /series filters
+#     (https://docs.kalshi.com/api-reference/market/get-series-list):
+#       category -> "Return series whose `categories` list contains this value ... exact and
+#                   case-sensitive"
+#       tags     -> same endpoint, tags filter
+#     Verified live 2026-11-21: ?category=Entertainment returns KXEMMYCACTO, KXSAGAWARDACTODRAMA,
+#     KXAWARDSCMAMOTY, KX1SONG; ?category=Elections returns KXNYCMAYOR2ND, KXVILNIUSMAYOR;
+#     ?tags=Golf returns KXGOLF, KXPHOENIXOPEN, KXTGLCHAMPION (all categories ["Sports"]).
+import io
+from unittest import mock as _mock
+
+CATS_DOC = json.loads((ROOT / "data" / "categories.json").read_text())
+for c in CATS_DOC["categories"]:
+    has_filter = bool(c.get("official_categories")) or bool(c.get("official_tags"))
+    # A topic may legitimately have NO official filter, but then it must say why in
+    # official_mapping_note and that note must name the observation that ruled the filter out.
+    check(has_filter or bool(c.get("official_mapping_note")),
+          f"topic {c['id']} must either declare an official GET /series filter or explain why not (F-66)")
+    if has_filter:
+        check(bool(c.get("official_mapping_note")),
+              f"topic {c['id']} must record how its filter was verified (F-66)")
+    check(c.get("official_source", "").startswith("https://docs.kalshi.com/"),
+          f"topic {c['id']} must link the official docs for its filter (F-66)")
+
+FAKE = {
+    "Entertainment": ["KXEMMYCACTO", "KXSAGAWARDACTODRAMA", "KXAWARDSCMAMOTY"],
+    "Elections": ["KXNYCMAYOR2ND", "KXVILNIUSMAYOR", "KXELECTIRAN"],
+    "Crypto": ["KXBTCY", "KXETHY", "KXDEMOFUTHOURLY"],
+    "Economics": ["KXAAAGASM", "KXAAAGASD"],
+    "Sports": ["KXPGATOUR", "KXBALLONDOR", "KXEPLFIRSTGOAL"],
+}
+TAGS = {"Golf": ["KXPGATOUR", "KXGOLF", "KXGOLFTENNISMAJORS"]}
+
+
+def fake_get(path, params=None, retries=3):
+    if path == "/series" and params:
+        if "category" in params:
+            return {"series": [{"ticker": t} for t in FAKE.get(params["category"], [])]}, "url"
+        if "tags" in params:
+            return {"series": [{"ticker": t} for t in TAGS.get(params["tags"], [])]}, "url"
+    raise RuntimeError("unexpected GET " + path)
+
+
+with _mock.patch.object(collect, "get", fake_get):
+    omap, ocalls = collect.official_discovery(CATS_DOC)
+check(omap.get("KXEMMYCACTO", {}).get("category_id") == "culture",
+      "official ?category=Entertainment must map an Emmys series to Culture (F-66)")
+check(omap.get("KXNYCMAYOR2ND", {}).get("category_id") == "elections",
+      "official ?category=Elections must map an election series to Elections (F-66)")
+check(omap.get("KXGOLF", {}).get("category_id") == "golf",
+      "official ?tags=Golf must map a Sports-categorised golf series to Golf (F-66)")
+check("KXWTIDIRY" not in omap,
+      "?category=Sports and ?tags=Oil & Gas must not be used as topic filters: they return other "
+      "sports and crude oil, which would flood Golf and Gas (F-66)")
+check("Sports" not in {c.get("value") for c in ocalls if c.get("filter") == "category"},
+      "Sports must never be used as a whole-topic filter (4,243 series; it contains every sport) (F-66)")
+check(collect.excluded_series_reason("culture", "KXBALLONDOR") is not None,
+      "the Ballon d'Or exclusion is what keeps a Sports award out of Culture (F-66)")
+check(all(c["url"].startswith("https://external-api.demo.kalshi.co/trade-api/v2/series?")
+          for c in ocalls if "error" not in c),
+      "every discovery call must record the exact official URL it used (F-66)")
+# A failed filter call must be reported, never silently drop a topic's only mapping.
+def failing_get(path, params=None, retries=3):
+    raise RuntimeError("HTTP 500 simulated")
+
+with _mock.patch.object(collect, "get", failing_get):
+    omap2, ocalls2 = collect.official_discovery(CATS_DOC)
+check(omap2 == {} and all("error" in c for c in ocalls2),
+      "a failed discovery call must be recorded with its error, not assumed to be empty (F-66)")
+
+# Per-topic series exclusions: Ballon d'Or is officially Sports/Soccer, so it stays out of
+# Culture even though the fee schedule lists it (and even though ?tags=Awards might catch it).
+check(collect.excluded_series_reason("culture", "KXBALLONDOR") is not None,
+      "KXBALLONDOR must be excluded from Culture with a reason (F-66)")
+check(collect.excluded_series_reason("culture", "KXEMMYCACTO") is None,
+      "the exclusion must be narrow: a real Entertainment series stays in Culture (F-66)")
+check(collect.excluded_series_reason("golf", "KXGOLFTENNISMAJORS") is not None,
+      "a tennis-vs-golf comparison series must not be a Golf event (F-66)")
+for topic, entries in collect.TOPIC_EXCLUDE_SERIES.items():
+    for ex in entries:
+        check(bool(ex.get("reason")) and "http" in ex["reason"],
+              f"every {topic} exclusion must cite the official series record that justifies it (F-66)")
 
 # 5. the committed snapshot must not contain a QA fixture inside the five topics
 live = ROOT / "data" / "live" / "markets.json"
@@ -130,6 +261,23 @@ if live.exists():
     if natgas_rows:
         print(f"note: {len(natgas_rows)} natural-gas row(s) still present in the committed snapshot; "
               f"the next collection drops them")
+
+    # 6. F-65 self-check on the committed data: no published row may contradict the official
+    #    categories recorded on itself. Rows written before this fix carry no series_categories,
+    #    so they are reported (visible) rather than failed — the collector owns this file and
+    #    the next scheduled run rewrites it.
+    conflicting = []
+    for r in (snap.get("open_markets") or []) + (snap.get("settled_markets") or []):
+        if collect.category_conflict(r.get("category_id"), r.get("series_categories") or [],
+                                     r.get("category_basis")) is not None:
+            conflicting.append(r["ticker"])
+    check(not conflicting,
+          "the committed snapshot must not publish a row that contradicts its own official "
+          f"series_categories (F-65): {', '.join(conflicting[:5])}")
+    unchecked = [r["ticker"] for r in (snap.get("open_markets") or []) if "series_categories" not in r]
+    if unchecked:
+        print(f"note: {len(unchecked)} open row(s) predate the series_categories field "
+              f"({', '.join(unchecked[:3])} …); the next collection records it")
 
 if errors:
     print("FAIL")

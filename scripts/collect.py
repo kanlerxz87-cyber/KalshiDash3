@@ -46,15 +46,11 @@ UA = "KalshiDash3-collector/1.0 (+https://github.com/kanlerxz87-cyber/KalshiDash
 PRICE_HISTORY_LIMIT = 120  # points kept per market
 PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
 SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
-SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
-# Hard cap on settled rows PUBLISHED in the snapshot (was a bare [:200] that followed a
-# global newest-first sort). A global sort starves four of the five topics: 15-minute
-# crypto markets settle ~96 a day, so the newest 200 rows were 92% crypto and the gas,
-# elections, culture and golf resolution history was silently cut off. The published set
-# is therefore chosen PER TOPIC (see `select_settled`), which is what the brief asks for
-# ("keep topics separate but keep events within the same topic organized together").
-SETTLED_PUBLISH_CAP = 200
-HISTORICAL_BACKFILL_PER_SEED = 40  # settled rows pulled per seeded series from /historical/markets
+SETTLED_KEEP = 1600        # most recent settled rows kept per status window, so the file stays browser-sized
+SETTLED_PUBLISH_CAP = 200  # settled rows PUBLISHED, chosen per topic (see select_settled)
+HISTORICAL_PER_SEED = 40   # settled rows pulled per seeded series from GET /historical/markets
+HISTORICAL_BACKFILL_PER_SEED = HISTORICAL_PER_SEED
+HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
@@ -77,6 +73,62 @@ EXCLUDE_KEYWORD_SERIES: dict[str, str] = {
     "KXNATGAS15M": "natural-gas futures (Commodities, Pyth NATGAS), not retail gasoline prices",
 }
 EXCLUDE_TITLE_RE = re.compile(r"demo portfolio test|portfolio cash out|\bqa\s*\d", re.I)
+
+# 3. A keyword fallback match on a market's TITLE is not evidence about its topic when the
+#    series itself is filed by Kalshi under a category that cannot be one of the five. Two
+#    instances were live on the deployed site on 2026-11-21:
+#      KXEPLFIRSTGOAL / KXEPLAST / KXEPLSOA  -> series.categories ["Sports"], tags ["Soccer"]
+#        matched Culture because the keyword "oscar" appears in the PLAYER'S NAME "Oscar Bobb".
+#        It was Culture's headline market on the landing page ("largest open" row) that whole day.
+#      KXDEMOFUTHOURLY -> series.categories ["Test"], tags ["Demo"], title
+#        "Demo hourly event contract futures"; matched Crypto because its market title contains
+#        "BTC". 8 of the 23 archived >= $0.10 swings were this test instrument.
+#    Official records (fetched 2026-11-21T20:19-20:23Z, GET {BASE}/series/{ticker}):
+#      https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLFIRSTGOAL
+#      https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY
+#    Rule: a row's official `categories` list is recorded on every row (category_source), and a
+#    SEED row's official categories are checked for consistency with its topic. A seed row whose
+#    categories are known, non-empty and contain none of the topic's compatible categories is
+#    dropped and counted, because the brief's five topics cannot include a series Kalshi files
+#    as Test or as a different sport. Unknown/empty categories never drop a row: absence of the
+#    field is not evidence (KXBTCY, for example, returns Crypto and would pass; a series with no
+#    categories list stays as it is and remains labelled by its basis).
+#
+#    Also documented in the same place: GET /series supports
+#      ?category=<exact, case-sensitive>  (https://docs.kalshi.com/api-reference/market/get-series-list)
+CATEGORY_COMPATIBLE = {
+    "gas": {"Economics", "Commodities", "Financials"},
+    "elections": {"Elections", "Politics", "World", "International"},
+    "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
+    "crypto": {"Crypto", "Financials"},
+    "golf": {"Sports", "Golf"},
+}
+# Official Kalshi categories that can never belong to any of the five topics, whatever a title
+# keyword says. Kept explicit so the exclusion is auditable rather than a silent side effect.
+CATEGORY_NEVER_IN_SCOPE = {"Test", "Demo"}
+
+# F-66: a broad official category can contain the topic AND everything next to it. Sports is
+# the case that matters: it is where Kalshi files golf, and also every other sport. Naming a
+# specific series as out of scope is the narrow, auditable way to handle that, and each entry
+# records the official record that justifies it. Applied AFTER the broad match, so golf keeps
+# working while a soccer award does not become Culture.
+#   KXBALLONDOR  GET /series/KXBALLONDOR -> categories ["Sports"], tags ["Soccer"]
+#   KXGOLFTENNISMAJORS -> categories ["Sports"], tags ["Golf","Tennis"]: a tennis-vs-golf
+#     comparison is not a golf event, so it is excluded from Golf specifically.
+TOPIC_EXCLUDE_SERIES: dict[str, list[dict]] = {
+    "culture": [
+        {"series": "KXBALLONDOR",
+         "reason": "Ballon d'Or: official series record is categories ['Sports'], tags ['Soccer'] "
+                   "(https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR); it is a "
+                   "football award, not a culture market"},
+    ],
+    "golf": [
+        {"series": "KXGOLFTENNISMAJORS",
+         "reason": "Tennis-vs-golf comparison: official series tags ['Golf','Tennis'] "
+                   "(https://external-api.demo.kalshi.co/trade-api/v2/series/KXGOLFTENNISMAJORS); "
+                   "not a golf tournament market"},
+    ],
+}
 
 
 def utcnow() -> str:
@@ -183,6 +235,53 @@ def classify(cats, series_ticker, series_title, series_categories, market_title)
     return None, None
 
 
+def excluded_series_reason(cat_id: str, series_ticker: str) -> str | None:
+    """Reason string when the topic names this series as out of scope (F-66), else None."""
+    st = (series_ticker or "").upper()
+    for ex in TOPIC_EXCLUDE_SERIES.get(cat_id or "", []):
+        if ex["series"] == st:
+            return ex["reason"]
+    return None
+
+
+def official_categories(series_record) -> list[str]:
+    """The series' own `categories` list, verbatim from GET /series.
+
+    Returns [] when the record is missing or the field is absent, and [] is treated as
+    "unknown", never as "contradicts" — a field the API did not return is not evidence.
+    """
+    if not isinstance(series_record, dict):
+        return []
+    cats = series_record.get("categories")
+    if isinstance(cats, list):
+        return [str(c) for c in cats if str(c).strip()]
+    single = series_record.get("category")
+    return [str(single)] if single else []
+
+
+def category_conflict(cat_id: str, official: list[str], basis: str, tags: list[str] | None = None) -> str | None:
+    """Return a reason when the series' official category contradicts the topic, else None.
+
+    Applied to every row, seed or keyword, because a series can be in the fee schedule and
+    still not be one of the five topics: KXBALLONDOR ("Ballon d'Or") is a fee-schedule seed
+    that Kalshi files under Sports, and the brief's Culture topic is not football awards.
+    The fee schedule is the authority for a series EXISTING; the series record is the
+    authority for its CATEGORY (https://docs.kalshi.com/api-reference/market/get-series-list).
+
+    Unknown categories ([] ) never conflict. A known category that is in the topic's
+    compatible set never conflicts. A known category outside it does conflict, and the reason
+    names the official category so the count on the page is auditable.
+    """
+    if not official or not cat_id:
+        return None
+    ok = CATEGORY_COMPATIBLE.get(cat_id, set())
+    if any(o in ok for o in official):
+        return None
+    if any(o in CATEGORY_NEVER_IN_SCOPE for o in official):
+        return f"official series categories {official} are test/demo instruments, not a live event in {cat_id}"
+    return f"official series categories {official} are not {cat_id} (compatible: {sorted(ok)})"
+
+
 def fetch_series_index():
     """GET /series — used only to enrich titles/categories.
 
@@ -196,6 +295,50 @@ def fetch_series_index():
     except RuntimeError as e:
         print(f"  ! /series unavailable ({e}); continuing without it", file=sys.stderr)
         return {}
+
+
+def official_discovery(cats) -> tuple[dict[str, dict], list[dict]]:
+    """Series the EXCHANGE itself files under each topic, via the documented filters.
+
+    Why this exists: before F-66 the only ways into a topic were (a) a ticker in the fee
+    schedule or (b) a keyword match on a title, and both are weak — the keyword path put a
+    soccer prop inside Culture because a player is called Oscar, and the fee-schedule path
+    put the Ballon d'Or (officially Sports) inside Culture, while Culture had almost no rows
+    at all even though Kalshi lists dozens of official Entertainment series. The API documents
+    exactly the filter needed:
+
+      GET /series?category=<value>  "Return series whose `categories` list contains this value."
+      GET /series?tags=<value>      (tags filter, same endpoint)
+      https://docs.kalshi.com/api-reference/market/get-series-list
+
+    Each topic declares both filters in data/categories.json (`official_categories`,
+    `official_tags`). Matching is exact and case-sensitive, as the documentation requires.
+    Every call is recorded (url, value, count, or the error) so the mapping is auditable, and a
+    failed call is reported and skipped — it never silently widens a topic.
+
+    Returns (series -> {category_id, matched_by, value}, calls).
+    """
+    by_series: dict[str, dict] = {}
+    calls: list[dict] = []
+    for c in cats["categories"]:
+        for kind, values in (("category", c.get("official_categories") or []),
+                             ("tags", c.get("official_tags") or [])):
+            for value in values:
+                url = f"{BASE}/series?{kind}={value}"
+                try:
+                    d, _ = get("/series", {kind: value})
+                except RuntimeError as e:
+                    print(f"  ! {url}: {e}", file=sys.stderr)
+                    calls.append({"category_id": c["id"], "filter": kind, "value": value,
+                                  "url": url, "series": 0, "error": str(e)})
+                    continue
+                tickers = [s.get("ticker", "").upper() for s in d.get("series", []) if s.get("ticker")]
+                for t in tickers:
+                    by_series.setdefault(t, {"category_id": c["id"], "filter": kind, "value": value})
+                calls.append({"category_id": c["id"], "filter": kind, "value": value,
+                              "url": url, "series": len(tickers)})
+                print(f"  official {c['id']:<9} {kind}={value:<20} -> {len(tickers)} series")
+    return by_series, calls
 
 
 def scan_markets():
@@ -340,7 +483,7 @@ def update_price_history(hist, rows):
     return hist
 
 
-def public_market_row(m, cat_id, basis, keep_rules=False):
+def public_market_row(m, cat_id, basis, keep_rules=False, official_cats=None, matched_by=None):
     row = {
         "ticker": m.get("ticker"),
         "event_ticker": m.get("event_ticker"),
@@ -349,6 +492,13 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
         "title": m.get("title") or m.get("yes_sub_title") or "",
         "category_id": cat_id,
         "category_basis": basis,
+        # The official category the EXCHANGE files this series under, verbatim, so a reader can
+        # see that e.g. a Culture row is Entertainment or that a row was checked and matched.
+        # Empty list = the series record did not return the field; never filled in.
+        "series_categories": list(official_cats or []),
+        # How the topic was decided: "official" (the exchange's own GET /series filter),
+        # "seed" (fee-schedule ticker) or "keyword" (title heuristic). F-66.
+        "category_matched_by": matched_by or basis,
         "status": m.get("status"),
         "result": m.get("result") or None,
         "last_price_dollars": fnum(m.get("last_price_dollars")),
@@ -384,36 +534,98 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
     return row
 
 
+DEFAULT_CATS = ("gas", "elections", "culture", "crypto", "golf")
 
-def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=("gas", "elections", "culture", "crypto", "golf")):
+
+def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=DEFAULT_CATS):
     """Choose which settled rows to publish, fairly across the five topics.
 
-    Round-robin by topic, newest-first inside each topic, so no single high-frequency
-    series (15-minute crypto markets) can crowd out the others. Every row returned keeps
-    its own fetch time and source URL; the per-topic counts are published so a reader can
-    see exactly how the cap was spent. Nothing is dropped silently.
+    The published set used to be `rows[:200]` after one global newest-first sort. That
+    silently starved four of the five topics: 15-minute crypto markets settle dozens of
+    times a day, so of the 200 rows the landing page showed on 2026-11-21, 198 were crypto
+    and gas/elections/culture/golf had no resolution history at all — even though the
+    snapshot held 1,600 settled in-scope rows. The brief asks for live events tracked
+    "until the events have resolved" with topics kept separate, so the cap is now spent
+    per topic.
+
+    Round-robin, newest-first inside each topic. A topic with less history simply stops
+    contributing and the others take the remaining capacity. Returns the picked rows plus
+    the per-topic split, so the snapshot can publish exactly how the cap was spent.
     """
     by_cat = {}
     for r in sorted(rows, key=lambda r: (r.get("settlement_ts") or ""), reverse=True):
         by_cat.setdefault(r.get("category_id") or "other", []).append(r)
     order = [c for c in cats if c in by_cat] + [c for c in by_cat if c not in cats]
-    picked, idx = [], {c: 0 for c in order}
-    # Two passes: pass 1 gives every topic its share one row at a time; pass 2 lets
-    # a topic with more history use leftover capacity once every other topic is served.
+    picked, taken = [], {c: 0 for c in order}
     while len(picked) < cap:
         progressed = False
         for c in order:
             if len(picked) >= cap:
                 break
-            lst = by_cat[c]
-            if idx[c] < len(lst):
-                picked.append(lst[idx[c]])
-                idx[c] += 1
+            if taken[c] < len(by_cat[c]):
+                picked.append(by_cat[c][taken[c]])
+                taken[c] += 1
                 progressed = True
         if not progressed:
             break
     picked.sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
-    return picked, {c: idx[c] for c in order}
+    return picked, {c: n for c, n in taken.items()}
+
+
+def split_and_select_settled(rows, keep=SETTLED_KEEP, cap=SETTLED_PUBLISH_CAP):
+    """Pick the published settled rows (full set first), then trim the stored window.
+
+    This exists as its own function because the ORDER is the defect: calling select_settled()
+    on the already-trimmed window looks right and is wrong. Returns
+    (stored_window, published_rows, published_by_category).
+    """
+    published, by_cat = select_settled(rows, cap=cap)
+    return rows[:keep], published, by_cat
+
+
+def historical_settled(seed_tickers, per_seed=HISTORICAL_PER_SEED):
+    """Settled rows for seeded series that the live endpoints can no longer return.
+
+    Documented behaviour: markets that settled before GET /historical/cutoff's
+    `market_settled_ts` "are only available via GET /historical/markets"
+    (https://docs.kalshi.com/getting_started/historical_data), and `GET /markets` stops
+    returning them. So a topic that settles rarely — the seeded elections series
+    KXELECTIRAN is the clear case — can look like it has no resolution history at all
+    even though the exchange settled some of its markets months ago.
+
+    Parameters used here are the ones the endpoint documents
+    (https://docs.kalshi.com/api-reference/historical/get-historical-markets):
+    `series_ticker` (one series per call; the filters are mutually exclusive),
+    `limit` (max 1000) and `cursor` for pagination.
+
+    Bounded on purpose: one request per seeded series, at most `per_seed` settled rows
+    kept, and a failure is reported and skipped — the live scan already succeeded, so a
+    historical hiccup must never fail the collection.
+    """
+    got_rows, report = {}, {}
+    for ticker in seed_tickers:
+        try:
+            d, url = get("/historical/markets", {"series_ticker": ticker, "limit": HISTORICAL_PAGE}, retries=2)
+        except RuntimeError as e:
+            report[ticker] = {"error": str(e), "kept": 0}
+            print(f"  ! historical {ticker}: {e}", file=sys.stderr)
+            continue
+        batch = d.get("markets") or []
+        kept = 0
+        for m in batch:
+            if not m.get("result"):          # only a resolved market has a result
+                continue
+            t = m.get("ticker")
+            if not t or t in got_rows:
+                continue
+            got_rows[t] = m
+            kept += 1
+            if kept >= per_seed:
+                break
+        report[ticker] = {"returned": len(batch), "kept": kept, "url": url}
+        if kept:
+            print(f"  historical {ticker:<16} -> {kept} settled market(s) from the archive")
+    return got_rows, report
 
 
 def build(include_orderbooks: int = 4, candlestick_points: int = 0):
@@ -422,6 +634,14 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     print(f"collect: {BASE}")
     series_index = fetch_series_index()
     print(f"  series index: {len(series_index)} entries")
+    # F-65: the index is a single GET /series call, so it can be partial or unavailable. Every
+    # series that produced a row — and every series in the topic seed lists — gets an
+    # authoritative per-series record too, so the category check is never a function of whether
+    # the bulk index happened to include that series. One request per distinct series.
+
+    # F-66: the exchange's own topic mapping, built from the documented GET /series filters.
+    official_map, official_calls = official_discovery(cats)
+    print(f"  official discovery: {len(official_map)} series mapped across {len(official_calls)} calls")
     raw = scan_markets()
     print(f"  markets: open={len(raw['open'])} settled={len(raw['settled'])}")
 
@@ -451,56 +671,63 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                     if not cursor or not batch or got >= 5000:
                         break
                 print(f"  seed {seed['ticker']:<16} {status:<8} -> {got} market(s)")
-    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
 
-    # ---- topic coverage for TOPICS THAT DO NOT SETTLE OFTEN -------------------
-    # A settled market older than the documented cutoff is only available from
-    # GET /historical/markets, so a topic whose last settlement predates the cutoff
-    # looks like it has no resolution history at all. Measured 2026-11-21:
-    #   GET /historical/cutoff -> market_settled_ts 2026-09-21T00:00:00Z
-    #   the seeded elections series KXELECTIRAN has exactly one settled market,
-    #   KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z (result "no") — before the
-    #   cutoff, so GET /markets?status=settled can never return it.
-    # Official sources: https://docs.kalshi.com/getting_started/historical_data
-    #                   https://docs.kalshi.com/api-reference/historical/get-historical-markets
-    # Bounded on purpose: at most HISTORICAL_BACKFILL_PER_SEED markets per seeded series,
-    # one request per series, failures never fatal (the live scan already succeeded).
+    # Topics that settle rarely: pull their archived settled markets as well. See
+    # historical_settled() for the documented reason this is necessary.
+    hist_cutoff, hist_report = None, {}
     try:
-        cutoff, _ = get("/historical/cutoff", retries=2)
-        historical_cutoff = cutoff.get("market_settled_ts")
+        cutoff_payload, _ = get("/historical/cutoff", retries=2)
+        hist_cutoff = cutoff_payload.get("market_settled_ts")
     except RuntimeError as e:
-        historical_cutoff = None
         print(f"  ! /historical/cutoff unavailable ({e})", file=sys.stderr)
-    backfill_rows: dict[str, dict] = {}
-    for c in cats["categories"]:
-        for seed in c["seed_series"]:
-            try:
-                d, _ = get("/historical/markets", {"limit": 1000, "series_ticker": seed["ticker"]}, retries=2)
-                batch = d.get("markets") or []
-            except RuntimeError:
-                continue  # the endpoint rejects unknown filter combinations; not fatal
-            got = 0
-            for m in batch:
-                if str(m.get("status") or "").lower() not in ("finalized", "settled", "determined", "closed"):
-                    continue
-                if not m.get("result"):
-                    continue
-                backfill_rows[m["ticker"]] = m
-                got += 1
-                if got >= HISTORICAL_BACKFILL_PER_SEED:
-                    break
-            if got:
-                print(f"  historical {seed['ticker']:<16} -> {got} settled market(s) from the archive")
-    for t, m in backfill_rows.items():
+    seed_tickers = [s["ticker"] for c in cats["categories"] for s in c["seed_series"]]
+    hist_rows, hist_report = historical_settled(seed_tickers)
+    for t, m in hist_rows.items():
         seeded["settled"].setdefault(t, m)
+    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}"
+          f" (historical backfill: {len(hist_rows)})")
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
         raw[status].extend([m for t, m in seeded[status].items() if t not in have])
+
+    # Series-level category ledger, published with the snapshot (F-65). Keyed by series ticker,
+    # value = the official categories verbatim plus where they came from. Series the API did not
+    # answer for are recorded with categories null — unknown, never inferred.
+    ledger: dict[str, dict] = {}
+
+    def record_series(ticker: str) -> None:
+        t = (ticker or "").upper()
+        if not t or t in ledger:
+            return
+        rec = series_index.get(t)
+        if rec is None:
+            try:
+                d, _ = get(f"/series/{t}")
+                rec = d.get("series") or {}
+            except RuntimeError as e:
+                print(f"  ! series {t}: {e}", file=sys.stderr)
+                rec = None
+        cats_official = official_categories(rec)
+        ledger[t] = {
+            "categories": cats_official if cats_official else None,
+            "title": (rec or {}).get("title"),
+            "tags": (rec or {}).get("tags"),
+            "source": f"{BASE}/series/{t}",
+        }
+
+    for t in sorted({series_of(m) for st2 in ("open", "settled") for m in raw[st2]}):
+        record_series(t)
+    no_answer = sorted(t for t, v in ledger.items() if not v["categories"])
+    print(f"  series ledger: {len(ledger)} series, {len(no_answer)} without an official categories answer")
 
     rows = {"open": [], "settled": []}
     unclassified = {"open": 0, "settled": 0}
     excluded_mve = {"open": 0, "settled": 0}
     excluded_topic = {"open": 0, "settled": 0}
+    cat_conflicts = {"open": 0, "settled": 0}
+    conflict_reasons: dict[str, int] = {}
+    excluded_series = {"open": 0, "settled": 0}
+    excluded_series_reasons: dict[str, str] = {}
     wrong_bucket = 0
     for status in ("open", "settled"):
         for m in raw[status]:
@@ -521,8 +748,39 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                 " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
                 m.get("title") or m.get("yes_sub_title"),
             )
+            # F-66: the exchange's own mapping outranks both the fee-schedule ticker match and
+            # the keyword heuristic, but a per-topic exclusion outranks everything.
+            matched_by = basis
+            off = official_map.get(st)
+            if off:
+                if excluded_series_reason(off["category_id"], st):
+                    excluded_series[status] += 1
+                    excluded_series_reasons[st] = excluded_series_reason(off["category_id"], st)
+                    continue
+                cat_id = off["category_id"]
+                # Only two basis values are ever published; the official mapping is recorded
+                # in category_matched_by so the schema the pages read does not change.
+                basis = "seed" if any(
+                    seed2["ticker"].upper() == st
+                    for c2 in cats["categories"] for seed2 in c2["seed_series"]
+                ) else "keyword"
+                matched_by = "official"
+            if cat_id and excluded_series_reason(cat_id, st):
+                excluded_series[status] += 1
+                excluded_series_reasons[st] = excluded_series_reason(cat_id, st)
+                continue
             if not cat_id:
                 unclassified[status] += 1
+                continue
+            # Category integrity (F-65): the exchange's own view of the series' category is
+            # recorded on the row and, when it is known and contradicts the topic, the row is
+            # dropped and counted by reason. See CATEGORY_COMPATIBLE / category_conflict.
+            record_series(st)
+            official = ledger.get(st, {}).get("categories") or []
+            conflict = category_conflict(cat_id, official, basis)
+            if conflict:
+                cat_conflicts[status] += 1
+                conflict_reasons[conflict] = conflict_reasons.get(conflict, 0) + 1
                 continue
             # Final safety check on the lifecycle status rather than trusting the
             # bucket: 'finalized', 'determined' and 'closed' are not open markets.
@@ -530,7 +788,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             if status == "open" and st_status in ("finalized", "determined", "closed", "settled"):
                 wrong_bucket += 1
                 continue
-            rows[status].append(public_market_row(m, cat_id, basis, keep_rules=(status == "open")))
+            rows[status].append(
+                public_market_row(m, cat_id, basis, keep_rules=(status == "open"), official_cats=official,
+                                  matched_by=matched_by)
+            )
 
     # Rank open markets by the labelled estimate so the page leads with the
     # biggest live markets in each category, then keep a bounded window per
@@ -556,13 +817,14 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
     settled_in_scope_total = len(rows["settled"])
     settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
+    # ORDER MATTERS, and the first version of this fix got it wrong: choosing the published
+    # set AFTER `[:SETTLED_KEEP]` looks per-topic but is not, because that 1,600-row window is
+    # itself nearly all crypto 15-minute markets. Measured on the 2026-11-21T20:27Z snapshot,
+    # which shipped that ordering: the per-topic split still came out crypto 178 / gas 17 /
+    # culture 5, with zero elections and zero golf rows. The selection therefore runs on the
+    # FULL in-scope list first, and only the leftover window is trimmed for file size.
+    rows["settled"], settled_published, settled_by_cat = split_and_select_settled(rows["settled"])
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
-    # Choose the published set from the FULL in-scope set, BEFORE the row cap. Selecting
-    # after `[:SETTLED_KEEP]` was the second half of F-41: the 1,600 most recent rows were
-    # already almost all crypto, so a per-topic round robin over that window had no
-    # elections rows to choose from (confirmed: an elections market settles —
-    # KXELECTIRAN-26JUL01, result "no", settlement_ts 2026-07-01T15:24:15Z — yet none appeared).
-    settled_published, settled_published_by_cat = select_settled(rows["settled"])
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -630,6 +892,18 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             # Published, never silent: scope corrections the brief requires.
             "open_excluded_off_topic_or_qa": excluded_topic["open"],
             "settled_excluded_off_topic_or_qa": excluded_topic["settled"],
+            # Category integrity (F-65): rows the topic matched by keyword or seed whose OWN
+            # official series record files them under a category the topic cannot contain.
+            "open_excluded_series": excluded_series["open"],
+            "settled_excluded_series": excluded_series["settled"],
+            "excluded_series_detail": dict(sorted(excluded_series_reasons.items())),
+            "official_discovery_calls": official_calls,
+            "official_discovery_series": len(official_map),
+            "open_excluded_category_conflict": cat_conflicts["open"],
+            "settled_excluded_category_conflict": cat_conflicts["settled"],
+            "category_conflict_reasons": dict(sorted(conflict_reasons.items())),
+            "category_compatible_official": {k: sorted(v) for k, v in CATEGORY_COMPATIBLE.items()},
+            "category_never_in_scope_official": sorted(CATEGORY_NEVER_IN_SCOPE),
             "excluded_series_reasons": dict(EXCLUDE_KEYWORD_SERIES),
             "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
             # Scan completeness, published: what the ranking below could see at all.
@@ -637,15 +911,20 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
             "safety_scan_cap": SAFETY_SCAN_CAP,
             "settled_rows_trimmed_for_size": settled_trimmed,
+            # What was published out of what was in scope, and the per-topic split:
+            # the row cap must never be spent by one high-frequency topic alone.
             "settled_in_scope_total": settled_in_scope_total,
+            "settled_kept_window": len(rows["settled"]),
             "settled_published": len(settled_published),
-            "settled_published_cap": SETTLED_PUBLISH_CAP,
-            "settled_published_by_category": settled_published_by_cat,
-            "historical_cutoff_market_settled_ts": historical_cutoff,
-            "historical_backfill_rows": len(backfill_rows),
+            "settled_publish_cap": SETTLED_PUBLISH_CAP,
+            "settled_published_by_category": settled_by_cat,
+            "historical_cutoff_market_settled_ts": hist_cutoff,
+            "historical_backfill_rows": len(hist_rows),
+            "historical_backfill_report": hist_report,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
         },
+        "series_index": dict(sorted(ledger.items())),
         "open_markets": rows["open"],
         "settled_markets": settled_published,
         "liquidity": depth_rows,
@@ -655,6 +934,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "category_basis=keyword rows are heuristic word-boundary matches and are flagged for review; only basis=seed rows are confirmed by the official fee schedule.",
             "Multivariate (combo) markets are excluded from every category: they combine unrelated legs and have their own lifecycle channel.",
             "Two scope corrections are published in counts: natural-gas futures (KXNATGAS15M, official series category Commodities / Pyth NATGAS) are not retail gas prices and Kalshi demo QA fixtures are not live events. Seed series can never be excluded by these rules.",
+            "series_index records, per series ticker, the official categories returned by GET /series for that series (null when the API did not answer), so a row's topic can be re-checked after the row leaves the open scan.",
+            "Category integrity: every row carries series_categories, the official categories returned by GET /series for its series. A row whose official categories are known and contain none of that topic's compatible categories is counted in *_excluded_category_conflict with its reason, never published under the topic. A row with no categories field returned stays published (unknown is not a contradiction).",
             "result can be yes, no, scalar, or empty. Nothing is coerced to yes/no.",
         ],
     }

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T06:38:13Z",
+ "generated": "2026-11-21T20:44:00Z",
  "note": "Every row was checked against the official Kalshi source named in `source` on 2026-11-20. Rows whose source is an API URL were observed directly; rows whose source is a documentation page were read. Live market values are not stored here as claims: they are collected into data/live/markets.json with a timestamp.",
  "facts": [
   {
@@ -141,10 +141,9 @@
    "id": "F-20",
    "claim": "Live market values (prices, volumes, resolutions) in this repo",
    "value": "",
-   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
+   "source": "",
    "verified": false,
-   "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL.",
-   "checked_against": "each live value is re-fetched from the demo Trade API at collection time; the field names and enum values above are what the official Get Markets reference documents"
+   "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL."
   },
   {
    "id": "F-21",
@@ -516,11 +515,42 @@
    "value": "The most recent candlesticks can be a few seconds behind the latest trades and quotes",
    "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
    "verified": true
+  },
+  {
+   "id": "F-70",
+   "claim": "Markets that settled before GET /historical/cutoff's market_settled_ts are only reachable through GET /historical/markets",
+   "value": "market_settled_ts partitions markets and their candlesticks; \"Settled markets and their candlesticks older than the cutoff will not appear\" in GET /markets",
+   "source": "https://docs.kalshi.com/getting_started/historical_data",
+   "verified": true,
+   "note": "Re-read this session (2026-11-21 20:2xZ). This is why a seeded elections market settled 2026-07-01 could never appear in a GET /markets?status=settled scan, whatever the page size."
+  },
+  {
+   "id": "F-71",
+   "claim": "GET /historical/markets filter parameters and paging",
+   "value": "tickers (comma-separated), event_ticker (single), series_ticker (single), mve_filter=exclude, limit default 100 / max 1000, cursor; the page states \"Filters are mutually exclusive\"",
+   "source": "https://docs.kalshi.com/api-reference/historical/get-historical-markets",
+   "verified": true,
+   "note": "Backfill in scripts/collect.py sends one series_ticker per call with limit=1000, which respects both the filter and the limit documented here."
+  },
+  {
+   "id": "F-72",
+   "claim": "Candlestick path parameters are required and named series_ticker + ticker",
+   "value": "/series/{series_ticker}/markets/{ticker}/candlesticks; start_ts and end_ts required (Unix seconds); period_interval required, one of 1, 60, 1440",
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true,
+   "note": "Confirmed again this session while wiring the dashboard chart; the earlier F-29 row already covered the interval list."
+  },
+  {
+   "id": "F-73",
+   "claim": "Archived candlesticks have their own documented endpoint",
+   "value": "GET /historical/markets/{ticker}/candlesticks is listed under Historical Endpoints",
+   "source": "https://docs.kalshi.com/getting_started/historical_data",
+   "verified": true
   }
  ],
  "counts": {
-  "total": 68,
-  "verified": 67,
+  "total": 72,
+  "verified": 71,
   "unverified": 1
  }
 }

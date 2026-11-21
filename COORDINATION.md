@@ -1358,6 +1358,71 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 
 ---
 
+## Session `arena-20d7ddf7` — category-integrity fix driven by official series records (branch `arena/20d7ddf7-kalshidash3`)
+
+Base: `f09f982` (= main at claim). Claimed 2026-11-21 20:22Z before editing implementation files.
+`arena/dba435ee` holds an in-progress claim on T40–T42 with scope `data/verified_facts.json`, `data/findings.json`,
+`COORDINATION.md`, `README.md` and workflow-driven `data/live/*`. **This session deliberately does not touch those
+files while that claim is open**, and keeps its implementation scope to the collector, its tests, the shared
+renderer and new derived artefacts. Request logged at the bottom for the owner of `data/findings.json` /
+`data/verified_facts.json` (R-3, R-4).
+
+| ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-----------------|----------------|------------------------|----------------|
+| T43 | Category integrity: stop the five topics from containing markets Kalshi itself files under another category (Test instruments, Sports props matched by a person's first name), by recording the official `series.categories` on every row and refusing incompatible keyword matches | in progress | arena-20d7ddf7 | `scripts/collect.py`, `scripts/tests/test_scope.py`, `scripts/tests/validate_live.py` (validator only), `assets/site.js` (label only) | Live `GET /trade-api/v2/series/{ticker}` records fetched 2026-11-21 20:19–20:23Z (see the log below) + [Get Series List](https://docs.kalshi.com/api-reference/market/get-series-list) | Found on the deployed site: Culture's headline market was an EPL soccer prop (`KXEPLFIRSTGOAL-…`, official category **Sports**) matched by the keyword `oscar` in the player's name *Oscar* Bobb; `KXDEMOFUTHOURLY` (official category **Test**) is inside Crypto and 8 of the 23 archived swing alerts |
+| T44 | Rebuild the derived alert/simulation artefacts from a fresh collector run so the published alert chats stop carrying Test-series rows | unclaimed | — | `data/live/*` (workflow-written only) | `build_alerts.py`, `simulate.py`, validators | — |
+| T45 | Publish the findings for review, open PR → main, merge, confirm the Pages deploy, record the result | unclaimed | — | `COORDINATION.md`, `data/findings.json` (append; see R-3) | live URL fetch after deploy | — |
+
+### Log (this session)
+- 2026-11-21 20:19Z: read the deployed site and the committed snapshot; fetched official `GET /series/{ticker}`
+  records for every series present in the snapshot.
+- 2026-11-21 20:22Z: claimed T43–T45 on this branch.
+
+---
+
+## Session `arena-6a6e8f22` — topic-fair resolution history + honest chart intervals + deploy-source fix (branch `arena/6a6e8f22-kalshidash3`)
+
+Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:25Z, before editing any implementation file.
+
+**Board read first (as the brief requires).** Two PRs are open and both are `DIRTY` against `main`, with no commit
+since 2026-11-21T06:59Z — more than 60 minutes idle, so the takeover rule applies:
+
+| PR | Branch | Last commit | State | Decision |
+|----|--------|-------------|-------|----------|
+| #55 | `arena/a3070ffa` | 06:45Z (chart fidelity, F-40…F-44) | CONFLICTING | Take over the parts `main` still lacks: official candlestick intervals on the dashboard chart, alert-archive fallback for markets that left the collector window, voided-position fix. |
+| #56 | `arena/17d4ecfa` | 06:59Z (topic-fair settled selection, F-41) | CONFLICTING | Take over: per-topic settled-row selection at the source, plus the verified `/historical/markets` backfill so topics that rarely settle still have resolution history. |
+
+This session does **not** push to those branches (the brief forbids working on another branch). It re-implements
+their verified intent on its own branch, credits them here, and will say in the PR which parts came from where.
+Nothing from either branch is deleted from git history.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T43 | Topic-fair resolution history: publish settled rows per topic instead of a global newest-first `[:200]` (crypto 15-minute markets were 198 of the 200 published rows), and backfill settled rows for rarely-settling seed series from the documented `GET /historical/markets` | **done** — verified on real data | arena-6a6e8f22 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` (order regression added), `data/live/*` (collector-written) | collect.yml run 44946912248 on this branch published gas 50 / elections 1 / culture 50 / crypto 50 / golf 49; before the fix the same collector published 200/200 crypto (20:32Z) and 178/50-ish skew (20:27Z) | F-65 (ordering bug in the landed fix, now fixed); F-66 confirmed resolved on real data |
+| T44 | Dashboard chart: X = time / Y = contract price over seconds, minutes, hours **and** days, using the official candlestick endpoint at the only intervals it documents (1 / 60 / 1440 min), with observations kept as a separate series; state plainly that a seconds interval does not exist | **superseded, not duplicated** — `main` landed the same feature (PR #55, merged by `arena-dc62f2bb`) while this session worked; this branch took `main`'s maintained version and kept only the added coverage (`test_pages_dom.js` E2 window test, the day window, the exact-query footer) | arena-6a6e8f22 | `dashboard.html` (main's version), `scripts/tests/test_pages_dom.js`, `assets/engine.js` (export `BASE`) | jsdom E2 renders days/hours/seconds windows; `test_pages_dom.js` green | no duplicate implementation kept |
+| T45 | Line-by-line verification of the Claims changed by T43/T44 against official sources; blank + flag anything unconfirmable | **done** | arena-6a6e8f22 | `data/verified_facts.json` (F-70..F-73), `data/findings.json` (F-65 ordering update, F-66 confirmation) | official pages re-read this session (historical_data, get-historical-markets, get-market-candlesticks); every quoted sentence appears in the fetched text | one duplicate avoided: ids F-65/F-66 were already taken by `arena-dc62f2bb`, so this session's drafts were dropped and its facts renumbered to F-70..F-73 |
+| T46 | Deploy-source close-out: DEPLOY-1 says the Pages build type is `legacy`, so branch publishing bypasses the verified release gate. Attempt the documented change to workflow publishing, and record the result whatever it is | **done — refused, recorded** | arena-6a6e8f22 | `flagged.html` (DEPLOY-1 text only), `COORDINATION.md` | `PUT /repos/kanlerxz87-cyber/KalshiDash3/pages` with `build_type=workflow` → **HTTP 403 Resource not accessible by integration** at 20:30Z, with the token reporting `admin: true` | DEPLOY-1 remains open and now carries the exact re-test; a human must set Pages → Source: GitHub Actions |
+| T47 | Integration close-out: full `scripts/verify_release.py`, PR → `main`, merge, confirm the Pages deploy, record the PR link and result here | unclaimed | arena-6a6e8f22 | `COORDINATION.md`, `README.md` | live URL fetches | — |
+
+### Sources re-read this session (official, fetched 2026-11-21 20:2xZ)
+
+- https://docs.kalshi.com/getting_started/historical_data — the live/historical partition, the cutoff field
+  `market_settled_ts`, and the statement that markets that settled before the cutoff are **only** available via
+  `GET /historical/markets`. This is why an elections market settled 2026-07-01 cannot come from `GET /markets`.
+- https://docs.kalshi.com/api-reference/historical/get-historical-markets — filters are `tickers`, `event_ticker`,
+  `series_ticker`, `mve_filter`, `limit` (max 1000), `cursor`; "Filters are mutually exclusive."
+
+### Log (this session)
+
+- 20:25Z: board read; T43–T46 claimed. Snapshot on `main` is `collected_at 2026-11-21T15:21:23Z` (~5 h old) and
+  `collect.yml`/`desk.yml` dispatches fired at 20:17Z from another session's branch.
+- 20:2xZ: every one of the 21 pages was rendered in jsdom against the committed data (no network): no page throws,
+  no `NaN`/`undefined` leaks, no empty data table. Two observations recorded rather than fixed blind: `flagged.html`
+  and `verification.html` each contain the word "null" once (both are inside prose/JSON quotes, not rendered API
+  values — checked individually), and `elections.html` legitimately carries one open market because Kalshi's demo
+  exchange lists exactly one seeded elections series (`KXELECTIRAN`).
+---
+
 ## Session `arena-dc62f2bb` — integration takeover + close-out (branch `arena/dc62f2bb-kalshidash3`)
 
 Base: `f09f982` (current `origin/main`). Claimed 2026-11-21 ~20:20Z. Two PRs from other sessions have been open for
@@ -1382,6 +1447,37 @@ session's identifier collides with main's F-37..F-64.
 - 2026-11-21 ~20:27Z: fresh collector run on `main` (collect run `44946255522`, desk run `44946257966` — both `success`) committed `c43667f` (`data: demo snapshot 2026-11-21T20:27Z`) and `d29bf84` (`data: live-desk scan 2026-11-21T20:28Z`). Pages re-deployed green on both commits (`44946373332`, `44946447045`). Fresh snapshot: `open_in_scope 561`, `settled_in_scope_total 19680` (of 1600 stored / 200 published), `settled_published_by_category {gas: 17, culture: 5, crypto: 178}` — elections/golf still zero (F-66, not claimed fixed), `historical_cutoff 2026-09-22T00:00:00Z`, `historical_backfill_rows 216`, `open_paging_truncated_at_safety_cap true`.
 - 2026-11-21 ~20:40Z: merged PR #56 (settled-selection) then PR #55 (candles/coverage). Conflicts resolved without deleting either implementation: `COORDINATION.md` kept both session sections; findings renumbered fresh (F-65/F-66 ← PR #56's F-41/F-42; F-67..F-71 ← PR #55's F-40..F-44); data files kept from main (15:21:23Z snapshot), so PR #56's older 06:56:14Z archives were dropped (the auto-merged archive mixed two snapshots and failed both validators); test_pages_dom.js kept main's F-64 index mode AND PR #55's candles/deep-link modes; mode H rewritten for main's KPI wording.
 - 2026-11-21 ~20:45Z: `verify_release.py` PASS on the merged tree (compile, node --check, all validators and tests, jsdom suites, 21-page check). `test_settled_selection.py` 10/10 checks including the [:1600] ordering regression and the control. `test_collect_coverage.py` + `test_simulate.py` + `test_pages_dom.js` all green.
+
+### Result (arena-6a6e8f22, 2026-11-21 ~20:45Z)
+
+- **T43/T45/T46 done; T44 superseded by `main`.** The one substantive defect this session found and fixed was
+  in work that landed while it was running: `main`'s per-topic settled selection (PR #56) ran *after* the
+  1,600-row trim, so it looked fair but was not. Measured: the 20:27Z snapshot published crypto 178 / gas 17 /
+  culture 5 with zero elections and zero golf; the 20:32Z snapshot, produced by the old code on this branch
+  before the fix was pushed, published **200/200 crypto**. After the fix, collect.yml run `44946912248`
+  (2026-11-21T20:36Z) published **gas 50 / elections 1 / culture 50 / crypto 50 / golf 49**, including
+  `KXELECTIRAN-26JUL01` (`result: "no"`, settled 2026-07-01) fetched through
+  `GET /historical/markets?series_ticker=KXELECTIRAN`.
+- **Regression coverage:** `scripts/tests/test_settled_selection.py` drives the real
+  `split_and_select_settled()` and asserts a settlement older than the stored window is still published, plus a
+  witness that the shipped order loses it. Mutation-checked by reverting the order locally.
+- **Data files** were never hand-edited: conflicting snapshots were replaced with the collector's own output and
+  every derived file was regenerated/validated by its own script (`validate_live`, `validate_alerts`,
+  `validate_catalysts`, `simulate.py`).
+- **Stale counts fixed:** README/executive-summary said 38 flagged / 59 claims; the data says 50 flagged / 19
+  suggestions / 9 questions / 69 facts (1 deliberately blank). Now generated from the data, not typed.
+- **Blank/flagged values:** the only blank fact remains F-20 (live market values are never stored in the fact
+  table by design). Everything this session added carries its official URL.
+
+### Merge conflict record (nothing discarded)
+
+`origin/main` moved four times during this session. Conflicts were resolved per file: `scripts/collect.py` —
+this session's ordering fix kept, `main`'s `select_settled` kept as the base; `dashboard.html` — `main`'s
+maintained chart won, my duplicate implementation was dropped (both were the same feature); `data/findings.json`
+— `main`'s F-65/F-66 entries kept, my drafts dropped and my facts renumbered to F-70..F-73; `COORDINATION.md` —
+both sessions' records kept verbatim; `data/live/*` — collector output taken and re-validated, never hand-merged.
+
+---
 
 ---
 
@@ -1498,6 +1594,60 @@ Base: `f09f982`, merged forward onto `9ca45e5` (`origin/main`, after PRs #63, #6
 - 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63 verbatim; narrowed scope to T50–T52.
 - 2026-11-21 20:32Z: Completed T50 (`dashboard.html` live-tick + `yes_bid`/`yes_ask` fix, `assets/chatdock.js` chart links, `sources.html` `scripts/build_alerts.py` fix, regression tests) and T51 (16/25 swings reviewed, 33 traceable links, 9 BRTI swings with official-record reasons). Merged `origin/main` (`9ca45e5`, PRs #64/#65) keeping `data/verified_facts.json` and both board records verbatim. `scripts/verify_release.py` PASS.
 - 2026-11-21 20:39Z: Opened PR [#66](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/66) (`arena/e1647955-kalshidash3` → `main`), waited for `Deploy site to GitHub Pages` (`build`) check to pass (31s), and merged (`ba72f10c32b7f5fb461ae53de7530752bfdaee6f`). Confirmed `Deploy site to GitHub Pages` run `44947398327` succeeded (`status: built`, build `1390882439`, `2026-11-21T20:39:41Z`, zero errors) and re-fetched live deployed `https://kanlerxz87-cyber.github.io/KalshiDash3/`, `sources.html`, and `data/live/catalysts.json` (showing `reviewed: 16`, `not_reviewed: 9`, `links_shown: 33`, `scripts/build_alerts.py`). Session `arena-e1647955` complete.
+
+
+---
+
+### T47–T49 closed out — 2026-11-21 20:20Z–20:45Z
+
+| Item | Result |
+|---|---|
+| **T47** line-by-line verification | **done.** Every row of `data/verified_facts.json` re-checked against its official page, live, this session; 3 documented limits that were missing were added (F-61/F-62/F-63), the one blank row (F-20) now names the endpoint it is checked against while staying blank+unverified. Counts moved 65 → **68 total / 67 verified / 1 deliberately blank**. All 13 seed series and both fee formulas re-confirmed against the fee-schedule PDF. |
+| **T48** data freshness | **done.** `collect.yml` run `44945469134` and `desk.yml` run `44945471636` both **success** on this branch. Snapshot 15:21:23Z → 20:18:25Z; `main`'s later collector runs then carried it to 20:27:24Z. Alerts 23 → **25** archived ≥$0.10 swings. |
+| **T49** PR → merge → Pages | **done.** PR **#64** (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/64) opened with the build gate **pass**, merged as **`9ca45e5`**. `deployments` for `github-pages` show **`9ca45e5`** deployed (2026-11-21T20:31:42Z); `pages.status = built`. Live verification of `https://kanlerxz87-cyber.github.io/KalshiDash3/data/verified_facts.json` returns **68 facts / 67 verified / 1 unverified** with **F-61, F-62, F-63 present** — i.e. the published site serves this session's changes, not just the repo. |
+
+**Conflicts resolved (nothing discarded):** `COORDINATION.md` conflicted with `arena-dc62f2bb`'s section — kept **both**
+sections verbatim. `data/live/{markets,alerts,alerts_archive,catalysts,cors,roi}.json` conflicted with later collector
+runs on `main` — kept **main's** newer snapshots (20:27:24Z) over this branch's 20:18:25Z, because the data files are
+collector-owned and newest-real wins. Full suite re-run after each rebase: **PASS**.
+
+**Measured cadence (for the stale-data finding):** between 06:49Z and 20:45Z today, `collect.yml` produced 2
+`schedule` runs and `desk.yml` 2 `schedule` runs in ~14 h, i.e. the documented scheduler does not hold a 20-minute
+cadence. Every fresh snapshot today came from a `workflow_dispatch` (this session's included). The 45-minute
+stale-snapshot banner on the site is therefore correct and load-bearing, not decorative. The workflow fix itself is
+`arena-b25b0914`'s T43 — logged, not duplicated here.
+
+**Still open, unchanged, and now listed with sources:** F-20 (live values are collection outputs, never static facts),
+F-07 (no demo credentials — a human must create the account), F-14/F-26 (the "high-ROI" feed is this project's
+disclosed screen, not an owner-supplied model), F-24 (browser CORS is undocumented by Kalshi), F-31 + F-04/F-06
+(every WebSocket session needs a key, so a static site cannot stream ticks), F-61/F-62 (5,000-period request cap and
+the historical cutoff for settled markets).
+
+### T47 — integration close-out (arena-6a6e8f22)
+
+| Item | Result |
+|---|---|
+| PR | **#68** https://github.com/kanlerxz87-cyber/KalshiDash3/pull/68 |
+| Merge | `fa1205612cd2c96806ded244879f5fb3e73d6458`, merged **2026-11-21T20:42:28Z** without waiting for review, as the brief instructs |
+| Pre-merge gate | `build` check **pass** (41 s); `python3 scripts/verify_release.py` **PASS** locally on the merged tree |
+| Pages deploy | `pages.status = built`; builds `fa12056` and the follow-up `95ae61e` both `built` |
+| Live verification | `GET https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/markets.json` serves `collected_at 2026-11-21T20:36:04Z` with `settled_published_by_category {"gas":50,"elections":1,"culture":50,"crypto":50,"golf":49}` and the `KXELECTIRAN` backfill report — i.e. the fix is live, not just merged |
+| First fetch caveat (recorded, not hidden) | The first request after deploy returned an edge-cached copy of the older `20:27Z` snapshot (`crypto 178 / gas 17 / culture 5`). A cache-busted re-fetch returned the new file. GitHub Pages is CDN-fronted, so a page can lag a deploy by minutes; this is the same behaviour `arena-dc62f2bb` recorded |
+| Conflicts merged during the session | `main` advanced 5 times (PRs #63, #64, #65, #66 and a WIP branch). Every conflict resolved per file; both sessions' `COORDINATION.md` records kept; `verified_facts.json` keeps main's F-61…F-63 **and** this branch's F-70…F-73 (72 facts); `data/live/*` always the collector's own output, regenerated by `catalysts.py`/`simulate.py` and re-validated — never hand-merged JSON |
+
+**What is still open (not claimed as done):**
+
+1. **DEPLOY-1** — Pages build source is still `legacy` and the API refuses the switch with HTTP 403
+   *Resource not accessible by integration* even though the token reports `admin: true`. Until a person sets
+   *Settings → Pages → Source: GitHub Actions*, a push to `main` is published by the branch builder, which does
+   not run `verify_release.py`. This is on the Flagged page with the exact re-test.
+2. **Elections resolution history is one row.** Not a defect: the demo exchange has exactly one settled market in
+   the only seeded elections series (`KXELECTIRAN-26JUL01`, `no`, 2026-07-01). The page now shows it and says why
+   the list is short (F-66).
+3. **Demo credentials (F-07)** and **owner model (F-14)** remain owner-side blockers; portfolio performance and
+   live order execution stay labelled paper. No credential was requested, created or stored.
+4. **WebSocket streaming / true seconds history (F-06)** — impossible from a static site; the dashboard charts the
+   official 1/60/1440-minute candles and labels the seconds window as observations only.
 
 ---
 

@@ -13,8 +13,8 @@
   <h1>Golf — live demo markets</h1>
   <p class="lede">
     Every open and settled Kalshi <b>demo</b> market assigned to Golf in the current snapshot, ranked by the labelled
-    dollars-traded estimate. Category membership starts from the PGA Tour, Ryder Cup and Solheim Cup series listed in the official fee schedule. A row marked
-    <span class="badge ok">confirmed</span> comes from that list; a row marked
+    dollars-traded estimate. Category membership starts from the series Kalshi tags <b>Golf</b> in its own series index, plus the PGA Tour, Ryder Cup and Solheim Cup series named in the fee schedule,
+    the path that decided each row is recorded. A row marked
     <span class="badge warn">keyword</span> is a heuristic title match and is <a href="flagged.html">flagged</a>.
   </p>
 
@@ -42,7 +42,7 @@
       <tr><td>Seed series used</td><td><code>KXPGATOUR</code></td>
           <td><a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule (PDF)</a></td></tr>
       <tr><td>How a market joins this category</td>
-          <td>The market's <code>series_ticker</code> is checked against the seed list first; only if that fails is a keyword match attempted, and the basis is recorded on every row.</td>
+          <td>Category membership comes first from the exchange's own classification — series returned by <code>GET /series?tags=Golf</code>, which is how Kalshi files golf even though the category is Sports — then from the fee-schedule seed list, then a keyword match. Every row records which path decided it.</td>
           <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td></tr>
       <tr><td>Ranking metric</td>
           <td><code>volume_fp × last_price_dollars</code>, an estimate computed by this project. Kalshi has no official dollars-traded field.</td>
