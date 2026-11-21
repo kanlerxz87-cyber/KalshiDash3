@@ -1017,7 +1017,8 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 
 - 2026-11-21: claim recorded (T25, arena-7e1df9fd); claim commit pushed immediately.
 - 2026-11-21: full local suite re-run — all green (listed above); `check_site.py` confirms no broken internal links on the 21 pages.
-- 2026-11-21: PR opened (<PR_LINK>); merged as <MERGE_SHA>; Pages deploy run <PAGES_RUN> status=built; live site re-checked after deploy.
+- 2026-11-21: PR #47 opened (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/47) from arena/7e1df9fd-kalshidash3 to main; full suite green pre-merge: check_site.py (21 pages), validate_live.py, validate_alerts.py + test_alerts.py (13), test_simulate.py (16), test_fees.py (42 fee-table numbers), test_roi_parity.py, test_roi_scan_snapshot.py, test_roi_scan_offline.py, validate_catalysts.py, validate_roi.py, engine.test.js, test_engine_node.js, node --check on all JS assets.
+- 2026-11-21: PR #47 merged without waiting for review as e2c56d6776867ed258b399feb5c88c6d4cc7f450 (2026-11-21T06:33:00Z); Pages deploy run 52 conclusion success, pages.status=built; live site https://kanlerxz87-cyber.github.io/KalshiDash3/ re-checked after deploy (serving the committed snapshot). Collector snapshot bdd02d3 (2026-11-21T06:34Z) is now on main.
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
