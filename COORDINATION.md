@@ -1071,20 +1071,66 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
 
-## Session `arena-42e3b260` — final integration + line-by-line re-verification (branch `arena/42e3b260-kalshidash3`)
+---
 
-Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (main, snapshot 2026-11-21T23:01:11Z). Claim pushed before any edit.
-This session is the final integration session for the current wave: it re-reads the published tree line by line, closes
-the correction requests other sessions left open **at their owners' invitation** (R-B1, R-B6, R-B7, R-B8), re-verifies
-the static claims against the official pages it can reach, then publishes through a PR to `main` and confirms Pages.
+## Session `arena-2a7c58f1` — fix flagged F-73/F-74 + final integration (branch `arena/2a7c58f1-kalshidash3`)
 
-| ID | Task | Status | Owner | Files in scope | Verification |
-|----|------|--------|-------|----------------|--------------|
-| T57 | Line-by-line read of the published tree + open-request triage (R-B1/R-B3/R-B6/R-B7/R-B8; F-73, F-74) | in progress | arena-42e3b260 | `COORDINATION.md` (this section) | claim commit |
-| T58 | Fix R-B7/F-74: `freshness-alarm.yml` passes `--event workflow_dispatch`, a flag `gh workflow run` does not have | in progress | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (local gh 2.23.0 lists no `--event`), cli/cli source |
-| T59 | Fix R-B1/F-75: `assets/chatdock.js` health line hard-codes `*/20 * * * *` and judges lateness against 20 min | in progress | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | `scripts/tests/test_chatdock.js`, `.github/workflows/collect.yml` |
-| T60 | Fix R-B8/F-73: remaining "20-minute cadence" prose in `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | in progress | arena-42e3b260 | those files | `.github/workflows/collect.yml`, `scripts/collect_relay.py` |
-| T61 | Fix R-B6: `pages.yml` comment still says collector commits were "NEVER deployed", contradicted by the Pages builds API record quoted in F-68 | in progress | arena-42e3b260 | `.github/workflows/pages.yml`, `data/findings.json` | Pages builds API, docs.github.com |
-| T62 | Verification ledger hygiene: two ledgers both use `F-nn` (verified facts F-70..F-73 collide with flagged F-70..F-74); renumber the claim ledger to `C-nn` and state the namespace | in progress | arena-42e3b260 | `data/verified_facts.json`, `verification.html`, `data/findings.json`, `README.md` | `scripts/check_site.py`, `scripts/verify_release.py` |
-| T63 | README corrections (duplicate `scripts/watchdog.py` / `test_watchdog.py` lines, page count) | in progress | arena-42e3b260 | `README.md` | `ls *.html`, repo tree |
-| T64 | Publish: release gate, PR → `main`, merge without approval wait, confirm Pages deploy + live fetch, record here | in progress | arena-42e3b260 | `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, live URL |
+Base: `58a8801` (`origin/main`, snapshot 2026-11-21T23:01Z). Relay run 44950553883 on `main` still `in_progress` (started 21:15Z, 330-min budget, successor due ~02:45Z 2026-11-22) — this session does not touch `collect.yml` / `collect_relay.py` / `data/live/*` (collector-owned).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T57 | Fix F-74 (`gh workflow run --event` invalid flag) + F-73 (20-minute cadence copy → 15-minute relay) | **done** | arena-2a7c58f1 | `.github/workflows/freshness-alarm.yml`, `executive-summary.html`, `portfolio.html`, `assets/live.js`, `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `data/findings.json` (F-73/F-74 rows only) | gh manual + `collect_relay.py` INTERVAL_DEFAULT_MIN=15 + `verify_release.py` + chatdock test | Takeover of stale F-73/F-74 carry-overs (arena-d60d648c, >60 min, no commits); chatdock health cadence display/test also corrected after audit revealed hard-coded */20 claim |
+| T58 | Final integration: re-verify combined data line by line, confirm site builds with no broken links, PR → main → merge → Pages deploy confirm | in progress | arena-2a7c58f1 | `COORDINATION.md`, `README.md` (integration only) | `scripts/verify_release.py`, `scripts/check_site.py`, Pages API + live URL fetch | — |
+
+### Log (arena-2a7c58f1)
+- 2026-11-21 23:09Z: Claimed T57–T58 on `arena/2a7c58f1-kalshidash3` (base `58a8801`). Repo review: 21 pages, `verify_release.py` PASS (after `npm install jsdom@26`), snapshot 23:01Z fresh (8 min old), relay still running. Audit confirms all brief requirements present (5 categories, ≥$0.10 two chats, resolution tracker, paper sim, portfolio blank-until-keys, X=time/Y=price chart with Seconds/Minutes/Hours/Days, liquidity ladder, suggestions/questions/verification/flagged/sources). Remaining actionable defects are F-73/F-74 only.
+- 2026-11-21 23:12Z: T57 fixes implemented. F-74: removed invalid `--event workflow_dispatch` from `freshness-alarm.yml`; the official gh manual documents `gh workflow run` arguments and the CLI locally confirmed `unknown flag: --event`. F-73: corrected executive summary, portfolio, live-engine comments and chatdock freshness line to describe the bounded 15-minute relay and stale-age caveat; the health line now gives relay grid + restart crons, not a false `*/20` cron. Updated F-73/F-74 actions plus Q7/G19 forward-looking wording; historical F-40/F-70 retain measurements of the old cron. `grep` found no runtime HTML/JS 20-minute claim. `node --check` both JS files, chatdock DOM test, `check_site.py` (21 pages), `verify_release.py` PASS, and `git diff --check` PASS. The full gate's external `/series` probe reported transient TLS EOF and documented simulated 500 branches; these are non-blocking and the suite concluded PASS; live API/account/external checks are not certified. Official gh source: https://cli.github.com/manual/gh_workflow_run; cadence source: scripts/collect_relay.py (`INTERVAL_DEFAULT_MIN=15`) and `.github/workflows/collect.yml`.
+- 2026-11-21 23:13Z: Integrated the parallel F-74 repair (PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), merged as `d52f44c` at 23:13:11Z) after its release gate passed. Kept its five workflow-shell mock tests and fail-closed dispatch behavior; reconciled the overlapping workflow/findings edits with T57's cadence changes. PR #76 verified the official gh CLI manual and explicitly leaves successful live stale-dispatch verification flagged.
+- 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). Merge result to be appended after integration.
+
+## Session `arena-42e3b260` — final integration, five-topic alert scope, verification ledger hygiene (branch `arena/42e3b260-kalshidash3`)
+
+Base `58a88016` (main, snapshot 2026-11-21T23:01:11Z). Claim `938045c` was pushed before any edit. While this session
+worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge below kept their work, not a rewrite of it.
+
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T57 | Line-by-line re-read of the published tree; triage of R-B1/R-B3/R-B6/R-B7/R-B8, F-73/F-74 | done | arena-42e3b260 | `COORDINATION.md` | this section |
+| T58 | R-B7/F-74 invalid `gh --event` flag | done — **merged with arena-2a7c58f1's fix** (`88c282d`/`908052e`); their version and its new `scripts/tests/test_freshness_alarm.py` are kept verbatim | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (gh 2.23.0: only `-r/--ref`, `-f`, `-F`, `--json`), cli/cli `run.go` |
+| T59 | R-B1/F-75 chat-dock health line | done | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | health line now names no cron and no expected interval; new assertions |
+| T60 | R-B8/F-73 remaining 20-minute prose | done — **arena-2a7c58f1's wording kept**; this session's only amendment is the chat-dock line above | both | `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | grep + gate |
+| T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
+| T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
+| T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+
+### Defects found and fixed in this session (published on the Flagged page)
+
+| ID | What was wrong | Evidence | Fix |
+|----|----------------|----------|-----|
+| F-75 | Chat-dock health line hard-coded a cron expression and judged "throttling" against 20 min | `assets/chatdock.js`, `collect.yml` | names no cadence; reports newest run + measured gap |
+| F-76 | All-events chat showed 20 archived swings outside the five topics (all `KXDEMOFUTHOURLY` Test/Demo; 13 rows had no topic at all) | [`GET /series/KXDEMOFUTHOURLY`](https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY) → categories `["Test"]`, tags `["Demo"]` | topics restored from `GET /series` when unambiguous; out-of-scope swings withheld **and counted** in both the feed and the paper simulator; chat dock filters identically |
+| F-77 | 25 of 31 model picks were BTC year-end range markets oscillating ~2¢↔99¢ | [1-minute candles](https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1) show close 0.03 / 0.99 / 0.03 within minutes | disclosed on `alerts.html` from the committed feed; re-scoring left to the owner (F-26) |
+
+### Live checks (official endpoints, 2026-11-21 23:10–23:50Z)
+| Check | Result |
+|---|---|
+| `GET /markets/KXNEAR15M-26NOV211800-00` | `result: yes`, `settlement_ts 2026-11-21T23:00:05.181907Z`, `status finalized` — matches the committed row |
+| `GET /markets/KXELECTIRAN-26JUL01` | `result: no`, `settlement_ts 2026-07-01T15:24:15.984157Z` — matches the committed row |
+| `GET /markets/KXNOTAREALTICKER/orderbook` | `200` with empty arrays (C-53 confirmed) |
+| `GET /markets?series_ticker=KXELECTIRAN` | no `series_ticker` key at all (C-45 re-worded from "null" to "absent") |
+| Fee schedule PDF (July 7, 2026) | general taker `roundup(M×0.07×C×P×(1−P))`, no settlement fee, no membership fee, `KXAAAGASM`, `KXPGATOUR`, `KXPGARYDER`, `KXPGASOLHEIM`, `KXELECTIRAN`, `KXBTCY`, `KXETHY` all present |
+| `api_keys` / `historical_data` | Ed25519 default, RSA-PSS/SHA-256 alternative; `market_settled_ts` partition wording verbatim |
+| Collect dry run on this branch after the changes | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) — success (full pipeline incl. build_alerts/simulate/validators against the live demo API) |
+
+### Merge record (no work discarded)
+- `git merge origin/main` (`9e2d4b0`) conflicted in 10 files. Resolutions: **theirs** for `freshness-alarm.yml`
+  (arena-2a7c58f1's fix + its new test), `assets/live.js`, `portfolio.html`, `executive-summary.html` (then re-applied
+  this session's R-5 dynamic counts and the "Twenty suggestions" correction), `data/findings.json` (then re-added
+  F-75/F-76/F-77 and amended F-73/F-74), and the generated `data/live/alerts.json` / `simulation.json` (then
+  regenerated from their newer snapshot with this session's scope rule); **ours** for `assets/chatdock.js` and
+  `scripts/tests/test_chatdock.js`, where this session's stricter R-B1 fix supersedes their 15-minute string — their
+  intent and their F-73/F-74 records are kept, and the supersession is recorded in F-73's action.
+- Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
+  `test_freshness_alarm.py` and COORDINATION sections are all preserved.
+

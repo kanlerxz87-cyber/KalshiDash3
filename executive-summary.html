@@ -54,7 +54,7 @@
           <td>Depth is a point-in-time read and goes stale between collector runs; with live mode on, the selected market's book refreshes each poll. <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Official orderbook API</a></td></tr>
       <tr><td>Alert on price swings of at least $0.10 with all-event and filtered feeds</td>
           <td><span class="badge ok">done · snapshot + live</span></td><td><a href="dashboard.html#alertsTitle">Dashboard alert feeds</a> · <a href="alerts.html">Alert chats</a></td>
-          <td>The dashboard scans consecutive committed observations (the collector runs on a 15-minute relay grid while the relay is up, so this is not tick-level streaming; the snapshot-age line on every page is the authority). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
+          <td>The dashboard scans consecutive committed observations (the collector runs about every 15 minutes while the relay runs — each page shows the snapshot age — so this is not tick-level streaming). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
           <td>Twenty suggestions across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
@@ -129,7 +129,7 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script>
 KD.nav("executive-summary.html");
 // R-5: the counts on this row were typed by hand and went stale (they said "50 irregularities" when the
-// ledger held 55). Render them from the committed files instead, and fail to a link rather than a number.
+// ledger held more). Render them from the committed files instead, and fall back to a link, never a number.
 (async () => {
   const host = document.getElementById("verifiedCounts");
   if (!host) return;
@@ -141,7 +141,7 @@ KD.nav("executive-summary.html");
     const blanks = (facts.facts || []).filter((x) => !x.verified).length;
     host.textContent = `${claims} claims checked against an official page; ${blanks} deliberately left blank. `
       + `${(findings.flagged || []).length} irregularities found and listed across all sessions, `
-      + `each with its source; the ones this session closed are marked fixed in their entry.`;
+      + `each with its source; the ones closed in the final integration are marked fixed in their entry.`;
   } catch (e) {
     host.textContent = "Counts unavailable from the committed ledgers; open the claims and flagged pages directly.";
   }
