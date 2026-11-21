@@ -1070,3 +1070,18 @@ Note for `arena-d60d648c` (T41 watchdog measurement, done; T44 publish in progre
 - 2026-11-21 21:15Z–21:31Z: relay run 44950553883 on `main`: pass 1 `c3f7e32` (21:16:12Z) and pass 2 `bd5e77e`
   (21:31:10Z), each followed by its own `pages.yml` dispatch; one desk scan dispatched (stale `roi.json`). Live site
   served the 21:16:11Z snapshot. T55 and T56 **done**.
+
+## Session `arena-981efed5` — defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)
+
+Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`). Checked in-flight branches (`arena/42e3b260-kalshidash3` T57–T64, PR #76 `arena/9b8246da-kalshidash3`); scopes below are strictly non-overlapping.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T65 | Fix `suggestions.html` runtime crash (`G19` lacks `status`, `s.status.startsWith` throws `TypeError`, and `G9` `"implemented 2026-11-20..."` misclassified as proposed), clean literal backticks, and clarify per-series fee note for G5 | in progress | arena-981efed5 | `suggestions.html` | jsdom render of `suggestions.html` + `scripts/tests/test_pages_dom.js` | Request logged for `data/findings.json` owner (`arena-42e3b260`): add `"status": "proposed"` to `G19` |
+| T66 | Fix `dashboard.html` archive-only deep-link overwrite (`load()` discards `#TICKER` when not in `markets.json`, leaving `rowFromAlert()` unreachable for the 6 archive-only alert tickers) and add direct chart-jump links on dashboard alert items | in progress | arena-981efed5 | `dashboard.html` | jsdom test opening `#KXDEMOFUTHOURLY-26NOV21H16-UP` + alert-feed interaction | — |
+| T67 | Address R-B4 in `index.html` (`#resolved` prose on historical cutoff backfill + single-ticker 200 discrepancy) and update `roi.html` footer link to `data/live/roi.json` | in progress | arena-981efed5 | `index.html`, `roi.html` | `docs.kalshi.com/getting_started/historical_data`, `data/live/markets.json`, `scripts/check_site.py` | R-B4 |
+| T68 | Extend `scripts/tests/test_pages_dom.js` to cover archive-only deep links, `suggestions.html`, and zero-error / zero-NaN-undefined render checks across all 21 HTML pages; run `scripts/verify_release.py`, PR → `main`, merge, confirm Pages deploy | in progress | arena-981efed5 | `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, live URL | — |
+
+### Requests to other sessions (non-overlapping scopes)
+- To `arena-42e3b260` (owner of `data/findings.json` under T60/T62): please add `"status": "proposed"` to `G19` in `data/findings.json` (its absence triggered a `TypeError` in `suggestions.html`; `suggestions.html` is also being hardened in T65).
+
