@@ -96,12 +96,12 @@
     differencing would invent a number) and <span class="badge dim">no history</span> (the two observations are no longer
     in the committed history). The floor is a <b>project rule, not a Kalshi field</b> — Kalshi publishes no per-move
     significance field — and every alert shows the exact contract count so you can apply your own. Full method:
-    <code>scripts/alert_evidence.py</code>; <a href="flagged.html">F-76</a>.
+    <code>scripts/alert_evidence.py</code>; <a href="flagged.html">F-78, F-79, F-80</a>.
   </p>
 
   <div class="chats">
     <div class="chat">
-      <h3>💬 All events — every ≥ $0.10 swing <span class="kchip" id="allCount">0</span></h3>
+      <h3>💬 All events — every ≥ $0.10 swing in the five topics <span class="kchip" id="allCount">0</span></h3>
       <div class="body" id="feedAll"></div>
     </div>
     <div class="chat">
@@ -160,15 +160,45 @@ KD.nav("alerts.html");
   try {
     const doc = await KD.json("data/live/alerts.json");
     const c = doc.counts || {};
-    const n = c.withheld_category_conflict;
-    if (!n) return;
+    const conflict = c.withheld_category_conflict || 0;
+    const scope = c.withheld_out_of_scope || 0;
+    if (!conflict && !scope) return;
     const reasons = Object.entries(c.withheld_reasons || {}).flatMap(([cat, m]) =>
       Object.entries(m).map(([cats, cnt]) => `${cat} ← officially ${cats}: ${cnt}`));
-    KD.$("#withheldNote").innerHTML =
-      `<div class="notice warn"><b>${n} archived swing(s) are withheld from both chats (F-65).</b>
+    const scopeReasons = Object.entries(c.withheld_out_of_scope_reasons || {})
+      .map(([why, cnt]) => `${why}: ${cnt}`);
+    const parts = [];
+    if (conflict) {
+      parts.push(`<b>${conflict} archived swing(s) are withheld from both chats (F-65).</b>
        Their market's own <code>GET /series</code> record files it under a category this topic cannot contain,
-       so the exchange itself says it is not a market in that topic. The archive is not rewritten — only the
-       displayed feeds exclude them. ${KD.esc(reasons.join(" · "))}.</div>`;
+       so the exchange itself says it is not a market in that topic. ${KD.esc(reasons.join(" · "))}.`);
+    }
+    if (scope) {
+      parts.push(`<b>${scope} archived swing(s) are withheld as outside the five topics (F-76).</b>
+       ${KD.esc(scopeReasons.join(" · "))}. A demo/test instrument or an unconfirmed topic is not an
+       event in gas, elections, culture, crypto or golf, and this project does not guess a topic.`);
+    }
+    // F-77: on this demo exchange several BTC year-end range markets oscillate between ~2c and
+    // ~99c, so a "swing" can be a 50-97c jump that the 15-minute sampler catches at a random
+    // phase. Count them from the committed feed instead of quoting a number that will drift.
+    const roi = doc.high_roi || [];
+    const big = roi.filter((r) => Math.abs(Number(r.delta)) >= 0.5);
+    if (roi.length && big.length) {
+      const by = {};
+      for (const r of big) by[r.ticker] = (by[r.ticker] || 0) + 1;
+      const top = Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 3)
+        .map(([t, n]) => `${KD.esc(t)} (${n})`).join(", ");
+      const wide = roi.filter((r) => r.to_yes_bid != null && r.to_yes_ask != null
+        && Number(r.to_yes_ask) - Number(r.to_yes_bid) > 0.10).length;
+      parts.push(`<b>${big.length} of ${roi.length} model picks are moves of 50c or more</b>` +
+        (wide ? `; ${wide} of the ${roi.length} had a quote wider than 10c at the alert` : "") +
+        `. The most frequent are ${top}. Official 1-minute candles confirm these prints are real on the ` +
+        `<b>demo</b> exchange (a range market can sit near 99c and 2c within one minute), so the ` +
+        `screen is measuring demo oscillation, not a tradable edge (F-77).`);
+    }
+    KD.$("#withheldNote").innerHTML =
+      `<div class="notice warn">${parts.join(" ")} The archive is not rewritten — only the
+       displayed feeds exclude them.</div>`;
   } catch (e) { /* no feed committed yet: nothing to disclose */ }
 })();
 

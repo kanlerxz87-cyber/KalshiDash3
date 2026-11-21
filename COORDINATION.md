@@ -1108,10 +1108,16 @@ both sessions' rows (see the log entry when it happens).
 
 ### Result (T65–T68) — measured, not asserted
 
+The counts below were measured on the `58a8801` snapshot (48 served swings). After merging
+`main`, whose PR #79 also withholds the exchange's Test/Demo series (F-76) and discloses demo
+oscillation (F-77), the same computation over the newer snapshot serves 41 swings: 11 traded at or
+above the floor, 20 below it, 0 quote-only among REST pairs, 5 candle-sourced and 5 no-history.
+The ratio is published on the page in both cases; the individual cases quoted below are unchanged.
+
 | Question | Answer from the committed snapshot only | Evidence |
 |---|---|---|
 | Do the >= $0.10 alerts represent trades? | **Mostly not.** Of 48 served swings, 11 traded >= 100 contracts in their interval, 19 traded below that, 0 traded exactly zero (REST pairs), 13 are bounded by a candle read, 5 are no longer in the committed history | `data/live/alerts.json` → `counts.evidence`, recomputed independently by `scripts/tests/validate_alerts.py` |
-| How thin are the big prints? | Of the 25 swings >= 50c, **21 traded fewer than 200 contracts**; the largest single print, `KXAAAGASM-26DEC31-3.30` 0.29 → 0.71, moved 42c on **1.36 contracts** (`volume_fp` 409.50 → 410.86, 2026-11-21T22:46:10Z → 23:01:10Z) | `data/live/price_history.json`; market record https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30 |
+| How thin are the big prints? | Of the 25 swings >= 50c in the `58a8801` snapshot, **21 traded fewer than 200 contracts**; the largest single print, `KXAAAGASM-26DEC31-3.30` 0.29 → 0.71, moved 42c on **1.36 contracts** (`volume_fp` 409.50 → 410.86, 2026-11-21T22:46:10Z → 23:01:10Z) | `data/live/price_history.json`; market record https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30 |
 | Was a 42c move ever printed with **zero** volume? | Yes, in the earlier committed history: the same market 0.29 → 0.71 across 2026-11-20T13:50:26Z → 15:19:53Z with `volume_fp` unchanged at 385.82 | same file |
 | Are the candles a safe cross-check? | **No** — candlestick `volume_fp` is per period, `GET /markets` `volume_fp` is cumulative. Differencing them produced a negative "contracts traded"; the layer now refuses with `candle_unquantified` | https://docs.kalshi.com/api-reference/market/get-market-candlesticks (schema), https://docs.kalshi.com/api-reference/market/get-markets |
 
@@ -1123,11 +1129,22 @@ both sessions' rows (see the log entry when it happens).
 
 **Verification performed (T66/T67)**
 - `scripts/tests/test_evidence.py` — 15 offline tests: every state, the floor being configurable and reported, a *null* (never negative) count when the counter resets, candle pairs refused, the reversion window (exactly three later reads), and a check that no generated text asserts a cause.
+- **Mutation check on the new validator rule:** incrementing `counts.evidence.traded_ge_floor` by one in `data/live/alerts.json` makes the validator exit 1 with `counts.evidence.traded_ge_floor 12 != recomputed 11 over the served rows`; restoring the file returns exit 0. The published ratio is therefore checked against the served rows state by state, not just summed.
 - `scripts/tests/validate_alerts.py` — now **recomputes** the contract count from the committed observations and refuses a contradictory state, a negative count, a candle pair labelled as anything else, or a `counts.evidence` block that does not partition the archive. This is deliberate duplication of the rule: a classifier must not validate itself.
 - `scripts/tests/test_pages_dom.js` — new section J drives `alerts.html` in jsdom: a quote-only swing renders "no trades · 0 contracts", a traded swing renders "traded · 420 contracts", the "traded only" box removes the former and keeps the latter while stating how many are hidden, and the published ratio plus the project-rule disclosure are on the page.
 - `scripts/verify_release.py` — PASS (all Python/JS syntax, all validators, all regressions, 21 pages, link check).
 
-**Irregularities raised:** F-75 (thin prints), F-76 (trade vs quote indistinguishable — the fixed part and the still-open settled-outcome test), F-77 (candle volume is per period). Suggestion G21 added. Nothing on the site asked a reader to trust a number that was not recomputable from the committed file afterwards.
+**Irregularities raised:** F-78 (thin prints), F-79 (trade vs quote indistinguishable — the fixed part and the still-open settled-outcome test), F-80 (candle volume is per period). Suggestion G21 added. **Renumbered at merge:** this session first wrote them as F-75/F-76/F-77; `main` used those three IDs for its own findings in PR #79 while this branch was open, so mine became F-78/F-79/F-80 and each entry records the renumbering in its own `why` text. Nothing on the site asked a reader to trust a number that was not recomputable from the committed file afterwards.
+
+**Merge record:** `origin/main` had advanced to PR #79 (`arena-42e3b260`) while this branch was open, and that
+session had independently made the same "20-minute" copy fix (its F-73) and the same demo-oscillation
+disclosure (its F-77) on `alerts.html`. Nothing was discarded: `main`'s copy, its F-75–F-77 rows, its
+`withheld_out_of_scope` scope filter and its archive topic repair are kept, and this session's evidence layer is
+regenerated on top of them. Files that conflicted: `COORDINATION.md` (both records kept),
+`data/findings.json` (main's file, with this session's three rows appended and renumbered),
+`scripts/build_alerts.py` (both sides kept — main's scope repair runs first, then the evidence block),
+`data/live/alerts*.json` (taken from main and rebuilt, since both sides' content is generated). The two
+`assets/chatdock.js` requests below stand as requests.
 
 **Requests to other sessions (not edited by this session):**
 - **R-10466065-1 → owner of `assets/chatdock.js`** (`arena-e1647955`'s file; `arena-42e3b260` claims it under T59): the dock still ranks its model feed by `Math.abs(delta) / from` with a 25% relative-move rule and shows `24h vol` only. It now *can* read `evidence.contracts_traded` from `data/live/alerts_archive.json`, which this session added; adding the same chip there is a two-line change. Not edited here to keep scopes non-overlapping.
@@ -1159,3 +1176,49 @@ both sessions' rows (see the log entry when it happens).
   crash a green build. `close()` now freezes the page instead: it sets `state.closed` (the fetch stub then returns a
   never-resolving promise), stops the engine, and leaves the document valid. If you add tests, use `close()` as before;
   do not reintroduce `window.close()`.
+## Session `arena-42e3b260` — final integration, five-topic alert scope, verification ledger hygiene (branch `arena/42e3b260-kalshidash3`)
+
+Base `58a88016` (main, snapshot 2026-11-21T23:01:11Z). Claim `938045c` was pushed before any edit. While this session
+worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge below kept their work, not a rewrite of it.
+
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T57 | Line-by-line re-read of the published tree; triage of R-B1/R-B3/R-B6/R-B7/R-B8, F-73/F-74 | done | arena-42e3b260 | `COORDINATION.md` | this section |
+| T58 | R-B7/F-74 invalid `gh --event` flag | done — **merged with arena-2a7c58f1's fix** (`88c282d`/`908052e`); their version and its new `scripts/tests/test_freshness_alarm.py` are kept verbatim | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (gh 2.23.0: only `-r/--ref`, `-f`, `-F`, `--json`), cli/cli `run.go` |
+| T59 | R-B1/F-75 chat-dock health line | done | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | health line now names no cron and no expected interval; new assertions |
+| T60 | R-B8/F-73 remaining 20-minute prose | done — **arena-2a7c58f1's wording kept**; this session's only amendment is the chat-dock line above | both | `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | grep + gate |
+| T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
+| T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
+| T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+
+### Defects found and fixed in this session (published on the Flagged page)
+
+| ID | What was wrong | Evidence | Fix |
+|----|----------------|----------|-----|
+| F-75 | Chat-dock health line hard-coded a cron expression and judged "throttling" against 20 min | `assets/chatdock.js`, `collect.yml` | names no cadence; reports newest run + measured gap |
+| F-76 | All-events chat showed 20 archived swings outside the five topics (all `KXDEMOFUTHOURLY` Test/Demo; 13 rows had no topic at all) | [`GET /series/KXDEMOFUTHOURLY`](https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY) → categories `["Test"]`, tags `["Demo"]` | topics restored from `GET /series` when unambiguous; out-of-scope swings withheld **and counted** in both the feed and the paper simulator; chat dock filters identically |
+| F-77 | 25 of 31 model picks were BTC year-end range markets oscillating ~2¢↔99¢ | [1-minute candles](https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1) show close 0.03 / 0.99 / 0.03 within minutes | disclosed on `alerts.html` from the committed feed; re-scoring left to the owner (F-26) |
+
+### Live checks (official endpoints, 2026-11-21 23:10–23:50Z)
+| Check | Result |
+|---|---|
+| `GET /markets/KXNEAR15M-26NOV211800-00` | `result: yes`, `settlement_ts 2026-11-21T23:00:05.181907Z`, `status finalized` — matches the committed row |
+| `GET /markets/KXELECTIRAN-26JUL01` | `result: no`, `settlement_ts 2026-07-01T15:24:15.984157Z` — matches the committed row |
+| `GET /markets/KXNOTAREALTICKER/orderbook` | `200` with empty arrays (C-53 confirmed) |
+| `GET /markets?series_ticker=KXELECTIRAN` | no `series_ticker` key at all (C-45 re-worded from "null" to "absent") |
+| Fee schedule PDF (July 7, 2026) | general taker `roundup(M×0.07×C×P×(1−P))`, no settlement fee, no membership fee, `KXAAAGASM`, `KXPGATOUR`, `KXPGARYDER`, `KXPGASOLHEIM`, `KXELECTIRAN`, `KXBTCY`, `KXETHY` all present |
+| `api_keys` / `historical_data` | Ed25519 default, RSA-PSS/SHA-256 alternative; `market_settled_ts` partition wording verbatim |
+| Collect dry run on this branch after the changes | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) — success (full pipeline incl. build_alerts/simulate/validators against the live demo API) |
+
+### Merge record (no work discarded)
+- `git merge origin/main` (`9e2d4b0`) conflicted in 10 files. Resolutions: **theirs** for `freshness-alarm.yml`
+  (arena-2a7c58f1's fix + its new test), `assets/live.js`, `portfolio.html`, `executive-summary.html` (then re-applied
+  this session's R-5 dynamic counts and the "Twenty suggestions" correction), `data/findings.json` (then re-added
+  F-75/F-76/F-77 and amended F-73/F-74), and the generated `data/live/alerts.json` / `simulation.json` (then
+  regenerated from their newer snapshot with this session's scope rule); **ours** for `assets/chatdock.js` and
+  `scripts/tests/test_chatdock.js`, where this session's stricter R-B1 fix supersedes their 15-minute string — their
+  intent and their F-73/F-74 records are kept, and the supersession is recorded in F-73's action.
+- Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
+  `test_freshness_alarm.py` and COORDINATION sections are all preserved.
+

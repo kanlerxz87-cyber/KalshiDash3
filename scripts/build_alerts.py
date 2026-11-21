@@ -56,6 +56,13 @@ CATEGORY_COMPATIBLE = {
     "golf": {"Sports", "Golf"},
 }
 
+# Categories the exchange uses for its own test instruments. `GET /series` files
+# KXDEMOFUTHOURLY under ["Test"], tag "Demo" (observed 2026-11-21), and the collector
+# already refuses such rows for the five topics (F-61). An alert about one of those
+# markets is not an event in gas, elections, culture, crypto or golf, so it is withheld
+# from the chats while staying in the archive.
+NEVER_IN_SCOPE = {"Test", "Demo"}
+
 
 def series_of_ticker(ticker: str) -> str:
     """Series ticker from a market ticker. Kalshi series tickers contain no hyphen.
@@ -211,6 +218,31 @@ def main() -> int:
         if prior.get("state") and prior.get("state") != current["state"]:
             print(f"evidence: {a.get('ticker')}@{a.get('to_time')} re-classified "
                   f"{prior.get('state')} -> {current['state']} (volume field changed on re-read)")
+    # Same repair for a MISSING TOPIC. Legacy entries were written while their market sat in
+    # the open scan, then the market left it; category_id stayed null even though the series
+    # record was known. GET /series now answers, so the topic is restored when exactly one of
+    # the five topics accepts that series. Prices, times, deltas and high_roi stay untouched.
+    # Ambiguous (a series filed under Financials could be gas or crypto) or unknown series are
+    # left null and the row is withheld below — an unconfirmed topic is not a topic.
+    assigned = 0
+    for a in archive["alerts"]:
+        if a.get("category_id"):
+            continue
+        cats = [str(c) for c in (a.get("series_categories") or [])]
+        if not cats:
+            entry = series_ledger.get(series_of_ticker(a.get("ticker") or "")) or {}
+            cats = [str(c) for c in (entry.get("categories") or [])]
+            if cats:
+                a["series_categories"] = cats
+                a["series_categories_source"] = entry.get("source")
+        topics = sorted(t for t, comp in CATEGORY_COMPATIBLE.items() if set(cats) & comp)
+        if len(topics) == 1:
+            a["category_id"] = topics[0]
+            a["category_basis"] = "official-series"
+            a["category_assigned_from"] = "GET /series categories (series_categories)"
+            assigned += 1
+    if assigned:
+        print(f"archive: restored the topic on {assigned} entr(y/ies) from official series categories")
 
     archive["alerts"].sort(key=lambda r: (r["to_time"], abs(r["delta"])), reverse=True)
     archive["alerts"] = archive["alerts"][:ARCHIVE_LIMIT]
@@ -230,6 +262,7 @@ def main() -> int:
     # A series with no ledger entry, or with null categories, is unknown and is served.
     ledger = markets.get("series_index") or {}
     conflicts: dict[str, dict] = {}
+    out_of_scope: dict[str, int] = {}
 
     def official_for(ticker: str) -> list[str]:
         row = by_ticker.get(ticker)
@@ -241,19 +274,39 @@ def main() -> int:
     def publishable(a) -> bool:
         cats = official_for(a.get("ticker") or "")
         cat = a.get("category_id")
-        compatible = CATEGORY_COMPATIBLE.get(cat or "", set())
-        if not cats or not compatible:
+        # 1. The exchange's own record files the series under a test/demo category.
+        never = sorted({c for c in cats if c in NEVER_IN_SCOPE})
+        if never:
+            key = "series filed under " + ", ".join(never)
+            out_of_scope[key] = out_of_scope.get(key, 0) + 1
+            return False
+        # 2. No topic could be confirmed for this swing. The five topics are the scope of
+        #    this project, so an unclassified swing is withheld and counted, not guessed.
+        if not cat:
+            key = "no topic could be confirmed from GET /series"
+            out_of_scope[key] = out_of_scope.get(key, 0) + 1
+            return False
+        compatible = CATEGORY_COMPATIBLE.get(cat, set())
+        # 3. No official categories recorded: unknown is not a contradiction.
+        if not cats:
             return True
         if any(c in compatible for c in cats):
             return True
+        # 4. The exchange says this market is not in the topic it was counted under.
         conflicts.setdefault(cat, {}).setdefault(str(cats), 0)
         conflicts[cat][str(cats)] += 1
         return False
 
     served = [a for a in archive["alerts"] if publishable(a)]
+    conflict_count = sum(sum(d.values()) for d in conflicts.values())
+    scope_count = sum(out_of_scope.values())
     withheld = len(archive["alerts"]) - len(served)
     all_feed = list(served)
     roi_feed = [a for a in served if a.get("high_roi")]
+    if withheld != conflict_count + scope_count:
+        print(f"ERROR: withheld {withheld} != conflicts {conflict_count} + out_of_scope {scope_count}",
+              file=sys.stderr)
+        return 1
 
     def newest_first(rows):
         return rows[:MAX_ALERTS_PER_FEED]
@@ -272,12 +325,14 @@ def main() -> int:
             "new_this_run": new_count,
             # F-65: archived, but withheld from the feeds because the snapshot's own row for the
             # market records official series categories that exclude it from its topic.
-            "withheld_category_conflict": withheld,
+            "withheld_category_conflict": conflict_count,
             "withheld_reasons": {k: dict(v) for k, v in sorted(conflicts.items())},
             # T66: how many of the served swings were backed by trades, and how many were a
             # quoted price that changed with no trade at all. Always published, so the ratio
             # cannot quietly get worse for a reader who never opens a row.
             "evidence": alert_evidence.summarize(all_feed),
+            "withheld_out_of_scope": scope_count,
+            "withheld_out_of_scope_reasons": dict(sorted(out_of_scope.items())),
         },
         "all_events": newest_first(all_feed),
         "high_roi": newest_first(roi_feed),
@@ -290,11 +345,14 @@ def main() -> int:
             "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
             "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
             "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten.",
+            "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",
+            "Scope: the chats cover the five topics only. An archived swing whose series GET /series files under Test/Demo, or for which no single topic can be confirmed, is withheld and counted (counts.withheld_out_of_scope) rather than shown under the wrong topic.",
         ],
     }
     (LIVE / "alerts.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     print(f"OK: new={new_count} all_events={len(all_feed)} high_roi={len(roi_feed)} "
-          f"withheld={withheld} threshold=${threshold:.2f}")
+          f"withheld={withheld} (conflicts={conflict_count}, out_of_scope={scope_count}) "
+          f"threshold=${threshold:.2f}")
     return 0
 
 
