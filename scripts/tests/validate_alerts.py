@@ -41,6 +41,8 @@ RULES = ROOT / "data" / "alert_rules.json"
 # snapshot written by a broken collector. Values are the official categories/tags recorded by
 # GET /series for each topic; see data/categories.json and
 # https://docs.kalshi.com/api-reference/market/get-series-list
+NEVER_IN_SCOPE = {"Test", "Demo"}  # GET /series categories of the exchange's own test instruments
+
 COMPATIBLE = {
     "gas": {"Economics", "Commodities", "Financials"},
     "elections": {"Elections", "Politics", "World", "International"},
@@ -141,21 +143,38 @@ def main() -> int:
         series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
         return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
 
-    all_compatible = set().union(*COMPATIBLE.values())
-
     def _served(a: dict) -> bool:
         cats = _official(a.get("ticker") or "")
+        # Scope: an exchange-test series is never an event in the five topics; an alert with
+        # no confirmed topic is withheld rather than shown under a guessed one.
+        if any(c in NEVER_IN_SCOPE for c in cats):
+            return False
+        cat = a.get("category_id")
+        if not cat:
+            return False
+        compatible = COMPATIBLE.get(cat, set())
+        # No official categories recorded: unknown is not a contradiction (same as the builder).
         if not cats:
             return True
-        compatible = COMPATIBLE.get(a.get("category_id") or "") or all_compatible
         return any(c in compatible for c in cats)
 
     counts = alerts_doc.get("counts") or {}
     served = [a for a in archive if _served(a)]
     withheld_expected = len(archive) - len(served)
-    check(counts.get("withheld_category_conflict") == withheld_expected,
-          f"counts.withheld_category_conflict must be {withheld_expected} when reproduced from "
-          f"series_index, got {counts.get('withheld_category_conflict')!r} (F-65)")
+    check(counts.get("withheld_category_conflict", 0) + counts.get("withheld_out_of_scope", 0) == withheld_expected,
+          f"counts.withheld_category_conflict + counts.withheld_out_of_scope must be {withheld_expected} when "
+          f"reproduced from series_index, got {counts.get('withheld_category_conflict')!r} + "
+          f"{counts.get('withheld_out_of_scope')!r} (F-65, F-76)")
+    # A topic restored from GET /series (category_assigned_from) must be the ONLY topic that
+    # accepts that series; an ambiguous or contradicted assignment fails the build.
+    for a in archive:
+        if not a.get("category_assigned_from"):
+            continue
+        cats = _official(a.get("ticker") or "")
+        topics = sorted(t for t, comp in COMPATIBLE.items() if set(cats) & comp)
+        check(topics == [a.get("category_id")],
+              f"archive:{a.get('ticker')}@{a.get('to_time')} assigned topic {a.get('category_id')!r} "
+              f"but GET /series categories {cats!r} accept {topics!r}")
     expected_all = served[:MAX]
     check(alerts_doc.get("all_events") == expected_all, "alerts.json all_events does not reproduce from the archive (order/membership/300 cap)")
     expected_roi = [a for a in served if a.get("high_roi")][:MAX]

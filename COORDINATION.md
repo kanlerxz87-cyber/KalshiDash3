@@ -1088,41 +1088,75 @@ Base: `58a8801` (`origin/main`, snapshot 2026-11-21T23:01Z). Relay run 449505538
 - 2026-11-21 23:13Z: Integrated the parallel F-74 repair (PR [#76](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/76), merged as `d52f44c` at 23:13:11Z) after its release gate passed. Kept its five workflow-shell mock tests and fail-closed dispatch behavior; reconciled the overlapping workflow/findings edits with T57's cadence changes. PR #76 verified the official gh CLI manual and explicitly leaves successful live stale-dispatch verification flagged.
 - 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
 
+## Session `arena-42e3b260` — final integration, five-topic alert scope, verification ledger hygiene (branch `arena/42e3b260-kalshidash3`)
+
+Base `58a88016` (main, snapshot 2026-11-21T23:01:11Z). Claim `938045c` was pushed before any edit. While this session
+worked, `arena/2a7c58f1` merged PR #77, which also closed F-73/F-74. The merge below kept their work, not a rewrite of it.
+
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T57 | Line-by-line re-read of the published tree; triage of R-B1/R-B3/R-B6/R-B7/R-B8, F-73/F-74 | done | arena-42e3b260 | `COORDINATION.md` | this section |
+| T58 | R-B7/F-74 invalid `gh --event` flag | done — **merged with arena-2a7c58f1's fix** (`88c282d`/`908052e`); their version and its new `scripts/tests/test_freshness_alarm.py` are kept verbatim | arena-42e3b260 | `.github/workflows/freshness-alarm.yml` | `gh workflow run --help` (gh 2.23.0: only `-r/--ref`, `-f`, `-F`, `--json`), cli/cli `run.go` |
+| T59 | R-B1/F-75 chat-dock health line | done | arena-42e3b260 | `assets/chatdock.js`, `scripts/tests/test_chatdock.js` | health line now names no cron and no expected interval; new assertions |
+| T60 | R-B8/F-73 remaining 20-minute prose | done — **arena-2a7c58f1's wording kept**; this session's only amendment is the chat-dock line above | both | `executive-summary.html`, `portfolio.html`, `assets/live.js`, `data/findings.json` | grep + gate |
+| T61 | R-B6 "NEVER deployed" comment | done | arena-42e3b260 | `.github/workflows/pages.yml` | Pages builds API record quoted in F-68 |
+| T62 | Two ledgers both used `F-nn` (verified facts F-70..F-73 vs flagged F-70..F-74) | done | arena-42e3b260 | `data/verified_facts.json` (claims → `C-nn`, 72 rows), `verification.html`, `data/findings.json` | `check_site.py`, gate |
+| T63 | README duplicates / stale counts / missing pages | done | arena-42e3b260 | `README.md`, `executive-summary.html` (R-5: counts rendered from the ledgers) | `ls *.html`, gate |
+| T64 | Publish: gate → PR #79 → merge → Pages confirm | in progress | arena-42e3b260 | `COORDINATION.md` | close-out below |
+
+### Defects found and fixed in this session (published on the Flagged page)
+
+| ID | What was wrong | Evidence | Fix |
+|----|----------------|----------|-----|
+| F-75 | Chat-dock health line hard-coded a cron expression and judged "throttling" against 20 min | `assets/chatdock.js`, `collect.yml` | names no cadence; reports newest run + measured gap |
+| F-76 | All-events chat showed 20 archived swings outside the five topics (all `KXDEMOFUTHOURLY` Test/Demo; 13 rows had no topic at all) | [`GET /series/KXDEMOFUTHOURLY`](https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY) → categories `["Test"]`, tags `["Demo"]` | topics restored from `GET /series` when unambiguous; out-of-scope swings withheld **and counted** in both the feed and the paper simulator; chat dock filters identically |
+| F-77 | 25 of 31 model picks were BTC year-end range markets oscillating ~2¢↔99¢ | [1-minute candles](https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1) show close 0.03 / 0.99 / 0.03 within minutes | disclosed on `alerts.html` from the committed feed; re-scoring left to the owner (F-26) |
+
+### Live checks (official endpoints, 2026-11-21 23:10–23:50Z)
+| Check | Result |
+|---|---|
+| `GET /markets/KXNEAR15M-26NOV211800-00` | `result: yes`, `settlement_ts 2026-11-21T23:00:05.181907Z`, `status finalized` — matches the committed row |
+| `GET /markets/KXELECTIRAN-26JUL01` | `result: no`, `settlement_ts 2026-07-01T15:24:15.984157Z` — matches the committed row |
+| `GET /markets/KXNOTAREALTICKER/orderbook` | `200` with empty arrays (C-53 confirmed) |
+| `GET /markets?series_ticker=KXELECTIRAN` | no `series_ticker` key at all (C-45 re-worded from "null" to "absent") |
+| Fee schedule PDF (July 7, 2026) | general taker `roundup(M×0.07×C×P×(1−P))`, no settlement fee, no membership fee, `KXAAAGASM`, `KXPGATOUR`, `KXPGARYDER`, `KXPGASOLHEIM`, `KXELECTIRAN`, `KXBTCY`, `KXETHY` all present |
+| `api_keys` / `historical_data` | Ed25519 default, RSA-PSS/SHA-256 alternative; `market_settled_ts` partition wording verbatim |
+| Collect dry run on this branch after the changes | run [44961155125](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961155125) — success (full pipeline incl. build_alerts/simulate/validators against the live demo API) |
+
+### Merge record (no work discarded)
+- `git merge origin/main` (`9e2d4b0`) conflicted in 10 files. Resolutions: **theirs** for `freshness-alarm.yml`
+  (arena-2a7c58f1's fix + its new test), `assets/live.js`, `portfolio.html`, `executive-summary.html` (then re-applied
+  this session's R-5 dynamic counts and the "Twenty suggestions" correction), `data/findings.json` (then re-added
+  F-75/F-76/F-77 and amended F-73/F-74), and the generated `data/live/alerts.json` / `simulation.json` (then
+  regenerated from their newer snapshot with this session's scope rule); **ours** for `assets/chatdock.js` and
+  `scripts/tests/test_chatdock.js`, where this session's stricter R-B1 fix supersedes their 15-minute string — their
+  intent and their F-73/F-74 records are kept, and the supersession is recorded in F-73's action.
+- Their newer snapshot (`23:16Z`), `price_history.json`, `markets.json`, `catalysts.json`, `cors.json`,
+  `test_freshness_alarm.py` and COORDINATION sections are all preserved.
+
 ---
 
-## Session `arena-86046b80` — F-65×F-72 Test-series leak fix, post-20:30Z official catalyst reviews, and remaining site-hygiene requests (R-2..R-6, R-B1, R-B4)
+## Session `arena-86046b80` — catalyst reviews, catalysts.py scope alignment, R-2..R-5 / R-B4 (branch `arena/86046b80-kalshidash3`)
 
-Branch `arena/86046b80-kalshidash3`, branched from `58a8801` and merged forward onto `b96e3d0` (`origin/main`, after PRs #76, #77, #81 and the `2026-11-21T23:16Z` snapshot).
+Base `58a88016` (main), merged forward onto `origin/main` `43fb93f` (PR #76, #77, #79, #81). While this session worked,
+PR #77 (`arena-2a7c58f1`) and PR #79 (`arena-42e3b260`) merged to `main`, resolving `F-73`–`F-77` (`alerts.json` scope,
+`assets/chatdock.js` R-B1, `C-nn` claim IDs). This merge kept 100% of `main`'s PR #76/#77/#79/#81 implementations verbatim
+and contributes the remaining unique fixes below:
 
-### Conflict resolution with `origin/main` (`b96e3d0`)
-- Kept PR #76 (`arena-9b8246da`, freshness-alarm fix + tests + F-74) and PR #77/#81 (`arena-2a7c58f1`, F-73 cadence wording in `portfolio.html`, `assets/live.js`, `data/findings.json` Q7/G19/F-73) verbatim — nothing discarded.
-- Merged `assets/chatdock.js` so it retains both `main`'s `"collector relay (15-min grid on main · cron restart: 7,27,47 + 13,43)"` wording and our live `in_progress`/`queued` relay detection (R-B1).
-- Kept `executive-summary.html` with both the 15-minute relay wording and our unique R-2..R-5 fixes (`F-14 → F-24`, `verification.html` `F-61`/`F-62`, `trading.html` auto-sim link, and dynamic JSON counts).
-- Regenerated `data/live/alerts.json` and `data/live/catalysts.json` from `main`'s newer `23:16Z` snapshot using the fixed F-65×F-72 filter and updated `data/catalyst_review.json`.
+| ID | Task | Status | Owner | Files | Verification |
+|----|------|--------|-------|-------|--------------|
+| T60 | Align `catalysts.py` / `validate_catalysts.py` with five-topic scope (F-76) + add unassigned `Test`/in-scope unit tests | done | arena-86046b80 | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/test_alerts.py` | `validate_catalysts.py` (41 leads, 21 links), `test_alerts.py` (20/20 OK) |
+| T61 | Official-source catalyst reviews for newest post-20:30Z swings (`KXPGATOUR-THRC26-MTHO` ×2, `KXAAAGASM-26DEC31-3.30` @ 23:01Z, `KXAAAGASD-26NOV21-3.6600` ×2) + official-record BRTI notes (`B32500`, `B52500`) | done | arena-86046b80 | `data/catalyst_review.json`, `data/live/catalysts.json` | 9/41 reviewed with fetched official links (`pgatour.com`, `gasprices.aaa.com`, `external-api.demo.kalshi.co`); 0 generic fallback rows |
+| T62 | Complete remaining R-2, R-3, R-4, R-5, R-B4 site-hygiene fixes (`executive-summary.html` `F-14→F-24`, `C-61/C-62`, `trading.html` link, dynamic Suggestions/Questions counts + DOM check J; `index.html` R-B4 note) | done | arena-86046b80 | `executive-summary.html`, `index.html`, `scripts/tests/test_pages_dom.js` | `test_pages_dom.js` blocks A–J + `check_site.py` (21 pages) |
+| T63 | Record live-verified R-B4 docs-vs-demo historical-cutoff discrepancy as **F-78** | done | arena-86046b80 | `data/findings.json` | Live probes `2026-11-21 ~23:11Z`: `/historical/cutoff` (`2026-09-22T00:00:00Z`) vs `GET /markets/KXELECTIRAN-26JUL01` (HTTP 200, settled `2026-07-01`) vs `docs.kalshi.com/getting_started/historical_data` |
+| T64 | Full release gate → PR #84 → merge → confirm live GitHub Pages deployment | in progress | arena-86046b80 | `COORDINATION.md` | `python3 scripts/verify_release.py` PASS |
 
-### Task board (this session)
+### Official sources verified live (2026-11-21 ~23:11Z)
+- `https://docs.kalshi.com/getting_started/historical_data`
+- `https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff` (`market_settled_ts: 2026-09-22T00:00:00Z`)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01` (HTTP 200, `status: finalized`, `result: no`, `settlement_ts: 2026-07-01T15:24:15.984157Z` → **F-78**)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO` + `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` (R3 suspended due to rain, no Saturday play; Michael Thorbjornsen T1 at -9)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30` + `https://gasprices.aaa.com/` (AAA 11/21/26 national regular average `$3.6594`, down `$0.0304` vs yesterday; 22:46Z→23:01Z +41¢ move on 3.92 24h contracts across 42¢ spread)
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
-| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
-|----|------|--------|-------|----------------|--------------|----------------|
-| T60 | Fix F-65×F-72 category-integrity bypass: withhold unassigned (`category_id: null`) candle-backfilled alerts whose official `GET /series` categories have zero overlap with the five topics (stops 8 `KXDEMOFUTHOURLY-*` `["Test"]` leaks from appearing in `alerts.json` and `catalysts.json`) | done | arena-86046b80 | `scripts/build_alerts.py`, `scripts/catalysts.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/test_alerts.py`, `data/live/alerts.json`, `data/live/catalysts.json` | `validate_alerts.py`, `validate_catalysts.py`, `test_alerts.py` (20/20 incl. 2 new regression tests); `withheld_category_conflict` 12 → 20; 0 Test-series leaks | F-75 (fixed, verified) |
-| T61 | Official-source catalyst review for newest post-20:30Z swings (`KXPGATOUR-THRC26-MTHO` ×2, `KXAAAGASM-26DEC31-3.30` @ 23:01Z, `KXAAAGASD-26NOV21-3.6600` ×2) + official-record BRTI notes for `KXBTCY-27JAN0100-B32500`/`B52500` | done | arena-86046b80 | `data/catalyst_review.json`, `data/live/catalysts.json` | Live fetches of Kalshi demo API (`KXPGATOUR-THRC26-MTHO`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500/B52500`), official PGA Tour RSM Classic leaderboard, and AAA Fuel Prices (`gasprices.aaa.com`); `validate_catalysts.py` PASS (all non-BRTI served swings reviewed, 21 traceable links, 0 generic fallback rows) | — |
-| T62 | Resolve open site copy, cross-reference, resolution-note, and chatdock health requests (R-2..R-6, R-B1, R-B4) | done | arena-86046b80 | `executive-summary.html`, `assets/chatdock.js`, `index.html`, `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js` | `test_chatdock.js` (active relay + no `*/20`), `test_pages_dom.js` (new block J checks dynamic JSON counts & hygiene on `executive-summary.html`) | F-76 (R-B4 docs-vs-demo discrepancy) |
-| T63 | Record findings F-75 & F-76 in `data/findings.json` (preserving main's F-73/F-74 verbatim) | done | arena-86046b80 | `data/findings.json` | `check_site.py` + `verify_release.py` PASS | F-75, F-76 |
-| T64 | Full verification gate (`verify_release.py`), PR → `main`, merge, GitHub Pages deploy confirm, live URL re-fetch, and close-out | in progress | arena-86046b80 | `COORDINATION.md` | Pending PR + Pages deploy confirm | — |
-
-### Sources verified live in this session (`arena-86046b80`, 2026-11-21 ~23:11Z)
-- `https://docs.kalshi.com/getting_started/historical_data` — verbatim Impacted Live Endpoints statement ("Settled markets and their candlesticks older than the cutoff will not appear").
-- `https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff` — `market_settled_ts: "2026-09-22T00:00:00Z"`.
-- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01` — HTTP 200, `status: "finalized"`, `settlement_ts: "2026-07-01T15:24:15.984157Z"`, `result: "no"` (confirms R-B4 / F-76).
-- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO` — active, `last_price_dollars: "0.1800"`, `yes_bid_dollars: "0.1700"`, `yes_ask_dollars: "0.1800"`, `volume_24h_fp: "10200.02"`.
-- `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` — Michael Thorbjornsen T1 (`-9`; R1 `64`, R2 `69`, strokes `133`); Round 3 suspended Saturday (no Saturday play; rescheduled Sunday 9:10–11:00 a.m. ET).
-- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30` — active, `last_price_dollars: "0.7100"`, `previous_price_dollars: "0.2900"`, `yes_bid_dollars: "0.2900"`, `yes_ask_dollars: "0.7100"`, `volume_24h_fp: "3.92"`.
-- `https://gasprices.aaa.com/` — Today's AAA National Average Regular `$3.6594` (11/21/26), Yesterday `$3.6898`, Week Ago `$3.8406`, Month Ago `$4.2644`.
-- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45` — finalized `result: "yes"`, `floor_strike: 56009.56`, `expiration_value: "57108.23"`, `settlement_ts: "2026-11-21T06:45:02.913537Z"`.
-- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500` and `…/KXBTCY-27JAN0100-B52500` — active CF Benchmarks BRTI range contracts (`updated_time: "2026-04-28T02:27:21.580016Z"`).
-
-### Log (`arena-86046b80`)
-- 2026-11-21 ~23:12Z: Claimed T60–T64 (`e965fec`) before implementation edits; avoided PR #76's freshness-alarm scope.
-- 2026-11-21 ~23:15Z–23:20Z: Implemented T60 (F-65×F-72 bypass fix + 2 regression tests), T61 (5 new official-source catalyst reviews + 2 BRTI official-record explanations), T62 (R-2..R-6, R-B1, R-B4, dynamic executive-summary counts + DOM/chatdock tests), and T63 (F-75, F-76).
-- 2026-11-21 ~23:22Z: Merged `origin/main` (`b96e3d0`, incl. PRs #76/#77/#81 and the `23:16Z` snapshot); resolved conflicts preserving all of `main`'s work verbatim and regenerated `data/live/alerts.json` + `data/live/catalysts.json` from the `23:16Z` snapshot.
 

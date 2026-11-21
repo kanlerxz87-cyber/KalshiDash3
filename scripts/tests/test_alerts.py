@@ -199,20 +199,23 @@ class CategoryIntegrityTests(unittest.TestCase):
         feed, archive = self._run(["Test"])
         self.assertEqual(feed["all_events"], [], "a Test-series swing must not be served")
         self.assertEqual(feed["high_roi"], [])
-        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
+        # F-76: a Test/Demo series is out of scope by the exchange's own record, so it is counted
+        # under withheld_out_of_scope (the category-conflict counter is for topic contradictions).
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
+        self.assertEqual(feed["counts"]["withheld_out_of_scope"], 1)
         self.assertEqual(feed["counts"]["archive_total"], 1,
                          "history is never rewritten: the alert stays in the archive")
         self.assertEqual(len(archive["alerts"]), 1)
 
     def test_unassigned_test_series_candle_alert_is_withheld(self):
-        # F-75: F-72 candle backfill creates archive rows with category_id=None for closed
+        # F-76: F-72 candle backfill creates archive rows with category_id=None for closed
         # tickers. Official ["Test"] categories still have zero overlap with the five project
-        # topics and must be withheld rather than slipping past the guard.
+        # topics and must be withheld as out of scope rather than slipping past the guard.
         feed, archive = self._run(["Test"], category_id=None)
         self.assertEqual(feed["all_events"], [], "an unassigned Test-series swing must not be served")
         self.assertEqual(feed["high_roi"], [])
-        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
-        self.assertIn("unassigned", feed["counts"]["withheld_reasons"])
+        self.assertEqual(feed["counts"]["withheld_out_of_scope"], 1)
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
         self.assertEqual(len(archive["alerts"]), 1)
 
     def test_unassigned_in_scope_series_candle_alert_is_served(self):

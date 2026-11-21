@@ -520,9 +520,9 @@ function commonAsserts(label, r) {
     const fd = JSON.parse(fs.readFileSync(path.join(ROOT, "data/findings.json"), "utf8"));
     const r = await loadPage("executive-summary.html", "snapshot");
     commonAsserts("executive-summary.html", r);
-    const vText = (r.doc.querySelector("#esVerifyCounts") || {}).textContent || "";
-    const sText = (r.doc.querySelector("#esSuggCount") || {}).textContent || "";
-    const qText = (r.doc.querySelector("#esQCount") || {}).textContent || "";
+    const vText = (r.doc.querySelector("#verifiedCounts") || {}).textContent || "";
+    const sText = (r.doc.querySelector("#execSuggestionsCount") || {}).textContent || "";
+    const qText = (r.doc.querySelector("#execQuestionsCount") || {}).textContent || "";
     check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
       `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
     check(sText.includes(`${fd.suggestions.length} suggestions`),

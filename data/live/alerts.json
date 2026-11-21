@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T23:23:50Z",
+ "generated_at": "2026-11-21T23:20:11Z",
  "snapshot_collected_at": "2026-11-21T23:16:11Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
@@ -15,14 +15,11 @@
   "high_roi": 32,
   "archive_total": 61,
   "new_this_run": 0,
-  "withheld_category_conflict": 20,
-  "withheld_reasons": {
-   "crypto": {
-    "['Test']": 12
-   },
-   "unassigned": {
-    "['Test']": 8
-   }
+  "withheld_category_conflict": 0,
+  "withheld_reasons": {},
+  "withheld_out_of_scope": 20,
+  "withheld_out_of_scope_reasons": {
+   "series filed under Test": 20
   }
  },
  "all_events": [
@@ -735,8 +732,8 @@
    "ticker": "KXBTC15M-26NOV210145-45",
    "event_ticker": null,
    "title": null,
-   "category_id": null,
-   "category_basis": null,
+   "category_id": "crypto",
+   "category_basis": "official-series",
    "series_categories": [
     "Crypto"
    ],
@@ -755,7 +752,8 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "category_assigned_from": "GET /series categories (series_categories)"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -813,8 +811,8 @@
    "ticker": "KXBTC15M-26NOV210145-45",
    "event_ticker": null,
    "title": null,
-   "category_id": null,
-   "category_basis": null,
+   "category_id": "crypto",
+   "category_basis": "official-series",
    "series_categories": [
     "Crypto"
    ],
@@ -833,14 +831,15 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "category_assigned_from": "GET /series categories (series_categories)"
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
    "event_ticker": null,
    "title": null,
-   "category_id": null,
-   "category_basis": null,
+   "category_id": "crypto",
+   "category_basis": "official-series",
    "series_categories": [
     "Crypto"
    ],
@@ -859,7 +858,8 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M",
+   "category_assigned_from": "GET /series categories (series_categories)"
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -891,8 +891,8 @@
    "ticker": "KXAAAGASD-26NOV21-3.6600",
    "event_ticker": null,
    "title": null,
-   "category_id": null,
-   "category_basis": null,
+   "category_id": "gas",
+   "category_basis": "official-series",
    "series_categories": [
     "Economics"
    ],
@@ -911,14 +911,15 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+   "category_assigned_from": "GET /series categories (series_categories)"
   },
   {
    "ticker": "KXAAAGASD-26NOV21-3.6600",
    "event_ticker": null,
    "title": null,
-   "category_id": null,
-   "category_basis": null,
+   "category_id": "gas",
+   "category_basis": "official-series",
    "series_categories": [
     "Economics"
    ],
@@ -937,7 +938,8 @@
    "cause_status": "unverified: no official cause source collected",
    "first_seen_at": "2026-11-21T20:57:38Z",
    "high_roi": false,
-   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+   "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+   "category_assigned_from": "GET /series categories (series_categories)"
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -1885,6 +1887,7 @@
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
   "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
   "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
-  "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten."
+  "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",
+  "Scope: the chats cover the five topics only. An archived swing whose series GET /series files under Test/Demo, or for which no single topic can be confirmed, is withheld and counted (counts.withheld_out_of_scope) rather than shown under the wrong topic."
  ]
 }

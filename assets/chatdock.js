@@ -149,7 +149,13 @@ const KDCHAT = (() => {
       if (r.ok) doc = await r.json();
     } catch { doc = null; }
     S.histLoaded = true;
+    S.histSkipped = 0;
     for (const a of (doc && doc.alerts) || []) {
+      // Scope: the chats cover the five topics only. A row whose series GET /series files under
+      // Test/Demo, or whose topic was never confirmed, is withheld and counted here rather than
+      // shown under no topic (F-76). The archive keeps it; only this view excludes it.
+      const cats = (a.series_categories || []).map(String);
+      if (cats.includes("Test") || cats.includes("Demo") || !a.category_id) { S.histSkipped += 1; continue; }
       const to = Date.parse(a.to_time || "");
       const from = fnum(a.from_price);
       const toP = fnum(a.to_price);
@@ -314,11 +320,12 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- freshness / collector health (T32 / R-B1) -------------------- */
-  // GitHub's cron scheduler drops runs under load (F-40), so `main` now uses a bounded
-  // 15-minute relay in collect.yml (T55), with off-peak crons as a fallback restart path.
-  // Instead of hard-coding a cron expression, read the newest collect.yml runs from the
-  // public GitHub REST API (CORS `*`) and report the actual newest/in-progress run.
+  /* -------------------- freshness / run health (T32, R-B1) -------------------- */
+  // The collector's schedule is unreliable (measured 2026-11-21: 4 schedule deliveries in ~20 h;
+  // F-40), and since PR #62 a run on main is a 15-minute relay rather than one cron tick. So this
+  // line names no cron and judges no expected interval (R-B1): it reports the newest run and how
+  // often the schedule actually fired, and leaves freshness to the snapshot-age line below.
+  // Read-only: public GitHub REST API (CORS `*` verified 2026-11-21). No token, no writes.
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -335,19 +342,25 @@ const KDCHAT = (() => {
         status: x.status,
         conclusion: x.conclusion,
       }));
-      const active = runs.find((x) => x.status === "in_progress" || x.status === "queued") || null;
       const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      const newest = runs.find((x) => !Number.isNaN(x.at)) || null;
       S.health = {
         runs: runs.length,
-        activeStatus: active ? active.status : null,
-        activeAt: active && !Number.isNaN(active.at) ? active.at : null,
         scheduled: sched.length,
         scheduleGapMinutes: gap,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
+        newest: newest
+          ? {
+              event: newest.event,
+              status: newest.status || "unknown",
+              conclusion: newest.conclusion || "",
+              at: newest.at,
+            }
+          : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
       };
     } catch (e) {
@@ -367,21 +380,17 @@ const KDCHAT = (() => {
           `<span class="cd-health mut">collector health: GitHub API not reachable from this browser (${esc(h.error)}) — ` +
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
       } else {
-        const running = h.activeStatus === "in_progress";
-        const queued = h.activeStatus === "queued";
         const gap = h.scheduleGapMinutes;
-        const late = !running && !queued && gap !== null && gap > 30;
-        const lead = running
-          ? `collector relay running (15-min grid on main · started ${h.activeAt ? esc(ago(h.activeAt)) : "recently"})`
-          : queued
-            ? `collector relay queued (15-min grid on main)`
-            : `collector relay (15-min grid on main · cron restart: 7,27,47 + 13,43)`;
+        const n = h.newest;
+        const newestText = n
+          ? `newest run ${esc(n.status)}${n.conclusion ? " · " + esc(n.conclusion) : ""} (${esc(n.event)}, ${esc(ago(n.at))})`
+          : "no runs in the last 20";
         host.innerHTML =
-          `<span class="cd-health ${late ? "warn" : "ok"}">` +
-          `${lead}: ${h.scheduled} of the last ${h.runs} runs were scheduled` +
-          (gap !== null ? ` · last two scheduled runs ${gap}m apart` : "") +
-          (late ? " · <b>GitHub is throttling the schedule (F-40)</b>" : "") +
-          ` · last completed ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
+          `<span class="cd-health ok">` +
+          `collector: ${newestText} · ` +
+          `${h.scheduled} of the last ${h.runs} runs were scheduled` +
+          (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
+          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
           `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
     }
@@ -396,6 +405,12 @@ const KDCHAT = (() => {
 
   /* ----------------------------- rendering ----------------------------- */
   function render() {
+    const scope = document.getElementById("kdScope");
+    if (scope) {
+      scope.textContent = S.histSkipped
+        ? ` ${S.histSkipped} archived swing(s) are withheld here because they are not in the five topics (F-76).`
+        : "";
+    }
     const all = S.feed;
     const model = all.filter((a) => Math.abs(a.delta) / Math.max(a.from, 0.05) >= 0.25 && (a.volume24 || 0) >= 100);
     const cat = S.filter;
@@ -488,6 +503,7 @@ const KDCHAT = (() => {
       News links are search leads, never asserted causes (<a href="flagged.html">F-25</a>).
       Topic labels on <b>history</b> rows are the collector's verified category; a market first seen by the live
       poller is matched by its series prefix, a keyword heuristic (<a href="flagged.html">flagged</a>).
+      <span id="kdScope"></span>
     </footer>
   </section>
 </div>`;

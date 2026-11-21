@@ -8,14 +8,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # F-68 (verified 2026-11-21): a push made with the repository's GITHUB_TOKEN does not trigger
-  # a Pages build. GitHub states it verbatim: "Commits pushed by a GitHub Actions workflow that
-  # uses the GITHUB_TOKEN do not trigger a GitHub Pages build."
+  # Verified 2026-11-21: a push made with the repository's GITHUB_TOKEN does not trigger a Pages
+  # build. GitHub states it verbatim: "Commits pushed by a GitHub Actions workflow that uses the
+  # GITHUB_TOKEN do not trigger a GitHub Pages build."
   #   https://docs.github.com/en/actions/concepts/security/github_token
-  # The scheduled collector (collect.yml) commits data/live with exactly that token, so every
-  # snapshot it produced was committed and then NEVER deployed: the branch had fresh data while
-  # the published site kept serving an older one. That is the real reason the site reported a
-  # 5h-old snapshot (F-67) even though runs were succeeding.
+  # The scheduled collector (collect.yml) commits data/live with exactly that token, so a push
+  # alone would not deploy a snapshot. Corrected reading (R-B6, measured 2026-11-21): this
+  # repository's Pages builds API shows legacy builds pushed by github-actions[bot] (e.g. 276d356
+  # at 15:21:26Z, c43667f at 20:27:28Z, a96b7de at 20:58:46Z), so an earlier comment here that
+  # claimed every collector snapshot was "NEVER deployed" was too strong. The 5-hour staleness on
+  # 2026-11-21 was the absence of collector runs (flagged F-40), not undeployed commits. Both
+  # mechanisms below are kept: the workflow_run chain, and the per-pass pages.yml dispatch the
+  # relay makes, so each committed pass publishes through this gate (flagged F-68 records the
+  # docs-vs-observed discrepancy).
   # workflow_run is the documented way to chain on a completed run regardless of the token that
   # pushed: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run
   # The deploy gate below is unchanged: only refs/heads/main and only non-PR runs may deploy, so
