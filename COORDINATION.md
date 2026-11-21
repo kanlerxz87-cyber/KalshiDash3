@@ -1376,10 +1376,10 @@ Nothing from either branch is deleted from git history.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T43 | Topic-fair resolution history: publish settled rows per topic instead of a global newest-first `[:200]` (crypto 15-minute markets were 198 of the 200 published rows), and backfill settled rows for rarely-settling seed series from the documented `GET /historical/markets` | in progress | arena-6a6e8f22 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` (new), `scripts/tests/validate_live.py` | official `GET /historical/markets` parameters re-read this session (see sources); local fixture tests | — |
-| T44 | Dashboard chart: X = time / Y = contract price over seconds, minutes, hours **and** days, using the official candlestick endpoint at the only intervals it documents (1 / 60 / 1440 min), with observations kept as a separate series; state plainly that a seconds interval does not exist | in progress | arena-6a6e8f22 | `dashboard.html`, `assets/engine.js` (read-only unless needed), `scripts/tests/test_pages_dom.js` | `node --check`, jsdom render of `dashboard.html` against the committed snapshot | — |
-| T45 | Line-by-line verification of the Claims changed by T43/T44 against official sources; blank + flag anything unconfirmable | in progress | arena-6a6e8f22 | `data/verified_facts.json`, `data/findings.json` (new ids only) | platform fetch of the official pages, recorded in the session log | — |
-| T46 | Deploy-source close-out: DEPLOY-1 says the Pages build type is `legacy`, so branch publishing bypasses the verified release gate. Attempt the documented change to workflow publishing, and record the result whatever it is | in progress | arena-6a6e8f22 | `COORDINATION.md` (record), `flagged.html` (DEPLOY-1 status only) | `gh api .../pages`, live fetch of the deployed site | — |
+| T43 | Topic-fair resolution history: publish settled rows per topic instead of a global newest-first `[:200]` (crypto 15-minute markets were 198 of the 200 published rows), and backfill settled rows for rarely-settling seed series from the documented `GET /historical/markets` | **done** — verified on real data | arena-6a6e8f22 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` (order regression added), `data/live/*` (collector-written) | collect.yml run 44946912248 on this branch published gas 50 / elections 1 / culture 50 / crypto 50 / golf 49; before the fix the same collector published 200/200 crypto (20:32Z) and 178/50-ish skew (20:27Z) | F-65 (ordering bug in the landed fix, now fixed); F-66 confirmed resolved on real data |
+| T44 | Dashboard chart: X = time / Y = contract price over seconds, minutes, hours **and** days, using the official candlestick endpoint at the only intervals it documents (1 / 60 / 1440 min), with observations kept as a separate series; state plainly that a seconds interval does not exist | **superseded, not duplicated** — `main` landed the same feature (PR #55, merged by `arena-dc62f2bb`) while this session worked; this branch took `main`'s maintained version and kept only the added coverage (`test_pages_dom.js` E2 window test, the day window, the exact-query footer) | arena-6a6e8f22 | `dashboard.html` (main's version), `scripts/tests/test_pages_dom.js`, `assets/engine.js` (export `BASE`) | jsdom E2 renders days/hours/seconds windows; `test_pages_dom.js` green | no duplicate implementation kept |
+| T45 | Line-by-line verification of the Claims changed by T43/T44 against official sources; blank + flag anything unconfirmable | **done** | arena-6a6e8f22 | `data/verified_facts.json` (F-70..F-73), `data/findings.json` (F-65 ordering update, F-66 confirmation) | official pages re-read this session (historical_data, get-historical-markets, get-market-candlesticks); every quoted sentence appears in the fetched text | one duplicate avoided: ids F-65/F-66 were already taken by `arena-dc62f2bb`, so this session's drafts were dropped and its facts renumbered to F-70..F-73 |
+| T46 | Deploy-source close-out: DEPLOY-1 says the Pages build type is `legacy`, so branch publishing bypasses the verified release gate. Attempt the documented change to workflow publishing, and record the result whatever it is | **done — refused, recorded** | arena-6a6e8f22 | `flagged.html` (DEPLOY-1 text only), `COORDINATION.md` | `PUT /repos/kanlerxz87-cyber/KalshiDash3/pages` with `build_type=workflow` → **HTTP 403 Resource not accessible by integration** at 20:30Z, with the token reporting `admin: true` | DEPLOY-1 remains open and now carries the exact re-test; a human must set Pages → Source: GitHub Actions |
 | T47 | Integration close-out: full `scripts/verify_release.py`, PR → `main`, merge, confirm the Pages deploy, record the PR link and result here | unclaimed | arena-6a6e8f22 | `COORDINATION.md`, `README.md` | live URL fetches | — |
 
 ### Sources re-read this session (official, fetched 2026-11-21 20:2xZ)
@@ -1422,3 +1422,32 @@ session's identifier collides with main's F-37..F-64.
 - 2026-11-21 ~20:20Z: claimed T41; recorded claim before any edit.
 - 2026-11-21 ~20:40Z: merged PR #56 (settled-selection) then PR #55 (candles/coverage). Conflicts resolved without deleting either implementation: `COORDINATION.md` kept both session sections; findings renumbered fresh (F-65/F-66 ← PR #56's F-41/F-42; F-67..F-71 ← PR #55's F-40..F-44); data files kept from main (15:21:23Z snapshot), so PR #56's older 06:56:14Z archives were dropped (the auto-merged archive mixed two snapshots and failed both validators); test_pages_dom.js kept main's F-64 index mode AND PR #55's candles/deep-link modes; mode H rewritten for main's KPI wording.
 - 2026-11-21 ~20:45Z: `verify_release.py` PASS on the merged tree (compile, node --check, all validators and tests, jsdom suites, 21-page check). `test_settled_selection.py` 10/10 checks including the [:1600] ordering regression and the control. `test_collect_coverage.py` + `test_simulate.py` + `test_pages_dom.js` all green.
+
+### Result (arena-6a6e8f22, 2026-11-21 ~20:45Z)
+
+- **T43/T45/T46 done; T44 superseded by `main`.** The one substantive defect this session found and fixed was
+  in work that landed while it was running: `main`'s per-topic settled selection (PR #56) ran *after* the
+  1,600-row trim, so it looked fair but was not. Measured: the 20:27Z snapshot published crypto 178 / gas 17 /
+  culture 5 with zero elections and zero golf; the 20:32Z snapshot, produced by the old code on this branch
+  before the fix was pushed, published **200/200 crypto**. After the fix, collect.yml run `44946912248`
+  (2026-11-21T20:36Z) published **gas 50 / elections 1 / culture 50 / crypto 50 / golf 49**, including
+  `KXELECTIRAN-26JUL01` (`result: "no"`, settled 2026-07-01) fetched through
+  `GET /historical/markets?series_ticker=KXELECTIRAN`.
+- **Regression coverage:** `scripts/tests/test_settled_selection.py` drives the real
+  `split_and_select_settled()` and asserts a settlement older than the stored window is still published, plus a
+  witness that the shipped order loses it. Mutation-checked by reverting the order locally.
+- **Data files** were never hand-edited: conflicting snapshots were replaced with the collector's own output and
+  every derived file was regenerated/validated by its own script (`validate_live`, `validate_alerts`,
+  `validate_catalysts`, `simulate.py`).
+- **Stale counts fixed:** README/executive-summary said 38 flagged / 59 claims; the data says 50 flagged / 19
+  suggestions / 9 questions / 69 facts (1 deliberately blank). Now generated from the data, not typed.
+- **Blank/flagged values:** the only blank fact remains F-20 (live market values are never stored in the fact
+  table by design). Everything this session added carries its official URL.
+
+### Merge conflict record (nothing discarded)
+
+`origin/main` moved four times during this session. Conflicts were resolved per file: `scripts/collect.py` —
+this session's ordering fix kept, `main`'s `select_settled` kept as the base; `dashboard.html` — `main`'s
+maintained chart won, my duplicate implementation was dropped (both were the same feature); `data/findings.json`
+— `main`'s F-65/F-66 entries kept, my drafts dropped and my facts renumbered to F-70..F-73; `COORDINATION.md` —
+both sessions' records kept verbatim; `data/live/*` — collector output taken and re-validated, never hand-merged.
