@@ -860,7 +860,6 @@ does not touch their scopes.
   Full suite re-run green on that fresh data: validate_live/alerts/roi, test_alerts/simulate/fees/roi_parity/
   roi_scan_offline, check_site (21 pages). Open PR #38 left to its author with the coordination comment.
 
-<<<<<<< HEAD
 ## Session arena-d60abf08 — release verification hardening (2026-11-21)
 
 | Task | Status | Owner | Files in scope | Verification / irregularities |
@@ -1038,3 +1037,29 @@ Branched from `ebce5e7` and rebased onto `bdd02d3` (`data: demo snapshot 2026-11
 
 ### Log (this session)
 - 2026-11-21: claimed tasks before editing (`a06d324`); rebased onto `origin/main@bdd02d3` preserving all concurrent sessions' records (`arena-d60abf08`, `arena-c076278a`, `arena-7d3aa4d3`, `arena-0a4a3d7a`, `arena-7e1df9fd`) verbatim and renumbering this session's tasks to T28–T30.
+
+## Session `arena-17d4ecfa` — independent audit + "live on every page" pass (branch `arena/17d4ecfa-kalshidash3`)
+
+Rebased onto `ff6f01f` (current `origin/main`) on 2026-11-21. Read the whole board first; no open PR and no branch
+commit newer than main at claim time, so nothing below overlaps an open claim.
+
+| ID | Task | Status | Owner | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| T30 | Close F-37 for real: `index.html` printed the stored settled-row cap (200) as "settled markets in scope" while the banner on the same page printed `counts.settled_in_scope` (1,600) | **done** — KPI now reads "of N settled rows in this snapshot (of M settled in scope)"; a resolution tracker was added to the same page | arena-17d4ecfa | `index.html`, `data/findings.json` (F-37 only) | jsdom render of `index.html` against `data/live/markets.json`: KPI renders "of 200 settled rows in this snapshot (of 1,600 settled in scope)", 25 resolution rows, no `NaN` | F-37 had been recorded "verified clean" after PR #40 while `collect.py:496` + `index.html:122` still shipped the defect; the earlier note was wrong and is corrected in the finding |
+| T31 | Two scrolling >= $0.10 alert chats on **every** page (brief: "a live alerting system ... simplified scrolling chat"), not only `alerts/dashboard/live` | **done** — `assets/chatdock.js` (new) on all 21 pages | arena-17d4ecfa | `assets/chatdock.js`, `assets/site.css`, all `*.html`, `scripts/tests/test_chatdock.js` | `scripts/tests/test_chatdock.js` — 27 assertions in jsdom: 0.09 refused, 0.10 fires exactly once, first reading is a baseline only, blocked API degrades to history, no `NaN`/`undefined`/`null` leaks, category taken from the collector's verified `category_id` | a market first seen by the live poller is placed in a topic by series-prefix heuristic (labelled as such in the panel) because `GET /markets` has no category field; demo API CORS remains undocumented (F-24) |
+| T32 | Freshness health on every page so a stale snapshot can never look live | **done** — the dock reports snapshot age + measured `collect.yml` cron cadence from the public GitHub REST API | arena-17d4ecfa | `assets/chatdock.js` | GitHub REST sends `access-control-allow-origin: *` (verified by header fetch this session); line renders "N of the last M runs were scheduled - last two scheduled runs Xm apart" | F-16 stands: the `*/20` cron fired once in 5.5 h; the site now measures and prints that instead of hiding it |
+| T33 | Independent line-by-line verification of the claims this pass touches | **in progress** (see log) | arena-17d4ecfa | `data/verified_facts.json`, `verification.html` | https://docs.kalshi.com/getting_started/quick_start_create_order , .../api_keys , .../demo_env | — |
+
+### Log
+- 2026-11-21 ~06:05Z: session start. `origin/main` = `ebce5e7`; no open PRs. Audited the deployed site (root tree,
+  legacy Pages publishing) and the collectors. Reproduced F-37 on the LIVE page ("of 200 settled markets in scope"
+  next to a banner reading 1,600) although the finding had been closed.
+- 2026-11-21 ~06:20Z: verified from official docs that order placement needs a signed API key
+  (quick_start_create_order posts to `/portfolio/events/orders` with `KALSHI-ACCESS-*` headers) and that **Ed25519 is
+  now the default demo key type** (api_keys). `scripts/kalshi_client.py` already signs Ed25519 or RSA-PSS, so the
+  README's "create a key" step is correct as written.
+- 2026-11-21 ~06:35Z: dispatched `collect.yml` on `main` (run 44876253177, success) -> snapshot `2026-11-21T06:34:10Z`,
+  763 open / 1,600 settled in scope; the desk scan followed at `06:35Z`. Recorded: the cron fired once between 00:49Z
+  and 06:34Z although `*/20` was due ~17 times — read from the run list, not assumed.
+- 2026-11-21 ~06:40Z: rebase onto `ff6f01f` (PRs #42–#49 from parallel sessions). COORDINATION.md conflicted; resolved
+  by KEEPING BOTH sides (arena-d60abf08's section and this one); no other session's record was removed.
