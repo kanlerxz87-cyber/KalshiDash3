@@ -30,8 +30,9 @@ left blank and listed on the *Flagged for Review* page.
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
 | `suggestions.html` | Twenty proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 72 claims (C-nn), each with the official page it was checked against |
-| `flagged.html` | Irregularities found (F-nn), plus every value deliberately left blank |
+| `verification.html` | every claim (C-nn), each with the official page it was checked against — the page renders the count from `data/verified_facts.json` and a 24-row official-link table |
+| `flagged.html` | every irregularity (F-nn) with its open/fixed status, plus every value deliberately left blank — the page renders the count from `data/findings.json` |
+
 | `sources.html` | The complete source list |
 
 ## Repository layout
@@ -76,7 +77,12 @@ This single offline command checks Python, shared and inline browser-script synt
 all committed-data validators; alert, fee, ROI and simulation regressions; engine and
 DOM behavior; and internal links across the 21 pages. Missing Node or jsdom is a failure,
 not a silent skip. It does not fetch fresh prices, verify external URL availability,
-certify profitability, or authenticate a demo account. Official endpoint and authentication
+certify profitability, or authenticate a demo account.
+
+Two site behaviours are derived rather than typed, because typed copies had already drifted: the
+collector **cadence** shown in the snapshot banner (F-73) and the **counts** in the executive summary
+(D-01) are computed from `data/live/price_history.json`, `data/findings.json` and
+`data/verified_facts.json` at render time. Official endpoint and authentication
 references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
 [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).
 
