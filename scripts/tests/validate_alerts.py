@@ -133,24 +133,36 @@ def main() -> int:
     # False (volume_24h_fp 0.0 recorded on the row), derived True from a later
     # snapshot. The archive rows carry category_basis and volume_24h_fp precisely
     # so the screen can be reproduced deterministically; the snapshot is consulted
-    # only for legacy rows that carry neither field.
+    # only for legacy rows that carry neither field. Disagreement with the current
+    # snapshot is reported as drift (F-39), never as a failure.
     markets_path = LIVE / "markets.json"
     snap = load(markets_path)
     roi_rules = rules.get("high_roi") or {}
-    if snap and roi_rules:
-        by_ticker = {m["ticker"]: m for m in (snap.get("open_markets") or [])}
+    if roi_rules:
+        req_basis = roi_rules.get("require_category_basis")
+        req_gt = roi_rules.get("require_volume_24h_gt", -1)
+        by_ticker = {m["ticker"]: m for m in ((snap or {}).get("open_markets") or [])}
+        drift = 0
         for a in archive:
             m = by_ticker.get(a.get("ticker", "")) or {}
             basis = a.get("category_basis") if a.get("category_basis") is not None else m.get("category_basis")
             vol = a.get("volume_24h_fp") if a.get("volume_24h_fp") is not None else m.get("volume_24h_fp")
             if basis is None and vol is None:
                 continue  # no recorded fields and not in the snapshot: nothing to reproduce
-            expected = bool(
-                basis == roi_rules.get("require_category_basis")
-                and (vol or 0) > roi_rules.get("require_volume_24h_gt", -1)
-            )
+            expected = bool(basis == req_basis and (vol or 0) > req_gt)
             check(a.get("high_roi") == expected,
-                  f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} != rules-derived {expected}")
+                  f"archive:{a.get('ticker')}@{a.get('to_time')} high_roi {a.get('high_roi')} contradicts the "
+                  f"inputs stored with it (category_basis={basis!r}, "
+                  f"volume_24h_fp={vol!r}, rule-derived {expected})")
+            if m:
+                now = bool(m.get("category_basis") == req_basis
+                           and (m.get("volume_24h_fp") or 0) > req_gt)
+                if now != expected:
+                    drift += 1
+        if drift:
+            print(f"note: {drift} archived alert(s) whose screen result differs in the CURRENT snapshot — "
+                  f"expected and allowed: high_roi is frozen at detection time (volume_24h_fp changes "
+                  f"between collections); the flag is verified against each entry's own stored inputs.")
 
     # ---- provenance: recompute swings from the committed observations ----
     hist = load(LIVE / "price_history.json")
