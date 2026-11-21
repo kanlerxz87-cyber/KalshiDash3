@@ -509,8 +509,33 @@ function commonAsserts(label, r) {
       check(afterCount === beforeCount + 1,
         `dashboard.html Seconds window must plot numeric-timestamp live poll ticks (before=${beforeCount}, after=${afterCount}, foot=${secFoot.slice(0, 120)})`);
       console.log(`  I obs+live fix  ok  (${sampleTicker} plots yes_bid, yes_ask, and numeric live poll ticks: ${beforeCount} -> ${afterCount})`);
+      await new Promise(res => setTimeout(res, 100));
       r.close();
     }
+  }
+
+  /* --- J. executive-summary.html: dynamic counts from JSON + R-2..R-5/R-B8 hygiene --- */
+  {
+    const vf = JSON.parse(fs.readFileSync(path.join(ROOT, "data/verified_facts.json"), "utf8"));
+    const fd = JSON.parse(fs.readFileSync(path.join(ROOT, "data/findings.json"), "utf8"));
+    const r = await loadPage("executive-summary.html", "snapshot");
+    commonAsserts("executive-summary.html", r);
+    const vText = (r.doc.querySelector("#esVerifyCounts") || {}).textContent || "";
+    const sText = (r.doc.querySelector("#esSuggCount") || {}).textContent || "";
+    const qText = (r.doc.querySelector("#esQCount") || {}).textContent || "";
+    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
+      `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
+    check(sText.includes(`${fd.suggestions.length} suggestions`),
+      `executive-summary.html must render live suggestions count (got: ${sText})`);
+    check(qText.includes(`${fd.questions.length} questions`),
+      `executive-summary.html must render live questions count (got: ${qText})`);
+    const bodyText = r.doc.body.textContent || "";
+    check(!/every 20 minutes|~20 min/.test(bodyText),
+      "executive-summary.html must not advertise the retired 20-minute cadence (R-B8)");
+    check(!/alerts-page auto-sim/.test(bodyText),
+      "executive-summary.html must point auto-sim references at trading.html, not alerts.html (R-4)");
+    console.log(`  J exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, ${fd.suggestions.length} suggestions, ${fd.questions.length} questions)`);
+    r.close();
   }
 
   if (problems.length) {

@@ -36,13 +36,13 @@
           <td>Executor targets the current V2 endpoint and is unexercised because keys do not exist. The old endpoint it used to target is gone (<a href="flagged.html">F-01</a>).</td></tr>
       <tr><td>Automate simulated trades to test different strategies (S1–S4 replay)</td>
           <td><span class="badge ok">done</span></td><td><a href="portfolio.html">Portfolio §4</a></td>
-          <td>Deterministic replay of the collected price history through the strategy-page rules: entries at observed asks, exits at observed bids, official general taker fee per fill, strategy × category ledger, equity curve, settlement against the literal API result. Complements the alerts-page auto-sim (G13), which trades the live alert stream instead.</td></tr>
+          <td>Deterministic replay of the collected price history through the strategy-page rules: entries at observed asks, exits at observed bids, official general taker fee per fill, strategy × category ledger, equity curve, settlement against the literal API result. Complements the auto-sim on <a href="trading.html">Auto-sim trading</a> (G13), which trades the live alert stream instead.</td></tr>
       <tr><td>Live interactive dashboard with a price graph, time on X, price on Y, seconds/minutes/hours window</td>
           <td><span class="badge ok">done</span></td><td><a href="dashboard.html">Live dashboard</a></td>
-          <td>X is time, Y is the contract price. Each window plots two series and says which is which: the exchange's own candles at 1 minute (<i>Minutes</i>), 1 hour (<i>Hours</i>) or 1 day (<i>Days</i>) from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">GET /series/…/candlesticks</a>, and the collector's own observations (one per run) on top. Archived ≥ $0.10 swings are drawn as dashed markers, and every alert in the chat deep-links to its chart. Seconds resolution cannot be requested from Kalshi — candles exist only at 1/60/1440 minutes — so the <i>Seconds</i> window is the accumulated-observation window and the page says so rather than inventing ticks (<a href="flagged.html">F-06</a>, <a href="flagged.html">F-68</a>). The dashboard also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-14</a>).</td></tr>
+          <td>X is time, Y is the contract price. Each window plots two series and says which is which: the exchange's own candles at 1 minute (<i>Minutes</i>), 1 hour (<i>Hours</i>) or 1 day (<i>Days</i>) from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">GET /series/…/candlesticks</a> (at most 5,000 periods per request, <a href="verification.html">F-61</a>; pre-cutoff markets via <code>/historical/markets/{ticker}/candlesticks</code>, <a href="verification.html">F-62</a>), and the collector's own observations (one per run) on top. Archived ≥ $0.10 swings are drawn as dashed markers, and every alert in the chat deep-links to its chart. Seconds resolution cannot be requested from Kalshi — candles exist only at 1/60/1440 minutes — so the <i>Seconds</i> window is the accumulated-observation window and the page says so rather than inventing ticks (<a href="flagged.html">F-06</a>, <a href="flagged.html">F-68</a>). The dashboard also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-24</a>).</td></tr>
       <tr><td>Live alerting on swings ≥ $0.10 in either direction, as a simplified scrolling chat viewable in real time</td>
           <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
-          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between its runs (~20 min) (<a href="flagged.html">F-14</a>).</td></tr>
+          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS (<a href="flagged.html">F-24</a>) the collector layer still catches ≥ $0.10 moves between its runs (~15 min while the relay runs; each page shows the live snapshot age).</td></tr>
       <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
           <td><span class="badge ok">done, labelled as leads</span></td><td>Alert bubbles + chart markers on the dashboard</td>
           <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-25</a>).</td></tr>
@@ -54,16 +54,16 @@
           <td>Depth is a point-in-time read and goes stale between collector runs; with live mode on, the selected market's book refreshes each poll. <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Official orderbook API</a></td></tr>
       <tr><td>Alert on price swings of at least $0.10 with all-event and filtered feeds</td>
           <td><span class="badge ok">done · snapshot + live</span></td><td><a href="dashboard.html#alertsTitle">Dashboard alert feeds</a> · <a href="alerts.html">Alert chats</a></td>
-          <td>The dashboard scans consecutive committed observations (the collector runs every 20 minutes, so this is not tick-level streaming). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
+          <td>The dashboard scans consecutive committed observations (about every 15 minutes while the collector relay runs on <code>main</code>, so this is not tick-level streaming; every page prints the live snapshot age). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (<a href="flagged.html">F-24</a>) and fall back to the same committed history. The filtered screen is not a validated ROI model (<a href="flagged.html">F-14</a>, <a href="flagged.html">F-26</a>). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
-          <td>Eighteen suggestions across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
+          <td><span id="esSuggCount">20 suggestions</span> across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
       <tr><td>A clear list of questions, information and answers needed before a decision</td>
           <td><span class="badge ok">done</span></td><td><a href="questions.html">Questions</a></td>
-          <td>Nine questions; one of them cannot be closed by an agent.</td></tr>
+          <td><span id="esQCount">9 questions</span>; one of them cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td>72 claims checked; 1 deliberately blank. 50 irregularities found and listed across all sessions; the live/alert/auto-sim layer added F-24–F-28 and the arena-f068786c integration added F-29 (<a href="flagged.html">flagged</a>).</td></tr>
+          <td><span id="esVerifyCounts">72 claims checked (71 verified, 1 deliberately blank); 55 irregularities found and listed across all sessions</span> (<a href="flagged.html">flagged</a>).</td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td></tr>
@@ -125,5 +125,29 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 </div></footer>
 <script src="assets/chatdock.js" defer></script>
 <script src="assets/site.js"></script>
-<script>KD.nav("executive-summary.html");</script>
+<script>
+KD.nav("executive-summary.html");
+(async () => {
+  try {
+    const [vf, fd] = await Promise.all([
+      KD.json("data/verified_facts.json"),
+      KD.json("data/findings.json"),
+    ]);
+    const facts = (vf && vf.facts) || [];
+    const verified = facts.filter((x) => x.verified).length;
+    const blank = facts.length - verified;
+    const flagged = ((fd && fd.flagged) || []).length;
+    const sugg = ((fd && fd.suggestions) || []).length;
+    const qs = ((fd && fd.questions) || []).length;
+    const vEl = KD.$("#esVerifyCounts");
+    if (vEl && facts.length) {
+      vEl.textContent = `${facts.length} claims checked (${verified} verified, ${blank} deliberately blank); ${flagged} irregularities found and listed across all sessions`;
+    }
+    const sEl = KD.$("#esSuggCount");
+    if (sEl && sugg) sEl.textContent = `${sugg} suggestions`;
+    const qEl = KD.$("#esQCount");
+    if (qEl && qs) qEl.textContent = `${qs} questions`;
+  } catch (_) {}
+})();
+</script>
 </body></html>

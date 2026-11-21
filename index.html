@@ -193,9 +193,10 @@ KD.nav("");
         series cannot crowd out gas, elections, culture or golf
         (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
         Settled markets older than the exchange's published historical cutoff
-        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
-        <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing
-        here — that is a gap in the archive, not a market that never resolved (<a href="flagged.html">F-66</a>). Full list on
+        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are documented as
+        available only via <code>GET /historical/markets</code> (which the collector backfills per seeded series),
+        though live demo probes still returned <code>GET /markets/KXELECTIRAN-26JUL01</code> directly — a
+        docs-vs-demo discrepancy flagged as <a href="flagged.html">F-76</a> (see also <a href="flagged.html">F-66</a>). Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },

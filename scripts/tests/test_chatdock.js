@@ -32,7 +32,7 @@ const bad = (m) => { failures++; console.log("  FAIL " + m); };
 const check = (c, m) => (c ? ok(m) : bad(m));
 
 /* ---------------------------------------------------------------- harness */
-function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
+function makeEnv({ apiMode, archive, snapshot, ticks, pollMs, workflowRuns }) {
   const state = { calls: [], polled: 0 };
   const fnum = (v) => { const n = Number(v); return Number.isNaN(n) ? null : n; };
 
@@ -41,7 +41,7 @@ function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
     const send = (body, status = 200) => ({ ok: status >= 200 && status < 300, status, json: async () => body });
     if (/^data\/live\/alerts_archive\.json/.test(u)) return send(archive);
     if (/^data\/live\/markets\.json/.test(u)) return send(snapshot);
-    if (/api\.github\.com/.test(u)) return send({ workflow_runs: [] });
+    if (/api\.github\.com/.test(u)) return send({ workflow_runs: workflowRuns || [] });
     if (/external-api\.demo\.kalshi\.co/.test(u)) {
       if (apiMode === "blocked") { const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
       state.calls.push(u);
@@ -199,10 +199,31 @@ function counts(w) {
   check(env3.w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length > 0,
     "history rows are still rendered when the demo API refuses the browser");
 
-  /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32 — cron health line");
+  /* -------------------------------------------------- H: health line (T32 / R-B1) */
+  console.log("\nT32 / R-B1 — collector health line (relay-aware, no retired */20 cron)");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector cron|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(/collector workflow|collector relay|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(!/\*\/20|every 20m/.test(health), "health line no longer claims the retired */20 cron (R-B1)");
+
+  const nowIso = new Date().toISOString();
+  const env4 = makeEnv({
+    apiMode: "blocked",
+    archive: ARCHIVE,
+    snapshot: SNAPSHOT,
+    ticks: [],
+    workflowRuns: [
+      { id: 1, event: "workflow_dispatch", status: "in_progress", conclusion: null, created_at: nowIso },
+      { id: 2, event: "schedule", status: "completed", conclusion: "success", created_at: new Date(Date.now() - 3600000).toISOString() },
+    ],
+  });
+  await sleep(120);
+  open(env4.w);
+  await sleep(80);
+  const relayHealth = env4.w.document.getElementById("kdHealth").textContent;
+  check(/collector relay running \(15-min grid on main/.test(relayHealth),
+    `active relay run is reported cleanly ("${relayHealth.slice(0, 72)}…")`);
+  check(/1 of the last 2 runs were scheduled/.test(relayHealth),
+    "scheduled-vs-total run count is still reported alongside active relay");
 
   console.log("");
   teardown();
