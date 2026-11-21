@@ -138,10 +138,13 @@ function render() {
       KD.table([{ key: "k", label: "Bucket" }, { key: "v", label: "Count", num: true }], [
         { k: "Open markets scanned (capped scan)", v: KD.num(snap.counts.open_total_scanned) },
         { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
-        { k: "Open rows kept in scope", v: KD.num(snap.counts.open_in_scope) },
+        { k: "Open rows kept in scope (published)", v: KD.num(snap.counts.open_published_rows ?? snap.counts.open_in_scope) },
+        { k: "Settled rows published, allocated across topics", v: KD.num(snap.counts.settled_published ?? snap.counts.settled_in_scope) },
+        { k: "Settled markets found in scope (scan total)", v: KD.num(snap.counts.settled_in_scope_total ?? "—") },
+        { k: "how that total was obtained", v: KD.esc(snap.counts.settled_in_scope_total_method || "not stated in this snapshot") },
         { k: "Open rows dropped for size (top 120 per category plus all confirmed)", v: KD.num(snap.counts.open_rows_trimmed_for_size) },
         { k: "Rows dropped for a terminal status in the open bucket", v: KD.num(snap.counts.rows_dropped_wrong_status) },
-        { k: "Multivariate combos excluded (open)", v: KD.num(snap.counts.open_excluded_multivariate) },
+        { k: "Multivariate combos still present after the API's mve_filter=exclude (open)", v: KD.num(snap.counts.open_excluded_multivariate) },
         { k: "Markets found by the confirmed seed-series pass", v: KD.num(snap.counts.seed_markets_found) }
       ]);
   } catch (e) { KD.$("#dataQuality").innerHTML = KD.empty("No snapshot committed yet."); }

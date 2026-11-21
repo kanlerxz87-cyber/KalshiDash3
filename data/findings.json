@@ -341,6 +341,18 @@
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
     "https://docs.kalshi.com/getting_started/rate_limits"
    ]
+  },
+  {
+   "id": "G20",
+   "suggestion": "SHIPPED: a pointer readout on the dashboard chart — hover reports the nearest PLOTTED contract price, its UTC time, the period's contract volume and the bid/ask when that point came from an official candle.",
+   "why_it_helps_decisions": "The chart was a bitmap: a trader could see a move but could not read a number off it. Reading the exact plotted value (never an interpolated one) is what turns the graph into an input to a decision, and naming whether a point is an official candle or a collector observation keeps the two commensurable.",
+   "effort": "Done in this session",
+   "risk": "None to the data: it reads window.__chart, which drawChart() fills with exactly what it drew. Points are matched by timestamp, so a candle and an observation at the same second report the candle's volume.",
+   "success_metric": "Hovering a plotted point prints its price, time and period volume; the number equals the plotted series' value at that timestamp (no averaging between neighbours).",
+   "status": "implemented",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
   }
  ],
  "flagged": [
@@ -913,6 +925,18 @@
    "sources": [
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
     "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
+  },
+  {
+   "id": "F-72",
+   "severity": "medium",
+   "item": "Every ticker the alert archive cites can be missing its price history, so the chart for an alerted market is empty and can never recover on its own",
+   "why": "Main retains observations for every ticker in alerts_archive.json (F-67's fix), which stops the pruning going forward but cannot restore what earlier runs already deleted: a settled market is never returned by GET /markets again, so no future collection re-observes it. Measured on main's committed snapshot (collected 2026-11-21T20:36:04Z): 7 of the 13 tickers cited by data/live/alerts_archive.json had no observations at all (KXDEMOFUTHOURLY-26NOV20H12-UP, -26NOV20H14-UP, -26NOV20H20-UP, -26NOV21H07-UP, -26NOV21H16-UP, KXBTC15M-26NOV210145-45, KXAAAGASD-26NOV21-3.6600), so dashboard.html#TICKER from those alerts renders an empty chart. The browser can fetch candles for them, but the committed snapshot layer cannot.",
+   "action": "scripts/collect.py gains backfill_from_candles(): for archive-cited tickers that have NO observations, it rebuilds the series from that market's own GET /series/{series}/markets/{ticker}/candlesticks at the documented 1-minute interval, over at most 5,000 periods (the documented per-request maximum), marked source=candle so a candle close is never passed off as a REST last_price read, skipping any ticker that already has data, and bounded to 12 series per run. counts.price_history_backfilled_from_candles reports it. Verified on run 44947044544 (2026-11-21T20:37Z): price_history_backfilled_from_candles = 6 and every archived ticker then had observations. Regression test: scripts/tests/test_settled_selection.py asserts the contract and fails on a snapshot where an archived ticker has no history.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44947044544"
    ]
   }
  ]

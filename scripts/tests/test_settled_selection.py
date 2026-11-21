@@ -147,6 +147,36 @@ def order_regression() -> int:
     return 0
 
 
+# ---------------------------------------------------------------- backfill contract (F-67)
+# F-67 is only half fixed by retaining history: whatever an earlier run already deleted is gone,
+# because a settled market is never returned by GET /markets again. These checks assert the
+# rebuild path exists, is bounded, is marked, and never overwrites collected data.
+src = (ROOT / "scripts" / "collect.py").read_text()
+check("def backfill_from_candles(" in src, "collect.py must rebuild lost history from official candles")
+check('"source": "candle"' in src, "a backfilled observation must be marked source=candle, not passed off as a REST read")
+check("if hist.get(ticker, {}).get(\"observations\"):" in src, "the backfill must skip any ticker that already has observations")
+check("max_series=12" in src, "the backfill must be bounded per run")
+check('"period_interval": 1' in src, "the backfill must request the documented 1-minute interval")
+check("end - 5000 * 60" in src, "the backfill window must respect the documented 5,000-period maximum")
+check('"price_history_backfilled_from_candles"' in src, "counts must report how many series were backfilled")
+check('"price_history_archived_tickers"' in src, "counts must report how many tickers the archive cites")
+
+# Live check on the committed snapshot: every ticker the alert archive cites must be chartable.
+LIVE = ROOT / "data" / "live"
+arch_path, hist_path = LIVE / "alerts_archive.json", LIVE / "price_history.json"
+if arch_path.exists() and hist_path.exists():
+    arch = {a.get("ticker") for a in json.loads(arch_path.read_text()).get("alerts", [])}
+    hist = json.loads(hist_path.read_text()).get("series", {})
+    missing = sorted(t for t in arch if not hist.get(t, {}).get("observations"))
+    check(not missing, f"every archived-alert ticker must have chartable observations (missing: {missing})")
+    candle_pts = sum(1 for v in hist.values() for o in v.get("observations", []) if o.get("source") == "candle")
+    print(f"  committed history: {len(hist)} series, {len(arch)} archived-alert tickers, {candle_pts} candle-backfilled points")
+
+print("OK: settled selection + history retention/backfill contract verified")
+if FAIL:
+    print("FAIL: %d check(s) failed" % len(FAIL))
+    sys.exit(1)
+
 if __name__ == "__main__":
     order_regression()
     raise SystemExit(main())

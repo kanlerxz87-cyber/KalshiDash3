@@ -483,6 +483,65 @@ def update_price_history(hist, rows):
     return hist
 
 
+def backfill_from_candles(hist, tickers, max_series=12):
+    """Rebuild a missing observation series from Kalshi's official 1-minute candles.
+
+    Why this is the only way to fix the rest of F-67: retaining history for every ticker an
+    alert cites (done above, from the archive file) stops the bleeding going forward, but it
+    cannot restore what an earlier run already deleted. A settled market is never returned by
+    GET /markets again, so no amount of future collection will re-observe it. Kalshi still
+    publishes the move itself, in that market's own candlestick history.
+
+    Only tickers that (a) appear in the alert archive and (b) currently have NO observations are
+    touched, so collected data is never overwritten and the cost is bounded by `max_series`.
+    Each written point is a candle CLOSE and is marked "source": "candle", so it can never be
+    mistaken for a REST last_price observation. Documented restrictions honoured here:
+    period_interval is 1/60/1440 minutes, start_ts/end_ts are seconds, and one request spans at
+    most 5,000 periods (https://docs.kalshi.com/api-reference/market/get-market-candlesticks).
+    A candle with no price block is skipped, never written as 0.
+    """
+    from datetime import datetime, timezone
+    done = 0
+    for ticker in tickers:
+        if done >= max_series:
+            break
+        if hist.get(ticker, {}).get("observations"):
+            continue
+        series_ticker = ticker.split("-")[0]
+        end = int(datetime.now(timezone.utc).timestamp())
+        start = end - 5000 * 60            # exactly the documented 5,000-period maximum
+        path = f"/series/{series_ticker}/markets/{ticker}/candlesticks"
+        try:
+            d, _ = get(path, {"start_ts": start, "end_ts": end, "period_interval": 1})
+        except RuntimeError as e:
+            print(f"  ! candle backfill {ticker}: {e}", file=sys.stderr)
+            continue
+        obs = []
+        for c in d.get("candlesticks") or []:
+            price = c.get("price") or {}
+            close = fnum(price.get("close_dollars", price.get("close")))
+            ts = c.get("end_period_ts")
+            if close is None or ts is None:
+                continue
+            obs.append({
+                "t": datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "last": close,
+                "yes_bid": fnum((c.get("yes_bid") or {}).get("close_dollars")),
+                "yes_ask": fnum((c.get("yes_ask") or {}).get("close_dollars")),
+                "volume_fp": c.get("volume_fp"),
+                "source": "candle",
+            })
+        if obs:
+            hist[ticker] = {
+                "observations": obs[-PRICE_HISTORY_LIMIT:],
+                "backfilled_from": f"{BASE}{path}?start_ts={start}&end_ts={end}&period_interval=1",
+                "backfilled_at": utcnow(),
+            }
+            done += 1
+            print(f"  candle backfill {ticker}: {len(obs)} one-minute closes")
+    return hist, done
+
+
 def public_market_row(m, cat_id, basis, keep_rules=False, official_cats=None, matched_by=None):
     row = {
         "ticker": m.get("ticker"),
@@ -859,12 +918,18 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # which the collect workflow runs right after this script. This file deliberately
     # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
+    archived_tickers: set = set()
     try:
         archive = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
-        watch |= {a["ticker"] for a in archive if a.get("ticker")}
+        archived_tickers = {a["ticker"] for a in archive if a.get("ticker")}
+        watch |= archived_tickers
     except (OSError, json.JSONDecodeError, AttributeError):
         pass  # first run: no archive yet, so open rows alone define the watch set
     hist = {k: v for k, v in hist.items() if k in watch}
+    # Restore what an earlier, prunier run already deleted: archive-cited tickers with no
+    # observations left at all are rebuilt from their own official candles (see the docstring).
+    missing_hist = sorted(t for t in archived_tickers if not hist.get(t, {}).get("observations"))
+    hist, hist_backfilled = backfill_from_candles(hist, missing_hist)
 
 
     payload = {
@@ -920,6 +985,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_published_by_category": settled_by_cat,
             "historical_cutoff_market_settled_ts": hist_cutoff,
             "historical_backfill_rows": len(hist_rows),
+            "price_history_backfilled_from_candles": hist_backfilled,
+            "price_history_archived_tickers": len(archived_tickers),
             "historical_backfill_report": hist_report,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
