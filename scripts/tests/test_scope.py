@@ -95,8 +95,12 @@ check("function isQaRow" in site_js, "assets/site.js must expose isQaRow so page
 check("isQaRow," in site_js, "isQaRow must be exported from the KD object")
 index_html = (ROOT / "index.html").read_text()
 check("KD.isQaRow(r)" in index_html, "index.html must skip QA fixtures when picking the largest market")
-check("settled markets stored" in index_html,
-      "index.html must label the stored settled-row cap distinctly from the in-scope count (F-37/F-38)")
+# Either wording is acceptable as long as both numbers are labelled: the stored row count and the
+# in-scope count. Main's sibling fix uses "stored settled rows (N in scope)"; this session's first
+# version used "settled markets stored; N were in scope". Pin the contract, not the phrasing.
+check(("stored settled rows" in index_html or "settled markets stored" in index_html)
+      and "settled_in_scope" in index_html,
+      "index.html must show the stored settled-row cap and the in-scope count as distinct, labelled numbers (F-37/F-38)")
 check('settled markets in scope' not in index_html,
       "index.html must not call the stored row cap 'settled markets in scope'")
 
