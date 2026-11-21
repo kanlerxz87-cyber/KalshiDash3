@@ -944,12 +944,13 @@
    "severity": "low",
    "item": "Site copy still describes a '20-minute' collector cadence; collect.yml declared 7,27,47 + 13,43 since PR #54, and main now sweeps on a 15-minute relay grid (R-B8)",
    "why": "executive-summary.html, live.html, portfolio.html, an assets/live.js comment and data/findings.json texts still say 'every 20 minutes' in places. collect.yml has declared two off-peak crons since PR #54, and PR #62 (merged 2026-11-21T21:13:41Z) replaces the declared cron behaviour on main with a bounded relay (one run, fixed 15-minute grid, <= 5.5 h, one queued successor, pages.yml per committed pass). The pages' own snapshot-age banner is the accurate signal; the hard-coded prose is not.",
-   "action": "Not edited in this PR (the named files belong to other in-flight scopes; the request is explicitly a findings carry-over). Correction: say 'about every 15 minutes while the relay runs; each page shows the snapshot age', or render the cadence from data. Flagged for the final integration session / page owners; first flagged 2026-11-21T21:20Z (arena-d60d648c, carrying R-B8).",
+   "action": "FIXED 2026-11-21 (session arena-86046b80, T62): updated executive-summary.html, portfolio.html, assets/live.js comments, and assets/chatdock.js health status (R-B1 + R-B8) to report the 15-minute relay cadence on main and the live snapshot age instead of the retired 20-minute / */20 cron wording. Regression-tested in scripts/tests/test_chatdock.js and scripts/tests/test_pages_dom.js.",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md"
-   ]
+   ],
+   "status": "fixed, verified (2026-11-21)"
   },
   {
    "id": "F-74",
@@ -962,6 +963,32 @@
     "https://cli.github.com/manual/gh_workflow_run",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
    ]
+  },
+  {
+   "id": "F-75",
+   "severity": "high",
+   "item": "F-65 x F-72 interaction: 8 candle-backfilled KXDEMOFUTHOURLY (Test-series) swings bypassed the category-integrity filter because their category_id was null",
+   "why": "When F-72 candle backfill wrote 1-minute candlesticks for already-closed archived tickers into data/live/price_history.json, scripts/build_alerts.py detected 13 new archive entries for markets no longer in open_markets (so category_id was null), including 8 swings on KXDEMOFUTHOURLY-* whose official GET /series/KXDEMOFUTHOURLY category is [\"Test\"]. Because publishable() in scripts/build_alerts.py (and its mirrors in scripts/catalysts.py, scripts/tests/validate_alerts.py, and scripts/tests/validate_catalysts.py) returned True whenever CATEGORY_COMPATIBLE.get(cat or \"\", set()) was empty, null category_id bypassed F-65 completely and leaked 8 Test-series swings into data/live/alerts.json and data/live/catalysts.json.",
+   "action": "FIXED 2026-11-21 (session arena-86046b80, T60): when category_id is absent, all four guards now check official series_categories against the union of the five in-scope topic categories. Official [\"Test\"] series have zero overlap and are withheld (withheld_category_conflict 12 -> 20) while alerts_archive.json remains append-only and in-scope unassigned rows (KXBTC15M-*, KXAAAGASD-*) remain served. Regression-tested in scripts/tests/test_alerts.py (test_unassigned_test_series_candle_alert_is_withheld, test_unassigned_in_scope_series_candle_alert_is_served).",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ],
+   "status": "fixed, verified on committed data (2026-11-21)"
+  },
+  {
+   "id": "F-76",
+   "severity": "low",
+   "item": "Docs-vs-demo discrepancy on historical cutoff: GET /markets/KXELECTIRAN-26JUL01 still returns HTTP 200 even though it settled before market_settled_ts (R-B4)",
+   "why": "Kalshi's official Historical Data guide (Impacted Live Endpoints table) states verbatim for GET /markets and GET /markets/{ticker}: \"Settled markets and their candlesticks older than the cutoff will not appear\". Live demo API probes on 2026-11-21T23:11Z (re-confirming arena-b25b0914's 20:22Z probe) return market_settled_ts \"2026-09-22T00:00:00Z\" from GET /historical/cutoff, yet GET /markets/KXELECTIRAN-26JUL01 still returns HTTP 200 with status \"finalized\", settlement_ts \"2026-07-01T15:24:15.984157Z\", and result \"no\".",
+   "action": "Flagged rather than hidden. index.html's resolution-tracker note now states both the documented cutoff rule and this observed demo exception, while scripts/collect.py keeps its bounded GET /historical/markets backfill per seeded series (F-66) so pre-cutoff resolutions remain covered if demo later enforces the documented cutoff strictly.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01"
+   ],
+   "status": "verified live on demo API (docs-vs-demo discrepancy)"
   }
  ]
 }
