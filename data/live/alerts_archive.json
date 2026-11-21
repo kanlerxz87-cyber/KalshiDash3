@@ -11,6 +11,31 @@
     "Crypto"
    ],
    "status": "active",
+   "from_time": "2026-11-21T22:31:10Z",
+   "to_time": "2026-11-21T22:46:10Z",
+   "from_price": 0.02,
+   "to_price": 0.99,
+   "delta": 0.97,
+   "direction": "up",
+   "volume_24h_fp": 8986.21,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.02,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T22:46:11Z",
+   "high_roi": true
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
    "from_time": "2026-11-21T22:16:10Z",
    "to_time": "2026-11-21T22:31:10Z",
    "from_price": 0.99,
