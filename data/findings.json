@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-20T19:50:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
+ "generated": "2026-11-21T07:00:00Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label).",
  "questions": [
   {
    "id": "Q1",
@@ -729,6 +729,32 @@
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ],
    "id": "F-37"
+  },
+  {
+   "id": "F-38",
+   "severity": "medium",
+   "item": "Culture's largest market is a $5 QA test market, not a culture event",
+   "why": "The landing page's largest-Culture row is KXGRAMMYNOMROTY-QA7CECC5-QA (\"Portfolio cash out QA 5\", rules_primary \"Demo portfolio test only.\", volume_fp 10.00, last_price_dollars 0.5000, dollars-traded estimate $5). It inherits Culture by keyword: its series KXGRAMMYNOMROTY is titled \"Grammy nominees for Record of the Year\" (categories Entertainment, tags Music/Awards/Grammys), so the word-boundary keyword \"grammy\" matches the series title even though the market's own title and rules contain no culture content. Every confirmed Culture seed market in the same snapshot (KXBALLONDOR, KXEMMY*) shows $0 traded, so the QA market tops the category. Verified live 2026-11-21 against GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA and GET /series/KXGRAMMYNOMROTY; snapshot values match the live record exactly. Only one QA/test market is in scope (searched rules_primary for \"test only\" and ticker/title for QA/portfolio-cash-out).",
+   "action": "Ranking rule left unchanged (no silent exclusion invented): the row stays labelled keyword, not confirmed, and disclosures were added on index.html and culture.html pointing here. Owner decision needed: exclude test/QA markets (rules_primary indicating test only) from the largest-per-category ranking, or keep them with the keyword label. Until then, do not treat a keyword top as a real event without reading its rules text.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGRAMMYNOMROTY-QA7CECC5-QA",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXGRAMMYNOMROTY",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-39",
+   "severity": "high",
+   "item": "Collector validation re-judged a detection-time high_roi flag against a later snapshot (PR #38 value, renumbered)",
+   "why": "scripts/build_alerts.py decides high_roi from the snapshot it is reading and the archive is append-only, but the pre-fix validate_alerts.py re-derived the same screen from the CURRENT data/live/markets.json and failed the run when the two disagreed. volume_24h_fp moves every collection, so one archived alert crossing the '> 0' boundary was enough: collect.yml run 44803531445 (2026-11-20T19:35Z) failed with 'archive:KXBTCY-27JAN0100-B47500@2026-11-20T19:30:14Z high_roi False != rules-derived True' \u2014 the entry recorded volume_24h_fp 0.0, the market started trading afterwards. Because the workflow only commits a snapshot that validates, every later run would fail the same way. The committed files pass either way, which is why no local check showed it. Main's PR #39 fixed the core (verify against the row's own recorded inputs); PR #38's remaining value (HighRoiFreezeTests, decided_at docs, drift note) was never merged and its F-34 id collides with main's F-34 (a different item: swing size vs conviction), so this session ports that value renumbered as F-39.",
+   "action": "Ported by session arena-968ce6ec: data/alert_rules.json states the freeze semantics (decided_at) next to the rule, validate_alerts.py reports current-snapshot disagreement as a drift note instead of failing, and scripts/tests/test_alerts.py HighRoiFreezeTests pins all three behaviours (drift allowed + reported, contradicted flag rejected, inputs present on every entry). scripts/build_alerts.py deliberately not changed \u2014 its behaviour is the correct one. PR #38 to be closed as superseded by this port.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44803531445",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/alerts_archive.json",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/markets.json",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
   }
  ]
 }

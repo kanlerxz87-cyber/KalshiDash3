@@ -26,10 +26,10 @@ left blank and listed on the *Flagged for Review* page.
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
-| `suggestions.html` | Ten proposals; each with its effort, risk and success metric |
+| `suggestions.html` | Eighteen proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
 | `verification.html` | 59 claims, each with the official page it was checked against |
-| `flagged.html` | 32 irregularities found, plus every value deliberately left blank |
+| `flagged.html` | 38 irregularities found, plus every value deliberately left blank |
 | `sources.html` | The complete source list |
 
 ## Repository layout

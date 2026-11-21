@@ -9,18 +9,25 @@ Rule under test (mirrors scripts/build_alerts.py and data/alert_rules.json):
   * an alert is a consecutive pair of last-traded-price observations for one
     market whose absolute change is >= $0.10, in either direction;
   * cause_link is null on every alert (no official cause source is collected);
-  * the high_roi feed is a subset of the all_events feed.
+  * the high_roi feed is a subset of the all_events feed;
+  * high_roi is frozen at detection time and is verified against the inputs stored with
+    each alert, never against a later snapshot (HighRoiFreezeTests).
 
 Run: python3 scripts/tests/test_alerts.py
 """
 from __future__ import annotations
 
 import json
+import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
+sys.path.insert(0, str(ROOT / "scripts"))
+import build_alerts  # noqa: E402
 EPS = 1e-9
 
 
@@ -130,6 +137,98 @@ class FeedTests(unittest.TestCase):
 
     def test_disclaimers_present(self):
         self.assertTrue(self.feed.get("disclaimers"))
+
+
+class HighRoiFreezeTests(unittest.TestCase):
+    """Regression for the 2026-11-20T19:42Z scheduled collector failure (run
+    44803531445, F-39): KXBTCY-27JAN0100-B47500 swung at 19:30:14Z with
+    volume_24h_fp == 0 (archived high_roi = False), then traded before the next
+    collection (volume_24h_fp > 0 in the new snapshot). Because the archive is
+    append-only and freezes high_roi at detection time, the validator must
+    reproduce high_roi from the inputs stored on the alert itself — never by
+    joining against the current markets.json."""
+
+    def test_detected_alert_stores_screen_inputs(self):
+        snap = {
+            "collected_at": "2026-11-20T19:30:14Z",
+            "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
+            "open_markets": [{
+                "ticker": "KXBTCY-27JAN0100-B47500",
+                "title": "Bitcoin price range",
+                "category_id": "crypto",
+                "category_basis": "seed",
+                "status": "open",
+                "volume_24h_fp": 0.0,
+                "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+            }],
+        }
+        hist = {
+            "series": {
+                "KXBTCY-27JAN0100-B47500": {
+                    "observations": [
+                        {"t": "2026-11-20T19:10:00Z", "last": 0.40},
+                        {"t": "2026-11-20T19:30:14Z", "last": 0.55},
+                    ]
+                }
+            }
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_live = Path(tmp)
+            markets_file = tmp_live / "markets.json"
+            hist_file = tmp_live / "price_history.json"
+            markets_file.write_text(json.dumps(snap), encoding="utf-8")
+            hist_file.write_text(json.dumps(hist), encoding="utf-8")
+
+            with mock.patch.object(build_alerts, "LIVE", tmp_live), \
+                 mock.patch.object(sys, "argv", ["build_alerts.py", "--markets", str(markets_file), "--history", str(hist_file)]):
+                rc = build_alerts.main()
+            self.assertEqual(rc, 0)
+            archive = json.loads((tmp_live / "alerts_archive.json").read_text())["alerts"]
+            self.assertEqual(len(archive), 1)
+            alert = archive[0]
+            self.assertEqual(alert["category_basis"], "seed")
+            self.assertEqual(alert["volume_24h_fp"], 0.0)
+            self.assertFalse(alert["high_roi"])
+
+            # Simulate the next collection: the same market now has 24h volume > 0,
+            # and a new swing is NOT added for the already-archived (from_time, to_time).
+            later_snap = {
+                **snap,
+                "collected_at": "2026-11-20T19:42:00Z",
+                "open_markets": [{
+                    **snap["open_markets"][0],
+                    "volume_24h_fp": 250.0,
+                }],
+            }
+            markets_file.write_text(json.dumps(later_snap), encoding="utf-8")
+            with mock.patch.object(build_alerts, "LIVE", tmp_live), \
+                 mock.patch.object(sys, "argv", ["build_alerts.py", "--markets", str(markets_file), "--history", str(hist_file)]):
+                rc2 = build_alerts.main()
+            self.assertEqual(rc2, 0)
+            merged = json.loads((tmp_live / "alerts_archive.json").read_text())["alerts"]
+            feed = json.loads((tmp_live / "alerts.json").read_text())
+            self.assertEqual(feed["counts"]["new_this_run"], 0)
+            self.assertFalse(merged[0]["high_roi"],
+                             "append-only archive freezes high_roi at detection time")
+            self.assertEqual(merged[0]["volume_24h_fp"], 0.0,
+                             "stored screen input stays with the archived alert so the "
+                             "frozen flag remains reproducible even after the snapshot moves on")
+
+    def test_every_archived_alert_matches_its_own_stored_inputs(self):
+        archive_path = LIVE / "alerts_archive.json"
+        rules_path = ROOT / "data" / "alert_rules.json"
+        if not archive_path.exists() or not rules_path.exists():
+            self.skipTest("no committed archive/rules")
+        archive = json.loads(archive_path.read_text()).get("alerts", [])
+        roi_rules = (json.loads(rules_path.read_text()).get("high_roi") or {})
+        req_basis = roi_rules.get("require_category_basis")
+        req_gt = roi_rules.get("require_volume_24h_gt", -1)
+        for a in archive:
+            if "category_basis" in a and "volume_24h_fp" in a:
+                expected = bool(a["category_basis"] == req_basis
+                                and (a["volume_24h_fp"] or 0) > req_gt)
+                self.assertEqual(a.get("high_roi"), expected,
+                                 f"{a.get('ticker')}@{a.get('to_time')} contradicts its stored inputs")
 
 
 if __name__ == "__main__":
