@@ -20,6 +20,23 @@
   <div id="summary"></div>
   <div id="flags"></div>
 
+  <h2>Publication configuration — needs review</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>ID</th><th>Observed issue</th><th>Impact and action</th><th>Official evidence</th></tr></thead>
+    <tbody><tr>
+      <td>DEPLOY-1</td>
+      <td>On 2026-11-21, the repository Pages API reported <code>build_type: legacy</code>.
+        Updating it to workflow publishing returned HTTP 403 to this session.</td>
+      <td>The full offline verification and Actions deployment passed on main, but legacy branch
+        publishing can still bypass those checks. Exclusive Actions-only publishing is not confirmed.
+        A repository administrator must change the Pages build source to GitHub Actions.
+        Branch validation does not deploy; only main may deploy through the workflow.</td>
+      <td><a href="https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/pages">Pages configuration (current API state; may require access)</a> ·
+        <a href="https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44875857408">Successful verified release</a> ·
+        <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub publishing-source documentation</a></td>
+    </tr></tbody>
+  </table></div>
+
   <h2>Unverified values currently visible on the site</h2>
   <div id="blank"></div>
 
