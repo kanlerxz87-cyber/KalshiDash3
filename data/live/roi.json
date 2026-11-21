@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-21T22:47:01Z",
- "runtime_seconds": 107.2,
+ "collected_at": "2026-11-21T22:53:35Z",
+ "runtime_seconds": 122.8,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -59,63 +59,6 @@
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV21H23-UP",
-   "eligible": false,
-   "fails": [
-    "spread 97.0c > 10c cap",
-    "YES entry 99.0c above 95c ceiling",
-    "net ROI -31.14% not above 0% floor",
-    "closes in 13 min < 15 min floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.6821711505371344,
-   "mid": 0.505,
-   "micro": 0.9854890015346697,
-   "last": 0.55,
-   "bid": 0.02,
-   "ask": 0.99,
-   "spread": 0.97,
-   "depth": 215.03,
-   "vol24": 6625.0,
-   "ttc_hours": 0.21638888888888888,
-   "momentum": null,
-   "series_ticker": "KXDEMOFUTHOURLY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "YES",
-    "entry": 0.99,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.990693,
-    "ev": -0.30852184946286565,
-    "roi": -0.31142023761434234
-   },
-   "score": -0.31142023761434234,
-   "dollars_traded_estimate": 3797.75,
-   "title": "Demo BTC at or above 60347.97 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-21T23:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H23",
-   "status": "active",
-   "result": null,
-   "volume_fp": 6905.0,
-   "volume_24h_fp": 6625.0,
-   "open_interest_fp": 85.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 214.03,
-    "depth_at_ask": 1.0,
-    "bid_price": 0.02,
-    "ask_price": 0.99
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H23-UP"
-  },
-  {
    "ticker": "KXAAAGASD-26NOV22-3.6450",
    "eligible": false,
    "fails": [
@@ -135,7 +78,7 @@
    "spread": 0.77,
    "depth": 20.0,
    "vol24": 0.0,
-   "ttc_hours": 6.199722222222222,
+   "ttc_hours": 6.090277777777778,
    "momentum": 0.0,
    "series_ticker": "KXAAAGASD",
    "fee_multiplier": {
@@ -173,6 +116,64 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450"
   },
   {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H23-UP",
+   "eligible": false,
+   "fails": [
+    "spread 97.0c > 10c cap",
+    "depth 3 < 50 contracts at the touch",
+    "YES entry 99.0c above 95c ceiling",
+    "net ROI -42.41% not above 0% floor",
+    "closes in 6 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.5705833333333333,
+   "mid": 0.505,
+   "micro": 0.6666666666666666,
+   "last": 0.55,
+   "bid": 0.02,
+   "ask": 0.99,
+   "spread": 0.97,
+   "depth": 3.0,
+   "vol24": 7390.0,
+   "ttc_hours": 0.10694444444444444,
+   "momentum": null,
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.99,
+    "fee_unit": 0.0006930000000000006,
+    "cost": 0.990693,
+    "ev": -0.4201096666666667,
+    "roi": -0.42405635920175744
+   },
+   "score": -0.42405635920175744,
+   "dollars_traded_estimate": 4347.75,
+   "title": "Demo BTC at or above 60347.97 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-21T23:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV21H23",
+   "status": "active",
+   "result": null,
+   "volume_fp": 7905.0,
+   "volume_24h_fp": 7390.0,
+   "open_interest_fp": 25.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 2.0,
+    "depth_at_ask": 1.0,
+    "bid_price": 0.02,
+    "ask_price": 0.99
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H23-UP"
+  },
+  {
    "ticker": "KXFEATURE-26NIT-DOJ",
    "eligible": false,
    "fails": [
@@ -193,7 +194,7 @@
    "spread": 0.99,
    "depth": 8.0,
    "vol24": 0.0,
-   "ttc_hours": 942.1997222222222,
+   "ttc_hours": 942.0902777777778,
    "momentum": 0.0,
    "series_ticker": "KXFEATURE",
    "fee_multiplier": {
@@ -251,7 +252,7 @@
    "spread": 0.99,
    "depth": 10.0,
    "vol24": 0.0,
-   "ttc_hours": 942.1997222222222,
+   "ttc_hours": 942.0902777777778,
    "momentum": 0.0,
    "series_ticker": "KXFEATURE",
    "fee_multiplier": {
@@ -309,7 +310,7 @@
    "spread": 0.98,
    "depth": 10.0,
    "vol24": 0.0,
-   "ttc_hours": 6.199722222222222,
+   "ttc_hours": 6.090277777777778,
    "momentum": 0.0,
    "series_ticker": "KXAAAGASD",
    "fee_multiplier": {
@@ -370,7 +371,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 8.0,
-   "ttc_hours": 11.216388888888888,
+   "ttc_hours": 11.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -422,7 +423,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 12.216388888888888,
+   "ttc_hours": 12.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -474,7 +475,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 12.216388888888888,
+   "ttc_hours": 12.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -526,7 +527,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 7.0,
-   "ttc_hours": 7.216388888888889,
+   "ttc_hours": 7.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -578,7 +579,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 11.216388888888888,
+   "ttc_hours": 11.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -630,7 +631,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 8.216388888888888,
+   "ttc_hours": 8.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -682,7 +683,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 9.216388888888888,
+   "ttc_hours": 9.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -734,7 +735,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 10.216388888888888,
+   "ttc_hours": 10.106944444444444,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
