@@ -60,7 +60,7 @@
           <td><span data-count="suggestions">Suggestions</span> across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
       <tr><td>A clear list of questions, information and answers needed before a decision</td>
           <td><span class="badge ok">done</span></td><td><a href="questions.html">Questions</a></td>
-          <td><span data-count="questions">questions</span>; one of them cannot be closed by an agent.</td></tr>
+          <td><span data-count="questions">Questions</span>, one of which cannot be closed by an agent.</td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
           <td><span id="verifiedCounts"><span data-count="claims">claims</span> checked against an official page; <span data-count="unverified">1</span> deliberately left blank. <span data-count="flagged">irregularities</span> found and listed across all sessions, each with its source; the ones closed in the final integration are marked fixed in their entry.</span> (<a href="verification.html">claims</a> · <a href="flagged.html">flagged</a>)</td></tr>
@@ -131,13 +131,20 @@ KD.nav("executive-summary.html");
 // ledger held more). Render them from the committed files instead, and fall back to a link, never a number.
 (async () => {
   const host = document.getElementById("verifiedCounts");
-  if (!host) return;
+  // F-73's sibling defect (D-01): the suggestion and question counts were typed too. Fill them from
+  // the same fetch; the static text stays as written if the fetch fails, never a wrong number.
+  const fill = (sel, n, one, many) => {
+    const el = document.querySelector(`[data-count="${sel}"]`);
+    if (el && Number.isFinite(n)) el.textContent = `${n} ${n === 1 ? one : many}`;
+  };
   try {
     const [findings, facts] = await Promise.all([
       KD.json("data/findings.json"), KD.json("data/verified_facts.json"),
     ]);
     const claims = (facts.facts || []).length;
     const blanks = (facts.facts || []).filter((x) => !x.verified).length;
+    fill("suggestions", (findings.suggestions || []).length, "suggestion", "suggestions");
+    fill("questions", (findings.questions || []).length, "question", "questions");
     host.textContent = `${claims} claims checked against an official page; ${blanks} deliberately left blank. `
       + `${(findings.flagged || []).length} irregularities found and listed across all sessions, `
       + `each with its source; the ones closed in the final integration are marked fixed in their entry.`;
