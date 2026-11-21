@@ -21,7 +21,7 @@ left blank and listed on the *Flagged for Review* page.
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
 | `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, optional in-browser live polling |
-| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed. A swing means two consecutive **executed prints** on the official trade tape that differ by ≥ $0.10, not a difference between two snapshot reads; each alert carries both trade ids and links the exact tape query, the market record and unverified news-search leads |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
 | `strategies.html` | Trade categorisation and four strategy hypotheses with the evidence each still needs |
@@ -42,7 +42,7 @@ data/verified_facts.json  every static claim + its official source
 data/findings.json    questions, suggestions, flagged irregularities
 data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector
-scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
+scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; verifies every candidate against GET /markets/trades and publishes moves / restatements / unverified separately; rules in data/alert_rules.json; fetched tape windows cached in data/live/trade_evidence.json
 scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
 scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
@@ -59,7 +59,8 @@ Nothing here needs credentials. All market data comes from public demo endpoints
 
 ```bash
 python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
-python3 scripts/build_alerts.py       # writes data/live/alerts_archive.json + alerts.json
+python3 scripts/build_alerts.py       # verifies swings against the trade tape; writes alerts_archive.json + alerts.json
+python3 scripts/tests/test_classify.py  # category rules: every seed series, the word-boundary trap
 python3 scripts/simulate.py           # writes data/live/simulation.json (paper only)
 python3 scripts/tests/validate_live.py
 python3 scripts/tests/validate_alerts.py
@@ -112,6 +113,12 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 - WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
 - Portfolio performance and the auto-sim engine are labelled paper simulations until demo credentials exist.
   Kalshi states a demo account "does not come with funds preloaded" and must be created by a person.
+- A ≥ $0.10 difference between two snapshot reads is **not** treated as a move. Only the official trade tape can
+  show that a price actually changed, so `scripts/build_alerts.py` verifies every candidate against
+  `GET /markets/trades` and publishes three separately labelled sections: `all_events` (tape-confirmed moves),
+  `restatements` (the tape shows the price did not move, or there are no prints in the window) and `unverified`
+  (the tape could not be read). See Flagged F-38/F-39. The exchange's `updated_time` is deliberately **not** used
+  as a move test: it does not advance on a trade and would have hidden a genuine −42¢ repricing.
 - Paper results need a stored bid and ask at the alert time. New archive entries now carry `to_yes_bid` /
   `to_yes_ask` (request R-2, implemented 2026-11-20); entries written before that still have no quote and
   stay unfilled, as do quotes whose spread exceeds the 0.10 cap (Flagged F-19, F-23).

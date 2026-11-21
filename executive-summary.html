@@ -42,7 +42,13 @@
           <td>Seconds resolution must be accumulated from live reads: candlesticks only go down to one minute (<a href="flagged.html">F-06</a>). The dashboard now also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-14</a>).</td></tr>
       <tr><td>Live alerting on swings ≥ $0.10 in either direction, as a simplified scrolling chat viewable in real time</td>
           <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
-          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between its runs (~20 min) (<a href="flagged.html">F-14</a>).</td></tr>
+          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. A swing now means two
+          consecutive <b>executed prints</b> on the official trade tape that differ by ≥ $0.10 — a difference between
+          two snapshot reads is no longer accepted, because a snapshot can restate an older trade
+          (<a href="flagged.html">F-38</a>). The browser detects moves between prints on a 25-second cycle; the
+          collector verifies every candidate against the tape and publishes unconfirmed differences separately. Every
+          alert carries both trade ids and the exact query as its evidence. The filtered screen is not a validated ROI
+          model (<a href="flagged.html">F-14</a>, <a href="flagged.html">F-26</a>).</td></tr>
       <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
           <td><span class="badge ok">done, labelled as leads</span></td><td>Alert bubbles + chart markers on the dashboard</td>
           <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-25</a>).</td></tr>
@@ -54,7 +60,15 @@
           <td>Depth is a point-in-time read and goes stale between collector runs; with live mode on, the selected market's book refreshes each poll. <a href="https://docs.kalshi.com/api-reference/market/get-market-orderbook" target="_blank" rel="noopener">Official orderbook API</a></td></tr>
       <tr><td>Alert on price swings of at least $0.10 with all-event and filtered feeds</td>
           <td><span class="badge ok">done · snapshot + live</span></td><td><a href="dashboard.html#alertsTitle">Dashboard alert feeds</a> · <a href="alerts.html">Alert chats</a></td>
-          <td>The dashboard scans consecutive committed observations (the collector runs every 20 minutes, so this is not tick-level streaming). The <a href="alerts.html">alert chats</a> additionally detect swings live in the browser when the demo API is reachable (F-24) and fall back to the same committed history. The filtered screen is not a validated ROI model (F-14, F-26). Market source: <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">official Get Markets API</a>; streaming details: <a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>.</td></tr>
+          <td>Every alert is an executed move: the collector verifies each candidate difference against
+          <a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">GET /markets/trades</a>
+          and only two consecutive prints differing by ≥ $0.10 enter the <b>all events</b> feed. In the browser the
+          <a href="alerts.html">alert chats</a> additionally read the same tape per watched market on a 25-second cycle,
+          so a move inside one collector gap (or one that happened and reversed) is still caught; unconfirmed
+          differences are listed as restatements, never as swings (F-38, F-39, F-40). WebSocket streaming stays
+          unavailable to a static page because the handshake needs an API key
+          (<a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">official WebSocket guide</a>).
+          The filtered screen is not a validated ROI model (F-14, F-26).</td></tr>
       <tr><td>Suggest improvements, in a dedicated section, reviewable before implementing</td>
           <td><span class="badge ok">done</span></td><td><a href="suggestions.html">Suggestions</a></td>
           <td>Seventeen suggestions across all sessions; shipped items are marked done in the table (correctness fixes plus the alert-archive simulator and the live chats / live polling / live auto-sim), the rest await your decision.</td></tr>
@@ -108,12 +122,36 @@
   <h2>4 · How the numbers stay honest</h2>
   <p>
     A scheduled, credential-free collector reads public demo endpoints and commits a timestamped snapshot. A validator refuses
-    a snapshot that invents a price, coerces a result to yes/no, or lacks provenance — and now also refuses any committed
+    a snapshot that invents a price, coerces a result to yes/no, or lacks provenance — and refuses any committed
     alert whose delta is smaller than the required $0.10, in either direction. On top of the snapshot layer, the browser can
     poll the same public endpoints directly (with a CORS self-test and automatic fallback), and the auto-sim ledger records
     every fill's price basis so the simulation can be audited. The pipeline is described on the
     <a href="index.html">home page</a>, the rules on <a href="verification.html">Verification</a>, and everything that
     failed or is unresolved on <a href="flagged.html">Flagged for Review</a>.
+  </p>
+
+  <h2>5 · What this session changed, and why it matters more than a feature</h2>
+  <p>
+    The site was already live and green, so this session audited it against the official API instead of adding features.
+    The audit found that <b>the alert chats were not reporting trades</b>. A difference between two snapshot reads was being
+    called a swing, and a snapshot can restate an older trade: one market was published as a −97¢ crash and a +95¢ spike
+    while every print on its official tape was 2¢, and another as a −92¢ crash on a window holding 165 prints all at 6¢.
+    Two thirds of the archived "swings" were that artefact.
+  </p>
+  <p>
+    A swing is now defined the only way the exchange can prove it: <b>two consecutive executed prints that differ by
+    ≥ $0.10</b>, from <a href="https://docs.kalshi.com/api-reference/market/get-trades" target="_blank" rel="noopener">GET /markets/trades</a>.
+    Every alert carries both trade ids and the exact query, so any reader can re-fetch the proof. Differences the tape
+    shows to be restatements are still published — clearly marked as not moves — because deleting them would quietly
+    rewrite history. The obvious shortcut, comparing the exchange's <code>updated_time</code>, was tested and rejected:
+    it would have hidden a real −42¢ repricing, and it does not advance on a trade at all
+    (<a href="flagged.html">F-39</a>). The chats were also made tick-level by reading the same tape from the browser on a
+    25-second cycle (<a href="flagged.html">F-40</a>), and the category heuristic was fixed so the live 2028 presidential
+    field is no longer invisible under Elections (<a href="flagged.html">F-41</a>).
+  </p>
+  <p class="small mut">
+    Each claim above is reproducible: the queries are on the alert rows themselves, the tests are in
+    <code>scripts/tests/</code>, and the full account with sources is on <a href="flagged.html">Flagged for Review</a>.
   </p>
 
 </main>
