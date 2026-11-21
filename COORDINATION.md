@@ -1372,6 +1372,24 @@ F-73 copy) and PR #79 (`arena-42e3b260`, F-76/F-77, C-nn ledger). main's version
 were the stricter or already-published one; this branch's unique contribution is the **data-derived cadence**, the
 **counts rendered from the ledgers**, and the **independent re-verification** of F-74.
 
+### Close-out (T61)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #78](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/78) merged 2026-11-21T23:30:18Z** as `24e0684` (merge commit, no approval wait) | PR check `pages.yml` [44961992564](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961992564): `build` pass in 49 s, `deploy` correctly skipped on a PR |
+| Merge conflicts | **four**, all `origin/main` advancing underneath this branch (PRs #76, #77, #79/#81, #82). Every one resolved by taking main's version where main's was equal or better and re-appending only this branch's unique data; no line of another session was discarded. Nothing was force-pushed. | `git log --oneline origin/main..HEAD` before the merge |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push on `24e0684` completed/success; `pages-build-deployment` dynamic on `24e0684` completed/success; later builds `c0dcdb0`, `3ef67ff` success |
+| Live verification | `/verification.html` serves the new section: 24 rows, 24 "resolves", 139 citations, plus the C-nn ledger and the snapshot-quality table | fetched at ~23:40Z (first read was a stale cache; re-fetch confirmed) |
+| Gate | `python3 scripts/verify_release.py` **PASS** on the merged tree, before and after merging main | 21 pages, all suites |
+| Flagged, not blocking | **F-78** (new, medium) — two divergent "model" scorers ship; only `assets/engine.js`'s runs | published on `flagged.html` |
+
+### What this session deliberately did not do
+
+Configuring Pages from legacy branch publishing to Actions-only publishing is still refused to these sessions'
+credentials (**DEPLOY-1** on `flagged.html`, HTTP 403). It needs a repository administrator, so it is left as published
+rather than retried silently. Live is therefore served by the legacy branch builder, which does not run
+`verify_release.py`; the workflow is an additional gate on the same commit, not a replacement.
+
 ## Session `arena-981efed5` — defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)
 
 Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `origin/main` (`3725fc6`, PRs #76–#79, #81–#83, #85–#88). Checked parallel sessions; scopes below are strictly non-overlapping.
