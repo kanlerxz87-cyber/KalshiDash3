@@ -1202,16 +1202,57 @@ each time the newer collector file was taken and the derived artefacts were rege
 already fixed the same defect (F-38 wording, F-37 label), their fix was kept, this session's duplicate was
 dropped, and the existing F-38 row was linked to the implementation record F-61 instead of being re-published.
 
+### F-64 — regression this session shipped and then caught on the deployed site
+
+Adding the QA-fixture guard to `index.html` (F-61) put a `const qaRows` **after** the KPI card that
+reads it. A const read in its temporal dead zone throws
+`ReferenceError: Cannot access 'qaRows' before initialization`, which aborted the page's async render, so
+the deployed landing page showed the heading "What is live right now" with **no table**. The release gate
+was green and the JSON data was correct — `index.html` had never been rendered by the DOM test, so nothing
+could have caught it before publication. Found by fetching the deployed page after the deploy, not by a test.
+
+Fixed by moving the declaration above its first use. Coverage added so it cannot recur:
+`scripts/tests/test_pages_dom.js` now renders `index.html` against the committed snapshot and asserts five
+category rows, a real ticker per row, the metric label, and the QA guard with its disclosure.
+Mutation-checked — the original declaration order makes the new test fail with the exact `ReferenceError`.
+Published as **F-64** on the Flagged page.
+
+### Final state of this session's work (2026-11-21 ~07:00Z)
+
+| Item | Result |
+|---|---|
+| PR #54 (scope fixes F-61/F-62, cadence + watchdog F-63, live API audit) | **merged** `5660ff2`, 06:49:08Z |
+| PR #57 (close-out record) | **merged** `bd05688`, 06:51:36Z |
+| PR #58 (F-64 fix + index.html DOM coverage) | **merged** `8b7855c`, 06:55:23Z |
+| Pages deploy after #58 | run `44877811399` **success**, `pages.status = built` |
+| Live site verified after the final deploy | landing table renders 5 category rows (Culture = a real market, not the QA fixture); "0 demo QA fixtures in the snapshot"; 43 flagged rows incl. F-61…F-64 |
+| Release gate on `main` | `scripts/verify_release.py` **PASS** (now renders `index.html` too) |
+
+**What is still genuinely open (not claimed):**
+
+1. **Watchdog measurement (F-63 / F-40 / F-16).** Scheduled-run cadence can only be measured over time. Read
+   `gh run list --workflow=collect.yml` and count `event == schedule` over several hours: if the bounded
+   watchdog (≤3 dispatches/hour, only when the snapshot is >35 min old) keeps data fresh, close it with the
+   numbers; if it does not, remove the step and rely on the crons. My dispatches at 06:30–06:41Z were manual
+   and are excluded from that count; dispatches seen at 06:48–06:55Z were another session's branch runs.
+2. **Demo credentials (F-07).** No demo API key exists, so portfolio performance and live order execution stay
+   labelled paper. Kalshi requires a person to create the demo account and add mock funds.
+3. **Owner model (F-14).** The "high-ROI" feed is this project's disclosed screen, not an owner-supplied model.
+4. **WebSocket streaming + true seconds history (F-04, F-06).** Impossible from a static site as documented.
+
+**Defects this session introduced and fixed, all published**: F-63 (runaway dispatch loop) and F-64 (landing
+table rendered empty). Both are on the Flagged page with run IDs and source links; neither was quietly repaired.
+
 ---
 
 ## Session `arena-617e3472` — catalyst review update for 2026-11-20T19:48Z–2026-11-21T06:42Z swings + live official-source verification & publish (branch `arena/617e3472-kalshidash3`)
 
-Base: `ff6f01f`, merged forward onto `bd05688` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52) landed F-37 and `verified_facts.json` changes on `main`, so this session dropped its overlapping file edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
+Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52) landed F-37 and `verified_facts.json` changes on `main`, so this session dropped its overlapping file edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T38 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:42Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXDEMOFUTHOURLY-26NOV21H07-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` (14/21 swings carry fetched links, 28 links traceable, 7 BRTI swings carry explicit `not_reviewed_reasons`), `scripts/verify_release.py` PASS | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) settle on CF Benchmarks' BRTI, which has no free public time series; documented in `not_reviewed_reasons` |
-| T39 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches | — |
+| T39 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches; PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60) | — |
 
 ### Sources fetched and verified live in this session (`arena-617e3472`, 2026-11-21)
 
@@ -1237,4 +1278,4 @@ Base: `ff6f01f`, merged forward onto `bd05688` (main). Claimed 2026-11-21 06:36Z
 
 ### Log (this session)
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
-- 2026-11-21 06:48Z: merged `origin/main` (`bd05688`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, and ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS).
+- 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).

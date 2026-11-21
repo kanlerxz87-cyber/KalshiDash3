@@ -261,11 +261,37 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- F. index.html: the landing table of "largest live market" per category ---
+   * This page had no DOM test, which is how a `const` used above its declaration shipped on
+   * 2026-11-21 and left "What is live right now" completely empty on the deployed site while
+   * every other check stayed green (F-64). Render it against the real committed snapshot. */
+  {
+    const r = await loadPage("index.html", "snapshot");
+    commonAsserts("index.html", r);
+    const today = r.doc.querySelector("#today");
+    check(!!today && today.querySelectorAll("tbody tr").length === 5,
+      `index.html: the largest-market table must render one row per category (got ${today ? today.querySelectorAll("tbody tr").length : "no #today host"})`);
+    check(/Dollars traded \(est\.\)/.test(r.text),
+      "index.html: the ranking metric must be labelled as an estimate");
+    const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t)),
+      "index.html: every category row must name a real ticker or say none is open");
+    // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
+    if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
+      check(/demo QA fixtures in the snapshot/.test(r.text),
+        "index.html: when the snapshot contains a QA fixture the page must say so");
+      check(!bodies.some(t => /QA7CECC5|Portfolio cash out/.test(t)),
+        "index.html: a demo QA fixture must never be the largest live market of a category");
+    }
+    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
+    r.close();
+  }
+
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);
     process.exit(1);
   }
-  console.log("OK: live desk, model page, alerts chats + lead table and dashboard render without errors in every data state available locally.");
+  console.log("OK: live desk, model page, alerts chats + lead table, dashboard and the landing page render without errors in every data state available locally.");
   process.exit(0);
 })().catch((e) => { console.error("FAILED:", e && e.stack || e); process.exit(1); });
