@@ -808,6 +808,17 @@
     "https://docs.github.com/en/actions/concepts/security/github_token",
     "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule"
    ]
+  },
+  {
+   "id": "F-64",
+   "severity": "high",
+   "item": "Regression I shipped: the landing page's 'What is live right now' table rendered empty on the deployed site",
+   "why": "While adding the QA-fixture guard (F-61) to index.html, a `const qaRows` was declared after the KPI card that reads it. A const read in its temporal dead zone throws 'ReferenceError: Cannot access qaRows before initialization', which aborts the page's async render function, so the landing page published on 2026-11-21T06:49Z showed the heading 'What is live right now' with no table. Caught by fetching the deployed page after deploy; the JSON data, the links and every other page were correct, and the release gate was green, because index.html had never been rendered by the DOM test.",
+   "action": "Fixed by moving the declaration above its first use, and the missing coverage was added: scripts/tests/test_pages_dom.js now renders index.html against the real committed snapshot and asserts five category rows, a real ticker per row, the metric label, and the QA guard plus its disclosure. Mutation-checked: re-introducing the original declaration order makes the new test fail with the exact ReferenceError, and restoring it passes. The release gate therefore now fails a deploy that breaks the landing table.",
+   "sources": [
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html"
+   ]
   }
  ]
 }

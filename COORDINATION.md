@@ -1201,3 +1201,18 @@ each time the newer collector file was taken and the derived artefacts were rege
 (`build_alerts.py`, `catalysts.py`, `simulate.py`) — no JSON was hand-edited. Where a parallel session had
 already fixed the same defect (F-38 wording, F-37 label), their fix was kept, this session's duplicate was
 dropped, and the existing F-38 row was linked to the implementation record F-61 instead of being re-published.
+
+### F-64 — regression this session shipped and then caught on the deployed site
+
+Adding the QA-fixture guard to `index.html` (F-61) put a `const qaRows` **after** the KPI card that
+reads it. A const read in its temporal dead zone throws
+`ReferenceError: Cannot access 'qaRows' before initialization`, which aborted the page's async render, so
+the deployed landing page showed the heading "What is live right now" with **no table**. The release gate
+was green and the JSON data was correct — `index.html` had never been rendered by the DOM test, so nothing
+could have caught it before publication. Found by fetching the deployed page after the deploy, not by a test.
+
+Fixed by moving the declaration above its first use. Coverage added so it cannot recur:
+`scripts/tests/test_pages_dom.js` now renders `index.html` against the committed snapshot and asserts five
+category rows, a real ticker per row, the metric label, and the QA guard with its disclosure.
+Mutation-checked — the original declaration order makes the new test fail with the exact `ReferenceError`.
+Published as **F-64** on the Flagged page.
