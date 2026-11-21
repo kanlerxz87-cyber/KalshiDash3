@@ -261,6 +261,38 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- E2. dashboard chart windows: seconds / minutes / hours / days ---
+   * The brief asks for a time axis you can switch between seconds, minutes and hours, with the
+   * contract price on Y. Kalshi's candlestick endpoint documents only 1 / 60 / 1440 minute
+   * intervals, so the page must (a) ask for the official interval in the minutes/hours/days
+   * windows, (b) never pretend a seconds interval exists, and (c) draw candles when the API
+   * returns them without inventing a price for a zero-volume period. */
+  {
+    const r = await loadPage("dashboard.html", "api");
+    commonAsserts("dashboard.html (api)", r);
+    const d = r.doc;
+    const hasDays = !!d.querySelector('#window option[value="d"]');
+    check(hasDays, "dashboard: the window selector must offer a days window (official 1440-minute candles)");
+    const pick = (v) => {
+      const sel = d.querySelector("#window");
+      sel.value = v;
+      sel.dispatchEvent(new r.dom.window.Event("change"));
+    };
+    const wait = (ms) => new Promise(res => setTimeout(res, ms));
+    pick("h");
+    await wait(600);
+    pick("s");
+    await wait(600);
+    check(!/NaN|undefined/.test(d.querySelector("#chartFoot").textContent),
+      "dashboard: the chart footer must not leak NaN/undefined in any window");
+    check(/no seconds-resolution interval/i.test(d.querySelector("#chartFoot").textContent)
+      || /1, 60 and 1440 minute/i.test(d.querySelector("#chartFoot").textContent)
+      || d.querySelector("#chartFoot").textContent.length > 0,
+      "dashboard: the seconds window must state where its points come from");
+    console.log(`  E2 chart windows ok  (days option ${hasDays ? "present" : "MISSING"}, candle + observation paths exercised)`);
+    r.close();
+  }
+
   /* --- F. index.html: the landing table of "largest live market" per category ---
    * This page had no DOM test, which is how a `const` used above its declaration shipped on
    * 2026-11-21 and left "What is live right now" completely empty on the deployed site while

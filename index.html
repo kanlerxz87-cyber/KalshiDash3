@@ -181,12 +181,13 @@ KD.nav("");
   const resHost = KD.$("#resolutions");
   if (resHost) {
     resHost.innerHTML =
-      `<p class="small mut">Showing the ${KD.num(resRows.length)} most recent settled rows stored in this snapshot,
-        newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
+      `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows published in this snapshot,
+        newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}.
         The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
-        collector stores ${KD.num(resRows.length)} of them to keep the page fast
-        (<code>counts.settled_rows_trimmed_for_size</code>). Full list on
-        <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
+        published set is chosen <b>per topic</b> so one high-frequency topic cannot take the whole cap
+        (${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "per-topic split not published yet — refresh after the next collector run")}).
+        Raw fields: <code>counts.settled_published</code>, <code>counts.settled_published_by_category</code>.
+        Full list on <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
          { key: "title", label: "Market" }, { key: "res", label: "Result" },
