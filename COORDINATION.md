@@ -870,3 +870,4 @@ Claimed 2026-11-21. Base `ebce5e7` (main). Scope: `COORDINATION.md` only (integr
 
 ### Log
 - 2026-11-21: claimed T25 before work; branch identical to main at claim time. Running full suite on the merged tree.
+- 2026-11-21: T25 done. Full suite green on merged tree (check_site 21 pages; validate_live/alerts/roi/catalysts; test_alerts/simulate/fees/roi_parity/roi_scan_offline/roi_scan_snapshot; engine tests; node --check). Live site fetched and matched data/live/markets.json exactly. PR #42 https://github.com/kanlerxz87-cyber/KalshiDash3/pull/42 merged 2026-11-21T06:27:47Z (merge commit 64176bef). Pages deploy run 44875653003 + pages-build-deployment 44875652212 both success; pages.status=built. No new irregularities; existing flagged items unchanged. Open PRs #38/#35 left to authors.
