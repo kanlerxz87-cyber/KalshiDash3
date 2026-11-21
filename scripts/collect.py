@@ -47,6 +47,13 @@ PRICE_HISTORY_LIMIT = 120  # points kept per market
 PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
 SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
 SETTLED_KEEP = 1600        # most recent settled rows kept, so the file stays browser-sized
+# Hard cap on settled rows PUBLISHED in the snapshot (was a bare [:200] that followed a
+# global newest-first sort). A global sort starves four of the five topics: 15-minute
+# crypto markets settle ~96 a day, so the newest 200 rows were 92% crypto and the gas,
+# elections, culture and golf resolution history was silently cut off. The published set
+# is therefore chosen PER TOPIC (see `select_settled`), which is what the brief asks for
+# ("keep topics separate but keep events within the same topic organized together").
+SETTLED_PUBLISH_CAP = 200
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 
@@ -340,6 +347,38 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
     return row
 
 
+
+def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=("gas", "elections", "culture", "crypto", "golf")):
+    """Choose which settled rows to publish, fairly across the five topics.
+
+    Round-robin by topic, newest-first inside each topic, so no single high-frequency
+    series (15-minute crypto markets) can crowd out the others. Every row returned keeps
+    its own fetch time and source URL; the per-topic counts are published so a reader can
+    see exactly how the cap was spent. Nothing is dropped silently.
+    """
+    by_cat = {}
+    for r in sorted(rows, key=lambda r: (r.get("settlement_ts") or ""), reverse=True):
+        by_cat.setdefault(r.get("category_id") or "other", []).append(r)
+    order = [c for c in cats if c in by_cat] + [c for c in by_cat if c not in cats]
+    picked, idx = [], {c: 0 for c in order}
+    # Two passes: pass 1 gives every topic its share one row at a time; pass 2 lets
+    # a topic with more history use leftover capacity once every other topic is served.
+    while len(picked) < cap:
+        progressed = False
+        for c in order:
+            if len(picked) >= cap:
+                break
+            lst = by_cat[c]
+            if idx[c] < len(lst):
+                picked.append(lst[idx[c]])
+                idx[c] += 1
+                progressed = True
+        if not progressed:
+            break
+    picked.sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
+    return picked, {c: idx[c] for c in order}
+
+
 def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     cats = load_categories()
     started = utcnow()
@@ -431,8 +470,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     trimmed = len(rows["open"]) - len(kept)
     rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
-    settled_trimmed = max(0, len(rows["settled"]) - SETTLED_KEEP)
+    settled_in_scope_total = len(rows["settled"])
+    settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
+    settled_published, settled_published_by_cat = select_settled(rows["settled"])
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -489,11 +530,15 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
             "safety_scan_cap": SAFETY_SCAN_CAP,
             "settled_rows_trimmed_for_size": settled_trimmed,
+            "settled_in_scope_total": settled_in_scope_total,
+            "settled_published": len(settled_published),
+            "settled_published_cap": SETTLED_PUBLISH_CAP,
+            "settled_published_by_category": settled_published_by_cat,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
         },
         "open_markets": rows["open"],
-        "settled_markets": rows["settled"][:200],
+        "settled_markets": settled_published,
         "liquidity": depth_rows,
         "disclaimers": [
             "All values are from the Kalshi DEMO environment (mock funds). The official docs warn that demo prices and behaviour may not reflect real markets.",

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T06:38:29Z",
+ "generated": "2026-11-21T06:47:51Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label).",
  "questions": [
   {
@@ -772,6 +772,19 @@
     "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml/runs?per_page=20"
    ],
    "status": "mitigated"
+  },
+  {
+   "id": "F-41",
+   "severity": "high",
+   "item": "Resolution history was 92% crypto: the published settled rows were the newest 200 overall, so gas, elections, culture and golf resolutions were silently cut off",
+   "why": "Measured on the deployed site and in data/live/markets.json at 2026-11-21T06:42:56Z: of the 200 published settled rows, 184 were crypto and 16 were other topics (gas 9, culture 7, elections 0, golf 0) — every row of the new 'How the live events resolved' table was Crypto. Cause: scripts/collect.py sorted all settled rows by settlement_ts and published `[:200]`. The demo exchange lists 15-minute crypto markets (KXBTC15M, KXETH15M, ...) that settle ~96 times a day, so a newest-first cap is structurally starved of every slower topic. Every category page reads `settled_markets`, so all four affected topics lost their resolution feed, not just the landing page. Same shape as F-35 (capped ranking) but on the settled side.",
+   "action": "FIXED same day: added `select_settled()` to scripts/collect.py — a round-robin selection across the five topics over a newest-first sort inside each topic — and published the allocation (`counts.settled_published`, `counts.settled_published_cap`, `counts.settled_published_by_category`, `counts.settled_in_scope_total`) so the cap can be audited instead of assumed. The landing page now says the published set is chosen per topic and names the count field. Locked down by scripts/tests/test_settled_selection.py, whose fixture reproduces the real shape (400 fast crypto rows + 5 rows in each other topic): all five topics survive, the rare topics keep all their rows, crypto takes the leftover capacity, and the published set stays newest-first. The corrected allocation appears at the next collect.yml run; the committed snapshot at the time of writing still shows the old skew.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ],
+   "status": "fixed (collector); verified by test, pending next data run"
   }
  ]
 }

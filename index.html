@@ -178,8 +178,9 @@ KD.nav("");
       `<p class="small mut">Showing the ${KD.num(resRows.length)} most recent settled rows stored in this snapshot,
         newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
         The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
-        collector stores ${KD.num(resRows.length)} of them to keep the page fast
-        (<code>counts.settled_rows_trimmed_for_size</code>). Full list on
+        collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
+        series cannot crowd out gas, elections, culture or golf
+        (<code>counts.settled_published_by_category</code>). Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
