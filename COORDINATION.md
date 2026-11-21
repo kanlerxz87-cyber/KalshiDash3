@@ -859,3 +859,9 @@ does not touch their scopes.
   (`20:01:03Z`, 10,342 order books fetched with the repeated-param form, 0 picks on the strict screen).
   Full suite re-run green on that fresh data: validate_live/alerts/roi, test_alerts/simulate/fees/roi_parity/
   roi_scan_offline, check_site (21 pages). Open PR #38 left to its author with the coordination comment.
+
+## Session arena-d60abf08 — release verification hardening (2026-11-21)
+
+| Task | Status | Owner | Files in scope | Verification / irregularities |
+|---|---|---|---|---|
+| Consolidate release checks so paper simulation, ROI provenance, Python and browser syntax cannot bypass Pages validation; audit existing site and publish | in progress | arena-d60abf08 | `scripts/verify_release.py`, `.github/workflows/pages.yml`, `README.md`, `COORDINATION.md` | Existing implementation retained; no duplicate site. Uses fixed Arena branch as required by environment. No active claim found for this new release-check runner. |
