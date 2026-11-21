@@ -160,6 +160,79 @@ check(set(collect.CATEGORY_COMPATIBLE) == {"gas", "elections", "culture", "crypt
 check("Test" in collect.CATEGORY_NEVER_IN_SCOPE,
       "the Test category must be named explicitly as never in scope (F-65)")
 
+# 4c. OFFICIAL DISCOVERY (F-66). The five topics use the documented GET /series filters
+#     (https://docs.kalshi.com/api-reference/market/get-series-list):
+#       category -> "Return series whose `categories` list contains this value ... exact and
+#                   case-sensitive"
+#       tags     -> same endpoint, tags filter
+#     Verified live 2026-11-21: ?category=Entertainment returns KXEMMYCACTO, KXSAGAWARDACTODRAMA,
+#     KXAWARDSCMAMOTY, KX1SONG; ?category=Elections returns KXNYCMAYOR2ND, KXVILNIUSMAYOR;
+#     ?tags=Golf returns KXGOLF, KXPHOENIXOPEN, KXTGLCHAMPION (all categories ["Sports"]).
+import io
+from unittest import mock as _mock
+
+CATS_DOC = json.loads((ROOT / "data" / "categories.json").read_text())
+for c in CATS_DOC["categories"]:
+    check(bool(c.get("official_categories")) or bool(c.get("official_tags")),
+          f"topic {c['id']} must declare at least one official GET /series filter (F-66)")
+    check(c.get("official_source", "").startswith("https://docs.kalshi.com/"),
+          f"topic {c['id']} must link the official docs for its filter (F-66)")
+
+FAKE = {
+    "Entertainment": ["KXEMMYCACTO", "KXSAGAWARDACTODRAMA", "KXAWARDSCMAMOTY"],
+    "Elections": ["KXNYCMAYOR2ND", "KXVILNIUSMAYOR", "KXELECTIRAN"],
+    "Crypto": ["KXBTCY", "KXETHY", "KXDEMOFUTHOURLY"],
+    "Economics": ["KXAAAGASM", "KXAAAGASD"],
+    "Sports": ["KXPGATOUR", "KXBALLONDOR", "KXEPLFIRSTGOAL"],
+}
+TAGS = {"Golf": ["KXPGATOUR", "KXGOLF", "KXGOLFTENNISMAJORS"], "Oil & Gas": ["KXAAAGASM"]}
+
+
+def fake_get(path, params=None, retries=3):
+    if path == "/series" and params:
+        if "category" in params:
+            return {"series": [{"ticker": t} for t in FAKE.get(params["category"], [])]}, "url"
+        if "tags" in params:
+            return {"series": [{"ticker": t} for t in TAGS.get(params["tags"], [])]}, "url"
+    raise RuntimeError("unexpected GET " + path)
+
+
+with _mock.patch.object(collect, "get", fake_get):
+    omap, ocalls = collect.official_discovery(CATS_DOC)
+check(omap.get("KXEMMYCACTO", {}).get("category_id") == "culture",
+      "official ?category=Entertainment must map an Emmys series to Culture (F-66)")
+check(omap.get("KXNYCMAYOR2ND", {}).get("category_id") == "elections",
+      "official ?category=Elections must map an election series to Elections (F-66)")
+check(omap.get("KXGOLF", {}).get("category_id") == "golf",
+      "official ?tags=Golf must map a Sports-categorised golf series to Golf (F-66)")
+check(omap.get("KXBALLONDOR", {}).get("category_id") == "golf",
+      "precondition: ?category=Sports maps Ballon d'Or into the Sports-based topic (golf), which is "
+      "exactly why the per-topic series exclusion is needed to keep it out of both (F-66)")
+check(all(c["url"].startswith("https://external-api.demo.kalshi.co/trade-api/v2/series?")
+          for c in ocalls if "error" not in c),
+      "every discovery call must record the exact official URL it used (F-66)")
+# A failed filter call must be reported, never silently drop a topic's only mapping.
+def failing_get(path, params=None, retries=3):
+    raise RuntimeError("HTTP 500 simulated")
+
+with _mock.patch.object(collect, "get", failing_get):
+    omap2, ocalls2 = collect.official_discovery(CATS_DOC)
+check(omap2 == {} and all("error" in c for c in ocalls2),
+      "a failed discovery call must be recorded with its error, not assumed to be empty (F-66)")
+
+# Per-topic series exclusions: Ballon d'Or is officially Sports/Soccer, so it stays out of
+# Culture even though the fee schedule lists it (and even though ?tags=Awards might catch it).
+check(collect.excluded_series_reason("culture", "KXBALLONDOR") is not None,
+      "KXBALLONDOR must be excluded from Culture with a reason (F-66)")
+check(collect.excluded_series_reason("culture", "KXEMMYCACTO") is None,
+      "the exclusion must be narrow: a real Entertainment series stays in Culture (F-66)")
+check(collect.excluded_series_reason("golf", "KXGOLFTENNISMAJORS") is not None,
+      "a tennis-vs-golf comparison series must not be a Golf event (F-66)")
+for topic, entries in collect.TOPIC_EXCLUDE_SERIES.items():
+    for ex in entries:
+        check(bool(ex.get("reason")) and "http" in ex["reason"],
+              f"every {topic} exclusion must cite the official series record that justifies it (F-66)")
+
 # 5. the committed snapshot must not contain a QA fixture inside the five topics
 live = ROOT / "data" / "live" / "markets.json"
 if live.exists():

@@ -103,6 +103,29 @@ CATEGORY_COMPATIBLE = {
 # keyword says. Kept explicit so the exclusion is auditable rather than a silent side effect.
 CATEGORY_NEVER_IN_SCOPE = {"Test", "Demo"}
 
+# F-66: a broad official category can contain the topic AND everything next to it. Sports is
+# the case that matters: it is where Kalshi files golf, and also every other sport. Naming a
+# specific series as out of scope is the narrow, auditable way to handle that, and each entry
+# records the official record that justifies it. Applied AFTER the broad match, so golf keeps
+# working while a soccer award does not become Culture.
+#   KXBALLONDOR  GET /series/KXBALLONDOR -> categories ["Sports"], tags ["Soccer"]
+#   KXGOLFTENNISMAJORS -> categories ["Sports"], tags ["Golf","Tennis"]: a tennis-vs-golf
+#     comparison is not a golf event, so it is excluded from Golf specifically.
+TOPIC_EXCLUDE_SERIES: dict[str, list[dict]] = {
+    "culture": [
+        {"series": "KXBALLONDOR",
+         "reason": "Ballon d'Or: official series record is categories ['Sports'], tags ['Soccer'] "
+                   "(https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR); it is a "
+                   "football award, not a culture market"},
+    ],
+    "golf": [
+        {"series": "KXGOLFTENNISMAJORS",
+         "reason": "Tennis-vs-golf comparison: official series tags ['Golf','Tennis'] "
+                   "(https://external-api.demo.kalshi.co/trade-api/v2/series/KXGOLFTENNISMAJORS); "
+                   "not a golf tournament market"},
+    ],
+}
+
 
 def utcnow() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -208,6 +231,15 @@ def classify(cats, series_ticker, series_title, series_categories, market_title)
     return None, None
 
 
+def excluded_series_reason(cat_id: str, series_ticker: str) -> str | None:
+    """Reason string when the topic names this series as out of scope (F-66), else None."""
+    st = (series_ticker or "").upper()
+    for ex in TOPIC_EXCLUDE_SERIES.get(cat_id or "", []):
+        if ex["series"] == st:
+            return ex["reason"]
+    return None
+
+
 def official_categories(series_record) -> list[str]:
     """The series' own `categories` list, verbatim from GET /series.
 
@@ -223,7 +255,7 @@ def official_categories(series_record) -> list[str]:
     return [str(single)] if single else []
 
 
-def category_conflict(cat_id: str, official: list[str], basis: str) -> str | None:
+def category_conflict(cat_id: str, official: list[str], basis: str, tags: list[str] | None = None) -> str | None:
     """Return a reason when the series' official category contradicts the topic, else None.
 
     Applied to every row, seed or keyword, because a series can be in the fee schedule and
@@ -259,6 +291,50 @@ def fetch_series_index():
     except RuntimeError as e:
         print(f"  ! /series unavailable ({e}); continuing without it", file=sys.stderr)
         return {}
+
+
+def official_discovery(cats) -> tuple[dict[str, dict], list[dict]]:
+    """Series the EXCHANGE itself files under each topic, via the documented filters.
+
+    Why this exists: before F-66 the only ways into a topic were (a) a ticker in the fee
+    schedule or (b) a keyword match on a title, and both are weak — the keyword path put a
+    soccer prop inside Culture because a player is called Oscar, and the fee-schedule path
+    put the Ballon d'Or (officially Sports) inside Culture, while Culture had almost no rows
+    at all even though Kalshi lists dozens of official Entertainment series. The API documents
+    exactly the filter needed:
+
+      GET /series?category=<value>  "Return series whose `categories` list contains this value."
+      GET /series?tags=<value>      (tags filter, same endpoint)
+      https://docs.kalshi.com/api-reference/market/get-series-list
+
+    Each topic declares both filters in data/categories.json (`official_categories`,
+    `official_tags`). Matching is exact and case-sensitive, as the documentation requires.
+    Every call is recorded (url, value, count, or the error) so the mapping is auditable, and a
+    failed call is reported and skipped — it never silently widens a topic.
+
+    Returns (series -> {category_id, matched_by, value}, calls).
+    """
+    by_series: dict[str, dict] = {}
+    calls: list[dict] = []
+    for c in cats["categories"]:
+        for kind, values in (("category", c.get("official_categories") or []),
+                             ("tags", c.get("official_tags") or [])):
+            for value in values:
+                url = f"{BASE}/series?{kind}={value}"
+                try:
+                    d, _ = get("/series", {kind: value})
+                except RuntimeError as e:
+                    print(f"  ! {url}: {e}", file=sys.stderr)
+                    calls.append({"category_id": c["id"], "filter": kind, "value": value,
+                                  "url": url, "series": 0, "error": str(e)})
+                    continue
+                tickers = [s.get("ticker", "").upper() for s in d.get("series", []) if s.get("ticker")]
+                for t in tickers:
+                    by_series.setdefault(t, {"category_id": c["id"], "filter": kind, "value": value})
+                calls.append({"category_id": c["id"], "filter": kind, "value": value,
+                              "url": url, "series": len(tickers)})
+                print(f"  official {c['id']:<9} {kind}={value:<20} -> {len(tickers)} series")
+    return by_series, calls
 
 
 def scan_markets():
@@ -393,7 +469,7 @@ def update_price_history(hist, rows):
     return hist
 
 
-def public_market_row(m, cat_id, basis, keep_rules=False, official_cats=None):
+def public_market_row(m, cat_id, basis, keep_rules=False, official_cats=None, matched_by=None):
     row = {
         "ticker": m.get("ticker"),
         "event_ticker": m.get("event_ticker"),
@@ -406,6 +482,9 @@ def public_market_row(m, cat_id, basis, keep_rules=False, official_cats=None):
         # see that e.g. a Culture row is Entertainment or that a row was checked and matched.
         # Empty list = the series record did not return the field; never filled in.
         "series_categories": list(official_cats or []),
+        # How the topic was decided: "official" (the exchange's own GET /series filter),
+        # "seed" (fee-schedule ticker) or "keyword" (title heuristic). F-66.
+        "category_matched_by": matched_by or basis,
         "status": m.get("status"),
         "result": m.get("result") or None,
         "last_price_dollars": fnum(m.get("last_price_dollars")),
@@ -452,6 +531,9 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # authoritative per-series record too, so the category check is never a function of whether
     # the bulk index happened to include that series. One request per distinct series.
 
+    # F-66: the exchange's own topic mapping, built from the documented GET /series filters.
+    official_map, official_calls = official_discovery(cats)
+    print(f"  official discovery: {len(official_map)} series mapped across {len(official_calls)} calls")
     raw = scan_markets()
     print(f"  markets: open={len(raw['open'])} settled={len(raw['settled'])}")
 
@@ -522,6 +604,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     excluded_topic = {"open": 0, "settled": 0}
     cat_conflicts = {"open": 0, "settled": 0}
     conflict_reasons: dict[str, int] = {}
+    excluded_series = {"open": 0, "settled": 0}
+    excluded_series_reasons: dict[str, str] = {}
     wrong_bucket = 0
     for status in ("open", "settled"):
         for m in raw[status]:
@@ -542,6 +626,27 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                 " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
                 m.get("title") or m.get("yes_sub_title"),
             )
+            # F-66: the exchange's own mapping outranks both the fee-schedule ticker match and
+            # the keyword heuristic, but a per-topic exclusion outranks everything.
+            matched_by = basis
+            off = official_map.get(st)
+            if off:
+                if excluded_series_reason(off["category_id"], st):
+                    excluded_series[status] += 1
+                    excluded_series_reasons[st] = excluded_series_reason(off["category_id"], st)
+                    continue
+                cat_id = off["category_id"]
+                # Only two basis values are ever published; the official mapping is recorded
+                # in category_matched_by so the schema the pages read does not change.
+                basis = "seed" if any(
+                    seed2["ticker"].upper() == st
+                    for c2 in cats["categories"] for seed2 in c2["seed_series"]
+                ) else "keyword"
+                matched_by = "official"
+            if cat_id and excluded_series_reason(cat_id, st):
+                excluded_series[status] += 1
+                excluded_series_reasons[st] = excluded_series_reason(cat_id, st)
+                continue
             if not cat_id:
                 unclassified[status] += 1
                 continue
@@ -562,7 +667,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                 wrong_bucket += 1
                 continue
             rows[status].append(
-                public_market_row(m, cat_id, basis, keep_rules=(status == "open"), official_cats=official)
+                public_market_row(m, cat_id, basis, keep_rules=(status == "open"), official_cats=official,
+                                  matched_by=matched_by)
             )
 
     # Rank open markets by the labelled estimate so the page leads with the
@@ -644,6 +750,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_excluded_off_topic_or_qa": excluded_topic["settled"],
             # Category integrity (F-65): rows the topic matched by keyword or seed whose OWN
             # official series record files them under a category the topic cannot contain.
+            "open_excluded_series": excluded_series["open"],
+            "settled_excluded_series": excluded_series["settled"],
+            "excluded_series_detail": dict(sorted(excluded_series_reasons.items())),
+            "official_discovery_calls": official_calls,
+            "official_discovery_series": len(official_map),
             "open_excluded_category_conflict": cat_conflicts["open"],
             "settled_excluded_category_conflict": cat_conflicts["settled"],
             "category_conflict_reasons": dict(sorted(conflict_reasons.items())),
