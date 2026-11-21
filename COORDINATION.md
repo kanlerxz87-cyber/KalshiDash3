@@ -1280,3 +1280,37 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-d60d648c` — takeover of stale PRs #55/#56 + final verification publish (branch `arena/d60d648c-kalshidash3`)
+
+Branch base: `f09f982` (the current, squashed `main` head, "data: live-desk scan 2026-11-21T17:57Z"). Started 2026-11-21 ~20:24Z.
+
+**Why this session exists.** The user brief (full Kalshi demo dashboard build) has been implemented by many
+prior parallel sessions and is live; the remaining engineering work is two stale, conflicting PRs from
+sessions whose branches were last committed ~07:00Z (>13 h old, i.e. past the 60-minute stale rule):
+
+- **PR #55** `arena/a3070ffa-kalshidash3` — "Dashboard chart: official candles + archived swings; collector
+  coverage; voided-position fix (F-40…F-44)". Last commit `6a5ac45` 2026-11-21T06:45:48Z. Conflicts with the
+  squashed `main` (no merge base). Its defects are all still present on `main` (verified in this session:
+  no `mve_filter` in `scripts/collect.py`, no candlestick fetch in `dashboard.html`, voided rows can keep a
+  −$1.00 mark in `scripts/simulate.py`, history pruned for alerted markets).
+- **PR #56** `arena/17d4ecfa-kalshidash3` — "Topic-fair resolution history (F-41)". Last commit `f2de495`
+  2026-11-21T06:59:43Z. Its defect is still present on `main` (settled rows published newest-first under one
+  global `[:200]` after sorting; 92% of the window was crypto, starving the other four topics).
+
+Neither branch may be pushed by this session (session rules: one branch per session; other branches may not
+be edited). Per the stale-claim rule in this board, this session takes the work over by **re-applying the
+same changes onto this branch**, keeping attribution in the commit messages, renumbering new finding IDs so
+they cannot collide with main's F-01…F-64, and regenerating derived artifacts with their own scripts instead
+of hand-editing them. Nothing from either PR is silently dropped; the two stale PRs will be closed with a
+link to the superseding PR once this branch is merged.
+
+| ID | Task | Status | Owner | Files in scope | Sources / verification | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| T40 | Take over PR #55 (dashboard chart fidelity, collector watch set + `mve_filter`, voided-position mark, coverage/DOM tests) and PR #56 (topic-fair settled selection, historical backfill, resolution-history allocation published) | in progress | arena-d60d648c | `dashboard.html`, `executive-summary.html`, `index.html`, `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/{test_collect_coverage.py,test_settled_selection.py,test_pages_dom.js,test_simulate.py}`, `.github/workflows/collect.yml`, `assets/alerts.js`, `data/findings.json`, `data/live/simulation.json`, `README.md`, `COORDINATION.md` | official docs (candlesticks `period_interval ∈ {1,60,1440}`; `mve_filter`; `historical_data`/`historical_markets`; fee schedule) + local re-derivation of every number; suite via `scripts/verify_release.py` | Finding IDs from both PRs collide with main (F-40…F-44 already used): renumbered on integration to F-65+; both PRs' `data/live/*.json` snapshots are from ~06:5xZ and are NOT ported (main's 17:57Z collector output is newer) — derived files are regenerated instead |
+| T41 | Open questions watchdog measurement (F-63 / F-40 / F-16): read `gh run list --workflow=collect.yml`, count `event == schedule` over the full day, record numbers, close or keep-flag the watchdog | in progress | arena-d60d648c | `COORDINATION.md` (record only), `flagged.html`/`data/findings.json` (status wording only, if warranted) | GitHub Actions run list API; workflow file `.github/workflows/collect.yml` | F-63 mitigation is live but cadence unproven until this measurement |
+| T42 | Final verification publish: full suite on the merged tree, PR → main, merge, Pages deploy confirm, dispatch collectors, record outcomes here | in progress | arena-d60d648c | `COORDINATION.md`, `README.md` (integration only) | `scripts/verify_release.py`, live URL fetch after deploy | — |
+
+Claim pushed before any implementation-file edit, per the board rule.
