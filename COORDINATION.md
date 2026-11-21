@@ -1072,3 +1072,34 @@ per the board rule. Existing sessions' sections are untouched; their scopes stay
   (https://docs.kalshi.com/api-reference/market/get-markets), and the same page states responses are cached and
   "can lag the exchange by several seconds". Measured on the demo host this session:
   `GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor, so the filter is live.
+
+### Results (this session)
+
+| ID | Result | Files changed | Verified by |
+|----|--------|---------------|-------------|
+| T30 | **done** — the collector pruned price history to the ranked open window, so 3 of the 7 tickers cited in `alerts_archive.json` had **0** observations and the dashboard chart was empty for exactly the alerted series. History now keeps `open rows ∪ archived-alert tickers`. The chart also rebuilds a row from the published alert record for `dashboard.html#TICKER` deep links outside the window, and the alerts chat links to it. | `scripts/collect.py`, `dashboard.html`, `assets/alerts.js` | `scripts/tests/test_collect_coverage.py`; `test_pages_dom.js` mode G |
+| T30b | **done** — the page never requested a single official candle. It now fetches `GET /series/{s}/markets/{t}/candlesticks` for the selected window (1-min / 1-hour / new 1-day), falls back to `GET /historical/markets/{t}/candlesticks`, reads both field shapes, and skips a candle with no price block instead of plotting `Number("")===0`. | `dashboard.html` | `test_pages_dom.js` mode F (mutation-checked: removing the `""` guard fails it) |
+| T31 | **done** — archived ≥ $0.10 swings are drawn as dashed markers on the chart; the swing list is the union of observations and the archive. Cause links remain the fetched-lead layer built by `scripts/catalysts.py`; no cause is invented. | `dashboard.html` | `test_pages_dom.js` modes D/E unchanged and still green (no causal wording) |
+| T32 | **done** — `scan_markets()` now sends the documented `mve_filter=exclude` (the filter `scripts/roi_scan.py` already used). Combo listings were consuming the newest-first 25,000-row paging budget, which is why the collector published 749 open-in-scope while the desk scan published 1,365 for the same exchange. | `scripts/collect.py` | `test_collect_coverage.py` (asserts the parameter on every scan request) |
+| T33 | **done** — see the PR record below. | `COORDINATION.md`, `README.md` | full suite + live URL fetch |
+
+**Defects found and published as irregularities** (all on `flagged.html`, all with official source links):
+
+- **F-37 resolved.** The index KPI read "of 200 settled markets in scope" — the stored-row cap — while the banner on the same page printed `counts.settled_in_scope` (1,600). Fixed and regression-tested (`test_pages_dom.js` mode H, mutation-checked).
+- **F-38** history pruned for alerted markets (the T30 defect).
+- **F-39** the chart ignored the candlestick endpoint.
+- **F-40** the collector's capped universe disagreed with the desk scan's.
+- **F-41** observation-only detection cannot see a move inside the collector gap. Demonstrated on `KXPGATOUR-THRC26-MPEN`: its official 1440-minute candle for `end_period_ts 1795237200` opens 0.0070 and closes 0.0880 (an 8.1¢ intraday move) while both surrounding observations read 0.00 — so no alert exists. Proposed as **G19** rather than switched on unilaterally.
+- **F-42** a voided (never-filled) paper position kept `unrealized_net -1.0` and `bid_now 0.0` from before it was voided; cleared at void time and normalised every run, committed `simulation.json` regenerated, two mutation-checked tests.
+
+**Verification performed this session.** Baseline re-run on `ebce5e7` before any edit (all validators green, collectors and Pages green).
+Live figures re-checked against the official API through the platform fetch path, since sandbox `curl` to the Kalshi host fails:
+`GET /markets/KXPGATOUR-THRC26-MPEN` → `last_price_dollars 0.0880`, `volume_fp 434504.17`, `open_interest_fp 419786.51`;
+the snapshot row is `last 0.088`, `volume 431,703.35`, `open_interest 419786.51`, `dollars_traded_estimate 37989.89 = volume × last` exactly.
+`GET /series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=1440` returns 5 daily candles (quoted in F-41);
+`GET /series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV21H07-UP/candlesticks?period_interval=1` returns 1-minute candles with real volume;
+`GET /historical/cutoff` → `market_settled_ts 2026-09-21T00:00:00Z`, which is why recent markets stay on the live endpoint;
+`GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor (the filter is live on the demo host).
+Static claims re-read from `docs.kalshi.com` this session: `period_interval ∈ {1, 60, 1440}` on both the live and historical candlestick endpoints; `mve_filter ∈ {only, exclude}` plus `series_ticker` on `GET /markets`; the doc's own warning that listing responses are cached and "can lag the exchange by several seconds"; unauthenticated requests have separate limits and clients must back off on 429.
+
+**Nothing was inferred.** Every new number on the site comes from a committed file or an API response quoted in the finding. Where a value did not exist (a candle with no price, a market with no history, a demo balance with no credentials) it is left blank and labelled, not filled.
