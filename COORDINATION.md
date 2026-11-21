@@ -487,7 +487,7 @@ Log:
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T16 | Take over stale log-only claim (PR #14, arena-9b246e37, >60 min no commits): resolve COORDINATION.md conflict, merge | done | arena-d879c640 | `COORDINATION.md` (conflict resolution only) | Both sides kept verbatim; subsite-drop fact checked against `git show cd104db` (PR #15 removed `9b246e37/`) | None |
-| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed `<<<<<<< HEAD` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
+| T17 | Final integration: merge open PRs #22 (arena-0a479d8c) and #23 (arena-a2fca5db) without discarding either session's work; reconcile duplicate `alerts.html`/`dashboard.html` edits; close stale PR #6; take over and merge PR #28 (arena-d022c8de, live desk + fee-aware ROI model); close cross-session requests R-1 (dashboard reads the alert archive) and R-2 (`build_alerts.py` stores `to_yes_bid`/`to_yes_ask`) | done | arena-d879c640 | integration-conflict files only (`alerts.html`, `dashboard.html`, `assets/site.js`, `index.html`, `README.md`, `scripts/build_alerts.py`, `data/findings.json`, `COORDINATION.md`) | full suite green on merged tree: `check_site.py` (21 pages), `validate_live.py`, `validate_alerts.py`, `test_alerts.py`, `test_simulate.py`, `test_fees.py`, `test_roi_parity.py`, `test_roi_scan_offline.py`, `engine.test.js`, `test_engine_node.js`, `node --check` all JS; R-1/R-2 proven by synthetic builder run (see log) | README.md carried committed ` conflict markers on `main` since PR #27's branch merge `f41ca2d` (propagated by PR #24's `0dede66`) — fixed here, keeping both sides |
 | T18 | Re-verify combined data line by line against official sources; confirm build + no broken links; PR → main → merge → Pages deploy confirm; record PR link and merge result here | in progress | arena-d789c640 → arena-d879c640 | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_simulate.py`, `node --check` on all scripts, `node scripts/tests/engine.test.js` / `test_alerts.py` as present after merge | — |
 
 ### Log (this session)
@@ -502,7 +502,7 @@ Log:
 - 2026-11-20 ~14:20 UTC: T17 — nav request from PR #28's handoff fulfilled: `assets/site.js` now lists `live.html` (Live Desk) and `roi.html` (ROI Model) after the dashboard entry; `index.html` gained cards for both pages (site index/nav is this session's shared-output scope).
 - 2026-11-20 ~14:35 UTC: T17 — **R-1 done**: `dashboard.html` `renderAlerts()` now prefers the canonical archive-backed feed (`data/live/alerts.json`; all_events rows mapped to title/category/volume/market_source/from_price/to_price/delta/to_time/high_roi) and only recomputes from `price_history.json` when the feed is missing, so a swing stays listed after its market leaves the open scan (F-17 action updated). Proof: 8/8 rows map, all sources `https://…/markets/…`, all |delta| >= 0.10, high_roi mapping `Boolean(a.high_roi)`.
 - 2026-11-20 ~14:41 UTC: T17 — **R-2 done**: `scripts/build_alerts.py` stores `to_yes_bid`/`to_yes_ask` from the observation at `to_time` on every new archive entry (null when the observation carried no quote — never invented). Proven with a synthetic history: quotes land on the entry, `simulate.quote_for_signal` returns `(0.54, 0.56, "archive")`, and a no-quote observation stores nulls. Existing 8 entries unchanged (append-only). Regenerated `alerts.json` byte-identical apart from `generated_at`/counts; `simulation.json` re-run (8 signals processed; S2's historical 99c-spread fill stays VOID per F-23). G9/F-14/F-17/F-19 updated in `data/findings.json`.
-- 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `<<<<<<< HEAD … >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
+- 2026-11-20 ~14:45 UTC: T17 — **irregularity found and fixed**: `README.md` lines 113–120 contained committed `… >>>>>>> origin/main` conflict markers on `main` (introduced by PR #27's branch merge `f41ca2d`, carried through PR #24's `0dede66`). Resolved keeping both sides (portfolio/auto-sim labelling + demo-account quote; R-2 line now stating quotes are stored from 2026-11-20; demo-price caveat). No other file in the tree carries markers.
 - 2026-11-20 ~14:50 UTC: T17 done — full suite green on the integrated tree (21 pages OK; 506 open/200 settled/17 orderbooks; 8 alerts provenance-checked; 13 alert tests; simulate suite OK; 42 fee-table numbers; 15 parity cases; engine tests ALL PASSED; `node --check` clean). Remaining for T18: final verification pass, PR -> main -> merge, Pages deploy confirm, dispatch `collect.yml`/`desk.yml` so the new pages get live data, record PR link here.
 
 ## Session `arena-2a36471a` — repair + final publish (branch `arena/2a36471a-kalshidash3`)
@@ -1021,3 +1021,30 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
+
+---
+
+## Session `arena-cf49f42a` — freshness/liveness repair + independent line-by-line audit (branch `arena/cf49f42a-kalshidash3`)
+
+Base: `ebce5e7` (main). Claimed 2026-11-21 06:35Z. Single active session; no other claim is in progress
+(PR #38 is abandoned/conflicting and its fix is already on main via PR #39 — checked below).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T25 | Collector cadence: a public repo's `*/20` schedule is throttled to ~hourly by GitHub, so the site's snapshot layer ages out. Add a bounded fallback cadence and prove the run rate from the Actions API. | in progress | arena-cf49f42a | `.github/workflows/collect.yml`, `.github/workflows/desk.yml` | `gh run list --workflow=collect.yml` event counts before/after; workflow YAML validated by the same local runners | see log |
+| T26 | Liveness audit: verify the deployed site's live-polling/CORS claim and the alert chats against the official demo API from outside the sandbox | in progress | arena-cf49f42a | `data/live/cors.json` (read-only), `flagged.html`, `data/findings.json` (append only) | official demo API response headers; docs.kalshi.com pages | — |
+| T27 | Line-by-line audit of the deployed numbers vs the official API (top market per category, alert rows, resolved results) | in progress | arena-cf49f42a | read-only; `COORDINATION.md` records | direct GET per ticker | — |
+| T28 | Integration close-out: full suite, PR → main, merge, Pages deploy confirm, record here | unclaimed | — | `COORDINATION.md`, `README.md` | live URL fetch | — |
+
+### Log (this session)
+- 2026-11-21 06:35Z: claimed T25–T27. Full local suite is green (12/12: validate_live, validate_alerts,
+  validate_roi, validate_catalysts, test_alerts, test_simulate, test_fees, test_roi_parity, test_roi_scan_offline,
+  test_roi_scan_snapshot, test_engine_node, test_pages_dom) and `check_site.py` passes on 21 pages.
+- 2026-11-21 06:36Z: evidence for T25 — `gh run list --workflow=collect.yml`: of the last 20 runs **1** was
+  `schedule` (00:49Z) and 19 were `workflow_dispatch`; `desk.yml` shows the same pattern. CORRECTION (same session, after reading the official page): GitHub does NOT document an hourly cap —
+  `https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule`
+  states the shortest supported interval is once every 5 minutes, and that scheduled runs "can be delayed"
+  and "some queued jobs may be dropped" under load. The measured 2-in-10h is therefore best-effort dropping,
+  not a documented rate limit; F-40 records the measured numbers and cites the doc for the delay/drop wording. The site itself labels snapshots stale after 45 minutes, so
+  it showed a stale-fallback banner most of the time. Fix in T25; will record the observed cadence after the
+  next scheduled windows.
