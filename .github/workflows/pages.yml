@@ -1,21 +1,19 @@
 name: Deploy site to GitHub Pages
 
-# Single publishing mechanism. GitHub Pages is configured to build from
-# GitHub Actions (not from a branch), so docs/ is the only thing that can ever
-# be published and the deployed content cannot silently change source.
-
+# Canonical published tree is the repository root. Configure Pages to use
+# GitHub Actions so legacy branch publishing cannot bypass these release gates.
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'release' }}
   cancel-in-progress: false
 
 jobs:
@@ -23,40 +21,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Validate the committed snapshot and the derived alerts
-        run: |
-          python3 scripts/tests/validate_live.py
-          python3 scripts/tests/validate_alerts.py
-
-      - name: Run alert-feed tests
-        run: python3 scripts/tests/test_alerts.py
-
-      - name: Run the ROI model tests (fee table, browser/CI parity, scan over the real snapshot)
-        run: |
-          python3 scripts/tests/test_fees.py
-          python3 scripts/tests/test_roi_parity.py
-          python3 scripts/tests/test_roi_scan_snapshot.py
-
-      - name: Check links, HTML and data files (fails the build on a broken page)
-        run: python3 scripts/check_site.py
-
-      - uses: actions/configure-pages@v5
-
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/setup-node@v4
         with:
-          path: .
+          node-version: "22"
+      - name: Install test-only DOM dependency
+        run: npm install --no-save --package-lock=false jsdom@26
+      - name: Verify release (offline, no account or orders)
+        run: python3 scripts/verify_release.py
+      - name: Stage only public site files
+        run: |
+          mkdir -p _site
+          cp *.html _site/
+          cp -R assets data _site/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/configure-pages@v5
       - id: deployment
         uses: actions/deploy-pages@v4

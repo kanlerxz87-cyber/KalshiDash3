@@ -53,9 +53,29 @@ scripts/tests/validate_alerts.py  provenance: re-derives every alert from the co
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
 
+## Release verification
+
+The Pages workflow runs on pull requests and again before deployment. It stages only
+HTML, `assets/`, and `data/` — not repository scripts, test dependencies or coordination logs.
+GitHub Pages must use **GitHub Actions**, not legacy branch publishing, for this gate to apply.
+
+```bash
+npm install --no-save --package-lock=false jsdom@26  # test-only; Node 20+ required
+python3 scripts/verify_release.py
+```
+
+This single offline command checks Python, shared and inline browser-script syntax;
+all committed-data validators; alert, fee, ROI and simulation regressions; engine and
+DOM behavior; and internal links across the 21 pages. Missing Node or jsdom is a failure,
+not a silent skip. It does not fetch fresh prices, verify external URL availability,
+certify profitability, or authenticate a demo account. Official endpoint and authentication
+references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
+[WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).
+
 ## How to re-run everything
 
-Nothing here needs credentials. All market data comes from public demo endpoints.
+Public collection and offline verification need no Kalshi credentials. Account access and
+order execution do require demo credentials. Market snapshots come from public demo endpoints.
 
 ```bash
 python3 scripts/collect.py            # writes data/live/markets.json + price_history.json
