@@ -28,7 +28,7 @@ left blank and listed on the *Flagged for Review* page.
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
 | `suggestions.html` | Eighteen proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 69 claims, each with the official page it was checked against |
+| `verification.html` | 72 claims, each with the official page it was checked against |
 | `flagged.html` | 50 irregularities found, plus every value deliberately left blank |
 | `sources.html` | The complete source list |
 
