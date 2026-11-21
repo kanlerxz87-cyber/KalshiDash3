@@ -188,7 +188,17 @@ def scan_markets():
         cursor, seen = "", 0
         truncated = False
         while True:
-            d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None})
+            # mve_filter=exclude is a DOCUMENTED parameter of GET /markets
+            # ("'only' returns only multivariate events, 'exclude' excludes multivariate
+            # events" — https://docs.kalshi.com/api-reference/market/get-markets). It
+            # removes the combo listings that are excluded below anyway, which is what
+            # pushed the newest-first scan into the safety cap: on main the 25,000-row
+            # window was truncated and the in-scope total moved between collector runs
+            # (749 open in scope at the 2026-11-21T00:50Z snapshot vs 1,365 in the desk
+            # scan of the same exchange). Asking the API for the smaller universe is
+            # honest filtering, not a wider guess.
+            d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None,
+                                    "mve_filter": "exclude"})
             batch = d.get("markets") or []
             out[status].extend(batch)
             seen += len(batch)
@@ -453,11 +463,25 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         except json.JSONDecodeError:
             hist = {}
     update_price_history(hist, raw["open"])
-    # Only keep history for markets that are actually shown, so the file stays small.
+    # Keep history for markets that are shown AND for every market that still carries a
+    # recorded price swing, so an alert never points at an empty graph.
+    # The original rule kept only `rows["open"]` (the capped, ranked window). A swing is
+    # archived by scripts/build_alerts.py the moment it is observed, and the ranking then
+    # rotates that market out of the window, so its observations were deleted while the
+    # alert that cites them lived on. Measured on the 2026-11-21T00:50Z snapshot: of the 7
+    # distinct tickers in data/live/alerts_archive.json, the 3 KXDEMOFUTHOURLY-* markets
+    # had 0 observations left, so dashboard.html rendered "No observations in this window
+    # yet" for exactly the series the alert was about. Alerts are read here as a file, not
+    # written (build_alerts.py stays the only writer and this script runs first).
     # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
     # which the collect workflow runs right after this script. This file deliberately
     # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
+    try:
+        archive = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
+        watch |= {a["ticker"] for a in archive if a.get("ticker")}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        pass  # first run: no archive yet, so open rows alone define the watch set
     hist = {k: v for k, v in hist.items() if k in watch}
 
 

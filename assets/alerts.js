@@ -166,6 +166,7 @@ const KDA = (() => {
         `<div class="small">${esc(titleShort)}</div>` +
         `<div class="small mut">${cat} ${sys || (sim && !a.from_ts) ? esc(t) : `${cents(a.from_price_dollars)} → <b>${cents(a.to_price_dollars)}</b> · ` + esc(t)}${scChip}${screenChip}</div>` +
         `<div class="small"><a href="${esc(a.source || "#")}" target="_blank" rel="noopener">${sys ? "workflow" : sim ? "about (flagged page)" : "API query"}</a>` +
+        (sys ? `` : ` <a href="dashboard.html#${encodeURIComponent(a.ticker)}" title="Open this market's price chart on the dashboard">chart</a>`) +
         (sim ? ` <span class="mut">· simulated tick (not market data)</span>` : ``) +
         `</div></div>`;
     }
