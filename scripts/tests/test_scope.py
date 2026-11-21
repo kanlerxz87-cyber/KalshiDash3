@@ -285,3 +285,28 @@ if errors:
         print(" -", e)
     sys.exit(1)
 print("OK: scope tests passed (natural gas excluded, QA fixtures refused, labels corrected, exclusions published)")
+# 5. F-72: the banner/table must never print the PUBLISHED settled-row count as if it were the
+#    scan total. The collector now publishes both; assert that wherever a settled total is
+#    labelled "in scope" the page reads settled_in_scope_total, and that the stored count is
+#    labelled as stored/published.
+site_js = (ROOT / "assets" / "site.js").read_text()
+check("settled_in_scope_total" in site_js,
+      "assets/site.js must read counts.settled_in_scope_total for the in-scope settled figure (F-72)")
+check("settled_published" in site_js,
+      "assets/site.js must name the published settled-row count separately (F-72)")
+for page_name in ("categories.html", "verification.html"):
+    body = (ROOT / page_name).read_text()
+    check("settled_in_scope_total" in body,
+          f"{page_name} must read counts.settled_in_scope_total, not only the published count (F-72)")
+    check("settled_published" in body,
+          f"{page_name} must show the published settled-row count as a separate row (F-72)")
+# and the collector must publish both numbers
+collect_src = (ROOT / "scripts" / "collect.py").read_text()
+check('"settled_in_scope_total": settled_in_scope_total' in collect_src,
+      "scripts/collect.py must publish counts.settled_in_scope_total")
+check('"open_published_rows"' in collect_src and '"settled_published_rows"' in collect_src,
+      "scripts/collect.py must publish the published-row counts explicitly")
+check('"settled_in_scope_total_method"' in collect_src,
+      "scripts/collect.py must publish how the settled total was obtained (exact vs carried forward)")
+check("settled_in_scope_total_method" in index_html,
+      "index.html must render the method beside the settled total (F-72)")
