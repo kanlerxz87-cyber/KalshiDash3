@@ -1280,3 +1280,25 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 - 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
 - 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
 - 2026-11-21 07:00Z: **T39 closed out.** Merged PR #60 as `a20e315bda1d675c2018a00d582b998dc7edd901` (2026-11-21T06:59:24Z). Both GitHub Pages workflows (`Deploy site to GitHub Pages` run `44878097228` and `pages-build-deployment` run `44878097127`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/catalysts.json` and `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` confirming the updated 14/21 reviewed catalyst leads (28 links) are live.
+
+---
+
+## Session `arena-83749e18` — claim (2026-11-21 20:20Z)
+
+Branch `arena/83749e18-kalshidash3`, base `f09f982` (= `main` at claim time). Claim written and pushed **before** any
+implementation edit. Earlier sessions are closed; two of their PRs are still open and conflicting with `main`
+(**#55** `arena/a3070ffa`: candle chart, history retention, `mve_filter`, voided marks; **#56**
+`arena/17d4ecfa`: topic-fair settled history). Their diagnoses are credited in my log and re-verified from scratch;
+I am not rebasing their branches, because each carries a full `data/live/` snapshot no longer compatible with `main`
+and rebasing would either drop my scope or resurrect stale data.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T40 | Collector correctness: publish resolution history per topic instead of 198/200 crypto rows; keep price history for every open + alerted + settled ticker; send the documented `mve_filter` | in progress | arena-83749e18 | `scripts/collect.py`, `scripts/tests/test_settled_selection.py` (new) | official `GET /markets` params re-read this session; fixture test reproducing the real skew; snapshot counts after a live run | — |
+| T41 | Dashboard chart: plot Kalshi's own candlesticks (1/60/1440 min) with archived observations as fallback, and mark swings ≥$0.10 on the chart | in progress | arena-83749e18 | `dashboard.html`, `assets/engine.js`, `scripts/tests/test_pages_dom.js` | candle field shapes from official docs; mutation-checked DOM test | — |
+| T42 | ROI screen: 0 of 13,637 in-scope markets scored — diagnose and fix the gate that makes the "high-ROI" feed structurally empty, without weakening any disclosed gate | in progress | arena-83749e18 | `scripts/roi_scan.py`, `scripts/roi_model.py` (only if the gate itself is wrong), `roi.html` (copy only) | `data/live/roi.json` diagnostics; official fee schedule for the taker fee | — |
+| T43 | Landing-page truthfulness: resolution table is crypto-only and labelled as the whole snapshot | in progress | arena-83749e18 | `index.html`, `assets/site.js` | re-render test `scripts/tests/test_pages_dom.js` | — |
+| T44 | Close-out: full release gate, PR → `main`, merge, confirm Pages deploy, live-URL verification, record here | unclaimed | — | `COORDINATION.md`, `README.md` | live fetch of the deployed pages | — |
+
+Not in scope for this session (owned/declared elsewhere): `.github/workflows/*` (only if a fix requires it, and then
+logged), `data/live/*` beyond what the collector itself writes, `portfolio.html`, `trading.html`.
