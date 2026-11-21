@@ -128,9 +128,8 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed category match", KD.num(confirmed), "series ticker listed in the official fee schedule"],
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows stored here"
-      + " — the settled scan in scope holds " + KD.num(snap.counts?.settled_in_scope_total ?? "—")
-      + (snap.counts?.settled_in_scope_total_method ? " (" + KD.esc(snap.counts.settled_in_scope_total_method) + ")" : "")],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows in this snapshot"
+      + " (of " + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " settled in scope)"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`;
@@ -172,47 +171,32 @@ KD.nav("");
      A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`;
 
   // ---- resolution tracker (brief: follow events until they resolve, YES or NO) ----
-  // Two truths this block has to tell at once:
-  //   1. what the snapshot's scan found in total (counts.settled_in_scope_total), and
-  //   2. what is actually stored/published here.
-  // The stored set is allocated ACROSS topics by scripts/collect.py (select_settled), because
-  // sorting every settled market newest-first published 198 of 200 rows as crypto and zero
-  // gas/elections/golf rows (F-65). The pre-fix wording said "the N most recent settled rows
-  // stored in this snapshot" while listing a single topic, which read as the whole picture.
-  // Shown here: the newest few resolutions PER TOPIC, so one fast series cannot crowd out
-  // the other four, with the topic's stored total stated next to it.
+  // Every row here is a settled market the collector stored, shown newest-first with
+  // the API's literal `result`. Rows whose result is not yes/no are NOT coerced:
+  // they are counted separately and the label says so.
   const resRows = settled.slice()
     .sort((a, b) => Date.parse(b.settlement_ts || b.close_time || 0) - Date.parse(a.settlement_ts || a.close_time || 0));
   const yn = resRows.filter(r => r.result === "yes" || r.result === "no");
   const other = resRows.length - yn.length;
-  const PER_TOPIC_SHOWN = 5;
-  const byTopic = {};
-  for (const r of yn) (byTopic[r.category_id] ||= []).push(r);
-  const picked = [];
-  for (const id of Object.keys(KD.CAT_LABEL)) {
-    for (const r of (byTopic[id] || []).slice(0, PER_TOPIC_SHOWN)) picked.push(r);
-  }
-  picked.sort((a, b) => Date.parse(b.settlement_ts || 0) - Date.parse(a.settlement_ts || 0));
-  const storedByTopic = KD.CAT_LABEL
-    ? Object.keys(KD.CAT_LABEL).map(id => `${KD.CAT_LABEL[id]} ${KD.num((byTopic[id] || []).length)}`).join(" · ")
-    : "";
   const resHost = KD.$("#resolutions");
   if (resHost) {
     resHost.innerHTML =
-      `<p class="small mut">Newest resolutions <b>per topic</b> (up to ${PER_TOPIC_SHOWN} each), so a fast-settling
-        series cannot crowd out the other four. Stored yes/no rows by topic: ${KD.esc(storedByTopic)}.
-        ${KD.num(yn.length)} of the ${KD.num(resRows.length)} stored settled rows resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}.
-        The settled scan in scope holds ${KD.num(snap.counts?.settled_in_scope_total ?? "—")}
-        (${KD.esc(snap.counts?.settled_in_scope_total_method || "method not stated in this snapshot")}) and this page stores
-        ${KD.num(resRows.length)} rows, allocated across topics
-        (<code>counts.settled_published_by_category</code>) to keep the page fast — so a topic can genuinely have
-        more history than is shown here, and the stored count above says which. Full list on
+      `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
+        newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
+        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
+        collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
+        series cannot crowd out gas, elections, culture or golf
+        (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
+        Settled markets older than the exchange's published historical cutoff
+        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
+        <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing
+        here — that is a gap in the archive, not a market that never resolved (<a href="flagged.html">F-66</a>). Full list on
         <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
          { key: "title", label: "Market" }, { key: "res", label: "Result" },
          { key: "px", label: "Final price", num: true }, { key: "src", label: "Source" }],
-        picked.map(r => ({
+        yn.slice(0, 25).map(r => ({
           t: `<span class="mono small">${KD.esc((r.settlement_ts || r.close_time || "").replace("T", " ").replace("Z", ""))}</span>`,
           cat: KD.esc(KD.CAT_LABEL[r.category_id] || r.category_id || "—"),
           title: `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 62))}</a>` +

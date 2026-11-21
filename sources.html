@@ -98,10 +98,10 @@
     <thead><tr><th>Computation</th><th>Where it lives</th><th>Why there is no external source</th></tr></thead>
     <tbody>
       <tr><td>Swing alert rule: |Δ last price| ≥ $0.10 between consecutive observations</td>
-          <td><code>scripts/alerts.py</code>, <code>data/live/alerts.json</code></td>
+          <td><code>scripts/build_alerts.py</code>, <code>data/live/alerts.json</code></td>
           <td>The $0.10 threshold is the brief's requirement; observations are accumulated because candlesticks are 1/60/1440 min only</td></tr>
       <tr><td>High-ROI model: <code>swing_roi = |Δ| / entry price on the moving side</code></td>
-          <td><code>scripts/alerts.py</code>, <code>data/live/alerts.json</code></td>
+          <td><code>scripts/build_alerts.py</code>, <code>data/live/alerts.json</code></td>
           <td>Kalshi returns no ROI field; this is a heuristic computed here and labelled a model (<a href="flagged.html#F-15">F-15</a>)</td></tr>
       <tr><td><code>dollars_traded_estimate = volume_fp × last_price_dollars</code></td>
           <td><code>scripts/collect.py</code></td>

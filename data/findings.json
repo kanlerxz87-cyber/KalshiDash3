@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T07:05:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label).",
+ "generated": "2026-11-21T20:40:00Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here).",
  "questions": [
   {
    "id": "Q1",
@@ -332,65 +332,26 @@
   },
   {
    "id": "G19",
-   "suggestion": "Move the board to Kalshi's own WebSocket feed with a tiny server-side relay, so swings are detected on the exchange's tick stream instead of on REST polls.",
-   "why_it_helps_decisions": "The alert chats are the core of the brief. Today the fastest path is a browser REST poll (10 s default) plus a collector run every 20-47 min, so a swing that happens and reverses inside a poll gap is invisible. The ticker and trade channels push every change, which removes the gap instead of sampling it.",
-   "effort": "Medium — roughly one small always-on process (Cloudflare Worker, Fly.io or a tiny VM) plus a secret for the demo key.",
-   "risk": "The WebSocket handshake requires signed headers (KALSHI-ACCESS-KEY / -SIGNATURE / -TIMESTAMP) even for public channels, so the key must live server-side; a static GitHub Pages site cannot do it. Adds a service to run and monitor.",
-   "success_metric": "A swing that occurs between two polls appears in the chat within one second, and the number of >= $0.10 moves detected per day rises to the count measured from candlesticks (today the observation layer sees only 1-2 per hour).",
-   "status": "proposed",
+   "suggestion": "Add a candle-derived backstop feed for swings the 20-minute observation gap misses",
+   "why_it_helps_decisions": "F-70 shows a real 8.1c intraday move (KXPGATOUR-THRC26-MPEN, 2026-11-21) that the observation-only rule did not raise, because both surrounding snapshots read 0.00. A backstop that polls GET /series/{s}/markets/{t}/candlesticks at 1-minute resolution for the markets on the watch list would catch moves that open and close between collector runs — which is the case the brief's 'sudden swings' wording is actually about.",
+   "effort": "Medium: one more browser-side loop using the endpoint assets/live.js already wraps, plus a distinct 'candle-derived' badge so a reader can tell which rule fired.",
+   "risk": "Candles are aggregated, so a single 10c high-low range inside one minute is not the same evidence as two observed prints 10c apart. Mixing them without labelling would overstate conviction — the badge and a separate feed are what keep it honest. Rate limits apply per IP; unauthenticated requests have separate limits (https://docs.kalshi.com/getting_started/rate_limits).",
+   "success_metric": "Every alert carries its basis ('observation' or 'candle'), and replaying the F-70 case produces a candle-derived alert while leaving the observation feed unchanged.",
    "sources": [
-    "https://docs.kalshi.com/getting_started/quick_start_websockets",
-    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/getting_started/rate_limits"
    ]
   },
   {
    "id": "G20",
-   "suggestion": "SHIPPED: the dashboard chart now plots Kalshi's official candlesticks (1 / 60 / 1440-minute) for Minutes/Hours/Days, keeps accumulated observations for Seconds, marks >= $0.10 swings on the chart, and shows a pointer readout of price, time, period volume and open interest.",
-   "why_it_helps_decisions": "A trader can see the actual move and its size on the same axis as the price, and can tell a candle-derived move from an archived alert, instead of reading one dot per collector run.",
+   "suggestion": "SHIPPED: a pointer readout on the dashboard chart — hover reports the nearest PLOTTED contract price, its UTC time, the period's contract volume and the bid/ask when that point came from an official candle.",
+   "why_it_helps_decisions": "The chart was a bitmap: a trader could see a move but could not read a number off it. Reading the exact plotted value (never an interpolated one) is what turns the graph into an input to a decision, and naming whether a point is an official candle or a collector observation keeps the two commensurable.",
    "effort": "Done in this session",
-   "risk": "Candle closes are not the same as collector observations, so a candle-derived swing can exist with no archived alert (labelled). Seconds resolution still cannot be requested from Kalshi.",
-   "success_metric": "Choosing Minutes issues one documented candlestick request and draws the returned candles; a candle with no price block is skipped, not plotted as $0.00 (pinned by scripts/tests/test_pages_dom.js section I, mutation-checked).",
+   "risk": "None to the data: it reads window.__chart, which drawChart() fills with exactly what it drew. Points are matched by timestamp, so a candle and an observation at the same second report the candle's volume.",
+   "success_metric": "Hovering a plotted point prints its price, time and period volume; the number equals the plotted series' value at that timestamp (no averaging between neighbours).",
    "status": "implemented",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
-   ]
-  },
-  {
-   "id": "G21",
-   "suggestion": "Give the resolution tracker a per-topic history view with a date filter and a one-click export, instead of a fixed newest-N table.",
-   "why_it_helps_decisions": "The brief asks to follow events until they resolve and to keep topics separate. Now that every topic has a resolution history (gas 154, golf 154, crypto 155, culture 136, elections 1 stored), a trader evaluating a strategy wants 'how did this series resolve over the last 30 days', which the current newest-first table cannot answer.",
-   "effort": "Small — the data is already in data/live/markets.json; this is a filter, a date control and a CSV button.",
-   "risk": "Only the published per-topic allocation is on the page; a full history would need a larger committed file or an on-demand query.",
-   "success_metric": "A reader can list every stored settlement for one topic and download it; the count on screen matches counts.settled_published_by_category.",
-   "status": "proposed",
-   "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-markets",
-    "https://docs.kalshi.com/getting_started/market_settlement"
-   ]
-  },
-  {
-   "id": "G22",
-   "suggestion": "Add a per-market 'why did this move' panel that shows the market's own settlement source next to a timestamped reading of that source (AAA national average for gas, the BRTI index for crypto), aligned to the swing's minute.",
-   "why_it_helps_decisions": "This is the brief's 'website links that may have caused a sharp jump'. A verified reference reading beside the move is evidence a trader can act on; a news search link is only a lead.",
-   "effort": "Medium — a small fetcher per topic with its own timestamp, plus the alignment logic the catalysts page already has.",
-   "risk": "Kalshi has no cause field, so the link can only ever be correlated. CF Benchmarks' BRTI has no free public time series, so crypto rows would stay blank (already disclosed). AAA publishes one national average per day, which cannot explain a move inside a day.",
-   "success_metric": "For each archived swing, the panel shows either a fetched reference reading within the same hour or an explicit 'no free public series for this settlement source' — never a guess.",
-   "status": "proposed",
-   "sources": [
-    "https://gasprices.aaa.com/",
-    "https://docs.kalshi.com/getting_started/market_settlement"
-   ]
-  },
-  {
-   "id": "G23",
-   "suggestion": "Publish the alert chat as an append-only JSON feed with a permalink per alert (stable ID, exact query, price before/after), so an alert can be cited outside the page.",
-   "why_it_helps_decisions": "A trader reviewing a decision later needs the exact alert they saw. The archive already stores every swing; a stable ID and permalink make each row citable in a note or a message.",
-   "effort": "Small — the archive keys each alert by ticker@from_time>to_time already.",
-   "risk": "None material; the feed grows with the archive and is trimmed only beyond 5,000 entries.",
-   "success_metric": "Every row in both chats opens a URL that renders that single alert with its source link, and the URL survives later collector runs.",
-   "status": "proposed",
-   "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   }
  ],
@@ -886,94 +847,96 @@
   {
    "id": "F-65",
    "severity": "high",
-   "item": "The resolution tracker could only ever show crypto: 198 of 200 published settled rows were crypto, with 0 gas, 0 elections and 0 golf",
-   "why": "scripts/collect.py sorted every settled market by settlement_ts across all topics and published rows[:200]. The demo exchange settles 15-minute crypto series roughly 96 times a day, so a single newest-first queue is structurally starved of the four slower topics. Measured on the committed 2026-11-21T15:21:23Z snapshot: 200 published settled rows = crypto 198, culture 2, gas 0, elections 0, golf 0 (counts.settled_in_scope said 1,600). The brief asks for events to be followed until they resolve, per topic, so a feed that can only show crypto is not a feed. Confirmed independently by a second session's open PR #56 (its ID F-41), which was never merged.",
-   "action": "Fixed in scripts/collect.py with select_settled(): each topic keeps its own newest N rows first (reserve), then any leftover capacity is shared round-robin, and the result is re-sorted newest-first for display. The allocation is published in counts.settled_published_by_category with the cap and the rule. Verified on a live collector run (2026-11-21T20:21:50Z, run 44945769234): 600 published rows = gas 154, golf 154, crypto 155, culture 136, elections 1. Elections is genuinely 1 because the scan found exactly one settled elections market in scope, not because of a cap. Pinned by scripts/tests/test_settled_selection.py (19 checks, including a mutation check that the old single-queue behaviour starves all four slow topics) and by the index.html DOM test.",
+   "item": "Resolution history was 92% crypto: the published settled rows were the newest 200 overall, so gas, elections, culture and golf resolutions were silently cut off",
+   "why": "Measured on the deployed site and in data/live/markets.json at 2026-11-21T06:42:56Z: of the 200 published settled rows, 184 were crypto and 16 were other topics (gas 9, culture 7, elections 0, golf 0) — every row of the new 'How the live events resolved' table was Crypto. Cause: scripts/collect.py sorted all settled rows by settlement_ts and published `[:200]`. The demo exchange lists 15-minute crypto markets (KXBTC15M, KXETH15M, ...) that settle ~96 times a day, so a newest-first cap is structurally starved of every slower topic. Every category page reads `settled_markets`, so all four affected topics lost their resolution feed, not just the landing page. Same shape as F-35 (capped ranking) but on the settled side. Re-checked after merging main's scope fix (44319b8): that commit excludes natural-gas futures and demo QA fixtures and adds `settled_excluded_off_topic_or_qa`, but it does NOT address the settled-row cap, so this finding stands on its own. [Integration note: this entry originally used draft id F-41; main already published its own F-41/F-42 (different items) while this PR was open, so it is numbered F-65 here to keep identifiers collision-free.]",
+   "action": "FIXED same day: added `select_settled()` to scripts/collect.py — a round-robin selection across the five topics over a newest-first sort inside each topic — and published the allocation (`counts.settled_published`, `counts.settled_published_cap`, `counts.settled_published_by_category`, `counts.settled_in_scope_total`) so the cap can be audited instead of assumed. The landing page now says the published set is chosen per topic and names the count field. Locked down by scripts/tests/test_settled_selection.py, whose fixture reproduces the real shape (400 fast crypto rows + 5 rows in each other topic): all five topics survive, the rare topics keep all their rows, crypto takes the leftover capacity, and the published set stays newest-first. The corrected allocation appears at the next collect.yml run; the committed snapshot at the time of writing still shows the old skew. UPDATE 2026-11-21 20:5xZ (session arena-6a6e8f22): the first fix was still wrong, and the 2026-11-21T20:27Z snapshot proved it — it selected per topic AFTER trimming to the newest 1,600 rows, and that window is itself nearly all crypto 15-minute markets, so the published set came out crypto 178 / gas 17 / culture 5 with zero elections and zero golf rows. scripts/collect.py now selects on the FULL in-scope set first (split_and_select_settled) and only then trims the stored window for file size. scripts/tests/test_settled_selection.py gained an order regression that drives the real function and asserts a settlement older than the stored window is still published, plus a witness check that the shipped order loses it. End-to-end proof still requires the next collect.yml run, because only the 200 published rows are committed. END-TO-END CONFIRMED 2026-11-21T20:36Z: the next collect run after the fix published gas 50 / elections 1 / culture 50 / crypto 50 / golf 49 out of the 200-row cap (counts.settled_published_by_category), against crypto 178 / gas 17 / culture 5 in the 20:27Z run before it, and 200/200 crypto in the 20:32Z run that still carried the old trim-then-select order. The 1,600-row stored window is unchanged; only its allocation is.",
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-markets",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44945769234"
-   ]
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ],
+   "status": "fixed, verified on real collector data (2026-11-21T20:36Z snapshot)"
   },
   {
    "id": "F-66",
    "severity": "medium",
-   "item": "Price history was deleted for the markets the alert feed still points at, so an archived >= $0.10 swing could not be charted",
-   "why": "collect.py kept price-history series only for tickers in the capped open window. build_alerts.py archives a swing permanently, but once that market left the open window (or settled) its observations were pruned, so dashboard.html#TICKER opened from an alert rendered 'No observations in this window yet' for the exact series the alert named. Measured on the 2026-11-21T00:50:12Z snapshot: 3 of 7 archived-alert tickers had zero observations left. After the retention fix, 6 archived tickers still had none, because earlier runs had already deleted them and a settled market can never be re-observed.",
-   "action": "The watch set is now open rows + published settled rows + every ticker with an archived alert, and the counts publish price_history_series_kept / _pruned / _kept_for_archived_alerts. For ticks that were already lost, backfill_from_candles() rebuilds ONLY those series from Kalshi's own GET /series/{series}/markets/{ticker}/candlesticks (1-minute closes, each point marked source=candle, capped at 12 requests per run, no price block skipped rather than written as 0). The dashboard also fetches official candles directly in the browser for Minutes/Hours/Days, which is the primary fix for an empty chart.",
+   "item": "Elections has no resolution history on the site even though the exchange has a settled elections market: it settled before the documented historical cutoff",
+   "why": "Measured against official sources this session. GET /historical/cutoff returns market_settled_ts = 2026-09-21T00:00:00Z, and the only settled market in the seeded elections series is KXELECTIRAN-26JUL01, settled 2026-07-01T15:24:15Z with result \"no\" — before the cutoff. Kalshi documents that markets settled before the cutoff are only available via GET /historical/markets and stop appearing in GET /markets. Confirmed live both ways: GET /markets?series_ticker=KXELECTIRAN&status=settled also returns it, but GET /markets?status=settled paging (30,456 newer settled rows, capped at 25,000) never reaches it, so the snapshot showed culture 7 / crypto 97 / golf 96 settled rows and zero elections rows. The topic therefore looked like it had never resolved anything. [Integration note: this entry originally used draft id F-42; main already published its own F-41/F-42 (different items) while this PR was open, so it is numbered F-66 here to keep identifiers collision-free.]",
+   "action": "PARTIAL, and stated as partial. scripts/collect.py now (a) reads GET /historical/cutoff and publishes it as counts.historical_cutoff_market_settled_ts, and (b) performs a bounded /historical/markets lookup per seeded series (one request each, at most 40 settled rows per series, failures non-fatal), publishing counts.historical_backfill_rows. That backfill demonstrably fetches rows (216 in the 2026-11-21T06:56Z run) but the elections row did NOT reach the published snapshot in that run, and this session could not read the collector's stdout (the GitHub logs endpoint returned EOF) to prove which filter dropped it. It is NOT claimed fixed. What IS verified: the endpoint returns the market with the documented shape, https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN returns KXELECTIRAN-26JUL01 with result \"no\". Next step is to read one collect.yml log's 'historical <series>' lines; until then the site shows no elections resolutions and says so rather than inventing one. CONFIRMED 2026-11-21T20:36Z: the elections row the site had never shown is now published — KXELECTIRAN-26JUL01, result \"no\", settled 2026-07-01T15:24:15Z, fetched through GET /historical/markets?series_ticker=KXELECTIRAN (the report records returned=1, kept=1). It is the single elections row, so the elections resolution history is one settled market because the exchange only has one in that series — not because the page is hiding any.",
    "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-    "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py"
-   ]
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
+    "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXELECTIRAN"
+   ],
+   "status": "verified on real collector data (elections resolution now published)"
   },
   {
    "id": "F-67",
-   "severity": "medium",
-   "item": "The dashboard chart never called Kalshi's candlestick endpoint: 'Minutes', 'Hours' and 'Days' were all one point per collector run",
-   "why": "dashboard.html plotted data/live/price_history.json only, which holds 1-2 observations per market per hour (measured: 140 series with 2 points, 369 with 20). The window selector changed the visible span but not the resolution, so a six-hour 'Minutes' window typically showed one or two dots. Kalshi publishes exactly the series the brief asks for (X = time, Y = contract price) at 1/60/1440-minute intervals.",
-   "action": "The chart now requests GET /series/{series}/markets/{ticker}/candlesticks with a documented period_interval (1 for Minutes, 60 for Hours, 1440 for Days), shows the exact query, interval and fetch time under the chart, and falls back to the observation series (saying so) for Seconds or when the API cannot serve the window. Gaps are bridged with a dashed line instead of being drawn as $0.00; a candle with no price block is skipped. Swings >= $0.10 between candle closes are marked on the chart and labelled candle-derived, distinct from archived alerts. A pointer readout reports the exact price, time, period volume and open interest. Verified by scripts/tests/test_pages_dom.js section I against a real-shaped candle payload, including mutation checks for the documented seconds-only timestamps and for plotting a price-less candle as zero (both make the test fail).",
+   "severity": "high",
+   "item": "The dashboard chart plotted an empty series for exactly the markets its own alerts were about: collect.py pruned price history to the capped open window",
+   "why": "scripts/collect.py kept observations only for tickers in rows['open'] — the per-category capped, ranked window — and then ran `hist = {k: v for k, v in hist.items() if k in watch}`. A market rotating out of that window (or closing) lost every observation, while the >=$0.10 swing archived for it stayed in data/live/alerts_archive.json. Measured on the committed 2026-11-21T00:50:12Z files: of the 7 distinct tickers in alerts_archive.json, the 3 KXDEMOFUTHOURLY-* markets (26NOV20H12-UP, 26NOV20H14-UP, 26NOV20H20-UP) had 0 observations left in price_history.json, so dashboard.html rendered 'No observations in this window yet' for the exact series an alert pointed at, and clicking through from the chat could not show the move. No number on the site was wrong; the graph was simply silent where it mattered most. [Integration history: this entry was first drafted as F-38 in PR #55, renumbered F-4x in that PR’s final rebase, and is numbered F-67 in this integration because main already published F-37..F-64 (different items).]",
+   "action": "collect.py's watch set is now `open rows UNION every ticker in alerts_archive.json`, so an alert always keeps its own observations. dashboard.html also rebuilds a chartable row from the published alert record when a deep-linked ticker (dashboard.html#TICKER) is outside the snapshot, and says 'from alert archive' so the reader knows the row is not from the ranked window. Regression tests: scripts/tests/test_collect_coverage.py (Python, offline) and modes F/G of scripts/tests/test_pages_dom.js. The 3 already-pruned series rebuild from the next collector run; nothing was back-filled by hand.",
    "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=60&start_ts=1795250000&end_ts=1795290000"
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
    ]
   },
   {
    "id": "F-68",
-   "severity": "low",
-   "item": "The landing page's resolution table said it showed 'the most recent settled rows stored in this snapshot' while listing a single topic",
-   "why": "The wording was literally true about the stored rows and completely misleading about the picture: with the F-65 skew the stored rows were 99% crypto, so a reader saw one topic and was told nothing about the other four. A snapshot-level count cannot be shown as if it were a per-topic one.",
-   "action": "index.html now shows the newest resolutions per topic (up to 5 each), states the stored yes/no count per topic, and distinguishes the stored/published rows from counts.settled_in_scope_total (19,584 on the 2026-11-21T20:21:50Z snapshot). Pinned by the index.html DOM test; the pre-fix single-queue code fails it with 'must show more than one topic ... got Crypto'.",
+   "severity": "medium",
+   "item": "The chart ignored Kalshi's own candlestick endpoint, so the Minutes/Hours windows showed only one point per collector run",
+   "why": "dashboard.html offers a Seconds/Minutes/Hours window selector and plots data/live/price_history.json, which holds one observation per scheduled collector run. On the committed snapshot that is 1–14 observations per market, and for a market added to the snapshot once it is a single point. Meanwhile assets/live.js already wraps GET /series/{series_ticker}/markets/{ticker}/candlesticks (used by live.html) and dashboard.html never called it, and dashboard.html does not load assets/live.js at all — it loads assets/engine.js, whose get() is the same unauthenticated demo root. The result was a 'Minutes' chart with minutes of detail that did not exist. [Integration history: this entry was first drafted as F-39 in PR #55, renumbered F-4x in that PR’s final rebase, and is numbered F-68 in this integration because main already published F-37..F-64 (different items).]",
+   "action": "dashboard.html now fetches official candles for the selected window and interval through engine.js get(): 1-minute for Minutes, 1-hour for Hours, and a new Days option using 1440-minute candles. It falls back to GET /historical/markets/{ticker}/candlesticks (documented archived endpoint, older field names without the _dollars suffix) for markets that have moved out of the live set. The muted line is the official series and the coloured line remains the collector's observations, with the footer stating which is which. A candle with no price block is skipped rather than plotted as Number('') === 0 — measured live this session: KXDEMOFUTHOURLY-26NOV20H20-UP returns a 1-hour candle whose price object carries only previous_dollars with volume_fp '0.00'. Seconds resolution is still impossible from Kalshi (1/60/1440 only) and the page still says so instead of inventing ticks.",
    "sources": [
-    "https://kanlerxz87-cyber.github.io/KalshiDash3/",
-    "https://docs.kalshi.com/api-reference/market/get-markets"
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV20H20-UP/candlesticks"
    ]
   },
   {
    "id": "F-69",
-   "severity": "high",
-   "item": "Re-verified, still unfixed by anyone: no demo API key exists, so portfolio performance and order execution remain paper only",
-   "why": "The brief asks to track portfolio performance on the Kalshi demo account and to execute trades. Kalshi requires a person to create the demo account at https://demo.kalshi.co/, add mock funds, and issue an API key; the help centre states the demo account does not come with funds preloaded. scripts/kalshi_client.py implements balance/positions/buy against the documented portfolio endpoints and refuses a non-demo base URL, but with no key it cannot be exercised, so this session did not execute a single order. Nothing on the site claims otherwise, and no balance is displayed rather than a fabricated one.",
-   "action": "Not fixable from this repository without a human-created credential, and credentials must never be committed. A static page also cannot hold a signing key safely, so live execution needs a server-side runner that reads a repository secret. This is the one brief requirement that remains unmet; it is recorded here and on portfolio.html rather than papered over.",
+   "severity": "medium",
+   "item": "The collector's universe scan hit its own safety cap and disagreed with the desk scan about how many markets are in scope",
+   "why": "scan_markets() paged GET /markets to a 25,000-row safety stop while listing newest-first, and counted the combo (multivariate) listings that it then excluded from every category. On the committed files the collector published counts.open_in_scope 749 with open_paging_truncated_at_safety_cap true and open_total_scanned 25,369, while the desk scan of the same exchange published open_in_scope 1,365. Two pages of one site therefore reported different in-scope universes, and 'largest market per category' was ranked over a window rather than over the exchange. [Integration history: this entry was first drafted as F-40 in PR #55, renumbered F-4x in that PR’s final rebase, and is numbered F-69 in this integration because main already published F-37..F-64 (different items).]",
+   "action": "scan_markets() now sends the documented mve_filter=exclude parameter (https://docs.kalshi.com/api-reference/market/get-markets), the same filter scripts/roi_scan.py already used, so combo listings no longer consume the paging budget. Truncation is still published in counts as before — the cap remains a safety stop, not a claim that the whole universe was seen. scripts/tests/test_collect_coverage.py asserts the parameter is on every scan request.",
    "sources": [
-    "https://docs.kalshi.com/getting_started/demo_env",
-    "https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account",
-    "https://docs.kalshi.com/getting_started/api_keys"
+    "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
   },
   {
    "id": "F-70",
    "severity": "medium",
-   "item": "Re-verified: the 'high-ROI' feed is a disclosed screen that currently passes 0 of 13,637 in-scope markets, not an owner-supplied model",
-   "why": "The brief asks for a second feed filtered to 'events that our model likes as high ROI'. No model was supplied, so this project ships its own fee-aware screen (data/roi_model.json). Re-measured on the 2026-11-21T17:54:36Z scan: 13,637 in-scope open markets, 13,637 order books fetched, and 0 eligible - every candidate failed at least one hard gate (spread > 10c, depth < 50 contracts, 24h volume < 100, or net ROI not above 0% after the published taker fee). That is a real result on demo liquidity, not a bug: the gates are deliberately conservative and disclosed on roi.html. An empty pick list is shown with the nearest candidates and the exact gate that stopped each one, so it is information rather than a blank panel.",
-   "action": "Left as is, and the empty scan is published with its gate-by-gate reasons. Recorded here so the second chat is not read as 'the model likes nothing' when the honest statement is 'the screen's documented thresholds pass nothing at today's demo spreads'.",
+   "item": "Observation-only swing detection cannot see a move that happens entirely between two collector runs; official daily candles show one on a live market where the site reports no alert",
+   "why": "The >=$0.10 rule is applied to consecutive observations in data/live/price_history.json, i.e. one snapshot per scheduled collector run (roughly every 20 minutes when the schedule fires). A swing that opens and closes inside one interval is invisible to that rule. Demonstrated against the official endpoint this session on the live market KXPGATOUR-THRC26-MPEN: its 1-day (1440-minute) candlestick for end_period_ts 1795237200 (2026-11-21T05:00Z) has price.open_dollars 0.0070, price.close_dollars 0.0880, high 0.0880, low 0.0060 — an 8.1c move intraday — and the market's own GET /markets record still reads previous_price_dollars 0.0070 against last_price_dollars 0.0880. The site's archive holds no alert for this market because the last two collected observations were both 0.00 and the next collection is what will first see 8.8c. No published number is wrong; the detection window is simply coarser than the move. [Integration history: this entry was first drafted as F-41 in PR #55, renumbered F-4x in that PR’s final rebase, and is numbered F-70 in this integration because main already published F-37..F-64 (different items).]",
+   "action": "Published rather than papered over. The dashboard chart now plots the official candles beside the observations (F-68), so a reader can see the intra-period move that produced no alert, and the footer names which series is which. A candle-derived backstop alert would be a threshold change on a data source with its own caveats, so it is proposed on the suggestions page (G19) instead of being switched on unilaterally.",
    "sources": [
-    "https://docs.kalshi.com/getting_started/demo_env",
-    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
-    "https://kanlerxz87-cyber.github.io/KalshiDash3/roi.html"
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPEN"
    ]
   },
   {
    "id": "F-71",
-   "severity": "high",
-   "item": "A dropped collector schedule left the site showing a 5-hour-old snapshot, and the freshness fallback could not run because it lived inside the collector",
-   "why": "collect.yml's freshness step only executes when a collection runs, so it cannot revive a collector that GitHub's scheduler skipped. Measured with `gh run list --workflow=collect.yml` on 2026-11-21: scheduled runs at 00:49Z, ~06:0xZ, 15:15:48Z and 15:20:32Z, then nothing until a manual dispatch at 20:26Z — about five hours on a 20-minute cron, with the committed snapshot at 15:21:23Z while the page was live. GitHub documents that scheduled runs may be delayed and that queued jobs may be dropped, so this is documented platform behaviour, not a cron-expression bug. The earlier attempt to fix a similar symptom (F-63) shipped an unconditional dispatch and chained five runs in five minutes, so any fallback has to be bounded.",
-   "action": "Added scripts/watchdog.py: a pure decision function (no network) that dispatches only when the snapshot is at least 35 minutes old, no collection is in flight, and fewer than 3 dispatches have happened in the last hour. Unit-tested by scripts/tests/test_watchdog.py (46 checks) with the anti-chain case pinned explicitly ('a fresh snapshot must never dispatch'). desk.yml — a different workflow on its own schedule, so it survives a dropped collect run — now runs it as its final step with actions:write. Verified by executing the extracted workflow step locally with `gh` stubbed: stale snapshot -> 'queued exactly one collection'; fresh, in-flight, and cap-reached -> skip with the reason printed. Whether the cadence actually improves can only be measured over hours, so this is recorded as fixed-in-code / pending measurement, not as proven.",
+   "severity": "medium",
+   "item": "A paper position that was voided (never filled) kept reporting a -$1.00 unrealised loss and a 0.0c bid",
+   "why": "scripts/simulate.py moves a position with an untradable entry quote (yes ask minus yes bid above max_quote_spread_dollars) to closed with status 'voided' and the note 'entry spread above 0.10: not a tradable quote'. Positions and closed rows are carried forward in simulation.json's state, so the bid_now 0.0 / unrealized_net -1.0 that had been written while the row was still open survived on the voided row. Measured on the committed data/live/simulation.json (generated 2026-11-21T00:50:12Z), row 'S2|KXDEMOFUTHOURLY-26NOV20H14-UP@2026-11-20T13:18:28Z>2026-11-20T13:32:25Z|no': status voided, outcome void, mark_note 'entry spread above 0.10: not a tradable quote', and yet unrealized_net -1.0 against a 0.99 entry for 1 contract. The page showed VOID beside a blank realised net, so no aggregate P&L total was wrong (strategy-level unrealized_net_open only sums OPEN positions), but the row was internally contradictory: a position that never existed appeared to be down a dollar. [Integration history: this entry was first drafted as F-42 in PR #55, renumbered F-4x in that PR’s final rebase, and is numbered F-71 in this integration because main already published F-37..F-64 (different items).]",
+   "action": "Cleared at the moment of voiding (bid_now, unrealized_net, mark_at set to null) AND normalised on every run for rows carried forward from an earlier void, because a fix at void time cannot repair a row already stored. The committed data/live/simulation.json was regenerated with the fixed simulator so the published row now carries null in all three fields. Two regression tests in scripts/tests/test_simulate.py cover the two paths separately (test_voided_position_does_not_keep_a_stale_mark, test_carried_forward_voided_row_is_normalised); mutation-checked — with the normalisation removed the carried-forward test fails with '-1.0 is not None'. A duplicate-key defect found in the same summary dict (three not_filled_* counters and 'voided' were each written twice, so the second copy silently shadowed the first) was fixed in the same pass.",
    "sources": [
-    "https://docs.github.com/en/actions/reference/workflows-and-events/events-that-trigger-workflows",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/watchdog.py"
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/getting_started/market_settlement"
    ]
   },
   {
    "id": "F-72",
    "severity": "medium",
-   "item": "After the topic-fair fix, the banner printed the PUBLISHED settled-row count (600) as 'In scope: ... 600 settled' while the scan had found 19,584",
-   "why": "counts.settled_in_scope had always meant 'rows kept for publication', but every page read it as the in-scope total. Before the fix the two were close enough (200 rows against a stated 1,600) that the mismatch was easy to miss; with the settlement allocation publishing 600 rows against 19,584 found, the banner became plainly wrong. A reader would conclude the topic pages had lost 97% of their history. Nothing was withheld — the rows simply were not the total — but the label said otherwise.",
-   "action": "scripts/collect.py now publishes settled_in_scope_total (the scan total), settled_published, settled_published_by_category and explicit open_published_rows / settled_published_rows, keeping the old keys for schema compatibility. assets/site.js prints the in-scope total and names the published count separately; categories.html and verification.html show the scan total, the published count and the open published count as three distinct rows. The multivariate counters are relabelled as what they now measure (combos still present after the API's mve_filter=exclude, measured 0) rather than implying the combo volume. scripts/tests/test_scope.py asserts the collector publishes both numbers and that the pages read the total for the 'in scope' figure.",
+   "item": "Every ticker the alert archive cites can be missing its price history, so the chart for an alerted market is empty and can never recover on its own",
+   "why": "Main retains observations for every ticker in alerts_archive.json (F-67's fix), which stops the pruning going forward but cannot restore what earlier runs already deleted: a settled market is never returned by GET /markets again, so no future collection re-observes it. Measured on main's committed snapshot (collected 2026-11-21T20:36:04Z): 7 of the 13 tickers cited by data/live/alerts_archive.json had no observations at all (KXDEMOFUTHOURLY-26NOV20H12-UP, -26NOV20H14-UP, -26NOV20H20-UP, -26NOV21H07-UP, -26NOV21H16-UP, KXBTC15M-26NOV210145-45, KXAAAGASD-26NOV21-3.6600), so dashboard.html#TICKER from those alerts renders an empty chart. The browser can fetch candles for them, but the committed snapshot layer cannot.",
+   "action": "scripts/collect.py gains backfill_from_candles(): for archive-cited tickers that have NO observations, it rebuilds the series from that market's own GET /series/{series}/markets/{ticker}/candlesticks at the documented 1-minute interval, over at most 5,000 periods (the documented per-request maximum), marked source=candle so a candle close is never passed off as a REST last_price read, skipping any ticker that already has data, and bounded to 12 series per run. counts.price_history_backfilled_from_candles reports it. Verified on run 44947044544 (2026-11-21T20:37Z): price_history_backfilled_from_candles = 6 and every archived ticker then had observations. Regression test: scripts/tests/test_settled_selection.py asserts the contract and fails on a snapshot where an archived ticker has no history.",
    "sources": [
-    "https://docs.kalshi.com/api-reference/market/get-markets",
-    "https://kanlerxz87-cyber.github.io/KalshiDash3/categories.html"
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44947044544"
    ]
   }
  ]

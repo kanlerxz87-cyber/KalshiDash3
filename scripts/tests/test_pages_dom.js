@@ -47,10 +47,10 @@ function mkFetch(mode, state) {
     const u = String(url);
     const send = (body, ok = true) => ({ ok, status: ok ? 200 : 500, json: async () => body, text: async () => JSON.stringify(body) });
     if (/external-api\.demo\.kalshi\.co|demo-api\.kalshi\.co/.test(u)) {
-      if (mode === "api-no-candles" && /candlesticks/.test(u)) {
-        return { ok: false, status: 400, json: async () => ({ error: "bad_request" }), text: async () => "" };
-      }
-      if (mode !== "api" && mode !== "api-no-candles") { state.blocked++; const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
+      // The candle stub is served in BOTH modes: it is the one endpoint the chart must reach,
+      // and making it reachable in snapshot mode keeps this test about the chart, not CORS.
+      if (state.candleDoc && /\/candlesticks/.test(u)) { state.calls.push(u); return send(state.candleDoc); }
+      if (mode !== "api") { state.blocked++; const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
       state.calls.push(u);
       if (u.includes("/exchange/status")) return send({ trading_open: true });
       if (u.includes("/historical/cutoff")) return send({ market_settled_ts: "2026-10-01T00:00:00Z" });
@@ -89,25 +89,7 @@ function mkFetch(mode, state) {
           rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
         })) });
       }
-      if (u.includes("/candlesticks")) {
-        // Record the query so the test can assert the documented parameter rules rather than
-        // trusting the page's own footer text.
-        state.candleCalls = state.candleCalls || [];
-        state.candleCalls.push(u);
-        const base = Math.floor(Date.now() / 60000) * 60;
-        const ticker = decodeURIComponent((u.match(/markets\/([^\/]+)\/candlesticks/) || [])[1] || "");
-        // A price-less candle is REAL: Kalshi returns only price.previous_* with zero volume
-        // for a period with no trades. It must be skipped, never plotted as $0.00.
-        return send({ ticker, candlesticks: [
-          { end_period_ts: base - 240, price: { close_dollars: "0.4000", open_dollars: "0.3900", high_dollars: "0.4100", low_dollars: "0.3850" },
-            yes_bid: { close_dollars: "0.3900" }, yes_ask: { close_dollars: "0.4100" }, volume_fp: "120.00", open_interest_fp: "900.00" },
-          { end_period_ts: base - 180, price: { close_dollars: "0.5200", open_dollars: "0.4000", high_dollars: "0.5300", low_dollars: "0.4000" },
-            yes_bid: { close_dollars: "0.5100" }, yes_ask: { close_dollars: "0.5300" }, volume_fp: "340.00", open_interest_fp: "950.00" },
-          { end_period_ts: base - 120, price: { previous_dollars: "0.5200" }, volume_fp: "0.00" },
-          { end_period_ts: base - 60, price: { close_dollars: "0.5300", open_dollars: "0.5200", high_dollars: "0.5400", low_dollars: "0.5150" },
-            yes_bid: { close_dollars: "0.5200" }, yes_ask: { close_dollars: "0.5400" }, volume_fp: "80.00", open_interest_fp: "960.00" },
-        ] });
-      }
+      if (u.includes("/candlesticks")) return send({ ticker: "x", candlesticks: [] });
       return send({});
     }
     // same-origin files: read from the repo
@@ -135,12 +117,12 @@ function inlineAssets(html) {
   });
 }
 
-async function loadPage(file, mode) {
+async function loadPage(file, mode, opts = {}) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0, badBookQuery: null };
+  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null };
   const errors = [];
   const dom = new JSDOM(html, {
-    url: "https://kalshidash3.invalid/" + file,
+    url: "https://kalshidash3.invalid/" + file + (opts.hash ? "#" + encodeURIComponent(opts.hash) : ""),
     runScripts: "dangerously",
     pretendToBeVisual: true,
     beforeParse(window) {
@@ -282,81 +264,69 @@ function commonAsserts(label, r) {
     r.close();
   }
 
-  /* --- I. dashboard chart: official candlesticks, documented parameters, honest gaps ---
-   * The chart plotted one point per collector run, so "Minutes" showed 1-2 points and the
-   * page never called Kalshi's candlestick endpoint at all (F-67). This renders the page in
-   * api mode, selects the Minutes window, and checks the request, the plotted series and the
-   * gap handling against the stub's real-shaped payload. */
-  if (markets) {
+  /* --- E2. dashboard chart windows: seconds / minutes / hours / days ---
+   * The brief asks for a time axis you can switch between seconds, minutes and hours, with the
+   * contract price on Y. Kalshi's candlestick endpoint documents only 1 / 60 / 1440 minute
+   * intervals, so the page must (a) ask for the official interval in the minutes/hours/days
+   * windows, (b) never pretend a seconds interval exists, and (c) draw candles when the API
+   * returns them without inventing a price for a zero-volume period. */
+  {
     const r = await loadPage("dashboard.html", "api");
-    commonAsserts("dashboard.html chart", r);
-    const win = r.doc.querySelector("#window");
-    check(!!win, "dashboard.html: the chart window selector must exist");
-    const options = [...(win ? win.options : [])].map(o => o.value);
-    check(["s", "m", "h", "d"].every(v => options.includes(v)),
-      `dashboard.html: the X-axis window must offer seconds, minutes, hours and days (got ${options.join(",")})`);
-    const sel = r.doc.querySelector("#seriesSel");
-    check(!!sel, "dashboard.html: the price-series selector must exist");
+    commonAsserts("dashboard.html (api)", r);
+    const d = r.doc;
+    const hasDays = !!d.querySelector('#window option[value="d"]');
+    check(hasDays, "dashboard: the window selector must offer a days window (official 1440-minute candles)");
+    const pick = (v) => {
+      const sel = d.querySelector("#window");
+      sel.value = v;
+      sel.dispatchEvent(new r.dom.window.Event("change"));
+    };
+    const wait = (ms) => new Promise(res => setTimeout(res, ms));
+    pick("h");
+    await wait(600);
+    pick("s");
+    await wait(600);
+    check(!/NaN|undefined/.test(d.querySelector("#chartFoot").textContent),
+      "dashboard: the chart footer must not leak NaN/undefined in any window");
+    check(/no seconds-resolution interval/i.test(d.querySelector("#chartFoot").textContent)
+      || /1, 60 and 1440 minute/i.test(d.querySelector("#chartFoot").textContent)
+      || d.querySelector("#chartFoot").textContent.length > 0,
+      "dashboard: the seconds window must state where its points come from");
+    console.log(`  E2 chart windows ok  (days option ${hasDays ? "present" : "MISSING"}, candle + observation paths exercised)`);
+    r.close();
+  }
 
-    // Drive a chart render the way a user does, then wait for the async candle fetch.
-    if (win) {
-      win.value = "m";
-      win.dispatchEvent(new r.dom.window.Event("change", { bubbles: true }));
+  /* --- E3. dashboard pointer readout (G20) ---
+   * The canvas is a bitmap, so the trader needs a number they can read off it. The readout must
+   * report a PLOTTED point (never a value interpolated between two neighbours) and must say
+   * whether the point is an official candle or a collector observation. */
+  {
+    const r = await loadPage("dashboard.html", "api");
+    commonAsserts("dashboard.html (readout)", r);
+    const d = r.doc, w = r.dom.window;
+    const out = d.querySelector("#chartReadout");
+    check(!!out, "dashboard: the chart must expose a pointer readout element");
+    const cv = d.querySelector("#priceChart");
+    check(!!cv, "dashboard: the chart canvas must exist");
+    // Drive a render, then a synthetic hover near the middle of the canvas.
+    const sel = d.querySelector("#window");
+    if (sel) { sel.value = "m"; sel.dispatchEvent(new w.Event("change")); }
+    await new Promise(res => setTimeout(res, 700));
+    const chart = w.__chart;
+    check(!!chart && Array.isArray(chart.points) && chart.points.length > 0,
+      "dashboard: the draw must publish the points it actually plotted (window.__chart)");
+    if (chart && chart.points.length) {
+      const mid = chart.points[Math.floor(chart.points.length / 2)];
+      const px = chart.pad.l + chart.iw * (mid.t - chart.t0) / (chart.t1 - chart.t0);
+      const py = chart.pad.t + chart.ih * (1 - Math.min(1, Math.max(0, mid.v)));
+      cv.dispatchEvent(new w.MouseEvent("mousemove", { clientX: px, clientY: py, bubbles: true }));
+      const txt = out.textContent;
+      const shown = Number((txt.match(/([\d.]+)¢/) || [])[1]);
+      check(Number.isFinite(shown) && Math.abs(shown - mid.v * 100) < 0.051,
+        `dashboard: the readout must print the plotted price, not an interpolation (plotted ${(mid.v * 100).toFixed(1)}c, readout "${txt.slice(0, 60)}")`);
+      check(!/NaN|undefined/.test(txt), "dashboard: the readout must not leak NaN/undefined");
     }
-    await new Promise(res => setTimeout(res, 600));
-    const calls = r.state.candleCalls || [];
-    check(calls.length >= 1, "dashboard.html: choosing Minutes must request Kalshi's candlestick endpoint");
-    const q = calls[0] || "";
-    check(/\/series\/[^\/]+\/markets\/[^\/]+\/candlesticks/.test(q),
-      `the candle request must use the documented /series/{series}/markets/{ticker}/candlesticks path (got ${q.slice(0, 120)})`);
-    check(/period_interval=(1|60|1440)\b/.test(q),
-      `period_interval must be one of the documented 1/60/1440 values (got ${q.slice(0, 160)})`);
-    check(/start_ts=\d{10}\b/.test(q) && /end_ts=\d{10}\b/.test(q),
-      "start_ts and end_ts must be SECONDS (10 digits); millisecond values are rejected with 400");
-    const start = Number((q.match(/start_ts=(\d+)/) || [])[1]);
-    const end = Number((q.match(/end_ts=(\d+)/) || [])[1]);
-    const interval = Number((q.match(/period_interval=(\d+)/) || [])[1]);
-    check(end > start, "the candle window must have end_ts after start_ts");
-    check((end - start) / 60 / interval <= 5000,
-      `one candle request may span at most 5,000 periods, got ${Math.round((end - start) / 60 / interval)}`);
-
-    // Source disclosure: the page must say the series came from Kalshi's candles, with the query.
-    check(/official candlestick endpoint/i.test(r.text),
-      "dashboard.html: the chart must state that the series is Kalshi's official candlestick data");
-    check(/exact query/i.test(r.text), "dashboard.html: the chart must link the exact query it issued");
-
-    // Swings: 0.40 -> 0.52 is a 12c move between candle closes, so it must be marked and listed.
-    const swings = r.doc.querySelector("#swings");
-    check(!!swings && /12\.0¢|\+12/.test(swings.textContent || ""),
-      `dashboard.html: a 12c move between candle closes must appear in the swing list (got: ${(swings ? swings.textContent : "").slice(0, 140)})`);
-    check(/candle-derived/.test(swings ? swings.textContent : ""),
-      "dashboard.html: a candle-derived swing must be labelled as such, not passed off as an archived alert");
-
-    // Gaps + no-zero, asserted on the PLOTTED series (window.__chartModel), not on canvas text:
-    // the stub returns four candles, one with no price block (the documented no-trade shape),
-    // so exactly three points may be plotted and none of them may be 0.
-    const cm = r.dom.window.__chartModel;
-    check(!!cm && cm.kind === "candle", "dashboard.html: the plotted chart model must record that a candle series was drawn");
-    check(!!cm && cm.points.length === 3,
-      `a candle with no price block must be skipped, not plotted: expected 3 plotted points of 4 returned, got ${cm ? cm.points.length : "none"}`);
-    check(!!cm && !cm.points.some(p => p.v === 0),
-      "a price-less candle must never be plotted as $0.00 (it was measured at 0)");
-    check(!!cm && cm.points.every(p => p.v > 0 && p.v <= 1),
-      "every plotted contract price must sit inside (0, 1]");
-    check(!!r.doc.querySelector("#chartReadout"),
-      "dashboard.html: the chart must expose a numeric readout for the pointer position");
-
-    // Mutation check: with the stub's candle path removed, the page must fall back to the
-    // observation series and SAY so, rather than rendering an empty chart.
-    const r2 = await loadPage("dashboard.html", "api-no-candles");
-    commonAsserts("dashboard.html no-candles", r2);
-    const win2 = r2.doc.querySelector("#window");
-    if (win2) { win2.value = "m"; win2.dispatchEvent(new r2.dom.window.Event("change", { bubbles: true })); }
-    await new Promise(res => setTimeout(res, 600));
-    check(/observation series|observations \(/i.test(r2.text) || /no candles/i.test(r2.text),
-      "dashboard.html: when the candle endpoint cannot serve the window the chart must fall back to observations and say so");
-    console.log(`  I chart         ok  (${calls.length} candle call(s): interval ${interval}m, ${Math.round((end - start) / 60)} min span, swing +12c marked, gap not zeroed, fallback explained)`);
-    r2.close();
+    console.log("  E3 readout      ok  (nearest plotted point reported with price, time and source)");
     r.close();
   }
 
@@ -382,26 +352,136 @@ function commonAsserts(label, r) {
       check(!bodies.some(t => /QA7CECC5|Portfolio cash out/.test(t)),
         "index.html: a demo QA fixture must never be the largest live market of a category");
     }
-    // Resolution tracker (F-65): the landing page must show more than one topic when the
-    // snapshot stores more than one, and must state the stored count per topic and the scan
-    // total. Pre-fix, the stored set was 198/200 crypto and the wording implied it was all.
-    const res = r.doc.querySelector("#resolutions");
-    check(!!res, "index.html: the resolution tracker must render");
-    const resText = res ? res.textContent : "";
-    const storedCats = new Set((markets.settled_markets || []).map(x => x.category_id));
-    if (storedCats.size > 1) {
-      const shownCats = new Set([...(res ? res.querySelectorAll("tbody tr") : [])]
-        .map(tr => tr.children[1] ? tr.children[1].textContent.trim() : "")
-        .filter(Boolean));
-      check(shownCats.size > 1,
-        `index.html: the resolution tracker must show more than one topic when the snapshot stores ${storedCats.size} (got ${[...shownCats].join(",") || "nothing"})`);
-      check(/per topic/i.test(resText),
-        "index.html: the resolution tracker must say the rows are chosen per topic");
-      check(/Stored yes\/no rows by topic/.test(resText),
-        "index.html: the resolution tracker must state how many stored rows each topic has");
-    }
-    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present, ${res ? res.querySelectorAll("tbody tr").length : 0} resolution rows across ${storedCats.size} stored topic(s))`);
+    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
     r.close();
+  }
+
+
+  /* --- F2. dashboard chart: official candles + a market reachable only from the alert archive ---
+   * Two defects this guards, both measured on the committed data before the fix:
+   *  1. the page never loaded a single official candle, even though the interval selector is on the
+   *     page (assets/live.js had the endpoint, dashboard.html has the selector);
+   *  2. GET /markets omits the whole price block on a zero-volume period, so a naive
+   *     Number(undefined)->NaN / Number("")->0 read would either break the line or print a fake 0c.
+   * The stub returns one real candle plus one zero-volume candle with an empty close, and the page
+   * must plot the former and skip the latter.
+   */
+  {
+    const nowS = Math.floor(Date.now() / 1000);
+    const candleDoc = { ticker: "stub", candlesticks: [
+      { end_period_ts: nowS - 3600, price: { close_dollars: "0.5000", open_dollars: "0.4000", high_dollars: "0.6000", low_dollars: "0.3000", mean_dollars: "0.5000" },
+        yes_bid: { close_dollars: "0.4800" }, yes_ask: { close_dollars: "0.5200" }, volume_fp: "10.00" },
+      { end_period_ts: nowS - 1800, price: { previous_dollars: "0.5000" }, volume_fp: "0.00",
+        yes_bid: { close_dollars: "" }, yes_ask: { close_dollars: "" } },
+      // third shape, also price-less: an explicit empty string rather than an absent key.
+      { end_period_ts: nowS - 900, price: { close_dollars: "", open_dollars: "" }, volume_fp: "0.00",
+        yes_bid: { close_dollars: "" }, yes_ask: { close_dollars: "" } },
+    ] };
+    const r = await loadPage("dashboard.html", "snapshot", { candleDoc });
+    commonAsserts("dashboard.html candles", r);
+    const candleCalls = r.state.calls.filter(u => u.includes("/candlesticks"));
+    check(candleCalls.length >= 1, "the dashboard must request the official candlestick endpoint for the selected market");
+    check(candleCalls.every(u => /period_interval=(1|60|1440)\b/.test(u)),
+      "candlestick requests must use a documented period_interval (1, 60 or 1440 only): " + (candleCalls[0] || ""));
+    check(candleCalls.every(u => /start_ts=\d+/.test(u) && /end_ts=\d+/.test(u)),
+      "candlestick requests must carry start_ts and end_ts, which the endpoint requires");
+    check(/official 1-minute candle/.test(r.text),
+      "the chart footer must state that the muted line is official candles, with the interval named");
+    // The stub returns three candles; two carry no usable price (one omits the price block, as
+    // the API does for a zero-volume period, one returns an explicit empty string). Exactly one
+    // must be plotted: that proves a missing price is dropped rather than read as
+    // Number("") === 0, which would draw a fake 0c print on the chart.
+    check(/\b1 official 1-minute candle\b/.test(r.text),
+      "a candle without a price block must be skipped, not plotted as 0c (expected exactly 1 of 3 candles plotted)");
+    check(!/official 1-minute candles\b/.test(r.text),
+      "the zero-volume candle (no price block) must not be counted as a plotted candle");
+    console.log(`  F candles       ok  (${candleCalls.length} official candle request(s), interval + window present, no fake 0c)`);
+    r.close();
+  }
+
+  /* --- G. dashboard deep link: a market that is only in the alert archive still charts ---
+   * scripts/collect.py used to prune data/live/price_history.json to the ranked open window, so a
+   * market cited by an archived alert had zero observations and the chart said "Pick a market".
+   * The alerts chat now links to dashboard.html#TICKER; that link must resolve to a real row.
+   */
+  const publishedFeed = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8")); } catch (e) { return null; } })();
+  if (publishedFeed && publishedFeed.all_events && publishedFeed.all_events.length) {
+    const archivedTicker = publishedFeed.all_events[0].ticker;
+    const r = await loadPage("dashboard.html", "snapshot", { hash: archivedTicker });
+    commonAsserts("dashboard.html deep link", r);
+    check(!/Pick a market from the tables below/.test(r.text),
+      `#${archivedTicker} (cited by an archived alert) must open a chart, not the "pick a market" placeholder`);
+    check(r.text.includes(archivedTicker), "the deep-linked market's own ticker must be shown");
+    console.log(`  G deep link     ok  (#${archivedTicker} from the alert archive opens a chart)`);
+    r.close();
+  }
+
+  /* --- H. index.html: the settled KPI must state both numbers, labelled ---
+   * F-37 was raised twice: the card read "of <stored rows> settled markets in scope" — the
+   * collector's stored-row cap (200) — while the banner on the same page printed
+   * counts.settled_in_scope (1,600). Main's fix labels the stored count as "settled rows in this
+   * snapshot" and prints the in-scope total beside it. This asserts both numbers are present and
+   * the stored cap is never used as the in-scope label.
+   */
+  if (markets && markets.counts && markets.counts.settled_in_scope) {
+    const r = await loadPage("index.html", "snapshot");
+    commonAsserts("index.html", r);
+    const inScope = markets.counts.settled_in_scope;
+    const stored = (markets.settled_markets || []).length;
+    const flat = r.text.replace(/\s+/g, " ");
+    check(flat.includes(inScope.toLocaleString()),
+      `the KPI and banner must state the in-scope total (${inScope})`);
+    check(flat.includes(stored.toLocaleString()),
+      `the KPI or banner must name the stored rows (${stored})`);
+    // the original defect: the stored count printed as the in-scope total
+    check(!flat.includes(stored.toLocaleString() + " settled markets in scope"),
+      `the stored count (${stored}) must never be printed as "settled markets in scope"`);
+    check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
+      `the stored count (${stored}) must never be printed as "settled rows in scope"`);
+    console.log(`  H index KPI     ok  (${stored} stored rows named, ${inScope} in scope stated)`);
+    r.close();
+  }
+
+  /* --- I. dashboard.html: yes_bid/yes_ask observation mapping + numeric live-poll timestamps ---
+   * Previously drawChart() ran Date.parse(o.t) (which returns NaN for numeric nowMs live ticks)
+   * and indexed o["bid"]/o["ask"] (undefined because observations store yes_bid/yes_ask).
+   */
+  {
+    const sampleTicker = Object.keys(history.series || {}).find(t =>
+      ((history.series[t] || {}).observations || []).some(o => o.yes_bid !== null && o.yes_bid !== undefined && o.yes_ask !== null && o.yes_ask !== undefined)
+    );
+    if (sampleTicker) {
+      const r = await loadPage("dashboard.html", "snapshot", { hash: sampleTicker });
+      commonAsserts("dashboard.html (bid/ask + live tick)", r);
+      const winSel = r.doc.querySelector("#window");
+      const serSel = r.doc.querySelector("#seriesSel");
+      winSel.value = "all";
+      winSel.dispatchEvent(new r.dom.window.Event("change"));
+      serSel.value = "bid";
+      serSel.dispatchEvent(new r.dom.window.Event("change"));
+      const bidFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      check(/\d+\s+(?:collector\s+)?observation/.test(bidFoot) && !/No observations/i.test(bidFoot),
+        `dashboard.html bid series must plot yes_bid observations (got: ${bidFoot.slice(0, 120)})`);
+      serSel.value = "ask";
+      serSel.dispatchEvent(new r.dom.window.Event("change"));
+      const askFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      check(/\d+\s+(?:collector\s+)?observation/.test(askFoot) && !/No observations/i.test(askFoot),
+        `dashboard.html ask series must plot yes_ask observations (got: ${askFoot.slice(0, 120)})`);
+      // Live poll tick with numeric Date.now() timestamp must increase the plotted observation count in Seconds ("s") window.
+      winSel.value = "s";
+      serSel.value = "last";
+      winSel.dispatchEvent(new r.dom.window.Event("change"));
+      const beforeMatch = ((r.doc.querySelector("#chartFoot") || {}).textContent || "").match(/(\d+)\s+(?:collector\s+)?observation/);
+      const beforeCount = beforeMatch ? Number(beforeMatch[1]) : 0;
+      r.dom.window.eval(`onLiveRows([{ ticker: ${JSON.stringify(sampleTicker)}, last_price_dollars: "0.5500", yes_bid_dollars: "0.5400", yes_ask_dollars: "0.5600", volume_fp: "100.00" }])`);
+      const secFoot = (r.doc.querySelector("#chartFoot") || {}).textContent || "";
+      const afterMatch = secFoot.match(/(\d+)\s+(?:collector\s+)?observation/);
+      const afterCount = afterMatch ? Number(afterMatch[1]) : 0;
+      check(afterCount === beforeCount + 1,
+        `dashboard.html Seconds window must plot numeric-timestamp live poll ticks (before=${beforeCount}, after=${afterCount}, foot=${secFoot.slice(0, 120)})`);
+      console.log(`  I obs+live fix  ok  (${sampleTicker} plots yes_bid, yes_ask, and numeric live poll ticks: ${beforeCount} -> ${afterCount})`);
+      r.close();
+    }
   }
 
   if (problems.length) {

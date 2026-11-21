@@ -41,11 +41,11 @@
     <label>Category <select id="catFilter"><option value="">All five</option></select></label>
     <label>Chart window
       <select id="window">
-        <option value="s">Seconds (1 s — observations + live ticks)</option>
-        <option value="m" selected>Minutes (1-minute candles)</option>
-        <option value="h">Hours (1-hour candles)</option>
-        <option value="d">Days (1-day candles)</option>
-        <option value="all">All collected observations</option>
+        <option value="s">Seconds · last 15 min (observations)</option>
+        <option value="m" selected>Minutes · last 6 h (1-min candles)</option>
+        <option value="h">Hours · last 72 h (1-hour candles)</option>
+        <option value="d">Days · last 30 d (1-day candles)</option>
+        <option value="all">All collected (observations)</option>
       </select>
     </label>
     <label>Price series
@@ -74,9 +74,8 @@
   <div class="card" id="chartCard">
     <h3 id="chartTitle">Price chart — X = time, Y = contract price ($)</h3>
     <p class="small mut" id="chartMeta">Pick a market from the tables below.</p>
-    <p class="small mut" id="chartSource"></p>
     <canvas id="priceChart" height="340" aria-label="Chart of contract price over time"></canvas>
-    <p class="small mono" id="chartReadout">Move the pointer over the chart to read an exact price, volume and period.</p>
+    <p class="small mono" id="chartReadout">Move the pointer over the chart to read an exact price, time and period volume.</p>
     <div class="swinglist" id="swings"></div>
     <p class="small mut" id="chartFoot"></p>
     <div id="causeBox"></div>
@@ -113,87 +112,10 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/engine.js"></script>
 <script>
 KD.nav("dashboard.html");
-const state = { snap: null, hist: null, alerts: null, sel: null, cat: "" };
+const state = { snap: null, hist: null, alerts: null, sel: null, cat: "", candles: {} };
 const live = { obs: new Map(), markers: new Map(), on: false };
 
 const WINDOWS = { s: 15 * 60e3, m: 6 * 3600e3, h: 72 * 3600e3, d: 30 * 86400e3, all: Infinity };
-
-/* ---- official candlesticks ------------------------------------------------------------
- * The chart used to plot one point per collector run, which is 1-2 observations per market
- * per hour and made "Minutes" look empty. Kalshi publishes exactly this series:
- *   GET /series/{series_ticker}/markets/{ticker}/candlesticks?start_ts&end_ts&period_interval
- *   period_interval is restricted to 1, 60 or 1440 minutes, one request spans at most 5,000
- *   periods, timestamps are seconds, and a candle with no trades carries only
- *   price.previous_* with zero volume (https://docs.kalshi.com/api-reference/market/get-market-candlesticks).
- * Markets that settled before the historical cutoff are served by
- *   GET /historical/markets/{ticker}/candlesticks
- * which uses the older unsuffixed field names (bid/ask/price, no *_dollars).
- * Both shapes are read here. Anything the API did not return stays blank: a candle with no
- * price block is skipped, never plotted as $0.00.
- */
-const CANDLES = { cache: new Map(), MAX_PERIODS: 5000 };
-
-function seriesOf(row) {
-  return String(row.series_ticker || row.series_ticker_from_api || row.ticker || "").split("-")[0].toUpperCase();
-}
-
-function numOrNull(v) {
-  if (v === null || v === undefined || v === "") return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-
-// One candle -> {t, open, high, low, close, yes_bid, yes_ask, volume, oi}. `close` is the
-// field the chart plots; it is null when the API returned no price for the period.
-function normaliseCandle(c) {
-  const price = c.price || {};
-  const bid = c.yes_bid || c.bid || {};
-  const ask = c.yes_ask || c.ask || {};
-  const close = numOrNull(price.close_dollars ?? price.close);
-  return {
-    t: Number(c.end_period_ts) * 1000,
-    open: numOrNull(price.open_dollars ?? price.open),
-    high: numOrNull(price.high_dollars ?? price.high),
-    low: numOrNull(price.low_dollars ?? price.low),
-    close,
-    yes_bid: numOrNull(bid.close_dollars ?? bid.close),
-    yes_ask: numOrNull(ask.close_dollars ?? ask.close),
-    volume: numOrNull(c.volume_fp ?? c.volume),
-    oi: numOrNull(c.open_interest_fp ?? c.open_interest),
-  };
-}
-
-async function fetchCandles(row, minutes, interval) {
-  const ticker = row.ticker;
-  const key = `${ticker}|${interval}|${minutes}`;
-  if (CANDLES.cache.has(key)) return CANDLES.cache.get(key);
-  const end = Math.floor(Date.now() / 1000);
-  const span = Math.min(minutes * 60, interval * 60 * CANDLES.MAX_PERIODS);
-  const start = end - span;
-  const q = `start_ts=${start}&end_ts=${end}&period_interval=${interval}`;
-  const attempts = [
-    { src: "live", url: `${KDL.BASE}/series/${encodeURIComponent(seriesOf(row))}/markets/${encodeURIComponent(ticker)}/candlesticks?${q}` },
-    { src: "historical", url: `${KDL.BASE}/historical/markets/${encodeURIComponent(ticker)}/candlesticks?${q}` },
-  ];
-  for (const a of attempts) {
-    try {
-      const r = await fetch(a.url, { cache: "no-store" });
-      if (!r.ok) continue;
-      const d = await r.json();
-      const candles = (d.candlesticks || []).map(normaliseCandle).filter(c => Number.isFinite(c.t));
-      if (candles.length) {
-        const out = { candles, src: a.src, url: a.url, interval, fetchedAt: Date.now() };
-        CANDLES.cache.set(key, out);
-        return out;
-      }
-    } catch (e) { /* CORS/network: fall through to the next source, then to observations */ }
-  }
-  return null;
-}
-
-// Refuse a request the API documents as a 400 (more than 5,000 periods in one call).
-function intervalFor(kind) { return kind === "m" ? 1 : kind === "h" ? 60 : 1440; }
-function minutesFor(kind) { return kind === "m" ? 6 * 60 : kind === "h" ? 72 * 60 : 30 * 24 * 60; }
 
 function pickInitialTicker() {
   const h = decodeURIComponent(location.hash.replace("#", ""));
@@ -373,304 +295,355 @@ function select(ticker) {
   drawLiq();
 }
 
+// A market can be selected straight from an alert (dashboard.html#TICKER) after the
+// collector's ranked window — and, in the old prune, its history — has rotated it out.
+// Rather than say "pick a market from the tables", rebuild the same row shape from the
+// row the archive already recorded for it. Every value here is a value the collector
+// published in data/live/alerts.json; nothing is derived or guessed.
+function rowFromAlert(ticker) {
+  const feed = state.alerts?.all_events || state.alerts?.alerts || [];
+  const a = feed.find(x => x.ticker === ticker);
+  if (!a) return null;
+  return {
+    ticker,
+    event_ticker: a.event_ticker || null,
+    title: a.title || ticker,
+    category_id: a.category_id || null,
+    category_basis: a.category_basis || null,
+    status: a.status || null,
+    result: a.status === "finalized" ? null : null,
+    last_price_dollars: a.to_price ?? null,
+    volume_fp: null,
+    open_interest_fp: null,
+    volume_24h_fp: a.volume_24h_fp ?? null,
+    source: a.market_source || null,
+    __from_alert: true,
+  };
+}
+
 function currentRow() {
   if (!state.sel) return null;
   return (state.snap?.open_markets || []).concat(state.snap?.settled_markets || [])
-    .find(r => r.ticker === state.sel) || null;
+    .find(r => r.ticker === state.sel) || rowFromAlert(state.sel);
 }
 
-/* The chart. Two sources, in this order:
- *   1. Kalshi's own candlesticks for Minutes/Hours/Days (source line under the chart says so);
- *   2. this project's accumulated observations (one per collector run + live poll ticks) for
- *      Seconds and whenever a candle request cannot be served (CORS, past the historical
- *      cutoff, no trades in the window).
- * The X axis is always time and the Y axis is always the contract price in dollars (0-1).
- * A crosshair readout reports the value, volume and period under the pointer, because a
- * chart a trader cannot read a number off is decoration. Nothing is interpolated: a period
- * with no returned price is a gap in the line, not a zero.
- */
-let chartModel = null;          // what is currently drawn, for the crosshair
-// Published for the DOM test (scripts/tests/test_pages_dom.js), which asserts the values the
-// chart actually plots rather than scraping the canvas bitmap: a bug that drew a price-less
-// candle at $0.00 was invisible to a text-based check.
-function publishChartModel() { try { window.__chartModel = chartModel; } catch (e) { /* non-browser */ } }
-let chartRequest = 0;           // guards against an out-of-order async render
+// Candlesticks: the official series endpoint, reached from the browser through the same
+// unauthenticated demo root the collector uses. period_interval is restricted by the API to
+// 1 / 60 / 1440 minutes (https://docs.kalshi.com/api-reference/market/get-market-candlesticks),
+// so a "seconds" window cannot come from here — it comes from accumulated observations.
+// Fetched lazily, cached per (ticker, interval), and a failure is reported, never faked.
+const candleCache = new Map();
+const CANDLE_TTL_MS = 55e3;
+function candleKey(ticker, interval) { return ticker + "@" + interval; }
+
+// A missing price must stay missing. `Number("")` is 0, which would draw a real-looking
+// 0c print for a candle that simply carried no trade — the API omits the whole price
+// block on a zero-volume period (observed live this session on
+// KXDEMOFUTHOURLY-26NOV20H20-UP, whose 06:00Z 1-hour candle has price.previous_dollars
+// only and volume_fp "0.00"). So empty strings, null and undefined are all rejected.
+function priceOf(v) {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+// The live series endpoint returns *_dollars keys. The archived (historical) endpoint uses
+// the older names without the _dollars suffix: price.open / low / high / close / mean /
+// previous, volume, open_interest
+// (https://docs.kalshi.com/api-reference/historical/get-historical-market-candlesticks).
+// Read either shape rather than assuming one.
+function readPriceBlock(b, suffix) {
+  if (!b || typeof b !== "object") return null;
+  const pick = (k) => priceOf(b[k + suffix] !== undefined ? b[k + suffix] : b[k]);
+  return { open: pick("open"), high: pick("high"), low: pick("low"), close: pick("close"), mean: pick("mean") };
+}
+
+function normalizeCandles(d) {
+  return (d.candlesticks || []).map(c => {
+    const p = readPriceBlock(c.price, "_dollars") || {};
+    const bid = readPriceBlock(c.yes_bid, "_dollars") || {};
+    const ask = readPriceBlock(c.yes_ask, "_dollars") || {};
+    return {
+      t: Number(c.end_period_ts) * 1000,
+      close: p.close, open: p.open, high: p.high, low: p.low, mean: p.mean,
+      bid: bid.close, ask: ask.close,
+      volume: priceOf(c.volume_fp !== undefined ? c.volume_fp : c.volume),
+    };
+  }).filter(c => Number.isFinite(c.t));
+}
+
+async function fetchCandles(row, interval, startS, endS) {
+  const k = candleKey(row.ticker, interval);
+  const hit = candleCache.get(k);
+  if (hit && Date.now() - hit.at < CANDLE_TTL_MS) return hit;
+  const seriesTicker = row.series_ticker || String(row.ticker).split("-")[0];
+  let source = "series";
+  let candles = [];
+  try {
+    const d = await KDL.get(
+      `/series/${encodeURIComponent(seriesTicker)}/markets/${encodeURIComponent(row.ticker)}/candlesticks`,
+      { start_ts: startS, end_ts: endS, period_interval: interval });
+    candles = normalizeCandles(d);
+  } catch (e) {
+    // Settled markets are moved out of the live set once GET /historical/cutoff advances
+    // past them, and the live endpoint then has nothing for them. The archived endpoint is
+    // the documented place for those, so fall back to it before giving up.
+    const d = await KDL.get(
+      `/historical/markets/${encodeURIComponent(row.ticker)}/candlesticks`,
+      { start_ts: startS, end_ts: endS, period_interval: interval });
+    candles = normalizeCandles(d);
+    source = "historical";
+  }
+  const out = { at: Date.now(), candles, source };
+  candleCache.set(k, out);
+  return out;
+}
+
+// The window selector -> the only intervals that exist. null = observations only.
+function candleIntervalFor(winKey) {
+  if (winKey === "s") return null;      // seconds: no such interval exists
+  if (winKey === "m") return 1;         // 1-minute candles
+  if (winKey === "h") return 60;        // 1-hour candles
+  if (winKey === "d") return 1440;      // 1-day candles
+  return null;
+}
 
 function drawChart() {
   const cv = KD.$("#priceChart");
   const row = currentRow();
-  const meta = KD.$("#chartMeta"), foot = KD.$("#chartFoot"), srcLine = KD.$("#chartSource");
+  const meta = KD.$("#chartMeta"), foot = KD.$("#chartFoot");
   const dpr = window.devicePixelRatio || 1;
   const W = cv.clientWidth || 900, H = 340;
   cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   const ctx = cv.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
+  const css = getComputedStyle(document.body);
+  const line = css.getPropertyValue("--line"), mut = css.getPropertyValue("--mut"), green = "#00b67a", bad = "#f2695c";
   if (!row) {
     meta.textContent = "Pick a market from the tables below.";
-    if (srcLine) srcLine.textContent = "";
     foot.textContent = "";
-    chartModel = null; publishChartModel();
     return;
   }
+  const histObs = (state.hist?.series?.[row.ticker]?.observations) || [];
+  const liveObs = live.obs.get(row.ticker) || [];
+  const series = histObs.concat(liveObs);
+  const key = KD.$("#seriesSel").value;
+  const win = WINDOWS[KD.$("#window").value] || Infinity;
+  const now = Date.now();
+  const obsTs = (t) => (typeof t === "number" ? t : Date.parse(t));
+  const obsVal = (o, k) => (k === "bid" ? (o.bid ?? o.yes_bid) : k === "ask" ? (o.ask ?? o.yes_ask) : o.last);
+  const pts = series
+    .map(o => ({ t: obsTs(o.t), v: obsVal(o, key) }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v))
+    .filter(p => win === Infinity || now - p.t <= win);
+  if (KD.$("#chartNote")) KD.$("#chartNote").textContent = "";
+
+  // Official candles for this window, when the API offers an interval in it at all.
+  const winKey = KD.$("#window").value;
+  const interval = candleIntervalFor(winKey);
+  const windowMs = win === Infinity ? 30 * 86400e3 : win;
+  const ck = row.ticker + "@" + interval;
+  const candleHit = (state.candles && state.candles[ck]) || null;
+  const candleSeries = candleHit ? candleHit.candles : null;
+  const candleSource = candleHit ? candleHit.source : null;
+  let candleNote = "";
+  if (interval) {
+    const startS = Math.floor((now - windowMs) / 1000);
+    const endS = Math.floor(now / 1000);
+    fetchCandles(row, interval, startS, endS).then(hit => {
+      if (!state.candles) state.candles = {};
+      const had = state.candles[ck];
+      state.candles[ck] = hit;
+      // repaint once per fetch, and only if the plotted shape actually changed
+      const sig = (h) => h ? h.candles.length + ":" + (h.candles[0]?.t || 0) + ":" + h.source : "";
+      if (!had || sig(had) !== sig(hit)) drawChart();
+    }).catch(e => {
+      const noteEl = KD.$("#chartNote");
+      // Say it plainly rather than drawing an empty chart as if there were no trades.
+      if (noteEl) noteEl.textContent = "No official candles for this market in this window from the browser (" +
+        (e && e.message || e) + "). The observation line below is the collector's own record.";
+    });
+  }
+
   meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
     `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis)} · ` +
     `status ${KD.statusBadge(row.status)} · result ${KD.resultBadge(row.result)} · ` +
     `last ${KD.cents(row.last_price_dollars)} · ${KD.num(row.volume_fp)} contracts traded · ` +
-    `open interest ${KD.num(row.open_interest_fp)}`;
+    `open interest ${KD.num(row.open_interest_fp)}` +
+    (row.__from_alert ? ` · <span class="badge warn" title="This market is no longer in the collector's ranked window; the row and its price come from the published alert record for it">from alert archive</span>` : "");
 
-  const key = KD.$("#seriesSel").value;
-  const kind = KD.$("#window").value;
-  const liveObs = live.obs.get(row.ticker) || [];
-  const histObs = (state.hist?.series?.[row.ticker]?.observations) || [];
-
-  // Observations always go on the chart as the underlying series; candles are drawn over them
-  // when the window asks for a candle interval. This keeps the page honest when the API is
-  // unreachable (the desk's normal sandbox state) instead of showing an empty box.
-  const obsSeries = histObs.concat(liveObs)
-    .map(o => ({ t: Date.parse(o.t), v: o[key] }))
-    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && Number.isFinite(Number(p.v)))
-    .map(p => ({ t: p.t, v: Number(p.v) }))
-    .sort((a, b) => a.t - b.t);
-
-  if (kind === "s" || kind === "all") { renderObservations(); return; }
-
-  const interval = intervalFor(kind), minutes = minutesFor(kind);
-  const requestId = ++chartRequest;
-  if (srcLine) srcLine.innerHTML = `Requesting ${interval}-minute candles from Kalshi's official endpoint…`;
-  fetchCandles(row, minutes, interval).then(candles => {
-    if (requestId !== chartRequest) return;   // a newer selection won
-    if (candles && candles.candles.length) renderCandles(candles);
-    else renderObservations(true);
-  }).catch(() => { if (requestId === chartRequest) renderObservations(true); });
-
-  // ------------------------------------------------------------------ candlestick render
-  function renderCandles(c) {
-    const win = WINDOWS[kind];
-    const now = Date.now();
-    const all = c.candles.filter(x => Number.isFinite(x.t));
-    const shown = all.filter(x => now - x.t <= win);
-    const pad = { l: 54, r: 14, t: 16, b: 34 };
-    const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
-    const css = getComputedStyle(document.body);
-    const mut = css.getPropertyValue("--mut"), line = css.getPropertyValue("--line");
-    const green = "#00b67a", bad = "#f2695c", amber = "#f0b429";
-
-    grid(pad, iw, ih, W, H, mut, line, ctx);
-    if (!shown.length) {
-      ctx.fillStyle = mut; ctx.font = "13px system-ui";
-      ctx.fillText("No candles were returned for this window.", pad.l + 12, pad.t + 26);
-      chartModel = null;
-      foot.innerHTML = `The API answered for <code>${KD.esc(row.ticker)}</code> but returned no candle inside this window. Source: <a href="${KD.esc(c.url)}" target="_blank" rel="noopener">the exact query</a>. Nothing is filled in.`;
-      if (srcLine) srcLine.innerHTML = candleSourceLine(c);
-      KD.$("#swings").innerHTML = "";
-      return;
-    }
-    const t0 = shown[0].t, t1 = Math.max(shown[shown.length - 1].t, t0 + 60000);
-    const X = t => pad.l + iw * (t - t0) / (t1 - t0);
-    const Y = v => pad.t + ih * (1 - Math.min(1, Math.max(0, v)));
-    timeAxis(t0, t1, pad, H, iw, ctx);
-    const bw = Math.max(1.5, Math.min(9, (iw / Math.max(1, shown.length)) * 0.62));
-
-    const plot = shown.filter(x => x.close !== null && x.close !== undefined);
-    // high/low wick + open/close body: the standard reading of a candle, no smoothing.
-    for (const x of plot) {
-      const up = x.close >= (x.open ?? x.close);
-      ctx.strokeStyle = up ? green : bad;
-      ctx.fillStyle = up ? green : bad;
-      ctx.lineWidth = 1;
-      if (x.high !== null && x.low !== null && x.high !== x.low) {
-        ctx.beginPath(); ctx.moveTo(X(x.t), Y(x.high)); ctx.lineTo(X(x.t), Y(x.low)); ctx.stroke();
-      }
-      const o = x.open ?? x.close, cl = x.close;
-      const yTop = Y(Math.max(o, cl)), yBot = Y(Math.min(o, cl));
-      ctx.fillRect(X(x.t) - bw / 2, yTop, bw, Math.max(1, yBot - yTop));
-    }
-    // Gaps: consecutive periods with no returned price are drawn as a dashed bridge so the
-    // reader can see the data is missing rather than assuming a flat price.
-    const times = new Set(plot.map(p => p.t));
-    const step = c.interval * 60000;
-    for (let i = 1; i < shown.length; i++) {
-      if (times.has(shown[i].t) && times.has(shown[i - 1].t)) continue;
-      if (!times.has(shown[i].t) || !times.has(shown[i - 1].t)) {
-        const a = shown[i - 1], b = shown[i];
-        if (a.close !== null && b.close !== null) {
-          ctx.setLineDash([2, 4]); ctx.strokeStyle = mut; ctx.lineWidth = 1;
-          ctx.beginPath(); ctx.moveTo(X(a.t), Y(a.close)); ctx.lineTo(X(b.t), Y(b.close)); ctx.stroke();
-          ctx.setLineDash([]);
-        }
-      }
-    }
-    void step;
-
-    // Swing markers: |close - previous close| >= $0.10, the alert rule, measured on Kalshi's
-    // own candles. Labelled as candle-derived so it is never confused with a collected alert.
-    const swings = [];
-    for (let i = 1; i < plot.length; i++) {
-      const d = plot[i].close - plot[i - 1].close;
-      if (Math.abs(d) >= 0.10 - 1e-9) swings.push({ t: plot[i].t, v: plot[i].close, prior: plot[i - 1].close, delta: d, mag: Math.abs(d), src: "candle" });
-    }
-    for (const s of swings) {
-      ctx.strokeStyle = s.delta > 0 ? green : bad; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(X(s.t), pad.t); ctx.lineTo(X(s.t), pad.t + ih); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = s.delta > 0 ? green : bad;
-      ctx.font = "10px ui-monospace,monospace";
-      ctx.fillText((s.delta > 0 ? "▲+" : "▼−") + (s.mag * 100).toFixed(0) + "¢", X(s.t) + 3, pad.t + 10);
-    }
-    // Live ticks landed on top of the last candle, so the current price is visible between polls.
-    for (const o of liveObs) {
-      if (!Number.isFinite(o[key])) continue;
-      ctx.fillStyle = amber;
-      ctx.beginPath(); ctx.arc(X(Math.min(Math.max(Date.parse(o.t), t0), t1)), Y(o[key]), 2.2, 0, 7); ctx.fill();
-    }
-    const lastPlot = plot[plot.length - 1];
-    if (lastPlot) {
-      ctx.fillStyle = css.getPropertyValue("--txt"); ctx.font = "12px system-ui";
-      ctx.fillText((key === "last" ? "close " : key === "bid" ? "bid " : "ask ") + (lastPlot.close * 100).toFixed(1) + "¢",
-        Math.min(X(lastPlot.t) + 6, W - 90), Math.max(Y(lastPlot.close) - 6, 12));
-    }
-
-    chartModel = { kind: "candle", row, t0, t1, pad, W, H, iw, ih, points: plot.map(p => ({ t: p.t, v: p.close, volume: p.volume, oi: p.oi, bid: p.yes_bid, ask: p.yes_ask })), candles: c };
-    publishChartModel();
-    if (srcLine) srcLine.innerHTML = candleSourceLine(c);
-    foot.innerHTML = `${shown.length} official ${c.interval}-minute candle${shown.length === 1 ? "" : "s"} from ${KD.esc(new Date(t0).toISOString())} to ${KD.esc(new Date(t1).toISOString())} (UTC). ` +
-      `Y axis is the contract price in dollars, bounded 0–1. Empty periods stay empty. ` +
-      `Swings marked on the chart are ≥ $0.10 between consecutive candle closes.`;
-    renderSwingList(swings);
+  const pad = { l: 54, r: 14, t: 16, b: 34 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  ctx.strokeStyle = line; ctx.fillStyle = mut; ctx.font = "11px ui-monospace,monospace"; ctx.lineWidth = 1;
+  // Y axis: contract price is bounded 0..1 by definition.
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + ih * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    ctx.fillText("$" + (1 - i / 4).toFixed(2), 6, y + 4);
   }
+  ctx.fillText("price", 6, pad.t - 4);
 
-  function candleSourceLine(c) {
-    const label = c.src === "historical" ? "archived endpoint (pre-cutoff market)" : "official candlestick endpoint";
-    return `Source: Kalshi ${label} · <code>${c.interval}-minute</code> · ` +
-      `<a href="${KD.esc(c.url)}" target="_blank" rel="noopener">exact query</a> · fetched ${KD.esc(new Date(c.fetchedAt).toISOString())}. ` +
-      `<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">documented intervals: 1 / 60 / 1440 min</a>.`;
+  // Candles can carry a window the collector's observations miss (the API serves them for
+  // markets that have left the ranked window and even for settled ones), so the plot uses
+  // the union of both series rather than refusing to draw when observations are absent.
+  const cpts = (candleSeries || [])
+    .map(c => ({ t: c.t, v: key === "bid" ? c.bid : key === "ask" ? c.ask : c.close }))
+    .filter(c => Number.isFinite(c.t) && c.v !== null && c.v !== undefined && !Number.isNaN(c.v))
+    .filter(c => win === Infinity || now - c.t <= win);
+
+  if (pts.length < 1 && cpts.length < 1) {
+    ctx.fillStyle = mut; ctx.font = "13px system-ui";
+    ctx.fillText("No price data in this window yet.", pad.l + 12, pad.t + 26);
+    ctx.font = "11px ui-monospace,monospace";
+    foot.innerHTML = `Kalshi serves candles only at 1, 60 and 1440-minute intervals
+      (<a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">source</a>),
+      so this chart plots one observation per collector run from <code>data/live/price_history.json</code>
+      plus official candles for the selected interval. Widen the window, or wait for another collector run.`;
+    KD.$("#swings").innerHTML = "";
+    return;
   }
-
-  // ------------------------------------------------------- observation fallback render
-  function renderObservations(fellBack) {
-    const win = WINDOWS[kind] === undefined ? Infinity : WINDOWS[kind];
-    const now = Date.now();
-    // A 6-hour fallback window full of 1-day-old observations is a lie by omission, so when
-    // the requested window holds nothing, widen to all retained observations and SAY SO.
-    let pts = obsSeries.filter(p => win === Infinity || now - p.t <= win);
-    let widened = false;
-    if (!pts.length && obsSeries.length) { pts = obsSeries; widened = true; }
-    const pad = { l: 54, r: 14, t: 16, b: 34 };
-    const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
-    const css = getComputedStyle(document.body);
-    const mut = css.getPropertyValue("--mut"), line = css.getPropertyValue("--line");
-    const green = "#00b67a", bad = "#f2695c";
-
-    grid(pad, iw, ih, W, H, mut, line, ctx);
-    if (!pts.length) {
-      ctx.fillStyle = mut; ctx.font = "13px system-ui";
-      ctx.fillText("No observations retained for this market yet.", pad.l + 12, pad.t + 26);
-      chartModel = null;
-      KD.$("#swings").innerHTML = "";
-      foot.innerHTML = `No observation exists for <code>${KD.esc(row.ticker)}</code> in <code>data/live/price_history.json</code> yet. ` +
-        `Seconds-resolution history cannot be requested from Kalshi (candlesticks support 1/60/1440-minute intervals only), so it is accumulated one observation per collector run.`;
-      if (srcLine) srcLine.innerHTML = fellBack ? `Kalshi returned no candles for this window and this project holds no observations for it. Nothing is drawn.` : "";
-      return;
-    }
-    const t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 60000);
-    const X = t => pad.l + iw * (t - t0) / (t1 - t0);
-    const Y = v => pad.t + ih * (1 - Math.min(1, Math.max(0, v)));
-    timeAxis(t0, t1, pad, H, iw, ctx);
-
-    ctx.strokeStyle = key === "ask" ? bad : green;
-    ctx.lineWidth = 2;
+  const t0 = Math.min(...[pts[0]?.t, cpts[0]?.t].filter(Number.isFinite));
+  const tEnd = Math.max(...[pts[pts.length - 1]?.t, cpts[cpts.length - 1]?.t].filter(Number.isFinite));
+  const t1 = Math.max(tEnd, t0 + 60000);
+  const X = t => pad.l + iw * (t - t0) / (t1 - t0);
+  const Y = v => pad.t + ih * (1 - Math.min(1, Math.max(0, v)));
+  for (let i = 0; i <= 4; i++) {
+    const t = t0 + (t1 - t0) * i / 4;
+    const d = new Date(t);
+    const label = (t1 - t0) > 86400e3 ? `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${String(d.getUTCHours()).padStart(2, "0")}:00`
+      : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    ctx.fillText(label, X(t) - 26, H - 10);
+  }
+  // Official candles first (thin, muted): they are the exchange's own series, at the only
+  // intervals it publishes. Observations are drawn over them because they carry the exact
+  // last-traded prints the >= $0.10 alert rule is defined on.
+  if (cpts.length) {
+    ctx.strokeStyle = mut; ctx.lineWidth = 1.5; ctx.setLineDash([]);
     ctx.beginPath();
-    pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)));
+    cpts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)));
     ctx.stroke();
-    ctx.fillStyle = key === "ask" ? bad : green;
-    pts.forEach(p => { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.4, 0, 7); ctx.fill(); });
+    candleNote = `${cpts.length} official ${interval}-minute candle${cpts.length === 1 ? "" : "s"} from the ` +
+      `${candleSource === "historical" ? "archived (/historical) endpoint" : "live series endpoint"} (muted line)`;
+  }
+  // Publish exactly what was plotted (plus the geometry) so the pointer readout reads real
+  // plotted points and never interpolates a value the exchange did not print.
+  window.__chart = {
+    t0, t1, pad, iw, ih, key,
+    points: pts.concat(cpts).sort((a, b) => a.t - b.t),
+    candles: (cpts.length ? candleSeries || [] : []).map(c => ({ t: c.t, v: c.close, volume: c.volume, bid: c.bid, ask: c.ask })),
+  };
+  ctx.strokeStyle = key === "ask" ? bad : green;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(X(p.t), Y(p.v)) : ctx.moveTo(X(p.t), Y(p.v)));
+  ctx.stroke();
+  ctx.fillStyle = key === "ask" ? bad : green;
+  pts.forEach(p => { ctx.beginPath(); ctx.arc(X(p.t), Y(p.v), 2.4, 0, 7); ctx.fill(); });
 
-    // swing markers from the live engine, then from consecutive observations (the alert rule)
-    const markers = live.markers.get(row.ticker) || [];
-    for (const m of markers) {
-      if (win !== Infinity && now - m.t > win) continue;
-      const x = X(Math.min(Math.max(m.t, t0), t1));
-      ctx.strokeStyle = m.dir === "up" ? green : bad; ctx.setLineDash([3, 3]);
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ih); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = m.dir === "up" ? green : bad; ctx.font = "10px ui-monospace,monospace";
-      ctx.fillText((m.dir === "up" ? "▲+" : "▼−") + (Math.abs(m.delta) * 100).toFixed(0) + "¢", x + 3, pad.t + 10);
+  // Archived >= $0.10 swings on this market, from the published feed. These survive the
+  // market leaving the open window (which is why they are not taken from the live engine
+  // alone): each one is a row the collector recorded, drawn where it happened.
+  const feedForMarket = (state.alerts?.all_events || state.alerts?.alerts || [])
+    .filter(a => a.ticker === row.ticker && Number.isFinite(Date.parse(a.to_time || "")));
+  ctx.setLineDash([2, 4]);
+  for (const a of feedForMarket) {
+    const t = Date.parse(a.to_time);
+    if (win !== Infinity && now - t > win) continue;
+    const x = X(Math.min(Math.max(t, t0), t1));
+    const up = Number(a.delta) > 0;
+    ctx.strokeStyle = up ? "#00b67a" : "#f2695c";
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ih); ctx.stroke();
+    ctx.fillStyle = up ? "#00b67a" : "#f2695c";
+    ctx.font = "10px ui-monospace,monospace";
+    ctx.fillText((up ? "▲+" : "▼−") + Math.abs(Number(a.delta) * 100).toFixed(0) + "¢", x + 3, pad.t + 22);
+  }
+  ctx.setLineDash([]);
+  ctx.font = "11px ui-monospace,monospace";
+  // swing markers: ≥ $0.10 alerts on this market (from the live engine)
+  const markers = live.markers.get(row.ticker) || [];
+  ctx.setLineDash([3, 3]);
+  for (const m of markers) {
+    if (win !== Infinity && now - m.t > win) continue;
+    const x = X(Math.min(Math.max(m.t, t0), t1));
+    ctx.strokeStyle = m.dir === "up" ? "#00b67a" : "#f2695c";
+    ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t + ih); ctx.stroke();
+    ctx.fillStyle = m.dir === "up" ? "#00b67a" : "#f2695c";
+    ctx.fillText((m.dir === "up" ? "▲+" : "▼−") + (Math.abs(m.delta) * 100).toFixed(0) + "¢", x + 3, pad.t + 10);
+  }
+  ctx.setLineDash([]);
+  // last point callout
+  const lastP = pts[pts.length - 1] || cpts[cpts.length - 1];
+  ctx.fillStyle = css.getPropertyValue("--txt");
+  ctx.font = "12px system-ui";
+  ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
+    Math.min(X(lastP.t) + 6, W - 80), Math.max(Y(lastP.v) - 6, 12));
+
+  // Swing markers: |Δ last price| >= $0.10 between consecutive observations.
+  // Uses the `last` field (the alert rule) and is independent of the series
+  // selector, so a swing is marked even when the chart plots bid/ask. Event and
+  // market links come from the canonical alert feed (data/live/alerts.json);
+  // what sits beside each swing is the market's OWN settlement reference and a fetched reading of it
+  // (data/live/catalysts.json). Kalshi has no cause feed, so a link is never called a cause: the
+  // state word comes from the file, whose builder refuses causal wording (scripts/catalysts.py).
+  const obsLast = (state.hist?.series?.[row.ticker]?.observations || [])
+    .map(o => ({ t: Date.parse(o.t), v: o.last }))
+    .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v));
+  const swings = [];
+  for (let i = 1; i < obsLast.length; i++) {
+    const delta = obsLast[i].v - obsLast[i - 1].v;
+    if (Math.abs(delta) >= 0.10 - 1e-9) {
+      swings.push({ t: obsLast[i].t, v: obsLast[i].v, prior: obsLast[i - 1].v, delta, mag: Math.abs(delta) });
     }
-    const swings = [];
-    for (let i = 1; i < pts.length; i++) {
-      const d = pts[i].v - pts[i - 1].v;
-      if (Math.abs(d) >= 0.10 - 1e-9) swings.push({ t: pts[i].t, v: pts[i].v, prior: pts[i - 1].v, delta: d, mag: Math.abs(d), src: "observation" });
-    }
-    for (const s of swings) {
-      ctx.fillStyle = s.delta > 0 ? "#f0b429" : bad;
+  }
+  // Union with the archived swings for this market. The archive is the durable record: when
+  // the ranked window rotates a market out, its observations are deleted by the size cap but
+  // the alert row (and the prices it recorded) stays. Same >= $0.10 rule, same fields.
+  for (const a of feedForMarket) {
+    const t = Date.parse(a.to_time);
+    if (swings.some(x => Math.abs(x.t - t) <= 1500)) continue;
+    const delta = Number(a.delta);
+    if (!Number.isFinite(delta) || Math.abs(delta) < 0.10 - 1e-9) continue;
+    swings.push({ t, v: Number(a.to_price), prior: Number(a.from_price), delta, mag: Math.abs(delta), archived: true });
+  }
+  swings.sort((a, b) => a.t - b.t);
+  if (key === "last") {
+    swings.filter(s => s.t >= t0 && s.t <= t1).forEach(s => {
+      ctx.fillStyle = s.delta > 0 ? "#f0b429" : "#f2695c";
       ctx.beginPath(); ctx.arc(X(s.t), Y(s.v), 4, 0, 7); ctx.fill();
       ctx.strokeStyle = css.getPropertyValue("--panel"); ctx.lineWidth = 1.2; ctx.stroke();
-    }
-    const lastP = pts[pts.length - 1];
-    ctx.fillStyle = css.getPropertyValue("--txt"); ctx.font = "12px system-ui";
-    ctx.fillText((key === "last" ? "last " : key === "bid" ? "bid " : "ask ") + (lastP.v * 100).toFixed(1) + "¢",
-      Math.min(X(lastP.t) + 6, W - 90), Math.max(Y(lastP.v) - 6, 12));
-
-    chartModel = { kind: "observation", row, t0, t1, pad, W, H, iw, ih, points: pts.map(p => ({ t: p.t, v: p.v })) };
-    publishChartModel();
-    if (srcLine) srcLine.innerHTML = fellBack
-      ? `Kalshi's candlestick request returned nothing usable for this market (it may be past the historical cutoff or blocked by CORS), so this is the project's own observation series.`
-      : `Source: this project's observations (<code>data/live/price_history.json</code>, one point per collector run, plus live ticks in this browser session). Seconds are only possible by accumulation — <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">candlesticks only support 1/60/1440-minute intervals</a>.`;
-    foot.innerHTML = `${pts.length} observation${pts.length === 1 ? "" : "s"} between ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC). ` +
-      `Y axis is the contract price in dollars, bounded 0–1.` +
-      (widened ? ` <b>The selected window held none, so every retained observation is shown instead.</b>` : "") +
-      ` Collected by <code>scripts/collect.py</code> from <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>.`;
-    renderSwingList(swings);
+    });
   }
-
-  // -------------------------------------------------------------------- shared chrome
-  function grid(pad, iw, ih, W, H, mut, line, ctx) {
-    ctx.strokeStyle = line; ctx.fillStyle = mut; ctx.font = "11px ui-monospace,monospace"; ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = pad.t + ih * i / 4;
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
-      ctx.fillText("$" + (1 - i / 4).toFixed(2), 6, y + 4);
-    }
-    ctx.fillText("price", 6, pad.t - 4);
-    ctx.fillText("time →", W - pad.r - 44, H - 6);
-  }
-  function timeAxis(t0, t1, pad, H, iw, ctx) {
-    for (let i = 0; i <= 4; i++) {
-      const t = t0 + (t1 - t0) * i / 4;
-      const d = new Date(t);
-      const label = (t1 - t0) > 86400e3
-        ? `${d.getUTCMonth() + 1}/${d.getUTCDate()} ${String(d.getUTCHours()).padStart(2, "0")}:00`
-        : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-      ctx.fillText(label, pad.l + iw * i / 4 - 26, H - 10);
-    }
-  }
-  function renderSwingList(swings) {
-    const host = KD.$("#swings");
-    if (!swings.length) {
-      host.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between consecutive plotted points for this market in this window.</p>';
-      return;
-    }
-    const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
-    const alertFor = (t) => allAlerts.find(a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
-      || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
-    host.innerHTML = swings.slice(-40).reverse().map(s => {
+  const allAlerts = state.alerts?.all_events || state.alerts?.alerts || [];
+  const alertFor = (t) => allAlerts.find(
+    a => a.ticker === row.ticker && a.to_time && Date.parse(a.to_time) === t)
+    || allAlerts.find(a => a.ticker === row.ticker && a.observed_at && Date.parse(a.observed_at) === t);
+  const swingHost = KD.$("#swings");
+  if (!swings.length) {
+    swingHost.innerHTML = '<p class="swing-empty">No swing ≥ $0.10 between collected observations for this market. Sharp jumps (≥ $0.10) are marked on the chart when it plots the last price.</p>';
+  } else {
+    swingHost.innerHTML = swings.map(s => {
+      const a = alertFor(s.t);
       const at = new Date(s.t);
       const time = at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       const dir = s.delta > 0 ? "up" : "down";
       const deltaTxt = (s.delta > 0 ? "+" : "−") + KD.cents(Math.abs(s.delta));
-      const a = alertFor(s.t);
       const ev = a && a.event_ticker
         ? " · " + KD.srcLink(String(a.market_source || a.source || "").replace(/\/markets\/.*$/, "") + "/events/" + a.event_ticker, "event")
         : "";
-      const tag = s.src === "candle"
-        ? '<span class="badge warn" title="Measured between two consecutive candle closes; a collector-gap move can appear here that has no archived alert">candle-derived</span>'
-        : "";
       return `<div class="swing-item"><span class="dir ${dir}">${dir === "up" ? "UP" : "DOWN"}</span>` +
         `<span class="move">${KD.cents(s.prior)} → ${KD.cents(s.v)} (${deltaTxt}) · swing ${KD.cents(s.mag)}</span>` +
-        `<span>${KD.esc(time)} ${tag}${ev} ${leadHtml(row.ticker, s.t)}</span></div>`;
+        `<span>${KD.esc(time)}${ev} ${leadHtml(row.ticker, s.t)}</span></div>`;
     }).join("");
   }
+
+  foot.innerHTML = `${pts.length} collector observation${pts.length === 1 ? "" : "s"}`
+    + (candleNote ? ` and ${KD.esc(candleNote)}` : ` and no official candle interval for this window (Kalshi publishes 1, 60 and 1440-minute candles only)`)
+    + ` between ${KD.esc(new Date(t0).toISOString())} and ${KD.esc(new Date(t1).toISOString())} (UTC).
+    Y axis is the contract price in dollars, bounded 0–1. Observations come from
+    <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">GET /markets</a>,
+    candles from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">GET /series/{{series}}/markets/{{ticker}}/candlesticks</a>.
+    Dashed vertical lines are archived ≥ $0.10 swings from <code>data/live/alerts.json</code>.`;
 }
 
 // One lead row per swing: the reference the market settles on, and the published numbers beside
@@ -766,46 +739,46 @@ async function load() {
 KD.$("#catFilter").addEventListener("change", e => { state.cat = e.target.value; renderAlerts(); renderTables(); renderResolved(); renderPending(); });
 KD.$("#window").addEventListener("change", drawChart);
 KD.$("#seriesSel").addEventListener("change", drawChart);
-KD.$("#reload").addEventListener("click", () => { CANDLES.cache.clear(); load(); });
+KD.$("#reload").addEventListener("click", load);
 window.addEventListener("resize", () => { drawChart(); });
 
-/* ---- crosshair: read an exact value off the chart ------------------------
- * The canvas is a bitmap, so the trader cannot select a number from it. The
- * nearest PLOTTED point to the pointer is reported verbatim (never interpolated
- * between two points), together with its candle volume / open interest when the
- * source was a candle. This is the "simple chart, readable number" the brief asks
- * for, without adding a charting dependency to a static page.
+/* ---- pointer readout: read an exact number off the chart ------------------
+ * A canvas is a bitmap, so a trader cannot select a value from it. This reports the nearest
+ * PLOTTED point to the pointer (never a value interpolated between two points), with its UTC
+ * time, the period's volume and the quote when the point came from an official candle. It
+ * reads window.__chart, which drawChart() fills with exactly what it drew.
  */
-(function crosshair() {
+(function chartReadout() {
   const cv = KD.$("#priceChart"), out = KD.$("#chartReadout");
   if (!cv || !out) return;
-  function nearest(px, py) {
-    const m = chartModel;
-    if (!m || !m.points || !m.points.length) return null;
-    const X = t => m.pad.l + m.iw * (t - m.t0) / (m.t1 - m.t0);
-    const Y = v => m.pad.t + m.ih * (1 - Math.min(1, Math.max(0, v)));
+  const nearest = (px, py) => {
+    const c = window.__chart;
+    if (!c || !c.points || !c.points.length) return null;
+    const X = t => c.pad.l + c.iw * (t - c.t0) / (c.t1 - c.t0);
+    const Y = v => c.pad.t + c.ih * (1 - Math.min(1, Math.max(0, v)));
     let best = null, bestD = Infinity;
-    for (const p of m.points) {
-      const dx = X(p.t) - px, dy = Y(p.v) - py;
-      const d = dx * dx + dy * dy;
+    for (const p of c.points) {
+      const dx = X(p.t) - px, dy = Y(p.v) - py, d = dx * dx + dy * dy;
       if (d < bestD) { bestD = d; best = p; }
     }
     return best && bestD < 120 * 120 ? best : null;
-  }
-  cv.addEventListener("mousemove", (ev) => {
+  };
+  cv.addEventListener("mousemove", ev => {
     const rect = cv.getBoundingClientRect();
     const p = nearest(ev.clientX - rect.left, ev.clientY - rect.top);
-    if (!p) { out.textContent = "No plotted point under the pointer."; return; }
-    const utc = new Date(p.t).toISOString().replace("T", " ").replace(".000Z", "Z");
-    const bits = [`<b>${(p.v * 100).toFixed(1)}¢</b>`, utc];
-    if (p.volume !== undefined && p.volume !== null) bits.push(`${KD.num(p.volume)} contracts in period`);
-    if (p.oi !== undefined && p.oi !== null) bits.push(`open interest ${KD.num(p.oi)}`);
-    if (p.bid !== undefined && p.bid !== null) bits.push(`bid ${KD.cents(p.bid)}`);
-    if (p.ask !== undefined && p.ask !== null) bits.push(`ask ${KD.cents(p.ask)}`);
+    if (!p) { out.textContent = "No plotted point near the pointer."; return; }
+    // A candle with the same timestamp carries the volume/quote context for this point.
+    const c = (window.__chart.candles || []).find(x => x.t === p.t);
+    const bits = [`<b>${(p.v * 100).toFixed(1)}¢</b>`,
+      new Date(p.t).toISOString().replace("T", " ").replace(".000Z", "Z")];
+    if (c && c.volume !== null && c.volume !== undefined) bits.push(`${KD.num(c.volume)} contracts in period`);
+    if (c && c.bid !== null && c.bid !== undefined) bits.push(`bid ${KD.cents(c.bid)}`);
+    if (c && c.ask !== null && c.ask !== undefined) bits.push(`ask ${KD.cents(c.ask)}`);
+    if (!c) bits.push("collector observation");
     out.innerHTML = bits.join(" · ");
   });
   cv.addEventListener("mouseleave", () => {
-    out.textContent = "Move the pointer over the chart to read an exact price, volume and period.";
+    out.textContent = "Move the pointer over the chart to read an exact price, time and period volume.";
   });
 })();
 

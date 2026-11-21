@@ -46,8 +46,11 @@ UA = "KalshiDash3-collector/1.0 (+https://github.com/kanlerxz87-cyber/KalshiDash
 PRICE_HISTORY_LIMIT = 120  # points kept per market
 PER_CATEGORY_KEEP = 120    # keyword-basis rows kept per category in the committed snapshot
 SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-dollar first
-SETTLED_PUBLISHED_CAP = 600  # settled rows published, allocated ACROSS topics (see select_settled)
-SETTLED_RESERVE_PER_CATEGORY = 60  # each topic's own newest rows, kept before any leftover is shared
+SETTLED_KEEP = 1600        # most recent settled rows kept per status window, so the file stays browser-sized
+SETTLED_PUBLISH_CAP = 200  # settled rows PUBLISHED, chosen per topic (see select_settled)
+HISTORICAL_PER_SEED = 40   # settled rows pulled per seeded series from GET /historical/markets
+HISTORICAL_BACKFILL_PER_SEED = HISTORICAL_PER_SEED
+HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
@@ -215,15 +218,15 @@ def scan_markets():
         cursor, seen = "", 0
         truncated = False
         while True:
-            # mve_filter=exclude is a documented query parameter of GET /markets
+            # mve_filter=exclude is a DOCUMENTED parameter of GET /markets
             # ("'only' returns only multivariate events, 'exclude' excludes multivariate
-            # events", https://docs.kalshi.com/api-reference/market/get-markets). Without
-            # it the safety cap is spent on combo listings that are then discarded by
-            # is_multivariate(), so the cap truncates real markets instead of combos:
-            # the collector published open_in_scope 749 while scripts/roi_scan.py, which
-            # already sent this filter, counted 1,365 in-scope open markets for the same
-            # exchange. The local is_multivariate() check is kept as a belt-and-braces
-            # guard in case the parameter is ever ignored.
+            # events" — https://docs.kalshi.com/api-reference/market/get-markets). It
+            # removes the combo listings that are excluded below anyway, which is what
+            # pushed the newest-first scan into the safety cap: on main the 25,000-row
+            # window was truncated and the in-scope total moved between collector runs
+            # (749 open in scope at the 2026-11-21T00:50Z snapshot vs 1,365 in the desk
+            # scan of the same exchange). Asking the API for the smaller universe is
+            # honest filtering, not a wider guess.
             d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None,
                                     "mve_filter": "exclude"})
             batch = d.get("markets") or []
@@ -240,51 +243,6 @@ def scan_markets():
         dedup = {m["ticker"]: m for m in out[status] if m.get("ticker")}
         out[status] = list(dedup.values())
     return out
-
-
-def select_settled(rows, cap=SETTLED_PUBLISHED_CAP, reserve=SETTLED_RESERVE_PER_CATEGORY):
-    """Choose which settled markets to publish, FAIRLY ACROSS TOPICS.
-
-    Why this exists (measured on the committed 2026-11-21T15:21Z snapshot before the fix):
-    sorting every settled market by settlement_ts and keeping the newest N published
-    200 rows of which **198 were crypto** (culture 2, gas 0, elections 0, golf 0). The
-    demo exchange lists 15-minute crypto series that settle roughly 96 times a day, so a
-    single newest-first queue is structurally starved of every slower topic. The brief
-    asks for events to be tracked "until the events have resolved", per topic, so a
-    resolution feed that can only show crypto is not a feed.
-
-    Allocation, stated so the page can disclose it:
-      1. each topic gets its own newest `reserve` rows;
-      2. any capacity left over goes round-robin across the topics (newest-first inside a
-         topic), so a topic that has no recent settlements costs nothing and a fast topic
-         can only ever take the leftover capacity, never another topic's reserve;
-      3. the published list is re-sorted newest-first overall for display.
-    The published counts per category are returned so they can be written into `counts`
-    rather than inferred by a reader.
-    """
-    by_cat: dict[str, list] = {}
-    for r in sorted(rows, key=lambda r: (r.get("settlement_ts") or ""), reverse=True):
-        by_cat.setdefault(r.get("category_id") or "unknown", []).append(r)
-    picked: dict[str, list] = {c: lst[:reserve] for c, lst in by_cat.items()}
-    used = sum(len(v) for v in picked.values())
-    if used < cap:
-        idx: dict[str, int] = {c: len(picked[c]) for c in by_cat}
-        progressed = True
-        while used < cap and progressed:
-            progressed = False
-            for c, lst in by_cat.items():
-                if used >= cap:
-                    break
-                i = idx[c]
-                if i < len(lst):
-                    picked[c].append(lst[i])
-                    idx[c] = i + 1
-                    used += 1
-                    progressed = True
-    published = [r for lst in picked.values() for r in lst]
-    published.sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
-    per_cat = {c: len(v) for c, v in sorted(picked.items())}
-    return published, per_cat
 
 
 def dollars_traded(m):
@@ -381,18 +339,18 @@ def update_price_history(hist, rows):
 def backfill_from_candles(hist, tickers, max_series=12):
     """Rebuild a missing observation series from Kalshi's official 1-minute candles.
 
-    Why: an archived >=$0.10 alert whose observations were pruned before the retention fix
-    above can never be charted again by accumulation alone — the market has already settled,
-    so no future GET /markets will ever report it. The move itself is still published by
-    Kalshi, in the market's own candlestick history, so the chart can show the real series
-    around the alert instead of an empty box.
+    Why this is the only way to fix the rest of F-67: retaining history for every ticker an
+    alert cites (done above, from the archive file) stops the bleeding going forward, but it
+    cannot restore what an earlier run already deleted. A settled market is never returned by
+    GET /markets again, so no amount of future collection will re-observe it. Kalshi still
+    publishes the move itself, in that market's own candlestick history.
 
-    Only markets that (a) appear in the alert archive and (b) have no observations at all are
-    backfilled, so this never overwrites collected data and costs at most `max_series`
-    requests. Each backfilled point is a candle CLOSE, not a REST last_price observation, and
-    is marked "source": "candle" so the two can be told apart. Documented restrictions used
-    here: period_interval is 1/60/1440 minutes, start_ts/end_ts are seconds, and one request
-    spans at most 5,000 periods (https://docs.kalshi.com/api-reference/market/get-market-candlesticks).
+    Only tickers that (a) appear in the alert archive and (b) currently have NO observations are
+    touched, so collected data is never overwritten and the cost is bounded by `max_series`.
+    Each written point is a candle CLOSE and is marked "source": "candle", so it can never be
+    mistaken for a REST last_price observation. Documented restrictions honoured here:
+    period_interval is 1/60/1440 minutes, start_ts/end_ts are seconds, and one request spans at
+    most 5,000 periods (https://docs.kalshi.com/api-reference/market/get-market-candlesticks).
     A candle with no price block is skipped, never written as 0.
     """
     from datetime import datetime, timezone
@@ -404,7 +362,7 @@ def backfill_from_candles(hist, tickers, max_series=12):
             continue
         series_ticker = ticker.split("-")[0]
         end = int(datetime.now(timezone.utc).timestamp())
-        start = end - 5000 * 60            # 5,000 one-minute periods, the documented maximum
+        start = end - 5000 * 60            # exactly the documented 5,000-period maximum
         path = f"/series/{series_ticker}/markets/{ticker}/candlesticks"
         try:
             d, _ = get(path, {"start_ts": start, "end_ts": end, "period_interval": 1})
@@ -418,9 +376,8 @@ def backfill_from_candles(hist, tickers, max_series=12):
             ts = c.get("end_period_ts")
             if close is None or ts is None:
                 continue
-            when = datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
             obs.append({
-                "t": when,
+                "t": datetime.fromtimestamp(int(ts), tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "last": close,
                 "yes_bid": fnum((c.get("yes_bid") or {}).get("close_dollars")),
                 "yes_ask": fnum((c.get("yes_ask") or {}).get("close_dollars")),
@@ -428,9 +385,11 @@ def backfill_from_candles(hist, tickers, max_series=12):
                 "source": "candle",
             })
         if obs:
-            hist[ticker] = {"observations": obs[-PRICE_HISTORY_LIMIT:],
-                            "backfilled_from": f"{BASE}{path}?start_ts={start}&end_ts={end}&period_interval=1",
-                            "backfilled_at": utcnow()}
+            hist[ticker] = {
+                "observations": obs[-PRICE_HISTORY_LIMIT:],
+                "backfilled_from": f"{BASE}{path}?start_ts={start}&end_ts={end}&period_interval=1",
+                "backfilled_at": utcnow(),
+            }
             done += 1
             print(f"  candle backfill {ticker}: {len(obs)} one-minute closes")
     return hist, done
@@ -480,6 +439,100 @@ def public_market_row(m, cat_id, basis, keep_rules=False):
     return row
 
 
+DEFAULT_CATS = ("gas", "elections", "culture", "crypto", "golf")
+
+
+def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=DEFAULT_CATS):
+    """Choose which settled rows to publish, fairly across the five topics.
+
+    The published set used to be `rows[:200]` after one global newest-first sort. That
+    silently starved four of the five topics: 15-minute crypto markets settle dozens of
+    times a day, so of the 200 rows the landing page showed on 2026-11-21, 198 were crypto
+    and gas/elections/culture/golf had no resolution history at all — even though the
+    snapshot held 1,600 settled in-scope rows. The brief asks for live events tracked
+    "until the events have resolved" with topics kept separate, so the cap is now spent
+    per topic.
+
+    Round-robin, newest-first inside each topic. A topic with less history simply stops
+    contributing and the others take the remaining capacity. Returns the picked rows plus
+    the per-topic split, so the snapshot can publish exactly how the cap was spent.
+    """
+    by_cat = {}
+    for r in sorted(rows, key=lambda r: (r.get("settlement_ts") or ""), reverse=True):
+        by_cat.setdefault(r.get("category_id") or "other", []).append(r)
+    order = [c for c in cats if c in by_cat] + [c for c in by_cat if c not in cats]
+    picked, taken = [], {c: 0 for c in order}
+    while len(picked) < cap:
+        progressed = False
+        for c in order:
+            if len(picked) >= cap:
+                break
+            if taken[c] < len(by_cat[c]):
+                picked.append(by_cat[c][taken[c]])
+                taken[c] += 1
+                progressed = True
+        if not progressed:
+            break
+    picked.sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
+    return picked, {c: n for c, n in taken.items()}
+
+
+def split_and_select_settled(rows, keep=SETTLED_KEEP, cap=SETTLED_PUBLISH_CAP):
+    """Pick the published settled rows (full set first), then trim the stored window.
+
+    This exists as its own function because the ORDER is the defect: calling select_settled()
+    on the already-trimmed window looks right and is wrong. Returns
+    (stored_window, published_rows, published_by_category).
+    """
+    published, by_cat = select_settled(rows, cap=cap)
+    return rows[:keep], published, by_cat
+
+
+def historical_settled(seed_tickers, per_seed=HISTORICAL_PER_SEED):
+    """Settled rows for seeded series that the live endpoints can no longer return.
+
+    Documented behaviour: markets that settled before GET /historical/cutoff's
+    `market_settled_ts` "are only available via GET /historical/markets"
+    (https://docs.kalshi.com/getting_started/historical_data), and `GET /markets` stops
+    returning them. So a topic that settles rarely — the seeded elections series
+    KXELECTIRAN is the clear case — can look like it has no resolution history at all
+    even though the exchange settled some of its markets months ago.
+
+    Parameters used here are the ones the endpoint documents
+    (https://docs.kalshi.com/api-reference/historical/get-historical-markets):
+    `series_ticker` (one series per call; the filters are mutually exclusive),
+    `limit` (max 1000) and `cursor` for pagination.
+
+    Bounded on purpose: one request per seeded series, at most `per_seed` settled rows
+    kept, and a failure is reported and skipped — the live scan already succeeded, so a
+    historical hiccup must never fail the collection.
+    """
+    got_rows, report = {}, {}
+    for ticker in seed_tickers:
+        try:
+            d, url = get("/historical/markets", {"series_ticker": ticker, "limit": HISTORICAL_PAGE}, retries=2)
+        except RuntimeError as e:
+            report[ticker] = {"error": str(e), "kept": 0}
+            print(f"  ! historical {ticker}: {e}", file=sys.stderr)
+            continue
+        batch = d.get("markets") or []
+        kept = 0
+        for m in batch:
+            if not m.get("result"):          # only a resolved market has a result
+                continue
+            t = m.get("ticker")
+            if not t or t in got_rows:
+                continue
+            got_rows[t] = m
+            kept += 1
+            if kept >= per_seed:
+                break
+        report[ticker] = {"returned": len(batch), "kept": kept, "url": url}
+        if kept:
+            print(f"  historical {ticker:<16} -> {kept} settled market(s) from the archive")
+    return got_rows, report
+
+
 def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     cats = load_categories()
     started = utcnow()
@@ -515,7 +568,21 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                     if not cursor or not batch or got >= 5000:
                         break
                 print(f"  seed {seed['ticker']:<16} {status:<8} -> {got} market(s)")
-    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}")
+
+    # Topics that settle rarely: pull their archived settled markets as well. See
+    # historical_settled() for the documented reason this is necessary.
+    hist_cutoff, hist_report = None, {}
+    try:
+        cutoff_payload, _ = get("/historical/cutoff", retries=2)
+        hist_cutoff = cutoff_payload.get("market_settled_ts")
+    except RuntimeError as e:
+        print(f"  ! /historical/cutoff unavailable ({e})", file=sys.stderr)
+    seed_tickers = [s["ticker"] for c in cats["categories"] for s in c["seed_series"]]
+    hist_rows, hist_report = historical_settled(seed_tickers)
+    for t, m in hist_rows.items():
+        seeded["settled"].setdefault(t, m)
+    print(f"  seed markets collected: open={len(seeded['open'])} settled={len(seeded['settled'])}"
+          f" (historical backfill: {len(hist_rows)})")
     for status in ("open", "settled"):
         have = {m.get("ticker") for m in raw[status]}
         raw[status].extend([m for t, m in seeded[status].items() if t not in have])
@@ -578,9 +645,15 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     rows["open"] = kept
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
     settled_in_scope_total = len(rows["settled"])
-    settled_rows, settled_by_category = select_settled(rows["settled"])
-    settled_trimmed = max(0, settled_in_scope_total - len(settled_rows))
-    rows["settled"] = settled_rows
+    settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
+    # ORDER MATTERS, and the first version of this fix got it wrong: choosing the published
+    # set AFTER `[:SETTLED_KEEP]` looks per-topic but is not, because that 1,600-row window is
+    # itself nearly all crypto 15-minute markets. Measured on the 2026-11-21T20:27Z snapshot,
+    # which shipped that ordering: the per-topic split still came out crypto 178 / gas 17 /
+    # culture 5, with zero elections and zero golf rows. The selection therefore runs on the
+    # FULL in-scope list first, and only the leftover window is trimmed for file size.
+    rows["settled"], settled_published, settled_by_cat = split_and_select_settled(rows["settled"])
+    rows["settled"] = rows["settled"][:SETTLED_KEEP]
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -601,77 +674,33 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         except json.JSONDecodeError:
             hist = {}
     update_price_history(hist, raw["open"])
-    # Which tickers keep their observation history. This used to be "open rows only",
-    # and that silently deleted the history of markets the alert feed was still pointing
-    # at: scripts/build_alerts.py archives a >=$0.10 swing forever, but once a market
-    # rotated out of the capped open window (or settled) its observations were pruned, so
-    # dashboard.html#TICKER from an alert rendered "No observations in this window yet"
-    # for the exact series the alert was about (measured: 3 of 7 tickers in
-    # alerts_archive.json had 0 observations left on the 2026-11-21T00:50Z snapshot).
-    # The watch set is therefore open ∪ recently settled ∪ every ticker that already has
-    # an archived alert. The archive is read here, never written: its single writer stays
-    # scripts/build_alerts.py.
-    archived_tickers: set[str] = set()
-    archive_path = LIVE / "alerts_archive.json"
-    if archive_path.exists():
-        try:
-            for a in json.loads(archive_path.read_text()).get("alerts", []):
-                if a.get("ticker"):
-                    archived_tickers.add(a["ticker"])
-        except (json.JSONDecodeError, OSError):
-            archived_tickers = set()
-    watch = ({r["ticker"] for r in rows["open"]}
-             | {r["ticker"] for r in rows["settled"]}
-             | archived_tickers)
-    kept_hist = {k: v for k, v in hist.items() if k in watch}
-    hist_pruned = len(hist) - len(kept_hist)
-    hist = kept_hist
-    # Tickers an archived alert names but for which no observation survived (pruned before
-    # the retention fix, or collected while the market was outside the open window) are
-    # rebuilt from the market's own official candles, and only those.
-    missing = sorted(t for t in archived_tickers if not hist.get(t, {}).get("observations"))
-    hist, backfilled = backfill_from_candles(hist, missing)
-
-    # Exact total, or the best defensible one when the scan was capped (see counts).
-    prev_counts, prev_settled = {}, []
+    # Keep history for markets that are shown AND for every market that still carries a
+    # recorded price swing, so an alert never points at an empty graph.
+    # The original rule kept only `rows["open"]` (the capped, ranked window). A swing is
+    # archived by scripts/build_alerts.py the moment it is observed, and the ranking then
+    # rotates that market out of the window, so its observations were deleted while the
+    # alert that cites them lived on. Measured on the 2026-11-21T00:50Z snapshot: of the 7
+    # distinct tickers in data/live/alerts_archive.json, the 3 KXDEMOFUTHOURLY-* markets
+    # had 0 observations left, so dashboard.html rendered "No observations in this window
+    # yet" for exactly the series the alert was about. Alerts are read here as a file, not
+    # written (build_alerts.py stays the only writer and this script runs first).
+    # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
+    # which the collect workflow runs right after this script. This file deliberately
+    # does NOT write alerts (one writer, one schema); it only probes CORS headers.
+    watch = {r["ticker"] for r in rows["open"]}
+    archived_tickers: set = set()
     try:
-        prev_doc = json.loads((LIVE / "markets.json").read_text())
-        prev_counts = prev_doc.get("counts") or {}
-        prev_settled = prev_doc.get("settled_markets") or []
-    except (OSError, json.JSONDecodeError):
-        prev_counts = {}
-    if not raw.get("_truncated", {}).get("settled"):
-        settled_total_published = settled_in_scope_total
-        settled_total_method = "exact: this run paged the settled scan to exhaustion"
-    else:
-        base = prev_counts.get("settled_in_scope_total")
-        prev_method = str(prev_counts.get("settled_in_scope_total_method") or "")
-        if isinstance(base, int) and base > 0:
-            # A carry-forward is only as good as what it carries. A previous value that was
-            # itself produced from a truncated window is a lower bound, so this stays a lower
-            # bound and says so -- the sum can understate but can never overstate.
-            new_ticks = len({r.get("ticker") for r in rows["settled"]} - {r.get("ticker") for r in prev_settled})
-            if prev_method.startswith("exact"):
-                settled_total_published = base + new_ticks
-                settled_total_method = (
-                    "carried forward from an exact total: the settled scan was truncated by the "
-                    "%d-row safety cap, so the previous run's exact total (%s) plus the %d settled "
-                    "tickers this run had not seen before. A ticker that settled inside the capped "
-                    "gap and was never observed is not counted, so this is a lower bound."
-                    % (SAFETY_SCAN_CAP, f"{base:,}", new_ticks))
-            else:
-                settled_total_published = max(base, settled_in_scope_total)
-                settled_total_method = (
-                    "lower bound, carried forward: the settled scan was truncated by the %d-row "
-                    "safety cap in this run and the stored previous value (%s) was itself a lower "
-                    "bound, so the larger of the two is shown. The true in-scope total is at least "
-                    "this. It is never inflated to look complete." % (SAFETY_SCAN_CAP, f"{base:,}"))
-        else:
-            settled_total_published = settled_in_scope_total
-            settled_total_method = (
-                "lower bound: the settled scan was truncated by the %d-row safety cap and no "
-                "previous exact total was stored, so this is only what this run's window held."
-                % SAFETY_SCAN_CAP)
+        archive = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
+        archived_tickers = {a["ticker"] for a in archive if a.get("ticker")}
+        watch |= archived_tickers
+    except (OSError, json.JSONDecodeError, AttributeError):
+        pass  # first run: no archive yet, so open rows alone define the watch set
+    hist = {k: v for k, v in hist.items() if k in watch}
+    # Restore what an earlier, prunier run already deleted: archive-cited tickers with no
+    # observations left at all are rebuilt from their own official candles (see the docstring).
+    missing_hist = sorted(t for t in archived_tickers if not hist.get(t, {}).get("observations"))
+    hist, hist_backfilled = backfill_from_candles(hist, missing_hist)
+
 
     payload = {
         "schema": 1,
@@ -689,13 +718,8 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         "counts": {
             "open_total_scanned": len(raw["open"]),
             "settled_total_scanned": len(raw["settled"]),
-            # What this page/table actually PUBLISHES (kept for schema compatibility). These are
-            # not totals: the scan finds far more, which is why the totals below are published
-            # separately and every page labels the difference (F-72).
             "open_in_scope": len(rows["open"]),
             "settled_in_scope": len(rows["settled"]),
-            "open_published_rows": len(rows["open"]),
-            "settled_published_rows": len(rows["settled"]),
             "open_out_of_scope": unclassified["open"],
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],
@@ -709,38 +733,24 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "open_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("open")),
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
             "safety_scan_cap": SAFETY_SCAN_CAP,
-            "scan_sends_mve_filter_exclude": True,
-            # Resolution history is allocated across topics, and the allocation is
-            # published so a reader never has to infer why a topic is thin.
-            # Exact while paging ran to exhaustion. When the safety cap stopped the scan, the
-            # window covers only the newest N settled markets, so the previous exact total is
-            # carried forward plus this run's newly settled tickers. The method is published
-            # next to the number so neither kind of value is passed off as the other.
-            "settled_in_scope_total": settled_total_published,
-            "settled_in_scope_total_method": settled_total_method,
-            "settled_in_scope_this_run_window": settled_in_scope_total,
-            "settled_published": len(rows["settled"]),
-            "settled_published_cap": SETTLED_PUBLISHED_CAP,
-            "settled_published_reserve_per_category": SETTLED_RESERVE_PER_CATEGORY,
-            "settled_published_by_category": settled_by_category,
-            "settled_published_by_category_allocation": (
-                "per-topic reserve of %d newest rows each, then round-robin for any leftover "
-                "capacity, then re-sorted newest-first" % SETTLED_RESERVE_PER_CATEGORY),
             "settled_rows_trimmed_for_size": settled_trimmed,
+            # What was published out of what was in scope, and the per-topic split:
+            # the row cap must never be spent by one high-frequency topic alone.
+            "settled_in_scope_total": settled_in_scope_total,
+            "settled_kept_window": len(rows["settled"]),
+            "settled_published": len(settled_published),
+            "settled_publish_cap": SETTLED_PUBLISH_CAP,
+            "settled_published_by_category": settled_by_cat,
+            "historical_cutoff_market_settled_ts": hist_cutoff,
+            "historical_backfill_rows": len(hist_rows),
+            "price_history_backfilled_from_candles": hist_backfilled,
+            "price_history_archived_tickers": len(archived_tickers),
+            "historical_backfill_report": hist_report,
             "open_rows_trimmed_for_size": trimmed,
             "rows_dropped_wrong_status": wrong_bucket,
-            # Price-history retention: open + settled + every ticker with an archived alert.
-            "price_history_series_kept": len(hist),
-            "price_history_series_pruned": hist_pruned,
-            "price_history_kept_for_archived_alerts": len(archived_tickers),
-            "price_history_backfilled_from_candles": backfilled,
-            "price_history_backfill_note": (
-                "Archived-alert tickers with no surviving observation are rebuilt from "
-                "GET /series/{series}/markets/{ticker}/candlesticks (1-minute closes, marked "
-                "source=candle) so a published swing can always be charted."),
         },
         "open_markets": rows["open"],
-        "settled_markets": rows["settled"],
+        "settled_markets": settled_published,
         "liquidity": depth_rows,
         "disclaimers": [
             "All values are from the Kalshi DEMO environment (mock funds). The official docs warn that demo prices and behaviour may not reflect real markets.",
@@ -757,8 +767,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         json.dumps({"schema": 1, "note": "Observations accumulated from GET /markets last_price_dollars on each collector run. Seconds resolution is only possible by accumulation because candlesticks support 1/60/1440-minute intervals only.", "series": hist}, indent=1)
     )
 
-    print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets, "
-          f"{len(rows['settled'])} settled rows {settled_by_category})")
+    print(f"  wrote {LIVE/'markets.json'} ({len(rows['open'])} in-scope open markets)")
     return payload
 
 
