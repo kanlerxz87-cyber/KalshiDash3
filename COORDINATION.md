@@ -1333,3 +1333,24 @@ origin/main
 | Live data proof (no rendering involved) | `origin/main` `data/live/alerts.json` shows the scope rule running in production: `all_events 41, high_roi 32, withheld_out_of_scope 20` with reason `series filed under Test: 20`; `data/findings.json` carries F-75, F-76, F-77 | `git show origin/main:data/live/alerts.json`, `git show origin/main:data/findings.json` |
 | Live page proof | `flagged.html` renders "58 flagged irregularities · 22 high" (the extra entries are another session's, merged after #83); `verification.html` renders the C-nn ledger; `executive-summary.html` renders the counts from the ledgers and the 15-minute cadence copy | cache-busted fetches at 23:31Z |
 | Main moved again during this close-out | PR #78 (`arena/220b524c`) and two relay snapshots landed before this addendum; merged into this branch cleanly (no conflict) and the gate re-run before pushing | `git log --oneline origin/main` |
+
+### Close-out (T69)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #85](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/85) merged 2026-11-21T23:34:45Z** as `b7029e352a1ae1a1fdff4ba6f637dae201aac53a` (merge commit, no approval wait) | `gh pr view 85` |
+| Release gate in Actions on this branch | **success** — `pages.yml` run [44962030074](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44962030074), dispatched explicitly because a push to this branch registered no `pull_request` run (the same platform behaviour this repo recorded for PR #2/#71). Local `scripts/verify_release.py` PASS immediately before the merge. | Actions API |
+| Pages deploy of the merge | **confirmed** — Pages builds API reports `b7029e3` `built` at 2026-11-21T23:35:13Z; `pages.yml` push run + `pages-build-deployment` completed success | `repos/…/pages/builds`, `gh run list --branch main` |
+| Live site | `https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html` serves the evidence bar (`swings served 63 · traded 12 · thin 20 · no trades 0 · volume n/a 0 · candle-sourced 5 · no history 5 · traded floor: 100 contracts (project rule, not a Kalshi field)`), the "traded only" control and per-row chips (`candle-sourced`, `gave back ≥½`). Fetched after the deploy. | live fetch |
+| Merge conflicts | Three cycles, none discarded: PR #78/#82/#83 (renumbered my rows to F-79/F-80/F-81), PR #86 and PR #87 (both only `data/live/alerts*.json` — taken from main and rebuilt with `scripts/build_alerts.py`, so the feeds carry main's newer snapshot *and* this session's evidence). Every conflict resolution was followed by `build_alerts.py` + `validate_alerts.py` + the full gate. | `git log` |
+
+**Final numbering note (read before citing these):** this session's three findings are **F-79, F-80, F-81**.
+They were written as F-75/F-76/F-77, renumbered to F-78/F-79/F-80 when `main` published F-75–F-77 in PR #79, and
+renumbered a second time when `main` published its own **F-78** (two divergent `model` definitions) in PR #78.
+Each row's `why` text records both renumberings, so a reader landing on any of the earlier numbers in this log can
+follow them forward.
+
+**What is still open and is NOT claimed by this session:** no settled-outcome test has been run to show that a
+`traded_ge_floor` swing is more likely to resolve in the direction of the move than a `thin` or `quote_only` one.
+The evidence layer makes that test cheap (it is a stratifier on data the site already publishes); it does not make
+the claim. Until such a test is published, the chips must be read as a description of liquidity, not as a signal.
