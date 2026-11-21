@@ -760,11 +760,23 @@
    "severity": "medium",
    "item": "The published snapshot was stale for most of the day: the collector's */20 cron delivered 2 scheduled runs in ~10 hours",
    "why": "GitHub documents that the schedule event is best-effort: 'The schedule event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped.' Measured on this repository (gh run list --workflow=collect.yml, 2026-11-20/21): 23 runs, of which 21 were manual workflow_dispatch and only 2 arrived from the schedule (2026-11-20T19:14Z and 2026-11-21T00:49Z). desk.yml, on a */10 cron, similarly produced 2 scheduled runs out of 16. The effects compound: pushes made with the repository's GITHUB_TOKEN do not start workflows, so each committed snapshot never triggered the Pages deploy workflow either. The site was correct about being stale (its banner appears after 45 minutes) but a dashboard labelled 'live' was showing hours-old prices.",
-   "action": "Partially fixed and honestly documented. collect.yml now uses two off-peak crons (7,27,47 and 13,43 - minutes deliberately away from the top of the hour, per the same doc) instead of a single */20, and its last step queues the next run with workflow_dispatch, which GitHub documents as the exception that 'always create workflow runs' when called with GITHUB_TOKEN; it needs permissions.actions: write, which is added. The stale banner now says how old the snapshot is and links the reason, instead of implying no collector exists. Whether the chained dispatch actually raises the observed run rate can only be measured after this merges - recorded on the coordination board, not claimed as verified here.",
+   "action": "Partially fixed and honestly documented. collect.yml now uses two off-peak crons (7,27,47 and 13,43 \u2014 minutes deliberately away from the top of the hour, per the same doc) instead of a single */20. The stale banner now says how old the snapshot is and links the reason, instead of implying no collector exists. See F-41 for what the first attempt at an automated freshness fallback got wrong, and for the bounded version that replaced it.",
    "sources": [
     "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule",
     "https://docs.github.com/en/actions/concepts/security/github_token",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml"
+   ]
+  },
+  {
+   "id": "F-41",
+   "severity": "high",
+   "item": "Self-inflicted defect: the first freshness fallback dispatched collections back-to-back (a runaway loop), caught and fixed within minutes",
+   "why": "To work around GitHub's best-effort schedule, the first version of the last step in collect.yml queued the next collection unconditionally using workflow_dispatch (documented to always create a run when called with GITHUB_TOKEN). Because the dispatched run also ran that step, it chained with no delay. Measured from the Actions API after dispatching it once on branch arena/cf49f42a-kalshidash3 on 2026-11-21: runs 44876177777 (06:34:21Z) -> 44876253177 (06:35:20Z) -> 44876330331 (06:36:17Z) -> 44876426619 (06:37:36Z) -> 44876553969 (06:39:14Z), i.e. a new collection and commit every 1-2 minutes. Nothing false was published and every run was green, but it is not a cadence, it consumes shared Actions capacity, and unchecked it would have run indefinitely.",
+   "action": "Contained, then replaced. The workflow was disabled on the default branch (gh api PUT .../disable, state now disabled_manually) and the in-flight run was cancelled, which stopped the chain; verified by watching the run list stay unchanged. The step is now a bounded watchdog: it reads data/live/markets.json, and dispatches at most one run only if the committed snapshot is older than 35 minutes AND no collect run is queued or in progress AND fewer than 3 dispatches have happened in the last hour; otherwise it exits without dispatching. The guard logic was exercised locally against three constructed states (stale/0-in-flight/0-recent -> dispatch; one in flight -> no; hourly cap reached -> no), and every branch logs its decision. It is still not a clock: the cron schedules remain the primary trigger. Re-enabling on the default branch is a deliberate step recorded on the coordination board.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml",
+    "https://docs.github.com/en/actions/concepts/security/github_token",
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule"
    ]
   }
  ]

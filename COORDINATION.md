@@ -1088,3 +1088,42 @@ F-37), **F-39** (high: natural-gas futures classified as Gas Prices; demo QA fix
 - Second-resolution charts cannot be *requested* from Kalshi (candlesticks accept 1/60/1440-minute intervals:
   https://docs.kalshi.com/api-reference/market/get-market-candlesticks); seconds on the X-axis therefore come
   from accumulated observations plus in-browser poll points, and the page says which.
+
+#### T25/T26/T27 post-fix verification (this session, live run — not a claim, a measurement)
+
+- `collect.yml` dispatched on this branch (`gh workflow run collect.yml --ref arena/cf49f42a-kalshidash3`),
+  run **44876177777**, conclusion **success** at ~06:36Z. It committed `e2b8a58`
+  `data: demo snapshot 2026-11-21T06:34Z` (`collected_at 2026-11-21T06:34:55Z`).
+- The snapshot proves the scope fix on real data: `open_excluded_off_topic_or_qa: 8`,
+  `settled_excluded_off_topic_or_qa: 96`, `excluded_series_reasons: {"KXNATGAS15M": "natural-gas futures
+  (Commodities, Pyth NATGAS), not retail gasoline prices"}`, and **0** natural-gas rows and **0** QA-fixture
+  rows remain, versus 11 and 1 before. `seed_markets_found` is unchanged at 5,825, i.e. no confirmed market
+  was lost by the correction.
+- Culture's headline market changed from the QA fixture to a real one, verified at the official API:
+  `GET /markets/KXFEATURE-26GTA6SCORE-ZEDD` -> title "Will Zedd be featured on Grand Theft Auto VI: The
+  Original Score?", `rules_primary` "If Zedd is featured on the album ... then the market resolves to Yes.",
+  `volume_fp 0.00`, `last 0.0000` (the page shows $0 and 0 contracts; nothing is invented).
+- Crypto's headline also re-verified after the price moved: `GET /markets/KXBTCY-27JAN0100-B97500` ->
+  `last 0.0100`, `volume_fp 72319449.06` => estimate $723,194.49 at the new price; the previous
+  `KXBTCY-27JAN0100-B147500` row still exists (`volume_fp 65336335.23`, `last 0.9800`).
+- F-40 remains **partially** verified: the code change is live, but whether the chained dispatch raises the
+  observed run rate can only be measured from scheduled runs after this merges. Not claimed as verified.
+
+#### T25 incident (this session, 06:34–06:45Z): runaway dispatch loop — contained, documented as F-41
+
+The first freshness fallback in `collect.yml` queued the next collection unconditionally. It chained:
+`44876177777` (06:34:21Z) → `44876253177` (06:35:20Z) → `44876330331` (06:36:17Z) → `44876426619`
+(06:37:36Z) → `44876553969` (06:39:14Z) — a collection and commit every 1–2 minutes. All runs were green
+and nothing false was published, but it is not a cadence. Contained by `gh api PUT
+.../actions/workflows/collect.yml/disable` (state `disabled_manually`) plus cancelling the in-flight run;
+the run list then stayed flat, verified over ~2 minutes. The step is now a bounded watchdog (stale >35 min,
+zero in flight, ≤3 dispatches/hour, each branch logging its decision) and the guards were exercised locally
+in three constructed states. Filed as **F-41** with the run IDs. Re-enabling on `main` after merge is a
+deliberate follow-up recorded here, not something this session will leave implicit.
+
+Data conflict policy used this session (so nothing is hand-edited): `data/live/markets.json`,
+`price_history.json`, `alerts_archive.json` and `cors.json` are written by `collect.yml` only; when they
+conflicted with `main`, this session took the newer collector-produced file and then regenerated the derived
+artefacts with their own scripts (`build_alerts.py`, `catalysts.py`, `simulate.py`). The snapshot it kept is
+the one produced by the run with the scope fix (`06:34:55Z`, `open_excluded_off_topic_or_qa: 8`,
+`settled_excluded_off_topic_or_qa: 96`, 0 natural-gas and 0 QA rows).
