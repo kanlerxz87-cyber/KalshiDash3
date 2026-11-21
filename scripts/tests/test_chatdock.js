@@ -123,9 +123,15 @@ function counts(w) {
 
   check(!!panel && !panel.hasAttribute("hidden"), "the dock mounts and opens on a category page");
   const c = counts(w);
-  const realGe10 = archiveWithDecoy.alerts.filter((a) => Math.abs(Number(a.delta)) >= 0.10 - 1e-9).length;
+  // F-76: a ≥$0.10 row is replayed only when it is in one of the five topics. Rows whose series
+  // GET /series files under Test/Demo, or with no confirmed topic, are withheld and counted.
+  const inScope = archiveWithDecoy.alerts.filter((a) => {
+    const cats = (a.series_categories || []).map(String);
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).length;
   check(c.all > 0, `history replay rendered ${c.all} rows`);
-  check(c.all === Math.min(realGe10, 80), `row count equals the ≥$0.10 archive rows (${realGe10})`);
+  check(c.all === Math.min(inScope, 80), `row count equals the in-scope ≥$0.10 archive rows (${inScope})`);
   const text = panel.textContent;
   check(!text.includes("sub-threshold decoy"), "the 0.09 decoy row is refused (threshold is ≥ $0.10)");
   check(/NaN|undefined|\[object Object\]/.test(text) === false, "no NaN/undefined/object leakage");
@@ -200,9 +206,11 @@ function counts(w) {
     "history rows are still rendered when the demo API refuses the browser");
 
   /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32 — cron health line");
+  console.log("\nT32 — run health line (R-B1: no cron name, no expected interval)");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector cron|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(/collector:|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(!/\*\/20|cronExpression|every 20m/.test(health), "health line names no cron and no expected interval (R-B1)");
+  check(/newest run|no runs in the last|API not reachable/.test(health), "health line reports the newest run (R-B1)");
 
   console.log("");
   teardown();

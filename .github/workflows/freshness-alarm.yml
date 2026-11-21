@@ -1,9 +1,11 @@
 name: Freshness alarm (independent monitor)
 
-# Why this workflow exists — F-67, measured 2026-11-21 on this repository:
+# Why this workflow exists — measured 2026-11-21 on this repository (flagged F-40, F-63, F-73,
+# and the relay record in COORDINATION.md T55):
 #
-# The data on the site is only as live as the last `collect.yml` run. `collect.yml` already
-# declares 12 scheduled runs per hour, and the GitHub Actions API shows four `schedule`
+# The data on the site is only as live as the last `collect.yml` run. `collect.yml` declares
+# 5 scheduled runs per hour (crons 7,27,47 and 13,43) and, on main, a single run is a 15-minute
+# relay that queues its own successor. Even so, the GitHub Actions API showed only four `schedule`
 # deliveries in ~20 hours on main (gh run list --workflow=collect.yml --jq '[.[]|select(.event=="schedule")]'):
 #   2026-11-20T19:14:35Z, 2026-11-21T00:49:31Z, 2026-11-21T15:15:48Z, 2026-11-21T15:20:32Z
 # The GitHub docs say why that can happen, verbatim:
@@ -15,6 +17,12 @@ name: Freshness alarm (independent monitor)
 # start a new workflow run, so the step only ever runs when a run is already happening — i.e.
 # exactly when it is not needed. The rescue has to come from a DIFFERENT workflow with its own
 # schedule, which is what this file is.
+#
+# F-74 (fixed 2026-11-21, session arena-42e3b260): this file used to dispatch with
+# `gh workflow run collect.yml --ref main --event workflow_dispatch`. `gh workflow run` has no
+# `--event` flag (only --ref, --field, --raw-field, --json; see `gh workflow run --help` and
+# https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go), so every alarm dispatch took
+# its "dispatch failed" branch. The invalid flag is removed below.
 #
 # Honest limit, stated here rather than discovered later: this monitor runs on the same
 # `schedule` mechanism, so it is exposed to the same delays and drops. It reduces the blast
@@ -81,7 +89,8 @@ jobs:
           # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
           if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
           if [ "$recent" -ge 1 ]; then echo "this monitor already dispatched within the hour; waiting for the cron"; exit 0; fi
-          gh workflow run collect.yml --ref main --event workflow_dispatch \
+          # No --event flag: `gh workflow run` only creates a workflow_dispatch event (F-74).
+          gh workflow run collect.yml --ref main \
             && echo "::warning::snapshot was ${AGE_MIN}m old — queued one collection" \
             || echo "::warning::dispatch failed; the cron schedules remain the only trigger"
 
