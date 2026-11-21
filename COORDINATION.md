@@ -1242,3 +1242,40 @@ Published as **F-64** on the Flagged page.
 
 **Defects this session introduced and fixed, all published**: F-63 (runaway dispatch loop) and F-64 (landing
 table rendered empty). Both are on the Flagged page with run IDs and source links; neither was quietly repaired.
+
+---
+
+## Session `arena-617e3472` — catalyst review update for 2026-11-20T19:48Z–2026-11-21T06:42Z swings + live official-source verification & publish (branch `arena/617e3472-kalshidash3`)
+
+Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z (`26b4650`) before editing any implementation file. Note: `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52) landed F-37 and `verified_facts.json` changes on `main`, so this session dropped its overlapping file edits per the non-overlapping-scope rule and restricted its file scope to `data/catalyst_review.json`, `data/live/catalysts.json`, and `COORDINATION.md`.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T38 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:42Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXDEMOFUTHOURLY-26NOV21H07-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | done | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` (14/21 swings carry fetched links, 28 links traceable, 7 BRTI swings carry explicit `not_reviewed_reasons`), `scripts/verify_release.py` PASS | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) settle on CF Benchmarks' BRTI, which has no free public time series; documented in `not_reviewed_reasons` |
+| T39 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `api.exchange.coinbase.com`, `gasprices.aaa.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` PASS + live URL fetches; PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60) | — |
+
+### Sources fetched and verified live in this session (`arena-617e3472`, 2026-11-21)
+
+- `https://docs.kalshi.com/getting_started/demo_env` — confirmed recommended REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds at `https://demo.kalshi.co/`, and verbatim warning that demo market prices/behavior may not reflect real markets.
+- `https://docs.kalshi.com/getting_started/orderbook_responses` — confirmed bids-only structure (`orderbook_fp.yes_dollars` / `no_dollars`), ascending price order with best bid last, reciprocal `YES BID at X = NO ASK at $1.00 - X`, and `200` + empty arrays for unknown tickers.
+- `https://docs.kalshi.com/getting_started/market_settlement` — confirmed `$1` per contract payout on the winning side, net positions only, zero settlement fees for simple yes/no determinations.
+- `https://docs.kalshi.com/getting_started/quick_start_websockets` — confirmed handshake authentication (`KALSHI-ACCESS-KEY`, `KALSHI-ACCESS-SIGNATURE`, `KALSHI-ACCESS-TIMESTAMP`) required even for public channels (`ticker`, `trade`, `market_lifecycle_v2`).
+- `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` — confirmed `exchange_active: true`, `trading_active: true` across all 4 demo shards.
+- Live market records fetched directly from `https://external-api.demo.kalshi.co/trade-api/v2/markets/{ticker}`:
+  - `KXDEMOFUTHOURLY-26NOV20H20-UP`: `status: "finalized"`, `result: "yes"`, `settlement_value_dollars: "1.0000"`, `settlement_ts: "2026-11-20T20:01:18.417962Z"`, strike `58337.51 USD`.
+  - `KXDEMOFUTHOURLY-26NOV21H07-UP`: `status: "active"`, `last_price_dollars: "0.5500"`, `yes_bid_dollars: "0.0100"`, `yes_ask_dollars: "0.9900"`, `volume_24h_fp: "6665.00"`, `open_interest_fp: "100.00"`, strike `55704.83 USD`.
+  - `KXAAAGASM-26DEC31-3.30`: `status: "active"`, `last_price_dollars: "0.3000"`, `yes_bid_dollars: "0.2900"`, `yes_ask_dollars: "0.7100"`, `volume_24h_fp: "22.13"`, `open_interest_fp: "209.00"`.
+  - `KXAAAGASM-26NOV30-3.90`: `status: "active"`, `last_price_dollars: "0.7500"`, `volume_fp: "31027.52"`, `open_interest_fp: "24988.65"`.
+  - `KXPGATOUR-THRC26-MPEN`: `status: "active"`, `last_price_dollars: "0.0880"`, `yes_bid_dollars: "0.0830"`, `yes_ask_dollars: "0.0880"`, `volume_fp: "434504.17"`, `open_interest_fp: "419786.51"`.
+  - `KXELECTIRAN-27JAN01`: `status: "active"`, `last_price_dollars: "0.9000"`, `volume_fp: "3.19"`, `open_interest_fp: "0.02"`.
+  - `KXGRAMMYNOMROTY-QA7CECC5-QA`: `status: "active"`, `last_price_dollars: "0.5000"`, `volume_fp: "10.00"`, `rules_primary: "Demo portfolio test only."`.
+  - `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`, `KXBTC15M-26NOV210145-45`: confirmed CF Benchmarks BRTI settlement rules and quotes.
+- Reference publishers fetched directly:
+  - `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z` — 33 one-minute candles recorded in `data/catalyst_review.json` (`19:30Z` close `58111.03`, crossed `58337.51` strike up at `19:38Z` `58388.07`, `19:48Z` close `58481.38`).
+  - `https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z` — 15 one-minute candles recorded in `data/catalyst_review.json` (`06:34Z` close `56355.0`, `06:39Z` close `56578.4`, `06:42Z` close `56826.05`).
+  - `https://gasprices.aaa.com/` — confirmed current national average regular `$3.6898` as of `11/20/26` (yesterday `$3.7212`, week ago `$3.8724`).
+- Request logged for `sources.html` / `data/verified_facts.json` owner: in `sources.html`'s "Project-local computations" table, update `scripts/alerts.py` to `scripts/build_alerts.py`; in `data/verified_facts.json`, consider adding `"source": "https://docs.kalshi.com/api-reference/market/get-markets"` on unverified row `F-20` (while keeping `value: ""` and `verified: false`).
+
+### Log (this session)
+- 2026-11-21 06:36Z: claimed tasks on `arena/617e3472-kalshidash3` (`26b4650`) and pushed claim immediately before editing implementation files.
+- 2026-11-21 06:58Z: merged `origin/main` (`62e4811`), dropped overlapping file edits (`index.html`, `sources.html`, `data/verified_facts.json`) in favour of `arena-968ce6ec` (PR #51) and `arena-17d4ecfa` (PR #52), rebuilt `data/live/catalysts.json` from `data/catalyst_review.json`, ran `python3 scripts/verify_release.py` (all Python, Node, jsdom, and 21-page checks PASS), and opened PR #60 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/60).
