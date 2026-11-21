@@ -1498,3 +1498,30 @@ Base: `f09f982`, merged forward onto `9ca45e5` (`origin/main`, after PRs #63, #6
 - 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63 verbatim; narrowed scope to T50–T52.
 - 2026-11-21 20:32Z: Completed T50 (`dashboard.html` live-tick + `yes_bid`/`yes_ask` fix, `assets/chatdock.js` chart links, `sources.html` `scripts/build_alerts.py` fix, regression tests) and T51 (16/25 swings reviewed, 33 traceable links, 9 BRTI swings with official-record reasons). Merged `origin/main` (`9ca45e5`, PRs #64/#65) keeping `data/verified_facts.json` and both board records verbatim. `scripts/verify_release.py` PASS.
 
+
+---
+
+### T47–T49 closed out — 2026-11-21 20:20Z–20:45Z
+
+| Item | Result |
+|---|---|
+| **T47** line-by-line verification | **done.** Every row of `data/verified_facts.json` re-checked against its official page, live, this session; 3 documented limits that were missing were added (F-61/F-62/F-63), the one blank row (F-20) now names the endpoint it is checked against while staying blank+unverified. Counts moved 65 → **68 total / 67 verified / 1 deliberately blank**. All 13 seed series and both fee formulas re-confirmed against the fee-schedule PDF. |
+| **T48** data freshness | **done.** `collect.yml` run `44945469134` and `desk.yml` run `44945471636` both **success** on this branch. Snapshot 15:21:23Z → 20:18:25Z; `main`'s later collector runs then carried it to 20:27:24Z. Alerts 23 → **25** archived ≥$0.10 swings. |
+| **T49** PR → merge → Pages | **done.** PR **#64** (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/64) opened with the build gate **pass**, merged as **`9ca45e5`**. `deployments` for `github-pages` show **`9ca45e5`** deployed (2026-11-21T20:31:42Z); `pages.status = built`. Live verification of `https://kanlerxz87-cyber.github.io/KalshiDash3/data/verified_facts.json` returns **68 facts / 67 verified / 1 unverified** with **F-61, F-62, F-63 present** — i.e. the published site serves this session's changes, not just the repo. |
+
+**Conflicts resolved (nothing discarded):** `COORDINATION.md` conflicted with `arena-dc62f2bb`'s section — kept **both**
+sections verbatim. `data/live/{markets,alerts,alerts_archive,catalysts,cors,roi}.json` conflicted with later collector
+runs on `main` — kept **main's** newer snapshots (20:27:24Z) over this branch's 20:18:25Z, because the data files are
+collector-owned and newest-real wins. Full suite re-run after each rebase: **PASS**.
+
+**Measured cadence (for the stale-data finding):** between 06:49Z and 20:45Z today, `collect.yml` produced 2
+`schedule` runs and `desk.yml` 2 `schedule` runs in ~14 h, i.e. the documented scheduler does not hold a 20-minute
+cadence. Every fresh snapshot today came from a `workflow_dispatch` (this session's included). The 45-minute
+stale-snapshot banner on the site is therefore correct and load-bearing, not decorative. The workflow fix itself is
+`arena-b25b0914`'s T43 — logged, not duplicated here.
+
+**Still open, unchanged, and now listed with sources:** F-20 (live values are collection outputs, never static facts),
+F-07 (no demo credentials — a human must create the account), F-14/F-26 (the "high-ROI" feed is this project's
+disclosed screen, not an owner-supplied model), F-24 (browser CORS is undocumented by Kalshi), F-31 + F-04/F-06
+(every WebSocket session needs a key, so a static site cannot stream ticks), F-61/F-62 (5,000-period request cap and
+the historical cutoff for settled markets).
