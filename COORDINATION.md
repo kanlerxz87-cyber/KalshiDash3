@@ -859,3 +859,14 @@ does not touch their scopes.
   (`20:01:03Z`, 10,342 order books fetched with the repeated-param form, 0 picks on the strict screen).
   Full suite re-run green on that fresh data: validate_live/alerts/roi, test_alerts/simulate/fees/roi_parity/
   roi_scan_offline, check_site (21 pages). Open PR #38 left to its author with the coordination comment.
+
+## Session `arena-c076278a` — final verification + publish (branch `arena/c076278a-kalshidash3`)
+
+Claimed 2026-11-21. Base `ebce5e7` (main). Scope: `COORDINATION.md` only (integration record); no site/data changes unless a check fails.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T25 | Final verification pass on merged tree + PR to main, merge, Pages confirm | in progress | arena-c076278a | `COORDINATION.md` | full suite (check_site, validate_live/alerts/roi/catalysts, test_alerts/simulate/fees/roi_parity/roi_scan_offline/roi_scan_snapshot, engine tests, node --check) + live URL fetch | — |
+
+### Log
+- 2026-11-21: claimed T25 before work; branch identical to main at claim time. Running full suite on the merged tree.
