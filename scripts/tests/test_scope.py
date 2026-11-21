@@ -173,8 +173,14 @@ from unittest import mock as _mock
 
 CATS_DOC = json.loads((ROOT / "data" / "categories.json").read_text())
 for c in CATS_DOC["categories"]:
-    check(bool(c.get("official_categories")) or bool(c.get("official_tags")),
-          f"topic {c['id']} must declare at least one official GET /series filter (F-66)")
+    has_filter = bool(c.get("official_categories")) or bool(c.get("official_tags"))
+    # A topic may legitimately have NO official filter, but then it must say why in
+    # official_mapping_note and that note must name the observation that ruled the filter out.
+    check(has_filter or bool(c.get("official_mapping_note")),
+          f"topic {c['id']} must either declare an official GET /series filter or explain why not (F-66)")
+    if has_filter:
+        check(bool(c.get("official_mapping_note")),
+              f"topic {c['id']} must record how its filter was verified (F-66)")
     check(c.get("official_source", "").startswith("https://docs.kalshi.com/"),
           f"topic {c['id']} must link the official docs for its filter (F-66)")
 
@@ -185,7 +191,7 @@ FAKE = {
     "Economics": ["KXAAAGASM", "KXAAAGASD"],
     "Sports": ["KXPGATOUR", "KXBALLONDOR", "KXEPLFIRSTGOAL"],
 }
-TAGS = {"Golf": ["KXPGATOUR", "KXGOLF", "KXGOLFTENNISMAJORS"], "Oil & Gas": ["KXAAAGASM"]}
+TAGS = {"Golf": ["KXPGATOUR", "KXGOLF", "KXGOLFTENNISMAJORS"]}
 
 
 def fake_get(path, params=None, retries=3):
@@ -205,9 +211,13 @@ check(omap.get("KXNYCMAYOR2ND", {}).get("category_id") == "elections",
       "official ?category=Elections must map an election series to Elections (F-66)")
 check(omap.get("KXGOLF", {}).get("category_id") == "golf",
       "official ?tags=Golf must map a Sports-categorised golf series to Golf (F-66)")
-check(omap.get("KXBALLONDOR", {}).get("category_id") == "golf",
-      "precondition: ?category=Sports maps Ballon d'Or into the Sports-based topic (golf), which is "
-      "exactly why the per-topic series exclusion is needed to keep it out of both (F-66)")
+check("KXWTIDIRY" not in omap,
+      "?category=Sports and ?tags=Oil & Gas must not be used as topic filters: they return other "
+      "sports and crude oil, which would flood Golf and Gas (F-66)")
+check("Sports" not in {c.get("value") for c in ocalls if c.get("filter") == "category"},
+      "Sports must never be used as a whole-topic filter (4,243 series; it contains every sport) (F-66)")
+check(collect.excluded_series_reason("culture", "KXBALLONDOR") is not None,
+      "the Ballon d'Or exclusion is what keeps a Sports award out of Culture (F-66)")
 check(all(c["url"].startswith("https://external-api.demo.kalshi.co/trade-api/v2/series?")
           for c in ocalls if "error" not in c),
       "every discovery call must record the exact official URL it used (F-66)")

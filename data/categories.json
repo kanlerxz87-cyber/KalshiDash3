@@ -19,14 +19,11 @@
         "gasoline"
       ],
       "keyword_fallback_verified": false,
-      "official_categories": [
-        "Economics"
-      ],
-      "official_tags": [
-        "Oil & Gas"
-      ],
+      "official_categories": [],
+      "official_tags": [],
       "official_source": "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses."
+      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses.",
+      "official_mapping_note": "No official filter isolates RETAIL gasoline: ?tags=Oil & Gas returns WTI crude, heating oil and Pyth WTI futures (verified 2026-11-21), and ?category=Economics returns CPI/GDP/jobs. Gas therefore stays on the fee-schedule AAA series plus the gasoline keyword. ?tags=Golf and ?category=Crypto and ?category=Entertainment are verified narrow filters (134/321/2,631 series); the same check is what ruled out Oil & Gas for gasoline."
     },
     {
       "id": "elections",
@@ -53,7 +50,8 @@
       ],
       "official_tags": [],
       "official_source": "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses."
+      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses.",
+      "official_mapping_note": "?category=Elections returned 2,710 series, all elections (KXNYCMAYOR2ND, KXVILNIUSMAYOR, KXELECTIRAN). Exact fit."
     },
     {
       "id": "culture",
@@ -107,14 +105,10 @@
       "official_categories": [
         "Entertainment"
       ],
-      "official_tags": [
-        "Awards",
-        "Movies",
-        "Television",
-        "Music"
-      ],
+      "official_tags": [],
       "official_source": "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses."
+      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses.",
+      "official_mapping_note": "?category=Entertainment returned 2,631 series: the Emmys, SAG Awards, CMA Awards, BET Awards, Billboard and Rotten Tomatoes series. The fee-schedule seed list names only six of them. The ?tags=Awards filter is NOT used because it also returns sports awards."
     },
     {
       "id": "crypto",
@@ -154,7 +148,8 @@
       ],
       "official_tags": [],
       "official_source": "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses."
+      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses.",
+      "official_mapping_note": "?category=Crypto returned 321 series, all crypto. Exact fit."
     },
     {
       "id": "golf",
@@ -188,14 +183,13 @@
         "masters"
       ],
       "keyword_fallback_verified": false,
-      "official_categories": [
-        "Sports"
-      ],
+      "official_categories": [],
       "official_tags": [
         "Golf"
       ],
       "official_source": "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses."
+      "official_note": "Series returned by GET /series with these exact, case-sensitive filter values are in this topic (basis=official). Verified live on 2026-11-21: ?category=Elections and ?category=Entertainment and ?tags=Golf all return series; ?category=Entertainment is how Kalshi files the Emmys, SAG Awards, CMA Awards and Billboard series that the fee-schedule seed list mostly misses.",
+      "official_mapping_note": "?tags=Golf returned 134 series (KXGOLF, KXPHOENIXOPEN, KXTGLCHAMPION). ?category=Sports is NOT used: it returned 4,243 series and would put every other sport inside Golf."
     }
   ]
 }
