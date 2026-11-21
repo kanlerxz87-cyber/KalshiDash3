@@ -940,6 +940,11 @@ main's README did not enumerate.
   R-B6), new **F-74** (freshness-alarm.yml uses a nonexistent `gh workflow run --event` flag; R-B7 — numbered F-74
   because `main` had already published its own F-72 while this branch was open), new **F-73**
   (site copy still says '20 minutes'; R-B8). Relay observed live on main at 21:15:08Z (run 44950553883).
+- 2026-11-21 ~21:35Z: `main` merged again (PR #74 `a599b20` close-out + collector commits; board conflict in
+  `COORDINATION.md` auto-resolved — this record and `arena-b25b0914`'s relay close-out both retained). `data/findings.json`:
+  `main` had published its own **F-72** (candle backfill), so this branch's freshness-alarm entry is **F-74**; `README.md`
+  back to `main`'s exact content (main now enumerates `test_settled_selection.py`; my duplicate line dropped). Findings-ledger
+  formatting made byte-consistent with `main` (escaped non-ASCII), so the diff carries only the intended rows.
 
 ## Session `arena-b25b0914` — collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)
 
