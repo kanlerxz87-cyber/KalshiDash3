@@ -849,6 +849,19 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
     "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
    ]
+  },
+  {
+   "id": "F-67",
+   "severity": "high",
+   "item": "The freshness mechanism did not work, and could not have: a workflow cannot rescue its own schedule",
+   "why": "The site's data is only as live as the last collector run, so this matters more than it looks. Measured from the GitHub Actions API on 2026-11-21 (gh run list --workflow=collect.yml, event == schedule, on main): 2026-11-20T19:14:35Z, 2026-11-21T00:49:31Z, 15:15:48Z, 15:20:32Z \u2014 four scheduled deliveries in roughly twenty hours against a declared cadence of 12 per hour, including the back-to-back 15:15/15:20 pair that GitHub's own documentation describes as conflation under load. The 35-minute self-dispatch 'freshness watchdog' added to answer this (F-63/F-40) could never have closed the gap: the snapshot commit is pushed with the repository's GITHUB_TOKEN, and GitHub documents that such a push does not start a workflow run, so the dispatch step only executes inside a run that is already happening \u2014 precisely when it is not needed. Meanwhile the site told the reader 'no collection has committed for 5h', which was true and is the only reason this is a data-quality problem rather than a false-data problem.",
+   "action": "The self-dispatch step is gone; the same job now prints the measured schedule deliveries and the snapshot age so the number is on the record in every run (it changes nothing, and says why in the file). A separate workflow, .github/workflows/freshness-alarm.yml, monitors staleness on its own cron (23,53 * * * *) and dispatches at most one collection per hour and none while one is in flight, guarding against the runaway loop recorded as F-63. That monitor is itself subject to the same platform delays and drops; that is stated in its header rather than discovered later, and the site keeps rendering the snapshot age instead of implying the data is current.",
+   "sources": [
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule",
+    "https://docs.github.com/en/actions/concepts/security/github_token",
+    "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ]
   }
  ]
 }
