@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T20:53:06Z",
- "snapshot_collected_at": "2026-11-21T20:34:40Z",
+ "generated_at": "2026-11-21T20:58:44Z",
+ "snapshot_collected_at": "2026-11-21T20:58:43Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,10 +11,10 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 16,
-  "high_roi": 12,
-  "archive_total": 28,
-  "new_this_run": 0,
+  "all_events": 17,
+  "high_roi": 13,
+  "archive_total": 29,
+  "new_this_run": 1,
   "withheld_category_conflict": 12,
   "withheld_reasons": {
    "crypto": {
@@ -23,6 +23,31 @@
   }
  },
  "all_events": [
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:34:40Z",
+   "to_time": "2026-11-21T20:58:43Z",
+   "from_price": 0.57,
+   "to_price": 0.17,
+   "delta": -0.4,
+   "direction": "down",
+   "volume_24h_fp": 10187.91,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:58:44Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
    "event_ticker": "KXPGATOUR-THRC26",
@@ -436,6 +461,31 @@
   }
  ],
  "high_roi": [
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-21T20:34:40Z",
+   "to_time": "2026-11-21T20:58:43Z",
+   "from_price": 0.57,
+   "to_price": 0.17,
+   "delta": -0.4,
+   "direction": "down",
+   "volume_24h_fp": 10187.91,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "to_yes_bid": 0.16,
+   "to_yes_ask": 0.17,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-21T20:58:44Z",
+   "high_roi": true
+  },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
    "event_ticker": "KXPGATOUR-THRC26",
