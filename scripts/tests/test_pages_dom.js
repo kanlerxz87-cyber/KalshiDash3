@@ -47,6 +47,9 @@ function mkFetch(mode, state) {
     const u = String(url);
     const send = (body, ok = true) => ({ ok, status: ok ? 200 : 500, json: async () => body, text: async () => JSON.stringify(body) });
     if (/external-api\.demo\.kalshi\.co|demo-api\.kalshi\.co/.test(u)) {
+      // The candle stub is served in BOTH modes: it is the one endpoint the chart must reach,
+      // and making it reachable in snapshot mode keeps this test about the chart, not CORS.
+      if (state.candleDoc && /\/candlesticks/.test(u)) { state.calls.push(u); return send(state.candleDoc); }
       if (mode !== "api") { state.blocked++; const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
       state.calls.push(u);
       if (u.includes("/exchange/status")) return send({ trading_open: true });
@@ -114,12 +117,12 @@ function inlineAssets(html) {
   });
 }
 
-async function loadPage(file, mode) {
+async function loadPage(file, mode, opts = {}) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0, badBookQuery: null };
+  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null };
   const errors = [];
   const dom = new JSDOM(html, {
-    url: "https://kalshidash3.invalid/" + file,
+    url: "https://kalshidash3.invalid/" + file + (opts.hash ? "#" + encodeURIComponent(opts.hash) : ""),
     runScripts: "dangerously",
     pretendToBeVisual: true,
     beforeParse(window) {
@@ -316,6 +319,92 @@ function commonAsserts(label, r) {
         "index.html: a demo QA fixture must never be the largest live market of a category");
     }
     console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
+    r.close();
+  }
+
+
+  /* --- F2. dashboard chart: official candles + a market reachable only from the alert archive ---
+   * Two defects this guards, both measured on the committed data before the fix:
+   *  1. the page never loaded a single official candle, even though the interval selector is on the
+   *     page (assets/live.js had the endpoint, dashboard.html has the selector);
+   *  2. GET /markets omits the whole price block on a zero-volume period, so a naive
+   *     Number(undefined)->NaN / Number("")->0 read would either break the line or print a fake 0c.
+   * The stub returns one real candle plus one zero-volume candle with an empty close, and the page
+   * must plot the former and skip the latter.
+   */
+  {
+    const nowS = Math.floor(Date.now() / 1000);
+    const candleDoc = { ticker: "stub", candlesticks: [
+      { end_period_ts: nowS - 3600, price: { close_dollars: "0.5000", open_dollars: "0.4000", high_dollars: "0.6000", low_dollars: "0.3000", mean_dollars: "0.5000" },
+        yes_bid: { close_dollars: "0.4800" }, yes_ask: { close_dollars: "0.5200" }, volume_fp: "10.00" },
+      { end_period_ts: nowS - 1800, price: { previous_dollars: "0.5000" }, volume_fp: "0.00",
+        yes_bid: { close_dollars: "" }, yes_ask: { close_dollars: "" } },
+      // third shape, also price-less: an explicit empty string rather than an absent key.
+      { end_period_ts: nowS - 900, price: { close_dollars: "", open_dollars: "" }, volume_fp: "0.00",
+        yes_bid: { close_dollars: "" }, yes_ask: { close_dollars: "" } },
+    ] };
+    const r = await loadPage("dashboard.html", "snapshot", { candleDoc });
+    commonAsserts("dashboard.html candles", r);
+    const candleCalls = r.state.calls.filter(u => u.includes("/candlesticks"));
+    check(candleCalls.length >= 1, "the dashboard must request the official candlestick endpoint for the selected market");
+    check(candleCalls.every(u => /period_interval=(1|60|1440)\b/.test(u)),
+      "candlestick requests must use a documented period_interval (1, 60 or 1440 only): " + (candleCalls[0] || ""));
+    check(candleCalls.every(u => /start_ts=\d+/.test(u) && /end_ts=\d+/.test(u)),
+      "candlestick requests must carry start_ts and end_ts, which the endpoint requires");
+    check(/official 1-minute candle/.test(r.text),
+      "the chart footer must state that the muted line is official candles, with the interval named");
+    // The stub returns three candles; two carry no usable price (one omits the price block, as
+    // the API does for a zero-volume period, one returns an explicit empty string). Exactly one
+    // must be plotted: that proves a missing price is dropped rather than read as
+    // Number("") === 0, which would draw a fake 0c print on the chart.
+    check(/\b1 official 1-minute candle\b/.test(r.text),
+      "a candle without a price block must be skipped, not plotted as 0c (expected exactly 1 of 3 candles plotted)");
+    check(!/official 1-minute candles\b/.test(r.text),
+      "the zero-volume candle (no price block) must not be counted as a plotted candle");
+    console.log(`  F candles       ok  (${candleCalls.length} official candle request(s), interval + window present, no fake 0c)`);
+    r.close();
+  }
+
+  /* --- G. dashboard deep link: a market that is only in the alert archive still charts ---
+   * scripts/collect.py used to prune data/live/price_history.json to the ranked open window, so a
+   * market cited by an archived alert had zero observations and the chart said "Pick a market".
+   * The alerts chat now links to dashboard.html#TICKER; that link must resolve to a real row.
+   */
+  const publishedFeed = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8")); } catch (e) { return null; } })();
+  if (publishedFeed && publishedFeed.all_events && publishedFeed.all_events.length) {
+    const archivedTicker = publishedFeed.all_events[0].ticker;
+    const r = await loadPage("dashboard.html", "snapshot", { hash: archivedTicker });
+    commonAsserts("dashboard.html deep link", r);
+    check(!/Pick a market from the tables below/.test(r.text),
+      `#${archivedTicker} (cited by an archived alert) must open a chart, not the "pick a market" placeholder`);
+    check(r.text.includes(archivedTicker), "the deep-linked market's own ticker must be shown");
+    console.log(`  G deep link     ok  (#${archivedTicker} from the alert archive opens a chart)`);
+    r.close();
+  }
+
+  /* --- H. index.html: the settled KPI must state both numbers, labelled ---
+   * F-37 was raised twice: the card read "of <stored rows> settled markets in scope" — the
+   * collector's stored-row cap (200) — while the banner on the same page printed
+   * counts.settled_in_scope (1,600). Main's fix labels the stored count as "settled rows in this
+   * snapshot" and prints the in-scope total beside it. This asserts both numbers are present and
+   * the stored cap is never used as the in-scope label.
+   */
+  if (markets && markets.counts && markets.counts.settled_in_scope) {
+    const r = await loadPage("index.html", "snapshot");
+    commonAsserts("index.html", r);
+    const inScope = markets.counts.settled_in_scope;
+    const stored = (markets.settled_markets || []).length;
+    const flat = r.text.replace(/\s+/g, " ");
+    check(flat.includes(inScope.toLocaleString()),
+      `the KPI and banner must state the in-scope total (${inScope})`);
+    check(flat.includes(stored.toLocaleString()),
+      `the KPI or banner must name the stored rows (${stored})`);
+    // the original defect: the stored count printed as the in-scope total
+    check(!flat.includes(stored.toLocaleString() + " settled markets in scope"),
+      `the stored count (${stored}) must never be printed as "settled markets in scope"`);
+    check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
+      `the stored count (${stored}) must never be printed as "settled rows in scope"`);
+    console.log(`  H index KPI     ok  (${stored} stored rows named, ${inScope} in scope stated)`);
     r.close();
   }
 

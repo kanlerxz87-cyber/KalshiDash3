@@ -719,7 +719,7 @@ window.KDL = (() => {
   AT.load();
 
   return {
-    BASE, ALERT_THRESHOLD, MODEL, STRATS,
+    BASE, ALERT_THRESHOLD, MODEL, STRATS,   // BASE lets a page print the exact official URL it queried
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
     feedAlerts, clearFeed, renderFeed, bubble,
@@ -730,7 +730,6 @@ window.KDL = (() => {
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
     esc, num, cents, money, takerFee, bandOf,
-    BASE,                       // exposed so a page can print the exact official URL it queried
     markets: S.markets
   };
 })();

@@ -181,13 +181,17 @@ KD.nav("");
   const resHost = KD.$("#resolutions");
   if (resHost) {
     resHost.innerHTML =
-      `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows published in this snapshot,
-        newest first. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}.
+      `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
+        newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
         The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
-        published set is chosen <b>per topic</b> so one high-frequency topic cannot take the whole cap
-        (${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "per-topic split not published yet — refresh after the next collector run")}).
-        Raw fields: <code>counts.settled_published</code>, <code>counts.settled_published_by_category</code>.
-        Full list on <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
+        collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
+        series cannot crowd out gas, elections, culture or golf
+        (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
+        Settled markets older than the exchange's published historical cutoff
+        (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) are only available from
+        <code>GET /historical/markets</code>, so a topic whose last settlement predates it can legitimately have nothing
+        here — that is a gap in the archive, not a market that never resolved (<a href="flagged.html">F-66</a>). Full list on
+        <a href="dashboard.html#resolved">Live dashboard</a>.</p>` +
       KD.table(
         [{ key: "t", label: "Resolved (UTC)" }, { key: "cat", label: "Topic" },
          { key: "title", label: "Market" }, { key: "res", label: "Result" },

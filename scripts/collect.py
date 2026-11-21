@@ -49,6 +49,7 @@ SEED_KEEP = 400            # confirmed (seed) rows kept per category, largest-do
 SETTLED_KEEP = 1600        # most recent settled rows kept per status window, so the file stays browser-sized
 SETTLED_PUBLISH_CAP = 200  # settled rows PUBLISHED, chosen per topic (see select_settled)
 HISTORICAL_PER_SEED = 40   # settled rows pulled per seeded series from GET /historical/markets
+HISTORICAL_BACKFILL_PER_SEED = HISTORICAL_PER_SEED
 HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 
@@ -217,7 +218,17 @@ def scan_markets():
         cursor, seen = "", 0
         truncated = False
         while True:
-            d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None})
+            # mve_filter=exclude is a DOCUMENTED parameter of GET /markets
+            # ("'only' returns only multivariate events, 'exclude' excludes multivariate
+            # events" — https://docs.kalshi.com/api-reference/market/get-markets). It
+            # removes the combo listings that are excluded below anyway, which is what
+            # pushed the newest-first scan into the safety cap: on main the 25,000-row
+            # window was truncated and the in-scope total moved between collector runs
+            # (749 open in scope at the 2026-11-21T00:50Z snapshot vs 1,365 in the desk
+            # scan of the same exchange). Asking the API for the smaller universe is
+            # honest filtering, not a wider guess.
+            d, _ = get("/markets", {"status": status, "limit": 1000, "cursor": cursor or None,
+                                    "mve_filter": "exclude"})
             batch = d.get("markets") or []
             out[status].extend(batch)
             seen += len(batch)
@@ -407,6 +418,17 @@ def select_settled(rows, cap=SETTLED_PUBLISH_CAP, cats=DEFAULT_CATS):
     return picked, {c: n for c, n in taken.items()}
 
 
+def split_and_select_settled(rows, keep=SETTLED_KEEP, cap=SETTLED_PUBLISH_CAP):
+    """Pick the published settled rows (full set first), then trim the stored window.
+
+    This exists as its own function because the ORDER is the defect: calling select_settled()
+    on the already-trimmed window looks right and is wrong. Returns
+    (stored_window, published_rows, published_by_category).
+    """
+    published, by_cat = select_settled(rows, cap=cap)
+    return rows[:keep], published, by_cat
+
+
 def historical_settled(seed_tickers, per_seed=HISTORICAL_PER_SEED):
     """Settled rows for seeded series that the live endpoints can no longer return.
 
@@ -565,11 +587,14 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
     settled_in_scope_total = len(rows["settled"])
     settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
+    # ORDER MATTERS, and the first version of this fix got it wrong: choosing the published
+    # set AFTER `[:SETTLED_KEEP]` looks per-topic but is not, because that 1,600-row window is
+    # itself nearly all crypto 15-minute markets. Measured on the 2026-11-21T20:27Z snapshot,
+    # which shipped that ordering: the per-topic split still came out crypto 178 / gas 17 /
+    # culture 5, with zero elections and zero golf rows. The selection therefore runs on the
+    # FULL in-scope list first, and only the leftover window is trimmed for file size.
+    rows["settled"], settled_published, settled_by_cat = split_and_select_settled(rows["settled"])
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
-    # The published set is chosen from the kept window, per topic. Selecting after a global
-    # newest-first cut was the second half of F-41: that window is itself almost all crypto
-    # 15-minute markets, so a per-topic split of it would still have no elections rows.
-    settled_published, settled_by_cat = select_settled(rows["settled"])
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -590,11 +615,25 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         except json.JSONDecodeError:
             hist = {}
     update_price_history(hist, raw["open"])
-    # Only keep history for markets that are actually shown, so the file stays small.
+    # Keep history for markets that are shown AND for every market that still carries a
+    # recorded price swing, so an alert never points at an empty graph.
+    # The original rule kept only `rows["open"]` (the capped, ranked window). A swing is
+    # archived by scripts/build_alerts.py the moment it is observed, and the ranking then
+    # rotates that market out of the window, so its observations were deleted while the
+    # alert that cites them lived on. Measured on the 2026-11-21T00:50Z snapshot: of the 7
+    # distinct tickers in data/live/alerts_archive.json, the 3 KXDEMOFUTHOURLY-* markets
+    # had 0 observations left, so dashboard.html rendered "No observations in this window
+    # yet" for exactly the series the alert was about. Alerts are read here as a file, not
+    # written (build_alerts.py stays the only writer and this script runs first).
     # NOTE: alerts.json and alerts_archive.json are written by scripts/build_alerts.py,
     # which the collect workflow runs right after this script. This file deliberately
     # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
+    try:
+        archive = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
+        watch |= {a["ticker"] for a in archive if a.get("ticker")}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        pass  # first run: no archive yet, so open rows alone define the watch set
     hist = {k: v for k, v in hist.items() if k in watch}
 
 
