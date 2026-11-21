@@ -325,11 +325,11 @@
   },
   {
    "id": "C-45",
-   "claim": "GET /markets returns series_ticker: null on the demo environment (observed 2026-11-20)",
-   "value": "series_ticker is null on every sampled row, so the series must be derived from the ticker prefix",
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=open&limit=25",
+   "claim": "GET /markets omits series_ticker on the demo environment (a JSON parser surfaces it as null)",
+   "value": "series_ticker is absent on every sampled row (re-observed 2026-11-21), so the series must be derived from the ticker prefix",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXELECTIRAN&status=open",
    "verified": true,
-   "note": "The field exists in the schema but was empty in practice. Collector now derives the series from the part of the ticker before the first hyphen (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM) and keeps the raw API value alongside, so a wrong derivation fails to match rather than silently misclassifying."
+   "note": "Re-checked live 2026-11-21: the market object returned by GET /markets?series_ticker=KXELECTIRAN (and GET /markets/KXELECTIRAN-27JAN01) contains event_ticker but no series_ticker key at all. The earlier wording said the field was 'null'; in the raw body it is absent, and both readings are the same to a JSON parser. The collector derives the series from the part of the ticker before the first hyphen (KXAAAGASM-26MAR31-4.00 -> KXAAAGASM) and keeps the raw API value alongside as series_ticker_from_api, so a wrong derivation fails to match rather than silently misclassifying."
   },
   {
    "id": "C-46",

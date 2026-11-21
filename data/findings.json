@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T23:35:00Z",
+ "generated": "2026-11-21T23:45:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:20Z) closed R-B1/R-B7/R-B8 as F-75/F-74/F-73 (statuses now 'fixed'), corrected the F-40/F-70 cadence wording, and renumbered the claim ledger to C-nn so F-nn on this page is unambiguous.",
  "questions": [
   {
@@ -988,6 +988,18 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
     "https://docs.kalshi.com/api-reference/market/get-series-list",
     "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-77",
+   "severity": "high",
+   "item": "Demo BTC year-end range markets oscillate between about 2c and 99c, so 25 of the 31 model picks are 50c+ 'moves' in four markets — the ROI screen is measuring demo oscillation",
+   "why": "Measured on the committed 2026-11-21T23:01:10Z snapshot (data/live/alerts.json): of 31 high_roi picks, 25 are BTC year-end range markets (KXBTCY-27JAN0100-B32500 6, B87500 6, B97500 8, B77500 3, B52500 2), and 26 of 31 picks are moves of 50c or more. The archive shows KXBTCY-27JAN0100-B32500 reversing 99c <-> 2c on five consecutive 15-minute observations (21:46, 22:01, 22:16, 22:31, 22:46, 23:01). Checked against Kalshi's own endpoint on 2026-11-21 at 23:45Z: the 1-minute candlesticks for that market over 21:40-22:05Z show price.close_dollars alternating 0.0300 / 0.9900 / 0.0300 within minutes (high 0.99, low 0.03 in almost every candle) and yes_bid close 0.00-0.03 against yes_ask 0.03-0.99. So the prints are real exchange data — the market is genuinely oscillating — but a 97c 'swing' accompanied by a 96c spread is not a tradable opportunity, and 15 of the 31 picks had a quote wider than 10c at the alert instant. The screen (F-26) is disclosed as a heuristic, but a feed that is 80% one demo artifact is not useful for decisions.",
+   "action": "Disclosed, not silently re-scored: alerts.html now renders the concentration from the committed feed on every load (how many picks are 50c+ moves, how many had >10c quotes, and the three most frequent tickers) and names F-77. Re-scoring or adding a spread gate would change the frozen high_roi flag and is an owner decision (F-26); the paper simulator already refuses quotes wider than its 0.10 cap, so no paper position was opened on a wide quote. Suggested next step for the owner: require spread <= 0.05 at the alert time before a pick enters the model feed.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY/markets/KXBTCY-27JAN0100-B32500/candlesticks?start_ts=1795296000&end_ts=1795299000&period_interval=1",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
    ]
   }
  ]

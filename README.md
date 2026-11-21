@@ -144,6 +144,10 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
   `to_yes_ask` (request R-2, implemented 2026-11-20); entries written before that still have no quote and
   stay unfilled, as do quotes whose spread exceeds the 0.10 cap (Flagged F-19, F-23).
 - Paper results on demo prices are not evidence that a strategy would make money in real markets (Kalshi: demo prices may not reflect real markets).
+- The alert chats cover the five topics only. An archived swing whose series the exchange's own
+  `GET /series` record files under Test/Demo, or for which no single topic can be confirmed, is
+  withheld from both chats and from the paper simulator, counted under
+  `counts.withheld_out_of_scope` / `counts.excluded_out_of_scope`, and left in the archive (F-76).
 
 ## Sources
 
