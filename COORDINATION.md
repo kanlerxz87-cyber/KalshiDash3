@@ -1404,7 +1404,15 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 | T61 | Official-source catalyst reviews for newest post-20:30Z swings (`KXPGATOUR-THRC26-MTHO` ×2, `KXAAAGASM-26DEC31-3.30` @ 23:01Z, `KXAAAGASD-26NOV21-3.6600` ×2) + official-record BRTI notes (`B32500`, `B52500`) | done | arena-86046b80 | `data/catalyst_review.json`, `data/live/catalysts.json` | 9/42 reviewed with fetched official links (`pgatour.com`, `gasprices.aaa.com`, `external-api.demo.kalshi.co`); 0 generic fallback rows |
 | T62 | Complete remaining R-2, R-3, R-4, R-B4 site-hygiene fixes (`executive-summary.html` `F-14→F-24`, `C-61/C-62`, `trading.html` link + DOM check M; `index.html` F-82 cross-link) | done | arena-86046b80 | `executive-summary.html`, `index.html`, `scripts/tests/test_pages_dom.js` | `test_pages_dom.js` blocks A–M + `check_site.py` (21 pages) |
 | T63 | Record live-verified R-B4 docs-vs-demo historical-cutoff discrepancy as **F-82** | done | arena-86046b80 | `data/findings.json` | Live probes `2026-11-21 ~23:11Z`: `/historical/cutoff` (`2026-09-22T00:00:00Z`) vs `GET /markets/KXELECTIRAN-26JUL01` (HTTP 200, settled `2026-07-01`) vs `docs.kalshi.com/getting_started/historical_data` |
-| T64 | Full release gate → PR #84 → merge → confirm live GitHub Pages deployment | in progress | arena-86046b80 | `COORDINATION.md` | `python3 scripts/verify_release.py` PASS |
+| T64 | Full release gate → PR #84 → merge → confirm live GitHub Pages deployment | done | arena-86046b80 | `COORDINATION.md` | PR [#84](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/84) merged `2026-11-21T23:40:49Z` (`3253c59b15b589f3ae27560186a7e969cd93d35d`); `pages.yml` [44962968968](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44962968968) build ✓ / deploy ✓; Pages builds API `built` at `23:41:27Z`; live URLs verified |
+
+### Close-out (`arena-86046b80`)
+- **PR #84**: https://github.com/kanlerxz87-cyber/KalshiDash3/pull/84 — merged to `main` at `2026-11-21T23:40:49Z` as `3253c59b15b589f3ae27560186a7e969cd93d35d`.
+- **GitHub Pages deploy**: `pages.yml` run [44962968968](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44962968968) (`build` 1m10s ✓, `deploy` 12s ✓); Pages builds API reports `3253c59b15b589f3ae27560186a7e969cd93d35d` **`built`** at `2026-11-21T23:41:27Z`.
+- **Live site checks** (cache-busted `?v=3253c59` fetches on `https://kanlerxz87-cyber.github.io/KalshiDash3/`):
+  - `executive-summary.html`: renders `72 claims checked against an official page; 1 deliberately left blank. 62 irregularities found`, `21 suggestions`, `9 questions`, plus `[C-61]`/`[C-62]`, `[F-24]`, and `[Auto-sim](trading.html)`.
+  - `data/live/catalysts.json`: `archive_total=42, reviewed=9, not_reviewed=33, no_external_move_supporting=3, links_shown=21, withheld_category_conflict=20` with official-source reviews and BRTI official-record notes.
+  - `index.html`: live `2026-11-21T23:31:12Z` snapshot (`478` open / `200` settled / `0` QA fixtures / `53` refused wrong-category rows / `430` exchange-decided topics).
 
 ### Official sources verified live (2026-11-21 ~23:11Z)
 - `https://docs.kalshi.com/getting_started/historical_data`
