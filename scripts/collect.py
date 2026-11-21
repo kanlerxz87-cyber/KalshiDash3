@@ -416,12 +416,25 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
                 continue
             st = series_of(m)
             s = series_index.get(st, {})
+            # The keyword fallback used to see ONLY the markets title (or yes_sub_title), which is
+            # where it lost most of the in-scope universe. Measured 2026-11-21 on the official API:
+            # the 2028 presidential field is titled "Who will win the next presidential election?"
+            # with the person's name in yes_sub_title/no_sub_title/subtitle, so a title-only test
+            # matched nothing but the word "president" and the collector published 37 elections
+            # rows of which 36 were empty Van Hollen backers markets, while KXPRESPERSON-28-RPAU
+            # (790,337 contracts, 61,177 in 24h) was missing. Every field below is the market's own
+            # text, so this widens where a heuristic may look and confirms nothing.
+            _hay = " ".join(
+                str(x) for x in (
+                    m.get("title"), m.get("yes_sub_title"), m.get("no_sub_title"), m.get("subtitle"),
+                ) if x
+            )
             cat_id, basis = classify(
                 cats,
                 st,
                 s.get("title"),
                 " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
-                m.get("title") or m.get("yes_sub_title"),
+                _hay,
             )
             if not cat_id:
                 unclassified[status] += 1

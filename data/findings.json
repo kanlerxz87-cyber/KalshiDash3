@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T06:50:00Z",
+ "generated": "2026-11-21T07:05:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
  "questions": [
   {
@@ -764,6 +764,18 @@
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-trades",
     "https://docs.kalshi.com/getting_started/quick_start_websockets"
+   ]
+  },
+  {
+   "id": "F-41",
+   "severity": "high",
+   "item": "Elections coverage was almost entirely missing: the category was filled with empty placeholder markets while the live 2028 presidential field was invisible",
+   "why": "The keyword classifier in scripts/collect.py looked only at a market's title (or yes_sub_title when the title was absent). The 2028 presidential field is titled \"Who will win the next presidential election?\" with the candidate in yes_sub_title/no_sub_title/subtitle, so the classifier matched nothing but the word \"president\". The committed snapshot (2026-11-21T00:50:12Z) therefore held 37 elections rows of which 36 were zero-volume KXVANHOLLENBACKERS placeholder markets, and KXPRESPERSON-28-RPAU \u2014 790,337 contracts traded, 61,177 in 24h, 665,591 open interest \u2014 was absent. GET /markets?series_ticker=KXPRESPERSON confirms those markets are open and active on the official demo API. The same blind spot dropped KXPRESNOMD (the Democratic-nominee field) and would drop KXPGATOUR rows whose titles do not carry the series name.",
+   "action": "Fixed: the heuristic may now read every text field the market itself returns \u2014 title, yes_sub_title, no_sub_title and subtitle \u2014 and nothing else. Category membership is unchanged in kind: fee-schedule series stay 'confirmed', everything matched by text stays labelled 'keyword' and is flagged. Regression tests pin both directions plus the word-boundary trap: scripts/tests/test_classify.py (7 tests, including every one of the 13 seed series). Re-verified locally against the real API rows quoted above; the next collect.yml run will publish the recovered rows.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPRESPERSON&limit=5",
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
    ]
   }
  ]

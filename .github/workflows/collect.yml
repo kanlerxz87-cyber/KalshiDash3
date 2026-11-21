@@ -64,6 +64,7 @@ jobs:
           run_v validate_live   python3 scripts/tests/validate_live.py
           run_v validate_alerts python3 scripts/tests/validate_alerts.py
           run_v test_alerts     python3 scripts/tests/test_alerts.py
+          run_v test_classify   python3 scripts/tests/test_classify.py
           run_v test_simulate   python3 scripts/tests/test_simulate.py
           run_v validate_catalysts python3 scripts/tests/validate_catalysts.py
           exit $status
