@@ -226,11 +226,15 @@ def main() -> int:
         if p.get("quote_bid") is not None and p.get("quote_ask") is not None \
                 and (p["quote_ask"] - p["quote_bid"]) > max_spread + 1e-9:
             # The entry quote breached the spread rule (possible only for fills made before the rule existed).
-            p.update(
-                status="voided", outcome="void",
-                bid_now=None, unrealized_net=None, realized_net=None,
-                mark_note=f"entry spread above {max_spread:.2f}: not a tradable quote",
-            )
+            # A voided entry never traded, so no position exists to mark. Clear any mark a
+            # PREVIOUS run wrote while this row was still open: positions and closed rows are
+            # carried forward in `state`, and without this the published ledger showed
+            # bid_now 0.0 / unrealized_net -1.0 on a row whose own note reads "not a tradable
+            # quote" — a $1.00 loss that no fill ever produced (measured on the committed
+            # data/live/simulation.json at 2026-11-21T00:50Z, position
+            # "S2|KXDEMOFUTHOURLY-26NOV20H14-UP@...|no").
+            p.update(status="voided", outcome="void", mark_note=f"entry spread above {max_spread:.2f}: not a tradable quote",
+                     bid_now=None, unrealized_net=None, mark_at=None)
             bump(counters, p["strategy"], "voided")
             closed.append(p)
             del positions[pid]
@@ -277,12 +281,20 @@ def main() -> int:
             exit_fee = taker_fee(bid, contracts, multiplier_for(p.get("series_ticker"), strat))
             p["unrealized_net"] = round(bid - p["entry_price"] - p["entry_fee"] - exit_fee, 4)
 
-    # Normalize carried-forward voided rows so a stale open mark can never survive.
-    for p in closed:
-        if p.get("status") == "voided":
-            p["bid_now"] = None
-            p["unrealized_net"] = None
-            p["realized_net"] = None
+    # 2b) Normalise rows carried forward from an earlier run.
+    #
+    # Voided and scalar rows are moved to `closed` and never revisited, so a mark written in the
+    # run where they were still open stayed on them forever. The committed file carried
+    # bid_now 0.0 / unrealized_net -1.0 on a row whose own note reads "entry spread above 0.10:
+    # not a tradable quote" — a $1.00 loss no fill produced. Clearing at the moment of voiding
+    # (above) only helps rows voided from now on, so the carried-forward rows are normalised
+    # here every run. A row that never traded has no position: nothing to mark, no P&L.
+    for p_ in closed:
+        if p_.get("status") == "voided" or p_.get("outcome") == "void":
+            p_["bid_now"] = None
+            p_["unrealized_net"] = None
+            p_["mark_at"] = None
+            p_["realized_net"] = None
 
     # 3) Summaries and state for the next run.
     open_list = sorted(positions.values(), key=lambda p: p["entered_at"], reverse=True)[:MAX_OPEN_KEPT]
@@ -307,6 +319,9 @@ def main() -> int:
             "id": st["id"], "name": st["name"], "side_rule": st["side_rule"],
             "signal_filter": st["signal_filter"], "description": st["description"],
             "signals": c["signals"], "not_filled": c["not_filled"],
+            # Each key appears once. The three not_filled_* counters and "voided" were each
+            # written twice here (the second copy silently won and shadowed the first, so a
+            # reader editing one of them would have changed nothing). Same values, now single.
             "not_filled_no_quote": c["not_filled_no_quote"], "not_filled_bad_price": c["not_filled_bad_price"],
             "not_filled_wide_spread": c["not_filled_wide_spread"], "voided": c["voided"],
             "skipped_duplicate": c["skipped_duplicate"],

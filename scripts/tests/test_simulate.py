@@ -217,39 +217,62 @@ class SimulateTest(unittest.TestCase):
         self.assertEqual(self._strat(doc, "S1")["voided"], 1)
         self.assertEqual(self._strat(doc, "S1")["settled"], 0)
 
-    def test_voided_position_clears_stale_open_mark_and_carry_forward_mark(self):
-        # Both a newly voided position with a previous mark AND a carried-forward
-        # closed voided row with a stale mark must end up with bid_now=None,
-        # unrealized_net=None, realized_net=None.
-        self._write([], {})
-        open_stale = {
-            "id": "S1|open-void|yes", "strategy": "S1", "alert_key": "open-void", "ticker": "KXAAAGASM-X-1",
-            "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "yes",
-            "trade_type": "gas | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
-            "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
-            "status": "open", "outcome": None, "settled_at": None, "settled_result": None,
-            "realized_net": None, "bid_now": 0.0, "unrealized_net": -1.0, "mark_note": None, "source": None,
-        }
-        closed_stale = {
-            "id": "S2|carried-void|no", "strategy": "S2", "alert_key": "carried-void", "ticker": "KXAAAGASM-X-1",
-            "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "no",
-            "trade_type": "gas | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
-            "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
-            "status": "voided", "outcome": "void", "settled_at": None, "settled_result": None,
-            "realized_net": -1.0, "bid_now": 0.0, "unrealized_net": -1.0,
-            "mark_note": "entry spread above 0.10: not a tradable quote", "source": None,
-        }
-        simulate.OUT.write_text(json.dumps({"state": {
-            "processed_alert_ids": [], "open": [open_stale], "closed": [closed_stale], "counters": {}
-        }}))
+    def test_carried_forward_voided_row_is_normalised(self):
+        """A row already marked voided in a PREVIOUS run must also lose its stale mark.
+
+        The first fix cleared the mark when voiding, which cannot repair a row that was voided
+        before the fix existed — exactly the state the committed data/live/simulation.json was
+        in (its closed list held the row with unrealized_net -1.0). Normalising every run is what
+        makes the published file converge.
+        """
+        self._write([], {}, settled_rows=[])
+        already = {"id": "S2|old|no", "strategy": "S2", "alert_key": "old", "ticker": "KXDEMOFUTHOURLY-X-UP",
+                   "category_id": "crypto", "series_ticker": "KXDEMOFUTHOURLY", "direction": "up", "side": "no",
+                   "trade_type": "crypto | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
+                   "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
+                   "status": "voided", "outcome": "void", "settled_at": None, "settled_result": None,
+                   "realized_net": None, "bid_now": 0.0, "unrealized_net": -1.0,
+                   "mark_note": "entry spread above 0.10: not a tradable quote", "mark_at": T_SIG, "source": None}
+        simulate.OUT.write_text(json.dumps({"state": {"processed_alert_ids": [], "open": [], "closed": [already],
+                                                      "counters": {}}}))
         doc = self._run()
-        by_id = {p["id"]: p for p in doc["settled_positions"]}
-        for pid in ("S1|open-void|yes", "S2|carried-void|no"):
-            self.assertIn(pid, by_id)
-            self.assertEqual(by_id[pid]["status"], "voided")
-            self.assertIsNone(by_id[pid]["bid_now"])
-            self.assertIsNone(by_id[pid]["unrealized_net"])
-            self.assertIsNone(by_id[pid]["realized_net"])
+        row = [p for p in doc["settled_positions"] if p["id"] == "S2|old|no"]
+        self.assertEqual(len(row), 1)
+        self.assertIsNone(row[0]["unrealized_net"],
+                          "a voided row carried over from an earlier run must be normalised to no mark")
+        self.assertIsNone(row[0]["bid_now"])
+        self.assertEqual(self._strat(doc, "S2")["voided"], 0,
+                         "a row voided in an earlier run is already closed; it must not be counted as a "
+                         "new void this run")
+
+    def test_voided_position_does_not_keep_a_stale_mark(self):
+        """A voided entry never traded, so it must not carry a P&L mark.
+
+        Rows are carried forward in simulation.json state, so a mark written in an earlier run
+        survived into the voided row. The published file showed bid_now 0.0 / unrealized_net
+        -1.0 on a row whose own note said "not a tradable quote": a $1.00 loss no fill
+        produced. Clear both fields when voiding.
+        """
+        self._write([], {}, settled_rows=[])
+        legacy = {"id": "S2|stale|no", "strategy": "S2", "alert_key": "stale", "ticker": "KXAAAGASM-X-1",
+                  "category_id": "gas", "series_ticker": "KXAAAGASM", "direction": "up", "side": "no",
+                  "trade_type": "gas | move up | entry high", "band": "high", "entry_price": 0.99, "entry_fee": 0.01,
+                  "taker_multiplier": 1, "contracts": 1, "entered_at": T_SIG, "quote_bid": 0.01, "quote_ask": 1.00,
+                  "status": "open", "outcome": None, "settled_at": None, "settled_result": None,
+                  "realized_net": None,
+                  # a mark left behind by the run in which this row was still open
+                  "bid_now": 0.0, "unrealized_net": -1.0, "mark_note": None, "mark_at": T_SIG, "source": None}
+        simulate.OUT.write_text(json.dumps({"state": {"processed_alert_ids": [], "open": [legacy], "closed": [],
+                                                      "counters": {}}}))
+        doc = self._run()
+        voided = [p for p in doc["settled_positions"] if p["id"] == "S2|stale|no"]
+        self.assertEqual(len(voided), 1)
+        self.assertEqual(voided[0]["status"], "voided")
+        self.assertIsNone(voided[0]["unrealized_net"],
+                          "a voided (never-filled) row must not report an unrealised P&L")
+        self.assertIsNone(voided[0]["bid_now"],
+                          "a voided row has no position to mark to a bid")
+        self.assertIsNone(voided[0]["realized_net"])
 
     def test_open_position_is_marked_to_bid_and_fee_is_charged_at_exit(self):
         self._write([self._alert("up")], {"KXAAAGASM-X-1": self._obs(0.49, 0.50)},

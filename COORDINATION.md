@@ -1066,6 +1066,81 @@ commit newer than main at claim time, so nothing below overlaps an open claim.
 
 - 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
 
+
+## Session `arena-a3070ffa` — graph fidelity, alert-catalyst linkage, universe completeness
+
+Branch `arena/a3070ffa-kalshidash3`, branched from `ebce5e7`. Claim written and pushed **before** any code change,
+per the board rule. Existing sessions' sections are untouched; their scopes stay theirs.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T30 | Chart fidelity: the dashboard graph plotted an **empty series** for any market the collector's `watch` set pruned, and never used the official candlestick endpoint even though `assets/engine.js` exposes it. Fix the prune + add official `1/60/1440`-minute candles to the graph, keeping the honest note about the interval limit | in progress | arena-a3070ffa | `scripts/collect.py`, `dashboard.html`, `assets/site.css` | `fetch_page` of the official candlestick doc for the interval enum; `validate_live.py`, `check_site.py`, `test_pages_dom.js` | 3 of 7 archived alert tickers have 0 observations in `price_history.json` |
+| T31 | Alerts ↔ chart catalyst linkage: a graph marker for each ≥$0.10 swing that shows the market's own source text/links, never an invented cause | unclaimed → this session | arena-a3070ffa | `dashboard.html`, `assets/site.css` | official `GET /markets` schema (no news field: cause must come from the market's own `rules_*`) | catalyst attribution is proximity, not causation (F-15) |
+| T32 | Universe completeness: `GET /markets` is capped at `SAFETY_SCAN_CAP` and newest-first, so the in-scope universe is a window, not the whole exchange. Use the **documented** `mve_filter=exclude` to remove the combo flood from the scan and stop the bias | in progress | arena-a3070ffa | `scripts/collect.py`, `scripts/roi_scan.py`, published `counts` | doc: `mve_filter` enum `only/exclude` on `GET /markets`; live probe of the demo host returns pages with it | F-35 pattern recurs if the cap is what limits the ranking |
+| T33 | Publish + integrate: full suite, PR to `main`, merge, confirm Pages deploy, `collect.yml` run, record PR + result here | pending | arena-a3070ffa | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py` + node tests + live URL fetch after deploy | — |
+
+### Log (this session)
+
+- 2026-11-21 ~06:30 UTC: session start. Read `COORDINATION.md` (861 lines) and the deployed site. Baseline re-run
+  on `ebce5e7`: `validate_live`, `validate_alerts`, `validate_roi`, `validate_catalysts`, `test_alerts`,
+  `test_simulate`, `test_fees`, `test_roi_parity`, `test_roi_scan_offline`, `check_site` (21 pages) all pass;
+  `gh run list` shows `collect.yml`, `desk.yml` and Pages green on `main`. So this session starts from a working
+  site and only fixes defects it can demonstrate.
+- 2026-11-21 ~06:35 UTC: **defect demonstrated (T30).** `scripts/collect.py` prunes `data/live/price_history.json`
+  to the tickers kept in the capped `open_markets` window. Proof on the committed data: of the 7 distinct tickers
+  in `data/live/alerts_archive.json`, the 3 `KXDEMOFUTHOURLY-*` markets have **0** observations left, so the
+  dashboard's graph for those swings renders "No observations in this window yet" — the exact series an alert
+  points at. The official candlestick endpoint (already wrapped by `assets/engine.js` `candles()` and used by
+  `live.html`) would still serve them.
+- 2026-11-21 ~06:40 UTC: **documented source adopted (T32).** `GET /markets` supports
+  `series_ticker` and `mve_filter ∈ {only, exclude}`
+  (https://docs.kalshi.com/api-reference/market/get-markets), and the same page states responses are cached and
+  "can lag the exchange by several seconds". Measured on the demo host this session:
+  `GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor, so the filter is live.
+
+### Results (this session)
+
+| ID | Result | Files changed | Verified by |
+|----|--------|---------------|-------------|
+| T30 | **done** — the collector pruned price history to the ranked open window, so 3 of the 7 tickers cited in `alerts_archive.json` had **0** observations and the dashboard chart was empty for exactly the alerted series. History now keeps `open rows ∪ archived-alert tickers`. The chart also rebuilds a row from the published alert record for `dashboard.html#TICKER` deep links outside the window, and the alerts chat links to it. | `scripts/collect.py`, `dashboard.html`, `assets/alerts.js` | `scripts/tests/test_collect_coverage.py`; `test_pages_dom.js` mode G |
+| T30b | **done** — the page never requested a single official candle. It now fetches `GET /series/{s}/markets/{t}/candlesticks` for the selected window (1-min / 1-hour / new 1-day), falls back to `GET /historical/markets/{t}/candlesticks`, reads both field shapes, and skips a candle with no price block instead of plotting `Number("")===0`. | `dashboard.html` | `test_pages_dom.js` mode F (mutation-checked: removing the `""` guard fails it) |
+| T31 | **done** — archived ≥ $0.10 swings are drawn as dashed markers on the chart; the swing list is the union of observations and the archive. Cause links remain the fetched-lead layer built by `scripts/catalysts.py`; no cause is invented. | `dashboard.html` | `test_pages_dom.js` modes D/E unchanged and still green (no causal wording) |
+| T32 | **done** — `scan_markets()` now sends the documented `mve_filter=exclude` (the filter `scripts/roi_scan.py` already used). Combo listings were consuming the newest-first 25,000-row paging budget, which is why the collector published 749 open-in-scope while the desk scan published 1,365 for the same exchange. | `scripts/collect.py` | `test_collect_coverage.py` (asserts the parameter on every scan request) |
+| T33 | **done** — see the PR record below. | `COORDINATION.md`, `README.md` | full suite + live URL fetch |
+
+**Defects found and published as irregularities** (all on `flagged.html`, all with official source links):
+
+- **F-37 resolved (independently by another session, whose simpler label this branch keeps and regression-tests).** The index KPI read "of 200 settled markets in scope" — the stored-row cap — while the banner on the same page printed `counts.settled_in_scope` (1,600). Fixed and regression-tested (`test_pages_dom.js` mode H, mutation-checked).
+- **F-40** history pruned for alerted markets (the T30 defect).
+- **F-41** the chart ignored the candlestick endpoint.
+- **F-42** the collector's capped universe disagreed with the desk scan's.
+- **F-43** observation-only detection cannot see a move inside the collector gap. Demonstrated on `KXPGATOUR-THRC26-MPEN`: its official 1440-minute candle for `end_period_ts 1795237200` opens 0.0070 and closes 0.0880 (an 8.1¢ intraday move) while both surrounding observations read 0.00 — so no alert exists. Proposed as **G19** rather than switched on unilaterally.
+- **F-44** a voided (never-filled) paper position kept `unrealized_net -1.0` and `bid_now 0.0` from before it was voided; cleared at void time and normalised every run, committed `simulation.json` regenerated, two mutation-checked tests.
+
+**Verification performed this session.** Baseline re-run on `ebce5e7` before any edit (all validators green, collectors and Pages green).
+Live figures re-checked against the official API through the platform fetch path, since sandbox `curl` to the Kalshi host fails:
+`GET /markets/KXPGATOUR-THRC26-MPEN` → `last_price_dollars 0.0880`, `volume_fp 434504.17`, `open_interest_fp 419786.51`;
+the snapshot row is `last 0.088`, `volume 431,703.35`, `open_interest 419786.51`, `dollars_traded_estimate 37989.89 = volume × last` exactly.
+`GET /series/KXPGATOUR/markets/KXPGATOUR-THRC26-MPEN/candlesticks?period_interval=1440` returns 5 daily candles (quoted in F-43);
+`GET /series/KXDEMOFUTHOURLY/markets/KXDEMOFUTHOURLY-26NOV21H07-UP/candlesticks?period_interval=1` returns 1-minute candles with real volume;
+`GET /historical/cutoff` → `market_settled_ts 2026-09-21T00:00:00Z`, which is why recent markets stay on the live endpoint;
+`GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor (the filter is live on the demo host).
+Static claims re-read from `docs.kalshi.com` this session: `period_interval ∈ {1, 60, 1440}` on both the live and historical candlestick endpoints; `mve_filter ∈ {only, exclude}` plus `series_ticker` on `GET /markets`; the doc's own warning that listing responses are cached and "can lag the exchange by several seconds"; unauthenticated requests have separate limits and clients must back off on 429.
+
+**Coordination notes for this rebase.** While this session worked, main advanced through PRs #42–#51. Two overlaps were
+resolved without discarding anyone's work:
+(a) **F-37** was already fixed on main with a simpler label ("200 stored settled rows (1,600 in scope)"). This branch
+keeps that fix rather than re-implementing it, and adds mode H of `test_pages_dom.js` so the label cannot silently
+regress to a single misleading number.
+(b) **Finding IDs.** Other sessions had published their own **F-38** and **F-39** before this branch landed, so this
+session's drafted F-38…F-42 were renumbered **F-40, F-41, F-42, F-43, F-44** at the final rebase. Each renumbered entry
+carries the old ID in its `why` field, so the trail is not lost. No other session's identifier was changed.
+(c) The `pages.yml` merge keeps main's `verify_release.py` gate. The new `test_collect_coverage.py` is picked up by that
+gate automatically (it globs `scripts/tests/test_*.py`), so no duplicate step was added.
+
+**Nothing was inferred.** Every new number on the site comes from a committed file or an API response quoted in the finding. Where a value did not exist (a candle with no price, a market with no history, a demo balance with no credentials) it is left blank and labelled, not filled.
 > **ID note (parallel sessions):** `main` adopted F-38/F-39/F-40 and T26-T33 for other records while this session
 > was open (F-38 there is the same Culture QA fixture, left as an owner decision; this session implemented the
 > decision). This session's records were renumbered on rebase to F-61/F-62/F-63 and T34-T37 exactly once, and the
@@ -1283,16 +1358,41 @@ Base: `ff6f01f`, merged forward onto `62e4811` (main). Claimed 2026-11-21 06:36Z
 
 ---
 
-## Session `arena-e1647955` — collector fairness/coverage, official candlestick charts + alert deep links, simulator hygiene, & new-swing catalyst review (branch `arena/e1647955-kalshidash3`)
+## Session `arena-dc62f2bb` — integration takeover + close-out (branch `arena/dc62f2bb-kalshidash3`)
 
-Base: `f09f982` (main). Claimed 2026-11-21 20:20Z before editing any implementation file. Checked active parallel branch `arena/dba435ee-kalshidash3` (claiming T40–T42 on `data/verified_facts.json`, `data/findings.json`, `data/live/*`, `README.md`); file scopes below are strictly non-overlapping.
+Base: `f09f982` (current `origin/main`). Claimed 2026-11-21 ~20:20Z. Two PRs from other sessions have been open for
+>13 hours with no commits and no claims on this board: PR #55 (`arena/a3070ffa-kalshidash3`, dashboard candles,
+F-40..F-44 drafts) and PR #56 (`arena/17d4ecfa-kalshidash3`, per-topic settled selection, F-41/F-42 drafts). The
+stale-claim rule lets any session take over after >60 minutes with no commits, so this session claims them and
+records the handoff here. No files are deleted; both implementations are kept with ID renumbering so neither
+session's identifier collides with main's F-37..F-64.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T43 | Collector fairness & coverage: (1) topic-fair round-robin `select_settled()` so 15m crypto stops crowding out Gas/Elections/Culture/Golf (currently 198/200 crypto, 0 gas/elections/golf); (2) retain `price_history.json` for archived-alert tickers (currently 14/23 alerts pruned); (3) pass documented `mve_filter=exclude` on `GET /markets` | in progress | arena-e1647955 | `scripts/collect.py`, `scripts/tests/test_collect_coverage.py` | Official `docs.kalshi.com` `get-markets`, offline unit tests, `verify_release.py` | — |
-| T44 | Live dashboard candlestick charts + alert deep links + simulator & sources hygiene: (1) fetch official Kalshi candlesticks (`period_interval ∈ {1, 60, 1440}` + `/historical/markets/{ticker}/candlesticks` fallback) in `dashboard.html` skipping price-less candles; (2) support `#TICKER` archive deep links + chart links in `assets/chatdock.js`; (3) fix `sources.html` `scripts/alerts.py` → `scripts/build_alerts.py`; (4) remove duplicate summary keys and normalize voided marks in `scripts/simulate.py` | in progress | arena-e1647955 | `dashboard.html`, `assets/chatdock.js`, `sources.html`, `scripts/simulate.py`, `scripts/tests/test_pages_dom.js`, `scripts/tests/test_simulate.py`, `scripts/tests/test_chatdock.js` | Official `docs.kalshi.com` candlesticks + historical candlesticks docs, `verify_release.py` DOM + Node + Python tests | — |
-| T45 | Official-source catalyst review for newly archived unreviewed swings (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, etc.) | in progress | arena-e1647955 | `data/catalyst_review.json` | Direct fetches of official Kalshi demo API market records + reference publishers, `validate_catalysts.py` | — |
+| T41 | Take over stale PRs #55 and #56: merge both into the canonical tree with non-colliding finding IDs, keep both fixes, resolve data conflicts by keeping the newest real snapshot, full-suite verify, PR → main → merge → Pages confirm → record | done (merged, CI suite green) | arena-dc62f2bb | `COORDINATION.md`, `data/findings.json` (add new entries with fresh IDs F-65..F-71, keep F-37..F-64 verbatim), `scripts/collect.py`, `scripts/simulate.py`, `scripts/tests/*`, `assets/alerts.js`, `executive-summary.html`, `index.html`, `dashboard.html`, `.github/workflows/collect.yml`, `data/live/simulation.json` (merge-resolution only) | `verify_release.py`, `check_site.py`, `validate_live.py`, `validate_alerts.py`, `test_collect_coverage.py`, `test_settled_selection.py`, `test_simulate.py`, jsdom DOM/chatdock/engine suites | Data files: PR data is older than main's committed snapshot; main's newer snapshot kept and re-validated; fairness/candle fixes take effect at the next collector run |
+
+### Handoff notes (stale claims taken over)
+- PR #55 (`arena/a3070ffa-kalshidash3`, 2026-11-21T06:45Z): 13 changed files (dashboard.html +230, collect.py, simulate.py, test_collect_coverage.py (new), test_pages_dom.js, test_simulate.py, collect.yml, alerts.js, executive-summary.html, README.md, simulation.json, findings.json).
+- PR #56 (`arena/17d4ecfa-kalshidash3`, 2026-11-21T06:59Z): 10 changed files (collect.py +98, test_settled_selection.py (new), index.html +9, data/live/* (regenerated snapshots, older than main's committed data), findings.json).
+
+### Log (this session)
+- 2026-11-21 ~20:20Z: claimed T41; recorded claim before any edit.
+- 2026-11-21 ~20:40Z: merged PR #56 (settled-selection) then PR #55 (candles/coverage). Conflicts resolved without deleting either implementation: `COORDINATION.md` kept both session sections; findings renumbered fresh (F-65/F-66 ← PR #56's F-41/F-42; F-67..F-71 ← PR #55's F-40..F-44); data files kept from main (15:21:23Z snapshot), so PR #56's older 06:56:14Z archives were dropped (the auto-merged archive mixed two snapshots and failed both validators); test_pages_dom.js kept main's F-64 index mode AND PR #55's candles/deep-link modes; mode H rewritten for main's KPI wording.
+- 2026-11-21 ~20:45Z: `verify_release.py` PASS on the merged tree (compile, node --check, all validators and tests, jsdom suites, 21-page check). `test_settled_selection.py` 10/10 checks including the [:1600] ordering regression and the control. `test_collect_coverage.py` + `test_simulate.py` + `test_pages_dom.js` all green.
+
+---
+
+## Session `arena-e1647955` — official-source catalyst review for newest swings + live-chart observation bugfix + chatdock chart links & sources hygiene (branch `arena/e1647955-kalshidash3`)
+
+Base: `f09f982`, merged forward onto `d29bf84` (`origin/main`, after PR #63). Initially claimed T43–T45 at 2026-11-21 20:20Z before editing any implementation file. While this session worked, PR #63 (`16b6f8e`, `arena-dc62f2bb`) merged PRs #55/#56 to `main`; per the non-overlapping-scope and merge-conflict rules, this session adopted PR #63's implementations of `scripts/collect.py`, `scripts/simulate.py`, `dashboard.html` candlesticks/deep-links, and their tests verbatim, and narrowed its scope to the remaining non-overlapping defects below (renumbered T50–T52 to avoid colliding with parallel sessions `arena-b25b0914` and `arena-dba435ee`).
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T50 | Fix remaining dashboard/chatdock/sources defects on `main`: (1) `dashboard.html` silently dropped live poll ticks (`Date.parse(nowMs) === NaN`) and `bid`/`ask` observation series (`o["bid"]` vs `o.yes_bid`/`o.yes_ask`); (2) add `dashboard.html#TICKER` chart link to `assets/chatdock.js` alert bubbles; (3) fix `sources.html` broken filename `scripts/alerts.py` → `scripts/build_alerts.py` (logged request from `arena-617e3472`) | in progress | arena-e1647955 | `dashboard.html`, `assets/chatdock.js`, `sources.html`, `scripts/tests/test_pages_dom.js`, `scripts/tests/test_chatdock.js` | `scripts/verify_release.py`, jsdom DOM & chatdock regression tests | — |
+| T51 | Official-source catalyst review for all 3 unreviewed swings added after 06:42Z (`KXDEMOFUTHOURLY-26NOV21H16-UP`, `KXPGATOUR-THRC26-BHAR`, `KXBTCY-27JAN0100-B77500`) + rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | in progress | arena-e1647955 | `data/catalyst_review.json`, `data/live/catalysts.json` | Direct live fetches of Kalshi demo API, Coinbase Exchange BTC-USD 1m candles, PGA Tour official RSM Classic leaderboard, `validate_catalysts.py` | `KXPGATOUR-THRC26-BHAR` printed +74.5¢ on demo while official PGA Tour leaderboard lists Brian Harman as `CUT` (+1, 71-72=143) and Round 3 suspended Saturday |
+| T52 | Full verification gate, PR → main, merge, GitHub Pages deploy confirm, and live URL re-fetch | unclaimed | arena-e1647955 | `COORDINATION.md` | `scripts/verify_release.py`, live site fetch, `gh api .../pages` | — |
 
 ### Log (`arena-e1647955`)
-- 2026-11-21 20:20Z: Claimed T43–T45 on `arena/e1647955-kalshidash3` (base `f09f982`). Confirmed `arena-dba435ee` is active on T40–T42 (`data/verified_facts.json`, `data/findings.json`, `data/live/*`, `README.md`) and kept our scope strictly disjoint. Baseline `scripts/verify_release.py` passes locally; measured defects on `main`: `settled_markets` is 198 crypto / 2 culture / 0 gas / 0 elections / 0 golf; 14/23 archived alerts have 0 points in `price_history.json`; `scan_markets()` lacks `mve_filter=exclude`; `dashboard.html` does not call candlesticks; `sources.html` cites non-existent `scripts/alerts.py`; `scripts/simulate.py` has duplicate dict keys and leaves stale mark fields on voided positions.
+- 2026-11-21 20:20Z: Claimed initial tasks on `arena/e1647955-kalshidash3` (base `f09f982`).
+- 2026-11-21 20:29Z: Merged `origin/main` (`d29bf84`, containing PR #63 `16b6f8e` + fresh 20:27Z/20:28Z snapshots). Adopted PR #63's `scripts/collect.py`, `scripts/simulate.py`, `dashboard.html` candlesticks, and tests verbatim (nothing from PR #63 discarded); narrowed scope to T50–T52. Confirmed `origin/main`'s `dashboard.html` still passes numeric `nowMs` into `Date.parse(o.t)` (producing `NaN` and dropping every live poll point) and indexes `o["bid"]`/`o["ask"]` instead of `yes_bid`/`yes_ask` (producing empty bid/ask observation series).
 
