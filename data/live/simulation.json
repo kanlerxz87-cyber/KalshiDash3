@@ -2,7 +2,7 @@
  "schema": 1,
  "environment": "demo",
  "mode": "PAPER ONLY. scripts/simulate.py places no orders and uses no account. It records what a fixed rule would have done at the observed prices.",
- "generated_at": "2026-11-21T15:21:23Z",
+ "generated_at": "2026-11-21T20:23:45Z",
  "snapshot_collected_at": "2026-11-21T15:21:23Z",
  "rules_file": "data/strategies.json",
  "signals_file": "data/live/alerts_archive.json",
@@ -10,7 +10,7 @@
  "fee_model_source": "https://kalshi.com/docs/kalshi-fee-schedule.pdf (General Trading Fees; Non-Standard Fees table; July 7, 2026 update)",
  "counts": {
   "signals_processed_total": 23,
-  "new_signals_this_run": 1,
+  "new_signals_this_run": 0,
   "open_positions": 10,
   "settled_positions_kept": 0
  },

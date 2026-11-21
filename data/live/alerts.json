@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-21T15:21:23Z",
+ "generated_at": "2026-11-21T20:24:01Z",
  "snapshot_collected_at": "2026-11-21T15:21:23Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
@@ -14,7 +14,9 @@
   "all_events": 23,
   "high_roi": 7,
   "archive_total": 23,
-  "new_this_run": 1
+  "new_this_run": 0,
+  "withheld_category_conflict": 0,
+  "withheld_reasons": {}
  },
  "all_events": [
   {
@@ -669,6 +671,7 @@
   "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
   "Alerts are kept in data/live/alerts_archive.json, so a move stays listed after its market leaves the open scan.",
   "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
-  "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model."
+  "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
+  "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten."
  ]
 }
