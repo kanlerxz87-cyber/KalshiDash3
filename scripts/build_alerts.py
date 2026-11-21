@@ -144,6 +144,29 @@ def main() -> int:
             )
             archive["alerts"].append(alert)
 
+    # F-65 repair, applied to the archive's RECORDED CATEGORY FIELD only — never to the prices,
+    # times, deltas or high_roi flag, which stay frozen at detection time:
+    #
+    # Merging two collector branches brought archive entries whose rows predate `series_categories`
+    # (12 of the demo Test series among them), so those alerts carried no official categories. The
+    # snapshot's series_index now answers for them, and leaving the field null would make the
+    # withholding rule silently allow exactly the rows it exists to remove. A category this project
+    # has since verified from GET /series is therefore written onto the entry; an entry whose series
+    # is not in the ledger is left null (unknown is not a contradiction).
+    series_ledger = markets.get("series_index") or {}
+    repaired = 0
+    for a in archive["alerts"]:
+        if "series_categories" in a and a["series_categories"]:
+            continue
+        entry = series_ledger.get(series_of_ticker(a.get("ticker") or "")) or {}
+        cats = entry.get("categories")
+        if cats:
+            a["series_categories"] = [str(c) for c in cats]
+            a["series_categories_source"] = entry.get("source")
+            repaired += 1
+    if repaired:
+        print(f"archive: recorded official series_categories on {repaired} entr(y/ies) from series_index")
+
     archive["alerts"].sort(key=lambda r: (r["to_time"], abs(r["delta"])), reverse=True)
     archive["alerts"] = archive["alerts"][:ARCHIVE_LIMIT]
     archive_path.write_text(json.dumps(archive, indent=1) + "\n", encoding="utf-8")
@@ -219,7 +242,8 @@ def main() -> int:
         ],
     }
     (LIVE / "alerts.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    print(f"OK: new={new_count} all_events={len(all_feed)} high_roi={len(roi_feed)} threshold=${threshold:.2f}")
+    print(f"OK: new={new_count} all_events={len(all_feed)} high_roi={len(roi_feed)} "
+          f"withheld={withheld} threshold=${threshold:.2f}")
     return 0
 
 

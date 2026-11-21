@@ -20,7 +20,7 @@ left blank and listed on the *Flagged for Review* page.
 | `index.html` | Landing page, snapshot age, largest live market per category |
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
-| `dashboard.html` | Price chart (X = time, Y = contract price) with seconds/minutes/hours windows, liquidity ladder, resolution tracker, optional in-browser live polling |
+| `dashboard.html` | Price chart (X = time, Y = contract price): official candles at 1/60/1440 minutes plus the collector's observations, archived ≥ $0.10 swings marked and deep-linkable, liquidity ladder, resolution tracker, optional in-browser live polling |
 | `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
 | `portfolio.html` | Real demo-account endpoints, the working executor, and a labelled paper ledger with fee modelling |
@@ -28,8 +28,8 @@ left blank and listed on the *Flagged for Review* page.
 | `simulation.html` | Paper-only results of four fixed rules on the ≥ $0.10 swing archive: fills, fees, settlements, results by strategy, topic and trade type |
 | `suggestions.html` | Eighteen proposals; each with its effort, risk and success metric |
 | `questions.html` | Nine questions: known / unknown / best answer if forced / how to close it |
-| `verification.html` | 59 claims, each with the official page it was checked against |
-| `flagged.html` | 38 irregularities found, plus every value deliberately left blank |
+| `verification.html` | 72 claims, each with the official page it was checked against |
+| `flagged.html` | 50 irregularities found, plus every value deliberately left blank |
 | `sources.html` | The complete source list |
 
 ## Repository layout
@@ -49,6 +49,8 @@ scripts/kalshi_client.py  demo trade executor (env-var credentials only)
 scripts/check_site.py     link / HTML / data check, run before deploy
 scripts/tests/validate_live.py  refuses a fabricated snapshot
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
+scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
+scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
