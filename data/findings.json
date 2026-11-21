@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T19:50:00Z",
+ "generated": "2026-11-21T06:55:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34).",
  "questions": [
   {
@@ -729,6 +729,43 @@
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ],
    "id": "F-37"
+  },
+  {
+   "id": "F-38",
+   "severity": "medium",
+   "item": "Landing page labelled the stored settled-row cap as 'settled markets in scope' (F-37 was raised but not fixed)",
+   "why": "index.html rendered 'of ' + settled.length + ' settled markets in scope', where settled.length is the number of rows the collector stores (capped at 200 for the settled table) while the same page's banner printed counts.settled_in_scope = 1,600 for the 2026-11-21T00:50:12Z snapshot. Two different totals appeared under the same words on one screen. F-37 had recorded this and left it for the integration owner; this session is that pass.",
+   "action": "Fixed. The card now reads 'of N settled markets stored; M were in scope when collected', rendering both numbers from the snapshot instead of labelling one as the other. Pinned by scripts/tests/test_scope.py.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets?status=settled&limit=1000",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/"
+   ]
+  },
+  {
+   "id": "F-39",
+   "severity": "high",
+   "item": "Topic purity: natural-gas futures counted as Gas Prices, and a Kalshi demo QA fixture shown as the largest live Culture market",
+   "why": "Two independent scope errors, both verified against the official demo API on 2026-11-21. (a) The gas category's keyword fallback matched the word 'gas' in natural-gas futures: GET /series/KXNATGAS15M returns categories ['Commodities'], title 'Natural Gas 15-minute', product_metadata.scope 'Natural Gas', settlement source 'Pyth - NATGAS', whereas the confirmed seed series GET /series/KXAAAGASM returns categories ['Economics'], title 'US gas price', product_metadata.scope 'Gasoline', settlement source 'AAA'. 11 natural-gas markets therefore sat inside Gas Prices in the 2026-11-21T00:50:12Z snapshot. (b) GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA returns title 'Portfolio cash out QA 5' and rules_primary 'Demo portfolio test only.'; because its series ticker contains 'GRAMMY' it matched Culture by keyword, and at $5.00 estimated dollars it was the LARGEST open Culture market, so the landing page presented a test fixture as culture's biggest live event.",
+   "action": "Fixed in scripts/collect.py (the only writer of the snapshot): KXNATGAS15M is excluded from keyword classification with the official series record quoted in the source, and demo QA titles/rules are refused for every category. Seed series are never excluded, so the AAA series (KXAAAGASM) is unaffected and still classifies as confirmed; the daily AAA series (KXAAAGASD) still classifies by keyword. Exclusions are published as counts.open_excluded_off_topic_or_qa / counts.settled_excluded_off_topic_or_qa and counts.excluded_series_reasons so nothing is dropped silently. Defence in depth: assets/site.js refuses a QA row when picking a largest market, and the landing page now reports how many QA fixtures the snapshot contains. Rows already in the committed snapshot are dropped by the next scheduled collection, which is the only thing allowed to write that file.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGAS15M",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGRAMMYNOMROTY-QA7CECC5-QA",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-40",
+   "severity": "medium",
+   "item": "The published snapshot was stale for most of the day: the collector's */20 cron delivered 2 scheduled runs in ~10 hours",
+   "why": "GitHub documents that the schedule event is best-effort: 'The schedule event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped.' Measured on this repository (gh run list --workflow=collect.yml, 2026-11-20/21): 23 runs, of which 21 were manual workflow_dispatch and only 2 arrived from the schedule (2026-11-20T19:14Z and 2026-11-21T00:49Z). desk.yml, on a */10 cron, similarly produced 2 scheduled runs out of 16. The effects compound: pushes made with the repository's GITHUB_TOKEN do not start workflows, so each committed snapshot never triggered the Pages deploy workflow either. The site was correct about being stale (its banner appears after 45 minutes) but a dashboard labelled 'live' was showing hours-old prices.",
+   "action": "Partially fixed and honestly documented. collect.yml now uses two off-peak crons (7,27,47 and 13,43 - minutes deliberately away from the top of the hour, per the same doc) instead of a single */20, and its last step queues the next run with workflow_dispatch, which GitHub documents as the exception that 'always create workflow runs' when called with GITHUB_TOKEN; it needs permissions.actions: write, which is added. The stale banner now says how old the snapshot is and links the reason, instead of implying no collector exists. Whether the chained dispatch actually raises the observed run rate can only be measured after this merges - recorded on the coordination board, not claimed as verified here.",
+   "sources": [
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule",
+    "https://docs.github.com/en/actions/concepts/security/github_token",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/workflows/collect.yml"
+   ]
   }
  ]
 }

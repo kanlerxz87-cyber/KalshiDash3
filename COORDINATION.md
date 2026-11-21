@@ -1048,3 +1048,43 @@ Base: `ebce5e7` (main). Claimed 2026-11-21 06:35Z. Single active session; no oth
   not a documented rate limit; F-40 records the measured numbers and cites the doc for the delay/drop wording. The site itself labels snapshots stale after 45 minutes, so
   it showed a stale-fallback banner most of the time. Fix in T25; will record the observed cadence after the
   next scheduled windows.
+
+#### T27 — line-by-line audit of the deployed numbers vs the official demo API (2026-11-21 ~06:40Z)
+
+Every headline figure on the landing page was re-fetched from the official API this session, not copied from
+the snapshot. Five category leaders + one resolved row, all exact:
+
+| Category | Ticker | Snapshot (est. $ / volume / OI / last) | Official API `GET /markets/<ticker>` | Result |
+|---|---|---|---|---|
+| Crypto | `KXBTCY-27JAN0100-B147500` | 64,029,608.53 / 65,336,335.23 / 6,920,631.49 / 0.98 | `last_price_dollars 0.9800`, `volume_fp 65336335.23`, `open_interest_fp 6920631.49`; 65,336,335.23 × 0.98 = 64,029,608.53 | ✔ exact |
+| Golf | `KXPGATOUR-THRC26-MPEN` | 37,989.89 / 431,703.35 / 419,786.51 / 0.088 | `last 0.0880`, `volume_fp 434504.17` (live, moved since collection), `open_interest_fp 419786.51` | ✔ OI + price exact; volume is point-in-time |
+| Gas | `KXAAAGASM-26NOV30-3.90` | 23,270.64 / 31,027.52 / 24,988.65 / 0.75 | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` | ✔ exact |
+| Elections | `KXELECTIRAN-27JAN01` | 2.87 / 3.19 / 0.02 / 0.90 | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`; rules confirm "Iran … presidential election before January 1, 2027" | ✔ exact |
+| Culture | `KXGRAMMYNOMROTY-QA7CECC5-QA` | 5.00 / 10.00 / 10.00 / 0.50 | `title "Portfolio cash out QA 5"`, `rules_primary "Demo portfolio test only."` | ✔ numbers exact — **but it is a QA fixture → F-39** |
+| Settled | `KXNATGAS15M-26NOV201945-45` | `result yes`, settlement 1.0000, finalized | `result "yes"`, `settlement_value_dollars "1.0000"`, `settlement_ts 2026-11-21T00:45:47Z`, `expiration_value 3.77666` vs floor 3.77177 | ✔ exact — **but it is natural-gas futures inside Gas Prices → F-39** |
+
+Method check on the ranking metric itself: "dollars traded (est.)" is `volume_fp × last_price_dollars`, a
+project-computed estimate (Kalshi has no dollars-traded field), and the page says so. The audit confirms the
+arithmetic is right; it cannot make the metric official.
+
+Defects raised and fixed this session: **F-38** (settled-row cap mislabelled as in-scope total — the open
+F-37), **F-39** (high: natural-gas futures classified as Gas Prices; demo QA fixture headlining Culture),
+**F-40** (medium: `*/20` cron delivered 2 scheduled runs in ~10h, so the snapshot layer was stale most of the day).
+
+| Task | Status | Evidence |
+|---|---|---|
+| T25 cadence | done (code) — pending measurement after merge | `collect.yml`: two off-peak crons + chained `workflow_dispatch` (documented `GITHUB_TOKEN` exception) + `actions: write`; `desk.yml` unaffected; YAML validated |
+| T26 liveness | done | see below |
+| T27 audit | done | table above |
+
+#### T26 — liveness check (what is actually live, and what cannot be)
+
+- The browser polls the demo API directly (`assets/live.js`, `assets/engine.js`, base
+  `https://external-api.demo.kalshi.co/trade-api/v2`), CORS-probes first, and falls back to the committed
+  snapshot — that is real, and `data/live/cors.json` records the observed header
+  (`access_control_allow_origin: https://kanlerxz87-cyber.github.io`, status 200 at 2026-11-21T00:50:12Z).
+- WebSocket streaming is **not** possible for a static site: the handshake requires an API key
+  (https://docs.kalshi.com/getting_started/quick_start_websockets). Already flagged; unchanged.
+- Second-resolution charts cannot be *requested* from Kalshi (candlesticks accept 1/60/1440-minute intervals:
+  https://docs.kalshi.com/api-reference/market/get-market-candlesticks); seconds on the X-axis therefore come
+  from accumulated observations plus in-browser poll points, and the page says which.

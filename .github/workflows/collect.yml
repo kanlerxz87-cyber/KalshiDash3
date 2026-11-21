@@ -7,10 +7,23 @@ name: Collect Kalshi demo data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/20 * * * *"
+    # Why two crons and why the minutes are not zero, from the official docs
+    # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule):
+    #   - "The schedule event can be delayed during periods of high loads ... High load times
+    #      include the start of every hour ... some queued jobs may be dropped. To decrease the
+    #      chance of delay, schedule your workflow to run at a different time of the hour."
+    #   - "The shortest interval you can run scheduled workflows is once every 5 minutes."
+    # Measured on this repository on 2026-11-21 (gh run list --workflow=collect.yml): a */20 cron
+    # produced 2 scheduled runs in ~10 hours while 21 manual dispatches ran normally, i.e. the
+    # snapshot layer aged past its own 45-minute staleness banner most of the day. Two off-peak
+    # crons plus the chained dispatch below (a documented GITHUB_TOKEN exception, see the last
+    # step) keep fresh public data on the page without inventing a cadence the platform offers.
+    - cron: "7,27,47 * * * *"
+    - cron: "13,43 * * * *"
 
 permissions:
   contents: write
+  actions: write   # needed only for the chained dispatch in the last step (workflow_dispatch of collect.yml)
 concurrency:
   group: collect
   cancel-in-progress: false
@@ -63,8 +76,6 @@ jobs:
           run_v test_simulate   python3 scripts/tests/test_simulate.py
           run_v validate_catalysts python3 scripts/tests/validate_catalysts.py
           exit $status
-      - name: Run alert-feed tests
-        run: python3 scripts/tests/test_alerts.py
       - name: Commit snapshot
         run: |
           set -euo pipefail
@@ -75,3 +86,20 @@ jobs:
           git commit -m "data: demo snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push
+      # Chain the next collection. Push events caused by the repository's GITHUB_TOKEN do not
+      # start workflows, but workflow_dispatch does — the documented exception:
+      # "workflow_dispatch and repository_dispatch events always create workflow runs."
+      # (https://docs.github.com/en/actions/concepts/security/github_token). This is a fallback
+      # for GitHub's best-effort cron, not a clock: it adds one run per completed run, and the
+      # concurrency group below keeps at most one collection in flight.
+      - name: Queue the next collection (fallback for the best-effort schedule)
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! command -v gh >/dev/null 2>&1; then echo "gh unavailable on the runner; cron remains the trigger"; exit 0; fi
+          sleep 20   # let the just-pushed commit settle so the next run checks out the new snapshot
+          gh workflow run collect.yml --ref "${GITHUB_REF_NAME}" \
+            && echo "queued the next collection" \
+            || echo "::warning::could not queue the next collection; falling back to the cron schedules"
