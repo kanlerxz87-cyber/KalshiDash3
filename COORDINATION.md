@@ -1038,3 +1038,37 @@ Branched from `ebce5e7` and rebased onto `bdd02d3` (`data: demo snapshot 2026-11
 ### Log (this session)
 - 2026-11-21: claimed tasks before editing (`a06d324`); rebased onto `origin/main@bdd02d3` preserving all concurrent sessions' records (`arena-d60abf08`, `arena-c076278a`, `arena-7d3aa4d3`, `arena-0a4a3d7a`, `arena-7e1df9fd`) verbatim and renumbering this session's tasks to T28–T30.
 - 2026-11-21: **T30 closed out.** Opened PR #51 (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/51) and merged as `fc795c883b5b8e46b2275b1daeaddd7bfbda6102` (2026-11-21T06:37:42Z). Both Pages workflows (`pages-build-deployment` run `44876438192` and `Deploy site to GitHub Pages` run `44876438470`) completed with `success` and `pages.status=built`. Re-fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` and `https://kanlerxz87-cyber.github.io/KalshiDash3/culture.html` confirming the F-38 Culture QA notice and `2026-11-21T06:34:10Z` snapshot are live. Re-enabled `collect.yml` (`424927583`) and dispatched `collect.yml` + `desk.yml` on `main`.
+
+
+## Session `arena-a3070ffa` — graph fidelity, alert-catalyst linkage, universe completeness
+
+Branch `arena/a3070ffa-kalshidash3`, branched from `ebce5e7`. Claim written and pushed **before** any code change,
+per the board rule. Existing sessions' sections are untouched; their scopes stay theirs.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T30 | Chart fidelity: the dashboard graph plotted an **empty series** for any market the collector's `watch` set pruned, and never used the official candlestick endpoint even though `assets/engine.js` exposes it. Fix the prune + add official `1/60/1440`-minute candles to the graph, keeping the honest note about the interval limit | in progress | arena-a3070ffa | `scripts/collect.py`, `dashboard.html`, `assets/site.css` | `fetch_page` of the official candlestick doc for the interval enum; `validate_live.py`, `check_site.py`, `test_pages_dom.js` | 3 of 7 archived alert tickers have 0 observations in `price_history.json` |
+| T31 | Alerts ↔ chart catalyst linkage: a graph marker for each ≥$0.10 swing that shows the market's own source text/links, never an invented cause | unclaimed → this session | arena-a3070ffa | `dashboard.html`, `assets/site.css` | official `GET /markets` schema (no news field: cause must come from the market's own `rules_*`) | catalyst attribution is proximity, not causation (F-15) |
+| T32 | Universe completeness: `GET /markets` is capped at `SAFETY_SCAN_CAP` and newest-first, so the in-scope universe is a window, not the whole exchange. Use the **documented** `mve_filter=exclude` to remove the combo flood from the scan and stop the bias | in progress | arena-a3070ffa | `scripts/collect.py`, `scripts/roi_scan.py`, published `counts` | doc: `mve_filter` enum `only/exclude` on `GET /markets`; live probe of the demo host returns pages with it | F-35 pattern recurs if the cap is what limits the ranking |
+| T33 | Publish + integrate: full suite, PR to `main`, merge, confirm Pages deploy, `collect.yml` run, record PR + result here | pending | arena-a3070ffa | `COORDINATION.md`, `README.md` (integration only) | `scripts/check_site.py` + node tests + live URL fetch after deploy | — |
+
+### Log (this session)
+
+- 2026-11-21 ~06:30 UTC: session start. Read `COORDINATION.md` (861 lines) and the deployed site. Baseline re-run
+  on `ebce5e7`: `validate_live`, `validate_alerts`, `validate_roi`, `validate_catalysts`, `test_alerts`,
+  `test_simulate`, `test_fees`, `test_roi_parity`, `test_roi_scan_offline`, `check_site` (21 pages) all pass;
+  `gh run list` shows `collect.yml`, `desk.yml` and Pages green on `main`. So this session starts from a working
+  site and only fixes defects it can demonstrate.
+- 2026-11-21 ~06:35 UTC: **defect demonstrated (T30).** `scripts/collect.py` prunes `data/live/price_history.json`
+  to the tickers kept in the capped `open_markets` window. Proof on the committed data: of the 7 distinct tickers
+  in `data/live/alerts_archive.json`, the 3 `KXDEMOFUTHOURLY-*` markets have **0** observations left, so the
+  dashboard's graph for those swings renders "No observations in this window yet" — the exact series an alert
+  points at. The official candlestick endpoint (already wrapped by `assets/engine.js` `candles()` and used by
+  `live.html`) would still serve them.
+- 2026-11-21 ~06:40 UTC: **documented source adopted (T32).** `GET /markets` supports
+  `series_ticker` and `mve_filter ∈ {only, exclude}`
+  (https://docs.kalshi.com/api-reference/market/get-markets), and the same page states responses are cached and
+  "can lag the exchange by several seconds". Measured on the demo host this session:
+  `GET /markets?status=open&limit=3&mve_filter=exclude` → HTTP 200 with a cursor, so the filter is live.
