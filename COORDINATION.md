@@ -1400,3 +1400,61 @@ Base: `f09f982` (main at claim time). Claimed 2026-11-21 20:17Z before editing a
   `assets/engine.js`, `assets/site.js`, `index.html`, `roi.html`, `scripts/tests/*`) does **not** overlap my scope
   (`COORDINATION.md`, `data/verified_facts.json`, `data/findings.json`, `README.md`), so both can proceed. I will not
   edit their files; anything I find in them is logged as a request in this file instead.
+
+### T44 verification log (arena-dba435ee, 2026-11-21)
+
+Official pages re-fetched live this session and checked line by line (all 200, content matched):
+`getting_started/demo_env`, `getting_started/api_environments`, `getting_started/market_settlement`,
+`getting_started/orderbook_responses`, `getting_started/market_lifecycle`,
+`getting_started/quick_start_websockets`, `getting_started/rate_limits`, `api-reference/market/get-markets`,
+`api-reference/market/get-market-candlesticks`, `api-reference/orders/create-order-v2`,
+`kalshi.com/docs/kalshi-fee-schedule.pdf` (both chunks), plus
+`help.kalshi.com/.../13823775-creating-and-using-a-demo-account`.
+
+**Confirmed against `data/verified_facts.json` — no correction needed:** F-01…F-08 (all four demo/prod REST and WS
+roots, mock funds, credentials not shared, demo-price warning), F-11/F-12 (status vocabulary and the
+`?status=` filter mapping — `closed` = "any market past close_time that is not yet finalized"), F-13/F-14/F-37
+($1 per winning contract, net positions, "There is no settlement fee." / "There is no membership fee."),
+F-15/F-16/F-27/F-28 (bids only, ascending, best bid last, YES ask = 1 − best NO bid), F-17/F-29/F-30 (1/60/1440
+minute intervals; `end_period_ts`, `yes_bid{…_dollars}`, `price{open…}`, `volume_fp`, `open_interest_fp`),
+F-22/F-23/F-24/F-54 (`notional_value_dollars` is a per-contract settlement value, `volume_fp` / `volume_24h_fp` /
+`open_interest_fp` are fixed-point contract counts, `result` ∈ yes|no|scalar|""), F-31 (every WS session is
+key-authenticated, including for public channels), F-36 (taker `ceil(M × 0.07 × C × P × (1−P))`, maker
+`ceil(M × 0.0175 × C × P × (1−P))` — reproduced exactly by `scripts/roi_model.py`, checked against all 21 rows of
+the PDF's General Trading Fees Table by `scripts/tests/test_fees.py`), F-38 (demo has no preloaded funds), F-39
+(unauthenticated requests are rate-limited separately), F-53 (unknown ticker → 200 with empty arrays), F-55–F-60.
+All **13** seed series in `data/categories.json` were re-checked against the PDF's Non-Standard Fees table:
+`KXAAAGASM` (US gas price), `KXELECTIRAN`, `KXEMMYCACTO` / `KXEMMYCACTR` / `KXEMMYCSERIES` / `KXBALLONDOR` /
+`KXSUPERBOWLHEADLINE` (the last hyphenated across lines in the PDF as "KXSUPERBOWLHEADL" + "INE"), `KXBTCMAX150` /
+`KXBTCY` / `KXETHY`, `KXPGATOUR` / `KXPGARYDER` / `KXPGASOLHEIM`. All present, all descriptions match.
+`KXPGATOUR`'s "PGA Tour … 1 1" row sits in the PDF's row-continuation block on page 2 — verified there.
+
+**Two documented limits were missing from the fact table — added, not inferred:**
+- F-61: one candlestick request spans **at most 5,000 periods**; `start_ts`/`end_ts` are **seconds** and
+  millisecond values are rejected with `400 bad_request` (`api-reference/market/get-market-candlesticks`).
+- F-62: candlesticks for markets settled **before the historical cutoff** are only available via
+  `GET /historical/markets/{ticker}/candlesticks` (same page).
+- F-63: the most recent candlesticks "can be a few seconds behind the latest trades and quotes" (same page).
+- F-20 (the one deliberately blank row) now carries the official endpoint it is checked against
+  (`api-reference/market/get-markets`) instead of an empty `source`; its `value` is still blank and it is still
+  marked unverified, because live values are collection outputs, not static facts.
+
+**Checked and clean — no action needed:** every window on `live.html` (`5m` = 1-min candles × 300, `60m` = 60-min × 72,
+`1440m` = 1440-min × 30) and on `assets/live.js` (`candles()`) stays inside both the 1/60/1440 interval enum and the
+new 5,000-period cap, so the cap is recorded but not breached. `index.html` already discloses that it shows only the
+settled rows stored in the snapshot and prints `counts.settled_rows_trimmed_for_size` next to them (1,600 in scope,
+200 stored, 16,555 trimmed in the 20:18Z snapshot) — the disclosure is accurate and I did not change it.
+
+**Irregularities found in files outside my scope → logged as requests, not edited** (owner: `arena-83749e18`, who
+claimed `index.html`, `dashboard.html`, `assets/*.js`; `executive-summary.html` is unclaimed):
+
+| R-id | File | What is wrong | Correction | Source |
+|---|---|---|---|---|
+| R-2 | `executive-summary.html` | §1 row "Live alerting … (F-14)" cites F-14 (the high-ROI-model gap) for the browser-polling/CORS point. The CORS finding is **F-24**. | point the link at F-24 | `data/findings.json` F-24 |
+| R-3 | `executive-summary.html` | §1 row "Live interactive dashboard" cites **F-06** for "candlesticks only go down to one minute" and **F-14** for browser polling. F-06 is that candlestick claim, but the polling link should be F-24; the candlestick row should also cite **F-61/F-62** for the 5,000-period cap and the historical cutoff. | F-06 → keep, add F-61/F-62, F-14 → F-24 | `api-reference/market/get-market-candlesticks` |
+| R-4 | `executive-summary.html` | "Automate simulated trades (S1–S4 replay)" row says "the alerts-page auto-sim (G13)", but `alerts.html` contains no simulator — the auto-sim is `trading.html` (G13's own text says so). | "the auto-sim on Auto-sim trading (`trading.html`)" | `trading.html` `<title>`; `data/findings.json` G13 |
+| R-5 | `executive-summary.html` | §1 "Verified throughout" cell hard-codes "59 claims checked; 1 deliberately blank" and "Thirty-eight irregularities". The fact table is now **68 claims, 67 verified, 1 blank**; `data/findings.json` holds **43** flagged irregularities. | render the counts from `data/verified_facts.json` / `data/findings.json` instead of typing them | `data/verified_facts.json`, `data/findings.json` |
+| R-6 | `executive-summary.html` | §1 says "the arena-f068786c integration added F-29"; F-29 is present, but the same cell cites "F-05" for the five-sessions-one-tree finding — check that id still points at the canonical-tree finding after the F-6x additions. | re-check the F-05 anchor | `data/findings.json` |
+
+I verified the *substance* of every R-2…R-6 row against official sources while doing this; only the ids and the two
+hard-coded totals are wrong. None of them changes a sourced value.
