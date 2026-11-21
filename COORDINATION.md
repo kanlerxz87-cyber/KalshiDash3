@@ -945,6 +945,11 @@ main's README did not enumerate.
   `main` had published its own **F-72** (candle backfill), so this branch's freshness-alarm entry is **F-74**; `README.md`
   back to `main`'s exact content (main now enumerates `test_settled_selection.py`; my duplicate line dropped). Findings-ledger
   formatting made byte-consistent with `main` (escaped non-ASCII), so the diff carries only the intended rows.
+- 2026-11-21 ~21:50Z: **PR #73 merged as `6e06f8a` at 21:43:43Z. `pages.yml` run 44953036850 (push) completed/success;
+  `pages-build-deployment` 44953035850 success; Pages builds API reports status=built for `6e06f8a` at 21:43:44Z
+  (latest legacy build). The live URL could not be curled from this sandbox (outbound TLS blocked, curl exit 35);
+  the deploy confirmation above is from the Pages builds API and Actions, not from a browser fetch. F-74 can
+  drive a false 'dispatch failed' log line on `freshness-alarm.yml` until the owner drops its `--event` flag.
 
 ## Session `arena-b25b0914` — collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)
 
