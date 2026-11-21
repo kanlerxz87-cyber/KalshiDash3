@@ -912,7 +912,12 @@ had already landed the identical edit independently — kept, not duplicated).
 
 Claim (`9e8847c`) was pushed ~20:26Z before any implementation-file edit, per the board rule. The duplicate-work
 outcome is recorded here rather than hidden: several sessions re-derived the same fixes concurrently; main's were
-kept. `README.md` gains one line listing `scripts/tests/test_settled_selection.py`, which the merged tree ships but
+kept.
+
+*(Post-merge note: after this block was restored from `a96b7de`, `main` was consolidated again by PR #72
+(`389fa75`, merge of `arena/83749e18-kalshidash3`) — its `COORDINATION.md` is the compact form; this block was
+re-merged cleanly against it and retained verbatim, so the file a reader sees is the consolidated board plus
+this session's record, not the pre-#72 file.)* `README.md` gains one line listing `scripts/tests/test_settled_selection.py`, which the merged tree ships but
 main's README did not enumerate.
 
 ### Log (this session)
