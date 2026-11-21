@@ -233,7 +233,19 @@ function commonAsserts(label, r) {
       const archived = (() => { try {
         return JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8")).alerts.length;
       } catch (e) { return -1; } })();
-      check(leadsRows === archived, `the lead table must show one row per archived swing (table ${leadsRows}, archive ${archived})`);
+      // F-65: the table must show one row per archived swing EXCEPT the counted exclusions whose
+      // official series record puts them outside the topic. The exclusion must be published in
+      // counts.withheld_category_conflict, so a silent drop fails here too.
+      let withheld = 0;
+      try {
+        withheld = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"))
+          .counts.withheld_category_conflict || 0;
+      } catch (e) { withheld = 0; }
+      check(leadsRows === archived - withheld,
+        `the lead table must show one row per archived swing minus the counted F-65 exclusions `
+        + `(table ${leadsRows}, archive ${archived}, withheld ${withheld})`);
+      check(withheld === 0 || /withheld/i.test(fs.readFileSync(path.join(ROOT, "alerts.html"), "utf8")),
+        "alerts.html must disclose that some archived swings are withheld (F-65)");
       r.doc.querySelectorAll("#leads tbody tr").forEach((tr, i) => {
         tr.querySelectorAll("a").forEach(a => {
           check(/^https:\/\//.test(a.getAttribute("href") || ""), `lead row ${i}: every link must be an absolute https URL`);
