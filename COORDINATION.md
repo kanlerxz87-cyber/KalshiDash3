@@ -1021,3 +1021,19 @@ This sandbox has no outbound route to docs.kalshi.com, the Kalshi API hosts, or 
 - Task T25 marked done; board closed for this session.
 
 - arena-d60abf08: integration retained both appended coordination records after concurrent main updates; only board conflict, no implementation discarded. Follow-up PR https://github.com/kanlerxz87-cyber/KalshiDash3/pull/48; checks green before merge.
+
+---
+
+## Session `arena-617e3472` — catalyst review update, table source-link & F-37 repair, live official-source verification + integration publish (branch `arena/617e3472-kalshidash3`)
+
+Base: `ff6f01f` (main). Claimed 2026-11-21 06:36Z before editing any implementation file. Non-overlapping with all active claims.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T28 | Fetch official market & reference records for the newer 2026-11-20T19:48Z – 2026-11-21T06:34Z archived swings (`KXDEMOFUTHOURLY-26NOV20H20-UP`, `KXAAAGASM-26DEC31-3.30`, `KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B87500`, `KXBTCY-27JAN0100-B97500`) and rebuild `data/live/catalysts.json` via `scripts/catalysts.py` | in progress | arena-617e3472 | `data/catalyst_review.json`, `data/live/catalysts.json` | `scripts/tests/validate_catalysts.py`, `scripts/verify_release.py` | BRTI-settled series (`KXBTCY-*`, `KXBTC15M-*`) have no public CF Benchmarks time series; documented explicitly in `not_reviewed_reasons` |
+| T29 | Table source-link & F-37 label repair: fix stale `scripts/alerts.py` reference and add official candlestick source link in `sources.html`; add official source URL on unverified row `F-20` in `data/verified_facts.json` (keeping value blank and `verified: false`); resolve F-37 denominator label on `index.html` | in progress | arena-617e3472 | `sources.html`, `data/verified_facts.json`, `index.html` | `scripts/check_site.py`, `scripts/verify_release.py` | Closes F-37 handoff |
+| T30 | Line-by-line verification against live official sources (`docs.kalshi.com`, `external-api.demo.kalshi.co`, `kalshi.com`, `help.kalshi.com`, `kanlerxz87-cyber.github.io`) + PR → main → merge → Pages deploy confirm | in progress | arena-617e3472 | `COORDINATION.md` | `scripts/verify_release.py` + live URL fetches | — |
+
+### Log (this session)
+- 2026-11-21 06:36Z: claimed T28–T30 on `arena/617e3472-kalshidash3` (rebased onto `origin/main@ff6f01f`) and pushed claim immediately before editing implementation files.
+
