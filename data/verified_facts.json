@@ -303,7 +303,7 @@
   {
    "id": "C-42",
    "claim": "KXPGATOUR contains outright tournament-winner markets with a documented withdrawal rule",
-   "value": "\"The RSM Classic: Bill Haas wins\" \u2014 \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
+   "value": "\"The RSM Classic: Bill Haas wins\" — \"If Bill Haas wins the The RSM Classic, then the market resolves to Yes.\"",
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=100",
    "verified": true
   },
@@ -430,11 +430,11 @@
    "value": "project requirement (brief), enforced in assets/engine.js ALERT_THRESHOLD and scripts/collect.py compute_alerts; the validator refuses any committed alert with a smaller delta",
    "source": "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
    "verified": true,
-   "note": "Not an API field \u2014 recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
+   "note": "Not an API field — recorded as a requirement, with its enforcement test in scripts/tests/validate_live.py."
   },
   {
    "id": "C-54",
-   "claim": "GET /markets responses include volume_24h_fp (contracts traded in the last 24h), a fixed-point string \u2014 used by the alert model's volume factor",
+   "claim": "GET /markets responses include volume_24h_fp (contracts traded in the last 24h), a fixed-point string — used by the alert model's volume factor",
    "value": "volume_24h_fp (string, fixed-point, e.g. \"10.00\")",
    "source": "https://docs.kalshi.com/api-reference/market/get-markets",
    "verified": true,
@@ -798,5 +798,6 @@
    "verified": true,
    "checked": "2026-11-21"
   }
- ]
+ ],
+ "doc_links_note": "T57 (arena-220b524c). Every distinct docs.kalshi.com URL cited in the published pages and assets, checked on 2026-11-21 against Kalshi's own documentation index at https://docs.kalshi.com/llms.txt. `in_official_index` is true when the page is listed there; `confirmed_via` records exactly what was read. `cited_times` is the number of times the URL appears in *.html and assets/*.js, i.e. how much of the site would point at a dead page if it broke. This is a link-integrity check of the citation layer only: it does not re-verify the prose on each page, and it does not prove the endpoint is live (see the separate rows and scripts/collect.py output for observed responses)."
 }

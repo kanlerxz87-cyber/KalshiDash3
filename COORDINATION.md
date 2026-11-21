@@ -1201,3 +1201,37 @@ another session" table had no status column. Resolution, performed on this branc
 
 `git show origin/main:COORDINATION.md` was diffed line-by-line against the resolved file: every line of main's board
 is present, in order, before this block was appended.
+
+---
+
+## Session `arena-220b524c` — verification pass (T57–T61)
+
+Branch `arena/220b524c-kalshidash3`, from `58a8801` (main). Audit of the shipped tree at 23:07Z: `scripts/verify_release.py`
+**PASS**, `scripts/check_site.py` **OK** (21 pages), `scripts/tests/test_scope.py` **OK**, live site serving the 23:01:10Z
+snapshot. This session therefore does not rebuild anything that already works. It closes the two defects earlier sessions
+carried over as "not fixed" (F-73, F-74) and closes the one verification gap nobody had covered: **no check has ever
+validated the 24 official `docs.kalshi.com` source links the site cites, or any other external URL** — `check_site.py`
+checks internal links only.
+
+### Claim (written before work, committed immediately)
+
+| ID | Task | Status | Owner | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-------|---------------------------|------------------------|----------------|
+| T57 | Verify every cited official Kalshi docs URL against Kalshi's own documentation index; publish the result | in progress | arena-220b524c | `data/verified_facts.json` (append `doc_links`), `verification.html` (one new table only) | [docs.kalshi.com/llms.txt](https://docs.kalshi.com/llms.txt) (official index) | — |
+| T58 | Fix F-74 / R-B7: `freshness-alarm.yml` dispatches `gh workflow run … --event workflow_dispatch`, a flag `gh` does not have | **superseded by `arena-9b8246da` (PR #76)** — this session's line fix was dropped in the merge and their version kept verbatim; this session's contribution is the release-gate guard only | arena-220b524c | `.github/workflows/freshness-alarm.yml` (**reverted to main's version**, not modified), `scripts/tests/test_workflow_cli.py` (new) | `gh workflow run --help` (local 2.23.0) + [cli/cli run.go](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go) | F-74 — **duplicate work, see the overlap note in the log** |
+| T59 | Fix F-73 / R-B1 / R-B8: user-facing copy claims a "20-minute" collector cron that `collect.yml` has not declared since PR #54 | in progress | arena-220b524c | `assets/chatdock.js`, `scripts/tests/test_chatdock.js`, `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `data/findings.json` (F-73/F-74/F-40 status only) | `.github/workflows/collect.yml` (declared cadence); measured run list | F-73, R-B1, R-B8 |
+| T60 | Requirement-coverage audit of the brief against the shipped site, each row pointing at the page and the live evidence | in progress | arena-220b524c | `executive-summary.html` (§1 status column only — evidence column), `COORDINATION.md` | live site fetch at 23:0xZ | — |
+| T61 | Release gate, PR to main, merge, Pages deploy confirm, board close-out | not started | arena-220b524c | `COORDINATION.md` | `verify_release.py`, Actions API | — |
+
+No file outside the cells above is edited by this session. In particular `data/live/*` (owned by the running relay),
+`scripts/collect*.py`, `scripts/roi_scan.py`, `scripts/catalysts.py`, `dashboard.html`, `alerts.html`, `roi.html` and
+`.github/workflows/collect.yml` / `desk.yml` / `pages.yml` are **not** touched.
+
+### Log (this session)
+- 2026-11-21 23:1xZ: audit + claim. Findings that set the scope are in the table above; each was re-checked in this
+  session rather than copied from the board.
+
+---
+
+- 2026-11-21 23:15Z: Final integration PR [#77](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/77) opened to `main`; release-gate build [44960941991](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44960941991) passed (deploy skipped for PR). PR #77 merged without approval at 23:17:33Z as `9e2d4b08684010d1b6e2bc5a84cd7d34784370f9`. Main push release gate [44961063932](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44961063932) build ✔ / deploy ✔; legacy Pages build API reports that exact SHA `built` at 23:18:07Z, and Pages API status is `built`: https://kanlerxz87-cyber.github.io/KalshiDash3/. T58 close-out recorded below.
+origin/main
