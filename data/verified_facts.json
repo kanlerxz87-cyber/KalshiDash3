@@ -141,7 +141,7 @@
    "id": "F-20",
    "claim": "Live market values (prices, volumes, resolutions) in this repo",
    "value": "",
-   "source": "",
+   "source": "https://docs.kalshi.com/api-reference/market/get-markets",
    "verified": false,
    "flag": "Live market values are never stored in this repo's fact table. They are produced by scripts/collect.py into data/live/*.json at collection time and carry their own fetched_at timestamp and source URL."
   },

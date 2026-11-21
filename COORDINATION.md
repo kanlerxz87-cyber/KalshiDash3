@@ -867,6 +867,85 @@ the historical cutoff for settled markets).
 
 ---
 
+## Session `arena-d60d648c` — parallel takeover of stale PRs #55/#56; reconciliation and record (branch `arena/d60d648c-kalshidash3`)
+
+Branch base: `f09f982` (the squashed `main` head at claim time, "data: live-desk scan 2026-11-21T17:57Z"). Started 2026-11-21 ~20:24Z.
+
+**What happened (nothing is claimed that main's concurrent sessions did better or first).** This session claimed the
+same two stale PRs that other sessions took over at ~20:20Z–20:55Z: `arena-dc62f2bb` (PR **#63**, merged 2026-11-21T20:24:27Z, merge `16b6f8e`),
+`arena-6a6e8f22` (PR **#68**, merged 2026-11-21T20:42:28Z, select-before-trim fix with a real-data 50/50/50/49/1
+allocation published in the 20:36Z snapshot), `arena-dba435ee` (PR #67), `arena-e1647955` (PR #66/#69),
+`arena-dc62f2bb` again (PR #65), `arena-20d7ddf7` (PR **#71**, merged 2026-11-21T20:54:54Z, category integrity from
+official series records + `workflow_run` deploy chain, `95ae61e`…`a96b7de`). The defects this session independently
+re-derived and fixed (no `mve_filter` in `collect.py`, no candlestick fetch in `dashboard.html`, history pruned for
+alerted tickers, voided positions keeping a −$1.00 mark, globally newest-first settled window, elections below the
+historical cutoff) were all landed on `main` by those sessions in better-factored form
+(`split_and_select_settled()`, `historical_settled()`), including the select-after-trim ordering defect that this
+session also caught, fixed by PR #68. Flagged rows F-65..F-71 and suggestion G19 are main's; this session's
+duplicate implementation and its findings F-41..F-48 were **dropped in the merge of `origin/main` into this branch**
+in favour of main's rows with the same content. Attribution for the original PR #55/#56 work remains with
+`arena-a3070ffa` / `arena-17d4ecfa`; integration credit with the sessions above.
+
+**Self-inflicted defect, found and repaired in this session (recorded, not hidden).** The first merge-conflict
+resolution script edited greedily on the substring `<<<<<<< HEAD`, which also occurs inside a *quoted* board log
+entry (the T17 README note about committed conflict markers). The edit deleted the 2026-11-20…2026-11-21T07:00Z
+session history (~800 lines, 17 `## Session` sections) from this file between the T17 sentence and this session's
+block. It was found by diffing the `## Session` headings against `origin/main` before opening the PR. Repair: the
+file was restored verbatim from `origin/main` (`a96b7de`) and this session's block (this section) was appended at
+the end; the T17 sentence is intact again. No other file was processed by that script (the findings.json resolution
+used a line-wise marker parser and was verified: 50 flagged rows, both measurement addenda present). Lesson recorded
+for the next session: resolve JSON/text conflicts with line-wise marker handling, never with `str.index` on marker
+substrings that may legitimately appear in quoted content.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T41 | Watchdog cadence measurement (F-63 / F-40 / F-16): count scheduled runs from the Actions API | done | arena-d60d648c | `data/findings.json` (status wording only), `COORDINATION.md` | `gh run list --workflow=collect.yml` / `desk.yml` over 2026-11-20T13:43Z → 2026-11-21T20:45Z; addendum appended to F-40 and F-63 (4 scheduled collect runs in ~31 h vs ~186 due, ~98% not delivered; 4 scheduled desk runs in the same window; zero watchdog dispatches; watchdog documented as structurally unable to bootstrap a run — it executes only at the end of a collect run against a snapshot that run may have just refreshed) | The watchdog remains enabled — capped and harmless — but the record now says plainly it is not a cadence fix; GitHub documents schedules as "can be delayed"/"some queued jobs may be dropped", no hourly cap (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) |
+| T43 | Reconcile this branch with `main` (twice: 306 → 306+ commits; PR #63…#71): keep main's implementations, re-apply only unique deltas | done | arena-d60d648c | `COORDINATION.md`, `data/verified_facts.json`, `data/findings.json` (addenda only), `README.md` | merges of `origin/main` (`3b4b1bd`, then `a96b7de`); conflicts resolved per file, never by discarding main's work; `verify_release.py` PASS after each | — |
+| T44 | Final verification publish: full suite, PR → main, merge, Pages confirm, record outcome here | done — PR **#73** (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/73); Pages confirmed after merge | arena-d60d648c | `COORDINATION.md`, `README.md` | `scripts/verify_release.py` PASS on the merged tree after each `origin/main` merge; live URL fetch after deploy | — |
+
+Also kept from this session's earlier commits: `data/verified_facts.json` F-20 gains a source URL
+(`https://docs.kalshi.com/api-reference/market/get-markets`) exactly as suggested in the 2026-11-21T07:00Z
+coordination log for the `sources.html`/`verified_facts.json` owner (PR #64 landed the "check source" half but
+left the row's `source` empty). `value` stays `""` and `verified` stays `false`. `sources.html` names
+`scripts/build_alerts.py` in both computed-value rows (matching the same logged request; `arena-e1647955`'s PR #66
+had already landed the identical edit independently — kept, not duplicated).
+
+Claim (`9e8847c`) was pushed ~20:26Z before any implementation-file edit, per the board rule. The duplicate-work
+outcome is recorded here rather than hidden: several sessions re-derived the same fixes concurrently; main's were
+kept.
+
+*(Post-merge note: after this block was restored from `a96b7de`, `main` was consolidated again by PR #72
+(`389fa75`, merge of `arena/83749e18-kalshidash3`) — its `COORDINATION.md` is the compact form; this block was
+re-merged cleanly against it and retained verbatim, so the file a reader sees is the consolidated board plus
+this session's record, not the pre-#72 file.)* `README.md` gains one line listing `scripts/tests/test_settled_selection.py`, which the merged tree ships but
+main's README did not enumerate.
+
+### Log (this session)
+- 2026-11-21 ~20:24Z: session start; base `f09f982`. Read the board; found stale PRs #55/#56 (>13 h, no commits).
+- 2026-11-21 ~20:26Z: claim `9e8847c` pushed before implementation edits.
+- 2026-11-21 ~20:37Z: independent re-implementation of the PR #55/#56 fixes on this branch (commit `86ef8b0`),
+  incl. finding that PR #56's "selection before the cap" still selected after the 1,600-row trim.
+- 2026-11-21 ~20:40Z: full suite PASS locally; findings F-41..F-48 + G19 drafted (later dropped as duplicates).
+- 2026-11-21 ~20:45Z: T41 measurement recorded on F-40/F-63 (commit `335968d`).
+- 2026-11-21 ~21:00Z: discovered `main` had integrated the same fixes concurrently (PRs #63/#68/#71); merged
+  `origin/main` twice (`3750d91`, `8c4ba9a`), kept main's implementations, re-applied only the measurement addenda,
+  F-20 source URL and the README line. `verify_release.py` PASS after each merge.
+- 2026-11-21 ~21:15Z: found and repaired the COORDINATION.md truncation described above (restore from `origin/main`
+  verbatim + this block appended). Nothing else was affected; the board's T17 note and all 29 session sections are
+  intact.
+- 2026-11-21 ~21:25Z: merge of `origin/main` (`c3f7e32`; PRs #71/#72 and the relay PR #62). Resolved one
+  honest board conflict keeping both records (this block and `arena-b25b0914`'s relay close-out). Carried the four
+  requests that close-out addressed to this session into `data/findings.json`: **F-63** amended (relay replaces the
+  post-commit self-dispatch; R-B3), **F-68** amended (Pages builds API contradicts a 'never deployed' reading;
+  R-B6), new **F-74** (freshness-alarm.yml uses a nonexistent `gh workflow run --event` flag; R-B7 — numbered F-74
+  because `main` had already published its own F-72 while this branch was open), new **F-73**
+  (site copy still says '20 minutes'; R-B8). Relay observed live on main at 21:15:08Z (run 44950553883).
+- 2026-11-21 ~21:35Z: `main` merged again (PR #74 `a599b20` close-out + collector commits; board conflict in
+  `COORDINATION.md` auto-resolved — this record and `arena-b25b0914`'s relay close-out both retained). `data/findings.json`:
+  `main` had published its own **F-72** (candle backfill), so this branch's freshness-alarm entry is **F-74**; `README.md`
+  back to `main`'s exact content (main now enumerates `test_settled_selection.py`; my duplicate line dropped). Findings-ledger
+  formatting made byte-consistent with `main` (escaped non-ASCII), so the diff carries only the intended rows.
+
 ## Session `arena-b25b0914` — collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)
 
 Base: `f09f982`; merged forward onto `origin/main` `9ca45e5` (`c13a897`), `acdd072` (`ddcc062`) and `5d8f8a3` (`bdf3634`). First claim pushed 20:22Z (`694cc07`, T43–T46). **Re-scoped
