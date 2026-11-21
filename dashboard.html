@@ -45,7 +45,7 @@
         <option value="m" selected>Minutes · last 6 h (1-min candles)</option>
         <option value="h">Hours · last 72 h (1-hour candles)</option>
         <option value="d">Days · last 30 d (1-day candles)</option>
-        <option value="all">All collected</option>
+        <option value="all">All collected (observations)</option>
       </select>
     </label>
     <label>Price series
@@ -430,8 +430,10 @@ function drawChart() {
   const key = KD.$("#seriesSel").value;
   const win = WINDOWS[KD.$("#window").value] || Infinity;
   const now = Date.now();
+  const obsTs = (t) => (typeof t === "number" ? t : Date.parse(t));
+  const obsVal = (o, k) => (k === "bid" ? (o.bid ?? o.yes_bid) : k === "ask" ? (o.ask ?? o.yes_ask) : o.last);
   const pts = series
-    .map(o => ({ t: Date.parse(o.t), v: o[key] }))
+    .map(o => ({ t: obsTs(o.t), v: obsVal(o, key) }))
     .filter(p => Number.isFinite(p.t) && p.v !== null && p.v !== undefined && !Number.isNaN(p.v))
     .filter(p => win === Infinity || now - p.t <= win);
   if (KD.$("#chartNote")) KD.$("#chartNote").textContent = "";

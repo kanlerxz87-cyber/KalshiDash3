@@ -29,8 +29,16 @@
         Updating it to workflow publishing returned HTTP 403 to this session.</td>
       <td>The full offline verification and Actions deployment passed on main, but legacy branch
         publishing can still bypass those checks. Exclusive Actions-only publishing is not confirmed.
-        A repository administrator must change the Pages build source to GitHub Actions.
-        Branch validation does not deploy; only main may deploy through the workflow.</td>
+        Re-tested on 2026-11-21 at 20:30Z: <code>PUT /repos/…/pages</code> with
+        <code>build_type=workflow</code> was refused again with HTTP 403
+        <em>Resource not accessible by integration</em>, even though this session's token reports
+        <code>admin: true</code> on the repository — the Pages build source is not writable through the
+        API credential available to these sessions. A repository administrator must change it under
+        <em>Settings → Pages → Build and deployment → Source: GitHub Actions</em>.
+        Until then every push to <code>main</code> is published by the legacy branch builder, which does
+        <b>not</b> run <code>verify_release.py</code>; the deploy workflow is an additional gate that runs
+        on the same commit, not a replacement for it. Branch validation does not deploy; only main may
+        deploy through the workflow.</td>
       <td><a href="https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/pages">Pages configuration (current API state; may require access)</a> ·
         <a href="https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44875857408">Successful verified release</a> ·
         <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site">GitHub publishing-source documentation</a></td>

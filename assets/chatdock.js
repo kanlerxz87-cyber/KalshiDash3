@@ -122,6 +122,7 @@ const KDCHAT = (() => {
     const cat = CAT_LABEL[a.category] || a.category || "other";
     const links = [
       `<a href="${esc(a.api)}" target="_blank" rel="noopener" title="Re-run the exact API query this price came from">API</a>`,
+      `<a href="dashboard.html#${encodeURIComponent(a.ticker)}" title="Open this contract on the price chart">chart</a>`,
       `<a href="alerts.html">detail</a>`,
     ];
     if (a.news) links.push(`<a href="${esc(a.news)}" target="_blank" rel="noopener" title="News SEARCH lead — never an asserted cause (F-25)">news search</a>`);

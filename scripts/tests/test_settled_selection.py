@@ -107,5 +107,46 @@ def main() -> int:
     return 0
 
 
+
+# ---------------------------------------------------------------------------
+# ORDER REGRESSION (arena-6a6e8f22, 2026-11-21).
+# The first version of the per-topic fix selected AFTER `rows[:SETTLED_KEEP]`, and the
+# 2026-11-21T20:27Z snapshot proved it was still unfair: crypto 178 / gas 17 / culture 5,
+# zero elections and zero golf. select_settled() itself was correct, so only a test that
+# drives the real trim-then-select pipeline can catch it. That is what this does.
+def order_regression() -> int:
+    print("  --- order regression: selection must run before the stored window is trimmed")
+    rows = []
+    # 2,500 fresh crypto settlements dominate the newest-first window ...
+    for i in range(2500):
+        rows.append({"ticker": f"KXBTC15M-{i}", "category_id": "crypto",
+                     "settlement_ts": f"2026-11-21T{5 + (i // 60) % 15:02d}:{i % 60:02d}:00.000000Z",
+                     "result": "no", "source": "https://example.invalid/x"})
+    # ... while the other topics settled long ago, exactly like the real elections row.
+    rows.append({"ticker": "KXELECTIRAN-26JUL01", "category_id": "elections",
+                 "settlement_ts": "2026-07-01T15:24:15.000000Z", "result": "no",
+                 "source": "https://example.invalid/x"})
+    rows.append({"ticker": "KXPGATOUR-OLD", "category_id": "golf",
+                 "settlement_ts": "2026-08-01T00:00:00.000000Z", "result": "yes",
+                 "source": "https://example.invalid/x"})
+    rows.sort(key=lambda r: r["settlement_ts"], reverse=True)
+
+    stored, published, by_cat = collect.split_and_select_settled(rows, keep=1600, cap=200)
+    cats = {r["category_id"] for r in published}
+    check(len(stored) == 1600, f"the stored window is still trimmed to keep ({len(stored)})")
+    check("elections" in cats and "golf" in cats,
+          f"a settlement older than the stored window must still be published (got {sorted(cats)})")
+    check(by_cat.get("elections") == 1 and by_cat.get("golf") == 1,
+          f"those rows are counted in the published split ({by_cat})")
+
+    # The wrong order, reproduced: trim first, then select.
+    trimmed_first, _ = collect.select_settled(rows[:1600], cap=200)
+    wrong = {r["category_id"] for r in trimmed_first}
+    check("elections" not in wrong,
+          "witness: selecting after the trim really does lose elections (this is the shipped bug)")
+    return 0
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    order_regression()
+    raise SystemExit(main())
