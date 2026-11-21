@@ -4,8 +4,37 @@ name: Collect Kalshi demo data
 # snapshot, so every number on the page has a fetch time and a query URL.
 # Sources: https://docs.kalshi.com/getting_started/quick_start_market_data
 #          https://docs.kalshi.com/api-reference/market/get-markets
+#
+# Cadence (T55, arena-b25b0914 — measurements in COORDINATION.md):
+#   GitHub delivered 2 of ~67 configured schedule events for this workflow between 06:49Z and
+#   20:17Z on 2026-11-21, and the old "freshness watchdog" step could never fire (it ran right
+#   after a commit, when the snapshot was ~0 minutes old). So the cadence no longer depends on the
+#   scheduler: on main, one run is a bounded RELAY — scripts/collect_relay.py repeats the pass
+#   (probe -> collect -> alerts -> catalysts -> simulation -> validators -> commit) on a fixed
+#   15-minute grid for at most 5.5 hours and queues exactly one successor right before its final
+#   pass (the concurrency group holds it until this run ends, even by timeout). Each committed pass
+#   dispatches pages.yml once, so the snapshot is published through the verified release gate (the
+#   GITHUB_TOKEN docs say its pushes do not trigger a Pages build). Every bound (default
+#   branch only, >= 2 h of work before a successor, never while another run is queued,
+#   COLLECT_RELAY=off kill switch, <= 6 pushes/hour) is enforced in that script and pinned by
+#   scripts/tests/test_collect_relay.py. On any other branch a run is a single pass, as before.
+#   The per-pass validator list lives in scripts/collect_relay.py (VALIDATORS).
+#   Stop a running relay: set COLLECT_RELAY=off, then `gh run cancel <run id>`.
 on:
   workflow_dispatch:
+    inputs:
+      relay_minutes:
+        description: "Keep collecting for this many minutes (blank = 330 on main, a single pass elsewhere; max 330)"
+        required: false
+        default: ""
+      interval_minutes:
+        description: "Minutes between passes inside one run (blank = 15; min 10, or 2 for a dry run)"
+        required: false
+        default: ""
+      commit:
+        description: "Commit and push snapshots (false = dry run: validate only, dispatch nothing)"
+        required: false
+        default: "true"
   schedule:
     # Why two crons and why the minutes are not zero, from the official docs
     # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule):
@@ -18,78 +47,41 @@ on:
     # snapshot layer aged past its own 45-minute staleness banner most of the day. Two off-peak
     # crons plus the chained dispatch below (a documented GITHUB_TOKEN exception, see the last
     # step) keep fresh public data on the page without inventing a cadence the platform offers.
+    # [T55, arena-b25b0914: the chained dispatch is now the relay successor queued by
+    #  scripts/collect_relay.py; on main these crons are the RESTART path if a relay ever stops.]
     - cron: "7,27,47 * * * *"
     - cron: "13,43 * * * *"
 
 permissions:
   contents: write
-  actions: write   # needed only for the chained dispatch in the last step (workflow_dispatch of collect.yml)
+  actions: write   # scripts/collect_relay.py: one collect.yml successor per relay; pages.yml once per committed pass; desk.yml when roi.json is stale
+
+# Per branch: a relay on main never blocks a single pass dispatched on a session branch (and the
+# other way round). GitHub runs at most one run per group and keeps at most one pending.
 concurrency:
-  group: collect
+  group: collect-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   collect:
     runs-on: ubuntu-latest
+    timeout-minutes: 350   # relay budget 330 min + one final pass; the job limit is 6 h
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # each pass resets to the branch's newest remote head and may rebase a push
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Probe the official demo REST root
-        run: |
-          set -euo pipefail
-          code=$(curl -sS -m 30 -o /tmp/status.json -w '%{http_code}' \
-            https://external-api.demo.kalshi.co/trade-api/v2/exchange/status)
-          echo "HTTP $code"; head -c 400 /tmp/status.json || true
-          test "$code" = "200"
-      - name: Run the scope and category-integrity tests before collecting
-        run: python3 scripts/tests/test_scope.py
-      - name: Collect
-        run: python3 scripts/collect.py --orderbooks 4
-      - name: Build live alert feed (>= $0.10 swings)
-        run: python3 scripts/build_alerts.py
-      - name: Build swing leads from the review ledger (fetched sources only; refuses causal wording)
-        run: python3 scripts/catalysts.py
-      - name: Paper-trade fixed strategies on the alert archive (no orders, no account)
-        run: python3 scripts/simulate.py
-      - name: Validate the snapshot, the alert archive/feeds, and the simulation
-        run: |
-          set -uo pipefail
-          status=0
-          annotate() {  # surface validator diagnostics as check annotations, readable via `gh run view`
-            printf '%s\n' "$1" | head -12 | while IFS= read -r line; do
-              printf '::error::%s\n' "$(printf '%s' "$line" | sed -e 's/%/%25/g' -e 's/\r/%0D/g')"
-            done
-          }
-          run_v() {
-            name="$1"; shift
-            if out=$("$@" 2>&1); then
-              printf '%s\n' "$out"
-            else
-              status=1
-              printf '::error::%s FAILED\n' "$name"
-              annotate "$out"
-            fi
-          }
-          run_v validate_live   python3 scripts/tests/validate_live.py
-          run_v validate_alerts python3 scripts/tests/validate_alerts.py
-          run_v test_alerts     python3 scripts/tests/test_alerts.py
-          run_v test_coverage   python3 scripts/tests/test_collect_coverage.py
-          run_v test_selection  python3 scripts/tests/test_settled_selection.py
-          run_v test_simulate   python3 scripts/tests/test_simulate.py
-          run_v validate_catalysts python3 scripts/tests/validate_catalysts.py
-          exit $status
-      - name: Commit snapshot
-        run: |
-          set -euo pipefail
-          git config user.name  "kalshi-collector-bot"
-          git config user.email "kalshi-collector-bot@users.noreply.github.com"
-          git add data/live
-          if git diff --cached --quiet; then echo "no change"; exit 0; fi
-          git commit -m "data: demo snapshot $(date -u +%Y-%m-%dT%H:%MZ)"
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-          git push
+      - name: Collect, derive, validate, commit (relay on main, one pass elsewhere)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELAY_MINUTES: ${{ github.event.inputs.relay_minutes }}
+          INTERVAL_MINUTES: ${{ github.event.inputs.interval_minutes }}
+          COMMIT: ${{ github.event.inputs.commit }}
+          COLLECT_RELAY: ${{ vars.COLLECT_RELAY }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: python3 -u scripts/collect_relay.py
       # ---------------------------------------------------------------------------------
       # F-67 (measured 2026-11-21, this session): a workflow cannot sustain its own cadence.
       #
@@ -110,6 +102,11 @@ jobs:
       # in .github/workflows/freshness-alarm.yml, which runs on its own cron and can therefore
       # still act when collect.yml's cron stalls (it is subject to the same platform behaviour,
       # which is disclosed there).
+      # [T55, arena-b25b0914, merged 2026-11-21: the step above now sustains the cadence from inside one
+      #  long run on main and queues its own successor with workflow_dispatch, which the GITHUB_TOKEN
+      #  docs exempt (https://docs.github.com/en/actions/concepts/security/github_token). This report
+      #  is kept unchanged as the measured record. test_scope.py still runs BEFORE collecting, in every
+      #  pass (PRECHECKS in scripts/collect_relay.py), as be07a04 intended.]
       - name: "Cadence report — measured schedule deliveries, no self-dispatch"
         if: always() && github.ref == 'refs/heads/main'
         env:
