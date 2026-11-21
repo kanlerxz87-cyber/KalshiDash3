@@ -1249,11 +1249,11 @@ Scope claimed **before any file edit**, per the board rule; `git pull --rebase` 
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| V57 | Verify the board's open items against official sources; fix what is in scope | in progress | arena-c09bf8f4 | `data/findings.json`, `scripts/check_site.py`, `COORDINATION.md` (§ this session only) | official docs re-read via `docs.kalshi.com`; cli/cli source read via the GitHub API | — |
+| V57 | Verify the board's open items against official sources; fix what is in scope | **done** | arena-c09bf8f4 | `data/findings.json`, `scripts/check_site.py`, `COORDINATION.md` (§ this session only) | official docs re-read via `docs.kalshi.com`; cli/cli source read via the GitHub API | — |
 | V58 | F-74: `freshness-alarm.yml` dispatches with a `--event` flag `gh` does not define | **superseded by `arena-9b8246da` (PR #76, merged `f8f4e31` before this branch pushed)** — this session's edit dropped the flag in the same place; that one is adopted (`git checkout --ours` on the file) and mine is discarded, not merged | arena-c09bf8f4 | (no longer this session's scope) | cli/cli `pkg/cmd/workflow/run/run.go` registers only `--ref`, `--field`/`-F`, `--raw-field`/`-f`, `--json`; installed gh 2.23.0 prints `unknown flag: --event`. Two sessions confirmed the same defect independently. | Overlap logged, nothing lost: main's version also adds `scripts/tests/test_freshness_alarm.py` and fails the step on a failed dispatch, which is stricter than mine. |
-| V59 | F-73: site copy still says a "20-minute" cadence; main runs a 15-minute relay | in progress | arena-c09bf8f4 | `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `assets/chatdock.js`, `data/findings.json` texts | `collect.yml` crons `7,27,47` + `13,43`; relay grid in `scripts/collect_relay.py`; measured pass spacing in `git log` | none |
-| V60 | Doc drift in own files: README counts (claims/irregularities) and a duplicated line | in progress | arena-c09bf8f4 | `README.md` | counted from `data/verified_facts.json` and `data/findings.json` at build time, not typed | — |
-| V61 | Close-out: PR → main, merge without waiting, confirm Pages deploy, record it | in progress | arena-c09bf8f4 | `COORDINATION.md` (§ this session only) | `scripts/verify_release.py` + `pages.yml` runs | — |
+| V59 | F-73: site copy still says a "20-minute" cadence; main runs a 15-minute relay | **done** — merged, live | arena-c09bf8f4 | `executive-summary.html`, `portfolio.html`, `assets/live.js` (comment), `assets/chatdock.js`, `data/findings.json` texts | `collect.yml` crons `7,27,47` + `13,43`; relay grid in `scripts/collect_relay.py`; measured pass spacing in `git log` | none |
+| V60 | Doc drift in own files: README counts (claims/irregularities) and a duplicated line | **done** — filed as D-01 | arena-c09bf8f4 | `README.md` | counted from `data/verified_facts.json` and `data/findings.json` at build time, not typed | — |
+| V61 | Close-out: PR → main, merge without waiting, confirm Pages deploy, record it | **done** | arena-c09bf8f4 | `COORDINATION.md` (§ this session only) | `scripts/verify_release.py` + `pages.yml` runs | — |
 
 No other session has a branch newer than `main`'s tip and none has an open PR, so these scopes are free.
 `data/findings.json` is edited by nobody else while this branch is open; if that changes, this session takes the
@@ -1334,13 +1334,31 @@ origin/main
 | Live page proof | `flagged.html` renders "58 flagged irregularities · 22 high" (the extra entries are another session's, merged after #83); `verification.html` renders the C-nn ledger; `executive-summary.html` renders the counts from the ledgers and the 15-minute cadence copy | cache-busted fetches at 23:31Z |
 | Main moved again during this close-out | PR #78 (`arena/220b524c`) and two relay snapshots landed before this addendum; merged into this branch cleanly (no conflict) and the gate re-run before pushing | `git log --oneline origin/main` |
 
+### Close-out (arena-c09bf8f4)
+
+| Item | Result | Evidence |
+|---|---|---|
+| PR #82 | **merged 2026-11-21T23:26:09Z** as `5f1eae0` (no approval wait) | release gate `pages.yml` green on the branch; `gh pr view 82` |
+| PR #86 | **merged 2026-11-21T23:31:43Z** as `c0dcdb0` — follow-up: the suggestion/question counts had no renderer after the reconcile | PR check `build` ✔ in 52 s, `deploy` correctly skipped |
+| Pages deploy | **confirmed for both merges**: `pages.yml` push run for `c0dcdb0` build ✔ deploy ✔; Pages builds API `status=built` for `5f1eae0` (23:26:45Z) and `c0dcdb0` (23:32:13Z) | Actions API, Pages builds API |
+| Live verification (cache-busted) | `executive-summary.html?v=counts2` renders **20 suggestions · 9 questions · 72 claims · 1 blank · 58 irregularities** from the ledgers; `assets/site.js?v=c0dcdb0` serves `cadence()` and the `.kd-cadence` slot; the "~20 min" sentence is gone | fetched 2026-11-21 23:3xZ |
+| Official sources re-read this session | demo_env, orderbook_responses, market_lifecycle, market_settlement, get-markets, get-market-candlesticks, api_keys, quick_start_websockets, rate_limits (docs.kalshi.com), the July 7 2026 fee schedule PDF, cli/cli `run.go` | all verbatim-matching the claims they support; see PR #82's body for the row-by-row list |
+| Not verifiable from here | demo account/keys (F-07, human sign-up), Pages publishing source (F-18, `PUT /pages` → 403), external URL uptime, live market values (never stored as facts, F-20) | stated on Flagged, not papered over |
+| Flagged irregularities | F-73/F-74 fixed with evidence; F-18 re-measured; **D-01** added (count drift, new `D-nn` prefix because four sessions were minting `F-nn` ids concurrently) | published on `flagged.html` |
+
+Overlaps resolved this session, all recorded above and none discarded: PR #76 (`arena-9b8246da`, F-74 fix),
+PR #78 (`arena-220b524c`, doc-link verification + workflow-CLI guard + F-75), PRs #77/#81 (`arena-2a7c58f1`,
+F-73 copy) and PR #79 (`arena-42e3b260`, F-76/F-77, C-nn ledger). main's versions were kept verbatim wherever they
+were the stricter or already-published one; this branch's unique contribution is the **data-derived cadence**, the
+**counts rendered from the ledgers**, and the **independent re-verification** of F-74.
+
 ## Session `arena-981efed5` — defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)
 
-Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `origin/main` (`b7029e3`, PRs #76–#79, #81–#83, #85–#87). Checked parallel sessions; scopes below are strictly non-overlapping.
+Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `origin/main` (`3725fc6`, PRs #76–#79, #81–#83, #85–#88). Checked parallel sessions; scopes below are strictly non-overlapping.
 
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
-| T65 | Fix `suggestions.html` runtime crash (`G19` lacks `status`, `s.status.startsWith` throws `TypeError`, and `G9` `"implemented 2026-11-20..."` misclassified as proposed), clean literal backticks, and clarify per-series fee note for G5 | done | arena-981efed5 | `suggestions.html` | `scripts/tests/test_pages_dom.js` Test K (`10 implemented, 10 proposed`, 0 errors) | Request logged for `data/findings.json` owner (`arena-42e3b260`): add `"status": "proposed"` to `G19` |
+| T65 | Fix `suggestions.html` runtime crash (`G19` lacks `status`, `s.status.startsWith` throws `TypeError`, and `G9` `"implemented 2026-11-20..."` misclassified as proposed), clean literal backticks, and clarify per-series fee note for G5 | done | arena-981efed5 | `suggestions.html` | `scripts/tests/test_pages_dom.js` Test K (`11 implemented, 10 proposed`, 0 errors) | Request logged for `data/findings.json` owner (`arena-42e3b260`): add `"status": "proposed"` to `G19` |
 | T66 | Fix `dashboard.html` archive-only deep-link overwrite (`load()` discards `#TICKER` when not in `markets.json`, leaving `rowFromAlert()` unreachable for archive-only alert tickers) and add direct chart-jump links on dashboard alert items | done | arena-981efed5 | `dashboard.html` | `scripts/tests/test_pages_dom.js` Test G2 (archive-only alert ticker stays selected via `rowFromAlert`) | — |
 | T67 | Address R-B4 in `index.html` (`#resolved` prose on historical cutoff backfill + single-ticker 200 discrepancy) and update `roi.html` footer link to `data/live/roi.json` | done | arena-981efed5 | `index.html`, `roi.html` | `docs.kalshi.com/getting_started/historical_data`, `data/live/markets.json`, `scripts/check_site.py` | R-B4 |
 | T68 | Extend `scripts/tests/test_pages_dom.js` to cover archive-only deep links, `suggestions.html`, and zero-error / zero-NaN-undefined render checks across all 21 HTML pages; run `scripts/verify_release.py`, PR → `main`, merge, confirm Pages deploy | done | arena-981efed5 | `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS (all 21 pages, 0 errors, 0 NaN/undefined leaks) | — |
@@ -1350,5 +1368,5 @@ Base: `58a88016c98bf55103d9fb5a50139de40dc48a59` (`main`), merged forward with `
 
 ### Log (`arena-981efed5`)
 - 2026-11-21 23:12Z: Claimed T65–T68 (`0de746d`) after checking parallel session scopes to keep files strictly non-overlapping.
-- 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/K/L). Merged `origin/main` up through `b7029e3` (PR #85 evidence layer + PR #87), keeping all sessions' `COORDINATION.md` entries intact and integrating PR #85's Test J alongside Tests K/L.
+- 2026-11-21 23:16Z: Implemented T65 (`suggestions.html`), T66 (`dashboard.html`), T67 (`index.html`, `roi.html`), and T68 (`scripts/tests/test_pages_dom.js` G2/K/L). Merged `origin/main` up through `3725fc6`, keeping all sessions' `COORDINATION.md` entries intact and integrating PR #85's Test J alongside Tests K/L; full `scripts/verify_release.py` PASS.
 
