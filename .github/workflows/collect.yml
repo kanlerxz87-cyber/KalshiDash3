@@ -43,6 +43,8 @@ jobs:
             https://external-api.demo.kalshi.co/trade-api/v2/exchange/status)
           echo "HTTP $code"; head -c 400 /tmp/status.json || true
           test "$code" = "200"
+      - name: Run the scope and category-integrity tests before collecting
+        run: python3 scripts/tests/test_scope.py
       - name: Collect
         run: python3 scripts/collect.py --orderbooks 4
       - name: Build live alert feed (>= $0.10 swings)
