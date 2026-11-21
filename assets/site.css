@@ -123,3 +123,58 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 44px;colo
 .swing-item .dir.down{color:var(--bad);font-weight:700}
 .swing-item .cause{color:var(--mut);font-style:italic;font-size:11.5px}
 .swing-empty{color:var(--mut);font-size:12.5px;padding:6px 0}
+
+/* ============================================================================
+   Always-on alert chat dock (assets/chatdock.js) — session arena-17d4ecfa.
+   Fixed bottom-left so it never covers the sticky nav, collapses to a tab so it
+   cannot get in a trader's way, expands to two side-by-side scrolling chats.
+   ========================================================================== */
+.kd-dock{position:fixed;left:14px;bottom:14px;z-index:60;font-size:13px;max-width:min(920px,calc(100vw - 28px))}
+.kd-tab{display:flex;align-items:center;gap:8px;background:var(--panel);color:var(--txt);border:1px solid var(--line);
+  border-radius:22px;padding:7px 14px;font:600 13px/1 inherit;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.35)}
+.kd-tab:hover{background:var(--panel2)}
+.kd-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(0,182,122,.6);animation:kd-pulse 2.2s infinite}
+@keyframes kd-pulse{0%{box-shadow:0 0 0 0 rgba(0,182,122,.55)}70%{box-shadow:0 0 0 9px rgba(0,182,122,0)}100%{box-shadow:0 0 0 0 rgba(0,182,122,0)}}
+@media (prefers-reduced-motion:reduce){.kd-dot{animation:none}}
+.kd-chip{font:11px/1 var(--mono);padding:3px 8px;border-radius:20px;border:1px solid var(--line);color:var(--mut)}
+.kd-chip.live{background:#0f4d3a;color:#7ce8bb;border-color:transparent}
+.kd-chip.warn{background:#4a3a0d;color:#ffd479;border-color:transparent}
+.kd-panel{position:absolute;left:0;bottom:46px;width:min(900px,calc(100vw - 28px));background:var(--panel);
+  border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.45);overflow:hidden}
+.kd-phead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.kd-pmeta{color:var(--mut);font-size:12px}
+.kd-filter{font-size:12px;color:var(--mut);display:flex;gap:5px;align-items:center}
+.kd-filter select{background:var(--bg);color:var(--txt);border:1px solid var(--line);border-radius:7px;padding:3px 6px;font:12px inherit}
+.kd-btn{background:var(--green-d);color:#fff;border:0;border-radius:8px;padding:5px 11px;font:600 12px inherit;cursor:pointer}
+.kd-btn:hover{background:var(--green)}
+.kd-more{margin-left:auto;font-size:12px}
+.kd-snapline{flex-basis:100%;color:var(--mut);font-size:11.5px}
+.kd-snapline .warn{color:var(--warn)}
+#kdHealth{flex-basis:100%}
+.cd-health{font-size:11.5px;color:var(--mut)}
+.cd-health.ok code,.cd-health code{font-size:.9em}
+.cd-health.warn{color:var(--warn)}
+.kd-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media (max-width:760px){.kd-grid{grid-template-columns:1fr}}
+.kd-card{border-right:1px solid var(--line);min-width:0;display:flex;flex-direction:column}
+.kd-card:last-child{border-right:0}
+.kd-card h4{margin:0;padding:8px 12px 6px;font-size:12.5px;display:flex;gap:7px;align-items:center;color:var(--txt)}
+.kd-count{background:var(--panel2);color:var(--mut);border-radius:20px;padding:1px 8px;font:11px var(--mono)}
+.kd-note{margin:0 12px 6px;color:var(--mut);font-size:11px;line-height:1.45}
+.kd-feed{height:min(46vh,330px);overflow-y:auto;padding:8px 10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin}
+.cd-msg{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:8px;padding:6px 9px;background:var(--bg);font-size:12px}
+.cd-msg.up{border-left-color:var(--ok)}
+.cd-msg.down{border-left-color:var(--bad)}
+.cd-head{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cd-time{color:var(--mut);font:10.5px var(--mono)}
+.cd-delta{font-weight:700}
+.cd-msg.up .cd-delta{color:var(--ok)} .cd-msg.down .cd-delta{color:var(--bad)}
+.cd-cat{font-size:10.5px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:0 6px}
+.cd-orig{font:10px var(--mono);border-radius:20px;padding:1px 6px;background:var(--panel2);color:var(--mut)}
+.cd-orig.live{background:#0f4d3a;color:#7ce8bb}
+.cd-tick{color:var(--mut);font-size:10.5px;word-break:break-all}
+.cd-title{margin-top:1px}
+.cd-links{margin-top:3px;display:flex;gap:9px;flex-wrap:wrap;font-size:11px}
+.cd-empty{color:var(--mut);margin:auto;text-align:center;padding:18px;font-size:12px}
+.kd-pfoot{padding:7px 12px;border-top:1px solid var(--line);color:var(--mut);background:var(--panel2);line-height:1.45}
+@media print{.kd-dock{display:none}}
