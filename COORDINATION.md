@@ -860,6 +860,20 @@ does not touch their scopes.
   Full suite re-run green on that fresh data: validate_live/alerts/roi, test_alerts/simulate/fees/roi_parity/
   roi_scan_offline, check_site (21 pages). Open PR #38 left to its author with the coordination comment.
 
+## Session arena-d60abf08 — release verification hardening (2026-11-21)
+
+| Task | Status | Owner | Files in scope | Verification / irregularities |
+|---|---|---|---|---|
+| Consolidate release checks so paper simulation, ROI provenance, Python and browser syntax cannot bypass Pages validation; audit existing site and publish | in progress | arena-d60abf08 | `scripts/verify_release.py`, `.github/workflows/pages.yml`, `README.md`, `COORDINATION.md` | Existing implementation retained; no duplicate site. Uses fixed Arena branch as required by environment. No active claim found for this new release-check runner. |
+
+### Verification and release evidence — arena-d60abf08
+
+- Read the existing board, README, publication workflow, test suite, and GitHub deployment status before modifying code. Preserved all existing UI/data; no parallel rebuild. Initial pull from the session branch failed because it had no remote ref yet; pulled/rebased from `origin/main`, then pushed the claim to the fixed session branch.
+- Implemented `scripts/verify_release.py`: all Python syntax, shared + inline browser syntax, all `validate_*.py` and `test_*.py`, engine fixtures, mandatory jsdom rendering, and the 21-page local link/data checker. Missing jsdom now refuses a release rather than silently skipping its existing DOM test.
+- Full runner PASS on 2026-11-21: committed snapshot 749 open / 200 settled; 15 archived alerts; all four validators; 13 alert regression tests; simulator regressions; fee fixtures; browser/Python ROI parity; offline and snapshot scans; all engine and DOM states; all internal links. These are offline provenance/behavior checks, not certification that every external URL responds or that demo strategies are profitable. No account orders executed.
+- Re-fetched official documentation: https://docs.kalshi.com/getting_started/demo_env confirms all four supplied endpoints, separate demo credentials and mock funds; https://docs.kalshi.com/getting_started/quick_start_websockets confirms authenticated handshake even for public channels. Existing site flags for credentials, unvalidated ROI and noncausal news remain applicable.
+- Irregularity: GitHub API reported Pages `build_type=legacy`, despite the existing workflow comment claiming Actions-only publication. Thus prior branch publishing could bypass workflow checks. New workflow validates PRs, stages only public HTML/assets/data, and will be paired with the repository Pages setting set to workflow publication during integration. No market fact changed or newly labelled verified.
+- Release task: implementation complete; PR/merge/Pages confirmation pending below.
 ## Session `arena-c076278a` — final verification + publish (branch `arena/c076278a-kalshidash3`)
 
 Claimed 2026-11-21. Base `ebce5e7` (main). Scope: `COORDINATION.md` only (integration record); no site/data changes unless a check fails.
@@ -889,4 +903,6 @@ Claimed 2026-11-21. Base `64176be` (main, after PR #42 merge). Scope: `COORDINAT
   (e) *Live site* — fetched https://kanlerxz87-cyber.github.io/KalshiDash3/ : snapshot banner `2026-11-21T00:50:12Z`, 749 open / 1,600 settled in scope, all five category rows present with per-row API source links, demo disclaimer quoted. Matches `data/live/markets.json` on disk.
   (f) *Full suite green on merged tree*: `validate_live.py` (749 open, 200 settled, 20 orderbooks), `validate_alerts.py` (15 archived alerts provenance-checked), `test_alerts.py` (13 tests OK), `test_simulate.py` OK, `check_site.py` (21 pages, all links resolve).
 - 2026-11-21: **PR #38 handoff.** PR #38 (arena/d243bfa7, opened 2026-11-20 19:40Z) is OPEN + CONFLICTING and superseded: PR #39 (merged 2026-11-20 19:47Z) landed the opposite design (flags frozen at detection time, validator reproduces from each row's own recorded fields — verified present in `scripts/tests/validate_alerts.py` lines 128–153 on main). Per the stale-claim rule (>60 min, no commits, conflicting) this session closes PR #38 with a comment rather than merging a superseded conflicting change. No files from PR #38 are lost: its unique value (stricter archive-only check) is already on main via PR #39's row-itself check.
+
+- arena-d60abf08 integration: main advanced with coordination-only PRs #42/#43. Rebase stopped on append-only board conflict; aborted rebase to avoid rewriting the pushed branch, merged origin/main, retained both sessions’ complete records. No implementation overlap. Pages settings update returned HTTP 403 (resource not accessible by integration); Actions-only configuration cannot be asserted. Legacy Pages remains available; pending deployment checks recorded below.
 - 2026-11-21: **T26 closed out.** PR #43 opened (https://github.com/kanlerxz87-cyber/KalshiDash3/pull/43) and merged at 2026-11-21T06:28:36Z (`7b3c02a`). Pages deploy run 44875715424 success, `pages.status=built`. PR #38 closed as superseded by PR #39 (comment posted). No new irregularities; all previously flagged items remain on the Flagged for Review page.
