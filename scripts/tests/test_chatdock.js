@@ -123,9 +123,15 @@ function counts(w) {
 
   check(!!panel && !panel.hasAttribute("hidden"), "the dock mounts and opens on a category page");
   const c = counts(w);
-  const realGe10 = archiveWithDecoy.alerts.filter((a) => Math.abs(Number(a.delta)) >= 0.10 - 1e-9).length;
+  // F-76: a ≥$0.10 row is replayed only when it is in one of the five topics. Rows whose series
+  // GET /series files under Test/Demo, or with no confirmed topic, are withheld and counted.
+  const inScope = archiveWithDecoy.alerts.filter((a) => {
+    const cats = (a.series_categories || []).map(String);
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).length;
   check(c.all > 0, `history replay rendered ${c.all} rows`);
-  check(c.all === Math.min(realGe10, 80), `row count equals the ≥$0.10 archive rows (${realGe10})`);
+  check(c.all === Math.min(inScope, 80), `row count equals the in-scope ≥$0.10 archive rows (${inScope})`);
   const text = panel.textContent;
   check(!text.includes("sub-threshold decoy"), "the 0.09 decoy row is refused (threshold is ≥ $0.10)");
   check(/NaN|undefined|\[object Object\]/.test(text) === false, "no NaN/undefined/object leakage");
@@ -200,20 +206,11 @@ function counts(w) {
     "history rows are still rendered when the demo API refuses the browser");
 
   /* -------------------------------------------------- H: health line (T32) */
-  console.log("\nT32/T59 — collector health line names no cron");
+  console.log("\nT32 — run health line (R-B1: no cron name, no expected interval)");
   const health = env3.w.document.getElementById("kdHealth").textContent;
-  check(/collector runs|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
-  // T59: the panel used to hard-code cronExpression "*/20 * * * *" and
-  // expectedMinutes 20 and compare the measured gap against that made-up interval,
-  // so it reported a schedule collect.yml had not declared since PR #54 (F-73,
-  // R-B1). It must now state only measured facts and point at the workflow file.
-  check(!/\*\/20|every 20m|cron /.test(health),
-        "health line no longer asserts a cron string or a 20-minute interval (F-73/R-B1)");
-  check(/declared triggers/.test(health),
-        "health line links the workflow file as the authority on cadence");
-  const healthSrc = SRC.slice(SRC.indexOf("collector health (T32"));
-  check(!/cronExpression|expectedMinutes/.test(healthSrc),
-        "checkHealth() carries no cronExpression / expectedMinutes field at all");
+  check(/collector:|not reachable/.test(health), `health line renders ("${health.slice(0, 70)}…")`);
+  check(!/\*\/20|cronExpression|every 20m/.test(health), "health line names no cron and no expected interval (R-B1)");
+  check(/newest run|no runs in the last|API not reachable/.test(health), "health line reports the newest run (R-B1)");
 
   console.log("");
   teardown();

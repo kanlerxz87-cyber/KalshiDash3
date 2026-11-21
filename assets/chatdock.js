@@ -149,7 +149,13 @@ const KDCHAT = (() => {
       if (r.ok) doc = await r.json();
     } catch { doc = null; }
     S.histLoaded = true;
+    S.histSkipped = 0;
     for (const a of (doc && doc.alerts) || []) {
+      // Scope: the chats cover the five topics only. A row whose series GET /series files under
+      // Test/Demo, or whose topic was never confirmed, is withheld and counted here rather than
+      // shown under no topic (F-76). The archive keeps it; only this view excludes it.
+      const cats = (a.series_categories || []).map(String);
+      if (cats.includes("Test") || cats.includes("Demo") || !a.category_id) { S.histSkipped += 1; continue; }
       const to = Date.parse(a.to_time || "");
       const from = fnum(a.from_price);
       const toP = fnum(a.to_price);
@@ -314,24 +320,12 @@ const KDCHAT = (() => {
     render();
   }
 
-  /* -------------------- collector health (T32, corrected T59) -------------------- */
-  // What this line is allowed to say.
-  //
-  // The collector is no longer a cron. collect.yml has declared two off-peak crons
-  // (`7,27,47` and `13,43`) since PR #54, and on main a run is a bounded RELAY that
-  // collects on a 15-minute grid from inside one long run and queues a
-  // workflow_dispatch successor for itself (COORDINATION.md T55). Hard-coding
-  // `*/20 * * * *` therefore described a schedule that had not existed for hours:
-  // the panel showed a cadence nobody was running. It said `*/20` "fired once in
-  // 5.75 h", but the run list shows that string was never what main was on.
-  //
-  // So this panel names NO cron. It reports only what the public run list proves —
-  // how many of the last N runs were scheduled, how far apart the last two scheduled
-  // runs were if there are two, whether a run is in flight, and when the last one
-  // succeeded. Freshness itself is already stated by the snapshot-age line below,
-  // which measures data/live/markets.json, and by that file's own collected_at.
-  // Read-only: public REST API, no token, no secret, no writes.
-  // Source for the event names used below: https://docs.github.com/en/rest/actions/workflow-runs
+  /* -------------------- freshness / run health (T32, R-B1) -------------------- */
+  // The collector's schedule is unreliable (measured 2026-11-21: 4 schedule deliveries in ~20 h;
+  // F-40), and since PR #62 a run on main is a 15-minute relay rather than one cron tick. So this
+  // line names no cron and judges no expected interval (R-B1): it reports the newest run and how
+  // often the schedule actually fired, and leaves freshness to the snapshot-age line below.
+  // Read-only: public GitHub REST API (CORS `*` verified 2026-11-21). No token, no writes.
   async function checkHealth() {
     try {
       const r = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/collect.yml/runs?per_page=20`, {
@@ -350,19 +344,24 @@ const KDCHAT = (() => {
       }));
       const sched = runs.filter((x) => x.event === "schedule" && !Number.isNaN(x.at));
       const lastOk = runs.find((x) => x.ok && !Number.isNaN(x.at));
-      const inFlight = runs.find((x) => x.status === "in_progress" || x.status === "queued");
       let gap = null;
       if (sched.length >= 2) gap = Math.round((sched[0].at - sched[1].at) / 60000);
+      const newest = runs.find((x) => !Number.isNaN(x.at)) || null;
       S.health = {
         runs: runs.length,
         scheduled: sched.length,
         scheduleGapMinutes: gap,
         lastScheduledAt: sched.length ? sched[0].at : null,
         lastSuccessAt: lastOk ? lastOk.at : null,
-        inFlightAt: inFlight && !Number.isNaN(inFlight.at) ? inFlight.at : null,
+        newest: newest
+          ? {
+              event: newest.event,
+              status: newest.status || "unknown",
+              conclusion: newest.conclusion || "",
+              at: newest.at,
+            }
+          : null,
         runsUrl: `https://github.com/${REPO}/actions/workflows/collect.yml`,
-        // Disclosed, not asserted as a cadence: the workflow file is the authority.
-        workflowUrl: `https://github.com/${REPO}/blob/main/.github/workflows/collect.yml`,
       };
     } catch (e) {
       S.health = { error: String((e && e.message) || e) };
@@ -382,16 +381,17 @@ const KDCHAT = (() => {
           `<a href="https://github.com/${REPO}/actions/workflows/collect.yml" target="_blank" rel="noopener">check the runs yourself</a></span>`;
       } else {
         const gap = h.scheduleGapMinutes;
-        // No cron string and no "expected" interval: the workflow file is the only
-        // authority on cadence, and a run on main is a relay rather than a schedule.
+        const n = h.newest;
+        const newestText = n
+          ? `newest run ${esc(n.status)}${n.conclusion ? " · " + esc(n.conclusion) : ""} (${esc(n.event)}, ${esc(ago(n.at))})`
+          : "no runs in the last 20";
         host.innerHTML =
           `<span class="cd-health ok">` +
-          `collector runs — ${h.scheduled} of the last ${h.runs} were scheduled` +
-          (gap !== null ? ` · last two scheduled ${gap}m apart` : " · fewer than two scheduled runs in that window") +
-          (h.inFlightAt !== null ? ` · <b>one running now</b> (started ${esc(ago(h.inFlightAt))})` : "") +
-          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"}` +
-          ` · <a href="${esc(h.workflowUrl)}" target="_blank" rel="noopener">declared triggers</a>` +
-          ` · <a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
+          `collector: ${newestText} · ` +
+          `${h.scheduled} of the last ${h.runs} runs were scheduled` +
+          (gap !== null ? ` · last two scheduled runs ${gap}m apart` : " · fewer than two scheduled runs in that window") +
+          ` · last success ${h.lastSuccessAt ? esc(ago(h.lastSuccessAt)) : "unknown"} · ` +
+          `<a href="${esc(h.runsUrl)}" target="_blank" rel="noopener">runs</a></span>`;
       }
     }
     const snapLine = document.getElementById("kdSnapLine");
@@ -405,6 +405,12 @@ const KDCHAT = (() => {
 
   /* ----------------------------- rendering ----------------------------- */
   function render() {
+    const scope = document.getElementById("kdScope");
+    if (scope) {
+      scope.textContent = S.histSkipped
+        ? ` ${S.histSkipped} archived swing(s) are withheld here because they are not in the five topics (F-76).`
+        : "";
+    }
     const all = S.feed;
     const model = all.filter((a) => Math.abs(a.delta) / Math.max(a.from, 0.05) >= 0.25 && (a.volume24 || 0) >= 100);
     const cat = S.filter;
@@ -497,6 +503,7 @@ const KDCHAT = (() => {
       News links are search leads, never asserted causes (<a href="flagged.html">F-25</a>).
       Topic labels on <b>history</b> rows are the collector's verified category; a market first seen by the live
       poller is matched by its series prefix, a keyword heuristic (<a href="flagged.html">flagged</a>).
+      <span id="kdScope"></span>
     </footer>
   </section>
 </div>`;
