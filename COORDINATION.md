@@ -32,6 +32,15 @@ are used because F-83/F-84/F-85 and T74–T93 were each minted by concurrent ses
 | Flagged, not blocking | `S-01`…`S-04` (below) plus the carried items F-07, F-14/F-26/F-77, F-25, F-76, F-85, DEPLOY-1 | published on `flagged.html` |
 | Flake observed, not a finding | one `verify_release.py` run refused `test_pages_dom.js` under heavy parallel load and two immediate re-runs passed; the harness waits on fixed timers, so this is recorded as an observation rather than a claimed defect | this session's shell history |
 
+### Follow-up (PR #107)
+
+| Item | Result | Evidence |
+|---|---|---|
+| PR #107 | **merged `2026-11-22T08:49:31Z`** as `ca6196b` — the scan-total row now renders a blank instead of falling back to the published count on a pre-collection snapshot, S-02's action records it, and this close-out was written | `gh pr view 107`; `pages.yml` build pass 1m10s on the PR |
+| Pages deploy | **confirmed** | `pages build and deployment` success for `ca6196b`; Pages builds API `built`; later `f9df7d1` also built |
+| Live verification of the whole session's work (`?v=ca6196b`) | `categories.html`: scan-total row `—`, "Open rows published 470", "Open in-scope rows left out of the published window 11,693", settled 6,927/1,600/200. `verification.html`: all seven claim rows (C-11…C-17) link to HTML docs pages, no `.md`. `flagged.html`: **75** irregularities incl. S-01…S-04 with source links. `index.html`: "found 6,927 settled markets in scope (method not stated in this snapshot)" and 200 rows labelled published | fetched 2026-11-22 ~08:55Z |
+| Collector still stalled | the dispatched collect run was cancelled by the workflow's concurrency group and the scheduled run has been `in_progress` since 08:16Z; the snapshot is 3 h old and the site's own banner says so. This is the condition `arena-eed90ce4` recorded as F-85 — nothing this session can fix from a branch | `gh run list --workflow "Collect Kalshi demo data"` |
+
 ### Official sources read live this session (2026-11-22, 08:05–09:20Z)
 - `https://docs.kalshi.com/getting_started/market_lifecycle` — statuses `initialized, active, inactive, closed, determined, disputed, amended, finalized`; `?status=` mapping `unopened/open/paused/closed/settled` → matches `C-11`, `C-12`.
 - `https://docs.kalshi.com/getting_started/market_settlement` — "$1 per contract", "only net positions are settled", "settlement fees are zero for simple yes/no determinations but may apply for sub-cent scalar settlement" → matches `C-13`, `C-14`.
