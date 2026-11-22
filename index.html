@@ -128,6 +128,9 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed by the exchange", KD.num(confirmed), "series ticker listed in the official fee schedule (basis=seed)"],
+    // S-02 / F-90 (fixed 2026-11-22): the parenthetical used counts.settled_in_scope, the
+    // 1,600-row retained paging window, and called it "settled in scope". The scan total is
+    // counts.settled_in_scope_total; the two are different numbers and are now named separately.
     ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(snap.counts?.settled_published ?? settled.length)
       + " settled rows published in this snapshot, out of "
       + KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope ?? settled.length)
@@ -234,10 +237,11 @@ KD.nav("");
       `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
         newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
         <b>Three different numbers, so they are named separately (F-90):</b> the scan found
-        ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets inside the five
-        topics; ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
-        size window; ${KD.num(snap.counts?.settled_published ?? resRows.length)} are published, chosen <b>per topic</b>
-        so a fast 15-minute crypto series cannot crowd out gas, elections, culture or golf
+        ${KD.num(snap.counts?.settled_in_scope_total ?? "—")} settled markets in scope
+        <span class="mut">(${KD.esc(snap.counts?.settled_in_scope_total_method || "method not stated in this snapshot")})</span>;
+        ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
+        size window; the collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast
+        15-minute crypto series cannot crowd out gas, elections, culture or golf
         (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
         How the total was obtained: ${KD.esc(snap.counts?.settled_in_scope_total_method || "not stated in this snapshot")}.
         Kalshi's historical-data docs state settled markets older than the exchange's published historical cutoff

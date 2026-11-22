@@ -528,24 +528,33 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
-    const inScope = markets.counts.settled_in_scope_total || markets.counts.settled_in_scope;
+    // S-02 / F-90 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING
+    // WINDOW, not the number the scan found in scope. The page must state the scan total
+    // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
+    // and never label either the window or the stored cap "in scope".
+    const inScope = markets.counts.settled_in_scope_total ?? markets.counts.settled_in_scope;
     const kept = markets.counts.settled_kept_window || markets.counts.settled_in_scope;
+    const window_ = markets.counts.settled_in_scope;
     const stored = (markets.settled_markets || []).length;
     const flat = r.text.replace(/\s+/g, " ");
     check(flat.includes(inScope.toLocaleString()),
-      `the KPI and banner must state the scan total (${inScope})`);
+      `the KPI and banner must state the in-scope scan total (${inScope})`);
     check(flat.includes(kept.toLocaleString()),
       `the page must name the kept window (${kept}) as a number of its own`);
     check(flat.includes(stored.toLocaleString()),
-      `the KPI or banner must name the stored rows (${stored})`);
-    // the original defect: the stored count printed as the in-scope total
+      `the KPI or banner must name the published settled rows (${stored})`);
+    // the original defect: a smaller count printed as the in-scope total
     check(!flat.includes(stored.toLocaleString() + " settled markets in scope"),
-      `the stored count (${stored}) must never be printed as "settled markets in scope"`);
+      `the published count (${stored}) must never be printed as "settled markets in scope"`);
     check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
       `the stored count (${stored}) must never be printed as "settled rows in scope"`);
     // F-90: the kept window (1,600) is not the scan total (6,927) and must not be called "in scope"
     check(!flat.includes(kept.toLocaleString() + " settled in scope"),
       `the kept window (${kept}) must not be printed as "settled in scope" — that phrase belongs to the scan total`);
+    if (window_ && window_ !== stored) {
+      check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
+        `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
+    }
     // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
     check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
     check(/Untraded topics in this snapshot/.test(flat),

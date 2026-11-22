@@ -69,6 +69,29 @@ function inlineAssets(html) {
   // At least one link must actually be cited, or the table is decorative.
   check(links.some(r => r.cited_times > 0), "at least one row records a real citation");
 
+  console.log("\nB2 — every claim row cites a page a reader can open");
+  // Defect S-03 (2026-11-22): five claim rows (C-11…C-17) cited the raw `.md` form of a
+  // docs.kalshi.com page, and verification.html rendered them as the row's "official source",
+  // so a reader who clicked through got markdown source instead of the documentation page.
+  // Section B above already forbade that for doc_links; the claim rows were never checked.
+  const facts = Array.isArray(FACTS.facts) ? FACTS.facts : [];
+  check(facts.length > 0, `claims present (${facts.length} rows)`);
+  // Scope: docs.kalshi.com serves its pages as HTML, so a `.md` link there is the raw-source
+  // form. GitHub serves a `.md` path as a rendered page, so the same suffix is fine off-host.
+  const mdSources = facts.filter(f => /^https:\/\/docs\.kalshi\.com\//.test(String(f.source || ""))
+                                      && String(f.source || "").endsWith(".md"));
+  check(mdSources.length === 0,
+        `no claim cites a raw .md page${mdSources.length ? ": " + mdSources.slice(0, 4).map(f => f.id).join(", ") : ""}`);
+  const badClaimHost = facts.filter(f => {
+    const u = String(f.source || "");
+    return !/^https:\/\//.test(u) || !/^https:\/\/[A-Za-z0-9._-]+\//.test(u);
+  });
+  check(badClaimHost.length === 0,
+        `every claim source is an absolute https URL${badClaimHost.length ? ": " + badClaimHost.slice(0, 3).map(f => f.id).join(", ") : ""}`);
+  const noSource = facts.filter(f => !String(f.source || "").trim());
+  check(noSource.length === 0,
+        `every claim carries a source${noSource.length ? " (missing: " + noSource.slice(0, 4).map(f => f.id).join(", ") + ")" : ""}`);
+
   console.log("\nD — the page renders it");
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, "verification.html"), "utf8"));
   const errors = [];
@@ -104,6 +127,16 @@ function inlineAssets(html) {
   const text = host ? host.textContent : "";
   check(!/undefined|\bNaN\b|\[object Object\]/.test(text), "no undefined / NaN / [object Object] in the rendered table");
   check(/docs\.kalshi\.com/.test(text), "the table shows the documentation hostname");
+
+  // and the rendered claim table must not hand a reader a raw-markdown href
+  const mdHrefs = Array.from(doc.querySelectorAll("a[href$='.md']"))
+    .map(a => a.getAttribute("href"))
+    .filter(h => /^https:\/\/docs\.kalshi\.com\//.test(h || ""));
+  check(mdHrefs.length === 0,
+        `no rendered link points at a .md page${mdHrefs.length ? ": " + mdHrefs.slice(0, 3).join(", ") : ""}`);
+  const factsHost = doc.getElementById("facts");
+  const factRows = factsHost ? factsHost.querySelectorAll("tbody tr").length : 0;
+  check(factRows === facts.length, `rendered ${factRows} claim rows for ${facts.length} claims`);
 
   dom.window.close();
   console.log("");
