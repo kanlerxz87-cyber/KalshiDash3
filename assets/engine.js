@@ -292,7 +292,7 @@ window.KDL = (() => {
    * Why the flag rather than the score: the score below is a heuristic that has never been
    * backtested (F-26), and using it for membership meant the dashboard (49 picks), this page (47)
    * and the category-page dock (46) showed three different "model" feeds over the same 61 alerts
-   * (measured 2026-11-22, F-85). A pick count that depends on which page you are reading is a
+   * (measured 2026-11-22, D-02). A pick count that depends on which page you are reading is a
    * defect, so membership now comes from one frozen, reproducible rule and the score is only a
    * displayed ranking hint.
    */
@@ -533,7 +533,7 @@ window.KDL = (() => {
         // 20 demo/test instruments whose own GET /series record files them under "Test". This page
         // published the notice "20 archived swings are withheld as outside the five topics" while
         // the engine was loading all 81 rows, so the notice and the chats disagreed. The gate is
-        // the same one assets/chatdock.js applies, and the count is kept for disclosure (F-88).
+        // the same one assets/chatdock.js applies, and the count is kept for disclosure (D-05).
         const seriesCats = (a.series_categories || []).map(String);
         if (!a.category_id || seriesCats.includes("Test") || seriesCats.includes("Demo")) {
           S.withheldScope = (S.withheldScope || 0) + 1;

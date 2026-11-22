@@ -121,7 +121,7 @@
       <b>Result set · not paid yet</b> is not an outcome: Kalshi populates <code>result</code> when a market is
       determined and pays positions when it is finalized, so it is counted separately.
       A ticker that is absent from the snapshot reads <b>not in snapshot</b> — the committed snapshot is a ranked
-      window, not the whole exchange, so absence is never reported as "unresolved" (F-86).
+      window, not the whole exchange, so absence is never reported as "unresolved" (D-03).
     </p>
     <div class="evbar" id="lifecycleBar"></div>
     <div id="outcomes"></div>
@@ -142,7 +142,7 @@
       The heuristic score <code>0.30×liquidity + 0.25×price-band + 0.30×momentum + 0.15×spread</code> (each 0–1) is
       still printed on each pick as a <i>ranking hint</i>, and it is <b>not</b> the inclusion rule.
       Until 2026-11-22 it was: that made the three surfaces disagree (49 dashboard / 47 here / 46 in the dock, over the
-      same 61 alerts), which is a defect, so it is recorded as <a href="flagged.html">F-85</a>. The score itself has
+      same 61 alerts), which is a defect, so it is recorded as <a href="flagged.html">D-02</a>. The score itself has
       never been backtested and is flagged (<a href="flagged.html">F-26</a>).
       <b>This is an experimental screen, not advice.</b>
     </p>
@@ -297,7 +297,7 @@ function render() {
   const all = KDL.feedAlerts().filter(catFilter);
   // T70: one definition on every surface. See KDL.modelPick — membership is the archive's frozen
   // high_roi screen, not the heuristic score (which used to give this page 47 picks while the
-  // dashboard showed 49 and the category dock 46, over the same 61 alerts: F-85).
+  // dashboard showed 49 and the category dock 46, over the same 61 alerts: D-02).
   const model = all.filter(KDL.modelPick);
   // chronological order, newest at the BOTTOM: renderFeed auto-scrolls there.
   const shownAll = all.filter(tradedFilter);
@@ -341,9 +341,9 @@ function renderEvidenceBar(total, shown) {
  *     it is finalized (https://docs.kalshi.com/getting_started/market_lifecycle), so a determined
  *     market is shown as "result set · not paid yet" and is NOT counted in the yes/no outcome count.
  *   - absence is not evidence. The snapshot is a ranked window, so an alerted ticker that is not in
- *     it is "not in snapshot" — never "unresolved" and never "open" (F-86).
+ *     it is "not in snapshot" — never "unresolved" and never "open" (D-03).
  * The move-vs-outcome count is descriptive of the demo sample on hand; it is not a hit rate that
- * anyone should trade (F-87).
+ * anyone should trade (D-04).
  */
 function renderOutcomes() {
   const bar = KD.$("#lifecycleBar");
@@ -374,7 +374,7 @@ function renderOutcomes() {
     + chip("not in snapshot", t.not_listed, "")
     + (t.comparable
       ? `<span class="kchip">move agreed with the outcome: <b>${t.agree}</b> of ${t.comparable}` +
-        ` <span class="small mut">(descriptive; demo sample, not a hit rate — F-87)</span></span>`
+        ` <span class="small mut">(descriptive; demo sample, not a hit rate — D-04)</span></span>`
       : `<span class="kchip">move vs outcome: <b>no settled alert yet</b></span>`);
 
   // One row per market that has reached a result or a terminal status.

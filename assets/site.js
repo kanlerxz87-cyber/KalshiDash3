@@ -98,7 +98,7 @@ const KD = (() => {
    *      labelled "result set · not paid yet" and never counted as an outcome.
    *   2. Absence is not evidence. The committed snapshot is a ranked window, not the whole
    *      exchange (see scripts/collect.py), so a ticker that is not in it is labelled
-   *      "not in snapshot" — never "unresolved" and never "open" (F-86).
+   *      "not in snapshot" — never "unresolved" and never "open" (D-03).
    */
   // Statuses as published on https://docs.kalshi.com/getting_started/market_lifecycle (8 values, all
   // handled explicitly so none of them can fall through to a wrong default):
@@ -188,7 +188,7 @@ const KD = (() => {
   /* Tally of what happened to the events behind a set of alerts. "agreement" is the bare
    * descriptive question the brief implies — did the printed move point the same way as the
    * eventual outcome — and it is deliberately reported as a count, not as a hit rate that would
-   * dress a sample of a few demo markets up as a strategy (F-87). */
+   * dress a sample of a few demo markets up as a strategy (D-04). */
   function lifecycleTally(alerts) {
     const tickers = new Map();
     for (const a of alerts || []) {
