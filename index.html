@@ -168,8 +168,9 @@ KD.nav("");
       if (!Number.isFinite(t)) continue;
       if (t < bestT) { bestT = t; best = c; }
     }
+    if (!mine.length) continue;        // nothing open in this topic: the row says "none open in scope"
     if (best) { u.nearest = best; top[id] = best; }
-    else if (mine.length) { top[id] = mine[0]; }
+    else { top[id] = mine[0]; }
     untraded[id] = u;
   }
   const rows = Object.keys(live).map(id => {

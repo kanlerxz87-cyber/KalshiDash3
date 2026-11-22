@@ -1614,3 +1614,8 @@ session — this session did not touch it.
 **Data freshness at close-out:** the site still shows the `2026-11-22T06:17:12Z` snapshot and says so ("8 collection intervals behind");
 a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
 health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
+
+- 2026-11-22 08:4xZ (follow-up, same session): edge case found while re-reading the F-83 diff — a topic with **zero** open rows would have
+  been counted as "untraded, 0 of 0 rows traded" in the footnote while its own cell said "none open in scope". `index.html` now skips the
+  untraded bookkeeping when a topic has no open rows, and DOM Test F asserts the footnote is absent when every topic has trades.
+  Went out as [PR #101](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/101) (full `verify_release.py` PASS before merge).
