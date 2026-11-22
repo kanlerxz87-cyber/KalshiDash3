@@ -2020,3 +2020,14 @@ Fixed: a re-read is a new observation, so it now gets its own id stamped with it
 (`KALSHI_MARKET_{ticker}__2026-11-22T0820Z`), and the 48 reviews cite that. `reviewed_at` is now the time the source
 was actually read (36 sources, 69 reviews; still 57/61 reviewed, 4 `not_reviewed` with a stated reason). The ledger was
 rebuilt from `main`'s version rather than from this branch's, so no earlier session's source was altered or dropped.
+
+### Deploy record — `arena-d34a9f0d` (T75)
+
+| Item | Result |
+|---|---|
+| PR #106 | **merged** `ad98f19` — gate PASS, Pages build success, `MERGEABLE`/`CLEAN` |
+| PR #110 | **merged** `da8dac7` — the source-id/`reviewed_at` correction, gate PASS, Pages build success |
+| Pages build of `da8dac7` | run [45005346379](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45005346379) **completed / success** |
+| Live verification | `data/live/catalysts.json?cb=…` serves `generated_at 2026-11-22T08:56:14Z`, `counts.reviewed 57 / archive_total 61`, `reviewed_at 2026-11-22T08:20Z`, source id `KALSHI_MARKET_…__2026-11-22T0820Z`. `executive-summary.html` renders the catalyst row from that file. A first read without a cache-buster returned the pre-#110 file, so the check was repeated cache-busted before recording it |
+| Final state | `data/findings.json` 78 flagged entries, 0 duplicate ids (this session's **F-90**, **F-92**, **F-93** included); ledger 36 sources / 69 reviews; catalyst coverage **57/61**, 4 `not_reviewed` with the reason on the row |
+| Not done, on purpose | `data/live/markets.json` is written only by the collector, so `counts.settled_in_scope_total_method` appears on its next pass; until then `index.html` prints "not stated in this snapshot" rather than inventing it. The 4 `not_reviewed` rows were not forced: their bounding observations are gone from the committed history, so a verdict there would be a guess |
