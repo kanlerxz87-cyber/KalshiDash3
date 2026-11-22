@@ -144,8 +144,12 @@ def main() -> int:
     existing_sources = {s.get("id") for s in ledger.get("sources") or []}
 
     # --- sources -------------------------------------------------------------------------
+    # Source ids are stamped with the fetch time. An earlier session had already recorded reads of
+    # seven of these tickers under the bare `KALSHI_MARKET_{ticker}` id, and a review that cites one
+    # of those would print THAT session's fetch time as its own reviewed_at. A re-read is a new
+    # observation, so it gets its own id and the page prints the time it was actually read.
     for ticker, observed in MARKET_OBSERVED.items():
-        sid = f"KALSHI_MARKET_{ticker}"
+        sid = f"KALSHI_MARKET_{ticker}__2026-11-22T0820Z"
         if sid in existing_sources:
             continue
         ledger.setdefault("sources", []).append({
@@ -188,7 +192,7 @@ def main() -> int:
                     (f"above {mo['rules_primary'].split('above ')[1].split(' at ')[0]}"
                      if "above " in mo["rules_primary"] else "its stated level"))
         strike = mo["floor_strike"]
-        src_id = f"KALSHI_MARKET_{ticker}"
+        src_id = f"KALSHI_MARKET_{ticker}__2026-11-22T0820Z"
         links = [KALSHI + ticker]
         note_tail = ""
         if mo.get("result"):

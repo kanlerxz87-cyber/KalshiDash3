@@ -641,7 +641,145 @@
    }
   },
   {
-   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99",
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "95,000 to 99,999.99",
+    "floor_strike": 95000,
+    "cap_strike": 99999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.9700",
+    "previous_price_dollars": "0.0100",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.9700",
+    "volume_fp": "72327704.49",
+    "volume_24h_fp": "7692.47",
+    "open_interest_fp": "7296573.11",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "85,000 to 89,999.99",
+    "floor_strike": 85000,
+    "cap_strike": 89999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.9900",
+    "previous_price_dollars": "0.0200",
+    "yes_bid_dollars": "0.0100",
+    "yes_ask_dollars": "0.9900",
+    "volume_fp": "58460186.74",
+    "volume_24h_fp": "14407.93",
+    "open_interest_fp": "6094361.29",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "75,000 to 79,999.99",
+    "floor_strike": 75000,
+    "cap_strike": 79999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.0400",
+    "previous_price_dollars": "0.0400",
+    "yes_bid_dollars": "0.0300",
+    "yes_ask_dollars": "0.0400",
+    "volume_fp": "39588936.51",
+    "volume_24h_fp": "7568.23",
+    "open_interest_fp": "5968304.27",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "50,000 to 54,999.99",
+    "floor_strike": 50000,
+    "cap_strike": 54999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.1000",
+    "previous_price_dollars": "0.1300",
+    "yes_bid_dollars": "0.0900",
+    "yes_ask_dollars": "0.1000",
+    "volume_fp": "61741094.51",
+    "volume_24h_fp": "12115.19",
+    "open_interest_fp": "7788363.75",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "45,000 to 49,999.99",
+    "floor_strike": 45000,
+    "cap_strike": 49999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.1400",
+    "previous_price_dollars": "0.1000",
+    "yes_bid_dollars": "0.0900",
+    "yes_ask_dollars": "0.1400",
+    "volume_fp": "80211280.95",
+    "volume_24h_fp": "7639.53",
+    "open_interest_fp": "26584588.26",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "yes_sub_title": "30,000 to 34,999.99",
+    "floor_strike": 30000,
+    "cap_strike": 34999.99,
+    "strike_type": "between",
+    "last_price_dollars": "0.0200",
+    "previous_price_dollars": "0.0400",
+    "yes_bid_dollars": "0.0100",
+    "yes_ask_dollars": "0.0200",
+    "volume_fp": "35512765.72",
+    "volume_24h_fp": "6965.13",
+    "open_interest_fp": "6354404.69",
+    "status": "active",
+    "result": ""
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99__2026-11-22T0820Z",
    "publisher": "Kalshi demo Trade API (the market's own official record)",
    "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
    "fetched_at": "2026-11-22T08:20Z",
@@ -665,7 +803,7 @@
    }
   },
   {
-   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99",
+   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99__2026-11-22T0820Z",
    "publisher": "Kalshi demo Trade API (the market's own official record)",
    "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
    "fetched_at": "2026-11-22T08:20Z",
@@ -689,7 +827,31 @@
    }
   },
   {
-   "id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+   "id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
+    "title": "BTC price up in next 15 mins?",
+    "yes_sub_title": "Target Price: $56,009.56",
+    "floor_strike": 56009.56,
+    "strike_type": "greater_or_equal",
+    "last_price_dollars": "0.9910",
+    "previous_price_dollars": "0.9910",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_fp": "534.48",
+    "volume_24h_fp": "0.00",
+    "open_interest_fp": "271.15",
+    "status": "finalized",
+    "result": "yes",
+    "settlement_ts": "2026-11-21T06:45:02.913537Z",
+    "settlement_value_dollars": "1.0000"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450__2026-11-22T0820Z",
    "publisher": "Kalshi demo Trade API (the market's own official record)",
    "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
    "fetched_at": "2026-11-22T08:20Z",
@@ -1252,7 +1414,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T06:17:12Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T06:02:12Z",
    "window_to": "2026-11-22T06:17:12Z",
@@ -1272,7 +1434,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-22T06:02:12Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:47:11Z",
    "window_to": "2026-11-22T06:02:12Z",
@@ -1292,7 +1454,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T06:02:12Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:47:11Z",
    "window_to": "2026-11-22T06:02:12Z",
@@ -1312,7 +1474,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-22T05:47:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:32:11Z",
    "window_to": "2026-11-22T05:47:11Z",
@@ -1332,7 +1494,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T05:47:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:32:11Z",
    "window_to": "2026-11-22T05:47:11Z",
@@ -1352,7 +1514,7 @@
    "ticker": "KXBTCD-26NOV2201-T58799.99",
    "alert_to_time": "2026-11-22T05:47:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99"
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:32:11Z",
    "window_to": "2026-11-22T05:47:11Z",
@@ -1372,7 +1534,7 @@
    "ticker": "KXBTCD-26NOV2201-T58999.99",
    "alert_to_time": "2026-11-22T05:47:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99"
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:32:11Z",
    "window_to": "2026-11-22T05:47:11Z",
@@ -1392,7 +1554,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T05:32:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:17:12Z",
    "window_to": "2026-11-22T05:32:11Z",
@@ -1412,7 +1574,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T05:17:12Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T05:02:11Z",
    "window_to": "2026-11-22T05:17:12Z",
@@ -1432,7 +1594,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T05:02:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T04:47:11Z",
    "window_to": "2026-11-22T05:02:11Z",
@@ -1452,7 +1614,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-22T04:47:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T04:32:12Z",
    "window_to": "2026-11-22T04:47:11Z",
@@ -1472,7 +1634,7 @@
    "ticker": "KXAAAGASD-26NOV22-3.6450",
    "alert_to_time": "2026-11-22T04:02:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450__2026-11-22T0820Z",
     "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T03:47:11Z",
@@ -1498,7 +1660,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-22T00:31:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T00:16:11Z",
    "window_to": "2026-11-22T00:31:10Z",
@@ -1518,7 +1680,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T00:31:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T00:16:11Z",
    "window_to": "2026-11-22T00:31:10Z",
@@ -1538,7 +1700,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-22T00:16:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T00:01:11Z",
    "window_to": "2026-11-22T00:16:11Z",
@@ -1558,7 +1720,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-22T00:16:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-22T00:01:11Z",
    "window_to": "2026-11-22T00:16:11Z",
@@ -1578,7 +1740,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-22T00:01:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T23:46:11Z",
    "window_to": "2026-11-22T00:01:11Z",
@@ -1598,7 +1760,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-22T00:01:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T23:46:11Z",
    "window_to": "2026-11-22T00:01:11Z",
@@ -1618,7 +1780,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T23:46:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T23:31:11Z",
    "window_to": "2026-11-21T23:46:11Z",
@@ -1638,7 +1800,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T23:31:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T23:16:11Z",
    "window_to": "2026-11-21T23:31:11Z",
@@ -1658,7 +1820,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T23:16:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T23:01:10Z",
    "window_to": "2026-11-21T23:16:11Z",
@@ -1678,7 +1840,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-21T23:01:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:46:10Z",
    "window_to": "2026-11-21T23:01:10Z",
@@ -1698,7 +1860,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T23:01:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:46:10Z",
    "window_to": "2026-11-21T23:01:10Z",
@@ -1718,7 +1880,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T23:01:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:46:10Z",
    "window_to": "2026-11-21T23:01:10Z",
@@ -1738,7 +1900,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T22:46:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:31:10Z",
    "window_to": "2026-11-21T22:46:10Z",
@@ -1758,7 +1920,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T22:31:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:16:10Z",
    "window_to": "2026-11-21T22:31:10Z",
@@ -1778,7 +1940,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T22:31:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:16:10Z",
    "window_to": "2026-11-21T22:31:10Z",
@@ -1798,7 +1960,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-21T22:16:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:01:10Z",
    "window_to": "2026-11-21T22:16:10Z",
@@ -1818,7 +1980,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T22:16:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T22:01:10Z",
    "window_to": "2026-11-21T22:16:10Z",
@@ -1838,7 +2000,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T22:01:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:46:11Z",
    "window_to": "2026-11-21T22:01:10Z",
@@ -1858,7 +2020,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-21T21:46:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:31:09Z",
    "window_to": "2026-11-21T21:46:11Z",
@@ -1878,7 +2040,7 @@
    "ticker": "KXBTCY-27JAN0100-B32500",
    "alert_to_time": "2026-11-21T21:46:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:31:09Z",
    "window_to": "2026-11-21T21:46:11Z",
@@ -1898,7 +2060,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T21:46:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:31:09Z",
    "window_to": "2026-11-21T21:46:11Z",
@@ -1918,7 +2080,7 @@
    "ticker": "KXBTCY-27JAN0100-B52500",
    "alert_to_time": "2026-11-21T21:46:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:31:09Z",
    "window_to": "2026-11-21T21:46:11Z",
@@ -1938,7 +2100,7 @@
    "ticker": "KXBTCY-27JAN0100-B77500",
    "alert_to_time": "2026-11-21T21:31:09Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:16:11Z",
    "window_to": "2026-11-21T21:31:09Z",
@@ -1958,7 +2120,7 @@
    "ticker": "KXBTCY-27JAN0100-B52500",
    "alert_to_time": "2026-11-21T21:31:09Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:16:11Z",
    "window_to": "2026-11-21T21:31:09Z",
@@ -1978,7 +2140,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-21T21:16:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:10:21Z",
    "window_to": "2026-11-21T21:16:11Z",
@@ -1998,7 +2160,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T21:16:11Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T21:10:21Z",
    "window_to": "2026-11-21T21:16:11Z",
@@ -2018,7 +2180,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T20:30:54Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T15:21:23Z",
    "window_to": "2026-11-21T20:30:54Z",
@@ -2038,7 +2200,7 @@
    "ticker": "KXBTCY-27JAN0100-B77500",
    "alert_to_time": "2026-11-21T20:30:54Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T15:21:23Z",
    "window_to": "2026-11-21T20:30:54Z",
@@ -2058,7 +2220,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T06:42:56Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T06:39:48Z",
    "window_to": "2026-11-21T06:42:56Z",
@@ -2078,7 +2240,7 @@
    "ticker": "KXBTC15M-26NOV210145-45",
    "alert_to_time": "2026-11-21T06:38:00Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T06:37:00Z",
    "window_to": "2026-11-21T06:38:00Z",
@@ -2098,7 +2260,7 @@
    "ticker": "KXBTCY-27JAN0100-B97500",
    "alert_to_time": "2026-11-21T06:34:10Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T06:32:46Z",
    "window_to": "2026-11-21T06:34:10Z",
@@ -2118,7 +2280,7 @@
    "ticker": "KXBTC15M-26NOV210145-45",
    "alert_to_time": "2026-11-21T06:34:00Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T06:33:00Z",
    "window_to": "2026-11-21T06:34:00Z",
@@ -2138,7 +2300,7 @@
    "ticker": "KXBTC15M-26NOV210145-45",
    "alert_to_time": "2026-11-21T06:32:00Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-21T06:31:00Z",
    "window_to": "2026-11-21T06:32:00Z",
@@ -2158,7 +2320,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-20T20:01:29Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-20T19:48:19Z",
    "window_to": "2026-11-20T20:01:29Z",
@@ -2178,7 +2340,7 @@
    "ticker": "KXBTCY-27JAN0100-B87500",
    "alert_to_time": "2026-11-20T19:48:19Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-20T19:30:14Z",
    "window_to": "2026-11-20T19:48:19Z",
@@ -2198,7 +2360,7 @@
    "ticker": "KXBTCY-27JAN0100-B47500",
    "alert_to_time": "2026-11-20T19:30:14Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500__2026-11-22T0820Z"
    ],
    "window_from": "2026-11-20T19:22:42Z",
    "window_to": "2026-11-20T19:30:14Z",
