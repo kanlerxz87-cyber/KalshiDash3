@@ -1,18 +1,20 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T06:17:13Z",
+ "generated_at": "2026-11-22T08:23:39Z",
  "snapshot_collected_at": "2026-11-22T06:17:12Z",
  "ledger": "data/catalyst_review.json",
- "ledger_reviewed_by": "arena-6f158ab7",
+ "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
   "archive_total": 61,
-  "reviewed": 9,
-  "not_reviewed": 52,
+  "reviewed": 57,
+  "not_reviewed": 4,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
-  "links_shown": 21,
+  "best_quote_did_not_move": 19,
+  "reference_not_publicly_readable": 28,
+  "links_shown": 70,
   "withheld_category_conflict": 20
  },
  "alerts": [
@@ -31,11 +33,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T06:02:12Z and 2026-11-22T06:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T06:02:12Z",
+    "to": "2026-11-22T06:17:12Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -52,11 +79,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:47:11Z",
+    "to": "2026-11-22T06:02:12Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -73,11 +125,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:47:11Z",
+    "to": "2026-11-22T06:02:12Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -94,11 +171,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:32:11Z",
+    "to": "2026-11-22T05:47:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -115,11 +217,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:32:11Z",
+    "to": "2026-11-22T05:47:11Z"
+   }
   },
   {
    "ticker": "KXBTCD-26NOV2201-T58799.99",
@@ -134,13 +261,38 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
    "market_status": "active",
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 1 AM EST is above 58799.99 at 1 AM EST on Nov 22, 2026, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99",
+     "fetched_at": "2026-11-22T08:20Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 58799.99,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc20\u00a2 (80\u00a2 \u2192 60\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58799.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known.",
+   "reviewed_at": "2026-11-22T08:20Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99"
+   ],
+   "window": {
+    "from": "2026-11-22T05:32:11Z",
+    "to": "2026-11-22T05:47:11Z"
+   }
   },
   {
    "ticker": "KXBTCD-26NOV2201-T58999.99",
@@ -155,13 +307,38 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
    "market_status": "active",
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 1 AM EST is above 58999.99 at 1 AM EST on Nov 22, 2026, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99",
+     "fetched_at": "2026-11-22T08:20Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 58999.99,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc15\u00a2 (35\u00a2 \u2192 20\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known.",
+   "reviewed_at": "2026-11-22T08:20Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99"
+   ],
+   "window": {
+    "from": "2026-11-22T05:32:11Z",
+    "to": "2026-11-22T05:47:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -178,11 +355,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:17:12Z and 2026-11-22T05:32:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:17:12Z",
+    "to": "2026-11-22T05:32:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -199,11 +401,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:02:11Z and 2026-11-22T05:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T05:02:11Z",
+    "to": "2026-11-22T05:17:12Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -220,11 +447,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T04:47:11Z and 2026-11-22T05:02:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T04:47:11Z",
+    "to": "2026-11-22T05:02:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -241,11 +493,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T04:32:12Z and 2026-11-22T04:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-22T04:32:12Z",
+    "to": "2026-11-22T04:47:11Z"
+   }
   },
   {
    "ticker": "KXAAAGASD-26NOV22-3.6450",
@@ -260,13 +537,48 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
    "market_status": "active",
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.6450 on Nov 22, 2026 according to AAA, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://gasprices.aaa.com/",
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
+    },
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+     "fetched_at": "2026-11-22T08:20Z"
+    }
+   ],
+   "state": "published_reference_on_the_same_side_as_the_move",
+   "relation": {
+    "kind": "published_value_above_strike",
+    "strike": 3.645,
+    "before": 3.6594,
+    "before_at": "2026-11-21",
+    "after": 3.6594,
+    "after_at": "2026-11-21",
+    "reference_side": "yes",
+    "reference_name": "AAA US national average (regular)",
+    "change": 0.0,
+    "distance_to_strike_before": 0.0144,
+    "distance_to_strike_after": 0.0144,
+    "crossed": null,
+    "strike_side_after": "at_or_above"
+   },
+   "note": "Printed \u25b223\u00a2 (0\u00a2 \u2192 23\u00a2) between 2026-11-22T03:47:11Z and 2026-11-22T04:02:11Z. The committed book did reprice (yes bid/ask 0.23/1.00 \u2192 0.00/1.00). AAA's published US national average for regular was $3.6594 as of 11/21/26, above the $3.6450 strike \u2014 but that is the prior day's print; the Nov 22 average this market settles on had not been published when it was read, so this is the published figure on the same side as the move and not a statement about the outcome.",
+   "reviewed_at": "2026-11-22T08:20Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+    "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z"
+   ],
+   "window": {
+    "from": "2026-11-22T03:47:11Z",
+    "to": "2026-11-22T04:02:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -283,11 +595,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-22T00:16:11Z",
+    "to": "2026-11-22T00:31:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -304,11 +641,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T00:16:11Z",
+    "to": "2026-11-22T00:31:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -325,11 +687,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/1.00), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-22T00:01:11Z",
+    "to": "2026-11-22T00:16:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -346,11 +733,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-22T00:01:11Z",
+    "to": "2026-11-22T00:16:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -367,11 +779,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-21T23:46:11Z",
+    "to": "2026-11-22T00:01:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -388,11 +825,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T23:46:11Z",
+    "to": "2026-11-22T00:01:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -409,11 +871,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:31:11Z and 2026-11-21T23:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T23:31:11Z",
+    "to": "2026-11-21T23:46:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -430,11 +917,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T23:16:11Z and 2026-11-21T23:31:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T23:16:11Z",
+    "to": "2026-11-21T23:31:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -451,11 +963,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:01:10Z and 2026-11-21T23:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T23:01:10Z",
+    "to": "2026-11-21T23:16:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -472,11 +1009,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:46:10Z",
+    "to": "2026-11-21T23:01:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -493,11 +1055,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:46:10Z",
+    "to": "2026-11-21T23:01:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -514,11 +1101,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:46:10Z",
+    "to": "2026-11-21T23:01:10Z"
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -538,9 +1150,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
@@ -558,6 +1170,7 @@
     "after": 3.6594,
     "after_at": "2026-11-21",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.3594,
     "distance_to_strike_after": 0.3594,
@@ -590,11 +1203,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:31:10Z and 2026-11-21T22:46:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:31:10Z",
+    "to": "2026-11-21T22:46:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -611,11 +1249,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:16:10Z",
+    "to": "2026-11-21T22:31:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -632,11 +1295,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:16:10Z",
+    "to": "2026-11-21T22:31:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -653,11 +1341,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:01:10Z",
+    "to": "2026-11-21T22:16:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -674,11 +1387,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T22:01:10Z",
+    "to": "2026-11-21T22:16:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -695,11 +1433,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:46:11Z and 2026-11-21T22:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:46:11Z",
+    "to": "2026-11-21T22:01:10Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -716,11 +1479,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:31:09Z",
+    "to": "2026-11-21T21:46:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B32500",
@@ -737,11 +1525,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:31:09Z",
+    "to": "2026-11-21T21:46:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -758,11 +1571,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:31:09Z",
+    "to": "2026-11-21T21:46:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B52500",
@@ -779,11 +1617,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 50000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc89\u00a2 (99\u00a2 \u2192 10\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.09/0.10), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:31:09Z",
+    "to": "2026-11-21T21:46:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -800,11 +1663,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
+     "fetched_at": "2026-11-21T20:28Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 75000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc94\u00a2 (98\u00a2 \u2192 4\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.02/0.98 \u2192 0.03/0.04), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T20:28Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:16:11Z",
+    "to": "2026-11-21T21:31:09Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B52500",
@@ -821,11 +1709,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
+     "fetched_at": "2026-11-21T23:11Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 50000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b284\u00a2 (15\u00a2 \u2192 99\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.12/0.15 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T23:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:16:11Z",
+    "to": "2026-11-21T21:31:09Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -842,11 +1755,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:10:21Z",
+    "to": "2026-11-21T21:16:11Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -863,11 +1801,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.97 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T21:10:21Z",
+    "to": "2026-11-21T21:16:11Z"
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-MTHO",
@@ -913,6 +1876,7 @@
     "after": null,
     "after_at": "2026-11-21",
     "reference_side": "yes",
+    "reference_name": "reference",
     "incomplete": true,
     "strike_side_after": "below"
    },
@@ -972,6 +1936,7 @@
     "after": null,
     "after_at": "2026-11-21",
     "reference_side": "yes",
+    "reference_name": "reference",
     "incomplete": true,
     "strike_side_after": "below"
    },
@@ -1005,7 +1970,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
+   "note": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
    "reviewed_at": null
   },
   {
@@ -1026,7 +1991,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
+   "note": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
    "reviewed_at": null
   },
   {
@@ -1044,11 +2009,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T15:21:23Z",
+    "to": "2026-11-21T20:30:54Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B77500",
@@ -1065,11 +2055,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
+     "fetched_at": "2026-11-21T20:28Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 75000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b293\u00a2 (5\u00a2 \u2192 98\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book did reprice (yes bid/ask 0.03/0.05 \u2192 0.02/0.98), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T20:28Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+   ],
+   "window": {
+    "from": "2026-11-21T15:21:23Z",
+    "to": "2026-11-21T20:30:54Z"
+   }
   },
   {
    "ticker": "KXPGATOUR-THRC26-BHAR",
@@ -1115,6 +2130,7 @@
     "after": null,
     "after_at": "2026-11-21",
     "reference_side": "yes",
+    "reference_name": "reference",
     "incomplete": true,
     "strike_side_after": "below"
    },
@@ -1145,11 +2161,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T06:39:48Z and 2026-11-21T06:42:56Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T06:39:48Z",
+    "to": "2026-11-21T06:42:56Z"
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -1169,7 +2210,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
+   "note": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
    "reviewed_at": null
   },
   {
@@ -1185,13 +2226,38 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
    "market_status": null,
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b213\u00a2 (82\u00a2 \u2192 95\u00a2) between 2026-11-21T06:37:00Z and 2026-11-21T06:38:00Z. The committed book did reprice (yes bid/ask 0.85/0.90 \u2192 0.94/0.95), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window": {
+    "from": "2026-11-21T06:37:00Z",
+    "to": "2026-11-21T06:38:00Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
@@ -1208,11 +2274,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T06:32:46Z and 2026-11-21T06:34:10Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window": {
+    "from": "2026-11-21T06:32:46Z",
+    "to": "2026-11-21T06:34:10Z"
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -1232,7 +2323,7 @@
    "links": [],
    "state": "not_reviewed",
    "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
+   "note": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
    "reviewed_at": null
   },
   {
@@ -1248,13 +2339,38 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
    "market_status": null,
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b212\u00a2 (70\u00a2 \u2192 82\u00a2) between 2026-11-21T06:33:00Z and 2026-11-21T06:34:00Z. The committed book did reprice (yes bid/ask 0.54/0.70 \u2192 0.79/0.82), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window": {
+    "from": "2026-11-21T06:33:00Z",
+    "to": "2026-11-21T06:34:00Z"
+   }
   },
   {
    "ticker": "KXBTC15M-26NOV210145-45",
@@ -1269,13 +2385,38 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
    "market_status": null,
    "result_as_returned": null,
-   "settlement_reference_text": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b215\u00a2 (50\u00a2 \u2192 65\u00a2) between 2026-11-21T06:31:00Z and 2026-11-21T06:32:00Z. The committed book did reprice (yes bid/ask 0.49/0.50 \u2192 0.52/0.70), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window": {
+    "from": "2026-11-21T06:31:00Z",
+    "to": "2026-11-21T06:32:00Z"
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -1295,9 +2436,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
@@ -1315,6 +2456,7 @@
     "after": 3.6898,
     "after_at": "2026-11-20",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.3898,
     "distance_to_strike_after": 0.3898,
@@ -1350,9 +2492,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
@@ -1370,6 +2512,7 @@
     "after": 3.6898,
     "after_at": "2026-11-20",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.0298,
     "distance_to_strike_after": 0.0298,
@@ -1405,9 +2548,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
@@ -1425,6 +2568,7 @@
     "after": 3.6898,
     "after_at": "2026-11-20",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.0298,
     "distance_to_strike_after": 0.0298,
@@ -1457,11 +2601,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-20T19:48:19Z and 2026-11-20T20:01:29Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-20T19:48:19Z",
+    "to": "2026-11-20T20:01:29Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
@@ -1478,11 +2647,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+     "fetched_at": "2026-11-21T06:37Z"
+    }
+   ],
+   "state": "reference_not_publicly_readable",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25b295\u00a2 (4\u00a2 \u2192 99\u00a2) between 2026-11-20T19:30:14Z and 2026-11-20T19:48:19Z. The committed book did reprice (yes bid/ask 0.01/0.04 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
+   "reviewed_at": "2026-11-21T06:37Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window": {
+    "from": "2026-11-20T19:30:14Z",
+    "to": "2026-11-20T19:48:19Z"
+   }
   },
   {
    "ticker": "KXBTCY-27JAN0100-B47500",
@@ -1499,11 +2693,36 @@
    "result_as_returned": null,
    "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-   "links": [],
-   "state": "not_reviewed",
-   "relation": null,
-   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
-   "reviewed_at": null
+   "links": [
+    {
+     "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+     "publisher": "Kalshi demo Trade API (the market's own official record)",
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
+     "fetched_at": "2026-11-20T19:47Z"
+    }
+   ],
+   "state": "best_quote_did_not_move",
+   "relation": {
+    "kind": "band_floor_from_rules",
+    "strike": 45000,
+    "before": null,
+    "before_at": null,
+    "after": null,
+    "after_at": null,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules",
+    "incomplete": true,
+    "strike_side_after": "below"
+   },
+   "note": "Printed \u25bc92\u00a2 (98\u00a2 \u2192 6\u00a2) between 2026-11-20T19:22:42Z and 2026-11-20T19:30:14Z. The committed book was identical at both reads \u2014 yes bid 0.05 / ask 0.06 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 45000.00\u201349999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
+   "reviewed_at": "2026-11-20T19:47Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500"
+   ],
+   "window": {
+    "from": "2026-11-20T19:22:42Z",
+    "to": "2026-11-20T19:30:14Z"
+   }
   },
   {
    "ticker": "KXAAAGASM-26DEC31-3.30",
@@ -1523,9 +2742,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
@@ -1543,6 +2762,7 @@
     "after": 3.6898,
     "after_at": "2026-11-20",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.3898,
     "distance_to_strike_after": 0.3898,
@@ -1578,9 +2798,9 @@
    "links": [
     {
      "url": "https://gasprices.aaa.com/",
-     "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-     "source_id": "AAA_NATIONAL_AVERAGE",
-     "fetched_at": "2026-11-21T23:11Z"
+     "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+     "source_id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     },
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
@@ -1598,6 +2818,7 @@
     "after": 3.6898,
     "after_at": "2026-11-20",
     "reference_side": "yes",
+    "reference_name": "reference",
     "change": 0.0,
     "distance_to_strike_before": 0.0298,
     "distance_to_strike_after": 0.0298,

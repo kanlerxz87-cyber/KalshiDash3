@@ -100,7 +100,8 @@ check("KD.isQaRow(r)" in index_html, "index.html must skip QA fixtures when pick
 # stored cap is never presented alone as "settled markets in scope".
 check("settled_in_scope" in index_html,
       "index.html must render counts.settled_in_scope next to the stored settled-row count (F-37/F-38)")
-stored_labels = ("stored settled rows", "settled markets stored", "settled rows in this snapshot")
+stored_labels = ("stored settled rows", "settled markets stored", "settled rows in this snapshot",
+                 "settled rows published in this snapshot", "settled rows stored in this snapshot")
 check(any(lbl in index_html for lbl in stored_labels),
       "index.html must label the stored settled-row count distinctly (looked for: "
       + ", ".join(stored_labels) + ")")
@@ -279,16 +280,14 @@ if live.exists():
         print(f"note: {len(unchecked)} open row(s) predate the series_categories field "
               f"({', '.join(unchecked[:3])} …); the next collection records it")
 
-if errors:
-    print("FAIL")
-    for e in errors:
-        print(" -", e)
-    sys.exit(1)
-print("OK: scope tests passed (natural gas excluded, QA fixtures refused, labels corrected, exclusions published)")
 # 5. F-72: the banner/table must never print the PUBLISHED settled-row count as if it were the
 #    scan total. The collector now publishes both; assert that wherever a settled total is
 #    labelled "in scope" the page reads settled_in_scope_total, and that the stored count is
 #    labelled as stored/published.
+#
+#    F-84: this whole section used to sit BELOW the verdict, so every assertion in it was
+#    unreachable-by-failure — the run printed "OK" and exited 0 while three of these checks were
+#    failing. The verdict is now the last statement in the file, so a failing check fails the run.
 site_js = (ROOT / "assets" / "site.js").read_text()
 check("settled_in_scope_total" in site_js,
       "assets/site.js must read counts.settled_in_scope_total for the in-scope settled figure (F-72)")
@@ -310,3 +309,24 @@ check('"settled_in_scope_total_method"' in collect_src,
       "scripts/collect.py must publish how the settled total was obtained (exact vs carried forward)")
 check("settled_in_scope_total_method" in index_html,
       "index.html must render the method beside the settled total (F-72)")
+# 6. F-83: the three settled counts are different numbers and must not share one phrase.
+#    counts.settled_in_scope is the KEPT WINDOW (post-trim); settled_in_scope_total is the scan
+#    total; settled_published is what the pages render. index.html used to print the kept window
+#    as "settled in scope" while its own banner printed the scan total under the same words.
+kpi = index_html.split("Resolved yes/no captured", 1)[-1].split("],", 1)[0]
+check("settled_published" in kpi and "settled_in_scope_total" in kpi,
+      "index.html's settled KPI must read settled_published and settled_in_scope_total, not the kept window")
+check("settled markets in scope" not in index_html,
+      "index.html must not label counts.settled_in_scope as 'settled markets in scope' (it is the kept window, F-83)")
+# 7. F-85: a topic whose every open market has zero volume must not be presented as a ranking.
+check("No contracts traded in any open" in index_html,
+      "index.html must say in place when a topic's largest market has zero contracts traded (F-85)")
+check("Zero-volume topics" in index_html,
+      "index.html must name the zero-volume topics below the table (F-85)")
+
+if errors:
+    print("FAIL")
+    for e in errors:
+        print(" -", e)
+    sys.exit(1)
+print("OK: scope tests passed (natural gas excluded, QA fixtures refused, labels corrected, exclusions published)")

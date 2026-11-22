@@ -1,1181 +1,2240 @@
 {
-  "schema": 1,
-  "kind": "human-readable review ledger: what an agent fetched and read, verbatim",
-  "reviewed_by_session": "arena-6f158ab7",
-  "reviewed_on": "2026-11-20",
-  "fetched_at_precision": "minute (the fetch tool reports no finer stamp to this session)",
-  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
-  "honesty_rules": [
-    "A link in this file is evidence that a publisher printed a number, not evidence that the number caused a trade. The word 'cause' is refused by scripts/tests/validate_catalysts.py.",
-    "A swing with no matching move in the market's own settlement reference is recorded as no_external_move_in_window. Silence is reported as silence.",
-    "Demo prices are not real-market prices: https://docs.kalshi.com/getting_started/demo_env",
-    "A Kalshi market record carries the reference it settles on in rules_primary (https://docs.kalshi.com/api-reference/market/get-markets); that text, not a news site, is what makes a source relevant to a given market."
-  ],
-  "sources": [
-    {
-      "id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "rules_primary": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
-        "last_price_dollars": "0.7100",
-        "previous_price_dollars": "0.7000",
-        "yes_bid_dollars": "0.2900",
-        "yes_ask_dollars": "0.6700",
-        "volume_24h_fp": "20.14",
-        "open_interest_fp": "209.00",
-        "status": "active",
-        "updated_time": "2026-04-28T04:57:33.180373Z",
-        "re_read_2026_11_21T23_11Z": {
-          "last_price_dollars": "0.7100",
-          "previous_price_dollars": "0.2900",
-          "yes_bid_dollars": "0.2900",
-          "yes_ask_dollars": "0.7100",
-          "volume_24h_fp": "3.92",
-          "open_interest_fp": "209.92",
-          "volume_fp": "410.86"
-        }
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
-      "fetched_at": "2026-11-20T19:25Z",
-      "observed": {
-        "rules_primary": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
-        "last_price_dollars": "0.2700",
-        "yes_bid_dollars": "0.1900",
-        "yes_ask_dollars": "1.0000",
-        "volume_24h_fp": "48.00",
-        "open_interest_fp": "29.00",
-        "status": "active"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
-      "fetched_at": "2026-11-20T19:25Z",
-      "observed": {
-        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T13:00:00+00:00. Missing data delays determination.",
-        "title": "Demo BTC at or above 61498.92 USD",
-        "strike_type": "none-recorded",
-        "status": "finalized",
-        "result": "yes",
-        "close_time": "2026-11-20T14:00:00Z",
-        "settlement_ts": "2026-11-20T14:01:34.563789Z",
-        "settlement_value_dollars": "1.0000",
-        "volume_24h_fp": "8200.00",
-        "open_interest_fp": "50.00"
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_1320_1405",
-      "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
-      "fetched_at": "2026-11-20T19:25Z",
-      "observed_note": "1-minute candles, [bucket_start_unix, low, high, open, close, volume]. `closes` below lists the close of each candle by its bucket start (UTC). The response is ordered newest first; the order here is chronological.",
-      "observed": {
-        "closes": {
-          "2026-11-20T13:20:00Z": 61553.55,
-          "2026-11-20T13:21:00Z": 61554.02,
-          "2026-11-20T13:22:00Z": 61396.8,
-          "2026-11-20T13:23:00Z": 61363.62,
-          "2026-11-20T13:24:00Z": 61420.74,
-          "2026-11-20T13:25:00Z": 61374.83,
-          "2026-11-20T13:26:00Z": 61401.99,
-          "2026-11-20T13:27:00Z": 61410.76,
-          "2026-11-20T13:28:00Z": 61454.4,
-          "2026-11-20T13:29:00Z": 61433.33,
-          "2026-11-20T13:30:00Z": 61425.88,
-          "2026-11-20T13:31:00Z": 61381.94,
-          "2026-11-20T13:32:00Z": 61380.22,
-          "2026-11-20T13:33:00Z": 61328.72,
-          "2026-11-20T13:34:00Z": 61308.43,
-          "2026-11-20T13:35:00Z": 61290.76,
-          "2026-11-20T13:36:00Z": 61323.83,
-          "2026-11-20T13:37:00Z": 61361.66,
-          "2026-11-20T13:38:00Z": 61352.01,
-          "2026-11-20T13:39:00Z": 61351.11,
-          "2026-11-20T13:40:00Z": 61379.02,
-          "2026-11-20T13:41:00Z": 61386.88,
-          "2026-11-20T13:42:00Z": 61354.43,
-          "2026-11-20T13:43:00Z": 61395.67,
-          "2026-11-20T13:44:00Z": 61419.49,
-          "2026-11-20T13:45:00Z": 61404.25,
-          "2026-11-20T13:46:00Z": 61460.71,
-          "2026-11-20T13:47:00Z": 61512.22,
-          "2026-11-20T13:48:00Z": 61641.6,
-          "2026-11-20T13:49:00Z": 61739.75,
-          "2026-11-20T13:50:00Z": 61867.99,
-          "2026-11-20T13:51:00Z": 61905.11,
-          "2026-11-20T13:52:00Z": 61810.33,
-          "2026-11-20T13:53:00Z": 61793.98,
-          "2026-11-20T13:54:00Z": 61745.12,
-          "2026-11-20T13:55:00Z": 61811.05,
-          "2026-11-20T13:56:00Z": 61776.7,
-          "2026-11-20T13:57:00Z": 61764.62,
-          "2026-11-20T13:58:00Z": 61812.18,
-          "2026-11-20T13:59:00Z": 61855.57,
-          "2026-11-20T14:00:00Z": 61855.58,
-          "2026-11-20T14:01:00Z": 61869.63,
-          "2026-11-20T14:02:00Z": 61806.27,
-          "2026-11-20T14:03:00Z": 61779.2,
-          "2026-11-20T14:04:00Z": 61790.06,
-          "2026-11-20T14:05:00Z": 61762.21
-        }
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_1120_1145",
-      "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
-      "fetched_at": "2026-11-20T19:33Z",
-      "observed_note": "Same shape as the other window: candle close keyed by bucket start (UTC), chronological.",
-      "observed": {
-        "closes": {
-          "2026-11-20T11:20:00Z": 61678.5,
-          "2026-11-20T11:21:00Z": 61658.83,
-          "2026-11-20T11:22:00Z": 61689.15,
-          "2026-11-20T11:23:00Z": 61712.98,
-          "2026-11-20T11:24:00Z": 61713.31,
-          "2026-11-20T11:25:00Z": 61737.57,
-          "2026-11-20T11:26:00Z": 61764.74,
-          "2026-11-20T11:27:00Z": 61785.4,
-          "2026-11-20T11:28:00Z": 61804,
-          "2026-11-20T11:29:00Z": 61804.87,
-          "2026-11-20T11:30:00Z": 61761.51,
-          "2026-11-20T11:31:00Z": 61725.09,
-          "2026-11-20T11:32:00Z": 61713.54,
-          "2026-11-20T11:33:00Z": 61701.37,
-          "2026-11-20T11:34:00Z": 61715.41,
-          "2026-11-20T11:35:00Z": 61737.74,
-          "2026-11-20T11:36:00Z": 61751.06,
-          "2026-11-20T11:37:00Z": 61742.86,
-          "2026-11-20T11:38:00Z": 61706.97,
-          "2026-11-20T11:39:00Z": 61726.99,
-          "2026-11-20T11:40:00Z": 61753.75,
-          "2026-11-20T11:41:00Z": 61727.38,
-          "2026-11-20T11:42:00Z": 61757.25,
-          "2026-11-20T11:43:00Z": 61710.39,
-          "2026-11-20T11:44:00Z": 61711.46,
-          "2026-11-20T11:45:00Z": 61783.94
-        }
-      }
-    },
-    {
-      "id": "AAA_NATIONAL_AVERAGE",
-      "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
-      "url": "https://gasprices.aaa.com/",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "national_average_regular": 3.6898,
-        "price_as_of": "11/20/26",
-        "yesterday_average_regular": 3.7212,
-        "week_ago_average_regular": 3.8724,
-        "month_ago_average_regular": 4.2786,
-        "re_read_2026_11_21T23_11Z": {
-          "national_average_regular": 3.6594,
-          "price_as_of": "11/21/26",
-          "yesterday_average_regular": 3.6898,
-          "week_ago_average_regular": 3.8406,
-          "month_ago_average_regular": 4.2644
-        },
-        "headline": "Gas Prices Keep Dropping as Thanksgiving Approaches",
-        "headline_url": "https://gasprices.aaa.com/gas-prices-keep-dropping-as-thanksgiving-approaches/"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "fetched_at": "2026-11-20T19:38Z",
-      "observed": {
-        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
-        "title": "Demo BTC at or above 61985.83 USD",
-        "status": "finalized",
-        "result": "no",
-        "close_time": "2026-11-20T12:00:00Z",
-        "settlement_ts": "2026-11-20T12:01:19.562363Z",
-        "settlement_value_dollars": "0.0000",
-        "last_price_dollars": "0.6500",
-        "volume_24h_fp": "8220.00",
-        "open_interest_fp": "30.00",
-        "updated_time": "2026-11-20T12:01:19.622681Z"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
-      "fetched_at": "2026-11-20T19:47Z",
-      "observed": {
-        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T20:00:00+00:00 closes at or above 58337.51 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T19:00:00+00:00. Missing data delays determination.",
-        "title": "Demo BTC at or above 58337.51 USD",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.5500",
-        "volume_24h_fp": "5225.00",
-        "open_interest_fp": "70.00",
-        "close_time": "2026-11-20T20:00:00Z",
-        "updated_time": "2026-11-20T19:00:05.598989Z"
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_1905_1935",
-      "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
-      "fetched_at": "2026-11-20T19:47Z",
-      "observed": {
-        "candle_closes_by_minute_UTC": {
-          "19:05": 58249.98,
-          "19:06": 58211.71,
-          "19:07": 58229.2,
-          "19:08": 58194.85,
-          "19:09": 58140.36,
-          "19:10": 58159,
-          "19:11": 58183.18,
-          "19:12": 58073.19,
-          "19:13": 58036.48,
-          "19:14": 58056.96,
-          "19:15": 58008.53,
-          "19:16": 57988.28,
-          "19:17": 57802.29,
-          "19:18": 57915.02,
-          "19:19": 57886.39,
-          "19:20": 57932.97,
-          "19:21": 58012.63,
-          "19:22": 57995.21,
-          "19:23": 57989.23,
-          "19:24": 57925.2,
-          "19:25": 57749.6,
-          "19:26": 57917.41,
-          "19:27": 58047.17,
-          "19:28": 58121.23,
-          "19:29": 58076.91,
-          "19:30": 58111.03,
-          "19:31": 57931.65,
-          "19:32": 58035.49,
-          "19:33": 58100.85,
-          "19:34": 58079.56
-        },
-        "window_max_high": 58310.32,
-        "granularity_s": 60
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
-      "fetched_at": "2026-11-20T19:47Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.0600",
-        "previous_price_dollars": "0.9800",
-        "volume_24h_fp": "0.00",
-        "volume_fp": "80178731.12",
-        "open_interest_fp": "26587902.55",
-        "updated_time": "2026-04-28T02:27:21.580016Z",
-        "floor_strike": 45000.0,
-        "cap_strike": 49999.99
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_1930_2002",
-      "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z",
-      "fetched_at": "2026-11-21T06:37Z",
-      "observed": {
-        "closes": {
-          "2026-11-20T19:30:00Z": 58111.03,
-          "2026-11-20T19:31:00Z": 57931.65,
-          "2026-11-20T19:32:00Z": 58035.49,
-          "2026-11-20T19:33:00Z": 58100.85,
-          "2026-11-20T19:34:00Z": 58079.56,
-          "2026-11-20T19:35:00Z": 58203.5,
-          "2026-11-20T19:36:00Z": 58274.84,
-          "2026-11-20T19:37:00Z": 58290.88,
-          "2026-11-20T19:38:00Z": 58388.07,
-          "2026-11-20T19:39:00Z": 58551.56,
-          "2026-11-20T19:40:00Z": 58701.2,
-          "2026-11-20T19:41:00Z": 58578.62,
-          "2026-11-20T19:42:00Z": 58599.66,
-          "2026-11-20T19:43:00Z": 58786.07,
-          "2026-11-20T19:44:00Z": 58748.42,
-          "2026-11-20T19:45:00Z": 58669.77,
-          "2026-11-20T19:46:00Z": 58608.19,
-          "2026-11-20T19:47:00Z": 58556.77,
-          "2026-11-20T19:48:00Z": 58481.38,
-          "2026-11-20T19:49:00Z": 58516.67,
-          "2026-11-20T19:50:00Z": 58463.32,
-          "2026-11-20T19:51:00Z": 58459.51,
-          "2026-11-20T19:52:00Z": 58442.62,
-          "2026-11-20T19:53:00Z": 58408.75,
-          "2026-11-20T19:54:00Z": 58520.56,
-          "2026-11-20T19:55:00Z": 58591.05,
-          "2026-11-20T19:56:00Z": 58574.13,
-          "2026-11-20T19:57:00Z": 58536.8,
-          "2026-11-20T19:58:00Z": 58499.32,
-          "2026-11-20T19:59:00Z": 58471.84,
-          "2026-11-20T20:00:00Z": 58452.87,
-          "2026-11-20T20:01:00Z": 58518.11,
-          "2026-11-20T20:02:00Z": 58483.09
-        },
-        "granularity_s": 60
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
-      "fetched_at": "2026-11-21T06:37Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.0200",
-        "yes_bid_dollars": "0.0100",
-        "yes_ask_dollars": "0.0200",
-        "volume_24h_fp": "19193.57",
-        "volume_fp": "58445049.00",
-        "open_interest_fp": "6087752.69",
-        "updated_time": "2026-04-28T02:27:21.580016Z",
-        "floor_strike": 85000,
-        "cap_strike": 89999.99
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
-      "fetched_at": "2026-11-21T06:37Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.0100",
-        "previous_price_dollars": "0.9700",
-        "yes_bid_dollars": "0.0000",
-        "yes_ask_dollars": "0.0100",
-        "volume_24h_fp": "95695.80",
-        "volume_fp": "72319449.06",
-        "open_interest_fp": "7294377.11",
-        "updated_time": "2026-04-28T02:27:21.580016Z",
-        "floor_strike": 95000,
-        "cap_strike": 99999.99
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
-      "fetched_at": "2026-11-21T06:37Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
-        "title": "BTC price up in next 15 mins?",
-        "status": "active",
-        "result": "",
-        "floor_strike": 56009.56,
-        "last_price_dollars": "0.9400",
-        "yes_bid_dollars": "0.9300",
-        "yes_ask_dollars": "0.9400",
-        "volume_24h_fp": "234.60",
-        "volume_fp": "395.49",
-        "open_interest_fp": "283.10",
-        "updated_time": "2026-11-21T06:30:34.331278Z"
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_21_0630_0644",
-      "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
-      "fetched_at": "2026-11-21T06:44Z",
-      "observed": {
-        "schema": "[timestamp_unix, low, high, open, close, volume]",
-        "close_by_minute_utc": {
-          "2026-11-21T06:30:00Z": 56004.79,
-          "2026-11-21T06:31:00Z": 56064.99,
-          "2026-11-21T06:32:00Z": 56092.74,
-          "2026-11-21T06:33:00Z": 56318.25,
-          "2026-11-21T06:34:00Z": 56355.0,
-          "2026-11-21T06:35:00Z": 56245.54,
-          "2026-11-21T06:36:00Z": 56331.31,
-          "2026-11-21T06:37:00Z": 56529.69,
-          "2026-11-21T06:38:00Z": 56583.63,
-          "2026-11-21T06:39:00Z": 56578.4,
-          "2026-11-21T06:40:00Z": 56630.26,
-          "2026-11-21T06:41:00Z": 56860.65,
-          "2026-11-21T06:42:00Z": 56826.05,
-          "2026-11-21T06:43:00Z": 56906.69,
-          "2026-11-21T06:44:00Z": 57107.04
-        }
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
-      "fetched_at": "2026-11-21T06:44Z",
-      "observed": {
-        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-21T07:00:00+00:00 closes at or above 55704.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-21T06:00:00+00:00. Missing data delays determination.",
-        "title": "Demo BTC at or above 55704.83 USD",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.5500",
-        "yes_bid_dollars": "0.0100",
-        "yes_ask_dollars": "0.9900",
-        "volume_24h_fp": "6665.00",
-        "volume_fp": "7120.00",
-        "open_interest_fp": "100.00",
-        "updated_time": "2026-11-21T06:00:03.847602Z"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
-      "fetched_at": "2026-11-21T20:22Z",
-      "observed": {
-        "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-21T16:00:00+00:00 closes at or above 60237.37 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-21T15:00:00+00:00. Missing data delays determination.",
-        "title": "Demo BTC at or above 60237.37 USD",
-        "status": "finalized",
-        "result": "no",
-        "settlement_value_dollars": "0.0000",
-        "settlement_ts": "2026-11-21T16:01:32.910945Z",
-        "last_price_dollars": "0.6500",
-        "yes_bid_dollars": "0.0000",
-        "yes_ask_dollars": "1.0000",
-        "volume_24h_fp": "8206.00",
-        "volume_fp": "8206.00",
-        "open_interest_fp": "26.00",
-        "updated_time": "2026-11-21T16:01:33.278542Z"
-      }
-    },
-    {
-      "id": "COINBASE_BTCUSD_1MIN_21_1514_1524",
-      "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
-      "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
-      "fetched_at": "2026-11-21T20:23Z",
-      "observed": {
-        "schema": "[timestamp_unix, low, high, open, close, volume]",
-        "close_by_minute_utc": {
-          "2026-11-21T15:14:00Z": 60215.51,
-          "2026-11-21T15:15:00Z": 60022.29,
-          "2026-11-21T15:16:00Z": 59901.74,
-          "2026-11-21T15:17:00Z": 59752.35,
-          "2026-11-21T15:18:00Z": 59727.25,
-          "2026-11-21T15:19:00Z": 59951.84,
-          "2026-11-21T15:20:00Z": 60176.12,
-          "2026-11-21T15:21:00Z": 60144.14,
-          "2026-11-21T15:22:00Z": 60063.36,
-          "2026-11-21T15:23:00Z": 60080.64,
-          "2026-11-21T15:24:00Z": 60098.96
-        },
-        "window_low_utc_1518": 59581.53
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
-      "fetched_at": "2026-11-21T20:22Z",
-      "observed": {
-        "rules_primary": "If Brian Harman wins the The RSM Classic, then the market resolves to Yes.",
-        "title": "The RSM Classic: Brian Harman wins",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.7500",
-        "previous_price_dollars": "0.0050",
-        "yes_bid_dollars": "0.0000",
-        "yes_ask_dollars": "1.0000",
-        "volume_24h_fp": "7276.38",
-        "volume_fp": "153195.26",
-        "open_interest_fp": "119274.49",
-        "updated_time": "2026-11-16T01:34:34.569351Z"
-      }
-    },
-    {
-      "id": "KALSHI_SERIES_KXPGATOUR",
-      "publisher": "Kalshi demo Trade API (series record listing official settlement sources)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
-      "fetched_at": "2026-11-21T20:23Z",
-      "observed": {
-        "ticker": "KXPGATOUR",
-        "title": "PGA Tour",
-        "category": "Sports",
-        "settlement_sources": [
-          { "name": "Fox Sports", "url": "https://www.foxsports.com" },
-          { "name": "ESPN", "url": "https://www.espn.com/" },
-          { "name": "the Governing League", "url": "https://www.pgatour.com/" }
-        ]
-      }
-    },
-    {
-      "id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
-      "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
-      "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "tournament": "The RSM Classic (Nov 19 - 22, 2026, Sea Island Golf Club, St. Simons Island, Georgia)",
-        "round_status": "R3 Suspended — no Saturday play after rain and saturated course conditions; Round 3 rescheduled Sunday 9:10 - 11:00 a.m. ET; Final Round Monday 7:20 - 9:10 a.m. ET",
-        "brian_harman": {
-          "pos": "CUT",
-          "to_par": "+1",
-          "r1": 71,
-          "r2": 72,
-          "strokes": 143
-        },
-        "michael_thorbjornsen": {
-          "pos": "T1",
-          "to_par": "-9",
-          "r1": 64,
-          "r2": 69,
-          "strokes": 133,
-          "odds_to_win": "+440"
-        }
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
-      "fetched_at": "2026-11-21T20:28Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "floor_strike": 75000,
-        "cap_strike": 79999.99,
-        "last_price_dollars": "0.9800",
-        "previous_price_dollars": "0.0400",
-        "yes_bid_dollars": "0.0200",
-        "yes_ask_dollars": "0.9800",
-        "volume_24h_fp": "9508.62",
-        "volume_fp": "39586020.10",
-        "open_interest_fp": "5968212.66",
-        "updated_time": "2026-04-28T02:27:21.580016Z"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "rules_primary": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
-        "title": "The RSM Classic: Michael Thorbjornsen wins",
-        "status": "active",
-        "result": "",
-        "last_price_dollars": "0.1800",
-        "previous_price_dollars": "0.1700",
-        "yes_bid_dollars": "0.1700",
-        "yes_ask_dollars": "0.1800",
-        "volume_24h_fp": "10200.02",
-        "volume_fp": "97879.39",
-        "open_interest_fp": "62730.85",
-        "updated_time": "2026-11-16T01:34:34.569351Z"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "floor_strike": 30000,
-        "cap_strike": 34999.99,
-        "last_price_dollars": "0.0200",
-        "previous_price_dollars": "0.0200",
-        "yes_bid_dollars": "0.0100",
-        "yes_ask_dollars": "0.0200",
-        "volume_24h_fp": "8976.71",
-        "volume_fp": "35511092.26",
-        "open_interest_fp": "6354325.99",
-        "updated_time": "2026-04-28T02:27:21.580016Z"
-      }
-    },
-    {
-      "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
-      "publisher": "Kalshi demo Trade API (the market's own official record)",
-      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
-      "fetched_at": "2026-11-21T23:11Z",
-      "observed": {
-        "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
-        "title": "BTC price  on Jan 1, 2027?",
-        "status": "active",
-        "result": "",
-        "floor_strike": 50000,
-        "cap_strike": 54999.99,
-        "last_price_dollars": "0.1000",
-        "previous_price_dollars": "0.1300",
-        "yes_bid_dollars": "0.0900",
-        "yes_ask_dollars": "0.1000",
-        "volume_24h_fp": "13393.93",
-        "volume_fp": "61738868.31",
-        "open_interest_fp": "7788363.75",
-        "updated_time": "2026-04-28T02:27:21.580016Z"
-      }
+ "schema": 1,
+ "kind": "human-readable review ledger: what an agent fetched and read, verbatim",
+ "reviewed_by_session": "arena-d34a9f0d",
+ "reviewed_on": "2026-11-22",
+ "fetched_at_precision": "minute (the fetch tool reports no finer stamp to this session)",
+ "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
+ "honesty_rules": [
+  "A link in this file is evidence that a publisher printed a number, not evidence that the number caused a trade. The word 'cause' is refused by scripts/tests/validate_catalysts.py.",
+  "A swing with no matching move in the market's own settlement reference is recorded as no_external_move_in_window. Silence is reported as silence.",
+  "Demo prices are not real-market prices: https://docs.kalshi.com/getting_started/demo_env",
+  "A Kalshi market record carries the reference it settles on in rules_primary (https://docs.kalshi.com/api-reference/market/get-markets); that text, not a news site, is what makes a source relevant to a given market."
+ ],
+ "sources": [
+  {
+   "id": "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
+    "last_price_dollars": "0.7100",
+    "previous_price_dollars": "0.7000",
+    "yes_bid_dollars": "0.2900",
+    "yes_ask_dollars": "0.6700",
+    "volume_24h_fp": "20.14",
+    "open_interest_fp": "209.00",
+    "status": "active",
+    "updated_time": "2026-04-28T04:57:33.180373Z",
+    "re_read_2026_11_21T23_11Z": {
+     "last_price_dollars": "0.7100",
+     "previous_price_dollars": "0.2900",
+     "yes_bid_dollars": "0.2900",
+     "yes_ask_dollars": "0.7100",
+     "volume_24h_fp": "3.92",
+     "open_interest_fp": "209.92",
+     "volume_fp": "410.86"
     }
-  ],
-  "reviews": [
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-      "alert_to_time": "2026-11-20T13:50:26Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1320_1405",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "window_from": "2026-11-20T13:20:00Z",
-      "window_to": "2026-11-20T13:50:00Z",
-      "comparison": {
-        "kind": "index_crosses_strike_up",
-        "strike": 61498.92,
-        "reference_side": "yes",
-        "value_before": 61404.25,
-        "value_before_at": "2026-11-20T13:45:00Z",
-        "value_after": 61867.99,
-        "value_after_at": "2026-11-20T13:50:00Z"
-      },
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "note": "The market's own rules settle on the Coinbase BTC-USD one-minute candle. In the four minutes before this collector observation, the candle close passed from below the 61498.92 strike to above it. The market's price moved up in the same minute. Reported as a coincidence in time between a published number and a printed price, which is all that can be shown from outside the exchange."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-      "alert_to_time": "2026-11-20T13:35:54Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1320_1405",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "window_from": "2026-11-20T13:29:00Z",
-      "window_to": "2026-11-20T13:35:00Z",
-      "comparison": {
-        "kind": "index_window_low",
-        "strike": 61498.92,
-        "reference_side": "yes",
-        "value_before": 61433.33,
-        "value_before_at": "2026-11-20T13:29:00Z",
-        "value_after": 61290.76,
-        "value_after_at": "2026-11-20T13:35:00Z"
-      },
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "note": "The window low printed on this candle while the market price fell in the same minutes; the strike stayed above the index the whole window."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
-      "alert_to_time": "2026-11-20T13:32:25Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1320_1405",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "window_from": "2026-11-20T13:30:00Z",
-      "window_to": "2026-11-20T13:32:00Z",
-      "comparison": {
-        "kind": "index_moved_against_signal",
-        "strike": 61498.92,
-        "reference_side": "yes",
-        "value_before": 61425.88,
-        "value_before_at": "2026-11-20T13:30:00Z",
-        "value_after": 61380.22,
-        "value_after_at": "2026-11-20T13:32:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
-      ],
-      "note": "The market printed up 20c while the index it settles on printed down in the same minutes. Recorded as an unexplained swing, which is the honest answer: no external move supports it, and the trade that set it cannot be seen from a public quote. The 61498.92 strike is read from the market's own record, which is also cited."
-    },
-    {
-      "ticker": "KXAAAGASD-26NOV21-3.6600",
-      "alert_to_time": "2026-11-20T13:50:26Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
-      ],
-      "window_from": "2026-11-20T13:35:00Z",
-      "window_to": "2026-11-20T13:50:26Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.66,
-        "reference_side": "yes",
-        "value_before": 3.6898,
-        "value_before_at": "2026-11-20",
-        "value_after": 3.6898,
-        "value_after_at": "2026-11-20"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
-      ],
-      "note": "This market settles on AAA's US average regular price for Nov 21, 2026; the published national average at the time of the swing was 3.6898, which is 0.0298 above the 3.6600 strike. AAA also printed a falling trend on the same page (yesterday 3.7212, week ago 3.8724). The market itself stayed thinly traded: 48 contracts in 24h, and a 1.0000 yes ask against a 0.1900 yes bid when re-read at 19:25Z."
-    },
-    {
-      "ticker": "KXAAAGASM-26DEC31-3.30",
-      "alert_to_time": "2026-11-20T15:19:53Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
-      ],
-      "window_from": "2026-11-20T13:50:26Z",
-      "window_to": "2026-11-20T15:19:53Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.3,
-        "reference_side": "yes",
-        "value_before": 3.6898,
-        "value_before_at": "2026-11-20",
-        "value_after": 3.6898,
-        "value_after_at": "2026-11-20"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
-      ],
-      "note": "The largest swing in the archive: 0.29 to 0.71. AAA's current national average (3.6898) is 0.3898 above the 3.30 strike, so the YES side was already in the money on the published figure; the size of the print says more about the book than about the news, because 24h volume on this market is 20.14 contracts and the yes bid stayed at 0.2900 while the last traded price is 0.7100. Flagged as F-31: a 10c rule on last_price_dollars can be moved by one small trade in a demo book."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "alert_to_time": "2026-11-20T11:26:21Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1120_1145",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "window_from": "2026-11-20T11:25:00Z",
-      "window_to": "2026-11-20T11:26:21Z",
-      "comparison": {
-        "kind": "index_moved_toward_strike_not_crossing",
-        "strike": 61985.83,
-        "reference_side": "yes",
-        "value_before": 61737.57,
-        "value_before_at": "2026-11-20T11:25:00Z",
-        "value_after": 61764.74,
-        "value_after_at": "2026-11-20T11:26:00Z"
-      },
-      "verdict_override": "external_move_coincides_in_direction",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "note": "The market printed up 20c while the index it settles on rose 27.17 USD toward the 61985.83 strike; the strike was never reached. The market later settled NO, so this print was wrong on the reference."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "alert_to_time": "2026-11-20T11:28:31Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1120_1145",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "window_from": "2026-11-20T11:25:00Z",
-      "window_to": "2026-11-20T11:28:31Z",
-      "comparison": {
-        "kind": "index_moved_against_signal",
-        "strike": 61985.83,
-        "reference_side": "yes",
-        "value_before": 61785.4,
-        "value_before_at": "2026-11-20T11:27:00Z",
-        "value_after": 61804.0,
-        "value_after_at": "2026-11-20T11:28:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "note": "The market fell 10c on the candle that printed the window high for the index (61804.00 at 11:28, 61804.87 at 11:29). No move in the settlement reference supports a fall; recorded as unexplained."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "alert_to_time": "2026-11-20T11:31:35Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1120_1145",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "window_from": "2026-11-20T11:25:00Z",
-      "window_to": "2026-11-20T11:31:35Z",
-      "comparison": {
-        "kind": "index_moved_away_from_strike",
-        "strike": 61985.83,
-        "reference_side": "yes",
-        "value_before": 61804.87,
-        "value_before_at": "2026-11-20T11:29:00Z",
-        "value_after": 61725.09,
-        "value_after_at": "2026-11-20T11:31:00Z"
-      },
-      "verdict_override": "external_move_coincides",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "note": "A 20c fall in the market over the three minutes in which the index fell 79.78 USD away from the strike. This is the one H12 swing the published reference actually supports, and the market settled NO in the end (settlement_ts 2026-11-20T12:01:19Z, settlement_value_dollars 0.0000)."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
-      "alert_to_time": "2026-11-20T11:33:33Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1120_1145",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "window_from": "2026-11-20T11:25:00Z",
-      "window_to": "2026-11-20T11:33:33Z",
-      "comparison": {
-        "kind": "index_moved_against_signal",
-        "strike": 61985.83,
-        "reference_side": "yes",
-        "value_before": 61713.54,
-        "value_before_at": "2026-11-20T11:32:00Z",
-        "value_after": 61701.37,
-        "value_after_at": "2026-11-20T11:33:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
-      ],
-      "note": "The market printed up 10c while the index kept falling away from the strike. Recorded as unexplained."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-      "alert_to_time": "2026-11-20T19:30:14Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1905_1935",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
-      ],
-      "window_from": "2026-11-20T19:05:00Z",
-      "window_to": "2026-11-20T19:34:00Z",
-      "comparison": {
-        "kind": "index_below_strike_all_window",
-        "strike": 58337.51,
-        "reference_side": "yes",
-        "value_before": 58249.98,
-        "value_before_at": "2026-11-20T19:06:00Z",
-        "value_after": 58079.56,
-        "value_after_at": "2026-11-20T19:35:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
-      ],
-      "note": "The collector recorded this market printing up to 0.55 during its 19:30:14Z run. Across the fetched 19:05-19:35 candles the Coinbase index the rules name fell (close 58249.98 to 58079.56) and stayed under the 58337.51 strike the whole window - the highest candle HIGH was 58310.32, 27.19 short. The market's own record shows last_price 0.5500 against yes_ask 0.9900 / yes_bid 0.0100 on 70.00 open interest: the print sits in a spread, not near a book. Recorded as unexplained by the reference."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
-      "alert_to_time": "2026-11-20T19:48:19Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_1930_2002",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
-      ],
-      "window_from": "2026-11-20T19:30:00Z",
-      "window_to": "2026-11-20T19:48:00Z",
-      "comparison": {
-        "kind": "index_moved_against_signal",
-        "strike": 58337.51,
-        "reference_side": "yes",
-        "value_before": 58111.03,
-        "value_before_at": "2026-11-20T19:30:00Z",
-        "value_after": 58481.38,
-        "value_after_at": "2026-11-20T19:48:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
-      ],
-      "note": "The market printed down 30c (0.65 to 0.35) between the 19:30:14Z and 19:48:19Z collector runs while the Coinbase BTC-USD one-minute candle close rose from 58111.03 at 19:30Z across the 58337.51 strike (crossing up at 19:38Z at 58388.07) to 58481.38 at 19:48Z. The market subsequently finalized YES (settlement_value_dollars 1.0000). Recorded as an unexplained move against the settlement reference."
-    },
-    {
-      "ticker": "KXAAAGASM-26DEC31-3.30",
-      "alert_to_time": "2026-11-21T00:50:12Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
-      ],
-      "window_from": "2026-11-20T20:01:29Z",
-      "window_to": "2026-11-21T00:50:12Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.3,
-        "reference_side": "yes",
-        "value_before": 3.6898,
-        "value_before_at": "2026-11-20",
-        "value_after": 3.6898,
-        "value_after_at": "2026-11-20"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
-      ],
-      "note": "The market price reverted from 0.71 to 0.29 (-42c), back to the resting yes_bid_dollars of 0.2900 against a 0.6700-0.7100 yes_ask_dollars on 20.14 contracts of 24h volume. AAA's published US regular average (3.6898 as of 11/20/26) sits 0.3898 above the 3.30 strike, while AAA's page also reports a falling trend from 3.7212 yesterday and 3.8724 a week ago."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-      "alert_to_time": "2026-11-21T06:39:48Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_21_0630_0644",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP"
-      ],
-      "window_from": "2026-11-21T06:34:00Z",
-      "window_to": "2026-11-21T06:39:00Z",
-      "comparison": {
-        "kind": "index_moved_against_signal",
-        "strike": 55704.83,
-        "reference_side": "yes",
-        "value_before": 56355.0,
-        "value_before_at": "2026-11-21T06:34:00Z",
-        "value_after": 56578.4,
-        "value_after_at": "2026-11-21T06:39:00Z"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP"
-      ],
-      "note": "The market printed down 30c (0.65 to 0.35) between 06:34:10Z and 06:39:48Z while the Coinbase BTC-USD one-minute candle close rose from 56355.0 at 06:34Z to 56578.4 at 06:39Z, moving further above the 55704.83 strike. Recorded as an unexplained move against the settlement reference."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
-      "alert_to_time": "2026-11-21T06:42:56Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_21_0630_0644",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP"
-      ],
-      "window_from": "2026-11-21T06:39:00Z",
-      "window_to": "2026-11-21T06:42:00Z",
-      "comparison": {
-        "kind": "index_moved_toward_strike_not_crossing",
-        "strike": 55704.83,
-        "reference_side": "yes",
-        "value_before": 56578.4,
-        "value_before_at": "2026-11-21T06:39:00Z",
-        "value_after": 56826.05,
-        "value_after_at": "2026-11-21T06:42:00Z"
-      },
-      "verdict_override": "external_move_coincides_in_direction",
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP"
-      ],
-      "note": "The market printed up 30c (0.35 to 0.65) between 06:39:48Z and 06:42:56Z while the Coinbase BTC-USD one-minute candle close rose from 56578.4 at 06:39Z to 56826.05 at 06:42Z, already above the 55704.83 strike."
-    },
-    {
-      "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
-      "alert_to_time": "2026-11-21T15:21:23Z",
-      "source_ids": [
-        "COINBASE_BTCUSD_1MIN_21_1514_1524",
-        "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP"
-      ],
-      "window_from": "2026-11-21T15:16:00Z",
-      "window_to": "2026-11-21T15:21:00Z",
-      "comparison": {
-        "kind": "published_value_below_strike",
-        "strike": 60237.37,
-        "reference_side": "yes",
-        "value_before": 59901.74,
-        "value_before_at": "2026-11-21T15:16:00Z",
-        "value_after": 60144.14,
-        "value_after_at": "2026-11-21T15:21:00Z"
-      },
-      "links": [
-        "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP"
-      ],
-      "note": "The market printed down 20c (0.65 to 0.45) between 15:16:38Z and 15:21:23Z on a wide demo book (to_yes_bid 0.01, to_yes_ask 1.00). Over those minutes the Coinbase BTC-USD one-minute candle close stayed below the 60237.37 strike throughout (59901.74 at 15:16Z, dipping to a 59727.25 close / 59581.53 low at 15:18Z, and 60144.14 at 15:21Z). The market later finalized NO at 16:01:32Z."
-    },
-    {
-      "ticker": "KXPGATOUR-THRC26-BHAR",
-      "alert_to_time": "2026-11-21T15:16:38Z",
-      "source_ids": [
-        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
-        "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
-        "KALSHI_SERIES_KXPGATOUR"
-      ],
-      "window_from": "2026-11-21T06:42:56Z",
-      "window_to": "2026-11-21T15:16:38Z",
-      "comparison": {
-        "kind": "player_missed_cut_and_play_suspended",
-        "strike": null,
-        "reference_side": "yes",
-        "value_before": null,
-        "value_before_at": "2026-11-20",
-        "value_after": null,
-        "value_after_at": "2026-11-21"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
-        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
-      ],
-      "note": "The market printed up 74.5c (0.005 to 0.75) between 06:42:56Z and 15:16:38Z on a wide empty demo book (to_yes_bid 0.001, to_yes_ask 1.00; re-read at 20:22Z with yes_bid_dollars 0.0000, yes_ask_dollars 1.0000). The official PGA Tour leaderboard for The RSM Classic (a named settlement source in GET /series/KXPGATOUR) lists Brian Harman as CUT (+1; R1 71, R2 72, total 143) and states Round 3 play was suspended Saturday after rain and saturated course conditions with no Saturday play. Recorded as no external move supporting this swing."
-    },
-    {
-      "ticker": "KXPGATOUR-THRC26-MTHO",
-      "alert_to_time": "2026-11-21T20:34:40Z",
-      "source_ids": [
-        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
-        "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
-        "KALSHI_SERIES_KXPGATOUR"
-      ],
-      "window_from": "2026-11-21T20:30:54Z",
-      "window_to": "2026-11-21T20:34:40Z",
-      "comparison": {
-        "kind": "tournament_play_suspended",
-        "strike": null,
-        "reference_side": "yes",
-        "value_before": null,
-        "value_before_at": "2026-11-21",
-        "value_after": null,
-        "value_after_at": "2026-11-21"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
-        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
-      ],
-      "note": "The market printed up 40c (0.17 to 0.57) between 20:30:54Z and 20:34:40Z while the resting book remained at yes_bid 0.16 / yes_ask 0.17 (24h volume 10126.17). On the official PGA Tour RSM Classic leaderboard (fetched 2026-11-21T23:11Z), Michael Thorbjornsen sits T1 at -9 (R1 64, R2 69, total 133), and Round 3 was suspended all Saturday after rain and saturated course conditions with no Saturday play (rescheduled Sunday 9:10-11:00 a.m. ET). No on-course score change occurred during this window; recorded as no external move supporting this swing."
-    },
-    {
-      "ticker": "KXPGATOUR-THRC26-MTHO",
-      "alert_to_time": "2026-11-21T20:57:37Z",
-      "source_ids": [
-        "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
-        "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
-        "KALSHI_SERIES_KXPGATOUR"
-      ],
-      "window_from": "2026-11-21T20:34:40Z",
-      "window_to": "2026-11-21T20:57:37Z",
-      "comparison": {
-        "kind": "tournament_play_suspended",
-        "strike": null,
-        "reference_side": "yes",
-        "value_before": null,
-        "value_before_at": "2026-11-21",
-        "value_after": null,
-        "value_after_at": "2026-11-21"
-      },
-      "verdict_override": "no_external_move_supporting_this_swing",
-      "links": [
-        "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
-        "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
-      ],
-      "note": "The market printed back down 40c (0.57 to 0.17) between 20:34:40Z and 20:57:37Z, returning to its resting quote (yes_bid 0.16, yes_ask 0.17; re-read at 23:11Z at last 0.18, yes_bid 0.17, yes_ask 0.18). The official PGA Tour leaderboard shows no Saturday play at The RSM Classic (Round 3 suspended after rain; Michael Thorbjornsen unchanged at T1, -9). Recorded as no external move supporting this swing."
-    },
-    {
-      "ticker": "KXAAAGASM-26DEC31-3.30",
-      "alert_to_time": "2026-11-21T23:01:10Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
-      ],
-      "window_from": "2026-11-21T22:46:10Z",
-      "window_to": "2026-11-21T23:01:10Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.3,
-        "reference_side": "yes",
-        "value_before": 3.6594,
-        "value_before_at": "2026-11-21",
-        "value_after": 3.6594,
-        "value_after_at": "2026-11-21"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
-      ],
-      "note": "The market printed up 41c (0.30 to 0.71) between 22:46:10Z and 23:01:10Z on thin demo volume (volume_24h_fp 3.92; resting yes_bid_dollars 0.2900, yes_ask_dollars 0.7100). AAA publishes once daily, not intraday: its national regular average for 11/21/26 is $3.6594 (0.3594 above the $3.30 strike, down from $3.6898 on 11/20/26 and $3.8406 a week ago)."
-    },
-    {
-      "ticker": "KXAAAGASD-26NOV21-3.6600",
-      "alert_to_time": "2026-11-20T22:04:00Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
-      ],
-      "window_from": "2026-11-20T21:42:00Z",
-      "window_to": "2026-11-20T22:04:00Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.66,
-        "reference_side": "yes",
-        "value_before": 3.6898,
-        "value_before_at": "2026-11-20",
-        "value_after": 3.6898,
-        "value_after_at": "2026-11-20"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
-      ],
-      "note": "Candle-backfilled 1-minute close moved down 10c (0.19 to 0.09) on a wide book (yes_bid 0.09, yes_ask 1.00) on the evening before the Nov 21 AAA daily print. AAA publishes once daily: the 11/20/26 regular average was $3.6898 (0.0298 above the $3.6600 strike), down from $3.7212 the prior day."
-    },
-    {
-      "ticker": "KXAAAGASD-26NOV21-3.6600",
-      "alert_to_time": "2026-11-20T22:41:00Z",
-      "source_ids": [
-        "AAA_NATIONAL_AVERAGE",
-        "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
-      ],
-      "window_from": "2026-11-20T22:10:00Z",
-      "window_to": "2026-11-20T22:41:00Z",
-      "comparison": {
-        "kind": "published_value_above_strike",
-        "strike": 3.66,
-        "reference_side": "yes",
-        "value_before": 3.6898,
-        "value_before_at": "2026-11-20",
-        "value_after": 3.6898,
-        "value_after_at": "2026-11-20"
-      },
-      "links": [
-        "https://gasprices.aaa.com/",
-        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
-      ],
-      "note": "Candle-backfilled 1-minute close moved up 14c (0.07 to 0.21; yes_bid 0.21, yes_ask 0.24) on the evening before the Nov 21 AAA daily print. AAA's 11/20/26 regular average was $3.6898 (above the $3.6600 strike; the next day's 11/21/26 print later came in at $3.6594)."
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+   "fetched_at": "2026-11-20T19:25Z",
+   "observed": {
+    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.6600 on Nov 21, 2026 according to AAA, then the market resolves to Yes.",
+    "last_price_dollars": "0.2700",
+    "yes_bid_dollars": "0.1900",
+    "yes_ask_dollars": "1.0000",
+    "volume_24h_fp": "48.00",
+    "open_interest_fp": "29.00",
+    "status": "active"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "fetched_at": "2026-11-20T19:25Z",
+   "observed": {
+    "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T14:00:00+00:00 closes at or above 61498.92 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T13:00:00+00:00. Missing data delays determination.",
+    "title": "Demo BTC at or above 61498.92 USD",
+    "strike_type": "none-recorded",
+    "status": "finalized",
+    "result": "yes",
+    "close_time": "2026-11-20T14:00:00Z",
+    "settlement_ts": "2026-11-20T14:01:34.563789Z",
+    "settlement_value_dollars": "1.0000",
+    "volume_24h_fp": "8200.00",
+    "open_interest_fp": "50.00"
+   }
+  },
+  {
+   "id": "COINBASE_BTCUSD_1MIN_1320_1405",
+   "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+   "fetched_at": "2026-11-20T19:25Z",
+   "observed_note": "1-minute candles, [bucket_start_unix, low, high, open, close, volume]. `closes` below lists the close of each candle by its bucket start (UTC). The response is ordered newest first; the order here is chronological.",
+   "observed": {
+    "closes": {
+     "2026-11-20T13:20:00Z": 61553.55,
+     "2026-11-20T13:21:00Z": 61554.02,
+     "2026-11-20T13:22:00Z": 61396.8,
+     "2026-11-20T13:23:00Z": 61363.62,
+     "2026-11-20T13:24:00Z": 61420.74,
+     "2026-11-20T13:25:00Z": 61374.83,
+     "2026-11-20T13:26:00Z": 61401.99,
+     "2026-11-20T13:27:00Z": 61410.76,
+     "2026-11-20T13:28:00Z": 61454.4,
+     "2026-11-20T13:29:00Z": 61433.33,
+     "2026-11-20T13:30:00Z": 61425.88,
+     "2026-11-20T13:31:00Z": 61381.94,
+     "2026-11-20T13:32:00Z": 61380.22,
+     "2026-11-20T13:33:00Z": 61328.72,
+     "2026-11-20T13:34:00Z": 61308.43,
+     "2026-11-20T13:35:00Z": 61290.76,
+     "2026-11-20T13:36:00Z": 61323.83,
+     "2026-11-20T13:37:00Z": 61361.66,
+     "2026-11-20T13:38:00Z": 61352.01,
+     "2026-11-20T13:39:00Z": 61351.11,
+     "2026-11-20T13:40:00Z": 61379.02,
+     "2026-11-20T13:41:00Z": 61386.88,
+     "2026-11-20T13:42:00Z": 61354.43,
+     "2026-11-20T13:43:00Z": 61395.67,
+     "2026-11-20T13:44:00Z": 61419.49,
+     "2026-11-20T13:45:00Z": 61404.25,
+     "2026-11-20T13:46:00Z": 61460.71,
+     "2026-11-20T13:47:00Z": 61512.22,
+     "2026-11-20T13:48:00Z": 61641.6,
+     "2026-11-20T13:49:00Z": 61739.75,
+     "2026-11-20T13:50:00Z": 61867.99,
+     "2026-11-20T13:51:00Z": 61905.11,
+     "2026-11-20T13:52:00Z": 61810.33,
+     "2026-11-20T13:53:00Z": 61793.98,
+     "2026-11-20T13:54:00Z": 61745.12,
+     "2026-11-20T13:55:00Z": 61811.05,
+     "2026-11-20T13:56:00Z": 61776.7,
+     "2026-11-20T13:57:00Z": 61764.62,
+     "2026-11-20T13:58:00Z": 61812.18,
+     "2026-11-20T13:59:00Z": 61855.57,
+     "2026-11-20T14:00:00Z": 61855.58,
+     "2026-11-20T14:01:00Z": 61869.63,
+     "2026-11-20T14:02:00Z": 61806.27,
+     "2026-11-20T14:03:00Z": 61779.2,
+     "2026-11-20T14:04:00Z": 61790.06,
+     "2026-11-20T14:05:00Z": 61762.21
     }
-  ],
-  "sources_of_method": {
-    "get_market": "https://docs.kalshi.com/api-reference/market/get-markets",
-    "demo_environment": "https://docs.kalshi.com/getting_started/demo_env",
-    "candlesticks_documented_limit": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-    "aaa_publisher": "https://gasprices.aaa.com/",
-    "coinbase_market_data": "https://docs.cdp.coinbase.com/exchange/reference/apireference",
-    "pgatour_leaderboard": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard"
+   }
   },
-  "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary; AAA averages are copied from gasprices.aaa.com; golf tournament status and player scores are copied from the official PGA Tour leaderboard.",
-  "swings_in_archive_not_reviewed": {
-    "count_expected": 31,
-    "note": "Every served in-scope alert in data/live/alerts_archive.json whose settlement reference has a public source (AAA National Average or PGA Tour official leaderboard) has a review entry (9/9 served non-BRTI swings; 20 KXDEMOFUTHOURLY Test-series rows are withheld per F-65/F-75). The remaining 31 served BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit official-record not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
+  {
+   "id": "COINBASE_BTCUSD_1MIN_1120_1145",
+   "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+   "fetched_at": "2026-11-20T19:33Z",
+   "observed_note": "Same shape as the other window: candle close keyed by bucket start (UTC), chronological.",
+   "observed": {
+    "closes": {
+     "2026-11-20T11:20:00Z": 61678.5,
+     "2026-11-20T11:21:00Z": 61658.83,
+     "2026-11-20T11:22:00Z": 61689.15,
+     "2026-11-20T11:23:00Z": 61712.98,
+     "2026-11-20T11:24:00Z": 61713.31,
+     "2026-11-20T11:25:00Z": 61737.57,
+     "2026-11-20T11:26:00Z": 61764.74,
+     "2026-11-20T11:27:00Z": 61785.4,
+     "2026-11-20T11:28:00Z": 61804,
+     "2026-11-20T11:29:00Z": 61804.87,
+     "2026-11-20T11:30:00Z": 61761.51,
+     "2026-11-20T11:31:00Z": 61725.09,
+     "2026-11-20T11:32:00Z": 61713.54,
+     "2026-11-20T11:33:00Z": 61701.37,
+     "2026-11-20T11:34:00Z": 61715.41,
+     "2026-11-20T11:35:00Z": 61737.74,
+     "2026-11-20T11:36:00Z": 61751.06,
+     "2026-11-20T11:37:00Z": 61742.86,
+     "2026-11-20T11:38:00Z": 61706.97,
+     "2026-11-20T11:39:00Z": 61726.99,
+     "2026-11-20T11:40:00Z": 61753.75,
+     "2026-11-20T11:41:00Z": 61727.38,
+     "2026-11-20T11:42:00Z": 61757.25,
+     "2026-11-20T11:43:00Z": 61710.39,
+     "2026-11-20T11:44:00Z": 61711.46,
+     "2026-11-20T11:45:00Z": 61783.94
+    }
+   }
   },
-  "not_reviewed_reasons": {
-    "KXBTCY-27JAN0100-B32500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z — the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
-    "KXBTCY-27JAN0100-B47500": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
-    "KXBTCY-27JAN0100-B52500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
-    "KXBTCY-27JAN0100-B77500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 75000.00 and 79999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T20:28Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.9800, yes_bid_dollars 0.0200, yes_ask_dollars 0.9800, and updated_time 2026-04-28T02:27:21Z - the 0.05 -> 0.98 print reflects a wide demo book rather than a public reference feed.",
-    "KXBTCY-27JAN0100-B87500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
-    "KXBTCY-27JAN0100-B97500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 95000.00 and 99999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows yes_bid_dollars 0.0000 and yes_ask_dollars 0.0100 when re-read at 06:37Z after the 0.01 -> 0.97 print.",
-    "KXBTC15M-26NOV210145-45": "This 15-minute market settles on the sixty-second average of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 vs 1:30 AM EST on Nov 21, 2026 (floor_strike 56009.56; finalized YES with expiration_value 57108.23 at 06:45:02Z, re-read 2026-11-21T23:11Z). CF Benchmarks' BRTI tick stream is not publicly fetchable without a license, so no external minute-by-minute BRTI reading is asserted."
+  {
+   "id": "AAA_NATIONAL_AVERAGE",
+   "publisher": "AAA Fuel Prices (the publisher this market's own rules name: \"according to AAA\")",
+   "url": "https://gasprices.aaa.com/",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "national_average_regular": 3.6898,
+    "price_as_of": "11/20/26",
+    "yesterday_average_regular": 3.7212,
+    "week_ago_average_regular": 3.8724,
+    "month_ago_average_regular": 4.2786,
+    "re_read_2026_11_21T23_11Z": {
+     "national_average_regular": 3.6594,
+     "price_as_of": "11/21/26",
+     "yesterday_average_regular": 3.6898,
+     "week_ago_average_regular": 3.8406,
+     "month_ago_average_regular": 4.2644
+    },
+    "headline": "Gas Prices Keep Dropping as Thanksgiving Approaches",
+    "headline_url": "https://gasprices.aaa.com/gas-prices-keep-dropping-as-thanksgiving-approaches/"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "fetched_at": "2026-11-20T19:38Z",
+   "observed": {
+    "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T12:00:00+00:00 closes at or above 61985.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T11:00:00+00:00. Missing data delays determination.",
+    "title": "Demo BTC at or above 61985.83 USD",
+    "status": "finalized",
+    "result": "no",
+    "close_time": "2026-11-20T12:00:00Z",
+    "settlement_ts": "2026-11-20T12:01:19.562363Z",
+    "settlement_value_dollars": "0.0000",
+    "last_price_dollars": "0.6500",
+    "volume_24h_fp": "8220.00",
+    "open_interest_fp": "30.00",
+    "updated_time": "2026-11-20T12:01:19.622681Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "fetched_at": "2026-11-20T19:47Z",
+   "observed": {
+    "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-20T20:00:00+00:00 closes at or above 58337.51 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-20T19:00:00+00:00. Missing data delays determination.",
+    "title": "Demo BTC at or above 58337.51 USD",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.5500",
+    "volume_24h_fp": "5225.00",
+    "open_interest_fp": "70.00",
+    "close_time": "2026-11-20T20:00:00Z",
+    "updated_time": "2026-11-20T19:00:05.598989Z"
+   }
+  },
+  {
+   "id": "COINBASE_BTCUSD_1MIN_1905_1935",
+   "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
+   "fetched_at": "2026-11-20T19:47Z",
+   "observed": {
+    "candle_closes_by_minute_UTC": {
+     "19:05": 58249.98,
+     "19:06": 58211.71,
+     "19:07": 58229.2,
+     "19:08": 58194.85,
+     "19:09": 58140.36,
+     "19:10": 58159,
+     "19:11": 58183.18,
+     "19:12": 58073.19,
+     "19:13": 58036.48,
+     "19:14": 58056.96,
+     "19:15": 58008.53,
+     "19:16": 57988.28,
+     "19:17": 57802.29,
+     "19:18": 57915.02,
+     "19:19": 57886.39,
+     "19:20": 57932.97,
+     "19:21": 58012.63,
+     "19:22": 57995.21,
+     "19:23": 57989.23,
+     "19:24": 57925.2,
+     "19:25": 57749.6,
+     "19:26": 57917.41,
+     "19:27": 58047.17,
+     "19:28": 58121.23,
+     "19:29": 58076.91,
+     "19:30": 58111.03,
+     "19:31": 57931.65,
+     "19:32": 58035.49,
+     "19:33": 58100.85,
+     "19:34": 58079.56
+    },
+    "window_max_high": 58310.32,
+    "granularity_s": 60
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "fetched_at": "2026-11-20T19:47Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.0600",
+    "previous_price_dollars": "0.9800",
+    "volume_24h_fp": "0.00",
+    "volume_fp": "80178731.12",
+    "open_interest_fp": "26587902.55",
+    "updated_time": "2026-04-28T02:27:21.580016Z",
+    "floor_strike": 45000.0,
+    "cap_strike": 49999.99
+   }
+  },
+  {
+   "id": "COINBASE_BTCUSD_1MIN_1930_2002",
+   "publisher": "Coinbase Exchange public candles API \u2014 the exchange the market's rules name",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z",
+   "fetched_at": "2026-11-21T06:37Z",
+   "observed": {
+    "closes": {
+     "2026-11-20T19:30:00Z": 58111.03,
+     "2026-11-20T19:31:00Z": 57931.65,
+     "2026-11-20T19:32:00Z": 58035.49,
+     "2026-11-20T19:33:00Z": 58100.85,
+     "2026-11-20T19:34:00Z": 58079.56,
+     "2026-11-20T19:35:00Z": 58203.5,
+     "2026-11-20T19:36:00Z": 58274.84,
+     "2026-11-20T19:37:00Z": 58290.88,
+     "2026-11-20T19:38:00Z": 58388.07,
+     "2026-11-20T19:39:00Z": 58551.56,
+     "2026-11-20T19:40:00Z": 58701.2,
+     "2026-11-20T19:41:00Z": 58578.62,
+     "2026-11-20T19:42:00Z": 58599.66,
+     "2026-11-20T19:43:00Z": 58786.07,
+     "2026-11-20T19:44:00Z": 58748.42,
+     "2026-11-20T19:45:00Z": 58669.77,
+     "2026-11-20T19:46:00Z": 58608.19,
+     "2026-11-20T19:47:00Z": 58556.77,
+     "2026-11-20T19:48:00Z": 58481.38,
+     "2026-11-20T19:49:00Z": 58516.67,
+     "2026-11-20T19:50:00Z": 58463.32,
+     "2026-11-20T19:51:00Z": 58459.51,
+     "2026-11-20T19:52:00Z": 58442.62,
+     "2026-11-20T19:53:00Z": 58408.75,
+     "2026-11-20T19:54:00Z": 58520.56,
+     "2026-11-20T19:55:00Z": 58591.05,
+     "2026-11-20T19:56:00Z": 58574.13,
+     "2026-11-20T19:57:00Z": 58536.8,
+     "2026-11-20T19:58:00Z": 58499.32,
+     "2026-11-20T19:59:00Z": 58471.84,
+     "2026-11-20T20:00:00Z": 58452.87,
+     "2026-11-20T20:01:00Z": 58518.11,
+     "2026-11-20T20:02:00Z": 58483.09
+    },
+    "granularity_s": 60
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "fetched_at": "2026-11-21T06:37Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 85000.00-89999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.0200",
+    "yes_bid_dollars": "0.0100",
+    "yes_ask_dollars": "0.0200",
+    "volume_24h_fp": "19193.57",
+    "volume_fp": "58445049.00",
+    "open_interest_fp": "6087752.69",
+    "updated_time": "2026-04-28T02:27:21.580016Z",
+    "floor_strike": 85000,
+    "cap_strike": 89999.99
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "fetched_at": "2026-11-21T06:37Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 95000.00-99999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.0100",
+    "previous_price_dollars": "0.9700",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "0.0100",
+    "volume_24h_fp": "95695.80",
+    "volume_fp": "72319449.06",
+    "open_interest_fp": "7294377.11",
+    "updated_time": "2026-04-28T02:27:21.580016Z",
+    "floor_strike": 95000,
+    "cap_strike": 99999.99
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
+   "fetched_at": "2026-11-21T06:37Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:45 AM EST on Nov 21, 2026 is at least the simple average of the sixty seconds of CF Benchmarks' BRTI before 1:30 AM EST on November 21, 2026, then the market resolves to Yes.",
+    "title": "BTC price up in next 15 mins?",
+    "status": "active",
+    "result": "",
+    "floor_strike": 56009.56,
+    "last_price_dollars": "0.9400",
+    "yes_bid_dollars": "0.9300",
+    "yes_ask_dollars": "0.9400",
+    "volume_24h_fp": "234.60",
+    "volume_fp": "395.49",
+    "open_interest_fp": "283.10",
+    "updated_time": "2026-11-21T06:30:34.331278Z"
+   }
+  },
+  {
+   "id": "COINBASE_BTCUSD_1MIN_21_0630_0644",
+   "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
+   "fetched_at": "2026-11-21T06:44Z",
+   "observed": {
+    "schema": "[timestamp_unix, low, high, open, close, volume]",
+    "close_by_minute_utc": {
+     "2026-11-21T06:30:00Z": 56004.79,
+     "2026-11-21T06:31:00Z": 56064.99,
+     "2026-11-21T06:32:00Z": 56092.74,
+     "2026-11-21T06:33:00Z": 56318.25,
+     "2026-11-21T06:34:00Z": 56355.0,
+     "2026-11-21T06:35:00Z": 56245.54,
+     "2026-11-21T06:36:00Z": 56331.31,
+     "2026-11-21T06:37:00Z": 56529.69,
+     "2026-11-21T06:38:00Z": 56583.63,
+     "2026-11-21T06:39:00Z": 56578.4,
+     "2026-11-21T06:40:00Z": 56630.26,
+     "2026-11-21T06:41:00Z": 56860.65,
+     "2026-11-21T06:42:00Z": 56826.05,
+     "2026-11-21T06:43:00Z": 56906.69,
+     "2026-11-21T06:44:00Z": 57107.04
+    }
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "fetched_at": "2026-11-21T06:44Z",
+   "observed": {
+    "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-21T07:00:00+00:00 closes at or above 55704.83 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-21T06:00:00+00:00. Missing data delays determination.",
+    "title": "Demo BTC at or above 55704.83 USD",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.5500",
+    "yes_bid_dollars": "0.0100",
+    "yes_ask_dollars": "0.9900",
+    "volume_24h_fp": "6665.00",
+    "volume_fp": "7120.00",
+    "open_interest_fp": "100.00",
+    "updated_time": "2026-11-21T06:00:03.847602Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "fetched_at": "2026-11-21T20:22Z",
+   "observed": {
+    "rules_primary": "Demo only. YES if the Coinbase Exchange BTC-USD one-minute candle ending at 2026-11-21T16:00:00+00:00 closes at or above 60237.37 USD; otherwise NO. The reference is the close of the one-minute candle ending at 2026-11-21T15:00:00+00:00. Missing data delays determination.",
+    "title": "Demo BTC at or above 60237.37 USD",
+    "status": "finalized",
+    "result": "no",
+    "settlement_value_dollars": "0.0000",
+    "settlement_ts": "2026-11-21T16:01:32.910945Z",
+    "last_price_dollars": "0.6500",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_24h_fp": "8206.00",
+    "volume_fp": "8206.00",
+    "open_interest_fp": "26.00",
+    "updated_time": "2026-11-21T16:01:33.278542Z"
+   }
+  },
+  {
+   "id": "COINBASE_BTCUSD_1MIN_21_1514_1524",
+   "publisher": "Coinbase Exchange public market data (the index this demo series settles on, named in its own rules_primary)",
+   "url": "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
+   "fetched_at": "2026-11-21T20:23Z",
+   "observed": {
+    "schema": "[timestamp_unix, low, high, open, close, volume]",
+    "close_by_minute_utc": {
+     "2026-11-21T15:14:00Z": 60215.51,
+     "2026-11-21T15:15:00Z": 60022.29,
+     "2026-11-21T15:16:00Z": 59901.74,
+     "2026-11-21T15:17:00Z": 59752.35,
+     "2026-11-21T15:18:00Z": 59727.25,
+     "2026-11-21T15:19:00Z": 59951.84,
+     "2026-11-21T15:20:00Z": 60176.12,
+     "2026-11-21T15:21:00Z": 60144.14,
+     "2026-11-21T15:22:00Z": 60063.36,
+     "2026-11-21T15:23:00Z": 60080.64,
+     "2026-11-21T15:24:00Z": 60098.96
+    },
+    "window_low_utc_1518": 59581.53
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+   "fetched_at": "2026-11-21T20:22Z",
+   "observed": {
+    "rules_primary": "If Brian Harman wins the The RSM Classic, then the market resolves to Yes.",
+    "title": "The RSM Classic: Brian Harman wins",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.7500",
+    "previous_price_dollars": "0.0050",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_24h_fp": "7276.38",
+    "volume_fp": "153195.26",
+    "open_interest_fp": "119274.49",
+    "updated_time": "2026-11-16T01:34:34.569351Z"
+   }
+  },
+  {
+   "id": "KALSHI_SERIES_KXPGATOUR",
+   "publisher": "Kalshi demo Trade API (series record listing official settlement sources)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR",
+   "fetched_at": "2026-11-21T20:23Z",
+   "observed": {
+    "ticker": "KXPGATOUR",
+    "title": "PGA Tour",
+    "category": "Sports",
+    "settlement_sources": [
+     {
+      "name": "Fox Sports",
+      "url": "https://www.foxsports.com"
+     },
+     {
+      "name": "ESPN",
+      "url": "https://www.espn.com/"
+     },
+     {
+      "name": "the Governing League",
+      "url": "https://www.pgatour.com/"
+     }
+    ]
+   }
+  },
+  {
+   "id": "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+   "publisher": "PGA Tour official tournament leaderboard (named governing-league settlement source for KXPGATOUR)",
+   "url": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "tournament": "The RSM Classic (Nov 19 - 22, 2026, Sea Island Golf Club, St. Simons Island, Georgia)",
+    "round_status": "R3 Suspended \u2014 no Saturday play after rain and saturated course conditions; Round 3 rescheduled Sunday 9:10 - 11:00 a.m. ET; Final Round Monday 7:20 - 9:10 a.m. ET",
+    "brian_harman": {
+     "pos": "CUT",
+     "to_par": "+1",
+     "r1": 71,
+     "r2": 72,
+     "strokes": 143
+    },
+    "michael_thorbjornsen": {
+     "pos": "T1",
+     "to_par": "-9",
+     "r1": 64,
+     "r2": 69,
+     "strokes": 133,
+     "odds_to_win": "+440"
+    }
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
+   "fetched_at": "2026-11-21T20:28Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 75000.00-79999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "floor_strike": 75000,
+    "cap_strike": 79999.99,
+    "last_price_dollars": "0.9800",
+    "previous_price_dollars": "0.0400",
+    "yes_bid_dollars": "0.0200",
+    "yes_ask_dollars": "0.9800",
+    "volume_24h_fp": "9508.62",
+    "volume_fp": "39586020.10",
+    "open_interest_fp": "5968212.66",
+    "updated_time": "2026-04-28T02:27:21.580016Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "rules_primary": "If Michael Thorbjornsen wins the The RSM Classic, then the market resolves to Yes.",
+    "title": "The RSM Classic: Michael Thorbjornsen wins",
+    "status": "active",
+    "result": "",
+    "last_price_dollars": "0.1800",
+    "previous_price_dollars": "0.1700",
+    "yes_bid_dollars": "0.1700",
+    "yes_ask_dollars": "0.1800",
+    "volume_24h_fp": "10200.02",
+    "volume_fp": "97879.39",
+    "open_interest_fp": "62730.85",
+    "updated_time": "2026-11-16T01:34:34.569351Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 30000.00-34999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "floor_strike": 30000,
+    "cap_strike": 34999.99,
+    "last_price_dollars": "0.0200",
+    "previous_price_dollars": "0.0200",
+    "yes_bid_dollars": "0.0100",
+    "yes_ask_dollars": "0.0200",
+    "volume_24h_fp": "8976.71",
+    "volume_fp": "35511092.26",
+    "open_interest_fp": "6354325.99",
+    "updated_time": "2026-04-28T02:27:21.580016Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
+   "fetched_at": "2026-11-21T23:11Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 50000.00-54999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+    "title": "BTC price  on Jan 1, 2027?",
+    "status": "active",
+    "result": "",
+    "floor_strike": 50000,
+    "cap_strike": 54999.99,
+    "last_price_dollars": "0.1000",
+    "previous_price_dollars": "0.1300",
+    "yes_bid_dollars": "0.0900",
+    "yes_ask_dollars": "0.1000",
+    "volume_24h_fp": "13393.93",
+    "volume_fp": "61738868.31",
+    "open_interest_fp": "7788363.75",
+    "updated_time": "2026-04-28T02:27:21.580016Z"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 1 AM EST is above 58799.99 at 1 AM EST on Nov 22, 2026, then the market resolves to Yes.",
+    "title": "Bitcoin price on Nov 22, 2026?",
+    "yes_sub_title": "$58,800 or above",
+    "floor_strike": 58799.99,
+    "strike_type": "greater",
+    "last_price_dollars": "0.2200",
+    "previous_price_dollars": "0.0000",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_fp": "10.40",
+    "volume_24h_fp": "10.40",
+    "open_interest_fp": "10.40",
+    "status": "finalized",
+    "result": "no",
+    "settlement_ts": "2026-11-22T06:24:47.340002Z",
+    "settlement_value_dollars": "0.0000"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 1 AM EST is above 58999.99 at 1 AM EST on Nov 22, 2026, then the market resolves to Yes.",
+    "title": "Bitcoin price on Nov 22, 2026?",
+    "yes_sub_title": "$59,000 or above",
+    "floor_strike": 58999.99,
+    "strike_type": "greater",
+    "last_price_dollars": "0.2000",
+    "previous_price_dollars": "0.0000",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_fp": "16.17",
+    "volume_24h_fp": "16.17",
+    "open_interest_fp": "16.17",
+    "status": "finalized",
+    "result": "no",
+    "settlement_ts": "2026-11-22T06:24:47.340002Z",
+    "settlement_value_dollars": "0.0000"
+   }
+  },
+  {
+   "id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+   "publisher": "Kalshi demo Trade API (the market's own official record)",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed": {
+    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.6450 on Nov 22, 2026 according to AAA, then the market resolves to Yes.",
+    "title": "Will average **gas prices** be above $3.6450?",
+    "yes_sub_title": "Above 3.6450",
+    "floor_strike": 3.645,
+    "strike_type": "greater",
+    "last_price_dollars": "0.2300",
+    "previous_price_dollars": "0.0000",
+    "yes_bid_dollars": "0.0000",
+    "yes_ask_dollars": "1.0000",
+    "volume_fp": "20.00",
+    "volume_24h_fp": "20.00",
+    "open_interest_fp": "20.00",
+    "status": "closed",
+    "result": ""
+   }
+  },
+  {
+   "id": "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z",
+   "publisher": "AAA Fuel Gauge Report (the reference this series settles on, named in its own rules_primary)",
+   "url": "https://gasprices.aaa.com/",
+   "fetched_at": "2026-11-22T08:20Z",
+   "observed_note": "Read off the national table on the page: 'Today's AAA National Average $3.6594 / Price as of 11/21/26'. The Nov 22 print this market settles on had not been published at fetch time.",
+   "observed": {
+    "todays_national_average": 3.6594,
+    "price_as_of": "11/21/26",
+    "regular_current_avg": 3.6594,
+    "regular_yesterday_avg": 3.6898,
+    "regular_week_ago_avg": 3.8406
+   }
   }
+ ],
+ "reviews": [
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "alert_to_time": "2026-11-20T13:50:26Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window_from": "2026-11-20T13:20:00Z",
+   "window_to": "2026-11-20T13:50:00Z",
+   "comparison": {
+    "kind": "index_crosses_strike_up",
+    "strike": 61498.92,
+    "reference_side": "yes",
+    "value_before": 61404.25,
+    "value_before_at": "2026-11-20T13:45:00Z",
+    "value_after": 61867.99,
+    "value_after_at": "2026-11-20T13:50:00Z"
+   },
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "note": "The market's own rules settle on the Coinbase BTC-USD one-minute candle. In the four minutes before this collector observation, the candle close passed from below the 61498.92 strike to above it. The market's price moved up in the same minute. Reported as a coincidence in time between a published number and a printed price, which is all that can be shown from outside the exchange."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "alert_to_time": "2026-11-20T13:35:54Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window_from": "2026-11-20T13:29:00Z",
+   "window_to": "2026-11-20T13:35:00Z",
+   "comparison": {
+    "kind": "index_window_low",
+    "strike": 61498.92,
+    "reference_side": "yes",
+    "value_before": 61433.33,
+    "value_before_at": "2026-11-20T13:29:00Z",
+    "value_after": 61290.76,
+    "value_after_at": "2026-11-20T13:35:00Z"
+   },
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "note": "The window low printed on this candle while the market price fell in the same minutes; the strike stayed above the index the whole window."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H14-UP",
+   "alert_to_time": "2026-11-20T13:32:25Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1320_1405",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "window_from": "2026-11-20T13:30:00Z",
+   "window_to": "2026-11-20T13:32:00Z",
+   "comparison": {
+    "kind": "index_moved_against_signal",
+    "strike": 61498.92,
+    "reference_side": "yes",
+    "value_before": 61425.88,
+    "value_before_at": "2026-11-20T13:30:00Z",
+    "value_after": 61380.22,
+    "value_after_at": "2026-11-20T13:32:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T13:20:00Z&end=2026-11-20T14:05:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H14-UP"
+   ],
+   "note": "The market printed up 20c while the index it settles on printed down in the same minutes. Recorded as an unexplained swing, which is the honest answer: no external move supports it, and the trade that set it cannot be seen from a public quote. The 61498.92 strike is read from the market's own record, which is also cited."
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "alert_to_time": "2026-11-20T13:50:26Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window_from": "2026-11-20T13:35:00Z",
+   "window_to": "2026-11-20T13:50:26Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "reference_side": "yes",
+    "value_before": 3.6898,
+    "value_before_at": "2026-11-20",
+    "value_after": 3.6898,
+    "value_after_at": "2026-11-20"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
+   ],
+   "note": "This market settles on AAA's US average regular price for Nov 21, 2026; the published national average at the time of the swing was 3.6898, which is 0.0298 above the 3.6600 strike. AAA also printed a falling trend on the same page (yesterday 3.7212, week ago 3.8724). The market itself stayed thinly traded: 48 contracts in 24h, and a 1.0000 yes ask against a 0.1900 yes bid when re-read at 19:25Z."
+  },
+  {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "alert_to_time": "2026-11-20T15:19:53Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+   ],
+   "window_from": "2026-11-20T13:50:26Z",
+   "window_to": "2026-11-20T15:19:53Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.3,
+    "reference_side": "yes",
+    "value_before": 3.6898,
+    "value_before_at": "2026-11-20",
+    "value_after": 3.6898,
+    "value_after_at": "2026-11-20"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
+   ],
+   "note": "The largest swing in the archive: 0.29 to 0.71. AAA's current national average (3.6898) is 0.3898 above the 3.30 strike, so the YES side was already in the money on the published figure; the size of the print says more about the book than about the news, because 24h volume on this market is 20.14 contracts and the yes bid stayed at 0.2900 while the last traded price is 0.7100. Flagged as F-31: a 10c rule on last_price_dollars can be moved by one small trade in a demo book."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "alert_to_time": "2026-11-20T11:26:21Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window_from": "2026-11-20T11:25:00Z",
+   "window_to": "2026-11-20T11:26:21Z",
+   "comparison": {
+    "kind": "index_moved_toward_strike_not_crossing",
+    "strike": 61985.83,
+    "reference_side": "yes",
+    "value_before": 61737.57,
+    "value_before_at": "2026-11-20T11:25:00Z",
+    "value_after": 61764.74,
+    "value_after_at": "2026-11-20T11:26:00Z"
+   },
+   "verdict_override": "external_move_coincides_in_direction",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "note": "The market printed up 20c while the index it settles on rose 27.17 USD toward the 61985.83 strike; the strike was never reached. The market later settled NO, so this print was wrong on the reference."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "alert_to_time": "2026-11-20T11:28:31Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window_from": "2026-11-20T11:25:00Z",
+   "window_to": "2026-11-20T11:28:31Z",
+   "comparison": {
+    "kind": "index_moved_against_signal",
+    "strike": 61985.83,
+    "reference_side": "yes",
+    "value_before": 61785.4,
+    "value_before_at": "2026-11-20T11:27:00Z",
+    "value_after": 61804.0,
+    "value_after_at": "2026-11-20T11:28:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "note": "The market fell 10c on the candle that printed the window high for the index (61804.00 at 11:28, 61804.87 at 11:29). No move in the settlement reference supports a fall; recorded as unexplained."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "alert_to_time": "2026-11-20T11:31:35Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window_from": "2026-11-20T11:25:00Z",
+   "window_to": "2026-11-20T11:31:35Z",
+   "comparison": {
+    "kind": "index_moved_away_from_strike",
+    "strike": 61985.83,
+    "reference_side": "yes",
+    "value_before": 61804.87,
+    "value_before_at": "2026-11-20T11:29:00Z",
+    "value_after": 61725.09,
+    "value_after_at": "2026-11-20T11:31:00Z"
+   },
+   "verdict_override": "external_move_coincides",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "note": "A 20c fall in the market over the three minutes in which the index fell 79.78 USD away from the strike. This is the one H12 swing the published reference actually supports, and the market settled NO in the end (settlement_ts 2026-11-20T12:01:19Z, settlement_value_dollars 0.0000)."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H12-UP",
+   "alert_to_time": "2026-11-20T11:33:33Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1120_1145",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "window_from": "2026-11-20T11:25:00Z",
+   "window_to": "2026-11-20T11:33:33Z",
+   "comparison": {
+    "kind": "index_moved_against_signal",
+    "strike": 61985.83,
+    "reference_side": "yes",
+    "value_before": 61713.54,
+    "value_before_at": "2026-11-20T11:32:00Z",
+    "value_after": 61701.37,
+    "value_after_at": "2026-11-20T11:33:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T11:20:00Z&end=2026-11-20T11:45:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H12-UP"
+   ],
+   "note": "The market printed up 10c while the index kept falling away from the strike. Recorded as unexplained."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "alert_to_time": "2026-11-20T19:30:14Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1905_1935",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
+   ],
+   "window_from": "2026-11-20T19:05:00Z",
+   "window_to": "2026-11-20T19:34:00Z",
+   "comparison": {
+    "kind": "index_below_strike_all_window",
+    "strike": 58337.51,
+    "reference_side": "yes",
+    "value_before": 58249.98,
+    "value_before_at": "2026-11-20T19:06:00Z",
+    "value_after": 58079.56,
+    "value_after_at": "2026-11-20T19:35:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:05:00Z&end=2026-11-20T19:35:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
+   ],
+   "note": "The collector recorded this market printing up to 0.55 during its 19:30:14Z run. Across the fetched 19:05-19:35 candles the Coinbase index the rules name fell (close 58249.98 to 58079.56) and stayed under the 58337.51 strike the whole window - the highest candle HIGH was 58310.32, 27.19 short. The market's own record shows last_price 0.5500 against yes_ask 0.9900 / yes_bid 0.0100 on 70.00 open interest: the print sits in a spread, not near a book. Recorded as unexplained by the reference."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV20H20-UP",
+   "alert_to_time": "2026-11-20T19:48:19Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_1930_2002",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV20H20-UP"
+   ],
+   "window_from": "2026-11-20T19:30:00Z",
+   "window_to": "2026-11-20T19:48:00Z",
+   "comparison": {
+    "kind": "index_moved_against_signal",
+    "strike": 58337.51,
+    "reference_side": "yes",
+    "value_before": 58111.03,
+    "value_before_at": "2026-11-20T19:30:00Z",
+    "value_after": 58481.38,
+    "value_after_at": "2026-11-20T19:48:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-20T19:30:00Z&end=2026-11-20T20:02:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV20H20-UP"
+   ],
+   "note": "The market printed down 30c (0.65 to 0.35) between the 19:30:14Z and 19:48:19Z collector runs while the Coinbase BTC-USD one-minute candle close rose from 58111.03 at 19:30Z across the 58337.51 strike (crossing up at 19:38Z at 58388.07) to 58481.38 at 19:48Z. The market subsequently finalized YES (settlement_value_dollars 1.0000). Recorded as an unexplained move against the settlement reference."
+  },
+  {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "alert_to_time": "2026-11-21T00:50:12Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+   ],
+   "window_from": "2026-11-20T20:01:29Z",
+   "window_to": "2026-11-21T00:50:12Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.3,
+    "reference_side": "yes",
+    "value_before": 3.6898,
+    "value_before_at": "2026-11-20",
+    "value_after": 3.6898,
+    "value_after_at": "2026-11-20"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
+   ],
+   "note": "The market price reverted from 0.71 to 0.29 (-42c), back to the resting yes_bid_dollars of 0.2900 against a 0.6700-0.7100 yes_ask_dollars on 20.14 contracts of 24h volume. AAA's published US regular average (3.6898 as of 11/20/26) sits 0.3898 above the 3.30 strike, while AAA's page also reports a falling trend from 3.7212 yesterday and 3.8724 a week ago."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "alert_to_time": "2026-11-21T06:39:48Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_21_0630_0644",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP"
+   ],
+   "window_from": "2026-11-21T06:34:00Z",
+   "window_to": "2026-11-21T06:39:00Z",
+   "comparison": {
+    "kind": "index_moved_against_signal",
+    "strike": 55704.83,
+    "reference_side": "yes",
+    "value_before": 56355.0,
+    "value_before_at": "2026-11-21T06:34:00Z",
+    "value_after": 56578.4,
+    "value_after_at": "2026-11-21T06:39:00Z"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP"
+   ],
+   "note": "The market printed down 30c (0.65 to 0.35) between 06:34:10Z and 06:39:48Z while the Coinbase BTC-USD one-minute candle close rose from 56355.0 at 06:34Z to 56578.4 at 06:39Z, moving further above the 55704.83 strike. Recorded as an unexplained move against the settlement reference."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H07-UP",
+   "alert_to_time": "2026-11-21T06:42:56Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_21_0630_0644",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H07-UP"
+   ],
+   "window_from": "2026-11-21T06:39:00Z",
+   "window_to": "2026-11-21T06:42:00Z",
+   "comparison": {
+    "kind": "index_moved_toward_strike_not_crossing",
+    "strike": 55704.83,
+    "reference_side": "yes",
+    "value_before": 56578.4,
+    "value_before_at": "2026-11-21T06:39:00Z",
+    "value_after": 56826.05,
+    "value_after_at": "2026-11-21T06:42:00Z"
+   },
+   "verdict_override": "external_move_coincides_in_direction",
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T06:30:00Z&end=2026-11-21T06:44:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H07-UP"
+   ],
+   "note": "The market printed up 30c (0.35 to 0.65) between 06:39:48Z and 06:42:56Z while the Coinbase BTC-USD one-minute candle close rose from 56578.4 at 06:39Z to 56826.05 at 06:42Z, already above the 55704.83 strike."
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY-26NOV21H16-UP",
+   "alert_to_time": "2026-11-21T15:21:23Z",
+   "source_ids": [
+    "COINBASE_BTCUSD_1MIN_21_1514_1524",
+    "KALSHI_MARKET_KXDEMOFUTHOURLY-26NOV21H16-UP"
+   ],
+   "window_from": "2026-11-21T15:16:00Z",
+   "window_to": "2026-11-21T15:21:00Z",
+   "comparison": {
+    "kind": "published_value_below_strike",
+    "strike": 60237.37,
+    "reference_side": "yes",
+    "value_before": 59901.74,
+    "value_before_at": "2026-11-21T15:16:00Z",
+    "value_after": 60144.14,
+    "value_after_at": "2026-11-21T15:21:00Z"
+   },
+   "links": [
+    "https://api.exchange.coinbase.com/products/BTC-USD/candles?granularity=60&start=2026-11-21T15:14:00Z&end=2026-11-21T15:24:00Z",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP"
+   ],
+   "note": "The market printed down 20c (0.65 to 0.45) between 15:16:38Z and 15:21:23Z on a wide demo book (to_yes_bid 0.01, to_yes_ask 1.00). Over those minutes the Coinbase BTC-USD one-minute candle close stayed below the 60237.37 strike throughout (59901.74 at 15:16Z, dipping to a 59727.25 close / 59581.53 low at 15:18Z, and 60144.14 at 15:21Z). The market later finalized NO at 16:01:32Z."
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-BHAR",
+   "alert_to_time": "2026-11-21T15:16:38Z",
+   "source_ids": [
+    "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+    "KALSHI_MARKET_KXPGATOUR-THRC26-BHAR",
+    "KALSHI_SERIES_KXPGATOUR"
+   ],
+   "window_from": "2026-11-21T06:42:56Z",
+   "window_to": "2026-11-21T15:16:38Z",
+   "comparison": {
+    "kind": "player_missed_cut_and_play_suspended",
+    "strike": null,
+    "reference_side": "yes",
+    "value_before": null,
+    "value_before_at": "2026-11-20",
+    "value_after": null,
+    "value_after_at": "2026-11-21"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+   ],
+   "note": "The market printed up 74.5c (0.005 to 0.75) between 06:42:56Z and 15:16:38Z on a wide empty demo book (to_yes_bid 0.001, to_yes_ask 1.00; re-read at 20:22Z with yes_bid_dollars 0.0000, yes_ask_dollars 1.0000). The official PGA Tour leaderboard for The RSM Classic (a named settlement source in GET /series/KXPGATOUR) lists Brian Harman as CUT (+1; R1 71, R2 72, total 143) and states Round 3 play was suspended Saturday after rain and saturated course conditions with no Saturday play. Recorded as no external move supporting this swing."
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "alert_to_time": "2026-11-21T20:34:40Z",
+   "source_ids": [
+    "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+    "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+    "KALSHI_SERIES_KXPGATOUR"
+   ],
+   "window_from": "2026-11-21T20:30:54Z",
+   "window_to": "2026-11-21T20:34:40Z",
+   "comparison": {
+    "kind": "tournament_play_suspended",
+    "strike": null,
+    "reference_side": "yes",
+    "value_before": null,
+    "value_before_at": "2026-11-21",
+    "value_after": null,
+    "value_after_at": "2026-11-21"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+   ],
+   "note": "The market printed up 40c (0.17 to 0.57) between 20:30:54Z and 20:34:40Z while the resting book remained at yes_bid 0.16 / yes_ask 0.17 (24h volume 10126.17). On the official PGA Tour RSM Classic leaderboard (fetched 2026-11-21T23:11Z), Michael Thorbjornsen sits T1 at -9 (R1 64, R2 69, total 133), and Round 3 was suspended all Saturday after rain and saturated course conditions with no Saturday play (rescheduled Sunday 9:10-11:00 a.m. ET). No on-course score change occurred during this window; recorded as no external move supporting this swing."
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-MTHO",
+   "alert_to_time": "2026-11-21T20:57:37Z",
+   "source_ids": [
+    "PGATOUR_RSM_CLASSIC_2026_LEADERBOARD",
+    "KALSHI_MARKET_KXPGATOUR-THRC26-MTHO",
+    "KALSHI_SERIES_KXPGATOUR"
+   ],
+   "window_from": "2026-11-21T20:34:40Z",
+   "window_to": "2026-11-21T20:57:37Z",
+   "comparison": {
+    "kind": "tournament_play_suspended",
+    "strike": null,
+    "reference_side": "yes",
+    "value_before": null,
+    "value_before_at": "2026-11-21",
+    "value_after": null,
+    "value_after_at": "2026-11-21"
+   },
+   "verdict_override": "no_external_move_supporting_this_swing",
+   "links": [
+    "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+   ],
+   "note": "The market printed back down 40c (0.57 to 0.17) between 20:34:40Z and 20:57:37Z, returning to its resting quote (yes_bid 0.16, yes_ask 0.17; re-read at 23:11Z at last 0.18, yes_bid 0.17, yes_ask 0.18). The official PGA Tour leaderboard shows no Saturday play at The RSM Classic (Round 3 suspended after rain; Michael Thorbjornsen unchanged at T1, -9). Recorded as no external move supporting this swing."
+  },
+  {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "alert_to_time": "2026-11-21T23:01:10Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASM-26DEC31-3.30"
+   ],
+   "window_from": "2026-11-21T22:46:10Z",
+   "window_to": "2026-11-21T23:01:10Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.3,
+    "reference_side": "yes",
+    "value_before": 3.6594,
+    "value_before_at": "2026-11-21",
+    "value_after": 3.6594,
+    "value_after_at": "2026-11-21"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30"
+   ],
+   "note": "The market printed up 41c (0.30 to 0.71) between 22:46:10Z and 23:01:10Z on thin demo volume (volume_24h_fp 3.92; resting yes_bid_dollars 0.2900, yes_ask_dollars 0.7100). AAA publishes once daily, not intraday: its national regular average for 11/21/26 is $3.6594 (0.3594 above the $3.30 strike, down from $3.6898 on 11/20/26 and $3.8406 a week ago)."
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "alert_to_time": "2026-11-20T22:04:00Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window_from": "2026-11-20T21:42:00Z",
+   "window_to": "2026-11-20T22:04:00Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "reference_side": "yes",
+    "value_before": 3.6898,
+    "value_before_at": "2026-11-20",
+    "value_after": 3.6898,
+    "value_after_at": "2026-11-20"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
+   ],
+   "note": "Candle-backfilled 1-minute close moved down 10c (0.19 to 0.09) on a wide book (yes_bid 0.09, yes_ask 1.00) on the evening before the Nov 21 AAA daily print. AAA publishes once daily: the 11/20/26 regular average was $3.6898 (0.0298 above the $3.6600 strike), down from $3.7212 the prior day."
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV21-3.6600",
+   "alert_to_time": "2026-11-20T22:41:00Z",
+   "source_ids": [
+    "AAA_NATIONAL_AVERAGE",
+    "KALSHI_MARKET_KXAAAGASD-26NOV21-3.6600"
+   ],
+   "window_from": "2026-11-20T22:10:00Z",
+   "window_to": "2026-11-20T22:41:00Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.66,
+    "reference_side": "yes",
+    "value_before": 3.6898,
+    "value_before_at": "2026-11-20",
+    "value_after": 3.6898,
+    "value_after_at": "2026-11-20"
+   },
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600"
+   ],
+   "note": "Candle-backfilled 1-minute close moved up 14c (0.07 to 0.21; yes_bid 0.21, yes_ask 0.24) on the evening before the Nov 21 AAA daily print. AAA's 11/20/26 regular average was $3.6898 (above the $3.6600 strike; the next day's 11/21/26 print later came in at $3.6594)."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T06:17:12Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T06:02:12Z",
+   "window_to": "2026-11-22T06:17:12Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T06:02:12Z and 2026-11-22T06:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-22T06:02:12Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-22T05:47:11Z",
+   "window_to": "2026-11-22T06:02:12Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T06:02:12Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T05:47:11Z",
+   "window_to": "2026-11-22T06:02:12Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-22T05:47:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-22T05:32:11Z",
+   "window_to": "2026-11-22T05:47:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T05:47:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T05:32:11Z",
+   "window_to": "2026-11-22T05:47:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCD-26NOV2201-T58799.99",
+   "alert_to_time": "2026-11-22T05:47:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99"
+   ],
+   "window_from": "2026-11-22T05:32:11Z",
+   "window_to": "2026-11-22T05:47:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 58799.99,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99"
+   ],
+   "note": "Printed \u25bc20\u00a2 (80\u00a2 \u2192 60\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58799.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known."
+  },
+  {
+   "ticker": "KXBTCD-26NOV2201-T58999.99",
+   "alert_to_time": "2026-11-22T05:47:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99"
+   ],
+   "window_from": "2026-11-22T05:32:11Z",
+   "window_to": "2026-11-22T05:47:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 58999.99,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99"
+   ],
+   "note": "Printed \u25bc15\u00a2 (35\u00a2 \u2192 20\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T05:32:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T05:17:12Z",
+   "window_to": "2026-11-22T05:32:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:17:12Z and 2026-11-22T05:32:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T05:17:12Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T05:02:11Z",
+   "window_to": "2026-11-22T05:17:12Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:02:11Z and 2026-11-22T05:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T05:02:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T04:47:11Z",
+   "window_to": "2026-11-22T05:02:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T04:47:11Z and 2026-11-22T05:02:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-22T04:47:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-22T04:32:12Z",
+   "window_to": "2026-11-22T04:47:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T04:32:12Z and 2026-11-22T04:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXAAAGASD-26NOV22-3.6450",
+   "alert_to_time": "2026-11-22T04:02:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+    "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z"
+   ],
+   "window_from": "2026-11-22T03:47:11Z",
+   "window_to": "2026-11-22T04:02:11Z",
+   "comparison": {
+    "kind": "published_value_above_strike",
+    "strike": 3.645,
+    "reference_side": "yes",
+    "reference_name": "AAA US national average (regular)",
+    "value_before": 3.6594,
+    "value_before_at": "2026-11-21",
+    "value_after": 3.6594,
+    "value_after_at": "2026-11-21"
+   },
+   "verdict_override": "published_reference_on_the_same_side_as_the_move",
+   "links": [
+    "https://gasprices.aaa.com/",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450"
+   ],
+   "note": "Printed \u25b223\u00a2 (0\u00a2 \u2192 23\u00a2) between 2026-11-22T03:47:11Z and 2026-11-22T04:02:11Z. The committed book did reprice (yes bid/ask 0.23/1.00 \u2192 0.00/1.00). AAA's published US national average for regular was $3.6594 as of 11/21/26, above the $3.6450 strike \u2014 but that is the prior day's print; the Nov 22 average this market settles on had not been published when it was read, so this is the published figure on the same side as the move and not a statement about the outcome."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-22T00:31:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-22T00:16:11Z",
+   "window_to": "2026-11-22T00:31:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T00:31:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T00:16:11Z",
+   "window_to": "2026-11-22T00:31:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-22T00:16:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-22T00:01:11Z",
+   "window_to": "2026-11-22T00:16:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/1.00), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-22T00:16:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-22T00:01:11Z",
+   "window_to": "2026-11-22T00:16:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-22T00:01:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-21T23:46:11Z",
+   "window_to": "2026-11-22T00:01:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-22T00:01:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T23:46:11Z",
+   "window_to": "2026-11-22T00:01:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T23:46:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T23:31:11Z",
+   "window_to": "2026-11-21T23:46:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:31:11Z and 2026-11-21T23:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T23:31:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T23:16:11Z",
+   "window_to": "2026-11-21T23:31:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T23:16:11Z and 2026-11-21T23:31:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T23:16:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T23:01:10Z",
+   "window_to": "2026-11-21T23:16:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:01:10Z and 2026-11-21T23:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-21T23:01:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-21T22:46:10Z",
+   "window_to": "2026-11-21T23:01:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T23:01:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T22:46:10Z",
+   "window_to": "2026-11-21T23:01:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T23:01:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T22:46:10Z",
+   "window_to": "2026-11-21T23:01:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T22:46:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T22:31:10Z",
+   "window_to": "2026-11-21T22:46:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:31:10Z and 2026-11-21T22:46:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T22:31:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T22:16:10Z",
+   "window_to": "2026-11-21T22:31:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T22:31:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T22:16:10Z",
+   "window_to": "2026-11-21T22:31:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-21T22:16:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-21T22:01:10Z",
+   "window_to": "2026-11-21T22:16:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T22:16:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T22:01:10Z",
+   "window_to": "2026-11-21T22:16:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T22:01:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T21:46:11Z",
+   "window_to": "2026-11-21T22:01:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:46:11Z and 2026-11-21T22:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-21T21:46:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-21T21:31:09Z",
+   "window_to": "2026-11-21T21:46:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B32500",
+   "alert_to_time": "2026-11-21T21:46:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+   ],
+   "window_from": "2026-11-21T21:31:09Z",
+   "window_to": "2026-11-21T21:46:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 30000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T21:46:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T21:31:09Z",
+   "window_to": "2026-11-21T21:46:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B52500",
+   "alert_to_time": "2026-11-21T21:46:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+   ],
+   "window_from": "2026-11-21T21:31:09Z",
+   "window_to": "2026-11-21T21:46:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 50000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500"
+   ],
+   "note": "Printed \u25bc89\u00a2 (99\u00a2 \u2192 10\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.09/0.10), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B77500",
+   "alert_to_time": "2026-11-21T21:31:09Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+   ],
+   "window_from": "2026-11-21T21:16:11Z",
+   "window_to": "2026-11-21T21:31:09Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 75000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500"
+   ],
+   "note": "Printed \u25bc94\u00a2 (98\u00a2 \u2192 4\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.02/0.98 \u2192 0.03/0.04), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B52500",
+   "alert_to_time": "2026-11-21T21:31:09Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+   ],
+   "window_from": "2026-11-21T21:16:11Z",
+   "window_to": "2026-11-21T21:31:09Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 50000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500"
+   ],
+   "note": "Printed \u25b284\u00a2 (15\u00a2 \u2192 99\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.12/0.15 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-21T21:16:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-21T21:10:21Z",
+   "window_to": "2026-11-21T21:16:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T21:16:11Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T21:10:21Z",
+   "window_to": "2026-11-21T21:16:11Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.97 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T20:30:54Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T15:21:23Z",
+   "window_to": "2026-11-21T20:30:54Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B77500",
+   "alert_to_time": "2026-11-21T20:30:54Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+   ],
+   "window_from": "2026-11-21T15:21:23Z",
+   "window_to": "2026-11-21T20:30:54Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 75000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500"
+   ],
+   "note": "Printed \u25b293\u00a2 (5\u00a2 \u2192 98\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book did reprice (yes bid/ask 0.03/0.05 \u2192 0.02/0.98), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T06:42:56Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T06:39:48Z",
+   "window_to": "2026-11-21T06:42:56Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T06:39:48Z and 2026-11-21T06:42:56Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "alert_to_time": "2026-11-21T06:38:00Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window_from": "2026-11-21T06:37:00Z",
+   "window_to": "2026-11-21T06:38:00Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45"
+   ],
+   "note": "Printed \u25b213\u00a2 (82\u00a2 \u2192 95\u00a2) between 2026-11-21T06:37:00Z and 2026-11-21T06:38:00Z. The committed book did reprice (yes bid/ask 0.85/0.90 \u2192 0.94/0.95), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "alert_to_time": "2026-11-21T06:34:10Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+   ],
+   "window_from": "2026-11-21T06:32:46Z",
+   "window_to": "2026-11-21T06:34:10Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 95000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500"
+   ],
+   "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T06:32:46Z and 2026-11-21T06:34:10Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "alert_to_time": "2026-11-21T06:34:00Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window_from": "2026-11-21T06:33:00Z",
+   "window_to": "2026-11-21T06:34:00Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45"
+   ],
+   "note": "Printed \u25b212\u00a2 (70\u00a2 \u2192 82\u00a2) between 2026-11-21T06:33:00Z and 2026-11-21T06:34:00Z. The committed book did reprice (yes bid/ask 0.54/0.70 \u2192 0.79/0.82), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known."
+  },
+  {
+   "ticker": "KXBTC15M-26NOV210145-45",
+   "alert_to_time": "2026-11-21T06:32:00Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+   ],
+   "window_from": "2026-11-21T06:31:00Z",
+   "window_to": "2026-11-21T06:32:00Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 56009.56,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45"
+   ],
+   "note": "Printed \u25b215\u00a2 (50\u00a2 \u2192 65\u00a2) between 2026-11-21T06:31:00Z and 2026-11-21T06:32:00Z. The committed book did reprice (yes bid/ask 0.49/0.50 \u2192 0.52/0.70), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-20T20:01:29Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-20T19:48:19Z",
+   "window_to": "2026-11-20T20:01:29Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-20T19:48:19Z and 2026-11-20T20:01:29Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "alert_to_time": "2026-11-20T19:48:19Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+   ],
+   "window_from": "2026-11-20T19:30:14Z",
+   "window_to": "2026-11-20T19:48:19Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 85000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "reference_not_publicly_readable",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+   ],
+   "note": "Printed \u25b295\u00a2 (4\u00a2 \u2192 99\u00a2) between 2026-11-20T19:30:14Z and 2026-11-20T19:48:19Z. The committed book did reprice (yes bid/ask 0.01/0.04 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved."
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B47500",
+   "alert_to_time": "2026-11-20T19:30:14Z",
+   "source_ids": [
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500"
+   ],
+   "window_from": "2026-11-20T19:22:42Z",
+   "window_to": "2026-11-20T19:30:14Z",
+   "comparison": {
+    "kind": "band_floor_from_rules",
+    "strike": 45000,
+    "reference_side": "yes",
+    "reference_name": "the band floor written into the market's own rules"
+   },
+   "verdict_override": "best_quote_did_not_move",
+   "links": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500"
+   ],
+   "note": "Printed \u25bc92\u00a2 (98\u00a2 \u2192 6\u00a2) between 2026-11-20T19:22:42Z and 2026-11-20T19:30:14Z. The committed book was identical at both reads \u2014 yes bid 0.05 / ask 0.06 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 45000.00\u201349999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted."
+  }
+ ],
+ "sources_of_method": {
+  "get_market": "https://docs.kalshi.com/api-reference/market/get-markets",
+  "demo_environment": "https://docs.kalshi.com/getting_started/demo_env",
+  "candlesticks_documented_limit": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+  "aaa_publisher": "https://gasprices.aaa.com/",
+  "coinbase_market_data": "https://docs.cdp.coinbase.com/exchange/reference/apireference",
+  "pgatour_leaderboard": "https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard"
+ },
+ "populated_from": "Values are copied from the fetched responses listed in `sources`. The index closes in `comparison` are the candle closes for the stated buckets, re-read from the Coinbase response; the strikes are from each market's own rules_primary; AAA averages are copied from gasprices.aaa.com; golf tournament status and player scores are copied from the official PGA Tour leaderboard.",
+ "swings_in_archive_not_reviewed": {
+  "count_expected": 31,
+  "note": "Every served in-scope alert in data/live/alerts_archive.json whose settlement reference has a public source (AAA National Average or PGA Tour official leaderboard) has a review entry (9/9 served non-BRTI swings; 20 KXDEMOFUTHOURLY Test-series rows are withheld per F-65/F-75). The remaining 31 served BRTI-settled swings (KXBTCY-* and KXBTC15M-*) carry explicit official-record not_reviewed_reasons below because CF Benchmarks' BRTI has no free public time series."
+ },
+ "not_reviewed_reasons": {
+  "KXBTCY-27JAN0100-B32500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 30000.00 and 34999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z \u2014 the 0.02 <-> 0.99 prints reflect demo-book swings rather than a public reference feed.",
+  "KXBTCY-27JAN0100-B47500": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
+  "KXBTCY-27JAN0100-B52500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 50000.00 and 54999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T23:11Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.1000, yes_bid_dollars 0.0900, yes_ask_dollars 0.1000, and updated_time 2026-04-28T02:27:21Z.",
+  "KXBTCY-27JAN0100-B77500": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
+  "KXBTCY-27JAN0100-B87500": "This market settles on the sixty-second average of CF Benchmarks' BRTI between 85000.00 and 89999.99 at 12 AM EST on Jan 1, 2027 (quoted verbatim in its official record, fetched 2026-11-21T06:37Z). CF Benchmarks' BRTI has no free public time series this project can read, so no external reference value is invented. The market's own record shows last_price_dollars 0.0200, yes_bid_dollars 0.0100, yes_ask_dollars 0.0200, and updated_time 2026-04-28T02:27:21Z - the 0.04 -> 0.99 -> 0.02 swings reflect wide demo-book prints rather than a public reference feed.",
+  "KXBTCY-27JAN0100-B97500": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row.",
+  "KXBTC15M-26NOV210145-45": "The two observations that bound this swing are no longer in the committed price history, so the bid/ask either side of the print cannot be read back from the repository. Left as not_reviewed rather than guessed: the archived prices and the market's own official record are still linked on the row."
+ }
 }

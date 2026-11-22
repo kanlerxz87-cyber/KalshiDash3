@@ -44,8 +44,12 @@
           <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
           <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between committed observations, so a snapshot-only alert's resolution is one collector pass (about 15 minutes while the relay runs — and each page prints the cadence it measures from the committed observations rather than this sentence asserting one) (<a href="flagged.html">F-24</a>, <a href="flagged.html">F-73</a>).</td></tr>
       <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
-          <td><span class="badge ok">done, labelled as leads</span></td><td>Alert bubbles + chart markers on the dashboard</td>
-          <td>No API returns a cause→move mapping, so each alert links to news searches for the market title and the market's own API query; causality is never asserted (<a href="flagged.html">F-25</a>).</td></tr>
+          <td><span class="badge warn" id="catStatus">partial — coverage rendered below</span></td><td>Alert bubbles + chart markers on the dashboard</td>
+          <td>No API returns a cause→move mapping, so a cause is never asserted (<a href="flagged.html">F-25</a>).
+             What is published instead is a fetched reading of the reference each market settles on, beside the minute the
+             swing was recorded. <span id="catCoverage">Coverage is rendered from <code>data/live/catalysts.json</code>.</span>
+             The word “reference” is never applied to a proxy: where a market settles on an index with no public read
+             (the crypto series settle on CF Benchmarks’ BRTI), the row says so and quotes nothing (<a href="flagged.html">F-87</a>).</td></tr>
       <tr><td>Automate simulated trades to test different strategies</td>
           <td><span class="badge ok">done — paper only</span></td><td><a href="trading.html">Auto-sim</a></td>
           <td>Three disclosed strategies run automatically on live prices, settle from the API's literal <code>result</code>, and report net-of-fee P&amp;L by strategy/topic/band. Paper fills only: no demo credentials exist (<a href="flagged.html">F-27</a>; model unbacktested <a href="flagged.html">F-26</a>).</td></tr>
@@ -150,6 +154,36 @@ KD.nav("executive-summary.html");
       + `each with its source; the ones closed in the final integration are marked fixed in their entry.`;
   } catch (e) {
     host.textContent = "Counts unavailable from the committed ledgers; open the claims and flagged pages directly.";
+  }
+  // F-86: this row used to say "done" while the lead file held a review for 9 swings out of 61.
+  // The status and the coverage sentence are now read from the file that actually holds the reviews,
+  // so the summary cannot drift from the page it summarises. A fetch failure leaves the fallback
+  // text above, never a number.
+  try {
+    const leads = await KD.json("data/live/catalysts.json");
+    const c = leads.counts || {};
+    const reviewed = Number(c.reviewed), total = Number(c.archive_total);
+    const status = document.getElementById("catStatus");
+    const line = document.getElementById("catCoverage");
+    if (Number.isFinite(reviewed) && Number.isFinite(total) && total > 0) {
+      const pct = Math.round((reviewed / total) * 100);
+      if (status) {
+        status.textContent = reviewed === total ? "done — every swing reviewed" : `partial — ${reviewed} of ${total} reviewed`;
+        status.className = "badge " + (pct >= 90 ? "ok" : pct >= 50 ? "warn" : "bad");
+      }
+      if (line) {
+        line.textContent = `${reviewed} of ${total} archived swings (${pct}%) carry a review that names a source fetched `
+          + `and read for that minute; ${total - reviewed} are left not_reviewed with the reason stated on the row, `
+          + `because the observations that bound them are no longer in the committed history. `
+          + `Of the reviewed rows, ${c.best_quote_did_not_move || 0} show a best bid and ask that did not move at all — `
+          + `the ≥$0.10 change is in the last-traded print, not the quoted price (F-77, F-87).`;
+      }
+    } else if (line) {
+      line.textContent = "Coverage could not be read from data/live/catalysts.json.";
+    }
+  } catch (e) {
+    const line = document.getElementById("catCoverage");
+    if (line) line.textContent = "Coverage could not be read from data/live/catalysts.json.";
   }
 })();
 </script>

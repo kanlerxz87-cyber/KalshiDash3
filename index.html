@@ -128,8 +128,10 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed by the exchange", KD.num(confirmed), "series ticker listed in the official fee schedule (basis=seed)"],
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows in this snapshot"
-      + " (of " + KD.num(snap.counts?.settled_in_scope ?? settled.length) + " settled in scope)"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(snap.counts?.settled_published ?? settled.length)
+      + " settled rows published in this snapshot, out of "
+      + KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope ?? settled.length)
+      + " settled markets the scan found in scope"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`
@@ -148,10 +150,18 @@ KD.nav("");
   }
   const rows = Object.keys(live).map(id => {
     const r = top[id];
+    // F-85: a topic whose every open market has zero contracts traded has no "largest" market.
+    // Printing a $0 / 0.0¢ row under the heading "Largest live market" reads as a finding when it
+    // is the absence of one, so the row says so in place (culture.html carries the same notice).
+    const zeroVol = !!r && !((Number(r.volume_fp) || 0) > 0);
     return {
       cat: live[id],
       title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 68))}</a>` +
-                 `<div class="small mut mono">${KD.esc(r.ticker)}</div>` : '<span class="na">none open in scope</span>',
+                 `<div class="small mut mono">${KD.esc(r.ticker)}</div>` +
+                 (zeroVol ? `<div class="small mut"><b>No contracts traded in any open ${KD.esc(live[id])} market.</b> ` +
+                   `This row is not a ranking: the topic has $0 traded, so its dollar order cannot be computed ` +
+                   `(<a href="${KD.esc(id)}.html">topic page</a>).</div>` : "")
+               : '<span class="na">none open in scope</span>',
       dollars: r ? KD.money(r.dollars_traded_estimate, 0) : '<span class="na">—</span>',
       price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
       vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
@@ -160,6 +170,7 @@ KD.nav("");
       src: r ? KD.srcLink(r.source, "API") : '<span class="na">—</span>',
     };
   });
+  const zeroVolTopics = Object.keys(live).filter(id => top[id] && !((Number(top[id].volume_fp) || 0) > 0));
   KD.$("#today").innerHTML = KD.table(
     [{ key: "cat", label: "Category" }, { key: "title", label: "Largest live market" },
      { key: "dollars", label: "Dollars traded (est.)", num: true }, { key: "price", label: "Last price", num: true },
@@ -167,7 +178,14 @@ KD.nav("");
      { key: "basis", label: "Category basis" },
      { key: "src", label: "Source" }],
     rows
-  ) + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
+  ) + (zeroVolTopics.length
+      ? `<p class="small mut"><b>Zero-volume topics (${KD.esc(zeroVolTopics.map(id => live[id]).join(", "))}):</b>
+         every open market in ${zeroVolTopics.length === 1 ? "that topic" : "those topics"} shows 0 contracts traded in this
+         snapshot, so the dollar column cannot rank them and the row above says so instead of presenting a $0 market as
+         the leader. The demo has no market maker; that is a property of demo, not of the topic
+         (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Environment</a>).</p>`
+      : "")
+    + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
      Kalshi has no official “dollars traded” field — see
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
@@ -188,10 +206,13 @@ KD.nav("");
     resHost.innerHTML =
       `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
         newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
-        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope)} settled markets in scope; the
-        collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
-        series cannot crowd out gas, elections, culture or golf
+        <b>Three different numbers, so they are named separately (F-83):</b> the scan found
+        ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets inside the five
+        topics; ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
+        size window; ${KD.num(snap.counts?.settled_published ?? resRows.length)} are published, chosen <b>per topic</b>
+        so a fast 15-minute crypto series cannot crowd out gas, elections, culture or golf
         (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
+        How the total was obtained: ${KD.esc(snap.counts?.settled_in_scope_total_method || "not stated in this snapshot")}.
         Kalshi's historical-data docs state settled markets older than the exchange's published historical cutoff
         (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) will not appear in
         <code>GET /markets</code> and must be read from <code>GET /historical/markets</code>, which the collector now
