@@ -54,6 +54,10 @@ and publishes only the repository root.
 
 ### Task board (this session)
 
+> ID note: task ids on this board are local to each session section. `arena-38b89a30` claimed T69–T71 in the section
+> above at the same time as this session claimed T70–T73 below; no file scope overlaps (they touched only the `G19`
+> suggestion row and their own section), and both sets are recorded as written rather than renumbered after the fact.
+
 | ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
 |----|------|--------|-------|----------------|--------------|----------------|
 | T11 | Add sourced price-swing alert streams to the canonical dashboard (all alerts + transparent research shortlist) | done | arena-6d85f8f0 | `dashboard.html`, `assets/site.css`, `executive-summary.html` | `scripts/check_site.py`, `scripts/tests/validate_live.py`, `node --check`, and a Node fixture smoke test covering the exact 10¢ threshold, sub-threshold rejection, screen criteria, category filter, and source output all passed | GitHub Pages snapshot cadence is not tick-level live; the experimental shortlist is not a validated ROI model and no causal news links are claimed. |
@@ -1480,3 +1484,34 @@ Irregularities carried (unchanged, on the Flagged page): no demo API keys provid
 | Flagged, not blocking | unchanged from the board above: F-07, F-14/F-26/F-77, F-25, F-76, DEPLOY-1, F-82 | published on `flagged.html` |
 
 T69, T70, T71 are all **done**. No file outside `data/findings.json` (one row) and this section of `COORDINATION.md` was modified by this session.
+---
+
+## Session `arena-a070c747` — pick-rule unification, alert→resolution tracking, verification of the live site
+
+Branch `arena/a070c747-kalshidash3`, based on `main` `a159dd3` (2026-11-22T07:21Z snapshot). No other session held an
+unexpired claim when this section was written; every scope below is disjoint from the sections above (those sessions
+are closed out). Claim committed and pushed before any work, per the board rule.
+
+### Task board (this session)
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T70 | Unify the two-key "model picks" definition across every surface: dashboard (`data/live/alerts.json` `high_roi`), alerts.html (engine score ≥ 0.55), category-page dock (`assets/chatdock.js` inline rule). Measured divergence before the fix: **47 / 49 / 46 picks out of the same 61 alerts**. | in progress | arena-a070c747 | `assets/engine.js`, `assets/chatdock.js`, `alerts.html`, `scripts/tests/test_chatdock.js`, `data/findings.json` | count parity test over the committed feed |
+| T71 | Track every alerted event to its resolution: lifecycle chip (open / closed / settled YES / settled NO / not in snapshot) on each alert bubble, plus an outcomes ledger on alerts.html built from the collector's `settled_markets` `result` field. Absence from the snapshot is labelled "not in this snapshot", never "unresolved". | in progress | arena-a070c747 | `assets/lifecycle.js` (new), `assets/engine.js`, `alerts.html`, `scripts/tests/test_lifecycle.js` (new), `scripts/verify_release.py` | Node unit tests + jsdom render |
+| T72 | Re-verify the live site and the claims this session touches against official sources; publish new irregularities (F-83 pick-rule divergence, F-84 lifecycle-join limits) and correct F-78, whose "only engine.js runs" statement is false. | in progress | arena-a070c747 | `data/findings.json`, `flagged.html` (renderer only if needed), `executive-summary.html`, `README.md` | official URLs cited per row |
+| T73 | Release gate → PR → merge → confirm GitHub Pages deploy → record result here. | in progress | arena-a070c747 | `COORDINATION.md` | `scripts/verify_release.py`, Pages builds API, live fetch |
+
+### Sources this session re-reads before citing
+
+- https://docs.kalshi.com/api-reference/market/get-markets (last_price_dollars, volume_24h_fp, status, result)
+- https://docs.kalshi.com/getting_started/market_lifecycle (determined vs finalized, settlement_ts)
+- https://docs.kalshi.com/getting_started/market_settlement (result yes/no/scalar, $1 payout)
+- https://docs.kalshi.com/getting_started/demo_env (demo only; behaviour may not match real markets)
+
+### Log (`arena-a070c747`)
+
+- 2026-11-22 ~08:0xZ: Release gate re-run locally on the base commit with `jsdom@26` installed: **PASS** (21 pages,
+  all suites). Pages API reports `status: built` for `main`; the `Live desk scan` workflow is refreshing the snapshot
+  on a 15-minute grid.
+- 2026-11-22: Claimed T70–T73. Measured pick-count divergence from the committed feed before changing anything
+  (47 engine-score / 49 frozen `high_roi` / 46 dock rule over the same 61 alerts).
