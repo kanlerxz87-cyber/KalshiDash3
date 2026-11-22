@@ -53,7 +53,12 @@ KD.nav("categories.html");
       // count after the per-topic keep window — the same number the row further down already
       // prints as "Open rows published". The scan total is now published separately; the
       // fallback keeps an older snapshot readable without relabelling its number.
-      { k: "Open markets inside the five categories (scan total)", v: KD.num(snap.counts.open_in_scope_total ?? snap.counts.open_in_scope) },
+      // S-02: never fall back to the published count under this label. A snapshot written before
+      // 2026-11-22 does not carry open_in_scope_total; until the next collection runs, the honest
+      // value here is blank, not a smaller number wearing the "scan total" label.
+      { k: "Open markets inside the five categories (scan total)", v: (snap.counts.open_in_scope_total === undefined || snap.counts.open_in_scope_total === null)
+          ? '<span class="na" title="Not published in this snapshot; the collector now records it (S-02)">—</span>'
+          : KD.num(snap.counts.open_in_scope_total) },
       { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
       { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
       { k: "Settled markets inside the five categories (scan total)", v: KD.num(snap.counts.settled_in_scope_total ?? "—") +
