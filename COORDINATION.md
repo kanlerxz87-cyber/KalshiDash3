@@ -1646,6 +1646,11 @@ session — this session did not touch it.
 a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
 health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
 
+- 2026-11-22 08:4xZ (follow-up, same session): edge case found while re-reading the F-83 diff — a topic with **zero** open rows would have
+  been counted as "untraded, 0 of 0 rows traded" in the footnote while its own cell said "none open in scope". `index.html` now skips the
+  untraded bookkeeping when a topic has no open rows, and DOM Test F asserts the footnote is absent when every topic has trades.
+  Went out as [PR #102](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/102) (full `verify_release.py` PASS before merge).
+
 ---
 
 ## Session `arena-a070c747` — pick-rule unification, alert→resolution tracking, verification of the live site
@@ -1715,12 +1720,20 @@ are closed out). Claim committed and pushed before any work, per the board rule.
 - 2026-11-22: Local release gate `python3 scripts/verify_release.py` **PASS** after every change (21 pages, all
   suites, including the new `test_lifecycle.js` which `scripts/verify_release.py` now runs).
 
-### T73 close-out (filled in after the merge)
+### T73 close-out
 
-| Item | Result |
-|---|---|
-| Pull request | _pending_ |
-| Pages deploy | _pending_ |
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #97](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/97) merged 2026-11-22T08:26:11Z** as `693548902c19bd0907bb3520febef8654f84a6f6` (merge commit, no approval wait) | `gh pr view 97` |
+| Release gate before the merge | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, all suites, both new node tests: `test_fee_multipliers.js` from main and `test_lifecycle.js` from this session) | local run immediately before `gh pr merge` |
+| Pages deploy of the merge | **confirmed** — Pages builds API reports `6935489` **`built`** at 08:26:26Z; `Deploy site to GitHub Pages` run [45002806850](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45002806850) `conclusion: success` on `headSha: 6935489…` (build ✔ deploy ✔) | Actions + Pages builds API |
+| Live verification (after deploy) | `alerts.html` renders the new lifecycle chips — live rows carried `settled NO`, `still open` and `no history` — and the all-events chat reads **61** (the scope gate), not 81; `assets/site.js` on the live host serves `lifecycleOf`/`lifecycleChip` with the D-03 reference; the resolution card's static copy ("Result set · not paid yet" is not an outcome; absence is never "unresolved") is served | cache-busted fetches of the live pages |
+| Merge conflicts | **five** rounds, all `COORDINATION.md` plus one `data/findings.json` union and one `executive-summary.html` (main added a per-requirement Source column). Nothing was discarded: main's F-83/F-84/F-85, `assets/alerts.js`, per-series taker multipliers, demo-only client boundary, workflow timeouts and every session's board section are kept verbatim; this session's rows moved to **D-02…D-05** to end the id collision. `findings.json` now has 69 unique flagged ids (D-01…D-05 present) and 23 suggestions (G22/G23 added). | `git log`, `gh pr view`, per-merge gate runs |
+| Force-push | **once**, `--force-with-lease`, on this session's own branch only (after rebasing its own two commits onto main). No other session's commit was rewritten. | reflog |
+
+**Still open, explicitly not claimed:** no settled-outcome test with enough sample to say whether a ≥ $0.10 swing
+predicts the direction of resolution — **D-04** publishes the current count (0 of 1) precisely so the gap is visible.
+Configuring Pages to Actions-only publishing is still refused to these credentials (DEPLOY-1, needs an admin).
 
 | ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
 |----|------|--------|-----------------|---------------------------|------------------------|----------------|
@@ -1752,6 +1765,16 @@ page exists. This session therefore re-fetched every external source the ledger 
 ### Log (continued)
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
+
+### T94 (`arena-eed90ce4`) — collector retry hardening, second PR
+
+- Code inspection of the stalled path found a checkable defect even though the run logs were unreadable: `scripts/collect.py`'s `get()` retried **only** HTTP 429 and broke out of the loop on the first attempt for every other status, so one transient 5xx or dropped connection aborted the whole pass (`RuntimeError` → exit 2 → the relay records a failed pass → nothing committed). On a ~500-call collection that is a very low bar for losing a snapshot.
+- Fixed: `get()` now retries 429/500/502/503/504 and network/socket errors with 1.5 s / 3 s / 4.5 s spacing, at most 4 attempts, then raises — so a persistently dead exchange still fails the pass and **nothing is written from a failed read**. Documented client errors (400/401/403/404/410) fail immediately on the first attempt, because retrying them cannot help and would only delay the honest failure.
+- Tests: new `scripts/tests/test_collect_retry.py` (6 offline cases: two 503s then success, bounded budget with no trailing sleep, 404 fails on attempt 1, URLError then success, 429 still retried, retry set is exactly the documented one). The release gate runs every `scripts/tests/test_*.py`, so it is picked up without touching `verify_release.py`.
+- Gate after the change: `verify_release.py` **PASS**, `check_site.py` **OK**, DOM test M: 72 facts / 70 flagged / 23 suggestions / 9 questions. (Findings grew to 70 because parallel sessions merged D-01..D-05 and others while this branch was open; no ids were duplicated — checked.)
+- No behaviour was changed for a *successful* read, and no value is ever invented on a failed one.
+
+---
 
 ---
 
@@ -1855,3 +1878,17 @@ $3.6594 as of 11/21/26 against its $3.6450 strike.
 - **The 4 remaining `not_reviewed` rows were not forced.** Their bounding observations are gone from the committed
   history, so the bid/ask either side of the print cannot be read back. A guess there would be exactly the failure the
   brief forbids.
+
+### Merge record 2 — `arena/d34a9f0d` merging `origin/main` (PR #102–#104)
+
+`main` advanced again while this PR was open (#102 `arena/ae1f84b0` conflict-tree fix, #103 `arena/eed90ce4`
+collector retry hardening, #104 `arena/a070c747` close-out). Two conflicts, both resolved additively:
+
+| File | Resolution |
+|---|---|
+| `data/findings.json` | main's 70 entries kept verbatim as the base (it had already published F-83, F-84, F-85 and D-02…D-05); this session's F-86…F-89 appended. 74 total, no duplicate ids — checked programmatically |
+| `COORDINATION.md` | main's new `### T94` section kept first, this session's close-out and merge record 1 kept after it, both verbatim |
+
+`python3 scripts/verify_release.py` **PASS** after the merge (21 pages, all suites including the new
+`test_collect_retry.py`); `test_pages_dom.js` all sections ok — M reads 72 facts / 74 flagged / 23 suggestions /
+9 questions / catalysts 57/61.
