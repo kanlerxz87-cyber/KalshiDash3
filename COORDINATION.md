@@ -1472,3 +1472,29 @@ before the push, this session merges rather than overwrites and says so in the l
 |----|------|--------|-----------------|---------------------------|------------------------|----------------|
 | T74 | Apply the fee schedule's **per-series taker multiplier** in the browser paper ledgers (`assets/alerts.js`, `assets/engine.js`, `portfolio.html`): all three charge a flat 0.07 and therefore charge a fee on series the official table lists at M = 0 | in progress | arena-ae1f84b0 | `assets/alerts.js`, `assets/engine.js`, `portfolio.html` (fee helper + its disclosure text), `executive-summary.html` (one sentence), `scripts/tests/engine.test.js`, `scripts/tests/test_fee_multipliers.js` (new), `scripts/verify_release.py` (test list only), `data/findings.json` (F-84 append only) | `https://kalshi.com/docs/kalshi-fee-schedule.pdf` — read this session, "Non-Standard Fees": KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0, KXAAAGASM 1/1, KXEMMY* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1, default M = 1; `data/strategies.json` `fee_model.multipliers` already carries the same table for `scripts/simulate.py` | New — measured on `data/live/alerts.json`: **44 of 61** archived alerts are KXBTCY, so most of the paper ledger was charged a fee the schedule says is zero. `portfolio.html` disclosed the simplification, so this is an accuracy defect, not a hidden claim (recorded as F-84) |
 
+
+### T72 — external-link re-verification (the gap the DOM gate cannot cover)
+
+`scripts/check_site.py` resolves **internal** links only, and `test_verification_links.js` asserts a row's *hostname*, not that the
+page exists. This session therefore re-fetched every external source the ledger publishes and checked the claim against the live page.
+
+| Claim set | How it was verified this session | Result |
+|---|---|---|
+| The 24 `docs.kalshi.com` rows in `data/verified_facts.json` → `doc_links` | Fetched the official sitemap `https://docs.kalshi.com/sitemap.xml` (all 4 chunks, `lastmod` 2026-11-22T01:01Z for the API-reference pages) and matched every slug: `api-reference/events/get-events`, `api-reference/historical/get-historical-market-candlesticks`, `api-reference/market/get-market-candlesticks`, `…/get-market-orderbook`, `…/get-markets`, `…/get-multiple-market-orderbooks`, `…/get-series-list`, `api-reference/orders/create-order-v2`, `api-reference/portfolio/get-balance`, `…/get-fills`, `…/get-positions`, `getting_started/api_environments`, `…/api_keys`, `…/demo_env`, `…/historical_data`, `…/market_lifecycle`, `…/market_settlement`, `…/orderbook_responses`, `…/pagination`, `…/quick_start_create_order`, `…/quick_start_market_data`, `…/quick_start_websockets`, `…/rate_limits`, `welcome` | **24/24 present.** No dead docs link, no renamed slug |
+| Fee schedule `https://kalshi.com/docs/kalshi-fee-schedule.pdf` (cited 20+ times) | Fetched and read | Live, "Last updated and effective: July 7, 2026". General taker `ceil(M × 0.07 × C × P × (1−P))`, maker `0.0175`, "There is no settlement fee", default `M = 1`; Non-Standard table: **KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0**, KXAAAGASM 1/1, KXEMMY\* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1 → **F-84** (below) |
+| Gas catalyst `https://gasprices.aaa.com/` (ledger: AAA 11/21/26 national regular `$3.6594`, down `$0.0304` vs yesterday) | Fetched | Page shows **$3.6594, "Price as of 11/21/26"**, yesterday **$3.6898** → difference **$0.0304**. Claim confirmed exactly |
+| Golf catalyst `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` (ledger: R3 suspended for rain, no Saturday play, Michael Thorbjornsen T1 at −9) | Fetched | Page shows **"R3 Suspended"**, "Play has been suspended … due to rain", "there will be no play today. Round 3 will be on Sunday", leaderboard **T1 Thorbjornsen −9**. Claim confirmed exactly |
+| Exchange endpoints (`external-api.demo.kalshi.co`) and Coinbase candle URLs in the catalyst ledger | **Not re-fetched**: this sandbox has no network route to Kalshi or Coinbase (verified: `curl` exit 35 / HTTP 000). Their values remain as recorded by the sessions that fetched them, and are labelled as such on the page | **Unverified here — not contradicted.** Recorded rather than implied |
+
+### Overlap found and logged (board rule)
+
+- **G19 status**: `arena/38b89a30` claimed the same fix (claim `627960b`, fix `2a39999`, PR **#93** open) after this session's claim.
+  This session had set `"status": "proposed"` on G19; to avoid duplicate/conflicting edits of the same line it **adopted theirs and
+  reverted its own**, leaving `data/findings.json` G19 untouched here. PR #93 owns that row.
+- **Files that another open PR also edits**: PR **#92** (`arena/5c8e3f0a`) touches `data/findings.json` and `executive-summary.html`;
+  this session's edits there are additive (F-83/F-84 entries; one sentence about the fee multiplier). If #92 merges first, this branch
+  merges `main` again and keeps both sides verbatim; nothing is force-pushed.
+
+### Log (continued)
+- 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
+  pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
