@@ -1715,12 +1715,20 @@ are closed out). Claim committed and pushed before any work, per the board rule.
 - 2026-11-22: Local release gate `python3 scripts/verify_release.py` **PASS** after every change (21 pages, all
   suites, including the new `test_lifecycle.js` which `scripts/verify_release.py` now runs).
 
-### T73 close-out (filled in after the merge)
+### T73 close-out
 
-| Item | Result |
-|---|---|
-| Pull request | _pending_ |
-| Pages deploy | _pending_ |
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #97](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/97) merged 2026-11-22T08:26:11Z** as `693548902c19bd0907bb3520febef8654f84a6f6` (merge commit, no approval wait) | `gh pr view 97` |
+| Release gate before the merge | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, all suites, both new node tests: `test_fee_multipliers.js` from main and `test_lifecycle.js` from this session) | local run immediately before `gh pr merge` |
+| Pages deploy of the merge | **confirmed** — Pages builds API reports `6935489` **`built`** at 08:26:26Z; `Deploy site to GitHub Pages` run [45002806850](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45002806850) `conclusion: success` on `headSha: 6935489…` (build ✔ deploy ✔) | Actions + Pages builds API |
+| Live verification (after deploy) | `alerts.html` renders the new lifecycle chips — live rows carried `settled NO`, `still open` and `no history` — and the all-events chat reads **61** (the scope gate), not 81; `assets/site.js` on the live host serves `lifecycleOf`/`lifecycleChip` with the D-03 reference; the resolution card's static copy ("Result set · not paid yet" is not an outcome; absence is never "unresolved") is served | cache-busted fetches of the live pages |
+| Merge conflicts | **five** rounds, all `COORDINATION.md` plus one `data/findings.json` union and one `executive-summary.html` (main added a per-requirement Source column). Nothing was discarded: main's F-83/F-84/F-85, `assets/alerts.js`, per-series taker multipliers, demo-only client boundary, workflow timeouts and every session's board section are kept verbatim; this session's rows moved to **D-02…D-05** to end the id collision. `findings.json` now has 69 unique flagged ids (D-01…D-05 present) and 23 suggestions (G22/G23 added). | `git log`, `gh pr view`, per-merge gate runs |
+| Force-push | **once**, `--force-with-lease`, on this session's own branch only (after rebasing its own two commits onto main). No other session's commit was rewritten. | reflog |
+
+**Still open, explicitly not claimed:** no settled-outcome test with enough sample to say whether a ≥ $0.10 swing
+predicts the direction of resolution — **D-04** publishes the current count (0 of 1) precisely so the gap is visible.
+Configuring Pages to Actions-only publishing is still refused to these credentials (DEPLOY-1, needs an admin).
 
 | ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
 |----|------|--------|-----------------|---------------------------|------------------------|----------------|
