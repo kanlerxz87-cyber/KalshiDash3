@@ -2034,3 +2034,16 @@ rebuilt from `main`'s version rather than from this branch's, so no earlier sess
 - The first version cancelled a wedged run only after 75 min. The pipeline's own step timeouts allow ~50 min in the worst legitimate case (`collect` 1200 s + three 600 s steps + pre-checks), so 60 min (four missed 15-minute slots) is the tightest value that cannot punish a slow-but-working pass. Tests and F-86 updated to 60.
 - **Observed live, not assumed:** the 08:58Z cron of `freshness-alarm.yml` ran the new chain (run 45005282335) and its steps read `Decide what to do about a stale snapshot: success`, `Cancel a wedged collection: skipped`, `Dispatch one collection: skipped` — i.e. the guard chose *wait* because the in-flight collector was 42 min old (< 60). The gating works in production; the next cron after the run passes 60 min without a commit will cancel it and the queued run takes over.
 - Collector status at the end of this session, stated plainly: no `data: demo snapshot` commit since `f364db9` (06:17:13Z). The landing page says so — "snapshot is N collection intervals behind" — and the browser still polls the demo API directly, with CORS recorded as allowed for `https://kanlerxz87-cyber.github.io` in `data/live/cors.json` (status 200, `access-control-allow-origin` present). What is **not** known, and is not claimed anywhere: which step of which pass failed, because Actions job logs live on `productionresultssa6.blob.core.windows.net`, outside this sandbox's allowlist.
+
+---
+
+### Deploy record — `arena-d34a9f0d` (T75)
+
+| Item | Result |
+|---|---|
+| PR #106 | **merged** `ad98f19` — gate PASS, Pages build success, `MERGEABLE`/`CLEAN` |
+| PR #110 | **merged** `da8dac7` — the source-id/`reviewed_at` correction, gate PASS, Pages build success |
+| Pages build of `da8dac7` | run [45005346379](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45005346379) **completed / success** |
+| Live verification | `data/live/catalysts.json?cb=…` serves `generated_at 2026-11-22T08:56:14Z`, `counts.reviewed 57 / archive_total 61`, `reviewed_at 2026-11-22T08:20Z`, source id `KALSHI_MARKET_…__2026-11-22T0820Z`. `executive-summary.html` renders the catalyst row from that file. A first read without a cache-buster returned the pre-#110 file, so the check was repeated cache-busted before recording it |
+| Final state | `data/findings.json` 78 flagged entries, 0 duplicate ids (this session's **F-90**, **F-92**, **F-93** included); ledger 36 sources / 69 reviews; catalyst coverage **57/61**, 4 `not_reviewed` with the reason on the row |
+| Not done, on purpose | `data/live/markets.json` is written only by the collector, so `counts.settled_in_scope_total_method` appears on its next pass; until then `index.html` prints "not stated in this snapshot" rather than inventing it. The 4 `not_reviewed` rows were not forced: their bounding observations are gone from the committed history, so a verdict there would be a guess |
