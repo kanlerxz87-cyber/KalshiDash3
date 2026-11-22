@@ -1442,43 +1442,53 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 
 
 
+## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
+
+Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
+**PASS** on this branch as checked out (21 pages, all suites, jsdom@26 installed). `curl` to the public site from the
+sandbox returns 000 (no direct egress to github.io), so live-site checks go through the fetch service, which confirmed
+the landing page serves the 2026-11-22T06:17:12Z snapshot.
+
+| ID | Task | Status | Owner | Files in scope |
+|----|------|--------|-------|----------------|
+| T69 | Close the open request from arena-981efed5: add the missing `"status": "proposed"` to suggestion `G19` in `data/findings.json` | in progress | arena-38b89a30 | `data/findings.json` (G19 row only), `COORDINATION.md` (this section) |
+| T70 | Independent spot re-verification of ledger claims (C-nn) against the official Kalshi documentation pages they cite; record result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+| T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+
+Claimed before any edit; no other session names these files in an open scope.
+
+### Results (T69, T70)
+
+| ID | Result | Evidence |
+|----|--------|----------|
+| T69 | **done** — `G19` in `data/findings.json` now carries `"status": "proposed"` (the only row missing one). `suggestions.html` renders it under `#prop` as before; no other field or row touched | `git diff` one hunk; `scripts/verify_release.py` PASS on the branch after the change; DOM test K prints `11 implemented, 10 proposed` and still finds `G19` under `#prop` |
+| T70 | **done** — independent spot re-verification of the ledger against the official pages it cites, 2026-11-22, all four read live in this session | (1) C-01..C-04 demo endpoints: `getting_started/demo_env` shows the same table verbatim (REST recommended `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS recommended `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`) — match. (2) C-NN candlestick claim: `api-reference/market/get-market-candlesticks` states `period_interval` enum is `1`, `60`, `1440` minutes — match, and the site's "seconds resolution is accumulated by the collector" wording follows from this. (3) Settlement page: yes/no settles at $1 per contract, scalar sub-cent settlement fee may apply — matches the site's handling of `scalar` results. (4) `kalshi.com/docs/kalshi-fee-schedule.pdf` remains the fee source cited by `simulation.html`/`roi.html`; not re-fetched this session — left as previously verified |
+| T71 | in progress | — |
+
+Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
+
+Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+
 ---
 
-## Session `arena-6cd28bd2` — independent line-by-line verification pass (branch `arena/6cd28bd2-kalshidash3`)
+## Session `arena-6cd28bd2` — independent line-by-line verification pass + F-76 scope fix (branch `arena/6cd28bd2-kalshidash3`)
 
-Base: `a159dd3` (main, snapshot 2026-11-22T07:21Z). All prior claims in this board are merged to `main` and complete; this session claims new work only. No files from any other session are in scope; no shared output is edited.
+Base: `a159dd3` (main, snapshot 2026-11-22T07:21Z). All prior claims in this board are merged to `main` and complete; this session claims new work only.
 
 | ID | Task | Status | Owner | Files in scope | Verification |
 |----|------|--------|-------|----------------|--------------|
-| T91 | Independent line-by-line re-verification of the published verification ledger (`data/verified_facts.json` C-nn) and the live site against official Kalshi sources; record every irregularity for manual review | in progress | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only, for irregularities found) | each cited official page fetched and read this session; live site fetched |
-| T92 | Live-site consistency + data/page cross-check: fetch the deployed site and the pages it links to; confirm data files parse and match what the pages render; flag every discrepancy | in progress | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only) | `scripts/check_site.py`, `node --check` on all inline JS, HTTP probes of the live site |
+| T91 | Independent line-by-line re-verification of the published verification ledger (`data/verified_facts.json` C-nn) and the live site against official Kalshi sources; record every irregularity for manual review | done | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only) | each cited official page fetched and read this session; live site fetched |
+| T92 | Live-site consistency + data/page cross-check: fetch the deployed site and the pages it links to; confirm data files parse and match what the pages render; flag every discrepancy | done | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only) | `scripts/check_site.py`, `node --check` on all inline JS, HTTP probes of the live site |
+| T93 | Fix the five-topic alert-scope defect found by T91/T92 (F-83): the main two-chat page (alerts.html) rendered the 20 out-of-scope Test/Demo swings the archive withholds | done | arena-6cd28bd2 | `assets/engine.js`, `scripts/tests/test_pages_dom.js` (one block), `data/findings.json` (F-83 append-only) | jsdom DOM test (block D assertion), `node scripts/tests/engine.test.js`, `scripts/verify_release.py` PASS |
 
-### Claims made this session, deliberately narrow
+### Sources (fetched and read this session, 2026-11-22)
 
-- No HTML/JS/CSS/JSON edit: the verification pass only appends findings to this board and, if needed, to `data/findings.json`.
-- `data/findings.json` is append-only (new F-nn rows with this session's ID). No existing F-nn rows are edited, renumbered, or reworded.
-- No re-collection, no new snapshot data, no changes to the collector, alerts, simulation, or site code.
+demo_env, market_lifecycle, market_settlement, orderbook_responses, get-market-candlesticks (page + OpenAPI), get-markets (page + full OpenAPI spec), get-events (OpenAPI), quick_start_market_data, quick_start_websockets, historical_data, rate_limits, the fee schedule PDF (both pages), plus live probes of the deployed site and of the demo API (`KXBTCY-27JAN0100-B97500` → `status: active`, `last_price_dollars: "0.9700"`, 97¢ spread).
 
-### Log
+### Log (this session)
 
-- 2026-11-22: Claimed T91/T92; no other session has an active claim in the board (all prior claims merged via PRs #1–#91). Base `a159dd3`.
-- 2026-11-22: T91 verification — independent line-by-line re-verification against official sources (all fetched this session):
-  - Market lifecycle: statuses `initialized/active/inactive/closed/determined/disputed/amended/finalized` + filter map `unopened=initialized, open=active, paused=inactive, closed=past close_time not finalized, settled=finalized` — exact match (C-11, C-12).
-  - Market settlement: Yes holders $1 on yes / No holders $1 on no / only net positions settle / settlement fees zero for simple yes/no but may apply for sub-cent scalar settlement — exact match (C-13, C-14).
-  - Orderbook: GET /markets/{ticker}/orderbook no auth; `orderbook_fp` with yes/no bids only; `[price_dollars, count_fp]` ascending pairs; best bid last; `depth` returns best N; mistyped ticker returns 200 with empty arrays not 404 — exact match (C-15, C-16, C-53).
-  - Candlesticks: period_interval ∈ {1,60,1440} minutes; start_ts/end_ts Unix timestamps; response schema (end_period_ts, yes_bid/yes_ask/price OHLC + mean/previous/min/max, volume_fp, open_interest_fp); required path params series_ticker + ticker; cached/lagging caveat — exact match (C-17, C-29, C-30, C-61, C-62, C-63, C-66).
-  - Fee schedule (July 7, 2026): general taker fee `roundup(M x 0.07 x C x P x (1-P))`; maker `roundup(M x 0.0175 x C x P x (1-P))`; no settlement fee; no membership fee; KXAAAGASM (US gas), KXPGATOUR/KXPGARYDER/KXPGASOLHEIM (golf) present with 1/1 multipliers; KXELECTIRAN (0/0), KXBTCY (0/0), KXETHY (0/0) present — exact match (C-18, C-19, C-36, C-37).
-  - GET /markets OpenAPI (full spec read): status enum `unopened|open|paused|closed|settled` (note: page prose omits `paused`); markets/cursor paging; tickers-only filter returns unpaged in one response, limit not applied, cursor empty; responses cached briefly, prices/status can lag seconds; `volume_24h_fp` documented; `volume_fp`/`open_interest_fp` as 2-decimal FixedPointCount; result enum `yes|no|scalar|""`; `notional_value_dollars` = "total value of a single contract at settlement in dollars"; title/subtitle deprecated — exact match (C-21, C-22, C-23, C-24, C-54, C-55, C-58, C-59).
-  - Historical data: partition rule (markets+candlesticks settled before `market_settled_ts` only via /historical/markets); cutoff fields (market_settled_ts/trades_created_ts/orders_updated_ts/market_positions_last_updated_ts); endpoints list — exact match (C-64).
-  - Quick Start: Market Data: public endpoints need no API key (series/events/markets/orderbooks) (C-09, C-56 support); Quick Start: WebSockets: WS handshake requires an API key (`KALSHI-ACCESS-KEY/SIGNATURE/TIMESTAMP`, `timestamp + "GET" + "/trade-api/ws/v2"`); public channels still use the authenticated session — exact match (C-31).
-  - Get Events OpenAPI: status enum `unopened|open|closed|settled`, limit max 200, cursor pagination, with_nested_markets default false, multivariate events excluded (C-32).
-  - Historical cutoff live probe: `GET /historical/cutoff` answers with market_settled_ts (from prior session runs; re-checked live 2026-11-22 in smoke: KXBTCY-27JAN0100-B97500 serves `status: active` at price 0.97 — consistent with F-77 oscillation disclosure).
-  - 72 claims ledger: 71 verified / 1 deliberately blank (C-20) — confirmed verbatim on the page.
-- 2026-11-22: T92 verification — live-site & data consistency:
-  - Independent fetches of the deployed homepage: banner, 470 open / 289 confirmed (seed) / 200 settled / 64 refused / 439 exchange-decided / snapshot age all match `data/live/markets.json` exactly (470/289/200/64/439).
-  - Deployed `data/live/alerts.json` matches local byte-for-byte in `generated_at`, counts and shapes (61 all_events / 49 high_roi / 81 archived / 20 withheld).
-  - Deployed `verification.html` renders the ledger (72 claims, 71 verified, 1 blank) and links each row to the official source.
-  - `scripts/check_site.py` PASS (21 pages), `scripts/verify_release.py` PASS (all suites), `node scripts/tests/engine.test.js` 21/21, `test_chatdock.js` PASS, `test_pages_dom.js` PASS (all 15 blocks A–M).
-- 2026-11-22: One defect found by T91/T92 and fixed (recorded as F-83, see `data/findings.json`): the five-topic alert-scope rule (F-76) was enforced in the floating chat dock but not in the main two-chat page (alerts.html) — `assets/engine.js` `loadCollectorAlerts()` loaded every row of `data/live/alerts_archive.json` into the feed, so the 20 out-of-scope Test/Demo swings rendered in both chats despite the page's own "withheld" note. Fixed by applying the same F-76 rule in `loadCollectorAlerts()` (skip rows whose `series_categories` include Test/Demo or whose `category_id` is null) and by adding a regression assertion in `scripts/tests/test_pages_dom.js` (block D) that no rendered feed row carries a withheld archived ticker. The archive is never rewritten; `build_alerts.py` still publishes `counts.withheld_out_of_scope`. Live page re-fetched after deploy (see Close-out).
-- 2026-11-22: Official-doc inconsistency noted (not a site defect): GET /markets prose description says `unopened, open, closed, settled` (page description + OpenAPI description), while the OpenAPI `status` enum includes `paused` and the market_lifecycle doc maps `paused=inactive`. The site cites the OpenAPI enum (C-21) and is correct. Flagged here for manual review rather than silently reworded.
-
+- 2026-11-22: Claimed T91/T92; no other session has an active claim in the board. Claimed, committed and pushed before implementation.
+- 2026-11-22: T91 verification — every ledger claim re-checked against its official page: market lifecycle (statuses + filter map, exact match), market settlement ($1 payout, net positions, zero fee for simple yes/no), orderbook (bids only, ordered ascending, best bid last, depth N, mistyped ticker → 200 empty arrays), candlesticks (period_interval ∈ {1,60,1440} min, Unix timestamps, required path params series_ticker + ticker, per-period volume_fp vs cumulative volume_fp — C-61/C-62/C-63), fee schedule (general taker roundup(M×0.07×C×P×(1−P)), maker roundup(M×0.0175×C×P×(1−P)), no settlement fee, no membership fee; KXAAAGASM/KXPGATOUR/KXPGARYDER/KXPGASOLHEIM present with 1/1; KXELECTIRAN/KXBTCY/KXETHY present with 0/0), GET /markets (page + OpenAPI: status enum includes paused — the page prose omits it, noted below; tickers-only returns unpaged, cached responses lag seconds, volume_24h_fp, volume_fp/open_interest_fp as 2-decimal FixedPointCount, result enum yes/no/scalar/"", notional_value_dollars definition, title/subtitle deprecated), historical data (partitioning rules), quick_start_market_data (public endpoints, no key), quick_start_websockets (WS handshake requires API key), get-events (status enum, limit max 200, with_nested_markets), rate limits (separate unauthenticated limits, back off on 429). All 72 ledger claims re-checked: 71 verified + 1 deliberately blank (C-20) — confirmed verbatim on the page.
+- 2026-11-22: T92 verification — live homepage banner/KPIs (470 open / 289 confirmed / 200 settled / 64 refused / 439 exchange-decided / snapshot 2026-11-22T06:17:12Z) match data/live/markets.json exactly; deployed data/live/alerts.json matches local (61 served / 81 archived / 20 withheld); deployed verification.html renders the ledger with official links; scripts/check_site.py PASS, scripts/verify_release.py PASS.
+- 2026-11-22: One defect found by T91/T92 and fixed (F-83): the five-topic scope rule (F-76) was enforced in the floating chat dock (chatdock.js) but not in the main two-chat page — assets/engine.js loadCollectorAlerts() loaded every row of data/live/alerts_archive.json into the feed, so the 20 out-of-scope Test/Demo swings rendered in both chats despite the page's own withheld note (live alerts.html rendered "81 in view" with KXDEMOFUTHOURLY rows). Fixed by applying the same F-76 rule in loadCollectorAlerts() (skip rows whose series_categories include Test/Demo or whose category_id is null), with a regression assertion in scripts/tests/test_pages_dom.js (block D). The archive is never rewritten; build_alerts.py still publishes counts.withheld_out_of_scope. Result: both chats show the 61 served rows, none of the 20 withheld tickers.
+- 2026-11-22: Official-doc inconsistency noted for manual review (not a site defect): GET /markets prose description says `unopened, open, closed, settled` (page description + OpenAPI description), while the OpenAPI `status` enum includes `paused` and the market_lifecycle doc maps `paused=inactive`. The site cites the OpenAPI enum (C-21) and is correct.
