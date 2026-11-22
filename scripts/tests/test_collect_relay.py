@@ -14,6 +14,7 @@ from __future__ import annotations
 import importlib.util
 import re
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,6 +31,23 @@ def check(cond, msg):
     print(("  ok   " if cond else "  FAIL ") + msg)
     if not cond:
         FAIL.append(msg)
+
+
+def setUpModule():
+    """Point the relay's failure record at a temp dir (F-87).
+
+    `make_pass` now records failures in `data/live/collector_health.json`. These tests
+    deliberately exercise failing passes, so without this they would drop a real-looking health
+    record into the working tree. ROOT itself is left alone: the fixtures resolve real
+    `scripts/tests/...` paths through it.
+    """
+    global _TMP_ROOT
+    _TMP_ROOT = tempfile.TemporaryDirectory(prefix="relay-root-")
+    R.HEALTH_ROOT = Path(_TMP_ROOT.name)
+
+
+def tearDownModule():
+    _TMP_ROOT.cleanup()
 
 
 class FakeWorld:
@@ -305,4 +323,11 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # This file runs its own check harness (not unittest), so the unittest hook above would
+    # never fire here: call it directly, or a deliberately failing fixture would write a
+    # real-looking data/live/collector_health.json into the working tree.
+    setUpModule()
+    try:
+        sys.exit(main())
+    finally:
+        tearDownModule()
