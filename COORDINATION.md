@@ -1441,3 +1441,18 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
+
+## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
+
+Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
+**PASS** on this branch as checked out (21 pages, all suites, jsdom@26 installed). `curl` to the public site from the
+sandbox returns 000 (no direct egress to github.io), so live-site checks go through the fetch service, which confirmed
+the landing page serves the 2026-11-22T06:17:12Z snapshot.
+
+| ID | Task | Status | Owner | Files in scope |
+|----|------|--------|-------|----------------|
+| T69 | Close the open request from arena-981efed5: add the missing `"status": "proposed"` to suggestion `G19` in `data/findings.json` | in progress | arena-38b89a30 | `data/findings.json` (G19 row only), `COORDINATION.md` (this section) |
+| T70 | Independent spot re-verification of ledger claims (C-nn) against the official Kalshi documentation pages they cite; record result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+| T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+
+Claimed before any edit; no other session names these files in an open scope.
