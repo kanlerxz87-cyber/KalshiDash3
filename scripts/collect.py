@@ -857,6 +857,15 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # category so the committed snapshot stays small enough to load in a browser.
     # Confirmed (seed) markets are always kept, even if small.
     rows["open"].sort(key=lambda r: (r["dollars_traded_estimate"] or 0), reverse=True)
+    # DEFECT (fixed 2026-11-22, arena-0553d7e9): `open_in_scope` below is read AFTER the keep
+    # window trims the list, so it is the PUBLISHED row count, not the number of in-scope markets
+    # the scan found. categories.html used it for both labels, and the true total was published
+    # nowhere (only implied by open_rows_trimmed_for_size). Both numbers are now explicit:
+    #   open_in_scope_total   — classified, non-excluded open markets this run saw (before trimming)
+    #   open_published_rows   — rows actually written to the snapshot (after the per-topic keep)
+    # `open_in_scope` is kept unchanged for readers of older snapshots and still equals
+    # open_published_rows; nothing downstream should label it "found in scope" again.
+    open_in_scope_total = len(rows["open"])
     kept, per_cat_kept, per_cat_seed = [], {}, {}
     for r in rows["open"]:
         c = r["category_id"]
@@ -873,6 +882,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         kept.append(r)
     trimmed = len(rows["open"]) - len(kept)
     rows["open"] = kept
+    open_published_rows = len(kept)
     rows["settled"].sort(key=lambda r: (r.get("settlement_ts") or ""), reverse=True)
     settled_in_scope_total = len(rows["settled"])
     settled_trimmed = max(0, settled_in_scope_total - SETTLED_KEEP)
@@ -948,8 +958,14 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         "counts": {
             "open_total_scanned": len(raw["open"]),
             "settled_total_scanned": len(raw["settled"]),
+            # `open_in_scope` is the legacy name for the PUBLISHED row count (see the note at the
+            # keep window). The scan total and the published count are published separately so a
+            # page can never print one under the other's label.
             "open_in_scope": len(rows["open"]),
+            "open_in_scope_total": open_in_scope_total,
+            "open_published_rows": open_published_rows,
             "settled_in_scope": len(rows["settled"]),
+            "settled_published_rows": len(settled_published),
             "open_out_of_scope": unclassified["open"],
             "settled_out_of_scope": unclassified["settled"],
             "open_excluded_multivariate": excluded_mve["open"],
@@ -979,6 +995,17 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             # What was published out of what was in scope, and the per-topic split:
             # the row cap must never be spent by one high-frequency topic alone.
             "settled_in_scope_total": settled_in_scope_total,
+            # HOW that total was obtained, so a reader can tell an exact count from a windowed one.
+            # It is the settled paging window this run read (documented cap, truncation stated)
+            # plus the rows GET /historical/markets added for seeded series — before the per-topic
+            # keep window. None of those three numbers is interchangeable with the 200 published.
+            "settled_in_scope_total_method": (
+                f"counted from this run's GET /markets?status=settled paging window (safety cap "
+                f"{SAFETY_SCAN_CAP} markets; cap reached: "
+                f"{'yes' if raw.get('_truncated', {}).get('settled') else 'no'}) plus "
+                f"{len(hist_rows)} row(s) from GET /historical/markets for seeded series, "
+                f"before the {SETTLED_KEEP}-row per-topic keep window"
+            ),
             "settled_kept_window": len(rows["settled"]),
             "settled_published": len(settled_published),
             "settled_publish_cap": SETTLED_PUBLISH_CAP,
