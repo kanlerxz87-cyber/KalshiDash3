@@ -128,7 +128,7 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed by the exchange", KD.num(confirmed), "series ticker listed in the official fee schedule (basis=seed)"],
-    // F-86 (fixed 2026-11-22): the parenthetical used counts.settled_in_scope, the 1,600-row
+    // S-02 (fixed 2026-11-22): the parenthetical used counts.settled_in_scope, the 1,600-row
     // retained paging window, and called it "settled in scope". The scan total is
     // counts.settled_in_scope_total; the two are different numbers and are now named separately.
     ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows published"

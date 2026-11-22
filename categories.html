@@ -49,7 +49,7 @@ KD.nav("categories.html");
     [{ key: "k", label: "Bucket" }, { key: "v", label: "Count", num: true }],
     [
       { k: "Open markets scanned", v: KD.num(snap.counts.open_total_scanned) },
-      // F-86 (fixed 2026-11-22): this row used counts.open_in_scope, which is the PUBLISHED row
+      // S-02 (fixed 2026-11-22): this row used counts.open_in_scope, which is the PUBLISHED row
       // count after the per-topic keep window — the same number the row further down already
       // prints as "Open rows published". The scan total is now published separately; the
       // fallback keeps an older snapshot readable without relabelling its number.

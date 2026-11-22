@@ -510,7 +510,7 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
-    // F-86 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
+    // S-02 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
     // number the scan found in scope. The page must state the scan total
     // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
     // and never label either the window or the stored cap "in scope".
