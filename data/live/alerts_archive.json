@@ -2,6 +2,55 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-22T04:32:12Z",
+   "to_time": "2026-11-22T04:47:11Z",
+   "from_price": 0.02,
+   "to_price": 0.99,
+   "delta": 0.97,
+   "direction": "up",
+   "volume_24h_fp": 14592.42,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.02,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-22T04:47:12Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 86.33,
+    "est_dollars": 85.47,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58458892.38,
+    "volume_to": 58458978.71,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "86.33 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-22T04:47:12Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXAAAGASD-26NOV22-3.6450",
    "event_ticker": "KXAAAGASD-26NOV22",
    "title": "Will average **gas prices** be above $3.6450?",
@@ -44,7 +93,7 @@
     "decided_at": "2026-11-22T04:02:12Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.23,
     "gave_back_half": false,
     "still_open": false
