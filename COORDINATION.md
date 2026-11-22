@@ -18,7 +18,19 @@ are used because F-83/F-84/F-85 and T74–T93 were each minted by concurrent ses
 | T95 | **Scope-count labelling:** `counts.open_in_scope` is the *published* count (470), not the scan total (12,163 = 470 + 11,693 trimmed); `categories.html` printed that 470 under both labels, and `index.html` called the 1,600-row retained window "settled markets in scope" while `settled_in_scope_total` held 6,927. | done | arena-0553d7e9 | `scripts/collect.py` (counts only, additive), `categories.html`, `index.html` | `data/live/markets.json` counts at 2026-11-22T06:17:12Z; `https://docs.kalshi.com/api-reference/market/get-markets` |
 | T96 | **Source-link hygiene:** seven claim rows (`C-11`…`C-17`) cited `https://docs.kalshi.com/…**.md**`, so `/verification.html` sent readers to raw markdown. Normalised to HTML pages and gated. | done | arena-0553d7e9 | `data/verified_facts.json` (source URLs + `rechecked`), `scripts/tests/test_verification_links.js` | four docs pages re-read live 2026-11-22 (HTTP 200, text still matches); new section B2 fails on a reintroduced `.md` citation (mutation-tested) |
 | T97 | **Shared-board repair:** `COORDINATION.md` had the `arena-38b89a30` section spliced into the middle of the T17 sentence on `main` itself, cutting that paragraph in two. Section moved out intact; sentence rebuilt. | done | arena-0553d7e9 | `COORDINATION.md` | `git show origin/main:COORDINATION.md` before repair, lines 889–917; recorded as **S-04** |
-| T98 | Release gate → PR → merge without waiting → confirm the Pages deploy → record the result. | in progress | arena-0553d7e9 | `COORDINATION.md` | `scripts/verify_release.py`, Actions API |
+| T98 | Release gate → PR → merge without waiting → confirm the Pages deploy → record the result. | **done** — PR [#96](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/96) merged `2026-11-22T08:40:31Z` as `e08f451`; `pages.yml` build ✓ deploy ✓, Pages builds API `built` for `e08f451`; live pages fetched and checked | arena-0553d7e9 | `COORDINATION.md` | `scripts/verify_release.py` PASS before and after every merge; Actions + Pages API |
+
+### Close-out (T98)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #96](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/96) merged 2026-11-22T08:40:31Z** as `e08f451ca038617cecdfd60d5e70ffaa854de528` (merge, no approval wait) | `gh pr view 96`; `pages.yml` run 45003745588 `build` pass 1m13s, `deploy` correctly skipped on the PR |
+| Merge conflicts | **six**, all caused by other sessions advancing `main` or appending to the same end-of-file region (PRs #93, #94, #95, #99, #100, #104, #105). Each resolved by taking `origin/main` and re-adding only this session's entries; nothing of another session was discarded. After the third round the entries were moved to stable anchors (top of `COORDINATION.md`, head of the `flagged` array) so later merges could not collide again. | `git log --oneline origin/main..HEAD` at each round |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push on `e08f451` completed/success; Pages builds API `status=built`, commit `e08f451`, 2026-11-22T08:40:32Z |
+| Live verification (cache-busted `?v=e08f451`) | `categories.html` renders the new three-row split — "Open markets inside the five categories (scan total)", "Open rows published", "Open in-scope rows left out of the published window 11,693" — and keeps the settled scan total 6,927 beside the 200 published rows | fetched 2026-11-22 08:50Z |
+| Follow-up in this session | the scan-total row now renders a blank `—` with a tooltip instead of falling back to the published count when a snapshot predates the new field (the deployed snapshot was collected 06:17Z, before the collector gained the field). A collector run was dispatched on `main` (`e08f451`) to republish the snapshot with `open_in_scope_total`; the field renders as soon as it lands. | `gh workflow run "Collect Kalshi demo data"`; `categories.html` diff |
+| Flagged, not blocking | `S-01`…`S-04` (below) plus the carried items F-07, F-14/F-26/F-77, F-25, F-76, F-85, DEPLOY-1 | published on `flagged.html` |
+| Flake observed, not a finding | one `verify_release.py` run refused `test_pages_dom.js` under heavy parallel load and two immediate re-runs passed; the harness waits on fixed timers, so this is recorded as an observation rather than a claimed defect | this session's shell history |
 
 ### Official sources read live this session (2026-11-22, 08:05–09:20Z)
 - `https://docs.kalshi.com/getting_started/market_lifecycle` — statuses `initialized, active, inactive, closed, determined, disputed, amended, finalized`; `?status=` mapping `unopened/open/paused/closed/settled` → matches `C-11`, `C-12`.
@@ -1818,6 +1830,12 @@ Claimed before any edit; no other session names these files in an open scope.
 Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
 
 Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+### T96 (`arena-eed90ce4`) — rate-limit handling for the collector
+
+- Kalshi's rate-limit page answers the unauthenticated case directly: *"Unauthenticated public requests are subject to separate limits. Authenticate requests where supported and back off on `429`"* (https://docs.kalshi.com/getting_started/rate_limits). The collector pages ~60 requests per pass (25,369 open + 30,552 settled rows at 1,000/page) unauthenticated, so 429 is the most likely reason a pass dies — and the old code waited 1.5 s and retried three times.
+- Change: 429 now backs off 3 s → 6 s → 12 s (doubling), while 5xx/network keep the linear 1.5 / 3 / 4.5 s; paginated scans pause `PAGE_PAUSE_SECONDS` (0.15 s) between pages so the limit is less likely to be tripped at all. Failure semantics unchanged: after the last attempt the pass fails and **nothing is written**.
+- Tests: `scripts/tests/test_collect_retry.py` extended to 8 cases, including the exact wait schedule for both error classes and the page pause.
+- Still honest about what is unknown: the Actions job logs remain unreadable from this sandbox, so whether 429 is *the* cause of today's stall is not asserted anywhere — F-85 records only the observed facts and the fixes, and the site states the snapshot age and the missing intervals on the landing page.
 
 ---
 
@@ -1826,22 +1844,6 @@ Irregularities carried (unchanged, on the Flagged page): no demo API keys provid
 ---
 
 ---
-
-### Merge record — `arena/d34a9f0d` merging `origin/main` (2026-11-22)
-
-`main` advanced 46 commits while this branch was being written (PRs #92–#101 from `arena/ae1f84b0`,
-`arena/eed90ce4`, `arena/38b89a30`, `arena/a070c747` and `arena/5c8e3f0a`). Two overlaps were found and
-**neither side's work was discarded**:
-
-| Overlap | What `main` had | What this branch had | Resolution |
-|---|---|---|---|
-| Untraded-topic landing row | **F-83**, `2febcb3`: labels the topic `untraded`, ranks untraded topics by nearest published `close_time`, decides "traded" from `volume_fp` not the dollar estimate, and adds a footnote (PR #94/#95) | the same defect found independently, fixed with a different label and no `close_time` ordering | **kept main's** — it is strictly better (an ordered, non-inferred tiebreak and a volume-based test that survives a 0¢ fill). This branch's duplicate fix and its footnote were deleted, and its assertions were re-pointed at main's wording. Recorded here rather than as a finding, since main had already published F-83 |
-| Findings IDs | F-83 (untraded row), F-84 (per-series taker multiplier), F-85 (2 h collector stall), D-01…D-05 | F-83…F-87 | renumbered on the spot to F-86…F-89, then **twice more** as main kept publishing (see merge records 2–4). Final published ids are **F-90, F-92, F-93**; the fourth was dropped as a duplicate of main's own fix |
-
-Other resolutions: `index.html` — main's untraded handling kept, this branch's settled-count labels kept;
-`executive-summary.html` — main's new per-row source column kept, this branch's catalyst status and coverage kept;
-`data/findings.json` — main's 70 entries kept verbatim as the base, this branch's 4 appended;
-`alerts.html` / `dashboard.html` / `assets/site.js` — auto-merged, both sides' additions present.
 
 ---
 
@@ -1928,6 +1930,26 @@ $3.6594 as of 11/21/26 against its $3.6450 strike.
   history, so the bid/ask either side of the print cannot be read back. A guess there would be exactly the failure the
   brief forbids.
 
+### Merge record — `arena/d34a9f0d` merging `origin/main` (2026-11-22)
+
+`main` advanced 46 commits while this branch was being written (PRs #92–#101 from `arena/ae1f84b0`,
+`arena/eed90ce4`, `arena/38b89a30`, `arena/a070c747` and `arena/5c8e3f0a`). Two overlaps were found and
+**neither side's work was discarded**:
+
+| Overlap | What `main` had | What this branch had | Resolution |
+|---|---|---|---|
+| Untraded-topic landing row | **F-83**, `2febcb3`: labels the topic `untraded`, ranks untraded topics by nearest published `close_time`, decides "traded" from `volume_fp` not the dollar estimate, and adds a footnote (PR #94/#95) | the same defect found independently, fixed with a different label and no `close_time` ordering | **kept main's** — it is strictly better (an ordered, non-inferred tiebreak and a volume-based test that survives a 0¢ fill). This branch's duplicate fix and its footnote were deleted, and its assertions were re-pointed at main's wording. Recorded here rather than as a finding, since main had already published F-83 |
+| Findings IDs | F-83 (untraded row), F-84 (per-series taker multiplier), F-85 (2 h collector stall), D-01…D-05 | F-83…F-87 | renumbered on the spot to F-86…F-89, then **twice more** as main kept publishing (see merge records 2–4). Final published ids are **F-90, F-92, F-93**; the fourth was dropped as a duplicate of main's own fix |
+
+Other resolutions: `index.html` — main's untraded handling kept, this branch's settled-count labels kept;
+`executive-summary.html` — main's new per-row source column kept, this branch's catalyst status and coverage kept;
+`data/findings.json` — main's 70 entries kept verbatim as the base, this branch's 4 appended;
+`alerts.html` / `dashboard.html` / `assets/site.js` — auto-merged, both sides' additions present.
+
+---
+
+---
+
 ### Merge record 2 — `arena/d34a9f0d` merging `origin/main` (PR #102–#104)
 
 `main` advanced again while this PR was open (#102 `arena/ae1f84b0` conflict-tree fix, #103 `arena/eed90ce4`
@@ -1973,3 +1995,15 @@ to the end of the file — which is the defect this session recorded as T72. Res
 Final published ids for this session: **F-90** (settled-count labels), **F-92** (catalyst coverage 9/61 reported as
 "done"), **F-93** (raw verdict identifier printed on the dashboard). The dead-assertion and untraded-row defects are
 recorded in the T72/T73 rows above and on `main` as S-02/F-83, so they are not double-published.
+
+### Merge record 5 — `arena/d34a9f0d` merging `origin/main` (PR #107–#108)
+
+PR #107 (`ea48482`, S-02 blank-scan-total edge case) and PR #108 (`5d453aa`, 429 backoff F-85) landed while this PR
+was awaiting merge. Two conflicts, both resolved additively and neither side discarded:
+
+| File | Resolution |
+|---|---|
+| `data/findings.json` | main's 75 entries kept verbatim as the base; this session's F-90/F-92/F-93 appended → **78 total, 0 duplicate ids** (checked programmatically) |
+| `COORDINATION.md` | main's new content kept first, this session's after it, both verbatim. A merge-record heading that an earlier resolution had left parked above this session's header was moved back inside it |
+
+`verify_release.py` **PASS** after the merge; `test_client_safety.py` (main's board-marker guard) **OK**.

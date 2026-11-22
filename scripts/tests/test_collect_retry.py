@@ -22,7 +22,11 @@ What is asserted
   4. Network-level failure (URLError) then 200 -> returns, proving a dropped
      connection no longer costs the pass.
   5. 429 is still retried, per the documented "no penalty" behaviour
-     (https://docs.kalshi.com/getting_started/rate_limits).
+     (https://docs.kalshi.com/getting_started/rate_limits), and on a longer schedule than a
+     5xx: 3 s, 6 s, 12 s (doubling) instead of 1.5 s, 3 s, 4.5 s (linear), because a
+     rate-limited collector that retries in milliseconds just trips the limit again.
+  6. A scan pauses briefly between pages (PAGE_PAUSE_SECONDS) instead of hammering the
+     unauthenticated limit with ~60 back-to-back page reads.
 
 Offline: `urllib.request.urlopen` and `time.sleep` are patched inside the collector
 module. No network, no credentials, no files written.
@@ -118,6 +122,21 @@ class RetryPolicyTests(unittest.TestCase):
         outcome, calls = self.run_get([http_error(429, "Too Many Requests"), ok({"markets": []})])
         self.assertEqual(outcome[0], "ok", outcome)
         self.assertEqual(calls["urlopen"].call_count, 2)
+
+    def test_429_backoff_doubles_and_5xx_backoff_is_linear(self):
+        outcome, calls = self.run_get([http_error(429, "Too Many Requests")] * 10, retries=4)
+        self.assertEqual(outcome[0], "error", outcome)
+        waits = [c.args[0] for c in calls["sleep"].call_args_list]
+        self.assertEqual(waits, [3.0, 6.0, 12.0], "429 backs off on the documented advice")
+
+        outcome, calls = self.run_get([http_error(503, "Service Unavailable")] * 10, retries=4)
+        waits = [c.args[0] for c in calls["sleep"].call_args_list]
+        self.assertEqual(waits, [1.5, 3.0, 4.5])
+
+    def test_scan_pauses_between_pages(self):
+        self.assertGreater(self.mod.PAGE_PAUSE_SECONDS, 0)
+        source = (ROOT / "scripts" / "collect.py").read_text()
+        self.assertIn("time.sleep(PAGE_PAUSE_SECONDS)", source)
 
     def test_retry_status_set_is_the_documented_one(self):
         self.assertEqual(set(self.mod.RETRY_STATUS), {429, 500, 502, 503, 504})
