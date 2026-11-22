@@ -1552,3 +1552,34 @@ Base `a159dd3` (main HEAD, 2026-11-22T07:21Z). This session re-verifies the comp
 
 ### Log (`arena-eed90ce4`)
 - 2026-11-22 08:05Z: Claimed T90–T93. Repo already contains a complete 21-page site (prior sessions); `check_site.py` PASS; `verify_release.py` PASS (after `npm install jsdom@26`). Snapshot `2026-11-22T06:17:12Z` (470 open in-scope / 200 settled published / 61 alerts / 49 model-watch). Pages builds API: `a159dd3` built 07:21:38Z. No open PRs. Desk scan run 45000919735 in progress on main.
+
+### T90 — line-by-line requirement verification (`arena-eed90ce4`, 2026-11-22)
+
+Sources fetched **this session** (all official, live):
+- https://docs.kalshi.com/getting_started/demo_env — demo Trade API root `https://external-api.demo.kalshi.co/trade-api/v2` (alt `https://demo-api.kalshi.co/trade-api/v2`); WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (alt `wss://demo-api.kalshi.co/trade-api/ws/v2`); quoted caveat: *"The price and behavior of markets in the demo environment may not be reflective of those in real markets."*
+- https://docs.kalshi.com/api-reference/market/get-markets — field schema confirms `last_price_dollars`, `volume_fp`, `volume_24h_fp`, `yes_bid_dollars`/`yes_ask_dollars`, `result: "yes"`, `settlement_value_dollars`; demo base URLs listed in the endpoint selector.
+- https://docs.kalshi.com/api-reference/market/get-market-candlesticks — `period_interval` valid values are **1, 60, 1440 minutes only**; `volume_fp` is contracts bought during the period.
+- https://docs.kalshi.com/getting_started/quick_start_market_data — orderbook response shape `orderbook_fp.yes_dollars` / `.no_dollars`, arrays sorted ascending, best bid last.
+- https://docs.kalshi.com/getting_started/quick_start_websockets — all WebSocket connections require auth at the handshake (`KALSHI-ACCESS-KEY/SIGNATURE/TIMESTAMP`); public channels (`ticker`, `trade`, …) still ride the authenticated session.
+- https://docs.kalshi.com/getting_started/api_keys — Ed25519 or RSA-PSS, timestamp within 30 s, sign path without query string.
+- https://docs.kalshi.com/getting_started/rate_limits — token buckets; `GET /portfolio/balance` has its own bucket (1/s Basic+Advanced, 5/s above).
+- https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account — quoted: *"Your demo account won't have funds preloaded"* → independently re-confirms **F-07** (balance must stay blank).
+
+| # | Brief requirement | Where it is implemented | Verification performed this session | Result |
+|---|---|---|---|---|
+| R1 | Executive summary | `executive-summary.html` | page present in the 21-page `check_site.py` pass; endpoint table matches `demo_env` verbatim | PASS |
+| R2 | Highest-dollar live events, 5 topics only | `dashboard.html`, `data/live/markets.json` | 470 open in-scope (crypto 166, golf 211, gas 31, elections 11, culture 51); ranking = `volume_fp × last_price_dollars`, labelled a project estimate because Kalshi publishes no "dollars traded" field (get-markets schema checked) | PASS (estimate labelled) |
+| R3 | ≥$0.10 swing alerts, two scrolling chats | `alerts.html`, `dashboard.html` (`allAlerts` / `modelAlerts`), `data/alert_rules.json` | gate test: 0.09 refused, 0.10 fires exactly once; live counts 61 all-events / 49 model-watch; model chat asserts "not an ROI prediction" | PASS |
+| R4 | Track to resolution, yes/no literal | resolution tracker in `dashboard.html`, `data/live/markets.json` | 200 settled published, results `no=146 / yes=54`, rendered from the API's own `result` field, never coerced | PASS |
+| R5 | Automated simulated trades + strategy categories | `simulation.html`, `trading.html`, `data/live/simulation.json`, `data/strategies.json` | 81 signals processed, 28 open positions, mode string "PAPER ONLY … places no orders and uses no account" | PASS (paper only — no keys) |
+| R6 | Demo-account portfolio performance | `portfolio.html` | balance cell deliberately blank; F-07 re-confirmed against the help-centre article today; `GET /portfolio/balance` is key-authenticated | PASS (blank + flagged, as required) |
+| R7 | Interactive chart, X = time (s/m/h/d), Y = contract price | `dashboard.html` window selector `s/m/h/d` | docs confirm only 1/60/1440-minute intervals exist; page states *"seconds: no such interval exists"* and builds the seconds window from accumulated observations | PASS (limitation disclosed) |
+| R8 | Liquidity / contracts available at a price | liquidity ladder in `dashboard.html`, `assets/live.js` | reads `orderbook_fp.yes_dollars` / `.no_dollars` exactly as the quick-start documents (ascending, best last) | PASS |
+| R9 | Catalyst/news links for ≥$0.10 jumps | `data/live/catalysts.json`, `scripts/catalysts.py` | links attached per swing; Kalshi publishes no causal attribution field → F-15 stays flagged | PASS (links only, no causal claim) |
+| R10 | Topics separate, events grouped within topic | `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `categories.html` | all present, link-checked | PASS |
+| R11 | GitHub Pages site, clean landing + category subpages, per-row official source link | root artifact via `.github/workflows/pages.yml` | Pages builds API: `a159dd3` built 2026-11-22T07:21:38Z; prior deploy runs success | PASS |
+| R12 | Line-by-line verification, blank + flag when unverified | `verification.html` (24 official doc links), `flagged.html` (62 findings from `data/findings.json`), `sources.html` | `test_verification_links.js` asserts all 24 URLs are `https://docs.kalshi.com/…`; flagged page DOM-rendered in gate | PASS |
+| R13 | Parallel-session coordination | `COORDINATION.md` | claim committed and pushed before any edit (this section) | PASS |
+| R14 | WebSocket endpoints | disclosed on `executive-summary.html`, `sources.html` | docs confirm the socket needs a key at handshake, so the browser cannot stream ticks without credentials — stated on the page instead of faked | PASS (disclosed) |
+
+Release gate re-run this session: `python3 scripts/verify_release.py` → **PASS** (after `npm install --no-save --package-lock=false jsdom@26`), including alert-chat-dock (0.09 refused / 0.10 fires once / CORS-blocked fallback), verification-link table (24/24 official), and `check_site.py` (21 pages, all internal links resolve). No irregularities found that were not already published on `flagged.html`.
