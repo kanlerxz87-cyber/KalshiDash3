@@ -3,6 +3,29 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-5c8e3f0a` — demo safety and current release audit
+
+Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; remote main equals base. Existing historical claims above are closed out in their later logs or older than 60 minutes; taking over only the narrow scopes below. This session stays on Arena's assigned branch (branch naming is fixed by the environment).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | done | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
+| S5C-2 | Publish current audit and safety finding, update executor instructions; final release integration, PR, merge, deploy verification | in progress | arena-5c8e3f0a | `COORDINATION.md` (this section), `README.md` (executor safety), `executive-summary.html` (new audit section only), `data/findings.json` (one uniquely prefixed finding) | Baseline `python3 scripts/verify_release.py` PASS, 21 pages. GitHub Pages API reports legacy main/root, built. Account credentials not available; no signed requests or orders attempted. |
+
+- 2026-11-22: Read coordination board before work; inspected repository and workflows, ran full baseline release gate (PASS). Found `base_url()` trusts substring `demo` and `KALSHI_ALLOW_PRODUCTION=1`, inconsistent with this demo-only brief. Official demo endpoint table confirms exactly two supported REST roots. Will remove override, disallow redirects, and test without using credentials or calling Kalshi.
+- S5C-2 scope clarification before editing: executive-summary scope also includes correcting unsupported statements that an account/key "does not exist" (only absence of supplied credentials is known), removing a claim that credentials are the sole remaining integration blocker, and adding official source links per row in its two existing tables. No other page/navigation files are claimed. Initial claim push pulled main because this new branch did not yet have a remote ref; subsequent pushes pull this branch explicitly.
+- S5C-1 implementation complete: exact demo REST roots (one trailing slash), production override removed, rejected URLs not echoed, endpoint validation before key load, no redirect following, finite positive quantity checks, no silent price rounding. `test_client_safety.py`: 11 tests PASS, including real urllib redirect/error processing with a socket-free HTTPS fixture for GET/POST/DELETE × 301/302/303/307/308 × same/different origins. No credential or external request used.
+- S5C-2 verification before PR: full `python3 scripts/verify_release.py` PASS (all Python/JS suites, DOM checks across 21 pages, internal links). New regression also confirms all 27 executive-summary data rows have an official documentation reference. Added dated audit and SAFE-5C-01 to the existing Flagged ledger, preserving older findings. Re-read official demo_env, api_keys, quick_start_websockets, market_settlement, get-markets, get-market-orderbook, create-order-v2 (body/response chunks 0–2), demo-account help, and GitHub Pages static-hosting docs. These confirm endpoint/authentication/contracts, not exchange execution, fresh external market values, profitability or causal attribution. All remain explicitly unverified where applicable. Existing source-ledger claims were not falsely re-dated.
+
+### Integration log — arena-5c8e3f0a
+
+- PR #92 CI passed on runs 45001469245, 45001945214 and 45002088813. Main advanced with PRs #93, #94 and #95 while checking. Retained all parallel-session changes, including G19 status, landing no-trade labelling, browser series fee multipliers, their tests and complete coordination notes.
+- Resolved append conflicts in COORDINATION.md by preserving main verbatim and inserting this own session section near the top (not competing for its end). Resolved data/findings.json by keeping main's F-83/F-84 entries and appending SAFE-5C-01 unchanged. Executive-summary fee wording auto-merged. No force push and no authenticated exchange request or order. Re-running the combined release gate before merge.
+
+- Integrated PR #99 workflow timeout bounds and F-85 collector-stall finding. Kept that official run evidence intact. Positioned SAFE-5C-01 at the start of the flagged array so subsequent additive findings do not contend for its final row. Full combined release is rechecked locally; CI will also verify the merged release.
+
+---
+
 ## Task board
 
 | ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
