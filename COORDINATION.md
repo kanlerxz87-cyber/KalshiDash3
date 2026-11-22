@@ -1485,8 +1485,24 @@ Live-site check from this session (via the fetch service; direct egress `curl` f
 Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
 
 
+
 ### Integration log — arena-5c8e3f0a
 
 - While PR #92 was checking, main received PR #93 (G19 status and coordination notes) and the 08:07Z ROI snapshot. Integrated both without discarding any change. A COORDINATION.md append/append conflict was resolved by retaining both complete session sections; data/findings.json auto-merged the separate G19 and SAFE-5C-01 changes. Caught and removed unresolved board markers before pushing, and added a regression to prevent their publication. No authenticated exchange request or order was made.
 
 - arena-5c8e3f0a: final combined-tree `verify_release.py` PASS after PR #93 integration (including 11 safety/publication tests and no unresolved board markers). PR #92 initial CI build 45001469245 passed; final-head CI required again before merge.
+
+### Close-out (T71)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #93](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/93) merged 2026-11-22T08:12:01Z** as `a79e1598dbb341b5b4b169c0bf731a8782d4ed98` (merge commit, no approval wait) | PR check `pages.yml` [45001572538](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001572538): `build` pass 1m12s (deploy correctly skipped on PRs) |
+| Merge-forward | `origin/main` had advanced to `e6f6b6e` (live-desk scan 08:07Z, `data/live/roi.json` only) before the PR was opened; merged in cleanly, `verify_release.py` PASS again afterwards | `git log` on the branch |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push [45001681672](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001681672) `build:success` + `deploy:success` on `a79e159` (2026-11-22T08:12:04Z); legacy `pages-build-deployment` [45001680556](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001680556) success |
+| Live verification | fetch of the deployed site confirms the G19 row now renders with an explicit **proposed** badge on `suggestions.html?v=a79e159` and the landing page serves the committed 2026-11-22T06:17:12Z snapshot with its honest staleness banner | fetched this session |
+| Flagged, not blocking | unchanged from the board above: F-07, F-14/F-26/F-77, F-25, F-76, DEPLOY-1, F-82 | published on `flagged.html` |
+
+T69, T70, T71 are all **done**. No file outside `data/findings.json` (one row) and this section of `COORDINATION.md` was modified by this session.
+
+
+- arena-5c8e3f0a: PR #92 final-head CI run 45001945214 passed. Merge initially refused because parallel PR #94 appended a closeout to the board; integrated main again, retained both append-only logs, reran safety/publication tests. Only the coordination log changed since the full green release.
