@@ -1441,3 +1441,40 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
+
+---
+
+## Session `arena-d34a9f0d` — independent verification pass, landing-page count defects, dead test assertions, catalyst coverage (branch `arena/d34a9f0d-kalshidash3`)
+
+Base `a159dd3` (`main`, snapshot 2026-11-22T07:21Z). Checked every live claim before starting: there are
+**no open pull requests** and no `in-progress` task row younger than 2026-11-21, so no scope below overlaps a
+live session. Claim `arena-d34a9f0d` pushed before any implementation edit.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T70 | Independent line-by-line verification of the published numbers against the official demo API and docs.kalshi.com, using a fetch route this sandbox has and earlier sessions did not | done | arena-d34a9f0d | `COORDINATION.md` (this section) | 5/5 headline rows re-fetched from `GET /markets/{ticker}` and matched field-for-field; see the table below |
+| T71 | **F-83**: `index.html` prints `counts.settled_in_scope` (the 1,600-row *kept window*) as "settled markets in scope", while the banner on the same page prints the 6,927-row scan total — two different numbers under the same phrase | done | arena-d34a9f0d | `index.html` | `scripts/tests/test_scope.py`, `test_pages_dom.js` |
+| T72 | **F-84**: `scripts/tests/test_scope.py` ends its verdict (`if errors: sys.exit`) at line 287 and then keeps asserting to line 312, so section 5's assertions can never fail the run — and one of them (`settled_in_scope_total_method` must be rendered in `index.html`) is failing right now while the suite prints `OK` | done | arena-d34a9f0d | `scripts/tests/test_scope.py` | suite now fails on the defect it was written to catch, then passes after T71 |
+| T73 | **F-85**: the landing page names a $0-volume, 0.0¢ market as Culture's "largest live market" with no explanation, although `culture.html` carries a notice saying exactly that | done | arena-d34a9f0d | `index.html`, `scripts/tests/test_scope.py` | `test_scope.py` + DOM render |
+| T74 | **F-86**: catalyst coverage is 9 of 61 swings, yet the executive summary reports the requirement as "done"; extend the review ledger with sources actually fetched this session and correct the status to the measured coverage | in progress | arena-d34a9f0d | `data/catalyst_review.json`, `data/live/catalysts.json` (regenerated only), `executive-summary.html`, `data/findings.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` |
+| T75 | Publish: gate → PR → merge → confirm Pages | pending | arena-d34a9f0d | `COORDINATION.md` | close-out below |
+
+### Verification evidence (T70) — headline rows re-fetched 2026-11-22 ~08:1xZ
+
+Each row of the landing page's "What is live right now" table was re-read from the market's own official record
+and compared with the committed snapshot `2026-11-22T06:17:12Z`. Every value matched exactly; no price is
+invented, rounded up, or carried forward from a different ticker.
+
+| Landing-page cell | Committed snapshot | `GET /markets/{ticker}` just now | Match |
+|---|---|---|---|
+| Gas · `KXAAAGASM-26NOV30-3.90` · $23,271 · 75.0¢ · 31,028 · 24,989 | `volume_fp 31027.52`, `last_price_dollars 0.75`, `open_interest_fp 24988.65` | same three values, `status active` | ✔ 31027.52 × 0.75 = 23270.64 |
+| Elections · `KXELECTIRAN-27JAN01` · $3 · 90.0¢ · 3 · 0 | `volume_fp 3.19`, `last 0.90`, `open_interest_fp 0.02` | same, `status active` | ✔ 3.19 × 0.90 = 2.87 |
+| Culture · `KXALBUMCHART-GTA6H100-05DEC26-GE9` · $0 · 0.0¢ · 0 · 0 | `volume_fp 0`, `last 0`, `open_interest_fp 0` | same, `status active` | ✔ (and see T73: a $0 row is a poor "largest") |
+| Crypto · `KXBTCY-27JAN0100-B147500` · $64,029,609 · 98.0¢ · 65,336,335 · 6,920,631 | `volume_fp 65336335.23`, `last 0.98`, `open_interest_fp 6920631.49` | same | ✔ |
+| Golf · `KXPGATOUR-THRC26-BHAR` · $114,896 · 75.0¢ · 153,195 · 119,274 | `volume_fp 153195.26`, `last 0.75`, `open_interest_fp 119274.49` | same, `volume_24h_fp 2586.93` | ✔ |
+
+Also re-read this session: `GET /historical/cutoff` → `market_settled_ts 2026-09-23T00:00:00Z`. **The cutoff moved
+one day since F-82 was recorded** (it read `2026-09-22T00:00:00Z` on 2026-11-21), which confirms it is a rolling
+value rather than a fixed date. F-82's *finding* stands (a market settled 2026-07-01 still returns HTTP 200 from
+`GET /markets/{ticker}` while the bulk settled paging never reaches it); only the quoted constant is now stale, and
+the site prints it from the snapshot rather than typing it, so nothing on the page is wrong.
