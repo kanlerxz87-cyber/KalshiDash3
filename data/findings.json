@@ -1086,6 +1086,19 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01"
    ]
+  },
+  {
+   "id": "SAFE-5C-01",
+   "severity": "high",
+   "item": "Fixed 2026-11-22: executor demo boundary accepted substring matches and a production override",
+   "why": "Repository review of scripts/kalshi_client.py at a159dd3 found base_url() trusted any URL containing demo, including attacker-controlled hosts, and KALSHI_ALLOW_PRODUCTION=1 enabled non-demo roots. urllib also followed redirects by default. This did not guarantee the demo-only scope or containment of signed account headers. This is a code/fixture finding, not evidence of a credential leak or a real trade.",
+   "action": "Fixed: an exact allowlist of the two documented HTTPS demo REST roots, no production override, no redirect following or automatic order retries, and validation before loading keys. Added offline spoofed-host, production, redirect, unsigned-query-path and invalid-order tests. Rejects non-finite values and silent four-decimal price rounding. Exchange execution and account data remain unverified because no demo credentials were supplied; the static site has no authenticated backend. No account is asserted not to exist.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://docs.kalshi.com/getting_started/api_keys",
+    "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/a159dd3ab161043705a8761e1c6bd40999396da6/scripts/kalshi_client.py"
+   ]
   }
  ]
 }

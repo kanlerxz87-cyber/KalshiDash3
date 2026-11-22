@@ -121,8 +121,20 @@ python3 scripts/kalshi_client.py positions
 python3 scripts/kalshi_client.py buy MARKET-TICKER 25 0.42
 ```
 
-The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCTION=1` is set, and it posts to
-`POST /portfolio/events/orders` because the legacy `/portfolio/orders` write endpoints now return `410 Gone`.
+The executor is **demo-only, with no production override**. `KALSHI_BASE` must exactly match either
+`https://external-api.demo.kalshi.co/trade-api/v2` or `https://demo-api.kalshi.co/trade-api/v2`
+(one trailing slash is allowed), as listed in the [official demo endpoint table](https://docs.kalshi.com/getting_started/demo_env).
+Spoofed hosts, embedded credentials, alternate paths, HTTP and production roots are rejected before loading a key.
+The former `KALSHI_ALLOW_PRODUCTION` variable no longer grants an exception. Signed requests never follow redirects
+or automatically retry an order. Invalid/non-finite quantities and prices fail locally; a price that would be rounded
+by this client's four-decimal format is rejected, not silently changed. Market-specific tick/quantity rules still need
+exchange validation. Run the credential-free regression tests with `python3 scripts/tests/test_client_safety.py`.
+
+Orders use the documented [`POST /portfolio/events/orders` V2 endpoint](https://docs.kalshi.com/api-reference/orders/create-order-v2).
+No demo keys were supplied to this session, so no authenticated balance, position, fill or execution has been verified.
+Do not interpret passing fixture tests as a successful exchange trade. The static Pages site cannot safely hold a
+private key or run a persistent authenticated service; account synchronization needs a separately secured backend.
+See the [current executive audit](https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html#audit-2026-11-22).
 
 ## Rules this repository follows
 
