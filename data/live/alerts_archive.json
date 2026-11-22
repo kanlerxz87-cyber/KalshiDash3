@@ -2,6 +2,55 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXBTCD-26NOV2211-T60799.99",
+   "event_ticker": "KXBTCD-26NOV2211",
+   "title": "Bitcoin price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-22T15:43:54Z",
+   "to_time": "2026-11-22T15:58:54Z",
+   "from_price": 0.37,
+   "to_price": 0.25,
+   "delta": -0.12,
+   "direction": "down",
+   "volume_24h_fp": 7.27,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2211-T60799.99",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-22T15:58:55Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 1.0,
+    "est_dollars": 0.25,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 6.27,
+    "volume_to": 7.27,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "1 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-22T15:58:55Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",
@@ -44,10 +93,10 @@
     "decided_at": "2026-11-22T15:43:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -93,7 +142,7 @@
     "decided_at": "2026-11-22T15:28:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -142,7 +191,7 @@
     "decided_at": "2026-11-22T15:13:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.97,
     "gave_back_half": false,
     "still_open": false
@@ -191,7 +240,7 @@
     "decided_at": "2026-11-22T15:13:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -240,7 +289,7 @@
     "decided_at": "2026-11-22T15:13:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.96,
     "gave_back_half": false,
     "still_open": false
