@@ -2054,3 +2054,20 @@ rebuilt from `main`'s version rather than from this branch's, so no earlier sess
 - Tests: `scripts/tests/test_collect_health.py`, 5 offline cases (git and the temp root are stubbed): field shape and tail bound, only the health file is staged, no-change is not committed, a rejected push still leaves the file, and every failure path in `make_pass` routes through it. `test_collect_relay.py` still passes unchanged.
 - **F-86 validated in production this session:** after the 09:23Z cron was dropped by the scheduler, a manual `gh workflow run freshness-alarm.yml` (the workflow supports dispatch) ran the new chain — `Decide what to do about a stale snapshot: success`, `Cancel a wedged collection so the run queued behind it can start: **success**`, `Dispatch one collection: skipped`. The run that had been in flight for 1 h 9 m with no commit was cancelled automatically and the already-queued run took over. That is the exact human rescue performed earlier, now automated.
 - Collector status at close: still no `data: demo snapshot` commit since `f364db9` (06:17:13Z); `record_health()` will now record the reason on the next failed pass, which is the first thing any later session should read.
+
+### Session close-out (`arena-eed90ce4`, 2026-11-22)
+
+PRs opened from `arena/eed90ce4-kalshidash3` and merged to `main` without waiting for review, each merged only after `verify_release.py` PASS and `check_site.py` OK on the merged tree, each followed by a confirmed Pages build:
+
+| PR | merge commit | Pages | content |
+|----|--------------|-------|---------|
+| [#99](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/99) | `78b7b2c` | built | brief requirement table (T90) + `desk.yml`/`freshness-alarm.yml` job timeouts |
+| [#103](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/103) | `20f1fff` | built | collector retries transient 5xx/network instead of aborting the pass (`test_collect_retry.py`) |
+| [#105](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/105) | `e585ff7` | built | freshness monitor cancels a wedged collector instead of going silent (F-86, `freshness_guard.py`) |
+| [#108](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/108) | `f9df7d1` | built | documented 429 backoff (3/6/12 s) + page pacing |
+| [#112](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/112) | `4dee283` | built | stall threshold 60 min, from the pipeline's own worst legitimate pass |
+| [#113](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/113) | `c268c3c` | built | failed pass records its reason in `data/live/collector_health.json` (F-87) |
+
+What this session verified line by line (official sources fetched live, listed in T90 above): the demo REST/WS roots, the `GET /markets` field semantics used for ranking and resolution, candlestick intervals (1/60/1440 min only), the orderbook shape, WebSocket handshake auth, key signing, the balance endpoint's own rate-limit bucket, and the help-centre statement that a demo account has no preloaded funds (re-confirming F-07 → portfolio balance stays blank). All 14 brief requirements were mapped to the page/asset that implements them and to the check that pins it: see the T90 table.
+
+What is **not** resolved and must not be read as resolved: the collector committed no snapshot after `f364db9` (06:17:13Z) during this session. Its runs held and were handed over correctly (one cancelled by hand, one cancelled by the new guard), the site states the snapshot age and the count of missed intervals on every page that shows data, and the browser still polls the demo API directly because CORS is recorded as allowed for the Pages origin. The cause is unread; the next failed pass now writes `data/live/collector_health.json`, which is the first file a later session should read (F-87).
