@@ -1468,7 +1468,6 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 
 
 
-<<<<<<< HEAD
 ---
 
 ## Session `arena-ae1f84b0` — audit of the shipped tree at 2026-11-22T08:0xZ (branch `arena/ae1f84b0-kalshidash3`)
