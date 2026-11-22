@@ -49,7 +49,11 @@ KD.nav("categories.html");
     [{ key: "k", label: "Bucket" }, { key: "v", label: "Count", num: true }],
     [
       { k: "Open markets scanned", v: KD.num(snap.counts.open_total_scanned) },
-      { k: "Open markets inside the five categories", v: KD.num(snap.counts.open_in_scope) },
+      // S-02 (fixed 2026-11-22): this row used counts.open_in_scope, which is the PUBLISHED row
+      // count after the per-topic keep window — the same number the row further down already
+      // prints as "Open rows published". The scan total is now published separately; the
+      // fallback keeps an older snapshot readable without relabelling its number.
+      { k: "Open markets inside the five categories (scan total)", v: KD.num(snap.counts.open_in_scope_total ?? snap.counts.open_in_scope) },
       { k: "Open markets excluded", v: KD.num(snap.counts.open_out_of_scope) },
       { k: "Settled markets scanned", v: KD.num(snap.counts.settled_total_scanned) },
       { k: "Settled markets inside the five categories (scan total)", v: KD.num(snap.counts.settled_in_scope_total ?? "—") +
@@ -57,6 +61,7 @@ KD.nav("categories.html");
       { k: "Settled markets in this run's paging window", v: KD.num(snap.counts.settled_in_scope_this_run_window ?? snap.counts.settled_in_scope) },
       { k: "Settled rows published, allocated across the five topics", v: KD.num(snap.counts.settled_published ?? snap.counts.settled_in_scope) },
       { k: "Open rows published (largest first, per category)", v: KD.num(snap.counts.open_published_rows ?? snap.counts.open_in_scope) },
+      { k: "Open in-scope rows left out of the published window", v: KD.num(snap.counts.open_rows_trimmed_for_size ?? "—") },
       { k: "Settled markets excluded", v: KD.num(snap.counts.settled_out_of_scope) },
       // The scan now sends mve_filter=exclude, so combos are filtered by the API before they are
       // counted; these two counters therefore show what still slipped through, not the combo volume.

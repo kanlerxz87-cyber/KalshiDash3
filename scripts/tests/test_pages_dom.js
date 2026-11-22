@@ -514,19 +514,28 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
-    const inScope = markets.counts.settled_in_scope;
+    // S-02 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
+    // number the scan found in scope. The page must state the scan total
+    // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
+    // and never label either the window or the stored cap "in scope".
+    const inScope = markets.counts.settled_in_scope_total ?? markets.counts.settled_in_scope;
+    const window_ = markets.counts.settled_in_scope;
     const stored = (markets.settled_markets || []).length;
     const flat = r.text.replace(/\s+/g, " ");
     check(flat.includes(inScope.toLocaleString()),
-      `the KPI and banner must state the in-scope total (${inScope})`);
+      `the KPI and banner must state the in-scope scan total (${inScope})`);
     check(flat.includes(stored.toLocaleString()),
-      `the KPI or banner must name the stored rows (${stored})`);
-    // the original defect: the stored count printed as the in-scope total
+      `the KPI or banner must name the published settled rows (${stored})`);
+    // the original defect: a smaller count printed as the in-scope total
     check(!flat.includes(stored.toLocaleString() + " settled markets in scope"),
-      `the stored count (${stored}) must never be printed as "settled markets in scope"`);
+      `the published count (${stored}) must never be printed as "settled markets in scope"`);
     check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
-      `the stored count (${stored}) must never be printed as "settled rows in scope"`);
-    console.log(`  H index KPI     ok  (${stored} stored rows named, ${inScope} in scope stated)`);
+      `the published count (${stored}) must never be printed as "settled rows in scope"`);
+    if (window_ && window_ !== stored) {
+      check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
+        `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
+    }
+    console.log(`  H index KPI     ok  (${stored} published rows named, ${inScope} in-scope scan total stated)`);
     r.close();
   }
 

@@ -387,6 +387,54 @@
  ],
  "flagged": [
   {
+   "id": "S-01",
+   "severity": "high",
+   "item": "The release gate never evaluated nine assertions in scripts/tests/test_scope.py: the suite printed OK and exited 0 before they ran, and three of them were false at the time",
+   "why": "The file ended its checks at line ~283 with `if errors: FAIL/exit` followed by `print(\"OK: scope tests passed …\")`. The F-72 block added later sits BELOW that report, so it executed after the summary and its findings could never affect the exit code. verify_release.py runs this file and treats exit 0 as a pass, so the gate reported 21 pages green while the dead checks were demanding fields the collector does not publish: '\"open_published_rows\"' and '\"settled_published_rows\"' in scripts/collect.py (absent), '\"settled_in_scope_total_method\"' (absent), and settled_in_scope_total_method in index.html (absent). Proven by running the file (prints OK, exit 0) and grepping collect.py for the strings it requires. This is a test-integrity failure, not a data failure: the page numbers it was supposed to protect were also wrong (F-84).",
+   "action": "Report block moved to the end of scripts/tests/test_scope.py, so every check now gates the run. The three false assertions were made true rather than deleted: scripts/collect.py publishes counts.open_in_scope_total, open_published_rows, settled_published_rows and settled_in_scope_total_method, and index.html renders the method. Mutation-tested: removing open_in_scope_total from categories.html now makes the suite print FAIL and exit 1 (before the fix it printed OK). Re-run with `python3 scripts/tests/test_scope.py`.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_scope.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/verify_release.py"
+   ]
+  },
+  {
+   "id": "S-02",
+   "severity": "medium",
+   "item": "Two pages labelled the PUBLISHED (trimmed) row count as the number of markets found in scope: categories.html for open markets, index.html for settled markets",
+   "why": "scripts/collect.py computes counts.open_in_scope AFTER the per-topic keep window, so the value is the published row count (470 open rows in the 2026-11-22T06:17:12Z snapshot), while the scan had classified 12,163 open in-scope markets (470 published + 11,693 recorded in open_rows_trimmed_for_size). categories.html printed that same 470 twice: once as 'Open markets inside the five categories' and once, correctly, as 'Open rows published'. index.html did the same on the settled side: counts.settled_in_scope is the 1,600-row retained paging window, but the resolution tracker called it 'settled markets in scope' while counts.settled_in_scope_total held the scan total (6,927) and only 200 rows are published. The in-scope total for open markets was not published anywhere, so no page could have shown it.",
+   "action": "scripts/collect.py now publishes open_in_scope_total (before trimming), open_published_rows, settled_published_rows and settled_in_scope_total_method (the settled paging window + historical backfill rows, with the safety-cap state). categories.html shows the scan total, the published count and the trimmed count as three separate rows; index.html names the scan total, prints the method, and labels its table 'settled rows published'. Both pages fall back to the old fields when reading an older snapshot, and scripts/tests/test_scope.py (now a live gate, F-83) fails if either label regresses. Values quoted are from data/live/markets.json collected 2026-11-22T06:17:12Z.",
+   "sources": [
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/markets.json",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://kanlerxz87-cyber.github.io/KalshiDash3/categories.html"
+   ]
+  },
+  {
+   "id": "S-03",
+   "severity": "low",
+   "item": "Seven claim rows on verification.html sent readers to the raw-markdown form of a Kalshi docs page (.md) instead of the documentation page",
+   "why": "data/verified_facts.json rows C-11 and C-12 cited https://docs.kalshi.com/getting_started/market_lifecycle.md, C-13/C-14 market_settlement.md, C-15/C-16 orderbook_responses.md and C-17 get-market-candlesticks.md. verification.html renders each row's source as the row's 'official source' link, so a reader who clicked through received markdown source rather than the page the site is quoting. The site's own rule already forbade this for doc_links rows (section B of test_verification_links.js) but the claim rows were never checked, so the defect could not fail the build.",
+   "action": "All seven source URLs were changed to the HTML page and each page was re-fetched and re-read on 2026-11-22 (market_lifecycle, market_settlement, orderbook_responses, get-market-candlesticks — all HTTP 200, content still matching the stored claim text), recorded per row as \"rechecked\": \"2026-11-22\". scripts/tests/test_verification_links.js gains section B2: no claim may cite a docs.kalshi.com .md URL, and no rendered link on the page may point at one. GitHub .md links are exempt because GitHub renders them as pages. Mutation-tested: re-appending .md to C-13 makes the suite fail.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks"
+   ]
+  },
+  {
+   "id": "S-04",
+   "severity": "low",
+   "item": "COORDINATION.md on main had a whole session section spliced into the middle of an earlier paragraph by a greedy merge-resolution edit",
+   "why": "`git show origin/main:COORDINATION.md` (before this repair) showed the sentence 'The first merge-conflict resolution script edited greedily on the substring `...`, which also occurs inside a quoted board log entry ...' cut in two: the entire '## Session arena-38b89a30' section was inserted between the backtick and its continuation, 26 lines early, so the paragraph that explains the earlier incident read as if it had been interrupted, and the session section appeared in the wrong place in the log. No text was lost — the section was intact — but the board is the shared coordination surface, so a reader following it top-to-bottom met a session header mid-sentence.",
+   "action": "Repaired in this session without deleting anything: the spliced section was moved, verbatim, to the end of the file with an HTML comment recording the move, and the interrupted sentence was rebuilt (the literal `=======` that the greedy edit had consumed is restored in backticks; the rest of the sentence is unchanged). Recorded here because the same greedy-replace pattern is the one that damaged content in earlier sessions, and a reader should know the file was edited for structure, not for content.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/COORDINATION.md",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/94"
+   ]
+  },
+  {
    "id": "SAFE-5C-01",
    "severity": "high",
    "item": "Fixed 2026-11-22: executor demo boundary accepted substring matches and a production override",

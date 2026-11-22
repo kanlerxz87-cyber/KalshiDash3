@@ -95,17 +95,21 @@ check("function isQaRow" in site_js, "assets/site.js must expose isQaRow so page
 check("isQaRow," in site_js, "isQaRow must be exported from the KD object")
 index_html = (ROOT / "index.html").read_text()
 check("KD.isQaRow(r)" in index_html, "index.html must skip QA fixtures when picking the largest market")
-# Three sessions have now worded this line differently; what matters (F-37/F-38) is that the number of
-# STORED settled rows and the number IN SCOPE are both rendered as labelled, distinct values, and that the
-# stored cap is never presented alone as "settled markets in scope".
-check("settled_in_scope" in index_html,
-      "index.html must render counts.settled_in_scope next to the stored settled-row count (F-37/F-38)")
-stored_labels = ("stored settled rows", "settled markets stored", "settled rows in this snapshot")
-check(any(lbl in index_html for lbl in stored_labels),
-      "index.html must label the stored settled-row count distinctly (looked for: "
-      + ", ".join(stored_labels) + ")")
-check('"of " + KD.num(settled.length) + " settled markets in scope"' not in index_html,
-      "index.html must not present the stored row cap alone as 'settled markets in scope'")
+# Three sessions have now worded this line differently; what matters (F-37/F-38, restated by S-02
+# on 2026-11-22) is that the count of PUBLISHED settled rows and the count the scan FOUND IN SCOPE
+# are both rendered as labelled, distinct values, and that neither is presented as the other.
+# S-02 was the exact failure: index.html read counts.settled_in_scope (the 1,600-row retained
+# paging window) and called it "settled markets in scope" while counts.settled_in_scope_total
+# held the scan total (6,927). The page now names the scan total, prints how it was obtained,
+# and labels the rows it lists as published.
+check("settled_in_scope_total" in index_html,
+      "index.html must render counts.settled_in_scope_total as the in-scope settled figure (S-02)")
+check("settled_in_scope_total_method" in index_html,
+      "index.html must render how the settled scan total was obtained (S-02)")
+check("settled rows published" in index_html,
+      "index.html must label the rows it lists as published, not as 'in scope' (S-02)")
+check("KD.num(snap.counts?.settled_in_scope)} settled markets in scope" not in index_html,
+      "index.html must not present the retained paging window as 'settled markets in scope' (S-02)")
 
 # 4. the exclusion must be published, never silent
 collect_src = (ROOT / "scripts" / "collect.py").read_text()
@@ -279,12 +283,6 @@ if live.exists():
         print(f"note: {len(unchecked)} open row(s) predate the series_categories field "
               f"({', '.join(unchecked[:3])} …); the next collection records it")
 
-if errors:
-    print("FAIL")
-    for e in errors:
-        print(" -", e)
-    sys.exit(1)
-print("OK: scope tests passed (natural gas excluded, QA fixtures refused, labels corrected, exclusions published)")
 # 5. F-72: the banner/table must never print the PUBLISHED settled-row count as if it were the
 #    scan total. The collector now publishes both; assert that wherever a settled total is
 #    labelled "in scope" the page reads settled_in_scope_total, and that the stored count is
@@ -310,3 +308,26 @@ check('"settled_in_scope_total_method"' in collect_src,
       "scripts/collect.py must publish how the settled total was obtained (exact vs carried forward)")
 check("settled_in_scope_total_method" in index_html,
       "index.html must render the method beside the settled total (F-72)")
+# S-02: the open side had the same defect and is checked the same way.
+categories_html = (ROOT / "categories.html").read_text()
+check('"open_in_scope_total": open_in_scope_total' in collect_src,
+      "scripts/collect.py must publish counts.open_in_scope_total (S-02)")
+check("open_in_scope_total" in categories_html,
+      "categories.html must read counts.open_in_scope_total for 'inside the five categories' (S-02)")
+check("open_published_rows" in categories_html,
+      "categories.html must name the published open-row count separately (S-02)")
+check("KD.num(snap.counts.open_in_scope)}" not in categories_html,
+      "categories.html must not label the published open-row count as the scan total (S-02)")
+
+
+# The report MUST be last. Before 2026-11-22 this block sat above the F-72 checks, so the
+# suite printed OK and exited 0 before any of them ran: nine assertions were dead code and
+# three of them were false at the time (the collector published no open_published_rows, no
+# settled_published_rows and no settled_in_scope_total_method). Found by running the file and
+# grepping collect.py for the fields the dead checks demanded.
+if errors:
+    print("FAIL")
+    for e in errors:
+        print(" -", e)
+    sys.exit(1)
+print("OK: scope tests passed (natural gas excluded, QA fixtures refused, labels corrected, exclusions published)")
