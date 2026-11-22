@@ -91,6 +91,8 @@ const KDCHAT = (() => {
     prev: new Map(),          // ticker -> { t, last }
     boot: new Map(),          // ticker -> last (from the committed snapshot)
     cat: new Map(),           // ticker -> category_id VERIFIED by the collector
+    basis: new Map(),         // ticker -> category_basis the collector published (seed | keyword | ...)
+    life: new Map(),          // ticker -> the snapshot row, for the lifecycle chip (T71)
     polls: 0,
     blocked: null,            // null | "cors" | "http" | "offline"
     lastError: "",
@@ -134,6 +136,7 @@ const KDCHAT = (() => {
           `<span class="cd-cat">${esc(cat)}</span>` +
           `${origin(a.origin)}</div>` +
         `<div class="cd-tick mono">${esc(a.ticker)}${a.volume24 !== null && a.volume24 !== undefined ? ` · 24h vol ${num(a.volume24)}` : ""}</div>` +
+        `<div class="cd-life">${lifeBit(a)}</div>` +
         `<div class="cd-title">${esc(a.title || "")}</div>` +
         `<div class="cd-links">${links.join(" · ")}</div>` +
       `</div>`
@@ -173,6 +176,10 @@ const KDCHAT = (() => {
         dir: delta >= 0 ? "up" : "down",
         origin: "history",
         volume24: fnum(a.volume_24h_fp),
+        basis: a.category_basis || null,
+        // Frozen at detection by scripts/build_alerts.py from data/alert_rules.json.
+        highRoi: a.high_roi === true,
+        life: lifeOf(a.ticker),
         api: `${BASE}/markets?tickers=${encodeURIComponent(a.ticker)}`,
         news: `https://news.google.com/search?q=${encodeURIComponent(String(a.title || a.ticker).slice(0, 120))}`,
       });
@@ -198,6 +205,10 @@ const KDCHAT = (() => {
       const rows = tick.filter((r) => fnum(r.last_price_dollars) !== null).slice(0, 40);
       for (const r of (d.open_markets || []).concat(d.settled_markets || [])) {
         if (r && r.ticker && r.category_id) S.cat.set(r.ticker, r.category_id);   // collector's verified category
+        if (r && r.ticker) {
+          S.basis.set(r.ticker, r.category_basis || null);
+          S.life.set(r.ticker, r);                                                // status/result for the lifecycle chip
+        }
       }
       for (const r of rows) {
         const t = Date.parse(d.collected_at || "");
@@ -221,6 +232,7 @@ const KDCHAT = (() => {
       if (!ticker || last === null) continue;
       const before = S.prev.get(ticker);
       S.prev.set(ticker, { t: at, last: last });
+      S.life.set(ticker, m);                    // a live reading is also a lifecycle reading
       if (!before) continue;                       // first reading is a baseline, never an alert
       const delta = last - before.last;
       if (Math.abs(delta) < THRESHOLD - 1e-9) continue;
@@ -235,6 +247,9 @@ const KDCHAT = (() => {
         dir: delta >= 0 ? "up" : "down",
         origin: "live",
         volume24: fnum(m.volume_24h_fp),
+        basis: S.basis.get(ticker) || null,
+        highRoi: undefined,                       // not archived yet -> rule applied at render
+        life: lifeOf(ticker),
         api: `${BASE}/markets?tickers=${encodeURIComponent(ticker)}`,
         news: `https://news.google.com/search?q=${encodeURIComponent(String(m.title || ticker).slice(0, 120))}`,
       })) fired++;
@@ -248,6 +263,21 @@ const KDCHAT = (() => {
   // snapshot has never seen — it is a PREFIX HEURISTIC, and it is labelled as such
   // wherever it can decide anything (discovery only).
   function catFor(ticker) { return S.cat.get(ticker) || categoryOf(ticker); }
+
+  /* T71: the event behind an alert is followed to its resolution. The viewer built by
+   * assets/site.js reads only the official status/result fields of the collector's snapshot, and
+   * it refuses to read absence as evidence (a ticker outside the ranked snapshot is "not in
+   * snapshot", never "unresolved"). S.life keeps the row the snapshot supplied. */
+  function lifeOf(ticker) {
+    const row = S.life.get(ticker);
+    return (typeof KD !== "undefined" && KD.lifecycleOf) ? KD.lifecycleOf(row || null) : null;
+  }
+
+  function lifeBit(a) {
+    if (typeof KD === "undefined" || !KD.lifecycleChip) return "";
+    const life = a.life || (a.ticker ? lifeOf(a.ticker) : null);
+    return life ? KD.lifecycleChip(life) : "";
+  }
 
   // GET /markets carries no category field, so a raw market record can only be
   // placed in one of the five requested topics by its series prefix. Anything
@@ -434,6 +464,13 @@ const KDCHAT = (() => {
     }
   }
 
+  function modelPick(a) {
+    if (!a) return false;
+    if (a.highRoi === true) return true;
+    if (a.highRoi === false) return false;
+    return a.basis === "seed" && (a.volume24 || 0) > 0;
+  }
+
   /* ----------------------------- rendering ----------------------------- */
   function render() {
     const scope = document.getElementById("kdScope");
@@ -443,7 +480,12 @@ const KDCHAT = (() => {
         : "";
     }
     const all = S.feed;
-    const model = all.filter((a) => Math.abs(a.delta) / Math.max(a.from, 0.05) >= 0.25 && (a.volume24 || 0) >= 100);
+    // T70: ONE screen, identical to the dashboard's Model watch and alerts.html. Membership is
+    // the archive's frozen `high_roi` flag (fee-schedule seed series with positive reported 24h
+    // volume, frozen at detection); a live alert the archive has not seen yet is judged by that
+    // same documented rule. This used to be an inline "≥25% relative move and ≥100 contracts"
+    // rule, which made the dock disagree with the other two surfaces (D-02).
+    const model = all.filter(modelPick);
     const cat = S.filter;
     const inCat = (a) => !cat || a.category === cat;
     const box = document.getElementById("kdChatAll");
@@ -459,7 +501,7 @@ const KDCHAT = (() => {
       const rows = model.filter(inCat).slice(-MAX_ROWS);
       mbox.innerHTML = rows.length
         ? rows.map(rowHTML).join("")
-        : '<div class="cd-empty">No swing has passed the experimental screen yet (≥ 25% relative move with ≥ 100 contracts of 24h volume).</div>';
+        : '<div class="cd-empty">No swing has passed the experimental screen yet (a fee-schedule seed series with positive reported 24-hour volume — not an ROI prediction).</div>';
       if (nearBottom(mbox)) mbox.scrollTop = mbox.scrollHeight;
     }
     const cAll = document.getElementById("kdCountAll");
@@ -520,7 +562,7 @@ const KDCHAT = (() => {
       </div>
       <div class="kd-card">
         <h4>Model watch · experimental <span class="kd-count" id="kdCountModel">0</span></h4>
-        <p class="kd-note">Not an ROI prediction. A transparent, unvalidated screen: ≥ 25% relative move with ≥ 100 contracts of reported 24h volume, newest last. Full method on <a href="alerts.html">Alert chats</a>.</p>
+        <p class="kd-note">Not an ROI prediction. Same screen as the dashboard and <a href="alerts.html">Alert chats</a>: a fee-schedule seed series with positive reported 24-hour volume, frozen at detection by the collector. One definition on every page (D-02).</p>
         <div class="kd-feed" id="kdChatModel" role="log" aria-live="polite" aria-label="Experimental screened swing alerts"></div>
       </div>
     </div>
