@@ -1441,3 +1441,14 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
+
+## Session `arena-5c8e3f0a` — demo safety and current release audit
+
+Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; remote main equals base. Existing historical claims above are closed out in their later logs or older than 60 minutes; taking over only the narrow scopes below. This session stays on Arena's assigned branch (branch naming is fixed by the environment).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | in progress | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
+| S5C-2 | Publish current audit and safety finding, update executor instructions; final release integration, PR, merge, deploy verification | in progress | arena-5c8e3f0a | `COORDINATION.md` (this section), `README.md` (executor safety), `executive-summary.html` (new audit section only), `data/findings.json` (one uniquely prefixed finding) | Baseline `python3 scripts/verify_release.py` PASS, 21 pages. GitHub Pages API reports legacy main/root, built. Account credentials not available; no signed requests or orders attempted. |
+
+- 2026-11-22: Read coordination board before work; inspected repository and workflows, ran full baseline release gate (PASS). Found `base_url()` trusts substring `demo` and `KALSHI_ALLOW_PRODUCTION=1`, inconsistent with this demo-only brief. Official demo endpoint table confirms exactly two supported REST roots. Will remove override, disallow redirects, and test without using credentials or calling Kalshi.
