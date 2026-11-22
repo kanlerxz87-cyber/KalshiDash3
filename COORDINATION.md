@@ -22,6 +22,8 @@ Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; 
 - PR #92 CI passed on runs 45001469245, 45001945214 and 45002088813. Main advanced with PRs #93, #94 and #95 while checking. Retained all parallel-session changes, including G19 status, landing no-trade labelling, browser series fee multipliers, their tests and complete coordination notes.
 - Resolved append conflicts in COORDINATION.md by preserving main verbatim and inserting this own session section near the top (not competing for its end). Resolved data/findings.json by keeping main's F-83/F-84 entries and appending SAFE-5C-01 unchanged. Executive-summary fee wording auto-merged. No force push and no authenticated exchange request or order. Re-running the combined release gate before merge.
 
+- Integrated PR #99 workflow timeout bounds and F-85 collector-stall finding. Kept that official run evidence intact. Positioned SAFE-5C-01 at the start of the flagged array so subsequent additive findings do not contend for its final row. Full combined release is rechecked locally; CI will also verify the merged release.
+
 ---
 
 ## Task board
@@ -1560,3 +1562,56 @@ page exists. This session therefore re-fetched every external source the ledger 
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
 
+## Session `arena-eed90ce4` — full-brief verification + refresh (branch `arena/eed90ce4-kalshidash3`)
+
+Base `a159dd3` (main HEAD, 2026-11-22T07:21Z). This session re-verifies the complete brief line-by-line against official sources, refreshes live data via scheduled collectors, and publishes via PR → main → Pages. Scope: `COORDINATION.md` (this section), `README.md` (status refresh if needed), data refresh commits only.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T90 | Claim + repo review + official-source verification of every brief requirement | in progress | arena-eed90ce4 | `COORDINATION.md` | docs.kalshi.com pages fetched live this session | — |
+| T91 | Full release gate (`verify_release.py`) + live site check | pending | arena-eed90ce4 | — (read-only) | gate output recorded below | — |
+| T92 | Fresh data via collect/desk workflows; confirm Pages deploy | pending | arena-eed90ce4 | `data/live/*` (via workflows) | workflow runs + Pages builds API | — |
+| T93 | PR → main, merge, confirm deploy, record links | pending | arena-eed90ce4 | `COORDINATION.md` | PR link + merge SHA + Pages status | — |
+
+### Log (`arena-eed90ce4`)
+- 2026-11-22 08:05Z: Claimed T90–T93. Repo already contains a complete 21-page site (prior sessions); `check_site.py` PASS; `verify_release.py` PASS (after `npm install jsdom@26`). Snapshot `2026-11-22T06:17:12Z` (470 open in-scope / 200 settled published / 61 alerts / 49 model-watch). Pages builds API: `a159dd3` built 07:21:38Z. No open PRs. Desk scan run 45000919735 in progress on main.
+
+### T90 — line-by-line requirement verification (`arena-eed90ce4`, 2026-11-22)
+
+Sources fetched **this session** (all official, live):
+- https://docs.kalshi.com/getting_started/demo_env — demo Trade API root `https://external-api.demo.kalshi.co/trade-api/v2` (alt `https://demo-api.kalshi.co/trade-api/v2`); WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (alt `wss://demo-api.kalshi.co/trade-api/ws/v2`); quoted caveat: *"The price and behavior of markets in the demo environment may not be reflective of those in real markets."*
+- https://docs.kalshi.com/api-reference/market/get-markets — field schema confirms `last_price_dollars`, `volume_fp`, `volume_24h_fp`, `yes_bid_dollars`/`yes_ask_dollars`, `result: "yes"`, `settlement_value_dollars`; demo base URLs listed in the endpoint selector.
+- https://docs.kalshi.com/api-reference/market/get-market-candlesticks — `period_interval` valid values are **1, 60, 1440 minutes only**; `volume_fp` is contracts bought during the period.
+- https://docs.kalshi.com/getting_started/quick_start_market_data — orderbook response shape `orderbook_fp.yes_dollars` / `.no_dollars`, arrays sorted ascending, best bid last.
+- https://docs.kalshi.com/getting_started/quick_start_websockets — all WebSocket connections require auth at the handshake (`KALSHI-ACCESS-KEY/SIGNATURE/TIMESTAMP`); public channels (`ticker`, `trade`, …) still ride the authenticated session.
+- https://docs.kalshi.com/getting_started/api_keys — Ed25519 or RSA-PSS, timestamp within 30 s, sign path without query string.
+- https://docs.kalshi.com/getting_started/rate_limits — token buckets; `GET /portfolio/balance` has its own bucket (1/s Basic+Advanced, 5/s above).
+- https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account — quoted: *"Your demo account won't have funds preloaded"* → independently re-confirms **F-07** (balance must stay blank).
+
+| # | Brief requirement | Where it is implemented | Verification performed this session | Result |
+|---|---|---|---|---|
+| R1 | Executive summary | `executive-summary.html` | page present in the 21-page `check_site.py` pass; endpoint table matches `demo_env` verbatim | PASS |
+| R2 | Highest-dollar live events, 5 topics only | `dashboard.html`, `data/live/markets.json` | 470 open in-scope (crypto 166, golf 211, gas 31, elections 11, culture 51); ranking = `volume_fp × last_price_dollars`, labelled a project estimate because Kalshi publishes no "dollars traded" field (get-markets schema checked) | PASS (estimate labelled) |
+| R3 | ≥$0.10 swing alerts, two scrolling chats | `alerts.html`, `dashboard.html` (`allAlerts` / `modelAlerts`), `data/alert_rules.json` | gate test: 0.09 refused, 0.10 fires exactly once; live counts 61 all-events / 49 model-watch; model chat asserts "not an ROI prediction" | PASS |
+| R4 | Track to resolution, yes/no literal | resolution tracker in `dashboard.html`, `data/live/markets.json` | 200 settled published, results `no=146 / yes=54`, rendered from the API's own `result` field, never coerced | PASS |
+| R5 | Automated simulated trades + strategy categories | `simulation.html`, `trading.html`, `data/live/simulation.json`, `data/strategies.json` | 81 signals processed, 28 open positions, mode string "PAPER ONLY … places no orders and uses no account" | PASS (paper only — no keys) |
+| R6 | Demo-account portfolio performance | `portfolio.html` | balance cell deliberately blank; F-07 re-confirmed against the help-centre article today; `GET /portfolio/balance` is key-authenticated | PASS (blank + flagged, as required) |
+| R7 | Interactive chart, X = time (s/m/h/d), Y = contract price | `dashboard.html` window selector `s/m/h/d` | docs confirm only 1/60/1440-minute intervals exist; page states *"seconds: no such interval exists"* and builds the seconds window from accumulated observations | PASS (limitation disclosed) |
+| R8 | Liquidity / contracts available at a price | liquidity ladder in `dashboard.html`, `assets/live.js` | reads `orderbook_fp.yes_dollars` / `.no_dollars` exactly as the quick-start documents (ascending, best last) | PASS |
+| R9 | Catalyst/news links for ≥$0.10 jumps | `data/live/catalysts.json`, `scripts/catalysts.py` | links attached per swing; Kalshi publishes no causal attribution field → F-15 stays flagged | PASS (links only, no causal claim) |
+| R10 | Topics separate, events grouped within topic | `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `categories.html` | all present, link-checked | PASS |
+| R11 | GitHub Pages site, clean landing + category subpages, per-row official source link | root artifact via `.github/workflows/pages.yml` | Pages builds API: `a159dd3` built 2026-11-22T07:21:38Z; prior deploy runs success | PASS |
+| R12 | Line-by-line verification, blank + flag when unverified | `verification.html` (24 official doc links), `flagged.html` (62 findings from `data/findings.json`), `sources.html` | `test_verification_links.js` asserts all 24 URLs are `https://docs.kalshi.com/…`; flagged page DOM-rendered in gate | PASS |
+| R13 | Parallel-session coordination | `COORDINATION.md` | claim committed and pushed before any edit (this section) | PASS |
+| R14 | WebSocket endpoints | disclosed on `executive-summary.html`, `sources.html` | docs confirm the socket needs a key at handshake, so the browser cannot stream ticks without credentials — stated on the page instead of faked | PASS (disclosed) |
+
+Release gate re-run this session: `python3 scripts/verify_release.py` → **PASS** (after `npm install --no-save --package-lock=false jsdom@26`), including alert-chat-dock (0.09 refused / 0.10 fires once / CORS-blocked fallback), verification-link table (24/24 official), and `check_site.py` (21 pages, all internal links resolve). No irregularities found that were not already published on `flagged.html`.
+
+### T92/T93 log (`arena-eed90ce4`, continuation)
+
+- **Found a real defect, not a cosmetic one.** Scheduled `collect.yml` run [44970894475](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44970894475) started 02:46:23Z and held the `collect-refs/heads/main` concurrency group while the newest collector commit stayed `f364db9` (06:17:13Z); `data/live/markets.json` therefore sat at `collected_at = 2026-11-22T06:17:12Z` for ~2 h behind the site's own cadence banner, and the queued dispatch run could not start behind it. `desk.yml` kept committing in the same window (06:44Z, 07:21Z, 08:07Z), so the demo API was answering — the stall was in the workflow chain, not the exchange.
+- **Cause not claimed.** Actions job logs are served from `productionresultssa6.blob.core.windows.net`, which this sandbox cannot reach (`gh api .../actions/jobs/<id>/logs` returns an EOF from that host; `gh run view --log` refuses while a run is in progress). The finding records observations only.
+- **Recovery:** cancelled the stuck run (`gh run cancel 44970894475`); the queued dispatch run 45001188514 immediately took the group and began collecting (job step started 08:07:36Z). This is the remedy already documented in `scripts/collect_relay.py`.
+- **Hardening shipped (F-85):** `desk.yml` → `timeout-minutes: 25` (measured 4.5 min typical, 12 m 19 s slowest), `freshness-alarm.yml` → `timeout-minutes: 10` (measured 8 s). Both share single-run groups with `cancel-in-progress: false`, so an unbounded job could pin them for the documented 6-hour hosted-job limit (https://docs.github.com/en/actions/reference/limits) and silently stop `roi.json` / the freshness monitor. `collect.yml` already had `timeout-minutes: 350`.
+- **Renumbering:** my stall finding was first written as `F-83`, but session `arena-ae1f84b0` merged an `F-83` (zero-volume landing row) and an `F-84` (fee ceiling) to main first, so this one is published as **F-85** and both other entries were kept intact. `data/findings.json` now carries 65 findings; `executive-summary.html` picks the count up dynamically.
+- **Merge race:** main advanced four times during this session (PR #93, #94, #95 and an extra merge), each appending to `COORDINATION.md`/`data/findings.json`. Resolved by rebasing and keeping every session's section and finding — nothing of mine replaced anyone else's.

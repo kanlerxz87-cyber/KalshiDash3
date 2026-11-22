@@ -30,6 +30,13 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    # Why bounded (arena-eed90ce4, F-85): this job shares the single-run `desk` concurrency group with
+    # cancel-in-progress:false, so a job that never returns would hold every later desk scan pending for
+    # GitHub's 6-hour default job limit and data/live/roi.json would silently stop refreshing. A measured
+    # scan takes ~4.5 min (run 44997539037) and the slowest observed was 12m19s (44994167105), so 25
+    # minutes leaves room for a slow demo API without ever pinning the group.
+    # See https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 

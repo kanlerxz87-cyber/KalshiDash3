@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-22T08:30:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes. Session arena-ae1f84b0 (2026-11-22T08:0xZ) added F-83 (landing table labelled a zero-volume market as a topic's largest) and re-verified the external links it cites; the missing G19 status is left to session arena-38b89a30, which claimed it first (see COORDINATION.md overlap note), after re-running the release gate on a159dd3 to confirm it was green before changing anything. Session arena-ae1f84b0 (2026-11-22T08:2xZ) added F-84 (browser paper ledgers charged the general taker fee on the schedule's M = 0 series and over-ceiled a cent) and fixed it in assets/alerts.js, assets/engine.js and portfolio.html with a new release-gate test.",
+ "generated": "2026-11-22T08:45:00Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes. Session arena-ae1f84b0 (2026-11-22T08:0xZ) added F-83 (landing table labelled a zero-volume market as a topic's largest) and re-verified the external links it cites; the missing G19 status is left to session arena-38b89a30, which claimed it first (see COORDINATION.md overlap note), after re-running the release gate on a159dd3 to confirm it was green before changing anything. Session arena-ae1f84b0 (2026-11-22T08:2xZ) added F-84 (browser paper ledgers charged the general taker fee on the schedule's M = 0 series and over-ceiled a cent) and fixed it in assets/alerts.js, assets/engine.js and portfolio.html with a new release-gate test. Session arena-eed90ce4 (2026-11-22T08:4xZ) added F-85 (a collect.yml relay run held the concurrency group for ~2 h with no commit, so the snapshot aged; desk.yml and freshness-alarm.yml job timeouts were bounded in the same change). It appended rather than replaced F-83/F-84, which merged from session arena-ae1f84b0 first.",
  "questions": [
   {
    "id": "Q1",
@@ -370,6 +370,19 @@
   }
  ],
  "flagged": [
+  {
+   "id": "SAFE-5C-01",
+   "severity": "high",
+   "item": "Fixed 2026-11-22: executor demo boundary accepted substring matches and a production override",
+   "why": "Repository review of scripts/kalshi_client.py at a159dd3 found base_url() trusted any URL containing demo, including attacker-controlled hosts, and KALSHI_ALLOW_PRODUCTION=1 enabled non-demo roots. urllib also followed redirects by default. This did not guarantee the demo-only scope or containment of signed account headers. This is a code/fixture finding, not evidence of a credential leak or a real trade.",
+   "action": "Fixed: an exact allowlist of the two documented HTTPS demo REST roots, no production override, no redirect following or automatic order retries, and validation before loading keys. Added offline spoofed-host, production, redirect, unsigned-query-path and invalid-order tests. Rejects non-finite values and silent four-decimal price rounding. Exchange execution and account data remain unverified because no demo credentials were supplied; the static site has no authenticated backend. No account is asserted not to exist.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://docs.kalshi.com/getting_started/api_keys",
+    "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/a159dd3ab161043705a8761e1c6bd40999396da6/scripts/kalshi_client.py"
+   ]
+  },
   {
    "id": "F-01",
    "item": "Legacy order endpoint used by the shipped scripts",
@@ -1113,16 +1126,18 @@
    ]
   },
   {
-   "id": "SAFE-5C-01",
-   "severity": "high",
-   "item": "Fixed 2026-11-22: executor demo boundary accepted substring matches and a production override",
-   "why": "Repository review of scripts/kalshi_client.py at a159dd3 found base_url() trusted any URL containing demo, including attacker-controlled hosts, and KALSHI_ALLOW_PRODUCTION=1 enabled non-demo roots. urllib also followed redirects by default. This did not guarantee the demo-only scope or containment of signed account headers. This is a code/fixture finding, not evidence of a credential leak or a real trade.",
-   "action": "Fixed: an exact allowlist of the two documented HTTPS demo REST roots, no production override, no redirect following or automatic order retries, and validation before loading keys. Added offline spoofed-host, production, redirect, unsigned-query-path and invalid-order tests. Rejects non-finite values and silent four-decimal price rounding. Exchange execution and account data remain unverified because no demo credentials were supplied; the static site has no authenticated backend. No account is asserted not to exist.",
+   "id": "F-85",
+   "severity": "medium",
+   "item": "The collector stalled for ~2 h behind a run that held its concurrency group, so the published snapshot aged past every stated refresh promise (found and cleared 2026-11-22)",
+   "why": "Observed with the Actions API, not inferred: schedule run 44970894475 of collect.yml started 2026-11-22T02:46:23Z and held the collect-refs/heads/main concurrency group; the newest collector commit was f364db9 'data: demo snapshot 2026-11-22T06:17Z' at 06:17:13Z, and data/live/markets.json kept collected_at = 2026-11-22T06:17:12Z while that run still reported in_progress for 6 h 48 m. Meanwhile desk.yml kept firing (commits at 06:44Z, 07:21Z and 08:07Z), so the demo API itself was answering during the stall. Cause NOT established: Actions job logs are served from productionresultssa6.blob.core.windows.net, which this session's sandbox cannot reach, so the per-pass output of the stalled run could not be read and no theory about which step stopped is recorded here as fact. GitHub documents that a concurrency group runs at most one job and holds at most one pending run, and that a GitHub-hosted job may run for up to 6 hours, which is exactly the window the stall consumed.",
+   "action": "Recovered in this session: the stuck run was cancelled (gh run cancel 44970894475) and the queued dispatch run 45001188514 took the group, which is the recovery procedure already written into scripts/collect_relay.py. Hardened: the two workflow jobs whose concurrency groups had no time bound now have one — desk.yml scan timeout-minutes 25 (measured 4.5 min typical, 12 m 19 s slowest) and freshness-alarm.yml check timeout-minutes 10 (measured 8 s) — so a wedged runner can no longer pin those single-run groups for the full 6-hour default. collect.yml already carried timeout-minutes 350. Residual: a stalled relay can still hold the collect group for up to ~5.8 h by design; the documented remedy is cancelling the run, which restarts the chain immediately.",
    "sources": [
-    "https://docs.kalshi.com/getting_started/demo_env",
-    "https://docs.kalshi.com/getting_started/api_keys",
-    "https://docs.kalshi.com/api-reference/orders/create-order-v2",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/a159dd3ab161043705a8761e1c6bd40999396da6/scripts/kalshi_client.py"
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44970894475",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001188514",
+    "https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency",
+    "https://docs.github.com/en/actions/reference/limits",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/desk.yml",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
    ]
   }
  ]
