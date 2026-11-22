@@ -135,6 +135,12 @@ The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCT
 
 ## Known limitations
 
+- Live-chart cause links are **not** causes, and the coverage is measured rather than claimed. `data/live/catalysts.json`
+  publishes, for each archived swing, a fetched reading of the reference that market settles on; the executive summary
+  renders the coverage from that file (57 of 61 swings on 2026-11-22, the other 4 left `not_reviewed` with the reason
+  stated on the row). Where the committed best bid **and** ask are identical either side of a swing, the row says the
+  move is in the last-traded print and not in the quoted price; where a market settles on an index with no public read
+  (the crypto series settle on CF Benchmarks' BRTI), the row quotes no reading at all rather than a proxy.
 - The collector cannot run in the environment that built this repository (no network route to Kalshi), so collection
   runs on GitHub Actions. Scheduled workflows can be delayed or skipped; the site shows the snapshot age for that reason.
 - In-browser live polling depends on CORS headers the demo API returns but Kalshi does not document. The engine probes

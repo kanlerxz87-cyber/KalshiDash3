@@ -1478,3 +1478,51 @@ one day since F-82 was recorded** (it read `2026-09-22T00:00:00Z` on 2026-11-21)
 value rather than a fixed date. F-82's *finding* stands (a market settled 2026-07-01 still returns HTTP 200 from
 `GET /markets/{ticker}` while the bulk settled paging never reaches it); only the quoted constant is now stale, and
 the site prints it from the snapshot rather than typing it, so nothing on the page is wrong.
+
+### Close-out (`arena-d34a9f0d`)
+
+| Item | Result |
+|---|---|
+| T70 verification | 5/5 landing-page headline rows re-fetched from `GET /markets/{ticker}` and matched field-for-field; 6 official documentation pages re-read and quoted verbatim (see the two tables below) |
+| T71 / **F-83** | fixed — the three settled counts (scan total 6,927 / kept window 1,600 / published 200) are named separately on `index.html`, and the collector now publishes `settled_in_scope_total_method` plus explicit published-row counts |
+| T72 / **F-84** | fixed — `scripts/tests/test_scope.py` had ~10 assertions *below* its verdict; three were failing on `main` while the suite printed `OK` and exited 0. The verdict is now the last statement, and the three assertions were made true rather than deleted. Confirmed by running the suite before the fix (it failed on the first assertion) and after (it passes) |
+| T73 / **F-85** | fixed — the landing page's Culture row named a $0-volume, 0.0¢ market as the "largest live market" with no explanation; the row and a footnote now say so in place, and `test_scope.py` / `test_pages_dom.js` assert it |
+| T74 / **F-86, F-87** | fixed — catalyst coverage **9/61 → 57/61**. 48 reviews written from sources fetched this session; 4 rows left `not_reviewed` with a stated reason (their bounding observations are no longer in the committed history). The executive summary's catalyst row now renders its status and coverage from `data/live/catalysts.json` instead of typing "done" |
+| Gate | `python3 scripts/verify_release.py` **PASS** on the branch — 21 pages, every suite, including the new assertions |
+| Flagged, not blocking | **F-83** (medium), **F-84** (medium), **F-85** (low), **F-86** (medium), **F-87** (low), all published on `flagged.html` with sources. **F-24** notes a third-party repository among its sources; it is labelled "circumstantial evidence only" and sits beside the official documentation link, so it was left as published rather than rewritten |
+
+#### T70 — official documentation re-read verbatim this session (2026-11-22 ~08:1x–08:4xZ)
+
+| Claim on the site | What the official page says (verbatim) | Source |
+|---|---|---|
+| C-01…C-04 demo endpoints | "Demo's recommended Trade API root is `https://external-api.demo.kalshi.co/trade-api/v2`", with `https://demo-api.kalshi.co/trade-api/v2` also supported, and the WebSocket pair `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` / `wss://demo-api.kalshi.co/trade-api/ws/v2` | [demo_env](https://docs.kalshi.com/getting_started/demo_env) |
+| C-07/C-08/C-50 demo is mock funds and may not reflect real markets | "For testing purposes, Kalshi offers a *demo* environment with mock funds… For safety, credentials are not shared between this environment and production. The price and behavior of markets in the demo environment may not be reflective of those in real markets." | [demo_env](https://docs.kalshi.com/getting_started/demo_env) |
+| C-17/C-29 candle intervals are 1/60/1440 only | "Time period length of each candlestick in minutes. Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-61 5,000-period cap and second-based timestamps | "One request can span at most 5,000 periods… rejected with 400 `bad_request`… 1-minute candlesticks are limited to about 3.5 days per request… `start_ts` and `end_ts` must be in seconds; millisecond values are rejected with 400 `bad_request`." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-62 / C-63 archived candles and freshness | "Candlesticks for markets that settled before the historical cutoff are only available via `GET /historical/markets/{ticker}/candlesticks`" · "The most recent candlesticks can be a few seconds behind the latest trades and quotes." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-27 orderbook shape | response body is `orderbook_fp` with `yes_dollars` and `no_dollars` arrays of `[price, count_fp]` string pairs | [get-market-orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook) |
+| C-53 an unknown ticker is 200 + empty arrays | re-probed live: `GET /markets/KXNOTAREALTICKER/orderbook` → `{"orderbook_fp":{"no_dollars":[],"yes_dollars":[]}}` | [live probe](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNOTAREALTICKER/orderbook) |
+
+#### T74 — the finding behind the new verdicts (measured, not asserted)
+
+Reading the two committed observations that bound each swing shows **two different phenomena** that the old
+vocabulary could not separate:
+
+| Pattern | Count | Evidence |
+|---|---|---|
+| Best bid **and** ask identical at both reads → the ≥ $0.10 change is in the last-traded print, not the quoted price | 19 swings | e.g. `KXBTCY-27JAN0100-B97500`: `last` 0.97 → 0.01 between 06:02:12Z and 06:17:12Z while the committed book stayed `yes_bid 0.00 / yes_ask 0.01` at both reads |
+| Book repriced → a real change in the quoted price, but the settlement reference (CF Benchmarks' BRTI) has no public read | 28 swings | e.g. `KXBTCY-27JAN0100-B52500` 21:46:11Z: book 0.01/0.99 → 0.09/0.10 while the print went 0.99 → 0.10 |
+
+Both are now first-class verdicts (`best_quote_did_not_move`, `reference_not_publicly_readable`) with human labels on
+both pages, and `relation` carries a `reference_name` so a proxy can never be printed as the settlement reference.
+Every row still links the market's own official record; the AAA row additionally links `gasprices.aaa.com` and quotes
+$3.6594 as of 11/21/26 against its $3.6450 strike.
+
+#### Deliberately not done
+
+- **`data/live/markets.json` was not rewritten.** The collector is the only writer and it is running on `main`; the new
+  `counts.settled_in_scope_total_method` and published-row fields appear on the next pass. Until then `index.html`
+  prints "not stated in this snapshot" rather than inventing the method string.
+- **The 4 remaining `not_reviewed` rows were not forced.** Their bounding observations are gone from the committed
+  history, so the bid/ask either side of the print cannot be read back. A guess there would be exactly the failure the
+  brief forbids.
