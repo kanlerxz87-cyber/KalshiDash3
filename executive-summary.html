@@ -104,7 +104,7 @@
              What is published instead is a fetched reading of the reference each market settles on, beside the minute the
              swing was recorded. <span id="catCoverage">Coverage is rendered from <code>data/live/catalysts.json</code>.</span>
              The word “reference” is never applied to a proxy: where a market settles on an index with no public read
-             (the crypto series settle on CF Benchmarks’ BRTI), the row says so and quotes nothing (<a href="flagged.html">F-89</a>).</td>
+             (the crypto series settle on CF Benchmarks’ BRTI), the row says so and quotes nothing (<a href="flagged.html">F-93</a>).</td>
           <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Market record (not causality)</a></td></tr>
       <tr><td>Automate simulated trades to test different strategies</td>
           <td><span class="badge ok">done — paper only</span></td><td><a href="trading.html">Auto-sim</a></td>
@@ -213,7 +213,7 @@ KD.nav("executive-summary.html");
   } catch (e) {
     host.textContent = "Counts unavailable from the committed ledgers; open the claims and flagged pages directly.";
   }
-  // F-88: this row used to say "done" while the lead file held a review for 9 swings out of 61.
+  // F-92: this row used to say "done" while the lead file held a review for 9 swings out of 61.
   // The status and the coverage sentence are now read from the file that actually holds the reviews,
   // so the summary cannot drift from the page it summarises. A fetch failure leaves the fallback
   // text above, never a number.
@@ -234,7 +234,7 @@ KD.nav("executive-summary.html");
           + `and read for that minute; ${total - reviewed} are left not_reviewed with the reason stated on the row, `
           + `because the observations that bound them are no longer in the committed history. `
           + `Of the reviewed rows, ${c.best_quote_did_not_move || 0} show a best bid and ask that did not move at all — `
-          + `the ≥$0.10 change is in the last-traded print, not the quoted price (F-77, F-89).`;
+          + `the ≥$0.10 change is in the last-traded print, not the quoted price (F-77, F-93).`;
       }
     } else if (line) {
       line.textContent = "Coverage could not be read from data/live/catalysts.json.";

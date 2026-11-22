@@ -233,7 +233,7 @@ KD.nav("");
     resHost.innerHTML =
       `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
         newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
-        <b>Three different numbers, so they are named separately (F-86):</b> the scan found
+        <b>Three different numbers, so they are named separately (F-90):</b> the scan found
         ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets inside the five
         topics; ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
         size window; ${KD.num(snap.counts?.settled_published ?? resRows.length)} are published, chosen <b>per topic</b>

@@ -1774,6 +1774,16 @@ page exists. This session therefore re-fetched every external source the ledger 
 - Gate after the change: `verify_release.py` **PASS**, `check_site.py` **OK**, DOM test M: 72 facts / 70 flagged / 23 suggestions / 9 questions. (Findings grew to 70 because parallel sessions merged D-01..D-05 and others while this branch was open; no ids were duplicated — checked.)
 - No behaviour was changed for a *successful* read, and no value is ever invented on a failed one.
 
+### T95 (`arena-eed90ce4`) — self-healing freshness monitor (F-86)
+
+- Cause-level gap found by reading the monitor, not by guessing: `freshness-alarm.yml` skipped its rescue on `in_flight > 0`. A run that holds the concurrency group and never commits *is* in flight, so the one scenario the monitor exists for was the one it could not act on — exactly today's 02:46Z–08:26Z stall.
+- Fix: decision extracted to `scripts/freshness_guard.py` (pure function + CLI, env-file output) so it is unit-testable offline: fresh → nothing; stale + in-flight collector younger than 75 min → wait (a slow pass is not a wedged one); stale + in-flight collector ≥ 75 min → **cancel that oldest run**, and the run already pending behind it starts a fresh pass from the remote head; stale + nothing in flight → dispatch one, still capped at one dispatch per hour (F-63 guard).
+- Why cancelling is safe: `scripts/collect_relay.py` re-syncs (`git reset --hard FETCH_HEAD`) at the top of every pass and pushes atomically, so a cancelled pass cannot leave a half-written snapshot — the same remedy the script's own docstring documents for humans.
+- Tests: `scripts/tests/test_freshness_guard.py`, 11 offline cases (each branch, the F-63 guard, "cancel never also dispatches", oldest-active-run targeting, unknown age not guessed, documented thresholds 45/75). Gate globs `test_*.py`, so no gate edit.
+- Honest limit kept in the finding: the monitor itself rides the same `schedule` mechanism, so this narrows the exposure in F-67/F-85 rather than removing it. The site's staleness banner remains the real protection and it was accurate throughout the stall.
+
+---
+
 ---
 
 ---
@@ -1892,3 +1902,18 @@ collector retry hardening, #104 `arena/a070c747` close-out). Two conflicts, both
 `python3 scripts/verify_release.py` **PASS** after the merge (21 pages, all suites including the new
 `test_collect_retry.py`); `test_pages_dom.js` all sections ok — M reads 72 facts / 74 flagged / 23 suggestions /
 9 questions / catalysts 57/61.
+
+### Merge record 3 — `arena/d34a9f0d` merging `origin/main` (PR #105)
+
+`main` published its own **F-86** (`8b799d6`, freshness alarm cancels a wedged collector) while this PR was open, which
+collided with this session's F-86. This session's four findings are therefore renumbered a second time, to
+**F-90…F-93**, and every cross-reference updated (`index.html`, `dashboard.html`, `executive-summary.html`,
+`scripts/catalysts.py`, `test_scope.py`, `test_pages_dom.js`). Remaining `F-86` references in the tree belong to
+main's alarm finding, which is correct.
+
+`data/findings.json`: main's 71 entries kept verbatim as the base, this session's 4 appended → **75 total, no duplicate
+ids** (checked programmatically). `COORDINATION.md`: main's new section kept first, this session's after it, both
+verbatim.
+
+Gate after the third merge: `verify_release.py` **PASS** (21 pages, all suites); `test_pages_dom.js` all sections ok —
+M reads 72 facts / 75 flagged / 23 suggestions / 9 questions / catalysts 57/61.
