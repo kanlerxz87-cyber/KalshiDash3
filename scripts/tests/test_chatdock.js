@@ -145,6 +145,16 @@ function counts(w) {
   const origins = [...w.document.querySelectorAll("#kdChatAll .cd-orig")].map((e) => e.textContent);
   check(origins.length > 0 && origins.every((o) => o === "history"), "history rows are labelled 'history', not 'live'");
   check(c.model <= c.all, `model chat (${c.model}) is a subset of all events (${c.all})`);
+  // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
+  // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
+  // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
+  const frozen = archiveWithDecoy.alerts.filter((a) => {
+    const cats = (a.series_categories || []).map(String);
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
+      && a.high_roi === true;
+  }).length;
+  check(c.model === Math.min(frozen, 80), `model chat count equals the frozen high_roi screen (${frozen})`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),

@@ -1645,3 +1645,110 @@ session — this session did not touch it.
 **Data freshness at close-out:** the site still shows the `2026-11-22T06:17:12Z` snapshot and says so ("8 collection intervals behind");
 a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
 health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
+
+---
+
+## Session `arena-a070c747` — pick-rule unification, alert→resolution tracking, verification of the live site
+
+Branch `arena/a070c747-kalshidash3`, based on `main` `a159dd3` (2026-11-22T07:21Z snapshot). No other session held an
+unexpired claim when this section was written; every scope below is disjoint from the sections above (those sessions
+are closed out). Claim committed and pushed before any work, per the board rule.
+
+### Task board (this session)
+
+> **ID note (2026-11-22):** this session's four new findings use the **D-nn** prefix, following the precedent set by
+> `D-01` ("new `D-nn` prefix because four sessions were minting `F-nn` ids concurrently"). They were written as
+> F-83..F-86, briefly published as F-85..F-88, and both ranges were merged by other sessions while this branch was open
+> (PR #95 added F-83/F-84, PR #99 added F-85). They are **D-02** (pick-rule divergence), **D-03** (snapshot absence),
+> **D-04** (0-of-1 sample) and **D-05** (scope-gate mismatch). Task ids below are also local to this section.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T70 | Unify the two-key "model picks" definition across every surface: dashboard (`data/live/alerts.json` `high_roi`), alerts.html (engine score ≥ 0.55), category-page dock (`assets/chatdock.js` inline rule). Measured divergence before the fix: **47 / 49 / 46 picks out of the same 61 alerts**. | done | arena-a070c747 | `assets/engine.js`, `assets/chatdock.js`, `alerts.html`, `scripts/tests/test_chatdock.js`, `data/findings.json` | count parity test over the committed feed |
+| T71 | Track every alerted event to its resolution: lifecycle chip (open / closed / settled YES / settled NO / not in snapshot) on each alert bubble, plus an outcomes ledger on alerts.html built from the collector's `settled_markets` `result` field. Absence from the snapshot is labelled "not in this snapshot", never "unresolved". | done | arena-a070c747 | `assets/site.js` (helpers), `assets/engine.js`, `assets/chatdock.js`, `alerts.html`, `dashboard.html`, `assets/site.css`, `scripts/tests/test_lifecycle.js` (new), `scripts/verify_release.py` | Node unit tests + jsdom render |
+| T72 | Re-verify the live site and the claims this session touches against official sources; publish new irregularities (D-02 pick-rule divergence, D-03 lifecycle-join limits, D-04 one-observation sample, D-05 scope-gate mismatch) and correct F-78. | done | arena-a070c747 | `data/findings.json`, `flagged.html` (renderer only if needed), `executive-summary.html`, `README.md` | official URLs cited per row |
+| T73 | Release gate → PR → merge → confirm GitHub Pages deploy → record result here. | in progress | arena-a070c747 | `COORDINATION.md` | `scripts/verify_release.py`, Pages builds API, live fetch |
+
+### Sources this session re-reads before citing
+
+- https://docs.kalshi.com/api-reference/market/get-markets (last_price_dollars, volume_24h_fp, status, result)
+- https://docs.kalshi.com/getting_started/market_lifecycle (determined vs finalized, settlement_ts)
+- https://docs.kalshi.com/getting_started/market_settlement (result yes/no/scalar, $1 payout)
+- https://docs.kalshi.com/getting_started/demo_env (demo only; behaviour may not match real markets)
+
+### Log (`arena-a070c747`)
+
+- 2026-11-22 ~08:0xZ: Release gate re-run locally on the base commit with `jsdom@26` installed: **PASS** (21 pages,
+  all suites). Pages API reports `status: built` for `main`; the `Live desk scan` workflow is refreshing the snapshot
+  on a 15-minute grid.
+- 2026-11-22: Claimed T70–T73. Measured pick-count divergence from the committed feed before changing anything
+  (47 engine-score / 49 frozen `high_roi` / 46 dock rule over the same 61 alerts).
+- 2026-11-22: **T70 done.** `assets/engine.js` gained `modelPick()` (frozen flag first, documented
+  seed + positive-volume rule only for a live swing the archive has not seen); `alerts.html` filters the model chat
+  with `KDL.modelPick`; `assets/chatdock.js` dropped its inline "≥ 25% relative move and ≥ 100 contracts" rule for the
+  same function. The heuristic score is still printed as a ranking hint and is explicitly not the inclusion rule.
+  Result on the committed feed: **49 / 49 / 49**. `scripts/tests/test_chatdock.js` now asserts the dock's count equals
+  the frozen screen exactly; `scripts/tests/test_lifecycle.js` section D asserts the rule in all three files and the
+  self-consistency of `data/live/alerts.json`.
+- 2026-11-22: **T71 done.** `KD.marketIndex`, `KD.lifecycleOf`, `KD.lifecycleChip`, `KD.lifecycleAttach`,
+  `KD.lifecycleTally` added to `assets/site.js`; the lifecycle chip is rendered on engine bubbles (`assets/engine.js`),
+  dashboard alert items and every dock row, and `alerts.html` gained a "Tracked to resolution" card: per-bucket counts
+  (settled / resolved YES / resolved NO / result set not paid / closed no result / paused / still open / not in
+  snapshot) plus a table of every alerted market that reached a result, with settlement time, settlement value and a
+  link to its official market record. All eight documented statuses are handled explicitly. Verified in jsdom against
+  the committed files: 14 distinct alerted markets → 1 settled (NO), 9 still open, 4 not in snapshot; all-events chat
+  now reads 61, identical to the dashboard.
+- 2026-11-22: **D-05 found and fixed while verifying T71.** `alerts.html` printed "20 archived swings are withheld as
+  outside the five topics" while `assets/engine.js` loaded all 81 archive rows, so the all-events chat read 81 against
+  the dashboard's 61. The engine now applies the same Test/Demo/missing-topic gate as the dock and counts it in
+  `state.withheldScope`; a test asserts the archive's 20 out-of-scope rows are exactly the 20 the feed reports withheld
+  and that none is a model pick.
+- 2026-11-22: **T72 done.** Re-read `market_lifecycle` (all 8 statuses, `result` set on `determined`, `settlement_ts`
+  populated on `finalized`, `disputed`/`amended` re-determination) and `get-markets` (fields `status`, `result`,
+  `settlement_ts`, `settlement_value_dollars`, `volume_24h_fp`, `last_price_dollars`) on docs.kalshi.com and
+  `demo_env` (demo prices may not reflect real markets) before writing any of the new copy. Published **D-02** (three
+  pick counts, fixed), **D-03** (alerted markets that rotate out of the ranked snapshot; labelled, not guessed),
+  **D-04** (move-vs-outcome is 0 of 1, so no hit rate is claimed), **D-05** (scope-gate mismatch, fixed), corrected
+  **F-78**, and added suggestions **G22** (opt-in sound/desktop notification) and **G23** (per-topic swing-quality
+  scoreboard). Exec summary, README and the alerts page copy updated from 21 → 23 suggestions by the pages' own
+  dynamic counts (no hard-coded numbers added).
+- 2026-11-22: Local release gate `python3 scripts/verify_release.py` **PASS** after every change (21 pages, all
+  suites, including the new `test_lifecycle.js` which `scripts/verify_release.py` now runs).
+
+### T73 close-out (filled in after the merge)
+
+| Item | Result |
+|---|---|
+| Pull request | _pending_ |
+| Pages deploy | _pending_ |
+
+| ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-----------------|---------------------------|------------------------|----------------|
+| T74 | Apply the fee schedule's **per-series taker multiplier** in the browser paper ledgers (`assets/alerts.js`, `assets/engine.js`, `portfolio.html`): all three charge a flat 0.07 and therefore charge a fee on series the official table lists at M = 0 | in progress | arena-ae1f84b0 | `assets/alerts.js`, `assets/engine.js`, `portfolio.html` (fee helper + its disclosure text), `executive-summary.html` (one sentence), `scripts/tests/engine.test.js`, `scripts/tests/test_fee_multipliers.js` (new), `scripts/verify_release.py` (test list only), `data/findings.json` (D-03 append only) | `https://kalshi.com/docs/kalshi-fee-schedule.pdf` — read this session, "Non-Standard Fees": KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0, KXAAAGASM 1/1, KXEMMY* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1, default M = 1; `data/strategies.json` `fee_model.multipliers` already carries the same table for `scripts/simulate.py` | New — measured on `data/live/alerts.json`: **44 of 61** archived alerts are KXBTCY, so most of the paper ledger was charged a fee the schedule says is zero. `portfolio.html` disclosed the simplification, so this is an accuracy defect, not a hidden claim (recorded as D-03) |
+
+
+### T72 — external-link re-verification (the gap the DOM gate cannot cover)
+
+`scripts/check_site.py` resolves **internal** links only, and `test_verification_links.js` asserts a row's *hostname*, not that the
+page exists. This session therefore re-fetched every external source the ledger publishes and checked the claim against the live page.
+
+| Claim set | How it was verified this session | Result |
+|---|---|---|
+| The 24 `docs.kalshi.com` rows in `data/verified_facts.json` → `doc_links` | Fetched the official sitemap `https://docs.kalshi.com/sitemap.xml` (all 4 chunks, `lastmod` 2026-11-22T01:01Z for the API-reference pages) and matched every slug: `api-reference/events/get-events`, `api-reference/historical/get-historical-market-candlesticks`, `api-reference/market/get-market-candlesticks`, `…/get-market-orderbook`, `…/get-markets`, `…/get-multiple-market-orderbooks`, `…/get-series-list`, `api-reference/orders/create-order-v2`, `api-reference/portfolio/get-balance`, `…/get-fills`, `…/get-positions`, `getting_started/api_environments`, `…/api_keys`, `…/demo_env`, `…/historical_data`, `…/market_lifecycle`, `…/market_settlement`, `…/orderbook_responses`, `…/pagination`, `…/quick_start_create_order`, `…/quick_start_market_data`, `…/quick_start_websockets`, `…/rate_limits`, `welcome` | **24/24 present.** No dead docs link, no renamed slug |
+| Fee schedule `https://kalshi.com/docs/kalshi-fee-schedule.pdf` (cited 20+ times) | Fetched and read | Live, "Last updated and effective: July 7, 2026". General taker `ceil(M × 0.07 × C × P × (1−P))`, maker `0.0175`, "There is no settlement fee", default `M = 1`; Non-Standard table: **KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0**, KXAAAGASM 1/1, KXEMMY\* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1 → **D-03** (below) |
+| Gas catalyst `https://gasprices.aaa.com/` (ledger: AAA 11/21/26 national regular `$3.6594`, down `$0.0304` vs yesterday) | Fetched | Page shows **$3.6594, "Price as of 11/21/26"**, yesterday **$3.6898** → difference **$0.0304**. Claim confirmed exactly |
+| Golf catalyst `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` (ledger: R3 suspended for rain, no Saturday play, Michael Thorbjornsen T1 at −9) | Fetched | Page shows **"R3 Suspended"**, "Play has been suspended … due to rain", "there will be no play today. Round 3 will be on Sunday", leaderboard **T1 Thorbjornsen −9**. Claim confirmed exactly |
+| Exchange endpoints (`external-api.demo.kalshi.co`) and Coinbase candle URLs in the catalyst ledger | **Not re-fetched**: this sandbox has no network route to Kalshi or Coinbase (verified: `curl` exit 35 / HTTP 000). Their values remain as recorded by the sessions that fetched them, and are labelled as such on the page | **Unverified here — not contradicted.** Recorded rather than implied |
+
+### Overlap found and logged (board rule)
+
+- **G19 status**: `arena/38b89a30` claimed the same fix (claim `627960b`, fix `2a39999`, PR **#93** open) after this session's claim.
+  This session had set `"status": "proposed"` on G19; to avoid duplicate/conflicting edits of the same line it **adopted theirs and
+  reverted its own**, leaving `data/findings.json` G19 untouched here. PR #93 owns that row.
+- **Files that another open PR also edits**: PR **#92** (`arena/5c8e3f0a`) touches `data/findings.json` and `executive-summary.html`;
+  this session's edits there are additive (D-02/D-03 entries; one sentence about the fee multiplier). If #92 merges first, this branch
+  merges `main` again and keeps both sides verbatim; nothing is force-pushed.
+
+### Log (continued)
+- 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
+  pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
