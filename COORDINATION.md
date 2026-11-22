@@ -1518,3 +1518,7 @@ Two items previously held as "flagged irregularities" in this session's memory w
 ### Merge status (recorded 2026-11-22)
 
 PR #98 (`arena/6cd28bd2-kalshidash3`) is **open and DIRTY**: `main` advanced under it (PR #94 `a9a272a`, the `arena-38b89a30` T71 closeout, landed after this branch's base). `assets/engine.js` / `test_pages_dom.js` / `findings.json` / `COORDINATION.md` do not conflict in substance — the merge-conflict record in this section is that a `git pull --rebase` attempt hit the session-board conflict again and was aborted; main was merged in instead (`bc34c26`) and the tree was re-verified (gate PASS). Rather than force a rebase that would rewrite the merge or discard the other open PRs (#92/#95/#96), the PR is left for the final integration session, which is responsible for the combined re-verification.
+
+### Flaky check (recorded 2026-11-22)
+
+`scripts/tests/test_pages_dom.js` block B ("the catalyst link must be the URL copied out of the market's own rules text") fails intermittently on `main` itself, not only on this branch: 1 in 3 runs on `origin/main` (`a9a272a`) and 1 in 3 runs on this branch both print `PAGE RENDER PROBLEMS: - the catalyst link must be...` while the overall test still exits 0 in most runs. It is timing-sensitive (the suite waits ~7.5 s for one poll cycle) and is **not** introduced by this session. The other 20+ assertions in block A–M are deterministic. Until the suite's timing budget or the check is hardened, this is a known-flaky signal, not a regression.
