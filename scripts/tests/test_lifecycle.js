@@ -18,7 +18,7 @@
  * 2. ONE PICK RULE (T70). assets/chatdock.js and assets/engine.js must select the same set of
  *    "model picks" from the same archive: the frozen `high_roi` flag, with the documented
  *    seed + positive-volume fallback only for rows that carry no flag. Before this test existed
- *    the dashboard showed 49, alerts.html 47 and the dock 46 over the same 61 alerts (F-83).
+ *    the dashboard showed 49, alerts.html 47 and the dock 46 over the same 61 alerts (F-85).
  *
  * Run: node scripts/tests/test_lifecycle.js
  */
@@ -84,7 +84,7 @@ console.log("A — one market row maps to exactly one lifecycle state");
   check(missing.state === "not_listed", "a ticker absent from the snapshot -> 'not_listed'");
   check(/not in snapshot/.test(KD.lifecycleChip(missing)), "the chip says 'not in snapshot'");
   check(/absence is not evidence/i.test(KD.LIFECYCLE_TIP.not_listed),
-    "the tooltip says absence is not evidence (F-84)");
+    "the tooltip says absence is not evidence (F-86)");
   check(!/undefined|null/.test(KD.lifecycleChip(missing)), "the chip contains no undefined/null");
 }
 
@@ -168,7 +168,7 @@ console.log("\nD — the chat dock and the alerts engine apply the SAME model-pi
   check(servedFlagged === served.counts.high_roi,
     `data/live/alerts.json is self-consistent: ${servedFlagged} flagged rows vs counts.high_roi=${served.counts.high_roi}`);
 
-  // F-86: the page publishes "N archived swings are withheld as outside the five topics", so the
+  // F-88: the page publishes "N archived swings are withheld as outside the five topics", so the
   // engine must actually withhold them. Before 2026-11-22 it loaded all 81 archive rows while the
   // notice said 20 were withheld, and the "all events" chat read 81 where the dashboard read 61.
   const outOfScope = ARCHIVE.alerts.filter((a) => {

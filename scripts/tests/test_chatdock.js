@@ -145,7 +145,7 @@ function counts(w) {
   const origins = [...w.document.querySelectorAll("#kdChatAll .cd-orig")].map((e) => e.textContent);
   check(origins.length > 0 && origins.every((o) => o === "history"), "history rows are labelled 'history', not 'live'");
   check(c.model <= c.all, `model chat (${c.model}) is a subset of all events (${c.all})`);
-  // T70/F-83: the model chat must be exactly the archive's frozen high_roi screen, not an inline
+  // T70/F-85: the model chat must be exactly the archive's frozen high_roi screen, not an inline
   // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
   // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
   const frozen = archiveWithDecoy.alerts.filter((a) => {

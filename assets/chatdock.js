@@ -484,7 +484,7 @@ const KDCHAT = (() => {
     // the archive's frozen `high_roi` flag (fee-schedule seed series with positive reported 24h
     // volume, frozen at detection); a live alert the archive has not seen yet is judged by that
     // same documented rule. This used to be an inline "≥25% relative move and ≥100 contracts"
-    // rule, which made the dock disagree with the other two surfaces (F-83).
+    // rule, which made the dock disagree with the other two surfaces (F-85).
     const model = all.filter(modelPick);
     const cat = S.filter;
     const inCat = (a) => !cat || a.category === cat;
@@ -562,7 +562,7 @@ const KDCHAT = (() => {
       </div>
       <div class="kd-card">
         <h4>Model watch · experimental <span class="kd-count" id="kdCountModel">0</span></h4>
-        <p class="kd-note">Not an ROI prediction. Same screen as the dashboard and <a href="alerts.html">Alert chats</a>: a fee-schedule seed series with positive reported 24-hour volume, frozen at detection by the collector. One definition on every page (F-83).</p>
+        <p class="kd-note">Not an ROI prediction. Same screen as the dashboard and <a href="alerts.html">Alert chats</a>: a fee-schedule seed series with positive reported 24-hour volume, frozen at detection by the collector. One definition on every page (F-85).</p>
         <div class="kd-feed" id="kdChatModel" role="log" aria-live="polite" aria-label="Experimental screened swing alerts"></div>
       </div>
     </div>
