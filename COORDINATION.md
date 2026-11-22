@@ -1507,6 +1507,14 @@ Three sessions minted `F-83` around the same time (claims pushed at ~08:10Z, ~08
 
 No file of another session was edited in this session. Requests to PR #95 / PR #96 owners: please renumber their `F-83`/`F-84`/`F-85` rows in `data/findings.json` to fresh ids before merging, and re-check that no other session's F-nn rows are discarded in the merge.
 
+### Re-verified non-defects (logged 2026-11-22)
+
+Two items previously held as "flagged irregularities" in this session's memory were re-checked against the archive/builder code and are **not defects**:
+
+1. **"F-77 warning is dead — `alerts.html` reads `doc.high_roi`, which is never published."** Wrong: `alerts.json` publishes `high_roi` as a top-level list of 49 rows (checked 2026-11-22 on the committed snapshot), and the warning block reads exactly that key. The warning renders.
+2. **"Builder missed the category conflict — `KXDEMOFUTHOURLY-26NOV21H16-UP` carries `category_id: crypto` + `series_categories: ['Test']` while `withheld_category_conflict=0`."** Wrong: `scripts/build_alerts.py` rule 1 (Test/Demo series, `NEVER_IN_SCOPE = {"Test", "Demo"}`) is checked **before** rule 4 (category conflict), so every Test-series row is classified `withheld_out_of_scope` with reason `series filed under Test` — which is exactly what `counts.withheld_out_of_scope_reasons: {"series filed under Test": 20}` and `withheld_category_conflict: 0` record. The archive carries 20 Test rows (13 with `category_id: null`, 7 with `category_id: crypto`); all 20 are withheld with the Test reason. `withheld_category_conflict: 0` is the correct count.
+3. **"Evidence chip `no history` for archive rows lacking an evidence field."** Minor cosmetic; archive rows carry `evidence_reversion.observed_after: 1–3` and the state labels are published; not a defect.
+
 ### Merge status (recorded 2026-11-22)
 
 PR #98 (`arena/6cd28bd2-kalshidash3`) is **open and DIRTY**: `main` advanced under it (PR #94 `a9a272a`, the `arena-38b89a30` T71 closeout, landed after this branch's base). `assets/engine.js` / `test_pages_dom.js` / `findings.json` / `COORDINATION.md` do not conflict in substance — the merge-conflict record in this section is that a `git pull --rebase` attempt hit the session-board conflict again and was aborted; main was merged in instead (`bc34c26`) and the tree was re-verified (gate PASS). Rather than force a rebase that would rewrite the merge or discard the other open PRs (#92/#95/#96), the PR is left for the final integration session, which is responsible for the combined re-verification.
