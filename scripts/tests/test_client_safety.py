@@ -16,6 +16,7 @@ from io import BytesIO, StringIO
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import unittest
 from unittest.mock import patch
@@ -220,6 +221,9 @@ class ClientSafety(unittest.TestCase):
         summary = (root / "executive-summary.html").read_text()
         self.assertIn('id="audit-2026-11-22"', summary)
         self.assertIn("SAFE-5C-01", summary)
+        board = (root / "COORDINATION.md").read_text()
+        self.assertIsNone(re.search(r"^(?:<{7} |={7}$|>{7} )", board, re.MULTILINE),
+                          "coordination board contains unresolved merge markers")
 
 
 if __name__ == "__main__":

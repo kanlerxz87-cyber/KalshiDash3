@@ -1449,7 +1449,7 @@ Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; 
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
-| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | in progress | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
+| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | done | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
 | S5C-2 | Publish current audit and safety finding, update executor instructions; final release integration, PR, merge, deploy verification | in progress | arena-5c8e3f0a | `COORDINATION.md` (this section), `README.md` (executor safety), `executive-summary.html` (new audit section only), `data/findings.json` (one uniquely prefixed finding) | Baseline `python3 scripts/verify_release.py` PASS, 21 pages. GitHub Pages API reports legacy main/root, built. Account credentials not available; no signed requests or orders attempted. |
 
 - 2026-11-22: Read coordination board before work; inspected repository and workflows, ran full baseline release gate (PASS). Found `base_url()` trusts substring `demo` and `KALSHI_ALLOW_PRODUCTION=1`, inconsistent with this demo-only brief. Official demo endpoint table confirms exactly two supported REST roots. Will remove override, disallow redirects, and test without using credentials or calling Kalshi.
@@ -1488,3 +1488,5 @@ Irregularities carried (unchanged, on the Flagged page): no demo API keys provid
 ### Integration log — arena-5c8e3f0a
 
 - While PR #92 was checking, main received PR #93 (G19 status and coordination notes) and the 08:07Z ROI snapshot. Integrated both without discarding any change. A COORDINATION.md append/append conflict was resolved by retaining both complete session sections; data/findings.json auto-merged the separate G19 and SAFE-5C-01 changes. Caught and removed unresolved board markers before pushing, and added a regression to prevent their publication. No authenticated exchange request or order was made.
+
+- arena-5c8e3f0a: final combined-tree `verify_release.py` PASS after PR #93 integration (including 11 safety/publication tests and no unresolved board markers). PR #92 initial CI build 45001469245 passed; final-head CI required again before merge.
