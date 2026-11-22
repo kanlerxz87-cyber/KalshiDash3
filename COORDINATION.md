@@ -1465,3 +1465,10 @@ before the push, this session merges rather than overwrites and says so in the l
 
 ### Log (this session)
 - 2026-11-22 08:0xZ: claim written and pushed before any file edit. Base-tree gate re-run: PASS.
+
+### Additional claim (T74) — added before editing assets/ and portfolio.html
+
+| ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-----------------|---------------------------|------------------------|----------------|
+| T74 | Apply the fee schedule's **per-series taker multiplier** in the browser paper ledgers (`assets/alerts.js`, `assets/engine.js`, `portfolio.html`): all three charge a flat 0.07 and therefore charge a fee on series the official table lists at M = 0 | in progress | arena-ae1f84b0 | `assets/alerts.js`, `assets/engine.js`, `portfolio.html` (fee helper + its disclosure text), `executive-summary.html` (one sentence), `scripts/tests/engine.test.js`, `scripts/tests/test_fee_multipliers.js` (new), `scripts/verify_release.py` (test list only), `data/findings.json` (F-84 append only) | `https://kalshi.com/docs/kalshi-fee-schedule.pdf` — read this session, "Non-Standard Fees": KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0, KXAAAGASM 1/1, KXEMMY* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1, default M = 1; `data/strategies.json` `fee_model.multipliers` already carries the same table for `scripts/simulate.py` | New — measured on `data/live/alerts.json`: **44 of 61** archived alerts are KXBTCY, so most of the paper ledger was charged a fee the schedule says is zero. `portfolio.html` disclosed the simplification, so this is an accuracy defect, not a hidden claim (recorded as F-84) |
+
