@@ -1441,3 +1441,24 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
+
+---
+
+## Session `arena-6cd28bd2` — independent line-by-line verification pass (branch `arena/6cd28bd2-kalshidash3`)
+
+Base: `a159dd3` (main, snapshot 2026-11-22T07:21Z). All prior claims in this board are merged to `main` and complete; this session claims new work only. No files from any other session are in scope; no shared output is edited.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T91 | Independent line-by-line re-verification of the published verification ledger (`data/verified_facts.json` C-nn) and the live site against official Kalshi sources; record every irregularity for manual review | in progress | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only, for irregularities found) | each cited official page fetched and read this session; live site fetched |
+| T92 | Live-site consistency + data/page cross-check: fetch the deployed site and the pages it links to; confirm data files parse and match what the pages render; flag every discrepancy | in progress | arena-6cd28bd2 | `COORDINATION.md` (this section, append-only), `data/findings.json` (append-only) | `scripts/check_site.py`, `node --check` on all inline JS, HTTP probes of the live site |
+
+### Claims made this session, deliberately narrow
+
+- No HTML/JS/CSS/JSON edit: the verification pass only appends findings to this board and, if needed, to `data/findings.json`.
+- `data/findings.json` is append-only (new F-nn rows with this session's ID). No existing F-nn rows are edited, renumbered, or reworded.
+- No re-collection, no new snapshot data, no changes to the collector, alerts, simulation, or site code.
+
+### Log
+
+- 2026-11-22: Claimed T91/T92; no other session has an active claim in the board (all prior claims merged via PRs #1–#91). Base `a159dd3`.
