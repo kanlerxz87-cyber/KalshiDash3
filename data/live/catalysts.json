@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T15:58:55Z",
- "snapshot_collected_at": "2026-11-22T15:58:54Z",
+ "generated_at": "2026-11-22T16:13:55Z",
+ "snapshot_collected_at": "2026-11-22T16:13:55Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
@@ -31,7 +31,7 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2211-T60799.99",
    "market_status": "active",
    "result_as_returned": null,
-   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 11 AM EST is above 60799.99 at 11 AM EST on Nov 22, 2026, then the market resolves to Yes.",
+   "settlement_reference_text": null,
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2211-T60799.99",
    "links": [],
    "state": "not_reviewed",
