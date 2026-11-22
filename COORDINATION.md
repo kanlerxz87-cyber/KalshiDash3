@@ -887,7 +887,7 @@ in favour of main's rows with the same content. Attribution for the original PR 
 `arena-a3070ffa` / `arena-17d4ecfa`; integration credit with the sessions above.
 
 **Self-inflicted defect, found and repaired in this session (recorded, not hidden).** The first merge-conflict
-resolution script edited greedily on the substring `<<<<<<< HEAD`, which also occurs inside a *quoted* board log
+resolution script edited greedily on the substring `, which also occurs inside a *quoted* board log
 entry (the T17 README note about committed conflict markers). The edit deleted the 2026-11-20…2026-11-21T07:00Z
 session history (~800 lines, 17 `## Session` sections) from this file between the T17 sentence and this session's
 block. It was found by diffing the `## Session` headings against `origin/main` before opening the PR. Repair: the
@@ -1441,7 +1441,6 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
-
 ## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
 
 Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
@@ -1468,3 +1467,35 @@ Claimed before any edit; no other session names these files in an open scope.
 Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
 
 Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+
+> Renumber note: this session originally claimed T70–T73; `arena-38b89a30` claimed T69–T71 on the same base while this
+> claim was in flight, so these were renumbered T72–T75 on the rebase and nothing of the other session's board was removed.
+
+## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
+
+Base `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). No other session had an unexpired claim in progress at claim time
+(this section is the claim; committed and pushed immediately below). Scopes are chosen to avoid every file owned by the
+sessions above except where a defect requires the owning file, in which case the request is logged rather than edited.
+
+**This session has a capability earlier sessions reported they lacked:** the sandbox still cannot open a socket to
+`external-api.demo.kalshi.co` or `docs.kalshi.com` (`curl` → `SSL_ERROR_SYSCALL`), but the page-fetch tool can read both.
+Every official source quoted below was therefore fetched **live on 2026-11-22 between 08:05Z and 08:25Z** and read, not
+recalled.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T72 | **Test integrity:** `scripts/tests/test_scope.py` prints `OK` and exits 0 **before** its F-72 assertions run, so nine checks are dead code — three of which are false today (the collector publishes no `open_published_rows`, no `settled_published_rows`, no `settled_in_scope_total_method`; `index.html` renders none of them). Move the report to the end and make every assertion true. | in progress | arena-0553d7e9 | `scripts/tests/test_scope.py` | `python3 scripts/tests/test_scope.py` prints OK while `grep -n open_published_rows scripts/collect.py` returns nothing |
+| T73 | **Scope-count labelling:** `counts.open_in_scope` is the *published* (trimmed) row count (470) but `categories.html` renders it as "Open markets inside the five categories" while the same table renders it again as "Open rows published"; the in-scope total (12,163 = 470 + 11,693 trimmed) is not published at all. `index.html` likewise calls `settled_in_scope` (1,600, the retained paging window) "settled markets in scope" when the snapshot's own scan total is `settled_in_scope_total` = 6,927. | in progress | arena-0553d7e9 | `scripts/collect.py` (counts only, additive), `categories.html`, `index.html` | `data/live/markets.json` counts; `https://docs.kalshi.com/api-reference/market/get-markets` |
+| T74 | **Source-link hygiene:** five verified-fact rows (`C-11`…`C-17`) cite `https://docs.kalshi.com/…**.md**`, so `/verification.html` sends a reader to raw markdown. The site's own rule (test B of `test_verification_links.js`) forbids exactly that for `doc_links` rows but never checked the fact rows. Normalise to the HTML pages and extend the gate. | in progress | arena-0553d7e9 | `data/verified_facts.json` (source URLs only), `scripts/tests/test_verification_links.js` | Live fetch 2026-11-22: `market_lifecycle`, `market_settlement`, `orderbook_responses` (all HTTP 200, content matches C-11…C-16 verbatim) |
+| T75 | Record the above as findings, publish, run the release gate, PR → `main`, merge, confirm the Pages deploy. | in progress | arena-0553d7e9 | `data/findings.json` (append), `COORDINATION.md` | `scripts/verify_release.py`, Actions API |
+
+### Official sources read live this session (2026-11-22, 08:05–08:25Z)
+- `https://docs.kalshi.com/getting_started/market_lifecycle` — statuses `initialized, active, inactive, closed, determined, disputed, amended, finalized`; filter mapping `unopened/open/paused/closed/settled` → matches `C-11`, `C-12`.
+- `https://docs.kalshi.com/getting_started/market_settlement` — "$1 per contract", "only net positions are settled", "settlement fees are zero for simple yes/no determinations but may apply for sub-cent scalar settlement" → matches `C-13`, `C-14`.
+- `https://docs.kalshi.com/getting_started/orderbook_responses` — bids only (`yes_dollars` + `no_dollars`), `[price_dollars, count_fp]` strings, ascending, best bid last, `depth` parameter, no auth → matches `C-15`, `C-16`.
+- `https://external-api.demo.kalshi.co/trade-api/v2/exchange/status` — 200, `trading_active: true` at 08:05Z (independent liveness check).
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B147500` — 200; `volume_fp 65336335.23`, `last_price_dollars 0.9800`, `yes_bid 0.0200` / `yes_ask 1.0000`: byte-identical to the committed snapshot row, so the published data still matches the exchange record it claims to come from.
+- `https://external-api.demo.kalshi.co/trade-api/v2/markets?series_ticker=KXPGATOUR&status=open&limit=3` — 200; RSM Classic winner markets still `active`, `expected_expiration_time 2026-11-22T00:00:00Z`.
+
+### Log
+- 2026-11-22 08:20Z: Claimed T72–T75 after reading the board; verified `main` is at `a159dd3` and no open PRs exist.
