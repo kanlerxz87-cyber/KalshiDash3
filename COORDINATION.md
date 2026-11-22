@@ -1539,3 +1539,24 @@ page exists. This session therefore re-fetched every external source the ledger 
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
 
+### Close-out (T73) — PR, merge, deploy, live verification
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #95](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/95) merged 2026-11-22T08:1xZ** as `ca2f8086d12676f62f84c1d8bc4bebbf04df52d6` (merge commit, no approval wait) | PR check `Deploy site to GitHub Pages` run [45002085182](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45002085182): `build` pass 1m08s, `deploy` correctly skipped on a PR |
+| Merge conflict | **one**, `COORDINATION.md`, because `main` advanced 5 then 2 commits under this branch (PR #93, PR #94). Resolved by keeping **main's sections first and this session's after**, both verbatim; the earlier resolution left a stray `<<<<<<< HEAD` line which was removed in `02f3ba6` and the file re-checked (`grep -c` = 0). Nothing force-pushed; no other session's line dropped | `git log --oneline origin/main..HEAD` before each merge |
+| Pages deploy of the merge | **confirmed** | Pages builds API: commit `ca2f808` **`built`**; `pages-build-deployment` run [45002190249](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45002190249) success; `Deploy site to GitHub Pages` push run [45002190767](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45002190767) on the same commit |
+| Live verification | `index.html?v=ca2f808` serves the new landing table: Culture renders `untraded` + **`$0 no trades`** (the defect this PR fixed), and the other four topics render unchanged. `flagged.html?v=ca2f808` renders **64 flagged irregularities** (F-83 and F-84 included, rendered from `data/findings.json`) | fetch service, cache-busted, 2026-11-22T08:2xZ |
+| Gate | `python3 scripts/verify_release.py` **PASS** on the base tree, on the changed tree, and again after each `origin/main` merge (21 pages, all suites, new fee test included) | — |
+
+**Carried, not fixed here (published):** DEPLOY-1 (Pages still served by the legacy branch publisher; `PUT /pages` is 403 to this
+session's token — the workflow gate runs on the same commit, so both publishers serve identical files), F-20 (fee-schedule
+multipliers transcribed from PDF text, want a person's visual check), F-07/F-08/F-14/F-25/F-26/F-76/F-77 as already published.
+
+**Open PR that needs its owner's attention:** [#92](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/92) was `CONFLICTING` when this
+session merged; it edits `data/findings.json` and `executive-summary.html`, which `main` has since changed. It must be rebased by its own
+session — this session did not touch it.
+
+**Data freshness at close-out:** the site still shows the `2026-11-22T06:17:12Z` snapshot and says so ("8 collection intervals behind");
+a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
+health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
