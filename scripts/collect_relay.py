@@ -353,37 +353,104 @@ def commit_and_push(ref: str) -> tuple[str, str]:
     return "dropped", "push rejected 3 times"
 
 
+HEALTH_PATH = "data/live/collector_health.json"
+#: Repo root the health file is written under. Overridable so the relay's own tests, which
+#: deliberately exercise failing passes, cannot drop a real-looking record into the working
+#: tree. Production leaves it None, which means "use ROOT".
+HEALTH_ROOT = None
+
+
+def record_health(pass_no: int, detail: str, tail: str = "", ref: str | None = None) -> str:
+    """Record WHY a pass did not commit, inside the repository (F-85).
+
+    Why: the reason a pass failed only ever existed in the job's stdout, and Actions job
+    logs are served from `productionresultssa6.blob.core.windows.net`, which is not
+    reachable from every environment that has to diagnose a stall — and a wedged run's
+    output dies with the run. This file is tiny, is committed on its own (never with the
+    snapshot), and carries the failing step's own last lines. It contains no credentials:
+    the collector is credential-free by construction.
+
+    Returns the git outcome of the health commit ("committed"/"skipped"/"dropped") so a
+    caller can log it; it never raises, because a diagnostic must not become a new failure.
+    """
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    doc = {
+        "schema": 1,
+        "generated_at": stamp,
+        "pass": pass_no,
+        "outcome": "failed",
+        "detail": detail,
+        "stderr_tail": (tail or "")[-2000:],
+        "run": {
+            "workflow": "collect.yml",
+            "run_id": os.environ.get("GITHUB_RUN_ID"),
+            "attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+            "sha": os.environ.get("GITHUB_SHA"),
+        },
+        "note": ("Written by scripts/collect_relay.py when a pass does not commit. Read by humans; "
+                 "the site's staleness banner is what readers see. Never contains credentials."),
+    }
+    try:
+        path = (HEALTH_ROOT or ROOT) / HEALTH_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(doc, indent=1) + "\n")
+        sh(["git", "add", HEALTH_PATH])
+        if sh(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+            return "skipped"
+        message = f"ops: collector health {stamp} ({detail})"
+        sh(["git", "commit", "--quiet", "-m", message])
+        target = ref or os.environ.get("GITHUB_REF_NAME") or "main"
+        for attempt in range(1, 4):
+            if sh(["git", "push", "--quiet", "origin", f"HEAD:refs/heads/{target}"], timeout=120).returncode == 0:
+                return "committed"
+            sh(["git", "fetch", "--quiet", "origin", target], timeout=120)
+            if sh(["git", "rebase", "--quiet", "FETCH_HEAD"]).returncode != 0:
+                sh(["git", "rebase", "--abort"])
+                return "dropped"
+            time.sleep(2 * attempt)
+    except Exception as e:  # a diagnostic must never break the relay
+        print(f"  ! health record failed: {type(e).__name__}: {e}")
+        return "failed"
+    return "failed"
+
+
 def make_pass(plan: Plan):
     def do_pass(n: int) -> tuple[str, str]:
+        def fail(detail: str, tail: str = "") -> tuple[str, str]:
+            # Every non-committing pass leaves a reason in the repository, not only in stdout.
+            outcome = record_health(n, detail, tail, plan.ref)
+            print(f"  health record: {outcome}")
+            return "failed", detail
+
         try:
             head = sync_to_remote(plan.ref)
         except RuntimeError as e:
             annotate("error", f"pass {n}: could not sync to origin/{plan.ref}", str(e))
-            return "failed", "git sync"
+            return fail("git sync", str(e))
         ok, why = probe_api()
         if not ok:
             annotate("warning", f"pass {n}: demo REST root unavailable ({why}); nothing collected")
-            return "failed", f"API probe {why}"
+            return fail(f"API probe {why}", why)
         for name, path in PRECHECKS:
             try:
                 p = sh(["python3", path], timeout=600)
             except subprocess.TimeoutExpired:
                 annotate("error", f"pass {n}: pre-check {name} timed out; nothing collected")
-                return "failed", f"pre-check {name} timeout"
+                return fail(f"pre-check {name} timeout")
             if p.returncode != 0:
                 annotate("error", f"pass {n}: pre-check {name} FAILED; nothing collected", (p.stdout + p.stderr)[-3000:])
-                return "failed", f"pre-check {name}"
+                return fail(f"pre-check {name}", p.stdout + p.stderr)
         for name, args, timeout in PIPELINE:
             try:
                 p = sh(args, timeout=timeout)
             except subprocess.TimeoutExpired:
                 discard_changes()
                 annotate("error", f"pass {n}: {name} timed out after {timeout}s")
-                return "failed", f"{name} timeout"
+                return fail(f"{name} timeout")
             if p.returncode != 0:
                 discard_changes()
                 annotate("error", f"pass {n}: {name} FAILED (exit {p.returncode})", (p.stdout + p.stderr)[-3000:])
-                return "failed", name
+                return fail(f"{name} (exit {p.returncode})", p.stdout + p.stderr)
         failed = []
         for name, path in VALIDATORS:
             if not (ROOT / path).exists():
@@ -399,7 +466,7 @@ def make_pass(plan: Plan):
                 annotate("error", f"pass {n}: {name} FAILED", (p.stdout + p.stderr)[-3000:])
         if failed:
             discard_changes()
-            return "failed", "validators: " + ", ".join(failed)
+            return fail("validators: " + ", ".join(failed))
         if not plan.commit:
             discard_changes()
             return "validated", f"dry run on {head}; nothing committed"
