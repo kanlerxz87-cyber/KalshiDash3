@@ -142,17 +142,27 @@ def utcnow() -> str:
 #: by retrying, so it fails immediately and loudly instead of burning the pass.
 RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 BACKOFF_SECONDS = 1.5
+#: 429 is the one case the docs answer directly: "Unauthenticated public requests are subject
+#: to separate limits ... back off on 429" (https://docs.kalshi.com/getting_started/rate_limits).
+#: For a collector that pages ~60 requests per pass that answer deserves more than 1.5 s, so a
+#: rate-limited read waits 3 s, 6 s, then 12 s before giving up on the pass.
+RATE_LIMIT_BACKOFF_SECONDS = 3.0
+#: A small pause between pages of one scan. It costs a few seconds per pass and lowers the odds
+#: of tripping the unauthenticated limit in the first place, which is cheaper than the backoff.
+PAGE_PAUSE_SECONDS = 0.15
 
 
 def get(path: str, params: dict | None = None, retries: int = 4):
     """GET a public endpoint with bounded exponential backoff.
 
-    Failure policy (F-85): a retryable failure is retried up to `retries` attempts with
-    1.5 s, 3 s, 4.5 s spacing and then raises, so a persistently unreachable exchange
-    still fails the pass and nothing is overwritten (exit code 2). Before this change a
-    single 5xx aborted the whole collection, because every non-429 HTTPError broke out of
-    the loop on the first attempt — one flaky response from the demo API was enough to
-    skip a pass, and a run that kept hitting them stopped committing entirely.
+    Failure policy (F-85): a retryable failure is retried up to `retries` attempts and then
+    raises, so a persistently unreachable exchange still fails the pass and nothing is
+    overwritten (exit code 2). Before this change a single 5xx aborted the whole collection,
+    because every non-429 HTTPError broke out of the loop on the first attempt — one flaky
+    response from the demo API was enough to skip a pass.
+
+    Wait schedule: 429 -> 3 s, 6 s, 12 s (the docs say to back off on 429 for unauthenticated
+    public requests); 5xx / network -> 1.5 s, 3 s, 4.5 s. No wait after the final attempt.
     """
     url = BASE + path
     if params:
@@ -163,6 +173,7 @@ def get(path: str, params: dict | None = None, retries: int = 4):
     last = None
     for attempt in range(retries):
         req = urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": UA})
+        wait = BACKOFF_SECONDS * (attempt + 1)
         try:
             with urllib.request.urlopen(req, timeout=25) as r:
                 return json.loads(r.read().decode("utf-8")), url
@@ -170,10 +181,13 @@ def get(path: str, params: dict | None = None, retries: int = 4):
             last = f"HTTP {e.code} {e.reason}"
             if e.code not in RETRY_STATUS:
                 raise RuntimeError(f"{last} for {url}") from e
+            wait = (RATE_LIMIT_BACKOFF_SECONDS * (2 ** attempt) if e.code == 429
+                    else BACKOFF_SECONDS * (attempt + 1))
         except Exception as e:  # network / TLS / DNS / socket timeout
             last = f"{type(e).__name__}: {e}"
+            wait = BACKOFF_SECONDS * (attempt + 1)
         if attempt + 1 < retries:
-            time.sleep(BACKOFF_SECONDS * (attempt + 1))
+            time.sleep(wait)
     raise RuntimeError(f"{last} for {url} after {retries} attempts")
 
 
@@ -394,6 +408,7 @@ def scan_markets():
             cursor = d.get("cursor") or ""
             if not cursor or not batch:
                 break
+            time.sleep(PAGE_PAUSE_SECONDS)
             if seen >= cap:
                 truncated = True
                 break
@@ -906,6 +921,18 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # FULL in-scope list first, and only the leftover window is trimmed for file size.
     rows["settled"], settled_published, settled_by_cat = split_and_select_settled(rows["settled"])
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
+    # How the in-scope settled total was obtained, published with the number so the page can
+    # print the method instead of a bare count. Two sessions have now worded this line
+    # differently and a third left it out; the string lives here, next to the value it describes.
+    settled_scan_truncated = bool(raw.get("_truncated", {}).get("settled"))
+    settled_total_method = (
+        "exact count of every settled row the paged scan returned inside the five topics, "
+        "measured before the per-topic publish selection and before the size window"
+        + ("; the scan stopped at the safety cap, so this is a lower bound"
+           if settled_scan_truncated else "; the scan was not truncated, so this is exact")
+        + f" (safety_scan_cap {SAFETY_SCAN_CAP}, kept window {SETTLED_KEEP}, "
+          f"published {len(settled_published)} across the five topics)"
+    )
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -1022,6 +1049,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_published": len(settled_published),
             "settled_publish_cap": SETTLED_PUBLISH_CAP,
             "settled_published_by_category": settled_by_cat,
+            "settled_in_scope_total_method": settled_total_method,
+            # The row counts the pages actually render, named as counts rather than inferred
+            # from the length of a list that is itself capped.
+            "open_published_rows": len(rows["open"]),
+            "settled_published_rows": len(settled_published),
             "historical_cutoff_market_settled_ts": hist_cutoff,
             "historical_backfill_rows": len(hist_rows),
             "price_history_backfilled_from_candles": hist_backfilled,

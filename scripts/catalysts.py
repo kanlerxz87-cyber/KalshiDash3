@@ -49,7 +49,16 @@ URL_RE = re.compile(r"^https://[^\s\"']+$")
 VERDICTS = {"external_move_coincides", "external_move_coincides_in_direction",
             "no_external_move_supporting_this_swing", "no_external_move_in_window",
             "published_reference_on_the_same_side_as_the_move",
-            "published_reference_on_the_other_side_of_the_strike", "not_reviewed"}
+            "published_reference_on_the_other_side_of_the_strike",
+            # Added 2026-11-22 (arena-d34a9f0d), both measured from the committed observations
+            # rather than asserted:
+            #   best_quote_did_not_move — the best bid AND ask are identical at the two reads that
+            #     bound the swing, so the >=10c change is in the last-traded print, not in the
+            #     quoted price. Nobody repriced the market between the observations.
+            #   reference_not_publicly_readable — the market's own rules name an index (the crypto
+            #     series settle on CF Benchmarks' BRTI) that has no public read, so no reading of
+            #     it is quoted and nothing is asserted about why the book moved.
+            "best_quote_did_not_move", "reference_not_publicly_readable", "not_reviewed"}
 
 
 def utcnow() -> str:
@@ -129,7 +138,10 @@ def relation(cmp: dict) -> dict:
     out = {"kind": cmp.get("kind"), "strike": strike,
            "before": before, "before_at": cmp.get("value_before_at"),
            "after": after, "after_at": cmp.get("value_after_at"),
-           "reference_side": cmp.get("reference_side")}
+           "reference_side": cmp.get("reference_side"),
+           # Which published series these numbers are. The pages print this word, so a proxy can
+           # never be presented as the settlement reference (F-93).
+           "reference_name": cmp.get("reference_name") or "reference"}
     if None in (before, after) or strike is None:
         out["incomplete"] = True
         return out
@@ -315,6 +327,10 @@ def build() -> dict:
         "not_reviewed": len(out_rows) - len(reviewed),
         "external_move_coincides": sum(1 for r in out_rows if r["state"].startswith("external_move_coincides")),
         "no_external_move_supporting": sum(1 for r in out_rows if r["state"].startswith("no_external_move")),
+        # F-93: the two verdicts added on 2026-11-22, counted so a summary can quote them
+        # instead of describing them.
+        "best_quote_did_not_move": sum(1 for r in out_rows if r["state"] == "best_quote_did_not_move"),
+        "reference_not_publicly_readable": sum(1 for r in out_rows if r["state"] == "reference_not_publicly_readable"),
         "links_shown": sum(len(r["links"]) for r in out_rows),
         # F-65: archived swings whose official series record puts them outside the topic, kept
         # out of this table as well as out of the chats, and counted so the number is auditable.

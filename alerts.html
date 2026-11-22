@@ -235,6 +235,8 @@ const LEAD_STATE_LABEL = {
   no_external_move_in_window: "no move in the settlement reference inside the window",
   published_reference_on_the_same_side_as_the_move: "the published figure sits on the side the price moved to",
   published_reference_on_the_other_side_of_the_strike: "the published figure sits against the side the price moved to",
+  best_quote_did_not_move: "the best bid and ask were identical before and after — the move is in the last-traded print, not the quoted price",
+  reference_not_publicly_readable: "the index this market settles on has no public read, so no reading of it is quoted",
   not_reviewed: "not reviewed yet — this market's reference has not been read for this minute",
 };
 
@@ -262,7 +264,7 @@ function renderLeads() {
         + `<span class="small mut"> · fetched ${KD.esc(l.fetched_at || "?")}</span>`).join("<br>");
       const rel = r.relation || {};
       const numbers = (rel.after === undefined || rel.after === null) ? ""
-        : `<div class="small mut">reference ${KD.esc(String(rel.before))} → ${KD.esc(String(rel.after))}`
+        : `<div class="small mut">${KD.esc(rel.reference_name || "reference")} ${KD.esc(String(rel.before))} → ${KD.esc(String(rel.after))}`
           + ` · strike ${KD.esc(String(rel.strike))}`
           + (rel.crossed ? ` · crossed ${KD.esc(rel.crossed)}` : " · strike not crossed") + `</div>`;
       const ref = r.settlement_reference_text

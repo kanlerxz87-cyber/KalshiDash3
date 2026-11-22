@@ -1839,3 +1839,180 @@ Claimed before any edit; no other session names these files in an open scope.
 Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
 
 Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+### T96 (`arena-eed90ce4`) — rate-limit handling for the collector
+
+- Kalshi's rate-limit page answers the unauthenticated case directly: *"Unauthenticated public requests are subject to separate limits. Authenticate requests where supported and back off on `429`"* (https://docs.kalshi.com/getting_started/rate_limits). The collector pages ~60 requests per pass (25,369 open + 30,552 settled rows at 1,000/page) unauthenticated, so 429 is the most likely reason a pass dies — and the old code waited 1.5 s and retried three times.
+- Change: 429 now backs off 3 s → 6 s → 12 s (doubling), while 5xx/network keep the linear 1.5 / 3 / 4.5 s; paginated scans pause `PAGE_PAUSE_SECONDS` (0.15 s) between pages so the limit is less likely to be tripped at all. Failure semantics unchanged: after the last attempt the pass fails and **nothing is written**.
+- Tests: `scripts/tests/test_collect_retry.py` extended to 8 cases, including the exact wait schedule for both error classes and the page pause.
+- Still honest about what is unknown: the Actions job logs remain unreadable from this sandbox, so whether 429 is *the* cause of today's stall is not asserted anywhere — F-85 records only the observed facts and the fixes, and the site states the snapshot age and the missing intervals on the landing page.
+
+---
+
+---
+
+---
+
+---
+
+---
+
+## Session `arena-d34a9f0d` — independent verification pass, landing-page count defects, dead test assertions, catalyst coverage (branch `arena/d34a9f0d-kalshidash3`)
+
+Base `a159dd3` (`main`, snapshot 2026-11-22T07:21Z). Checked every live claim before starting: there are
+**no open pull requests** and no `in-progress` task row younger than 2026-11-21, so no scope below overlaps a
+live session. Claim `arena-d34a9f0d` pushed before any implementation edit.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T70 | Independent line-by-line verification of the published numbers against the official demo API and docs.kalshi.com, using a fetch route this sandbox has and earlier sessions did not | done | arena-d34a9f0d | `COORDINATION.md` (this section) | 5/5 headline rows re-fetched from `GET /markets/{ticker}` and matched field-for-field; see the table below |
+| T71 | **F-90** (was logged here as F-83 before the merge renumbered it): `index.html` prints `counts.settled_in_scope` (the 1,600-row *kept window*) as "settled markets in scope", while the banner on the same page prints the 6,927-row scan total — two different numbers under the same phrase | done | arena-d34a9f0d | `index.html` | `scripts/tests/test_scope.py`, `test_pages_dom.js` |
+| T72 | *(no finding id published — main fixed the same defect independently, see close-out)* `scripts/tests/test_scope.py` ends its verdict (`if errors: sys.exit`) at line 287 and then keeps asserting to line 312, so section 5's assertions can never fail the run — and one of them (`settled_in_scope_total_method` must be rendered in `index.html`) is failing right now while the suite prints `OK` | done | arena-d34a9f0d | `scripts/tests/test_scope.py` | suite now fails on the defect it was written to catch, then passes after T71 |
+| T73 | *(no finding id published — main's **F-83** covers it, see close-out)* the landing page names a $0-volume, 0.0¢ market as Culture's "largest live market" with no explanation, although `culture.html` carries a notice saying exactly that | done | arena-d34a9f0d | `index.html`, `scripts/tests/test_scope.py` | `test_scope.py` + DOM render |
+| T74 | **F-92** + **F-93**: catalyst coverage is 9 of 61 swings, yet the executive summary reports the requirement as "done"; extend the review ledger with sources actually fetched this session and correct the status to the measured coverage | done | arena-d34a9f0d | `data/catalyst_review.json`, `data/live/catalysts.json` (regenerated only), `executive-summary.html`, `data/findings.json` | `scripts/catalysts.py`, `scripts/tests/validate_catalysts.py` |
+| T75 | Publish: gate → PR → merge → confirm Pages | in progress | arena-d34a9f0d | `COORDINATION.md` | close-out below |
+
+### Verification evidence (T70) — headline rows re-fetched 2026-11-22 ~08:1xZ
+
+Each row of the landing page's "What is live right now" table was re-read from the market's own official record
+and compared with the committed snapshot `2026-11-22T06:17:12Z`. Every value matched exactly; no price is
+invented, rounded up, or carried forward from a different ticker.
+
+| Landing-page cell | Committed snapshot | `GET /markets/{ticker}` just now | Match |
+|---|---|---|---|
+| Gas · `KXAAAGASM-26NOV30-3.90` · $23,271 · 75.0¢ · 31,028 · 24,989 | `volume_fp 31027.52`, `last_price_dollars 0.75`, `open_interest_fp 24988.65` | same three values, `status active` | ✔ 31027.52 × 0.75 = 23270.64 |
+| Elections · `KXELECTIRAN-27JAN01` · $3 · 90.0¢ · 3 · 0 | `volume_fp 3.19`, `last 0.90`, `open_interest_fp 0.02` | same, `status active` | ✔ 3.19 × 0.90 = 2.87 |
+| Culture · `KXALBUMCHART-GTA6H100-05DEC26-GE9` · $0 · 0.0¢ · 0 · 0 | `volume_fp 0`, `last 0`, `open_interest_fp 0` | same, `status active` | ✔ (and see T73: a $0 row is a poor "largest") |
+| Crypto · `KXBTCY-27JAN0100-B147500` · $64,029,609 · 98.0¢ · 65,336,335 · 6,920,631 | `volume_fp 65336335.23`, `last 0.98`, `open_interest_fp 6920631.49` | same | ✔ |
+| Golf · `KXPGATOUR-THRC26-BHAR` · $114,896 · 75.0¢ · 153,195 · 119,274 | `volume_fp 153195.26`, `last 0.75`, `open_interest_fp 119274.49` | same, `volume_24h_fp 2586.93` | ✔ |
+
+Also re-read this session: `GET /historical/cutoff` → `market_settled_ts 2026-09-23T00:00:00Z`. **The cutoff moved
+one day since F-82 was recorded** (it read `2026-09-22T00:00:00Z` on 2026-11-21), which confirms it is a rolling
+value rather than a fixed date. F-82's *finding* stands (a market settled 2026-07-01 still returns HTTP 200 from
+`GET /markets/{ticker}` while the bulk settled paging never reaches it); only the quoted constant is now stale, and
+the site prints it from the snapshot rather than typing it, so nothing on the page is wrong.
+
+### Close-out (`arena-d34a9f0d`)
+
+| Item | Result |
+|---|---|
+| T70 verification | 5/5 landing-page headline rows re-fetched from `GET /markets/{ticker}` and matched field-for-field; 6 official documentation pages re-read and quoted verbatim (see the two tables below) |
+| T71 / **F-90** | fixed — the three settled counts (scan total 6,927 / kept window 1,600 / published 200) are named separately on `index.html`, and the collector now publishes `settled_in_scope_total_method` plus explicit published-row counts |
+| T72 | found and fixed here **and independently on main** — `scripts/tests/test_scope.py` had ~10 assertions *below* its verdict; three were failing while the suite printed `OK` and exited 0. Main's S-02 work moved the verdict last and made the same three assertions true, so this session **adopted main's fix rather than publishing a duplicate finding id**. Its own section-6/7 assertions were kept alongside main's, because they fail on different regressions |
+| T73 | found and fixed here **and independently on main as F-83** — the landing page's Culture row named a $0-volume, 0.0¢ market as the "largest live market" with no explanation. Main's fix is strictly better (it ranks untraded topics by nearest published `close_time` and tests "traded" from `volume_fp`, which survives a 0¢ fill), so it was **kept and this branch's duplicate deleted**; the assertions were re-pointed at main's wording |
+| T74 / **F-92, F-93** | fixed — catalyst coverage **9/61 → 57/61**. 48 reviews written from sources fetched this session; 4 rows left `not_reviewed` with a stated reason (their bounding observations are no longer in the committed history). The executive summary's catalyst row now renders its status and coverage from `data/live/catalysts.json` instead of typing "done" |
+| Gate | `python3 scripts/verify_release.py` **PASS** on the branch — 21 pages, every suite, including the new assertions |
+| Flagged, not blocking | **F-90** (medium, settled-count labels), **F-92** (medium, catalyst coverage), **F-93** (low, raw verdict identifier) — all published on `flagged.html` with sources. The dead-assertion and untraded-row defects are recorded in this table under T72/T73 and on `main` as S-02/F-83, so they are not double-published. **F-24** notes a third-party repository among its sources; it is labelled "circumstantial evidence only" and sits beside the official documentation link, so it was left as published rather than rewritten |
+
+#### T70 — official documentation re-read verbatim this session (2026-11-22 ~08:1x–08:4xZ)
+
+| Claim on the site | What the official page says (verbatim) | Source |
+|---|---|---|
+| C-01…C-04 demo endpoints | "Demo's recommended Trade API root is `https://external-api.demo.kalshi.co/trade-api/v2`", with `https://demo-api.kalshi.co/trade-api/v2` also supported, and the WebSocket pair `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` / `wss://demo-api.kalshi.co/trade-api/ws/v2` | [demo_env](https://docs.kalshi.com/getting_started/demo_env) |
+| C-07/C-08/C-50 demo is mock funds and may not reflect real markets | "For testing purposes, Kalshi offers a *demo* environment with mock funds… For safety, credentials are not shared between this environment and production. The price and behavior of markets in the demo environment may not be reflective of those in real markets." | [demo_env](https://docs.kalshi.com/getting_started/demo_env) |
+| C-17/C-29 candle intervals are 1/60/1440 only | "Time period length of each candlestick in minutes. Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-61 5,000-period cap and second-based timestamps | "One request can span at most 5,000 periods… rejected with 400 `bad_request`… 1-minute candlesticks are limited to about 3.5 days per request… `start_ts` and `end_ts` must be in seconds; millisecond values are rejected with 400 `bad_request`." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-62 / C-63 archived candles and freshness | "Candlesticks for markets that settled before the historical cutoff are only available via `GET /historical/markets/{ticker}/candlesticks`" · "The most recent candlesticks can be a few seconds behind the latest trades and quotes." | [candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) |
+| C-27 orderbook shape | response body is `orderbook_fp` with `yes_dollars` and `no_dollars` arrays of `[price, count_fp]` string pairs | [get-market-orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook) |
+| C-53 an unknown ticker is 200 + empty arrays | re-probed live: `GET /markets/KXNOTAREALTICKER/orderbook` → `{"orderbook_fp":{"no_dollars":[],"yes_dollars":[]}}` | [live probe](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNOTAREALTICKER/orderbook) |
+
+#### T74 — the finding behind the new verdicts (measured, not asserted)
+
+Reading the two committed observations that bound each swing shows **two different phenomena** that the old
+vocabulary could not separate:
+
+| Pattern | Count | Evidence |
+|---|---|---|
+| Best bid **and** ask identical at both reads → the ≥ $0.10 change is in the last-traded print, not the quoted price | 19 swings | e.g. `KXBTCY-27JAN0100-B97500`: `last` 0.97 → 0.01 between 06:02:12Z and 06:17:12Z while the committed book stayed `yes_bid 0.00 / yes_ask 0.01` at both reads |
+| Book repriced → a real change in the quoted price, but the settlement reference (CF Benchmarks' BRTI) has no public read | 28 swings | e.g. `KXBTCY-27JAN0100-B52500` 21:46:11Z: book 0.01/0.99 → 0.09/0.10 while the print went 0.99 → 0.10 |
+
+Both are now first-class verdicts (`best_quote_did_not_move`, `reference_not_publicly_readable`) with human labels on
+both pages, and `relation` carries a `reference_name` so a proxy can never be printed as the settlement reference.
+Every row still links the market's own official record; the AAA row additionally links `gasprices.aaa.com` and quotes
+$3.6594 as of 11/21/26 against its $3.6450 strike.
+
+#### Deliberately not done
+
+- **`data/live/markets.json` was not rewritten.** The collector is the only writer and it is running on `main`; the new
+  `counts.settled_in_scope_total_method` and published-row fields appear on the next pass. Until then `index.html`
+  prints "not stated in this snapshot" rather than inventing the method string.
+- **The 4 remaining `not_reviewed` rows were not forced.** Their bounding observations are gone from the committed
+  history, so the bid/ask either side of the print cannot be read back. A guess there would be exactly the failure the
+  brief forbids.
+
+### Merge record — `arena/d34a9f0d` merging `origin/main` (2026-11-22)
+
+`main` advanced 46 commits while this branch was being written (PRs #92–#101 from `arena/ae1f84b0`,
+`arena/eed90ce4`, `arena/38b89a30`, `arena/a070c747` and `arena/5c8e3f0a`). Two overlaps were found and
+**neither side's work was discarded**:
+
+| Overlap | What `main` had | What this branch had | Resolution |
+|---|---|---|---|
+| Untraded-topic landing row | **F-83**, `2febcb3`: labels the topic `untraded`, ranks untraded topics by nearest published `close_time`, decides "traded" from `volume_fp` not the dollar estimate, and adds a footnote (PR #94/#95) | the same defect found independently, fixed with a different label and no `close_time` ordering | **kept main's** — it is strictly better (an ordered, non-inferred tiebreak and a volume-based test that survives a 0¢ fill). This branch's duplicate fix and its footnote were deleted, and its assertions were re-pointed at main's wording. Recorded here rather than as a finding, since main had already published F-83 |
+| Findings IDs | F-83 (untraded row), F-84 (per-series taker multiplier), F-85 (2 h collector stall), D-01…D-05 | F-83…F-87 | renumbered on the spot to F-86…F-89, then **twice more** as main kept publishing (see merge records 2–4). Final published ids are **F-90, F-92, F-93**; the fourth was dropped as a duplicate of main's own fix |
+
+Other resolutions: `index.html` — main's untraded handling kept, this branch's settled-count labels kept;
+`executive-summary.html` — main's new per-row source column kept, this branch's catalyst status and coverage kept;
+`data/findings.json` — main's 70 entries kept verbatim as the base, this branch's 4 appended;
+`alerts.html` / `dashboard.html` / `assets/site.js` — auto-merged, both sides' additions present.
+
+---
+
+---
+
+### Merge record 2 — `arena/d34a9f0d` merging `origin/main` (PR #102–#104)
+
+`main` advanced again while this PR was open (#102 `arena/ae1f84b0` conflict-tree fix, #103 `arena/eed90ce4`
+collector retry hardening, #104 `arena/a070c747` close-out). Two conflicts, both resolved additively:
+
+| File | Resolution |
+|---|---|
+| `data/findings.json` | main's 70 entries kept verbatim as the base (it had already published F-83, F-84, F-85 and D-02…D-05); this session's F-86…F-89 appended. 74 total, no duplicate ids — checked programmatically |
+| `COORDINATION.md` | main's new `### T94` section kept first, this session's close-out and merge record 1 kept after it, both verbatim |
+
+`python3 scripts/verify_release.py` **PASS** after the merge (21 pages, all suites including the new
+`test_collect_retry.py`); `test_pages_dom.js` all sections ok — M reads 72 facts / 74 flagged / 23 suggestions /
+9 questions / catalysts 57/61.
+
+### Merge record 3 — `arena/d34a9f0d` merging `origin/main` (PR #105)
+
+`main` published its own **F-86** (`8b799d6`, freshness alarm cancels a wedged collector) while this PR was open, which
+collided with this session's F-86. This session's four findings are therefore renumbered a second time, to
+**F-90…F-93**, and every cross-reference updated (`index.html`, `dashboard.html`, `executive-summary.html`,
+`scripts/catalysts.py`, `test_scope.py`, `test_pages_dom.js`). Remaining `F-86` references in the tree belong to
+main's alarm finding, which is correct.
+
+`data/findings.json`: main's 71 entries kept verbatim as the base, this session's 4 appended → **75 total, no duplicate
+ids** (checked programmatically). `COORDINATION.md`: main's new section kept first, this session's after it, both
+verbatim.
+
+Gate after the third merge: `verify_release.py` **PASS** (21 pages, all suites); `test_pages_dom.js` all sections ok —
+M reads 72 facts / 75 flagged / 23 suggestions / 9 questions / catalysts 57/61.
+
+### Merge record 4 — `arena/d34a9f0d` merging `origin/main` (PR #96)
+
+PR #96 (`arena/0553d7e9`) landed **S-01…S-04** while this PR was open. S-02 fixed the *same* settled-count wording
+defect this session fixed as F-90, from the other direction, and S-01's session also moved `test_scope.py`'s verdict
+to the end of the file — which is the defect this session recorded as T72. Resolution:
+
+| File | Resolution |
+|---|---|
+| `index.html` | **both kept** — main's S-02 wording (scan total + method string + per-topic selection) and this branch's explicit three-number naming (`settled_in_scope_total` / `settled_kept_window` / published). The KPI and the resolution paragraph each now carry both, so a reader gets the method *and* the three separate counts |
+| `scripts/tests/test_scope.py` | **both kept** — main's S-02 assertions (settled and open sides) plus this session's section 6/7. Main's precise check replaced this branch's over-broad one (`"settled markets in scope" not in index_html` would now fail on main's own correct wording) |
+| `data/findings.json` | main's 75 entries kept verbatim; this session's **F-90, F-92, F-93** appended → 78 total. The fourth (dead test assertions) was **dropped as a duplicate** of main's own fix rather than published under a second id |
+| `COORDINATION.md` | main's section first, this session's after it, both verbatim |
+
+Final published ids for this session: **F-90** (settled-count labels), **F-92** (catalyst coverage 9/61 reported as
+"done"), **F-93** (raw verdict identifier printed on the dashboard). The dead-assertion and untraded-row defects are
+recorded in the T72/T73 rows above and on `main` as S-02/F-83, so they are not double-published.
+
+### Merge record 5 — `arena/d34a9f0d` merging `origin/main` (PR #107–#108)
+
+PR #107 (`ea48482`, S-02 blank-scan-total edge case) and PR #108 (`5d453aa`, 429 backoff F-85) landed while this PR
+was awaiting merge. Two conflicts, both resolved additively and neither side discarded:
+
+| File | Resolution |
+|---|---|
+| `data/findings.json` | main's 75 entries kept verbatim as the base; this session's F-90/F-92/F-93 appended → **78 total, 0 duplicate ids** (checked programmatically) |
+| `COORDINATION.md` | main's new content kept first, this session's after it, both verbatim. A merge-record heading that an earlier resolution had left parked above this session's header was moved back inside it |
+
+`verify_release.py` **PASS** after the merge; `test_client_safety.py` (main's board-marker guard) **OK**.

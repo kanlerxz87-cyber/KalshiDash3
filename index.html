@@ -128,11 +128,13 @@ KD.nav("");
   k.innerHTML = [
     ["Open markets in scope", KD.num(open.length), "the five requested categories only"],
     ["Confirmed by the exchange", KD.num(confirmed), "series ticker listed in the official fee schedule (basis=seed)"],
-    // S-02 (fixed 2026-11-22): the parenthetical used counts.settled_in_scope, the 1,600-row
-    // retained paging window, and called it "settled in scope". The scan total is
+    // S-02 / F-90 (fixed 2026-11-22): the parenthetical used counts.settled_in_scope, the
+    // 1,600-row retained paging window, and called it "settled in scope". The scan total is
     // counts.settled_in_scope_total; the two are different numbers and are now named separately.
-    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(settled.length) + " settled rows published"
-      + " (this run's scan found " + KD.num(snap.counts?.settled_in_scope_total ?? "—") + " settled markets in scope)"],
+    ["Resolved yes/no captured", KD.num(resolved), "of " + KD.num(snap.counts?.settled_published ?? settled.length)
+      + " settled rows published in this snapshot, out of "
+      + KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope ?? settled.length)
+      + " settled markets the scan found in scope"],
     ["Snapshot age", KD.ago(snap.collected_at), "collected " + KD.esc(snap.collected_at || "")],
   ].map(([label, val, sub]) => `<div class="card"><div class="kpi">${val}<small>${label}</small></div><p class="small" style="margin-top:6px">${sub}</p></div>`).join("")
     + `<div class="card"><div class="kpi">${KD.num(qaRows)}<small>demo QA fixtures in the snapshot</small></div><p class="small" style="margin-top:6px">test instruments (their own rules say "demo portfolio test"); kept out of the largest-market table</p></div>`
@@ -200,7 +202,8 @@ KD.nav("");
      { key: "basis", label: "Category basis" },
      { key: "src", label: "Source" }],
     rows
-  ) + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
+  )
+    + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
      Kalshi has no official “dollars traded” field — see
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
@@ -233,11 +236,14 @@ KD.nav("");
     resHost.innerHTML =
       `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
         newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
-        The snapshot's own scan found ${KD.num(snap.counts?.settled_in_scope_total ?? "—")} settled markets in scope
+        <b>Three different numbers, so they are named separately (F-90):</b> the scan found
+        ${KD.num(snap.counts?.settled_in_scope_total ?? "—")} settled markets in scope
         <span class="mut">(${KD.esc(snap.counts?.settled_in_scope_total_method || "method not stated in this snapshot")})</span>;
-        the collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast 15-minute crypto
-        series cannot crowd out gas, elections, culture or golf
+        ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
+        size window; the collector publishes ${KD.num(resRows.length)} of them, chosen <b>per topic</b> so a fast
+        15-minute crypto series cannot crowd out gas, elections, culture or golf
         (<code>counts.settled_published_by_category</code>: ${KD.esc(Object.entries(snap.counts?.settled_published_by_category || {}).map(([k, v]) => `${KD.CAT_LABEL[k] || k} ${v}`).join(" · ") || "not published yet")}).
+        How the total was obtained: ${KD.esc(snap.counts?.settled_in_scope_total_method || "not stated in this snapshot")}.
         Kalshi's historical-data docs state settled markets older than the exchange's published historical cutoff
         (${KD.esc(snap.counts?.historical_cutoff_market_settled_ts || "not reported")}) will not appear in
         <code>GET /markets</code> and must be read from <code>GET /historical/markets</code>, which the collector now
