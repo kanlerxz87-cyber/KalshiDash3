@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-22T06:33:19Z",
- "runtime_seconds": 668.3,
+ "collected_at": "2026-11-22T07:18:21Z",
+ "runtime_seconds": 194.5,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,76 +29,76 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 7446,
+  "open_in_scope": 7537,
   "eligible": 0,
   "picks": 0,
   "near_misses": 8,
-  "unscoreable": 7416,
-  "orderbooks": 7446,
-  "orderbooks_requested": 7446,
+  "unscoreable": 7502,
+  "orderbooks": 7537,
+  "orderbooks_requested": 7537,
   "alerts": 0,
-  "markets_with_momentum": 150,
+  "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 7446,
-  "returned": 7446,
+  "requested": 7537,
+  "returned": 7537,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
   "docs": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks"
  },
  "historical_cutoff": {
-  "market_positions_last_updated_ts": "2026-09-22T00:00:00Z",
-  "market_settled_ts": "2026-09-22T00:00:00Z",
-  "orders_updated_ts": "2026-11-07T00:00:00Z",
-  "trades_created_ts": "2026-09-22T00:00:00Z"
+  "market_positions_last_updated_ts": "2026-09-23T00:00:00Z",
+  "market_settled_ts": "2026-09-23T00:00:00Z",
+  "orders_updated_ts": "2026-11-08T00:00:00Z",
+  "trades_created_ts": "2026-09-23T00:00:00Z"
  },
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXBTCD-26NOV2202-T58299.99",
+   "ticker": "KXBTC-26NOV2203-B58550",
    "eligible": false,
    "fails": [
-    "spread 11.0c > 10c cap",
     "24h volume 0.0 < 100 contracts",
+    "net ROI -78.83% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [],
-   "q": 0.77525,
-   "mid": 0.9450000000000001,
-   "micro": 1.0,
+   "q": 0.022500000000000003,
+   "mid": 0.05,
+   "micro": 0.0,
    "last": 0.0,
-   "bid": 0.89,
-   "ask": 1.0,
-   "spread": 0.10999999999999999,
-   "depth": 220.0,
+   "bid": 0.0,
+   "ask": 0.1,
+   "spread": 0.1,
+   "depth": 100.0,
    "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
-   "series_ticker": "KXBTCD",
+   "series_ticker": "KXBTC",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
     "listed": false
    },
    "entry": {
-    "side": "NO",
-    "entry": 0.10999999999999999,
-    "fee_unit": 0.006853,
-    "cost": 0.11685299999999998,
-    "ev": 0.10789700000000002,
-    "roi": 0.9233566960197859
+    "side": "YES",
+    "entry": 0.1,
+    "fee_unit": 0.006300000000000001,
+    "cost": 0.1063,
+    "ev": -0.0838,
+    "roi": -0.7883349012229539
    },
-   "score": 0.9233566960197859,
+   "score": -0.7883349012229539,
    "dollars_traded_estimate": 0.0,
-   "title": "Bitcoin price on Nov 22, 2026?",
+   "title": "Bitcoin price range on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXBTC-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -106,15 +106,125 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 220.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.89,
-    "ask_price": null
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 100.0,
+    "bid_price": null,
+    "ask_price": 0.09999999999999998
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2202-T58299.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC-26NOV2203-B58550"
   },
   {
-   "ticker": "KXHYPED-26NOV2202-T60.7499",
+   "ticker": "KXSOLD-26NOV2203-T69.4999",
+   "eligible": false,
+   "fails": [
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -78.83% not above 0% floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.022500000000000003,
+   "mid": 0.05,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.1,
+   "spread": 0.1,
+   "depth": 100.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.6941666666666667,
+   "momentum": null,
+   "series_ticker": "KXSOLD",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.1,
+    "fee_unit": 0.006300000000000001,
+    "cost": 0.1063,
+    "ev": -0.0838,
+    "roi": -0.7883349012229539
+   },
+   "score": -0.7883349012229539,
+   "dollars_traded_estimate": 0.0,
+   "title": "SOL price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXSOLD-26NOV2203",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 100.0,
+    "bid_price": null,
+    "ask_price": 0.09999999999999998
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2203-T69.4999"
+  },
+  {
+   "ticker": "KXBTC-26NOV2203-B59550",
+   "eligible": false,
+   "fails": [
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -78.86% not above 0% floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.018000000000000002,
+   "mid": 0.04,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.08,
+   "spread": 0.08,
+   "depth": 100.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.6941666666666667,
+   "momentum": null,
+   "series_ticker": "KXBTC",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.08,
+    "fee_unit": 0.005152000000000001,
+    "cost": 0.085152,
+    "ev": -0.067152,
+    "roi": -0.7886133032694476
+   },
+   "score": -0.7886133032694476,
+   "dollars_traded_estimate": 0.0,
+   "title": "Bitcoin price range on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXBTC-26NOV2203",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 100.0,
+    "bid_price": null,
+    "ask_price": 0.07999999999999996
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC-26NOV2203-B59550"
+  },
+  {
+   "ticker": "KXHYPED-26NOV2203-T60.7499",
    "eligible": false,
    "fails": [
     "24h volume 0.0 < 100 contracts",
@@ -131,7 +241,7 @@
    "spread": 0.05,
    "depth": 100.0,
    "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXHYPED",
    "fee_multiplier": {
@@ -152,8 +262,8 @@
    "title": "HYPE price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXHYPED-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXHYPED-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -166,10 +276,65 @@
     "bid_price": null,
     "ask_price": 0.050000000000000044
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2202-T60.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2203-T60.7499"
   },
   {
-   "ticker": "KXXRPD-26NOV2202-T0.8799",
+   "ticker": "KXSOLD-26NOV2203-T69.7499",
+   "eligible": false,
+   "fails": [
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -78.90% not above 0% floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.011250000000000001,
+   "mid": 0.025,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.05,
+   "spread": 0.05,
+   "depth": 100.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.6941666666666667,
+   "momentum": null,
+   "series_ticker": "KXSOLD",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.05,
+    "fee_unit": 0.0033250000000000003,
+    "cost": 0.053325000000000004,
+    "ev": -0.042075,
+    "roi": -0.7890295358649788
+   },
+   "score": -0.7890295358649788,
+   "dollars_traded_estimate": 0.0,
+   "title": "SOL price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXSOLD-26NOV2203",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 100.0,
+    "bid_price": null,
+    "ask_price": 0.050000000000000044
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2203-T69.7499"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2203-T0.8799",
    "eligible": false,
    "fails": [
     "depth 1 < 50 contracts at the touch",
@@ -187,7 +352,7 @@
    "spread": 0.010000000000000009,
    "depth": 1.0,
    "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXXRPD",
    "fee_multiplier": {
@@ -205,11 +370,11 @@
    },
    "score": 17.914242962685854,
    "dollars_traded_estimate": 0.0,
-   "title": "Ripple price at Nov 22, 2026 at 2am EST?",
+   "title": "Ripple price at Nov 22, 2026 at 3am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXXRPD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXXRPD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -222,10 +387,10 @@
     "bid_price": 0.99,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2202-T0.8799"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2203-T0.8799"
   },
   {
-   "ticker": "KXXRPD-26NOV2202-T0.8599",
+   "ticker": "KXXRPD-26NOV2203-T0.8599",
    "eligible": false,
    "fails": [
     "depth 1 < 50 contracts at the touch",
@@ -243,7 +408,7 @@
    "spread": 0.010000000000000009,
    "depth": 1.0,
    "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXXRPD",
    "fee_multiplier": {
@@ -261,11 +426,11 @@
    },
    "score": 17.914242962685854,
    "dollars_traded_estimate": 0.0,
-   "title": "Ripple price at Nov 22, 2026 at 2am EST?",
+   "title": "Ripple price at Nov 22, 2026 at 3am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXXRPD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXXRPD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -278,10 +443,10 @@
     "bid_price": 0.99,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2202-T0.8599"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2203-T0.8599"
   },
   {
-   "ticker": "KXXRPD-26NOV2202-T0.8399",
+   "ticker": "KXXRPD-26NOV2203-T0.8399",
    "eligible": false,
    "fails": [
     "depth 1 < 50 contracts at the touch",
@@ -299,7 +464,7 @@
    "spread": 0.010000000000000009,
    "depth": 1.0,
    "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXXRPD",
    "fee_multiplier": {
@@ -317,11 +482,11 @@
    },
    "score": 17.914242962685854,
    "dollars_traded_estimate": 0.0,
-   "title": "Ripple price at Nov 22, 2026 at 2am EST?",
+   "title": "Ripple price at Nov 22, 2026 at 3am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXXRPD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXXRPD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -334,180 +499,12 @@
     "bid_price": 0.99,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2202-T0.8399"
-  },
-  {
-   "ticker": "KXXRPD-26NOV2202-T0.8199",
-   "eligible": false,
-   "fails": [
-    "depth 1 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "NO entry 1.0c below 5c floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.79775,
-   "mid": 0.995,
-   "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.99,
-   "ask": 1.0,
-   "spread": 0.010000000000000009,
-   "depth": 1.0,
-   "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
-   "momentum": null,
-   "series_ticker": "KXXRPD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.010000000000000009,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.01069300000000001,
-    "ev": 0.19155700000000003,
-    "roi": 17.914242962685854
-   },
-   "score": 17.914242962685854,
-   "dollars_traded_estimate": 0.0,
-   "title": "Ripple price at Nov 22, 2026 at 2am EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXXRPD-26NOV2202",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 1.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.99,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2202-T0.8199"
-  },
-  {
-   "ticker": "KXXRPD-26NOV2202-T0.8999",
-   "eligible": false,
-   "fails": [
-    "depth 1 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "NO entry 2.0c below 5c floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.7955,
-   "mid": 0.99,
-   "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.98,
-   "ask": 1.0,
-   "spread": 0.020000000000000018,
-   "depth": 1.0,
-   "vol24": 0.0,
-   "ttc_hours": 0.44472222222222224,
-   "momentum": null,
-   "series_ticker": "KXXRPD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.020000000000000018,
-    "fee_unit": 0.0013720000000000013,
-    "cost": 0.02137200000000002,
-    "ev": 0.18312799999999999,
-    "roi": 8.568594422609012
-   },
-   "score": 8.568594422609012,
-   "dollars_traded_estimate": 0.0,
-   "title": "Ripple price at Nov 22, 2026 at 2am EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXXRPD-26NOV2202",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 1.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.99,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2202-T0.8999"
-  },
-  {
-   "ticker": "KXBTC15M-26NOV220145-45",
-   "eligible": false,
-   "fails": [
-    "24h volume 0.0 < 100 contracts",
-    "net ROI -3.26% not above 0% floor",
-    "closes in 12 min < 15 min floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.4224090909090909,
-   "mid": 0.43,
-   "micro": 0.4254545454545454,
-   "last": 0.4,
-   "bid": 0.42,
-   "ask": 0.44,
-   "spread": 0.020000000000000018,
-   "depth": 110.0,
-   "vol24": 0.0,
-   "ttc_hours": 0.1947222222222222,
-   "momentum": null,
-   "series_ticker": "KXBTC15M",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.5800000000000001,
-    "fee_unit": 0.017052,
-    "cost": 0.597052,
-    "ev": -0.019461090909090983,
-    "roi": -0.03259530310440461
-   },
-   "score": -0.03259530310440461,
-   "dollars_traded_estimate": 96.34,
-   "title": "BTC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-22T06:45:00Z",
-   "event_ticker": "KXBTC15M-26NOV220145",
-   "status": "active",
-   "result": null,
-   "volume_fp": 240.84,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 155.71,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 30.0,
-    "depth_at_ask": 80.0,
-    "bid_price": 0.66,
-    "ask_price": 0.6799999999999999
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV220145-45"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2203-T0.8399"
   }
  ],
  "unscoreable": [
   {
-   "ticker": "KXSOLD-26NOV2202-T68.4999",
+   "ticker": "KXSOLD-26NOV2203-T68.7499",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
@@ -519,16 +516,16 @@
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.5700000000000001,
+   "q": 0.544,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.85,
+   "last": 0.72,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
    "vol24": 50.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXSOLD",
    "fee_multiplier": {
@@ -538,12 +535,12 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 42.5,
+   "dollars_traded_estimate": 36.0,
    "title": "SOL price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXSOLD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXSOLD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 50.0,
@@ -556,10 +553,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2202-T68.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2203-T68.7499"
   },
   {
-   "ticker": "KXSOLD-26NOV2202-T68.7499",
+   "ticker": "KXSOLD-26NOV2203-T68.9999",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
@@ -571,16 +568,16 @@
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.54,
+   "q": 0.488,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.7,
+   "last": 0.44,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
    "vol24": 50.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
    "series_ticker": "KXSOLD",
    "fee_multiplier": {
@@ -590,12 +587,12 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 35.0,
+   "dollars_traded_estimate": 22.0,
    "title": "SOL price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXSOLD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXSOLD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 50.0,
@@ -608,10 +605,62 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2202-T68.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2203-T68.9999"
   },
   {
-   "ticker": "KXSOLD-26NOV2202-T68.9999",
+   "ticker": "KXBTCD-26NOV2203-T59099.99",
+   "eligible": false,
+   "fails": [
+    "spread 100.0c > 10c cap",
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 54.31 < 100 contracts",
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.444,
+   "mid": 0.5,
+   "micro": 0.5,
+   "last": 0.22,
+   "bid": 0.0,
+   "ask": 1.0,
+   "spread": 1.0,
+   "depth": 0,
+   "vol24": 54.31,
+   "ttc_hours": 0.6941666666666667,
+   "momentum": null,
+   "series_ticker": "KXBTCD",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 11.95,
+   "title": "Bitcoin price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2203",
+   "status": "active",
+   "result": null,
+   "volume_fp": 54.31,
+   "volume_24h_fp": 54.31,
+   "open_interest_fp": 54.31,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2203-T59099.99"
+  },
+  {
+   "ticker": "KXBTCD-26NOV2203-T59199.99",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
@@ -623,18 +672,18 @@
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.49,
+   "q": 0.424,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.45,
+   "last": 0.12,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
    "vol24": 50.0,
-   "ttc_hours": 0.44472222222222224,
+   "ttc_hours": 0.6941666666666667,
    "momentum": null,
-   "series_ticker": "KXSOLD",
+   "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -642,12 +691,12 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 22.5,
-   "title": "SOL price on Nov 22, 2026?",
+   "dollars_traded_estimate": 6.0,
+   "title": "Bitcoin price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXSOLD-26NOV2202",
+   "close_time": "2026-11-22T08:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2203",
    "status": "active",
    "result": null,
    "volume_fp": 50.0,
@@ -660,31 +709,31 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2202-T68.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2203-T59199.99"
   },
   {
-   "ticker": "KXBTCD-26NOV2202-T59099.99",
+   "ticker": "KXBTCD-26NOV2205-T60699.99",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
-    "depth 1 < 50 contracts at the touch",
-    "24h volume 88.65 < 100 contracts",
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 8.0 < 100 contracts",
     "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.267,
+   "q": 0.434,
    "mid": 0.5,
-   "micro": 0.0,
-   "last": 0.21,
+   "micro": 0.5,
+   "last": 0.17,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
-   "depth": 1.0,
-   "vol24": 88.65,
-   "ttc_hours": 0.44472222222222224,
+   "depth": 0,
+   "vol24": 8.0,
+   "ttc_hours": 2.694166666666667,
    "momentum": null,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -694,48 +743,49 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 18.62,
+   "dollars_traded_estimate": 1.36,
    "title": "Bitcoin price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2202",
+   "close_time": "2026-11-22T10:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2205",
    "status": "active",
    "result": null,
-   "volume_fp": 88.65,
-   "volume_24h_fp": 88.65,
-   "open_interest_fp": 88.65,
+   "volume_fp": 8.0,
+   "volume_24h_fp": 8.0,
+   "open_interest_fp": 8.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 0.0,
-    "depth_at_ask": 1.0,
+    "depth_at_ask": 0.0,
     "bid_price": null,
-    "ask_price": 0.19999999999999996
+    "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2202-T59099.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2205-T60699.99"
   },
   {
-   "ticker": "KXBTCD-26NOV2202-T59399.99",
+   "ticker": "KXBTCD-26NOV2206-T63099.99",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
     "depth 0 < 50 contracts at the touch",
+    "24h volume 6.0 < 100 contracts",
     "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.41000000000000003,
+   "q": 0.436,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.05,
+   "last": 0.18,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
-   "vol24": 277.0,
-   "ttc_hours": 0.44472222222222224,
+   "vol24": 6.0,
+   "ttc_hours": 3.694166666666667,
    "momentum": null,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -745,17 +795,17 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 13.85,
+   "dollars_traded_estimate": 1.08,
    "title": "Bitcoin price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2202",
+   "close_time": "2026-11-22T11:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2206",
    "status": "active",
    "result": null,
-   "volume_fp": 277.0,
-   "volume_24h_fp": 277.0,
-   "open_interest_fp": 277.0,
+   "volume_fp": 6.0,
+   "volume_24h_fp": 6.0,
+   "open_interest_fp": 6.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 0.0,
@@ -763,31 +813,31 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2202-T59399.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2206-T63099.99"
   },
   {
-   "ticker": "KXBTCD-26NOV2202-T58799.99",
+   "ticker": "KXBTCD-26NOV2206-T62999.99",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
     "depth 0 < 50 contracts at the touch",
-    "24h volume 2.0 < 100 contracts",
+    "24h volume 6.0 < 100 contracts",
     "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.53,
+   "q": 0.436,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.65,
+   "last": 0.18,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
-   "vol24": 2.0,
-   "ttc_hours": 0.44472222222222224,
+   "vol24": 6.0,
+   "ttc_hours": 3.694166666666667,
    "momentum": null,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -797,17 +847,17 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 9.75,
+   "dollars_traded_estimate": 1.08,
    "title": "Bitcoin price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2202",
+   "close_time": "2026-11-22T11:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2206",
    "status": "active",
    "result": null,
-   "volume_fp": 15.0,
-   "volume_24h_fp": 2.0,
-   "open_interest_fp": 15.0,
+   "volume_fp": 6.0,
+   "volume_24h_fp": 6.0,
+   "open_interest_fp": 6.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 0.0,
@@ -815,30 +865,31 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2202-T58799.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2206-T62999.99"
   },
   {
-   "ticker": "KXBTCD-26NOV2202-T59199.99",
+   "ticker": "KXBTCD-26NOV2205-T61399.99",
    "eligible": false,
    "fails": [
     "spread 100.0c > 10c cap",
     "depth 0 < 50 contracts at the touch",
+    "24h volume 6.0 < 100 contracts",
     "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.416,
+   "q": 0.434,
    "mid": 0.5,
    "micro": 0.5,
-   "last": 0.08,
+   "last": 0.17,
    "bid": 0.0,
    "ask": 1.0,
    "spread": 1.0,
    "depth": 0,
-   "vol24": 110.0,
-   "ttc_hours": 0.44472222222222224,
+   "vol24": 6.0,
+   "ttc_hours": 2.694166666666667,
    "momentum": null,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -848,17 +899,17 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 8.8,
+   "dollars_traded_estimate": 1.02,
    "title": "Bitcoin price on Nov 22, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2202",
+   "close_time": "2026-11-22T10:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2205",
    "status": "active",
    "result": null,
-   "volume_fp": 110.0,
-   "volume_24h_fp": 110.0,
-   "open_interest_fp": 110.0,
+   "volume_fp": 6.0,
+   "volume_24h_fp": 6.0,
+   "open_interest_fp": 6.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 0.0,
@@ -866,75 +917,24 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2202-T59199.99"
-  },
-  {
-   "ticker": "KXSOLD-26NOV2202-T69.4999",
-   "eligible": false,
-   "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 50.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.43,
-   "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.15,
-   "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 0,
-   "vol24": 50.0,
-   "ttc_hours": 0.44472222222222224,
-   "momentum": null,
-   "series_ticker": "KXSOLD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 7.5,
-   "title": "SOL price on Nov 22, 2026?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-22T07:00:00Z",
-   "event_ticker": "KXSOLD-26NOV2202",
-   "status": "active",
-   "result": null,
-   "volume_fp": 50.0,
-   "volume_24h_fp": 50.0,
-   "open_interest_fp": 50.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOLD-26NOV2202-T69.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2205-T61399.99"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 105,
+  "candles_used": 145,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 0,
+  "baseline_always_yes_bets": 1,
   "baseline_always_yes_hits": 0,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 24,
-   "no candles in the 2h before close": 927
+   "candle without a price": 23,
+   "no side passed the replay gates": 1,
+   "no candles in the 2h before close": 102
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -942,7 +942,8 @@
    "slippage beyond crossing the quoted price",
    "any production market: this is the demo environment"
   ],
-  "hit_rate": null
+  "hit_rate": null,
+  "baseline_always_yes_hit_rate": 0.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
