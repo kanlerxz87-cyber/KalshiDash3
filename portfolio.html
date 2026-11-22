@@ -79,10 +79,12 @@
   <h2>3 · Paper ledger — the analysis loop, testable now</h2>
   <p class="small mut">
     Stored only in this browser (<code>localStorage</code>), starting at $10,000 of pretend cash. It is a simulation and is
-    labelled as one everywhere. Fees are modelled at the documented general taker rate so the P&amp;L is not flattering:
+    labelled as one everywhere. Fees are modelled with the documented formula and the schedule's per-series multiplier so the P&amp;L is not flattering:
     <code>fee = ceil(M × 0.07 × C × P × (1 − P))</code>
     (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>).
-    Per-series multipliers can differ, so treat net P&amp;L as an estimate.
+    M is 0 for the series the schedule lists at 0/0 (<code>KXBTCY</code>, <code>KXETHY</code>, <code>KXELECTIRAN</code> — no trading fee),
+    and 1 — the documented default — for every other series, including those absent from the table. A series whose multiplier
+    the schedule lists differently from this table would still need a person's visual check (<a href="flagged.html">F-20</a>).
   </p>
 
   <div class="grid">
@@ -119,7 +121,7 @@
     <thead><tr><th>Metric</th><th>Meaning</th><th>Limit you must know</th></tr></thead>
     <tbody>
       <tr><td>Gross stake</td><td>Sum of contracts × price.</td><td>Not the amount at risk in the way a stock position is: a binary contract is worth $1 or $0.</td></tr>
-      <tr><td>Modelled fees</td><td>Taker fee at the general 0.07 rate.</td><td>Ignores per-series multipliers, which range from 0/0 to 1/1 in the fee schedule.</td></tr>
+      <tr><td>Modelled fees</td><td>Taker fee at the schedule's per-series multiplier (M = 0 for <code>KXBTCY</code>/<code>KXETHY</code>/<code>KXELECTIRAN</code>, otherwise 1).</td><td>The table is transcribed from the fee schedule's PDF text, so a value could be misread; it is published on this page for exactly that check (<a href="flagged.html">F-20</a>, <a href="flagged.html">F-84</a>).</td></tr>
       <tr><td>Open risk</td><td>Stake in markets whose <code>result</code> is still empty.</td><td>Becomes realised only when the API returns a result; the paper ledger cannot resolve itself.</td></tr>
       <tr><td>Win rate</td><td>Not shown until trades resolve.</td><td>Deliberately blank rather than estimated from prices, which would be circular.</td></tr>
     </tbody>
@@ -136,7 +138,7 @@
   <div class="notice bad">
     <b>AUTOMATED PAPER SIMULATION — not a demo-account record, not advice.</b> Every number in this section is computed in
     your browser from committed snapshots. No demo credentials exist (F-07), so nothing here touched the exchange.
-    Per-series fee multipliers are not applied (the general rate is), fills assume zero slippage within the displayed depth,
+    Per-series fee multipliers <i>are</i> applied (0 for <code>KXBTCY</code>/<code>KXETHY</code>/<code>KXELECTIRAN</code>, 1 otherwise, F-84); fills assume zero slippage within the displayed depth,
     and the replay is a pure function of the current snapshot: a market that settles later resolves only on the run that
     first sees its <code>result</code>.
   </div>
@@ -152,7 +154,7 @@
       <tr><td><b>S4 resolution fade</b></td>
           <td>At a market's final collected observation: if the price is ≤10¢ (or ≥90¢) and the favoured side has <b>zero resting bid contracts</b> in the snapshot book, take the faded side at ≤20¢. Held until the market settles; the payoff is the literal API <code>result</code> applied as $1 per winning contract, no settlement fee (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).</td></tr>
       <tr><td><b>Fees</b></td>
-          <td><code>ceil(0.07 × C × P × (1−P) × 100) / 100</code> per fill — the general taker rate from the <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>, ceiling to the cent, applied on entry <i>and</i> exit. Identical to the manual ledger above.</td></tr>
+          <td><code>ceil(M × 0.07 × C × P × (1−P) × 100) / 100</code> per fill — M is the schedule's per-series taker multiplier from the <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a> (0 for the three M = 0 series, otherwise 1), ceiling to the cent, applied on entry <i>and</i> exit. Identical to the manual ledger above.</td></tr>
       <tr><td><b>Position size</b></td>
           <td>$100 of paper cash per entry at the observed fill price; $10,000 starting cash; YES side for S1–S3, either side for S4.</td></tr>
     </tbody>
@@ -199,7 +201,14 @@ KD.nav("portfolio.html");
 const KEY = "kalshidash3.paper.v2";
 const BANDS = [[0, .1, "0–10¢"], [.1, .25, "10–25¢"], [.25, .5, "25–50¢"], [.5, .75, "50–75¢"], [.75, .9, "75–90¢"], [.9, 1.0001, "90–100¢"]];
 const bandOf = p => (BANDS.find(b => p >= b[0] && p < b[1]) || BANDS[BANDS.length - 1])[2];
-const takerFee = (c, p) => Math.ceil(Number((1 * 0.07 * c * p * (1 - p) * 100).toFixed(6))) / 100; // round before cent-ceil: float noise cannot overcharge a cent
+// ONE fee implementation for the whole site: KDA.fee in assets/alerts.js (loaded below) applies
+// the official formula ceil(M × 0.07 × C × P × (1−P)) with the schedule's per-series multiplier
+// M (fee schedule, "Non-Standard Fees", July 7, 2026: KXBTCY/KXETHY/KXELECTIRAN are 0/0, so no
+// trading fee; everything else defaults to 1). This page used to carry its own copy with a flat
+// M = 1, so it charged a fee on series the exchange does not charge — 44 of the 61 archived
+// alerts are KXBTCY, so that copy was wrong for most of the feed (F-84). Calling the shared
+// function keeps this ledger and the auto-sim below from drifting apart again.
+const takerFee = (c, p, ticker) => KDA.fee(c, p, ticker);
 
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || { cash: 10000, trades: [] }; } catch { return { cash: 10000, trades: [] }; } };
 const save = o => localStorage.setItem(KEY, JSON.stringify(o));
@@ -293,7 +302,7 @@ KD.$("#tGo").addEventListener("click", () => {
   if (!(count > 0)) { msg.textContent = "Contracts must be a positive whole number."; return; }
   if (!(price > 0 && price < 1)) { msg.textContent = "Price must be between $0.01 and $0.99 — a binary contract pays $1."; return; }
   const m = marketIndex[ticker] || {};
-  const fee = takerFee(count, price);
+  const fee = takerFee(count, price, ticker);
   const cost = count * price + fee;
   const L = load();
   if (cost > L.cash) { msg.textContent = `Insufficient paper cash: need $${cost.toFixed(2)}, have $${L.cash.toFixed(2)}.`; return; }
@@ -308,7 +317,7 @@ KD.$("#tGo").addEventListener("click", () => {
   });
   save(L);
   msg.innerHTML = `Recorded: ${count} × ${side.toUpperCase()} on <code>${KD.esc(ticker)}</code> at ${KD.cents(price)},
-    fee $${fee.toFixed(2)} modelled at the general taker rate. This is a paper trade in this browser only.`;
+    fee $${fee.toFixed(2)} modelled at the schedule rate for this series (M = ${KDA.takerMult(ticker)}, so the general 0.07 rate applies only when M = 1; F-84). This is a paper trade in this browser only.`;
   render();
 });
 
