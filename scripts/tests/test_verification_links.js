@@ -70,7 +70,7 @@ function inlineAssets(html) {
   check(links.some(r => r.cited_times > 0), "at least one row records a real citation");
 
   console.log("\nB2 — every claim row cites a page a reader can open");
-  // Defect F-85 (2026-11-22): five claim rows (C-11…C-17) cited the raw `.md` form of a
+  // Defect F-87 (2026-11-22): five claim rows (C-11…C-17) cited the raw `.md` form of a
   // docs.kalshi.com page, and verification.html rendered them as the row's "official source",
   // so a reader who clicked through got markdown source instead of the documentation page.
   // Section B above already forbade that for doc_links; the claim rows were never checked.

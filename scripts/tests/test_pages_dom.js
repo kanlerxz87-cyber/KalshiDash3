@@ -397,7 +397,31 @@ function commonAsserts(label, r) {
       check(Number.isFinite(expectedOfficial),
         "index.html: category_matched_by must be readable on every open row (F-66)");
     }
-    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
+    // F-83: a topic where NO open row has traded must be labelled as untraded rather than
+    // silently ranked. Measured on the 2026-11-22T06:17Z snapshot: 51 open Culture rows, all
+    // volume_fp 0, and the landing table printed "$0 / 0.0¢ / 0 / 0" as Culture's "largest live
+    // market". Assert the label, the count of labels and the disclosure paragraph, all derived
+    // from the committed data so the test cannot pass on hand-written copy.
+    const openRows = markets ? (markets.open_markets || []) : [];
+    if (openRows.length) {
+      const cats = [...new Set(openRows.map(x => x.category_id))];
+      const noVol = cats.filter(c => {
+        const mine = openRows.filter(x => x.category_id === c);
+        return mine.length > 0 && mine.every(x => !((x.volume_fp || 0) > 0));
+      });
+      const rendered = [...(today ? today.querySelectorAll("tbody tr") : [])];
+      const badgeCount = rendered.filter(tr => /untraded/.test(tr.textContent)).length;
+      check(badgeCount === noVol.length,
+        `index.html: every topic with zero volume on all its open rows must carry the "untraded" label (F-83; data says ${noVol.length}, page shows ${badgeCount})`);
+      if (noVol.length) {
+        check(/Untraded topics in this snapshot:/.test(r.text),
+          "index.html: untraded topics must be disclosed in the footnote, not only badged (F-83)");
+        const zeroRows = rendered.filter(tr => /\$0(?!\d)/.test(tr.textContent));
+        check(zeroRows.every(tr => /no trades/.test(tr.textContent)),
+          "index.html: a \"$0\" dollars cell must say \"no trades\" (F-83)");
+      }
+    }
+    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present, untraded topics labelled)`);
     r.close();
   }
 
@@ -486,7 +510,7 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
-    // F-84 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
+    // F-86 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
     // number the scan found in scope. The page must state the scan total
     // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
     // and never label either the window or the stored cap "in scope".
