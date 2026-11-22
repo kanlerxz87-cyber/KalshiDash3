@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T18:13:55Z",
- "snapshot_collected_at": "2026-11-22T18:13:55Z",
+ "generated_at": "2026-11-22T18:28:55Z",
+ "snapshot_collected_at": "2026-11-22T18:28:54Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -14,7 +14,7 @@
   "all_events": 89,
   "high_roi": 65,
   "archive_total": 109,
-  "new_this_run": 2,
+  "new_this_run": 0,
   "withheld_category_conflict": 0,
   "withheld_reasons": {},
   "evidence": {
@@ -77,10 +77,10 @@
     "decided_at": "2026-11-22T18:13:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.13,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -126,10 +126,10 @@
     "decided_at": "2026-11-22T18:13:55Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.12,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
