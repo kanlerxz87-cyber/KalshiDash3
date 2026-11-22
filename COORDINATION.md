@@ -1494,6 +1494,20 @@ before the push, this session merges rather than overwrites and says so in the l
 
 ### Additional claim (T74) — added before editing assets/ and portfolio.html
 
+Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+
+### Close-out (T71)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #93](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/93) merged 2026-11-22T08:12:01Z** as `a79e1598dbb341b5b4b169c0bf731a8782d4ed98` (merge commit, no approval wait) | PR check `pages.yml` [45001572538](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001572538): `build` pass 1m12s (deploy correctly skipped on PRs) |
+| Merge-forward | `origin/main` had advanced to `e6f6b6e` (live-desk scan 08:07Z, `data/live/roi.json` only) before the PR was opened; merged in cleanly, `verify_release.py` PASS again afterwards | `git log` on the branch |
+| Pages deploy of the merge | **confirmed** | `pages.yml` push [45001681672](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001681672) `build:success` + `deploy:success` on `a79e159` (2026-11-22T08:12:04Z); legacy `pages-build-deployment` [45001680556](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001680556) success |
+| Live verification | fetch of the deployed site confirms the G19 row now renders with an explicit **proposed** badge on `suggestions.html?v=a79e159` and the landing page serves the committed 2026-11-22T06:17:12Z snapshot with its honest staleness banner | fetched this session |
+| Flagged, not blocking | unchanged from the board above: F-07, F-14/F-26/F-77, F-25, F-76, DEPLOY-1, F-82 | published on `flagged.html` |
+
+T69, T70, T71 are all **done**. No file outside `data/findings.json` (one row) and this section of `COORDINATION.md` was modified by this session.
+
 | ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
 |----|------|--------|-----------------|---------------------------|------------------------|----------------|
 | T74 | Apply the fee schedule's **per-series taker multiplier** in the browser paper ledgers (`assets/alerts.js`, `assets/engine.js`, `portfolio.html`): all three charge a flat 0.07 and therefore charge a fee on series the official table lists at M = 0 | in progress | arena-ae1f84b0 | `assets/alerts.js`, `assets/engine.js`, `portfolio.html` (fee helper + its disclosure text), `executive-summary.html` (one sentence), `scripts/tests/engine.test.js`, `scripts/tests/test_fee_multipliers.js` (new), `scripts/verify_release.py` (test list only), `data/findings.json` (F-84 append only) | `https://kalshi.com/docs/kalshi-fee-schedule.pdf` — read this session, "Non-Standard Fees": KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0, KXAAAGASM 1/1, KXEMMY* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1, default M = 1; `data/strategies.json` `fee_model.multipliers` already carries the same table for `scripts/simulate.py` | New — measured on `data/live/alerts.json`: **44 of 61** archived alerts are KXBTCY, so most of the paper ledger was charged a fee the schedule says is zero. `portfolio.html` disclosed the simplification, so this is an accuracy defect, not a hidden claim (recorded as F-84) |
@@ -1524,3 +1538,4 @@ page exists. This session therefore re-fetched every external source the ledger 
 ### Log (continued)
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
+
