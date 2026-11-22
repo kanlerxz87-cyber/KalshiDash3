@@ -1752,3 +1752,11 @@ page exists. This session therefore re-fetched every external source the ledger 
 ### Log (continued)
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
+
+### T94 (`arena-eed90ce4`) — collector retry hardening, second PR
+
+- Code inspection of the stalled path found a checkable defect even though the run logs were unreadable: `scripts/collect.py`'s `get()` retried **only** HTTP 429 and broke out of the loop on the first attempt for every other status, so one transient 5xx or dropped connection aborted the whole pass (`RuntimeError` → exit 2 → the relay records a failed pass → nothing committed). On a ~500-call collection that is a very low bar for losing a snapshot.
+- Fixed: `get()` now retries 429/500/502/503/504 and network/socket errors with 1.5 s / 3 s / 4.5 s spacing, at most 4 attempts, then raises — so a persistently dead exchange still fails the pass and **nothing is written from a failed read**. Documented client errors (400/401/403/404/410) fail immediately on the first attempt, because retrying them cannot help and would only delay the honest failure.
+- Tests: new `scripts/tests/test_collect_retry.py` (6 offline cases: two 503s then success, bounded budget with no trailing sleep, 404 fails on attempt 1, URLError then success, 429 still retried, retry set is exactly the documented one). The release gate runs every `scripts/tests/test_*.py`, so it is picked up without touching `verify_release.py`.
+- Gate after the change: `verify_release.py` **PASS**, `check_site.py` **OK**, DOM test M: 72 facts / 70 flagged / 23 suggestions / 9 questions. (Findings grew to 70 because parallel sessions merged D-01..D-05 and others while this branch was open; no ids were duplicated — checked.)
+- No behaviour was changed for a *successful* read, and no value is ever invented on a failed one.
