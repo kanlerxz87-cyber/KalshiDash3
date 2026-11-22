@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-21T23:55:00Z",
+ "generated": "2026-11-22T08:05:00Z",
  "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes.",
  "questions": [
   {
@@ -1085,6 +1085,18 @@
     "https://docs.kalshi.com/getting_started/historical_data",
     "https://external-api.demo.kalshi.co/trade-api/v2/historical/cutoff",
     "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-26JUL01"
+   ]
+  },
+  {
+   "id": "F-83",
+   "severity": "medium",
+   "item": "The five-topic scope rule (F-76) was enforced in the floating chat dock but not in the main alert chats, so archived Test/Demo swings reached the screen",
+   "why": "assets/engine.js loadCollectorAlerts() read every row of data/live/alerts_archive.json — including the 20 withheld KXDEMOFUTHOURLY-* rows whose own GET /series record files them under Test/Demo (categories ['Test'], tags ['Demo']: https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY) and whose category_id was either null or carried a topic they do not belong to — and pushed all 81 rows into the in-memory feed. assets/chatdock.js (the small floating dock) filters the same archive with the F-76 rule and counts the skip, but the two chats on alerts.html — the page the brief asks to be a scrolling alerting system — showed every row, so the chats displayed swings the live page's own note says are withheld as outside the five topics. Measured 2026-11-22 on the committed 2026-11-22T06:17:12Z snapshot: the archive holds 81 rows (61 in scope, 20 out of scope) while data/live/alerts.json — the served feed — holds the same 61, and the live alerts.html rendered '81 in view' with KXDEMOFUTHOURLY rows in both chats.",
+   "action": "Fixed 2026-11-22 (session arena-6cd28bd2): loadCollectorAlerts() now applies the same F-76 rule chatdock.js uses — a row whose series_categories include Test/Demo, or whose category_id is null, is skipped before it reaches the feed — and an assertion in scripts/tests/test_pages_dom.js (block D) now proves no rendered feed row carries a withheld archived ticker. The archive itself is never rewritten; build_alerts.py still publishes counts.withheld_out_of_scope so the disclosure stays published. Result on the committed snapshot: both chats show the 61 served rows, none of the 20 withheld tickers.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV21H16-UP",
+    "https://docs.kalshi.com/getting_started/market_lifecycle"
    ]
   }
  ]

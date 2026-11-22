@@ -468,6 +468,14 @@ window.KDL = (() => {
     return full;
   }
 
+  // F-76: a row whose series GET /series files under Test/Demo, or whose topic was never
+  // confirmed, is withheld from BOTH chats (the floating chat dock applies the same rule).
+  // The archive keeps every swing; only this feed view excludes them.
+  function outOfScope(a) {
+    const cats = (a.series_categories || []).map(String);
+    return cats.includes("Test") || cats.includes("Demo") || !a.category_id;
+  }
+
   async function loadCollectorAlerts(base = "") {
     const revived = [];
     const known = new Set(feedAlerts().map((a) => a.id));
@@ -477,6 +485,7 @@ window.KDL = (() => {
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
       for (const a of entries) {
         if (!a || !a.ticker || num(a.delta) === null) continue;
+        if (outOfScope(a)) continue;   // withheld from the chats (F-76), never guessed
         const full = collectorAlertFromEntry(a);
         if (known.has(full.id)) continue;
         known.add(full.id);

@@ -245,6 +245,25 @@ function commonAsserts(label, r) {
     commonAsserts("alerts.html", r);
     check(r.doc.querySelectorAll("#feedAll").length === 1 && r.doc.querySelectorAll("#feedModel").length === 1,
       "alerts page must render both chat feeds");
+    // F-83: the five-topic scope rule (F-76) is enforced in the floating chat dock but the
+    // engine's loadCollectorAlerts pushed every archived row into the chats, so Test/Demo
+    // swings reached the screen anyway. Assert that no rendered feed row carries a ticker the
+    // archive withholds: series categories Test/Demo, or no confirmed topic.
+    {
+      const archive = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8"));
+      const withheld = (archive.alerts || []).filter((a) => {
+        const cats = (a.series_categories || []).map(String);
+        return cats.includes("Test") || cats.includes("Demo") || !a.category_id;
+      }).map((a) => a.ticker);
+      const feedText = (r.doc.querySelector("#feedAll")?.textContent || "")
+        + " " + (r.doc.querySelector("#feedModel")?.textContent || "");
+      check(withheld.length > 0,
+        "fixture check: the committed archive must contain out-of-scope swings for this test to mean anything");
+      for (const t of withheld) {
+        check(!feedText.includes(t),
+          `alerts.html must not render archived Test/Demo swing ${t} in either chat (F-76 scope)`);
+      }
+    }
     const box = r.doc.querySelector("#leads");
     check(!!box, "the lead panel must exist on the alerts page");
     const leadsRows = r.doc.querySelectorAll("#leads tbody tr").length;
