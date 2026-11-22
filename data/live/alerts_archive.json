@@ -2,6 +2,104 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXBTCD-26NOV2213-T60699.99",
+   "event_ticker": "KXBTCD-26NOV2213",
+   "title": "Bitcoin price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-22T17:43:54Z",
+   "to_time": "2026-11-22T17:58:54Z",
+   "from_price": 0.58,
+   "to_price": 0.9,
+   "delta": 0.32,
+   "direction": "up",
+   "volume_24h_fp": 4.52,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2213-T60699.99",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-22T17:58:55Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 2.52,
+    "est_dollars": 2.27,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 2.0,
+    "volume_to": 4.52,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2.52 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-22T17:58:55Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCD-26NOV2213-T60899.99",
+   "event_ticker": "KXBTCD-26NOV2213",
+   "title": "Bitcoin price on Nov 22, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-22T17:43:54Z",
+   "to_time": "2026-11-22T17:58:54Z",
+   "from_price": 0.24,
+   "to_price": 0.09,
+   "delta": -0.15,
+   "direction": "down",
+   "volume_24h_fp": 3.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2213-T60899.99",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-22T17:58:55Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 2.99,
+    "est_dollars": 0.27,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 3.0,
+    "volume_to": 5.99,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2.99 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-22T17:58:55Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXBTCD-26NOV2211-T60799.99",
    "event_ticker": "KXBTCD-26NOV2211",
    "title": "Bitcoin price on Nov 22, 2026?",
