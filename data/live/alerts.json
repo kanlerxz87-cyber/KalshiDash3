@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T14:42:58Z",
- "snapshot_collected_at": "2026-11-22T14:42:57Z",
+ "generated_at": "2026-11-22T14:58:00Z",
+ "snapshot_collected_at": "2026-11-22T14:58:00Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -14,7 +14,7 @@
   "all_events": 74,
   "high_roi": 58,
   "archive_total": 94,
-  "new_this_run": 3,
+  "new_this_run": 0,
   "withheld_category_conflict": 0,
   "withheld_reasons": {},
   "evidence": {
@@ -77,10 +77,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -126,10 +126,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -175,10 +175,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.79,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -224,7 +224,7 @@
     "decided_at": "2026-11-22T14:27:57Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -273,7 +273,7 @@
     "decided_at": "2026-11-22T14:27:57Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.11,
     "gave_back_half": false,
     "still_open": false
@@ -322,7 +322,7 @@
     "decided_at": "2026-11-22T14:13:00Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -371,7 +371,7 @@
     "decided_at": "2026-11-22T14:13:00Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -3726,10 +3726,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -3775,10 +3775,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -3824,10 +3824,10 @@
     "decided_at": "2026-11-22T14:42:58Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.79,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -3873,7 +3873,7 @@
     "decided_at": "2026-11-22T14:27:57Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -3922,7 +3922,7 @@
     "decided_at": "2026-11-22T14:13:00Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -3971,7 +3971,7 @@
     "decided_at": "2026-11-22T14:13:00Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
