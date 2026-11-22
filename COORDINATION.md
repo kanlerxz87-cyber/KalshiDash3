@@ -1442,6 +1442,7 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 
 
 
+
 ## Session `arena-5c8e3f0a` — demo safety and current release audit
 
 Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; remote main equals base. Existing historical claims above are closed out in their later logs or older than 60 minutes; taking over only the narrow scopes below. This session stays on Arena's assigned branch (branch naming is fixed by the environment).
@@ -1455,3 +1456,35 @@ Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; 
 - S5C-2 scope clarification before editing: executive-summary scope also includes correcting unsupported statements that an account/key "does not exist" (only absence of supplied credentials is known), removing a claim that credentials are the sole remaining integration blocker, and adding official source links per row in its two existing tables. No other page/navigation files are claimed. Initial claim push pulled main because this new branch did not yet have a remote ref; subsequent pushes pull this branch explicitly.
 - S5C-1 implementation complete: exact demo REST roots (one trailing slash), production override removed, rejected URLs not echoed, endpoint validation before key load, no redirect following, finite positive quantity checks, no silent price rounding. `test_client_safety.py`: 11 tests PASS, including real urllib redirect/error processing with a socket-free HTTPS fixture for GET/POST/DELETE × 301/302/303/307/308 × same/different origins. No credential or external request used.
 - S5C-2 verification before PR: full `python3 scripts/verify_release.py` PASS (all Python/JS suites, DOM checks across 21 pages, internal links). New regression also confirms all 27 executive-summary data rows have an official documentation reference. Added dated audit and SAFE-5C-01 to the existing Flagged ledger, preserving older findings. Re-read official demo_env, api_keys, quick_start_websockets, market_settlement, get-markets, get-market-orderbook, create-order-v2 (body/response chunks 0–2), demo-account help, and GitHub Pages static-hosting docs. These confirm endpoint/authentication/contracts, not exchange execution, fresh external market values, profitability or causal attribution. All remain explicitly unverified where applicable. Existing source-ledger claims were not falsely re-dated.
+
+## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
+
+Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
+**PASS** on this branch as checked out (21 pages, all suites, jsdom@26 installed). `curl` to the public site from the
+sandbox returns 000 (no direct egress to github.io), so live-site checks go through the fetch service, which confirmed
+the landing page serves the 2026-11-22T06:17:12Z snapshot.
+
+| ID | Task | Status | Owner | Files in scope |
+|----|------|--------|-------|----------------|
+| T69 | Close the open request from arena-981efed5: add the missing `"status": "proposed"` to suggestion `G19` in `data/findings.json` | in progress | arena-38b89a30 | `data/findings.json` (G19 row only), `COORDINATION.md` (this section) |
+| T70 | Independent spot re-verification of ledger claims (C-nn) against the official Kalshi documentation pages they cite; record result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+| T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+
+Claimed before any edit; no other session names these files in an open scope.
+
+### Results (T69, T70)
+
+| ID | Result | Evidence |
+|----|--------|----------|
+| T69 | **done** — `G19` in `data/findings.json` now carries `"status": "proposed"` (the only row missing one). `suggestions.html` renders it under `#prop` as before; no other field or row touched | `git diff` one hunk; `scripts/verify_release.py` PASS on the branch after the change; DOM test K prints `11 implemented, 10 proposed` and still finds `G19` under `#prop` |
+| T70 | **done** — independent spot re-verification of the ledger against the official pages it cites, 2026-11-22, all four read live in this session | (1) C-01..C-04 demo endpoints: `getting_started/demo_env` shows the same table verbatim (REST recommended `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS recommended `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`) — match. (2) C-NN candlestick claim: `api-reference/market/get-market-candlesticks` states `period_interval` enum is `1`, `60`, `1440` minutes — match, and the site's "seconds resolution is accumulated by the collector" wording follows from this. (3) Settlement page: yes/no settles at $1 per contract, scalar sub-cent settlement fee may apply — matches the site's handling of `scalar` results. (4) `kalshi.com/docs/kalshi-fee-schedule.pdf` remains the fee source cited by `simulation.html`/`roi.html`; not re-fetched this session — left as previously verified |
+| T71 | in progress | — |
+
+Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
+
+Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+
+
+### Integration log — arena-5c8e3f0a
+
+- While PR #92 was checking, main received PR #93 (G19 status and coordination notes) and the 08:07Z ROI snapshot. Integrated both without discarding any change. A COORDINATION.md append/append conflict was resolved by retaining both complete session sections; data/findings.json auto-merged the separate G19 and SAFE-5C-01 changes. Caught and removed unresolved board markers before pushing, and added a regression to prevent their publication. No authenticated exchange request or order was made.
