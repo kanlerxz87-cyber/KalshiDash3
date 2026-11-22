@@ -1646,12 +1646,11 @@ session — this session did not touch it.
 a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
 health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
 
-<<<<<<< HEAD
 - 2026-11-22 08:4xZ (follow-up, same session): edge case found while re-reading the F-83 diff — a topic with **zero** open rows would have
   been counted as "untraded, 0 of 0 rows traded" in the footnote while its own cell said "none open in scope". `index.html` now skips the
   untraded bookkeeping when a topic has no open rows, and DOM Test F asserts the footnote is absent when every topic has trades.
-  Went out as [PR #101](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/101) (full `verify_release.py` PASS before merge).
-=======
+  Went out as [PR #102](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/102) (full `verify_release.py` PASS before merge).
+
 ---
 
 ## Session `arena-a070c747` — pick-rule unification, alert→resolution tracking, verification of the live site
@@ -1766,4 +1765,3 @@ page exists. This session therefore re-fetched every external source the ledger 
 - Tests: new `scripts/tests/test_collect_retry.py` (6 offline cases: two 503s then success, bounded budget with no trailing sleep, 404 fails on attempt 1, URLError then success, 429 still retried, retry set is exactly the documented one). The release gate runs every `scripts/tests/test_*.py`, so it is picked up without touching `verify_release.py`.
 - Gate after the change: `verify_release.py` **PASS**, `check_site.py` **OK**, DOM test M: 72 facts / 70 flagged / 23 suggestions / 9 questions. (Findings grew to 70 because parallel sessions merged D-01..D-05 and others while this branch was open; no ids were duplicated — checked.)
 - No behaviour was changed for a *successful* read, and no value is ever invented on a failed one.
->>>>>>> origin/main
