@@ -135,11 +135,24 @@ def utcnow() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def get(path: str, params: dict | None = None, retries: int = 3):
-    """GET a public endpoint with small exponential backoff.
+#: Status codes worth asking again. 429 is documented as "too_many_requests with no
+#: Retry-After and no penalty" (https://docs.kalshi.com/getting_started/rate_limits);
+#: 5xx are the exchange/edge failing transiently. Any other 4xx (400 bad request,
+#: 404 unknown ticker, 410 removed endpoint) is a client error that cannot be fixed
+#: by retrying, so it fails immediately and loudly instead of burning the pass.
+RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
+BACKOFF_SECONDS = 1.5
 
-    Documented behaviour: 429 returns too_many_requests with no Retry-After and
-    no penalty (https://docs.kalshi.com/getting_started/rate_limits).
+
+def get(path: str, params: dict | None = None, retries: int = 4):
+    """GET a public endpoint with bounded exponential backoff.
+
+    Failure policy (F-85): a retryable failure is retried up to `retries` attempts with
+    1.5 s, 3 s, 4.5 s spacing and then raises, so a persistently unreachable exchange
+    still fails the pass and nothing is overwritten (exit code 2). Before this change a
+    single 5xx aborted the whole collection, because every non-429 HTTPError broke out of
+    the loop on the first attempt — one flaky response from the demo API was enough to
+    skip a pass, and a run that kept hitting them stopped committing entirely.
     """
     url = BASE + path
     if params:
@@ -155,14 +168,13 @@ def get(path: str, params: dict | None = None, retries: int = 3):
                 return json.loads(r.read().decode("utf-8")), url
         except urllib.error.HTTPError as e:
             last = f"HTTP {e.code} {e.reason}"
-            if e.code == 429:
-                time.sleep(1.5 * (attempt + 1))
-                continue
-            break
-        except Exception as e:  # network / TLS / DNS
+            if e.code not in RETRY_STATUS:
+                raise RuntimeError(f"{last} for {url}") from e
+        except Exception as e:  # network / TLS / DNS / socket timeout
             last = f"{type(e).__name__}: {e}"
-            time.sleep(1.5 * (attempt + 1))
-    raise RuntimeError(f"{last} for {url}")
+        if attempt + 1 < retries:
+            time.sleep(BACKOFF_SECONDS * (attempt + 1))
+    raise RuntimeError(f"{last} for {url} after {retries} attempts")
 
 
 def fnum(v):

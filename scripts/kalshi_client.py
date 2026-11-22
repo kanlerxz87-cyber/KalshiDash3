@@ -2,13 +2,12 @@
 """Kalshi demo trade executor and portfolio reader.
 
 Reads credentials ONLY from environment variables. Nothing is ever written to
-the repository, and the script refuses to run against production unless you
-explicitly opt in.
+the repository. Only the two documented HTTPS demo REST roots are accepted;
+there is no production override. Redirects are never followed with signed headers.
 
-    KALSHI_KEY_ID           the API key id
+    KALSHI_KEY_ID           the demo API key id
     KALSHI_PRIVATE_KEY_PATH path to the PEM private key (Ed25519 or RSA)
-    KALSHI_BASE             optional, defaults to the demo Trade API root
-    KALSHI_ALLOW_PRODUCTION optional, set to 1 to permit a non-demo base URL
+    KALSHI_BASE             optional, one of DEMO_BASES below (trailing / allowed)
 
 Official sources
   Endpoints ....... https://docs.kalshi.com/getting_started/api_environments
@@ -52,22 +51,30 @@ from decimal import Decimal, InvalidOperation
 from urllib.parse import urlparse
 
 DEFAULT_BASE = "https://external-api.demo.kalshi.co/trade-api/v2"
+# Exact roots from https://docs.kalshi.com/getting_started/demo_env.
+# Substring/hostname-prefix checks are unsafe (e.g. demo-api.example.org).
+DEMO_BASES = frozenset((DEFAULT_BASE, "https://demo-api.kalshi.co/trade-api/v2"))
 TIF_VALUES = ("fill_or_kill", "good_till_canceled", "immediate_or_cancel")
 STP_VALUES = ("taker_at_cross", "maker")
 
 
 def base_url() -> str:
-    base = os.environ.get("KALSHI_BASE", DEFAULT_BASE).rstrip("/")
-    demo = "demo" in base or base.startswith("https://demo-api")
-    if not demo and os.environ.get("KALSHI_ALLOW_PRODUCTION") != "1":
+    base = os.environ.get("KALSHI_BASE", DEFAULT_BASE).removesuffix("/")
+    if base not in DEMO_BASES:
+        # Do not print a rejected URL: it could contain embedded credentials.
         sys.exit(
-            "Refusing to run against a non-demo base URL.\n"
-            f"  base = {base}\n"
-            "This project is scoped to the demo environment "
-            "(https://docs.kalshi.com/getting_started/demo_env).\n"
-            "Set KALSHI_ALLOW_PRODUCTION=1 only if you really mean it."
+            "Refusing an unsupported base URL. Only the two documented HTTPS "
+            "demo REST roots are allowed; there is no production override.\n"
+            "https://docs.kalshi.com/getting_started/demo_env"
         )
     return base
+
+
+class NoRedirects(urllib.request.HTTPRedirectHandler):
+    """Never forward signed account headers or replay orders after a redirect."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 def load_key():
@@ -122,7 +129,15 @@ def sign(key_id: str, key, method: str, path: str) -> dict:
 def request(method: str, endpoint: str, body: dict | None = None, auth: bool = True,
             query: str = "") -> tuple[int, dict | str]:
     """Call an endpoint. `endpoint` excludes the /trade-api/v2 prefix."""
-    base = base_url()
+    base = base_url()  # Validate before loading a key or signing anything.
+    # Endpoint and query are separate so the signed path cannot contain a query.
+    parts = urlparse(endpoint)
+    if (not endpoint.startswith("/") or endpoint.startswith("//")
+            or parts.scheme or parts.netloc or parts.query or parts.fragment
+            or "?" in endpoint or "#" in endpoint or "\\" in endpoint
+            or any(ord(c) <= 32 or ord(c) == 127 for c in endpoint)
+            or any(p in (".", "..") for p in endpoint.split("/"))):
+        sys.exit("endpoint must be an absolute API path without a query or fragment")
     full_path = urlparse(base).path + endpoint
     url = base + endpoint + (("?" + query) if query else "")
     headers = {"Accept": "application/json", "User-Agent": "KalshiDash3-executor/1.0"}
@@ -132,7 +147,9 @@ def request(method: str, endpoint: str, body: dict | None = None, auth: bool = T
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, headers=headers, method=method.upper())
     try:
-        with urllib.request.urlopen(req, timeout=25) as r:
+        # urllib's default opener follows redirects and can copy custom auth
+        # headers to the redirected host. A redirect is an error, not a retry.
+        with urllib.request.build_opener(NoRedirects()).open(req, timeout=25) as r:
             raw = r.read().decode()
             try:
                 return r.status, json.loads(raw)
@@ -148,9 +165,12 @@ def request(method: str, endpoint: str, body: dict | None = None, auth: bool = T
 
 def money(txt) -> Decimal:
     try:
-        return Decimal(str(txt))
+        amount = Decimal(str(txt))
+        if not amount.is_finite():
+            raise ValueError("amount must be finite")
+        return amount
     except (InvalidOperation, TypeError, ValueError):
-        sys.exit(f"Not a valid decimal amount: {txt!r}")
+        sys.exit(f"Not a finite decimal amount: {txt!r}")
 
 
 def cmd_balance(_a):
@@ -194,18 +214,29 @@ def cmd_fills(a):
 
 
 def place(side: str, ticker: str, count: str, price: str, tif: str, stp: str) -> int:
+    if side not in ("bid", "ask"):
+        sys.exit("side must be bid (buy YES) or ask (sell YES)")
+    if not ticker or any(c.isspace() or ord(c) < 32 or ord(c) == 127 for c in ticker):
+        sys.exit("ticker must be nonempty and contain no whitespace or control characters")
     if tif not in TIF_VALUES:
         sys.exit(f"time_in_force must be one of {TIF_VALUES}")
     if stp not in STP_VALUES:
         sys.exit(f"self_trade_prevention_type must be one of {STP_VALUES}")
+    if money(count) <= 0:
+        sys.exit("count must be a positive finite number of contracts")
     p = money(price)
     if not (Decimal("0") < p < Decimal("1")):
         sys.exit("price must be strictly between 0 and 1 dollar — a binary contract settles at $1 or $0")
+    # Local safety policy, not a claim about every market's tick-size rules:
+    # never silently round an input to fit this client's four-decimal wire format.
+    wire_price = f"{p:.4f}"
+    if Decimal(wire_price) != p:
+        sys.exit("price must be exactly representable at four decimal places; refusing to round")
     body = {
         "ticker": ticker,
         "side": side,
         "count": str(count),
-        "price": f"{p:.4f}",
+        "price": wire_price,
         "time_in_force": tif,
         "self_trade_prevention_type": stp,
     }
@@ -270,7 +301,7 @@ def fail(code: int, body) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Kalshi demo executor (demo-only by default).")
+    ap = argparse.ArgumentParser(description="Kalshi demo-only executor (no production override).")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("balance", help="GET /portfolio/balance").set_defaults(fn=cmd_balance)

@@ -81,6 +81,152 @@ const KD = (() => {
     return `<a class="srclink" href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}">${esc(label)}</a>`;
   }
 
+  /* ------------------------------------------------------------------------ lifecycle
+   * The brief asks for live events to be followed "until the events have resolved … either
+   * yes or no". An alert is a moment in a market's life, so every alert surface can answer one
+   * more question than it used to: what happened to the market afterwards?
+   *
+   * Everything below reads only two official fields from the collector's snapshot:
+   *   status  — the market's lifecycle state   https://docs.kalshi.com/getting_started/market_lifecycle
+   *   result  — yes | no | scalar once determined; settlement_ts is filled on finalization
+   *                                            https://docs.kalshi.com/getting_started/market_settlement
+   *                                            https://docs.kalshi.com/api-reference/market/get-markets
+   *
+   * Two honesty rules are built into the code, not just the prose:
+   *   1. "determined" is NOT "settled". The lifecycle doc says result is set when the market is
+   *      determined and positions are paid when it is finalized, so a determined market is
+   *      labelled "result set · not paid yet" and never counted as an outcome.
+   *   2. Absence is not evidence. The committed snapshot is a ranked window, not the whole
+   *      exchange (see scripts/collect.py), so a ticker that is not in it is labelled
+   *      "not in snapshot" — never "unresolved" and never "open" (D-03).
+   */
+  // Statuses as published on https://docs.kalshi.com/getting_started/market_lifecycle (8 values, all
+  // handled explicitly so none of them can fall through to a wrong default):
+  //   initialized · active · inactive · closed · determined · disputed · amended · finalized
+  const RESULT_BEARING = new Set(["determined", "disputed", "amended"]);
+  const TERMINAL_STATUS = new Set(["finalized", "settled", "determined", "disputed", "amended", "closed", "expired"]);
+
+  function marketIndex(doc) {
+    const m = new Map();
+    const rows = ((doc && doc.open_markets) || []).concat((doc && doc.settled_markets) || []);
+    for (const r of rows) if (r && r.ticker) m.set(r.ticker, r);
+    return m;
+  }
+
+  function lifecycleOf(row) {
+    if (!row) return { state: "not_listed", status: null, result: null };
+    const status = String(row.status || "").toLowerCase();
+    const result = typeof row.result === "string" ? row.result.toLowerCase() : null;
+    const base = {
+      status: status || null,
+      result: result,
+      settlement_ts: row.settlement_ts || null,
+      settlement_value_dollars: row.settlement_value_dollars ?? null,
+      source: row.source || null,
+    };
+    const isResult = result === "yes" || result === "no" || result === "scalar";
+    if (isResult) {
+      if (status === "finalized" || status === "settled") {
+        return Object.assign(base, { state: result === "scalar" ? "settled_scalar" : "settled" });
+      }
+      // A disputed result may be re-determined, and an amended market has been re-determined;
+      // both are reported as what they are rather than as an outcome.
+      if (status === "disputed") return Object.assign(base, { state: "disputed" });
+      if (status === "amended") return Object.assign(base, { state: "amended" });
+      return Object.assign(base, { state: "determined" });
+    }
+    if (status === "inactive") return Object.assign(base, { state: "paused" });
+    if (status === "initialized") return Object.assign(base, { state: "not_open" });
+    if (TERMINAL_STATUS.has(status)) return Object.assign(base, { state: "awaiting_result" });
+    return Object.assign(base, { state: "open" });
+  }
+
+  const LIFECYCLE_SPEC = {
+    settled: ["ok", "settled"],
+    settled_scalar: ["warn", "settled (scalar)"],
+    determined: ["warn", "result set · not paid yet"],
+    disputed: ["warn", "result disputed"],
+    amended: ["warn", "re-determined"],
+    awaiting_result: ["dim", "closed · no result yet"],
+    paused: ["dim", "paused by the exchange"],
+    not_open: ["dim", "not open yet"],
+    open: ["dim", "still open"],
+    not_listed: ["dim", "not in snapshot"],
+  };
+  const LIFECYCLE_TIP = {
+    settled: "Finalized: Kalshi's own result field says how this market resolved",
+    settled_scalar: "Finalized with a scalar value — not a yes/no outcome, so it is not counted as one",
+    determined: "The result field is populated but the market is not finalized yet, so no payout has been made",
+    disputed: "The result has been challenged and may be re-determined, so it is not counted as an outcome",
+    amended: "Re-determined after a dispute; the settlement timer has restarted, so it is not counted as an outcome",
+    awaiting_result: "Closed but no result is published in the snapshot yet",
+    paused: "Temporarily deactivated by the exchange — trading is paused but the market has not closed",
+    not_open: "Created but not yet open for trading",
+    open: "Still trading at the time of the snapshot in which this was last seen",
+    not_listed: "Not in the collector's ranked snapshot. That window is not the whole exchange, so absence is not evidence of anything",
+  };
+
+  function lifecycleChip(life) {
+    if (!life) return "";
+    const spec = LIFECYCLE_SPEC[life.state] || LIFECYCLE_SPEC.not_listed;
+    let text = spec[1];
+    if (life.state === "settled" && life.result) text += " " + String(life.result).toUpperCase();
+    const when = life.settlement_ts ? ` (${String(life.settlement_ts).replace("T", " ").replace("Z", " UTC")})` : "";
+    return `<span class="badge ${spec[0]}" title="${esc((LIFECYCLE_TIP[life.state] || "") + when)}">${esc(text)}</span>`;
+  }
+
+  // Attach the lifecycle of the market each alert fired on. Never invents one: an alert whose
+  // ticker is absent from the index gets state "not_listed".
+  function lifecycleAttach(alerts, index) {
+    for (const a of alerts || []) {
+      if (!a || !a.ticker) continue;
+      a.lifecycle = lifecycleOf(index && index.get ? index.get(a.ticker) : null);
+    }
+    return alerts;
+  }
+
+  /* Tally of what happened to the events behind a set of alerts. "agreement" is the bare
+   * descriptive question the brief implies — did the printed move point the same way as the
+   * eventual outcome — and it is deliberately reported as a count, not as a hit rate that would
+   * dress a sample of a few demo markets up as a strategy (D-04). */
+  function lifecycleTally(alerts) {
+    const tickers = new Map();
+    for (const a of alerts || []) {
+      if (!a || !a.ticker) continue;
+      if (!tickers.has(a.ticker)) tickers.set(a.ticker, a);
+    }
+    const t = {
+      alerts: (alerts || []).length, tickers: tickers.size, open: 0, settled: 0,
+      settled_yes: 0, settled_no: 0, settled_scalar: 0, determined: 0,
+      disputed: 0, amended: 0, paused: 0, not_open: 0,
+      awaiting_result: 0, not_listed: 0, agree: 0, disagree: 0, comparable: 0,
+    };
+    for (const a of tickers.values()) {
+      const l = a.lifecycle;
+      if (!l) continue;
+      if (l.state === "settled" || l.state === "settled_scalar") t.settled += 1;
+      if (l.state === "settled" && l.result === "yes") t.settled_yes += 1;
+      if (l.state === "settled" && l.result === "no") t.settled_no += 1;
+      if (l.state === "settled_scalar") t.settled_scalar += 1;
+      if (l.state === "determined") t.determined += 1;
+      if (l.state === "disputed") t.disputed += 1;
+      if (l.state === "amended") t.amended += 1;
+      if (l.state === "paused") t.paused += 1;
+      if (l.state === "not_open") t.not_open += 1;
+      if (l.state === "awaiting_result") t.awaiting_result += 1;
+      if (l.state === "not_listed") t.not_listed += 1;
+      if (l.state === "open") t.open += 1;
+      const d = Number(a.delta ?? (Number(a.to) - Number(a.from)));
+      if (l.state === "settled" && (l.result === "yes" || l.result === "no") && Number.isFinite(d) && d !== 0) {
+        t.comparable += 1;
+        const agrees = (d > 0 && l.result === "yes") || (d < 0 && l.result === "no");
+        if (agrees) t.agree += 1; else t.disagree += 1;
+      }
+    }
+    t.agree_rate = t.comparable ? t.agree / t.comparable : null;
+    return t;
+  }
+
   function empty(msg) {
     return `<p class="empty">${msg}</p>`;
   }
@@ -210,5 +356,6 @@ const KD = (() => {
       items.map(([h, l]) => `<a href="${h}"${h === active ? ' class="on"' : ""}>${l}</a>`).join("");
   }
 
-  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, cadence };
+  return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, cadence,
+    marketIndex, lifecycleOf, lifecycleChip, lifecycleAttach, lifecycleTally, LIFECYCLE_SPEC, LIFECYCLE_TIP };
 })();
