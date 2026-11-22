@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T13:42:59Z",
- "snapshot_collected_at": "2026-11-22T13:42:58Z",
+ "generated_at": "2026-11-22T13:57:57Z",
+ "snapshot_collected_at": "2026-11-22T13:57:56Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 66,
+  "archive_total": 67,
   "reviewed": 57,
-  "not_reviewed": 9,
+  "not_reviewed": 10,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
   "best_quote_did_not_move": 19,
@@ -18,6 +18,27 @@
   "withheld_category_conflict": 20
  },
  "alerts": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B47500",
+   "to_time": "2026-11-22T13:57:56Z",
+   "from_time": "2026-11-22T13:42:58Z",
+   "from_price": 0.98,
+   "to_price": 0.07,
+   "delta": -0.91,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "BTC price  on Jan 1, 2027?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 45000.00-49999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "This market settles on the sixty-second average of CF Benchmarks' BRTI at 12 AM EST on Jan 1, 2027 (quoted verbatim in its own record, fetched 2026-11-20T20:38Z). BRTI has no free public time series this project can read, so there is no fetched value to place beside the 19:30:14Z swing and none is invented. Context that IS from the record: the 0.9800 -> 0.0600 print happened on volume_24h_fp 0.00, the row's updated_time is 2026-04-28T02:27:21Z, and the demo 'previous' price may predate the collector gap - consistent with F-34 (a thin demo book), not with news.",
+   "reviewed_at": null
+  },
   {
    "ticker": "KXBTCD-26NOV2208-T60799.99",
    "to_time": "2026-11-22T12:57:56Z",
