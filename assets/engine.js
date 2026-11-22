@@ -208,6 +208,7 @@ window.KDL = (() => {
       dollars_traded_estimate: num(raw.dollars_traded_estimate),
       close_time: raw.close_time || null,
       settlement_value_dollars: num(raw.settlement_value_dollars),
+      settlement_ts: raw.settlement_ts || null,
       source: raw.source || null
     };
   }
@@ -263,6 +264,30 @@ window.KDL = (() => {
   function scoreMarket(m) {
     const r = MODEL.reasons(m, null);
     return r;
+  }
+
+  /* ------------------------------------------------------- model picks (T70)
+   * ONE definition, used by the model chat on this page and mirrored in assets/chatdock.js:
+   * a pick is a swing whose market the canonical archive already flagged `high_roi` (frozen at
+   * detection by scripts/build_alerts.py from data/alert_rules.json: a fee-schedule seed series
+   * with positive reported 24h volume), or — for an alert raised live in this browser that the
+   * archive has not seen yet — the same documented rule computed from the fields we have.
+   *
+   * Why the flag rather than the score: the score below is a heuristic that has never been
+   * backtested (F-26), and using it for membership meant the dashboard (49 picks), this page (47)
+   * and the category-page dock (46) showed three different "model" feeds over the same 61 alerts
+   * (measured 2026-11-22, F-83). A pick count that depends on which page you are reading is a
+   * defect, so membership now comes from one frozen, reproducible rule and the score is only a
+   * displayed ranking hint.
+   */
+  function modelPick(a) {
+    if (!a) return false;
+    if (a.high_roi_screen === true || a.high_roi === true) return true;
+    if (a.high_roi_screen === false) return false;
+    const m = S.markets.get(a.ticker) || {};
+    const basis = a.category_basis || m.category_basis || null;
+    const vol = num(a.volume_24h_fp) !== null ? num(a.volume_24h_fp) : num(m.volume_24h_fp);
+    return basis === "seed" && vol !== null && vol > 0;
   }
 
   // ---------------------------------------------------------------- alert feed storage
@@ -324,6 +349,16 @@ window.KDL = (() => {
     const rev = a.evidence_reversion;
     const revBit = rev && rev.gave_back_half === true
       ? `<span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "";
+    // T71: was the event behind this alert resolved, and how? The lifecycle is joined from the
+    // collector's snapshot (status/result are official fields); when KD is unavailable the chip is
+    // simply omitted rather than guessed.
+    let lifeBit = "";
+    try {
+      if (typeof KD !== "undefined" && KD.lifecycleChip && S.markets.size) {
+        const life = a.lifecycle || KD.lifecycleOf(S.markets.get(a.ticker));
+        lifeBit = KD.lifecycleChip(life);
+      }
+    } catch (e) { lifeBit = ""; }
     return `<div class="chat-msg ${up ? "up" : "down"}">
       <div class="chat-head">
         <span class="chat-time">${hh}</span>
@@ -333,6 +368,7 @@ window.KDL = (() => {
         ${modelBit}
         ${evBit}
         ${revBit}
+        ${lifeBit}
         <span class="badge dim">${esc(cat)}</span>
         <span class="badge ${a.origin === "live" ? "live" : "dim"}" title="${a.origin === "live" ? "Detected in your browser from the live demo API" : "Recovered from the collector's committed price history"}">${a.origin}</span>
       </div>
@@ -477,6 +513,16 @@ window.KDL = (() => {
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
       for (const a of entries) {
         if (!a || !a.ticker || num(a.delta) === null) continue;
+        // F-76 scope gate (2026-11-22): the append-only archive keeps every swing, including the
+        // 20 demo/test instruments whose own GET /series record files them under "Test". This page
+        // published the notice "20 archived swings are withheld as outside the five topics" while
+        // the engine was loading all 81 rows, so the notice and the chats disagreed. The gate is
+        // the same one assets/chatdock.js applies, and the count is kept for disclosure (F-86).
+        const seriesCats = (a.series_categories || []).map(String);
+        if (!a.category_id || seriesCats.includes("Test") || seriesCats.includes("Demo")) {
+          S.withheldScope = (S.withheldScope || 0) + 1;
+          continue;
+        }
         const full = collectorAlertFromEntry(a);
         if (known.has(full.id)) continue;
         known.add(full.id);
@@ -751,7 +797,7 @@ window.KDL = (() => {
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
     feedAlerts, clearFeed, renderFeed, bubble, pushAlert, makeAlert,
-    scoreMarket, scoreAlert,
+    scoreMarket, scoreAlert, modelPick,
     AT,
     onRows: addRowsListener,
     onAlert: (cb) => (S.onAlert.add(cb), () => S.onAlert.delete(cb)),

@@ -21,7 +21,7 @@ left blank and listed on the *Flagged for Review* page.
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
 | `dashboard.html` | Price chart (X = time, Y = contract price): official candles at 1/60/1440 minutes plus the collector's observations, a pointer readout of the exact plotted price/time/period volume, archived ≥ $0.10 swings marked and deep-linkable, liquidity ladder, resolution tracker, optional in-browser live polling |
-| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks feed (one frozen screen, identical on every page: `data/alert_rules.json` → `high_roi`). Each alert carries its market's lifecycle — settled YES/NO, result set but not yet paid, closed, open, or not in snapshot — and an outcomes ledger counts how the alerted events resolved |
 | `live.html` | In-browser live desk: polls the public demo API directly, swings ≥ 10¢ ranked by modelled ROI after fees |
 | `roi.html` | The high-ROI model definition, its parameters and its out-of-sample measurement |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
@@ -58,6 +58,7 @@ scripts/tests/test_settled_selection.py  topic-fair settlement allocation + rete
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
+scripts/tests/test_lifecycle.js  lifecycle join (resolved YES/NO vs determined vs not-in-snapshot) and the single model-pick rule shared by engine, page and dock
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```

@@ -1496,9 +1496,9 @@ are closed out). Claim committed and pushed before any work, per the board rule.
 
 | ID | Task | Status | Owner | Files in scope | Verification |
 |----|------|--------|-------|----------------|--------------|
-| T70 | Unify the two-key "model picks" definition across every surface: dashboard (`data/live/alerts.json` `high_roi`), alerts.html (engine score ≥ 0.55), category-page dock (`assets/chatdock.js` inline rule). Measured divergence before the fix: **47 / 49 / 46 picks out of the same 61 alerts**. | in progress | arena-a070c747 | `assets/engine.js`, `assets/chatdock.js`, `alerts.html`, `scripts/tests/test_chatdock.js`, `data/findings.json` | count parity test over the committed feed |
-| T71 | Track every alerted event to its resolution: lifecycle chip (open / closed / settled YES / settled NO / not in snapshot) on each alert bubble, plus an outcomes ledger on alerts.html built from the collector's `settled_markets` `result` field. Absence from the snapshot is labelled "not in this snapshot", never "unresolved". | in progress | arena-a070c747 | `assets/lifecycle.js` (new), `assets/engine.js`, `alerts.html`, `scripts/tests/test_lifecycle.js` (new), `scripts/verify_release.py` | Node unit tests + jsdom render |
-| T72 | Re-verify the live site and the claims this session touches against official sources; publish new irregularities (F-83 pick-rule divergence, F-84 lifecycle-join limits) and correct F-78, whose "only engine.js runs" statement is false. | in progress | arena-a070c747 | `data/findings.json`, `flagged.html` (renderer only if needed), `executive-summary.html`, `README.md` | official URLs cited per row |
+| T70 | Unify the two-key "model picks" definition across every surface: dashboard (`data/live/alerts.json` `high_roi`), alerts.html (engine score ≥ 0.55), category-page dock (`assets/chatdock.js` inline rule). Measured divergence before the fix: **47 / 49 / 46 picks out of the same 61 alerts**. | done | arena-a070c747 | `assets/engine.js`, `assets/chatdock.js`, `alerts.html`, `scripts/tests/test_chatdock.js`, `data/findings.json` | count parity test over the committed feed |
+| T71 | Track every alerted event to its resolution: lifecycle chip (open / closed / settled YES / settled NO / not in snapshot) on each alert bubble, plus an outcomes ledger on alerts.html built from the collector's `settled_markets` `result` field. Absence from the snapshot is labelled "not in this snapshot", never "unresolved". | done | arena-a070c747 | `assets/lifecycle.js` (new), `assets/engine.js`, `alerts.html`, `scripts/tests/test_lifecycle.js` (new), `scripts/verify_release.py` | Node unit tests + jsdom render |
+| T72 | Re-verify the live site and the claims this session touches against official sources; publish new irregularities (F-83 pick-rule divergence, F-84 lifecycle-join limits, F-85 one-observation sample, F-86 scope-gate mismatch) and correct F-78. | done | arena-a070c747 | `data/findings.json`, `flagged.html` (renderer only if needed), `executive-summary.html`, `README.md` | official URLs cited per row |
 | T73 | Release gate → PR → merge → confirm GitHub Pages deploy → record result here. | in progress | arena-a070c747 | `COORDINATION.md` | `scripts/verify_release.py`, Pages builds API, live fetch |
 
 ### Sources this session re-reads before citing
@@ -1515,3 +1515,41 @@ are closed out). Claim committed and pushed before any work, per the board rule.
   on a 15-minute grid.
 - 2026-11-22: Claimed T70–T73. Measured pick-count divergence from the committed feed before changing anything
   (47 engine-score / 49 frozen `high_roi` / 46 dock rule over the same 61 alerts).
+- 2026-11-22: **T70 done.** `assets/engine.js` gained `modelPick()` (frozen flag first, documented
+  seed + positive-volume rule only for a live swing the archive has not seen); `alerts.html` filters the model chat
+  with `KDL.modelPick`; `assets/chatdock.js` dropped its inline "≥ 25% relative move and ≥ 100 contracts" rule for the
+  same function. The heuristic score is still printed as a ranking hint and is explicitly not the inclusion rule.
+  Result on the committed feed: **49 / 49 / 49**. `scripts/tests/test_chatdock.js` now asserts the dock's count equals
+  the frozen screen exactly; `scripts/tests/test_lifecycle.js` section D asserts the rule in all three files and the
+  self-consistency of `data/live/alerts.json`.
+- 2026-11-22: **T71 done.** `KD.marketIndex`, `KD.lifecycleOf`, `KD.lifecycleChip`, `KD.lifecycleAttach`,
+  `KD.lifecycleTally` added to `assets/site.js`; the lifecycle chip is rendered on engine bubbles (`assets/engine.js`),
+  dashboard alert items and every dock row, and `alerts.html` gained a "Tracked to resolution" card: per-bucket counts
+  (settled / resolved YES / resolved NO / result set not paid / closed no result / paused / still open / not in
+  snapshot) plus a table of every alerted market that reached a result, with settlement time, settlement value and a
+  link to its official market record. All eight documented statuses are handled explicitly. Verified in jsdom against
+  the committed files: 14 distinct alerted markets → 1 settled (NO), 9 still open, 4 not in snapshot; all-events chat
+  now reads 61, identical to the dashboard.
+- 2026-11-22: **F-86 found and fixed while verifying T71.** `alerts.html` printed "20 archived swings are withheld as
+  outside the five topics" while `assets/engine.js` loaded all 81 archive rows, so the all-events chat read 81 against
+  the dashboard's 61. The engine now applies the same Test/Demo/missing-topic gate as the dock and counts it in
+  `state.withheldScope`; a test asserts the archive's 20 out-of-scope rows are exactly the 20 the feed reports withheld
+  and that none is a model pick.
+- 2026-11-22: **T72 done.** Re-read `market_lifecycle` (all 8 statuses, `result` set on `determined`, `settlement_ts`
+  populated on `finalized`, `disputed`/`amended` re-determination) and `get-markets` (fields `status`, `result`,
+  `settlement_ts`, `settlement_value_dollars`, `volume_24h_fp`, `last_price_dollars`) on docs.kalshi.com and
+  `demo_env` (demo prices may not reflect real markets) before writing any of the new copy. Published **F-83** (three
+  pick counts, fixed), **F-84** (alerted markets that rotate out of the ranked snapshot; labelled, not guessed),
+  **F-85** (move-vs-outcome is 0 of 1, so no hit rate is claimed), **F-86** (scope-gate mismatch, fixed), corrected
+  **F-78**, and added suggestions **G22** (opt-in sound/desktop notification) and **G23** (per-topic swing-quality
+  scoreboard). Exec summary, README and the alerts page copy updated from 21 → 23 suggestions by the pages' own
+  dynamic counts (no hard-coded numbers added).
+- 2026-11-22: Local release gate `python3 scripts/verify_release.py` **PASS** after every change (21 pages, all
+  suites, including the new `test_lifecycle.js` which `scripts/verify_release.py` now runs).
+
+### T73 close-out (filled in after the merge)
+
+| Item | Result |
+|---|---|
+| Pull request | _pending_ |
+| Pages deploy | _pending_ |

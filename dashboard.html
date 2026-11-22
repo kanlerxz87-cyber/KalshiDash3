@@ -30,7 +30,7 @@
       </section>
       <section class="card alert-card" aria-labelledby="modelAlertsTitle">
         <div class="alert-heading"><h3 id="modelAlertsTitle">Model watch · experimental screen</h3><span id="modelAlertCount" class="badge warn">0</span></div>
-        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, ordered by that volume. It has no demonstrated profitability.</p>
+        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, frozen at detection, ordered by that volume — the same one rule the alert page and the chat dock use (F-83). It has no demonstrated profitability. Each alert also carries the event's lifecycle: <b>settled YES/NO</b> once Kalshi's own <code>result</code> field is final, <b>still open</b>, or <b>not in snapshot</b> (the snapshot is a ranked window, not the exchange — F-84).</p>
         <div id="modelAlerts" class="alert-feed" role="log" aria-live="polite" aria-label="Experimental screened price swing alerts"></div>
       </section>
     </div>
@@ -208,6 +208,7 @@ function renderAlerts() {
       <span class="alert-market">${KD.esc(title)}</span>
       <span class="alert-move ${direction}">${sign}${(Math.abs(a.change) * 100).toFixed(1)}¢</span>
       ${evidenceChip(a)}
+      ${state.lifeIdx && state.lifeIdx.size ? KD.lifecycleChip(a.lifecycle || KD.lifecycleOf(state.lifeIdx.get(a.ticker))) : ""}
       <span class="small mut"> ${ (a.before * 100).toFixed(1)}¢ → ${(a.after * 100).toFixed(1)}¢</span>
       <div><button class="ghost" data-t="${KD.esc(a.ticker)}" style="padding:2px 8px;font-size:11.5px;margin-right:8px">Chart &amp; swings</button><a href="${KD.esc(a.market.source)}" target="_blank" rel="noopener">Official Kalshi market API record</a></div>
     </article>`;
@@ -740,6 +741,7 @@ async function load() {
   loading = true;
   const refresh = Date.now();
   try { state.snap = await KD.json(`data/live/markets.json?refresh=${refresh}`); } catch { /* retain last successful snapshot */ }
+  state.lifeIdx = KD.marketIndex(state.snap);   // T71: official status/result per market
   try { state.hist = await KD.json(`data/live/price_history.json?refresh=${refresh}`); } catch { /* retain last successful history */ }
   try { state.alerts = await KD.json(`data/live/alerts.json?refresh=${refresh}`); } catch { /* swings still render from history */ }
   // Fetched source leads (scripts/catalysts.py, from the review ledger data/catalyst_review.json).

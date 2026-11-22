@@ -110,17 +110,41 @@
     </div>
   </div>
 
+  <section class="card" id="resolutionCard" aria-labelledby="resolutionTitle">
+    <h3 id="resolutionTitle">Tracked to resolution — how the events behind these alerts settled</h3>
+    <p class="small mut">
+      Every alert is followed after the swing it reported. The join uses only the collector's committed
+      snapshot: the market's own <code>status</code> and <code>result</code> fields
+      (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>,
+      lifecycle and payout order per
+      <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).
+      <b>Result set · not paid yet</b> is not an outcome: Kalshi populates <code>result</code> when a market is
+      determined and pays positions when it is finalized, so it is counted separately.
+      A ticker that is absent from the snapshot reads <b>not in snapshot</b> — the committed snapshot is a ranked
+      window, not the whole exchange, so absence is never reported as "unresolved" (F-84).
+    </p>
+    <div class="evbar" id="lifecycleBar"></div>
+    <div id="outcomes"></div>
+  </section>
+
   <div class="card">
     <h3>How the model pick is computed (fully disclosed)</h3>
     <p class="small mut">
-      Score = <code>0.30×liquidity + 0.25×price-band + 0.30×momentum + 0.15×spread</code>, each component 0–1.
-      Picks are alerts whose score ≥ <b>0.55</b>. Components: liquidity from 24h contracts traded and the
-      dollars-traded estimate (log-scaled); price-band peaks at 50¢ where the binary payout profile and the
-      taker fee <code>ceil(M×0.07×C×P×(1−P))</code>
-      (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>) are both maximal;
-      momentum from the swing size (capped at 30¢); spread from the API bid/ask gap.
-      <b>This is a heuristic screen, not a backtested strategy and not advice</b> — it is flagged for review
-      (<a href="flagged.html">F-26</a>).
+      <b>Membership is one rule on every page.</b> A swing is a model pick when the canonical archive's frozen
+      <code>high_roi</code> flag is set for it: its series is in the official fee schedule
+      (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a> — the
+      <span class="badge ok">confirmed</span> basis) <i>and</i> the market reported positive 24-hour volume at the moment
+      the swing was detected. The flag is written once by <code>scripts/build_alerts.py</code> from
+      <code>data/alert_rules.json</code> and never relabelled, so the dashboard, this page and the chat dock show the
+      same count. A live swing this browser detects before the archive has seen it is judged by that same rule.
+    </p>
+    <p class="small mut">
+      The heuristic score <code>0.30×liquidity + 0.25×price-band + 0.30×momentum + 0.15×spread</code> (each 0–1) is
+      still printed on each pick as a <i>ranking hint</i>, and it is <b>not</b> the inclusion rule.
+      Until 2026-11-22 it was: that made the three surfaces disagree (49 dashboard / 47 here / 46 in the dock, over the
+      same 61 alerts), which is a defect, so it is recorded as <a href="flagged.html">F-83</a>. The score itself has
+      never been backtested and is flagged (<a href="flagged.html">F-26</a>).
+      <b>This is an experimental screen, not advice.</b>
     </p>
     <p class="small mut">Category tabs filter both chats. Categories stay separate — a market is attributed to one
       topic only: by the exchange's own series classification (<code>GET /series?category=…</code>, F-66), by a
@@ -271,13 +295,17 @@ function tradedFilter(a) {
 
 function render() {
   const all = KDL.feedAlerts().filter(catFilter);
-  const model = all.filter((a) => a.model && a.model.score >= KDL.MODEL.threshold);
+  // T70: one definition on every surface. See KDL.modelPick — membership is the archive's frozen
+  // high_roi screen, not the heuristic score (which used to give this page 47 picks while the
+  // dashboard showed 49 and the category dock 46, over the same 61 alerts: F-83).
+  const model = all.filter(KDL.modelPick);
   // chronological order, newest at the BOTTOM: renderFeed auto-scrolls there.
   const shownAll = all.filter(tradedFilter);
   const shownModel = model.filter(tradedFilter);
   KDL.renderFeed(KD.$("#feedAll"), shownAll.slice(-120), { catLabels: KD.CAT_LABEL });
   KDL.renderFeed(KD.$("#feedModel"), shownModel.slice(-120), { catLabels: KD.CAT_LABEL, showWhy: true });
   renderEvidenceBar(all.length, shownAll.length);
+  renderOutcomes();
   KD.$("#allCount").textContent = shownAll.length + (shownAll.length === all.length ? " in view" : ` of ${all.length} shown`);
   KD.$("#modelCount").textContent = shownModel.length + (shownModel.length === model.length ? " in view" : ` of ${model.length} shown`);
   const f = KDL.feedAlerts();
@@ -302,6 +330,80 @@ function renderEvidenceBar(total, shown) {
     + chip("candle-sourced", c.candle_unquantified || 0, "")
     + chip("no history", c.unknown_no_observations || 0, "")
     + `<span class="kchip">traded floor: ${c.floor_contracts ?? "—"} contracts (project rule, not a Kalshi field)</span>`;
+}
+
+/* T71 — "track the live event until it resolves, and how (yes/no)".
+ *
+ * The join is deliberately narrow. It reads the collector's snapshot `open_markets` and
+ * `settled_markets` and nothing else; `status`, `result`, `settlement_ts` and
+ * `settlement_value_dollars` are official fields (GET /markets). Two rules keep it honest:
+ *   - determined is not finalized. Kalshi sets `result` when a market is determined and pays when
+ *     it is finalized (https://docs.kalshi.com/getting_started/market_lifecycle), so a determined
+ *     market is shown as "result set · not paid yet" and is NOT counted in the yes/no outcome count.
+ *   - absence is not evidence. The snapshot is a ranked window, so an alerted ticker that is not in
+ *     it is "not in snapshot" — never "unresolved" and never "open" (F-84).
+ * The move-vs-outcome count is descriptive of the demo sample on hand; it is not a hit rate that
+ * anyone should trade (F-85).
+ */
+function renderOutcomes() {
+  const bar = KD.$("#lifecycleBar");
+  const box = KD.$("#outcomes");
+  if (!bar || !box) return;
+  const feed = KDL.feedAlerts();
+  if (!state.snap || !state.lifeIdx || !state.lifeIdx.size) {
+    bar.innerHTML = `<span class="kchip">lifecycle: <b>no snapshot loaded</b></span>`;
+    box.innerHTML = KD.empty("No committed snapshot is available, so no lifecycle can be read. The page does not guess one.");
+    return;
+  }
+  KD.lifecycleAttach(feed, state.lifeIdx);
+  const t = KD.lifecycleTally(feed);
+
+  const chip = (label, n, color) =>
+    `<span class="kchip"${color ? ` style="color:${color}"` : ""}>${label}: <b>${n}</b></span>`;
+  bar.innerHTML = chip("alerted markets", t.tickers)
+    + chip("settled", t.settled, "#7ce8bb")
+    + chip("resolved YES", t.settled_yes, "#7ce8bb")
+    + chip("resolved NO", t.settled_no, "#ffb3a7")
+    + (t.settled_scalar ? chip("scalar settlements", t.settled_scalar, "#ffd88a") : "")
+    + chip("result set · not paid", t.determined, "#ffd88a")
+    + (t.disputed ? chip("result disputed", t.disputed, "#ffd88a") : "")
+    + (t.amended ? chip("re-determined", t.amended, "#ffd88a") : "")
+    + (t.paused ? chip("paused by the exchange", t.paused, "") : "")
+    + chip("closed · no result", t.awaiting_result, "")
+    + chip("still open", t.open, "")
+    + chip("not in snapshot", t.not_listed, "")
+    + (t.comparable
+      ? `<span class="kchip">move agreed with the outcome: <b>${t.agree}</b> of ${t.comparable}` +
+        ` <span class="small mut">(descriptive; demo sample, not a hit rate — F-85)</span></span>`
+      : `<span class="kchip">move vs outcome: <b>no settled alert yet</b></span>`);
+
+  // One row per market that has reached a result or a terminal status.
+  const seen = new Map();
+  for (const a of feed) if (a.ticker && !seen.has(a.ticker)) seen.set(a.ticker, a);
+  const rows = Array.from(seen.values())
+    .filter((a) => a.lifecycle && ["settled", "settled_scalar", "determined", "disputed", "amended", "awaiting_result"].includes(a.lifecycle.state))
+    .sort((x, y) => Date.parse(y.lifecycle.settlement_ts || y.to_time || 0) - Date.parse(x.lifecycle.settlement_ts || x.to_time || 0))
+    .map((a) => {
+      const l = a.lifecycle;
+      const move = a.delta === undefined ? "" : `${a.delta > 0 ? "▲" : "▼"} ${(Math.abs(Number(a.delta)) * 100).toFixed(1)}¢`;
+      return {
+        ticker: l.source
+          ? `<a href="${KD.esc(l.source)}" target="_blank" rel="noopener" class="mono">${KD.esc(a.ticker)}</a>`
+          : `<span class="mono">${KD.esc(a.ticker)}</span>`,
+        title: KD.esc(a.title || ""),
+        move: KD.esc(move),
+        life: KD.lifecycleChip(l),
+        result: l.result ? KD.resultBadge(l.result) : '<span class="na">—</span>',
+        when: l.settlement_ts ? KD.esc(String(l.settlement_ts).replace("T", " ").replace("Z", " UTC")) : '<span class="na">—</span>',
+        value: l.settlement_value_dollars === null || l.settlement_value_dollars === undefined
+          ? '<span class="na">—</span>' : KD.money(l.settlement_value_dollars, 4),
+      };
+    });
+  box.innerHTML = KD.table([
+    { key: "ticker", label: "Market" }, { key: "title", label: "Event" }, { key: "move", label: "Alert move" },
+    { key: "life", label: "Lifecycle" }, { key: "result", label: "Resolved" },
+    { key: "when", label: "Settlement time" }, { key: "value", label: "Settlement value", num: true },
+  ], rows, { empty: "No alerted market has reached a result yet. Alerts are tracked here until the market's own status and result fields change; nothing is inferred in the meantime." });
 }
 
 function statusChip(st) {
@@ -335,6 +437,7 @@ async function boot() {
     state.feedCounts = doc.counts || null;
   } catch { state.feedCounts = null; }
   state.snap = await KDL.loadSnapshot();
+  state.lifeIdx = KD.marketIndex(state.snap);   // T71: status/result per market, for the lifecycle join
   KDL.ingest((state.snap?.open_markets || []).concat(state.snap?.settled_markets || []), "collector", { silent: true });
   await KDL.loadCollectorAlerts();
   await pickWatchlist();
