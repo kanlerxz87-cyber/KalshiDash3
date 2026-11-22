@@ -77,50 +77,57 @@
    "id": "C-11",
    "claim": "Market statuses returned by REST",
    "value": "initialized, active, inactive, closed, determined, disputed, amended, finalized",
-   "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-12",
    "claim": "GET /markets?status= filter mapping",
    "value": "unopened=initialized, open=active, paused=inactive, closed=past close_time not finalized, settled=finalized",
-   "source": "https://docs.kalshi.com/getting_started/market_lifecycle.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/market_lifecycle",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-13",
    "claim": "Determination sets result to yes/no/scalar; settlement pays $1 per winning contract",
    "value": "Yes holders get $1 on yes; No holders get $1 on no; only net positions settle",
-   "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/market_settlement",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-14",
    "claim": "Settlement fees are zero for simple yes/no determinations",
    "value": "May apply for sub-cent scalar settlement",
-   "source": "https://docs.kalshi.com/getting_started/market_settlement.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/market_settlement",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-15",
    "claim": "Orderbook endpoint returns bids only (yes_dollars + no_dollars); asks are implied as $1 minus opposite bid",
    "value": "GET /markets/{ticker}/orderbook, no auth required",
-   "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-16",
    "claim": "Orderbook arrays are [price_dollars, count_fp] string pairs sorted ascending; best bid is last element",
    "value": "depth param returns best N levels per side",
-   "source": "https://docs.kalshi.com/getting_started/orderbook_responses.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/getting_started/orderbook_responses",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-17",
    "claim": "Candlestick period_interval valid values",
    "value": "1 (minute), 60 (hour), 1440 (day)",
-   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks.md",
-   "verified": true
+   "source": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+   "verified": true,
+   "rechecked": "2026-11-22"
   },
   {
    "id": "C-18",
