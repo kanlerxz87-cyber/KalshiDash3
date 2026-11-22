@@ -1539,3 +1539,16 @@ page exists. This session therefore re-fetched every external source the ledger 
 - 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
   pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
 
+## Session `arena-eed90ce4` — full-brief verification + refresh (branch `arena/eed90ce4-kalshidash3`)
+
+Base `a159dd3` (main HEAD, 2026-11-22T07:21Z). This session re-verifies the complete brief line-by-line against official sources, refreshes live data via scheduled collectors, and publishes via PR → main → Pages. Scope: `COORDINATION.md` (this section), `README.md` (status refresh if needed), data refresh commits only.
+
+| ID | Task | Status | Owner | Files in scope | Verification | Irregularities |
+|----|------|--------|-------|----------------|--------------|----------------|
+| T90 | Claim + repo review + official-source verification of every brief requirement | in progress | arena-eed90ce4 | `COORDINATION.md` | docs.kalshi.com pages fetched live this session | — |
+| T91 | Full release gate (`verify_release.py`) + live site check | pending | arena-eed90ce4 | — (read-only) | gate output recorded below | — |
+| T92 | Fresh data via collect/desk workflows; confirm Pages deploy | pending | arena-eed90ce4 | `data/live/*` (via workflows) | workflow runs + Pages builds API | — |
+| T93 | PR → main, merge, confirm deploy, record links | pending | arena-eed90ce4 | `COORDINATION.md` | PR link + merge SHA + Pages status | — |
+
+### Log (`arena-eed90ce4`)
+- 2026-11-22 08:05Z: Claimed T90–T93. Repo already contains a complete 21-page site (prior sessions); `check_site.py` PASS; `verify_release.py` PASS (after `npm install jsdom@26`). Snapshot `2026-11-22T06:17:12Z` (470 open in-scope / 200 settled published / 61 alerts / 49 model-watch). Pages builds API: `a159dd3` built 07:21:38Z. No open PRs. Desk scan run 45000919735 in progress on main.
