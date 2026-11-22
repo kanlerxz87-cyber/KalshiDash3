@@ -140,7 +140,7 @@ def relation(cmp: dict) -> dict:
            "after": after, "after_at": cmp.get("value_after_at"),
            "reference_side": cmp.get("reference_side"),
            # Which published series these numbers are. The pages print this word, so a proxy can
-           # never be presented as the settlement reference (F-87).
+           # never be presented as the settlement reference (F-89).
            "reference_name": cmp.get("reference_name") or "reference"}
     if None in (before, after) or strike is None:
         out["incomplete"] = True
@@ -327,7 +327,7 @@ def build() -> dict:
         "not_reviewed": len(out_rows) - len(reviewed),
         "external_move_coincides": sum(1 for r in out_rows if r["state"].startswith("external_move_coincides")),
         "no_external_move_supporting": sum(1 for r in out_rows if r["state"].startswith("no_external_move")),
-        # F-87: the two verdicts added on 2026-11-22, counted so a summary can quote them
+        # F-89: the two verdicts added on 2026-11-22, counted so a summary can quote them
         # instead of describing them.
         "best_quote_did_not_move": sum(1 for r in out_rows if r["state"] == "best_quote_did_not_move"),
         "reference_not_publicly_readable": sum(1 for r in out_rows if r["state"] == "reference_not_publicly_readable"),

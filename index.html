@@ -142,27 +142,48 @@ KD.nav("");
     + `<div class="card"><div class="kpi">${KD.num(open.filter(r => r.category_matched_by === "official").length)}<small>topics decided by the exchange</small></div><p class="small" style="margin-top:6px">open rows whose topic came from the documented <code>GET /series?category=…</code> filter rather than a title keyword. <a href="flagged.html">F-66</a></p></div>`;
 
   // Highest dollars-traded estimate per category, 1 row each.
+  //
+  // A topic can legitimately have no traded market at all in a snapshot: measured on the
+  // 2026-11-22T06:17Z snapshot, all 51 open Culture rows carry volume_fp 0, so `max` by
+  // dollars picks an arbitrary zero-volume listing and the table then printed
+  // "$0 / 0.0¢ / 0 / 0" under the heading "Largest live market" — a ranking claim the data
+  // does not support (F-83). Untraded topics are now labelled `untraded`, their row is the
+  // open listing with the nearest published close_time (the only ordered field left), and
+  // the footnote names the topic and the count. Nothing is inferred: rows whose close_time
+  // is missing or already past are skipped, never defaulted.
   const top = {};
-  for (const r of open) {
-    if (r.dollars_traded_estimate === null || r.dollars_traded_estimate === undefined) continue;
-    if (KD.isQaRow(r)) continue;   // demo QA fixtures are not live events (F-39)
-    if (!top[r.category_id] || r.dollars_traded_estimate > top[r.category_id].dollars_traded_estimate) top[r.category_id] = r;
+  const untraded = {};   // category_id -> {openRows, nearest}
+  for (const id of Object.keys(live)) {
+    const mine = open.filter(r => r.category_id === id && !KD.isQaRow(r)
+      && r.dollars_traded_estimate !== null && r.dollars_traded_estimate !== undefined);
+    // "Traded" is a volume fact from the API (volume_fp), never the dollar estimate: a market
+    // that filled at 0¢ has volume but a $0 estimate, and must not be called untraded.
+    const traded = mine.filter(r => (r.volume_fp || 0) > 0);
+    if (traded.length) {
+      top[id] = traded.reduce((a, b) => (b.dollars_traded_estimate > a.dollars_traded_estimate ? b : a));
+      continue;
+    }
+    const u = { openRows: mine.length, nearest: null };
+    let bestT = Infinity, best = null;
+    for (const c of mine) {
+      const t = Date.parse(c.close_time || "");
+      if (!Number.isFinite(t)) continue;
+      if (t < bestT) { bestT = t; best = c; }
+    }
+    if (best) { u.nearest = best; top[id] = best; }
+    else if (mine.length) { top[id] = mine[0]; }
+    untraded[id] = u;
   }
   const rows = Object.keys(live).map(id => {
     const r = top[id];
-    // F-85: a topic whose every open market has zero contracts traded has no "largest" market.
-    // Printing a $0 / 0.0¢ row under the heading "Largest live market" reads as a finding when it
-    // is the absence of one, so the row says so in place (culture.html carries the same notice).
-    const zeroVol = !!r && !((Number(r.volume_fp) || 0) > 0);
+    const isUntraded = !!untraded[id] && !!r;
     return {
       cat: live[id],
       title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 68))}</a>` +
                  `<div class="small mut mono">${KD.esc(r.ticker)}</div>` +
-                 (zeroVol ? `<div class="small mut"><b>No contracts traded in any open ${KD.esc(live[id])} market.</b> ` +
-                   `This row is not a ranking: the topic has $0 traded, so its dollar order cannot be computed ` +
-                   `(<a href="${KD.esc(id)}.html">topic page</a>).</div>` : "")
+                 (isUntraded ? ' <span class="badge warn" title="No open market in this topic has traded in this snapshot (volume 0 on every row), so no market is the largest. The row shown is the one with the nearest published close_time.">untraded</span>' : '')
                : '<span class="na">none open in scope</span>',
-      dollars: r ? KD.money(r.dollars_traded_estimate, 0) : '<span class="na">—</span>',
+      dollars: r ? KD.money(r.dollars_traded_estimate, 0) + (isUntraded ? ' <span class="small mut">no trades</span>' : '') : '<span class="na">—</span>',
       price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
       vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
       oi: r ? KD.num(r.open_interest_fp) : '<span class="na">—</span>',
@@ -170,7 +191,6 @@ KD.nav("");
       src: r ? KD.srcLink(r.source, "API") : '<span class="na">—</span>',
     };
   });
-  const zeroVolTopics = Object.keys(live).filter(id => top[id] && !((Number(top[id].volume_fp) || 0) > 0));
   KD.$("#today").innerHTML = KD.table(
     [{ key: "cat", label: "Category" }, { key: "title", label: "Largest live market" },
      { key: "dollars", label: "Dollars traded (est.)", num: true }, { key: "price", label: "Last price", num: true },
@@ -178,20 +198,26 @@ KD.nav("");
      { key: "basis", label: "Category basis" },
      { key: "src", label: "Source" }],
     rows
-  ) + (zeroVolTopics.length
-      ? `<p class="small mut"><b>Zero-volume topics (${KD.esc(zeroVolTopics.map(id => live[id]).join(", "))}):</b>
-         every open market in ${zeroVolTopics.length === 1 ? "that topic" : "those topics"} shows 0 contracts traded in this
-         snapshot, so the dollar column cannot rank them and the row above says so instead of presenting a $0 market as
-         the leader. The demo has no market maker; that is a property of demo, not of the topic
-         (<a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo Environment</a>).</p>`
-      : "")
+  )
     + `<p class="small mut">“Dollars traded (est.)” = volume × last price, computed by this project.
      Kalshi has no official “dollars traded” field — see
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
      “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.
-     A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`;
+     A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`
+   // F-83: name the topics where no market has traded, so "$0" is never read as a ranking result.
+   + (Object.keys(untraded).length
+      ? `<p class="small mut"><b>Untraded topics in this snapshot:</b> ` +
+        Object.keys(untraded).map(id => {
+          const u = untraded[id];
+          const parts = [`<b>${KD.esc(live[id] || id)}</b> — 0 of ${KD.num(u.openRows)} open rows have traded`];
+          if (u.nearest) parts.push(`showing <code>${KD.esc(u.nearest.ticker)}</code> because its published <code>close_time</code> (${KD.esc(u.nearest.close_time)}) is nearest`);
+          else parts.push("no open row with a parseable close_time, so the stored listing is shown");
+          return parts.join(", ");
+        }).join("; ") +
+        `. In a topic with no trades, “$0” and “0.0¢” are the API's literal values and the row is <b>not</b> a ranking result: no market there is the largest (<a href="flagged.html">F-83</a>).</p>`
+      : "");
 
   // ---- resolution tracker (brief: follow events until they resolve, YES or NO) ----
   // Every row here is a settled market the collector stored, shown newest-first with
@@ -206,7 +232,7 @@ KD.nav("");
     resHost.innerHTML =
       `<p class="small mut">Showing the ${KD.num(resRows.length)} settled rows stored in this snapshot,
         newest first within each topic, chosen per topic. ${KD.num(yn.length)} resolved <b>yes/no</b>${other ? `; ${KD.num(other)} carry a non-yes/no result and are shown exactly as returned` : ""}
-        <b>Three different numbers, so they are named separately (F-83):</b> the scan found
+        <b>Three different numbers, so they are named separately (F-86):</b> the scan found
         ${KD.num(snap.counts?.settled_in_scope_total ?? snap.counts?.settled_in_scope)} settled markets inside the five
         topics; ${KD.num(snap.counts?.settled_kept_window ?? snap.counts?.settled_in_scope)} of them were kept in the
         size window; ${KD.num(snap.counts?.settled_published ?? resRows.length)} are published, chosen <b>per topic</b>

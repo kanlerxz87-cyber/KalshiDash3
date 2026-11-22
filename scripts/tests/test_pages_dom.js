@@ -272,20 +272,20 @@ function commonAsserts(label, r) {
             `lead row ${i}: links must carry target=_blank rel=noopener`);
         });
       });
-      // F-87: the verdict identifier is a key, not a sentence. Every state must resolve to a
+      // F-89: the verdict identifier is a key, not a sentence. Every state must resolve to a
       // human label, and the relation line must name which published series it is quoting.
       const rawStates = ["best_quote_did_not_move", "reference_not_publicly_readable",
         "published_reference_on_the_same_side_as_the_move", "no_external_move_supporting_this_swing"];
       const leadText = box.textContent || "";
       for (const s of rawStates) {
-        check(!leadText.includes(s), `alerts.html must not print the raw verdict identifier "${s}" (F-87)`);
+        check(!leadText.includes(s), `alerts.html must not print the raw verdict identifier "${s}" (F-89)`);
       }
       check(/best bid and ask were identical/.test(leadText),
-        "alerts.html must render a human label for best_quote_did_not_move (F-87)");
+        "alerts.html must render a human label for best_quote_did_not_move (F-89)");
       check(/no public read/.test(leadText),
-        "alerts.html must render a human label for reference_not_publicly_readable (F-87)");
+        "alerts.html must render a human label for reference_not_publicly_readable (F-89)");
       check(!/reference 3\.6594/.test(leadText) || /AAA US national average/.test(leadText),
-        "the AAA row must name the series it quotes rather than the bare word 'reference' (F-87)");
+        "the AAA row must name the series it quotes rather than the bare word 'reference' (F-89)");
     } else {
       check(/No lead file has been published yet|could not be loaded/i.test(r.text),
         "with no lead file the page must say so instead of rendering nothing");
@@ -411,7 +411,31 @@ function commonAsserts(label, r) {
       check(Number.isFinite(expectedOfficial),
         "index.html: category_matched_by must be readable on every open row (F-66)");
     }
-    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present)`);
+    // F-83: a topic where NO open row has traded must be labelled as untraded rather than
+    // silently ranked. Measured on the 2026-11-22T06:17Z snapshot: 51 open Culture rows, all
+    // volume_fp 0, and the landing table printed "$0 / 0.0¢ / 0 / 0" as Culture's "largest live
+    // market". Assert the label, the count of labels and the disclosure paragraph, all derived
+    // from the committed data so the test cannot pass on hand-written copy.
+    const openRows = markets ? (markets.open_markets || []) : [];
+    if (openRows.length) {
+      const cats = [...new Set(openRows.map(x => x.category_id))];
+      const noVol = cats.filter(c => {
+        const mine = openRows.filter(x => x.category_id === c);
+        return mine.length > 0 && mine.every(x => !((x.volume_fp || 0) > 0));
+      });
+      const rendered = [...(today ? today.querySelectorAll("tbody tr") : [])];
+      const badgeCount = rendered.filter(tr => /untraded/.test(tr.textContent)).length;
+      check(badgeCount === noVol.length,
+        `index.html: every topic with zero volume on all its open rows must carry the "untraded" label (F-83; data says ${noVol.length}, page shows ${badgeCount})`);
+      if (noVol.length) {
+        check(/Untraded topics in this snapshot:/.test(r.text),
+          "index.html: untraded topics must be disclosed in the footnote, not only badged (F-83)");
+        const zeroRows = rendered.filter(tr => /\$0(?!\d)/.test(tr.textContent));
+        check(zeroRows.every(tr => /no trades/.test(tr.textContent)),
+          "index.html: a \"$0\" dollars cell must say \"no trades\" (F-83)");
+      }
+    }
+    console.log(`  F index page    ok  (${today ? today.querySelectorAll("tbody tr").length : 0} category rows, QA guard + disclosure present, untraded topics labelled)`);
     r.close();
   }
 
@@ -515,14 +539,13 @@ function commonAsserts(label, r) {
       `the stored count (${stored}) must never be printed as "settled markets in scope"`);
     check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
       `the stored count (${stored}) must never be printed as "settled rows in scope"`);
-    // F-83: the kept window (1,600) is not the scan total (6,927) and must not be called "in scope"
+    // F-86: the kept window (1,600) is not the scan total (6,927) and must not be called "in scope"
     check(!flat.includes(kept.toLocaleString() + " settled in scope"),
       `the kept window (${kept}) must not be printed as "settled in scope" — that phrase belongs to the scan total`);
-    // F-85: a topic with zero volume must be named in place, not presented as a ranking
-    check(/No contracts traded in any open/.test(flat),
-      "a topic whose largest market has zero contracts traded must say so in the row (F-85)");
-    check(/Zero-volume topics/.test(flat),
-      "the page must name the zero-volume topics below the table (F-85)");
+    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
+    check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+    check(/Untraded topics in this snapshot/.test(flat),
+      "the page must name the untraded topics below the table (F-83)");
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }
@@ -675,7 +698,7 @@ function commonAsserts(label, r) {
       "executive-summary.html must not advertise the retired 20-minute cadence (R-B8)");
     check(!/alerts-page auto-sim/.test(bodyText),
       "executive-summary.html must point auto-sim references at trading.html, not alerts.html (R-4)");
-    // F-86: the catalyst row must state the coverage that is in the file, not a typed "done".
+    // F-88: the catalyst row must state the coverage that is in the file, not a typed "done".
     const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"));
     const catLine = (r.doc.querySelector("#catCoverage") || {}).textContent || "";
     const catStatus = (r.doc.querySelector("#catStatus") || {}).textContent || "";

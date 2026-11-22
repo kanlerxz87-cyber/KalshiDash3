@@ -39,6 +39,10 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # Why bounded (arena-eed90ce4, F-85): the alarm shares the single-run `freshness-alarm` group with
+    # cancel-in-progress:false. Measured runs take 8 s, so 10 minutes is generous; without a bound a
+    # wedged runner would leave the monitor permanently pending and the alarm would never fire.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 

@@ -21,7 +21,7 @@ left blank and listed on the *Flagged for Review* page.
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
 | `dashboard.html` | Price chart (X = time, Y = contract price): official candles at 1/60/1440 minutes plus the collector's observations, a pointer readout of the exact plotted price/time/period volume, archived ≥ $0.10 swings marked and deep-linkable, liquidity ladder, resolution tracker, optional in-browser live polling |
-| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks (high-ROI screen) feed; each alert links to the exact API query, the order book and news-search leads |
+| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks feed (one frozen screen, identical on every page: `data/alert_rules.json` → `high_roi`). Each alert carries its market's lifecycle — settled YES/NO, result set but not yet paid, closed, open, or not in snapshot — and an outcomes ledger counts how the alerted events resolved |
 | `live.html` | In-browser live desk: polls the public demo API directly, swings ≥ 10¢ ranked by modelled ROI after fees |
 | `roi.html` | The high-ROI model definition, its parameters and its out-of-sample measurement |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
@@ -58,6 +58,7 @@ scripts/tests/test_settled_selection.py  topic-fair settlement allocation + rete
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
+scripts/tests/test_lifecycle.js  lifecycle join (resolved YES/NO vs determined vs not-in-snapshot) and the single model-pick rule shared by engine, page and dock
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
@@ -121,8 +122,20 @@ python3 scripts/kalshi_client.py positions
 python3 scripts/kalshi_client.py buy MARKET-TICKER 25 0.42
 ```
 
-The executor refuses to talk to a non-demo base URL unless `KALSHI_ALLOW_PRODUCTION=1` is set, and it posts to
-`POST /portfolio/events/orders` because the legacy `/portfolio/orders` write endpoints now return `410 Gone`.
+The executor is **demo-only, with no production override**. `KALSHI_BASE` must exactly match either
+`https://external-api.demo.kalshi.co/trade-api/v2` or `https://demo-api.kalshi.co/trade-api/v2`
+(one trailing slash is allowed), as listed in the [official demo endpoint table](https://docs.kalshi.com/getting_started/demo_env).
+Spoofed hosts, embedded credentials, alternate paths, HTTP and production roots are rejected before loading a key.
+The former `KALSHI_ALLOW_PRODUCTION` variable no longer grants an exception. Signed requests never follow redirects
+or automatically retry an order. Invalid/non-finite quantities and prices fail locally; a price that would be rounded
+by this client's four-decimal format is rejected, not silently changed. Market-specific tick/quantity rules still need
+exchange validation. Run the credential-free regression tests with `python3 scripts/tests/test_client_safety.py`.
+
+Orders use the documented [`POST /portfolio/events/orders` V2 endpoint](https://docs.kalshi.com/api-reference/orders/create-order-v2).
+No demo keys were supplied to this session, so no authenticated balance, position, fill or execution has been verified.
+Do not interpret passing fixture tests as a successful exchange trade. The static Pages site cannot safely hold a
+private key or run a persistent authenticated service; account synchronization needs a separately secured backend.
+See the [current executive audit](https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html#audit-2026-11-22).
 
 ## Rules this repository follows
 

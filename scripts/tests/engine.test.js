@@ -37,6 +37,9 @@ const check = (cond, msg) => { if (!cond) { console.log("FAIL:", msg); fails++; 
 check(KDL.ALERT_THRESHOLD === 0.10, "threshold is 0.10");
 check(KDL.takerFee(100, 0.5) === 1.75 && KDL.takerFee(1, 0.5) === 0.02, "fee formula cent-ceil(0.07xCxPx(1-P)): 100@50c=1.75, 1@50c=0.02");
 check(KDL.takerFee(100,0.5) === 1.75, "fee = $1.75 for 100 contracts at 50c");
+check(KDL.takerFee(100,0.5,0) === 0, "M = 0 series pay no trading fee (fee schedule, F-84)");
+check(KDL.seriesTakerMult("KXBTCY-27JAN0100-B47500") === 0 && KDL.seriesTakerMult("KXAAAGASM-X") === 1,
+  "per-series taker multiplier read from the schedule: KXBTCY 0, default 1 (F-84)");
 
 // baseline tick (silent ingest sets prevPrices)
 KDL.ingest([row("T-MOM", 0.40), row("T-REV", 0.80)], "live", { silent: true });

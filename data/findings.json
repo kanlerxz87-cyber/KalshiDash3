@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-21T23:55:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes.",
+ "generated": "2026-11-22T08:40:00Z",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes. Session arena-ae1f84b0 (2026-11-22T08:0xZ) added F-83 (landing table labelled a zero-volume market as a topic's largest) and re-verified the external links it cites; the missing G19 status is left to session arena-38b89a30, which claimed it first (see COORDINATION.md overlap note), after re-running the release gate on a159dd3 to confirm it was green before changing anything. Session arena-ae1f84b0 (2026-11-22T08:2xZ) added F-84 (browser paper ledgers charged the general taker fee on the schedule's M = 0 series and over-ceiled a cent) and fixed it in assets/alerts.js, assets/engine.js and portfolio.html with a new release-gate test. Session arena-eed90ce4 (2026-11-22T08:4xZ) added F-85 (a collect.yml relay run held the concurrency group for ~2 h with no commit, so the snapshot aged; desk.yml and freshness-alarm.yml job timeouts were bounded in the same change). It appended rather than replaced F-83/F-84, which merged from session arena-ae1f84b0 first. Session arena-a070c747 added D-02 (three divergent model-pick counts, fixed), D-03 (alerted markets that rotate out of the snapshot are labelled 'not in snapshot'), D-04 (the move-vs-outcome count is 0 of 1, so no hit rate is claimed) and D-05 (the alert page said 20 swings were withheld while showing all 81, fixed), corrected F-78, and added G22/G23. D-nn is used deliberately: four sessions were minting F-nn ids concurrently, this session's rows were written as F-83..F-86 and then F-85..F-88, and both ranges were merged by other sessions while this branch was open.",
  "questions": [
   {
    "id": "Q1",
@@ -340,7 +340,8 @@
    "sources": [
     "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
     "https://docs.kalshi.com/getting_started/rate_limits"
-   ]
+   ],
+   "status": "proposed"
   },
   {
    "id": "G20",
@@ -366,9 +367,38 @@
     "https://docs.kalshi.com/api-reference/market/get-markets",
     "https://docs.kalshi.com/getting_started/demo_env"
    ]
+  },
+  {
+   "id": "G22",
+   "suggestion": "Make the alert chats something you can leave open: an opt-in sound and a browser notification for each new swing \u2265 $0.10, with a per-topic switch and a mute that remembers itself",
+   "why_it_helps_decisions": "The brief asks for a live alerting system a person can watch in real time. A chat only alerts someone who is looking at it; a tab in the background does not. A single short tone plus a desktop notification (no text typed by the user, no account, no key) turns the page into something that can actually interrupt a trader, and the per-topic switch stops gas-price noise from drowning a golf position. It must be opt-in because browsers require a user gesture for audio and because an alert that fires on every thin print is worse than none \u2014 which is why it should be paired with the existing 'traded only' chip rather than replacing it.",
+   "effort": "Small: one toggle in the alerts toolbar, one AudioContext beep, the Notification API with a permission prompt. No build step, no dependency, consistent with the rest of the site.",
+   "risk": "Alert fatigue and false urgency: the demo exchange prints swings with zero contracts traded, so a naive sound would train the reader to ignore it. Mitigate by defaulting to off, by gating the notification on the evidence chip the reader chooses, and by never sounding for a quote-only row unless 'all alerts' is explicitly selected.",
+   "success_metric": "The toggle is exercised in the jsdom suite (off by default, one sound per alert, none on a sub-threshold move), and the page states the chosen gate in the chat header so nobody has to remember it."
+  },
+  {
+   "id": "G23",
+   "suggestion": "Publish a per-topic swing-quality scoreboard (traded vs thin vs quote-only, and resolved direction) so a topic can be chosen on evidence rather than on headline size",
+   "why_it_helps_decisions": "The brief asks for events to stay separated by topic and for the dashboard to help a trader decide. Size alone is a poor guide: a large Culture event can print dozens of untradeable 30c swings while a small golf market prints a handful of traded ones. A compact scoreboard next to each category link would let a reader pick the topic where the prints are executable and, as alerts settle, where the direction of the move has actually matched the outcome. It is the same evidence layer already computed for the chats, aggregated rather than hidden in prose.",
+   "effort": "Medium: aggregate data/live/alerts.json counts.evidence and the alert lifecycle by category_id; render one small table on categories.html. No new data collection.",
+   "risk": "A per-topic 'accuracy' column on a sample of a few demo markets would look far more authoritative than it is. Mitigate by showing counts with the sample size attached, never a percentage alone, and by labelling any direction statistic as descriptive until the sample is large enough to be published with an interval (F-87).",
+   "success_metric": "The scoreboard renders on every category page from committed data only, its numbers reconcile with the alert page to the row, and a reader can see the sample size next to every rate."
   }
  ],
  "flagged": [
+  {
+   "id": "SAFE-5C-01",
+   "severity": "high",
+   "item": "Fixed 2026-11-22: executor demo boundary accepted substring matches and a production override",
+   "why": "Repository review of scripts/kalshi_client.py at a159dd3 found base_url() trusted any URL containing demo, including attacker-controlled hosts, and KALSHI_ALLOW_PRODUCTION=1 enabled non-demo roots. urllib also followed redirects by default. This did not guarantee the demo-only scope or containment of signed account headers. This is a code/fixture finding, not evidence of a credential leak or a real trade.",
+   "action": "Fixed: an exact allowlist of the two documented HTTPS demo REST roots, no production override, no redirect following or automatic order retries, and validation before loading keys. Added offline spoofed-host, production, redirect, unsigned-query-path and invalid-order tests. Rejects non-finite values and silent four-decimal price rounding. Exchange execution and account data remain unverified because no demo credentials were supplied; the static site has no authenticated backend. No account is asserted not to exist.",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://docs.kalshi.com/getting_started/api_keys",
+    "https://docs.kalshi.com/api-reference/orders/create-order-v2",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/a159dd3ab161043705a8761e1c6bd40999396da6/scripts/kalshi_client.py"
+   ]
+  },
   {
    "id": "F-01",
    "item": "Legacy order endpoint used by the shipped scripts",
@@ -1033,7 +1063,7 @@
    "why": [
     "`assets/engine.js` defines the scorer that actually produces every 'model picks' bubble and the `model N.NN` chip: `MODEL.weights = { liquidity: 0.30, band: 0.25, momentum: 0.30, spread: 0.15 }`, `MODEL.threshold = 0.55`, integer score 0-1, with `modeled_roi_if_yes_at_ask`. `assets/alerts.js` defines a second, unrelated scorer: `weights = { magnitude: 0.35, relative: 0.25, liquidity: 0.20, volume: 0.20 }`, `threshold_score: 55`, score 0-100, and a different component set (no price band, no spread). Only `assets/alerts.js` also carries the comment 'Weights and components are published verbatim on alerts.html and strategies.html' \u2014 but the page publishes engine.js's weights, and `assets/alerts.js` is loaded only by portfolio.html, which uses just `loadJSON`, `replayStrategies` and `indexLiquidity` from it. `KDA.scoreAlert` and its `MODEL` are therefore dead code on every page. Verified by instrumenting alerts.html in jsdom: `KDL.MODEL.weights` is the 0.30/0.25/0.30/0.15 object, 60 of 60 alerts are scored by the engine, 39 pass 0.55, and the rendered 'model picks' count reads 39; no page references `KDA.scoreAlert`."
    ],
-   "action": "NOT fixed in this branch \u2014 deleting or merging exports from `assets/alerts.js` is a functional change to a file another session owns and to a page (portfolio.html) that does load it, so it needs an owner who can re-run the replay tests. Recommended correction, in order of preference: (1) delete `MODEL` and `scoreAlert` from `assets/alerts.js` and have portfolio.html keep using the engine's, so exactly one scorer exists; or (2) if the second scorer is wanted, rename it (`REPLAY_MODEL`) and document that it is not the chat ranking. Interim advice to a reader: the numbers on `alerts.html` and `strategies.html` are the engine's and are the correct ones. Flagged rather than silently edited because the brief requires unverified or risky changes to be surfaced, not guessed at.",
+   "action": "NOT fixed in this branch \u2014 deleting or merging exports from `assets/alerts.js` is a functional change to a file another session owns and to a page (portfolio.html) that does load it, so it needs an owner who can re-run the replay tests. Recommended correction, in order of preference: (1) delete `MODEL` and `scoreAlert` from `assets/alerts.js` and have portfolio.html keep using the engine's, so exactly one scorer exists; or (2) if the second scorer is wanted, rename it (`REPLAY_MODEL`) and document that it is not the chat ranking. Interim advice to a reader: the numbers on `alerts.html` and `strategies.html` are the engine's and are the correct ones. Flagged rather than silently edited because the brief requires unverified or risky changes to be surfaced, not guessed at.\n\nCORRECTED 2026-11-22 (arena-a070c747): the statement above understates the problem. Besides this dead\nscorer, a THIRD live rule was selecting the dock's picks on every category page while the dashboard used the\narchive's frozen flag and the alert page used this engine score \u2014 three different counts over the same 61 alerts\n(49 / 47 / 46). That live divergence is recorded and fixed as D-02; assets/alerts.js remains dead code, which is\nunchanged by that fix.",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/alerts.js",
@@ -1089,6 +1119,105 @@
   },
   {
    "id": "F-83",
+   "severity": "low",
+   "item": "Landing table ranked a zero-volume market: with no traded market in a topic, an arbitrary untraded listing was printed as that topic's \"Largest live market\" ($0 / 0.0\u00a2 / 0 contracts / 0 open interest)",
+   "why": "Measured on the committed snapshot data/live/markets.json (collected_at 2026-11-22T06:17:12Z by the scheduled collector from https://external-api.demo.kalshi.co/trade-api/v2): the Culture topic had 51 open rows and volume_fp was 0 on all 51, so the landing page's max-by-dollars-traded-estimate choice fell through to an arbitrary row (KXALBUMCHART-GTA6H100-05DEC26-GE9) and presented it under the heading \"Largest live market\" with $0, 0.0\u00a2, 0 contracts and 0 open interest. The values are literal API values, not invented, but the heading is a ranking claim the data cannot support. Elections is the near-miss case: its top market has volume_fp 3.19, so it is traded and correctly ranked. The existing DOM gate checked only that one row per category existed, never that a zero-volume row was labelled.",
+   "action": "FIXED in index.html: a topic is classified from the API's volume fact (volume_fp > 0 on at least one open row), never from the dollar estimate, so a market that filled at 0\u00a2 is still 'traded'. When no open row in a topic has traded, the row carries an 'untraded' badge, its dollars cell reads '$0 no trades', the row shown is the listing with the nearest published close_time (rows with a missing close_time are skipped, never defaulted), and a footnote names the topic, the count (0 of N open rows have traded) and why that listing is shown, linking here. Locked down by scripts/tests/test_pages_dom.js Test F, which derives the untraded topics from the committed snapshot and asserts the badge count, the footnote and that no '$0' cell lacks the 'no trades' note.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXALBUMCHART-GTA6H100-05DEC26-GE9",
+    "data/live/markets.json"
+   ]
+  },
+  {
+   "id": "F-84",
+   "severity": "medium",
+   "item": "Browser paper ledgers charged the general taker fee on series the official fee schedule lists at taker multiplier 0, and alerts.js over-ceiled a cent on every standard-rate fill",
+   "why": "Read this session from https://kalshi.com/docs/kalshi-fee-schedule.pdf (July 7, 2026 update): the fee is ceil(M x 0.07 x C x P x (1-P)) and the Non-Standard Fees table lists KXBTCY, KXETHY and KXELECTIRAN at maker 0 / taker 0, with 'M defaults to 1 unless otherwise indicated' for everything else. Measured on the committed feed data/live/alerts.json (generated_at 2026-11-22T06:17:12Z): 44 of the 61 archived alerts are KXBTCY, so most of the browser paper ledger was charged a fee the exchange does not charge. Separately, assets/alerts.js computed ceil(0.07 x C x P x (1-P) x 100)/100 without rounding the float product first, and 0.07 x 100 x 0.5 x 0.5 x 100 evaluates to 175.00000000000003, so a documented $1.75 fill was booked at $1.76 \u2014 a one-cent overcharge on every 100-contract 50c fill. scripts/simulate.py already applied the schedule's multipliers from data/strategies.json, so the server-side and browser-side paper results disagreed on cost.",
+   "action": "FIXED: assets/alerts.js (KDA.fee/KDA.takerMult) and assets/engine.js (KDL.takerFee/seriesTakerMult) carry the schedule's M = 0 series and default 1, and both now round the float product to 6 decimals before the cent-ceil. portfolio.html no longer keeps a private flat-rate copy \u2014 it calls KDA.fee, so the manual ledger and the auto-sim cannot drift apart again. The disclosure sentences on portfolio.html and executive-summary.html now state that multipliers are applied. Verified by scripts/tests/test_fee_multipliers.js (asserts M = 0 pricing, the default rate, cent-ceil, case-insensitive series matching, KXBTC15M is not treated as KXBTCY, per-series parity with data/strategies.json, and that portfolio.html contains no private flat-rate formula), added to the release gate in scripts/verify_release.py, plus new assertions in scripts/tests/engine.test.js.",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "data/strategies.json",
+    "data/live/alerts.json"
+   ]
+  },
+  {
+   "id": "F-85",
+   "severity": "medium",
+   "item": "The collector stalled for ~2 h behind a run that held its concurrency group, so the published snapshot aged past every stated refresh promise (found and cleared 2026-11-22)",
+   "why": "Observed with the Actions API, not inferred: schedule run 44970894475 of collect.yml started 2026-11-22T02:46:23Z and held the collect-refs/heads/main concurrency group; the newest collector commit was f364db9 'data: demo snapshot 2026-11-22T06:17Z' at 06:17:13Z, and data/live/markets.json kept collected_at = 2026-11-22T06:17:12Z while that run still reported in_progress for 6 h 48 m. Meanwhile desk.yml kept firing (commits at 06:44Z, 07:21Z and 08:07Z), so the demo API itself was answering during the stall. Cause NOT established: Actions job logs are served from productionresultssa6.blob.core.windows.net, which this session's sandbox cannot reach, so the per-pass output of the stalled run could not be read and no theory about which step stopped is recorded here as fact. GitHub documents that a concurrency group runs at most one job and holds at most one pending run, and that a GitHub-hosted job may run for up to 6 hours, which is exactly the window the stall consumed.",
+   "action": "Recovered in this session: the stuck run was cancelled (gh run cancel 44970894475) and the queued dispatch run 45001188514 took the group, which is the recovery procedure already written into scripts/collect_relay.py. Hardened: the two workflow jobs whose concurrency groups had no time bound now have one \u2014 desk.yml scan timeout-minutes 25 (measured 4.5 min typical, 12 m 19 s slowest) and freshness-alarm.yml check timeout-minutes 10 (measured 8 s) \u2014 so a wedged runner can no longer pin those single-run groups for the full 6-hour default. collect.yml already carried timeout-minutes 350. Residual: a stalled relay can still hold the collect group for up to ~5.8 h by design; the documented remedy is cancelling the run, which restarts the chain immediately.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/44970894475",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45001188514",
+    "https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency",
+    "https://docs.github.com/en/actions/reference/limits",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/desk.yml",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/freshness-alarm.yml"
+   ]
+  },
+  {
+   "id": "D-02",
+   "severity": "medium",
+   "status": "fixed 2026-11-22 (arena-a070c747)",
+   "item": "The same 61 swings produced three different \"model picks\" counts depending on which page you read: 49 on the dashboard, 47 on the alert page and 46 in the category-page chat dock\n\n[RENUMBERED 2026-11-22: written as F-83, briefly published as F-85, and moved to D-02 \u2014 parallel sessions merged their own F-83 and F-85 while this branch was open. Nothing factual changed; every reference now points at D-02.]",
+   "why": "Each surface had its own inclusion rule. dashboard.html read the archive's frozen high_roi flag (scripts/build_alerts.py, data/alert_rules.json: fee-schedule seed series with positive reported 24h volume) -> 49 of 61. alerts.html selected rows whose engine score passed 0.55 (assets/engine.js MODEL.weights = liquidity 0.30 + band 0.25 + momentum 0.30 + spread 0.15), replayed against the committed snapshot -> 47 of the same 61. assets/chatdock.js, which renders the dock on every category page, used a third inline rule (>= 25% relative move and >= 100 contracts of 24h volume) -> 46. Measured 2026-11-22 on data/live/alerts.json (all_events, 61 rows) + data/live/markets.json by replaying each published rule; 46 of the three sets overlapped, so the difference was not cosmetic. A pick count that changes with the page undermines the one thing this dashboard is for.\n\n[RENUMBERED 2026-11-22: written as F-83, briefly published as F-85, and moved to D-02 \u2014 parallel sessions merged their own F-83 and F-85 while this branch was open. Nothing factual changed; every reference now points at D-02.]",
+   "action": "FIXED. Membership is now the archive's frozen high_roi flag everywhere, because it is the only one of the three that is computed once, stored with the alert and never relabelled. assets/engine.js exposes modelPick() and alerts.html filters the model chat with it; assets/chatdock.js applies the same rule (flag first, the documented seed+positive-volume rule for a live swing the archive has not seen). The heuristic score is still printed on each pick as a ranking hint and is explicitly not the inclusion rule. scripts/tests/test_lifecycle.js section D asserts the rule in all three files, and scripts/tests/test_chatdock.js now asserts the dock's count equals the frozen screen exactly (49).\n\n[RENUMBERED 2026-11-22: written as F-83, briefly published as F-85, and moved to D-02 \u2014 parallel sessions merged their own F-83 and F-85 while this branch was open. Nothing factual changed; every reference now points at D-02.]",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "data/alert_rules.json",
+    "data/live/alerts.json",
+    "assets/engine.js",
+    "assets/chatdock.js",
+    "alerts.html"
+   ]
+  },
+  {
+   "id": "D-03",
+   "severity": "medium",
+   "status": "published \u2014 cannot be fixed from the data (labelled on the page)",
+   "item": "An alerted market can rotate out of the collector's snapshot before it resolves, so for those alerts the outcome is unknowable from committed data \u2014 it is labelled \"not in snapshot\", never \"unresolved\"\n\n[RENUMBERED 2026-11-22: written as F-84, briefly published as F-86, and moved to D-03 \u2014 parallel sessions merged their own F-84 and F-86 while this branch was open. Nothing factual changed; every reference now points at D-03.]",
+   "why": "scripts/collect.py records a ranked window (470 open + 200 settled markets in the 2026-11-22T07:21Z snapshot), not the whole exchange. Of the 14 distinct markets behind the 61 served swings, 1 is finalized with a result, 9 are active, and 4 are in neither bucket. The alert page therefore reports four separate buckets (settled / result set but not paid / closed without a result / not in snapshot) instead of a single \"pending\". Guessing the missing rows would be fabrication: GET /markets/{ticker} is reachable, but a per-alert lookup for every historical ticker is a separate design decision (rate limits, cutoff rules) and is not done silently.\n\n[RENUMBERED 2026-11-22: written as F-84, briefly published as F-86, and moved to D-03 \u2014 parallel sessions merged their own F-84 and F-86 while this branch was open. Nothing factual changed; every reference now points at D-03.]",
+   "action": "Published, not papered over: KD.lifecycleOf() in assets/site.js returns state 'not_listed' for an absent ticker, the chip reads 'not in snapshot', its tooltip states that absence is not evidence, and scripts/tests/test_lifecycle.js pins the behaviour. The count is shown on the alert page so a reader can see how much of the record is unknown.\n\n[RENUMBERED 2026-11-22: written as F-84, briefly published as F-86, and moved to D-03 \u2014 parallel sessions merged their own F-84 and F-86 while this branch was open. Nothing factual changed; every reference now points at D-03.]",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/historical_data",
+    "data/live/markets.json",
+    "assets/site.js"
+   ]
+  },
+  {
+   "id": "D-04",
+   "severity": "low",
+   "status": "published \u2014 sample too small to be a statistic",
+   "item": "The \"did the move agree with the eventual outcome\" count is 0 of 1: exactly one alerted market in the archive has a finalized yes/no result, so there is no hit rate to report\n\n[RENUMBERED 2026-11-22: written as F-85, briefly published as F-87, and moved to D-04 \u2014 parallel sessions merged their own F-85 and F-87 while this branch was open. Nothing factual changed; every reference now points at D-04.]",
+   "why": "The alert archive holds 81 swings across 19 tickers. One of those markets has settled (KXAAAGASD-26NOV21-3.6600, result no, settled 2026-11-21T13:11:17Z) and its alert printed +34.0c, i.e. the printed move pointed the other way. That is a single observation on the demo exchange, where Kalshi explicitly warns market behaviour may not reflect real markets.\n\n[RENUMBERED 2026-11-22: written as F-85, briefly published as F-87, and moved to D-04 \u2014 parallel sessions merged their own F-85 and F-87 while this branch was open. Nothing factual changed; every reference now points at D-04.]",
+   "action": "Shown as a bare count with the method stated ('descriptive; demo sample, not a hit rate'), never as a percentage, a win rate, a strategy or a recommendation. No strategy on the site is built on it. It becomes informative only as settled alerts accumulate; the code path already computes it, so no new work is needed to keep it current.\n\n[RENUMBERED 2026-11-22: written as F-85, briefly published as F-87, and moved to D-04 \u2014 parallel sessions merged their own F-85 and F-87 while this branch was open. Nothing factual changed; every reference now points at D-04.]",
+   "sources": [
+    "https://docs.kalshi.com/getting_started/demo_env",
+    "https://docs.kalshi.com/getting_started/market_settlement",
+    "data/live/alerts.json",
+    "data/live/markets.json"
+   ]
+  },
+  {
+   "id": "D-05",
+   "severity": "high",
+   "status": "fixed 2026-11-22 (arena-a070c747)",
+   "item": "The alert page published the notice \"20 archived swings are withheld as outside the five topics\" while actually displaying all 81 archive rows; the all-events chat read 81 where the dashboard read 61\n\n[RENUMBERED 2026-11-22: written as F-86, briefly published as F-88, and moved to D-05 \u2014 parallel sessions merged their own F-86 and F-88 while this branch was open. Nothing factual changed; every reference now points at D-05.]",
+   "why": "data/live/alerts.json is built from the archive by scripts/build_alerts.py, which excludes the 20 swings whose own GET /series record files the market under Test and publishes that count in counts.withheld_out_of_scope. assets/chatdock.js applied the same gate (histSkipped). assets/engine.js's loadCollectorAlerts() did not: it ingested every archive row, so alerts.html rendered 81 all-events rows including 20 demo/test instruments, contradicting the notice printed on the same page. Verified by replaying alerts.html in jsdom against the committed files: 81 rows, 61 of which are in scope.\n\n[RENUMBERED 2026-11-22: written as F-86, briefly published as F-88, and moved to D-05 \u2014 parallel sessions merged their own F-86 and F-88 while this branch was open. Nothing factual changed; every reference now points at D-05.]",
+   "action": "FIXED. The engine now applies the same Test/Demo/missing-topic gate as the dock, counts what it withholds in state.withheldScope, and the page renders 61 all-events rows \u2014 identical to the dashboard. scripts/tests/test_lifecycle.js asserts that the archive's out-of-scope rows are exactly the 20 the feed reports withheld, and that none of them is a model pick (so the fix cannot change the pick count).\n\n[RENUMBERED 2026-11-22: written as F-86, briefly published as F-88, and moved to D-05 \u2014 parallel sessions merged their own F-86 and F-88 while this branch was open. Nothing factual changed; every reference now points at D-05.]",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "data/live/alerts.json",
+    "data/live/alerts_archive.json",
+    "assets/engine.js",
+    "assets/chatdock.js"
+   ]
+  },
+  {
+   "id": "F-86",
    "severity": "medium",
    "item": "The landing page printed the collector's 1,600-row kept window as \"settled markets in scope\" while its own banner printed the 6,927-row scan total under the same phrase",
    "why": "Two different numbers carried the same phrase on the same page. `counts.settled_in_scope` is `len(rows[\"settled\"])` AFTER `rows[\"settled\"] = rows[\"settled\"][:SETTLED_KEEP]` in scripts/collect.py, so it is the size-trimmed storage window (1,600 on the 2026-11-22T06:17:12Z snapshot), not the number of settled markets found in scope. That number is `counts.settled_in_scope_total` (6,927). index.html used `settled_in_scope` for the KPI sub-label \"(of 1,600 settled in scope)\" and again for the resolution paragraph \"the snapshot's own scan found 1,600 settled markets in scope\", while assets/site.js used `settled_in_scope_total` for the banner's \"6,927 settled markets were found in scope\". A reader comparing the two lines on one screen sees a contradiction. The collector publishes three distinct counts (`settled_in_scope_total`, `settled_kept_window`, `settled_published`); only one phrase was in use.",
@@ -1099,7 +1228,7 @@
    ]
   },
   {
-   "id": "F-84",
+   "id": "F-87",
    "severity": "medium",
    "item": "scripts/tests/test_scope.py ended its verdict at line 287 and then kept asserting to line 312, so section 5's assertions could never fail the run",
    "why": "The file's structure was `if errors: print(\"FAIL\"); sys.exit(1)` followed by `print(\"OK: ...\")` and THEN section 5 (F-72's checks). Nothing re-read `errors` after that block, so every check in section 5 was decorative: the suite printed OK and exited 0 while three of them were failing on main \u2014 `\"settled_in_scope_total_method\"` was absent from scripts/collect.py, `open_published_rows`/`settled_published_rows` were absent from collect.py, and `settled_in_scope_total_method` was absent from index.html. A test that cannot fail is worse than no test, since it records a guarantee that does not hold. Found while auditing every test for assertions placed after the verdict; this was the only file affected.",
@@ -1109,18 +1238,7 @@
    ]
   },
   {
-   "id": "F-85",
-   "severity": "low",
-   "item": "The landing page presented a $0-volume, 0.0\u00a2 market as Culture's \"largest live market\", with no explanation on that page",
-   "why": "Every one of the 51 open Culture rows in the 2026-11-22T06:17:12Z snapshot has volume_fp 0.00 and last_price_dollars 0.0000, verified against the market's own record (GET /markets/KXALBUMCHART-GTA6H100-05DEC26-GE9). The largest-by-dollars pick therefore returned a $0 market and printed it under the heading \"Largest live market\" with dollars $0, price 0.0\u00a2, contracts 0 and open interest 0 \u2014 arithmetically true and useless to a trader, and it reads as a finding rather than as the absence of one. culture.html already carried a notice saying the topic's dollar ranking is meaningless right now; index.html did not.",
-   "action": "Fixed: the row now says in place that no contracts were traded in any open market in that topic and that the row is not a ranking, with a link to the topic page, and a footnote names every zero-volume topic. The $0 figures are still printed, since they are the API's own values.",
-   "sources": [
-    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXALBUMCHART-GTA6H100-05DEC26-GE9",
-    "https://docs.kalshi.com/getting_started/demo_env"
-   ]
-  },
-  {
-   "id": "F-86",
+   "id": "F-88",
    "severity": "medium",
    "item": "The executive summary reported the \"events and website links that may have caused a sharp jump\" requirement as \"done\" while the lead file carried a fetched review for 9 of 61 swings",
    "why": "`data/live/catalysts.json` on main (generated_at 2026-11-22T06:17Z) counted 61 archived swings, 9 reviewed and 52 `not_reviewed`. The row said \"done, labelled as leads\". The 52 unreviewed rows rendered as \"not reviewed yet \u2014 this market's reference has not been read for this minute\", which is honest per row, but the summary's status column contradicted the file. A decision-maker reading only the summary would believe every swing had a source attached.",
@@ -1132,7 +1250,7 @@
    ]
   },
   {
-   "id": "F-87",
+   "id": "F-89",
    "severity": "low",
    "item": "dashboard.html printed the raw verdict identifier into the chart, and the relation line hardcoded the word \"reference\" so a proxy could be presented as the settlement reference",
    "why": "`leadHtml()` rendered `KD.esc(hit.state)` straight into the lead chip, so a trader saw `published_reference_on_the_same_side_as_the_move` in snake_case beside the chart. alerts.html had a human label map; dashboard.html did not, so the two pages described the same verdict in two different ways. Separately, both pages printed `reference ${rel.before} \u2192 ${rel.after}` with the word hardcoded, which leaves no way to label a reading that is a proxy rather than the index the market settles on \u2014 and the crypto series settle on CF Benchmarks' BRTI, which has no public read.",

@@ -65,12 +65,28 @@ window.KDL = (() => {
 
   function money(v, d = 2) { return v === null || v === undefined ? "—" : "$" + Number(v).toFixed(d); }
 
+  // Per-series taker multipliers M from the "Non-Standard Fees" table of the official fee
+  // schedule (https://kalshi.com/docs/kalshi-fee-schedule.pdf, July 7, 2026 update). A series
+  // listed at M = 0 pays NO trading fee. Without this table the live auto-sim charged the
+  // general rate on KXBTCY — the series that dominates the demo's alert feed (44 of 61
+  // archived alerts at 2026-11-22T06:17Z) — so its paper P&L was overstated in cost (F-84).
+  // Absent series use M = 1, the documented default. Same table as data/strategies.json.
+  const SERIES_TAKER_MULT = { KXBTCY: 0, KXETHY: 0, KXELECTIRAN: 0 };
+
+  function seriesOf(ticker) { return String(ticker || "").split("-")[0].toUpperCase(); }
+
+  function seriesTakerMult(ticker) {
+    const s = seriesOf(ticker);
+    return Object.prototype.hasOwnProperty.call(SERIES_TAKER_MULT, s) ? SERIES_TAKER_MULT[s] : 1;
+  }
+
   function takerFee(count, price, mult = 1) {
     // Documented general taker rate: fee = ceil(M x 0.07 x C x P x (1-P)) in cents.
     // https://kalshi.com/docs/kalshi-fee-schedule.pdf — per-series multipliers can differ.
     // The product is rounded to 6 decimals BEFORE the cent-ceil so float noise
     // (0.07*100*0.5*0.5*100 = 175.00000000000003) cannot overcharge a cent.
     if (!(count > 0) || !(price > 0) || price >= 1) return null;
+    if (!mult) return 0;              // M = 0 in the schedule: no trading fee at all
     const centsRaw = mult * 0.07 * count * price * (1 - price) * 100;
     return Math.ceil(Number(centsRaw.toFixed(6))) / 100;
   }
@@ -208,6 +224,7 @@ window.KDL = (() => {
       dollars_traded_estimate: num(raw.dollars_traded_estimate),
       close_time: raw.close_time || null,
       settlement_value_dollars: num(raw.settlement_value_dollars),
+      settlement_ts: raw.settlement_ts || null,
       source: raw.source || null
     };
   }
@@ -263,6 +280,30 @@ window.KDL = (() => {
   function scoreMarket(m) {
     const r = MODEL.reasons(m, null);
     return r;
+  }
+
+  /* ------------------------------------------------------- model picks (T70)
+   * ONE definition, used by the model chat on this page and mirrored in assets/chatdock.js:
+   * a pick is a swing whose market the canonical archive already flagged `high_roi` (frozen at
+   * detection by scripts/build_alerts.py from data/alert_rules.json: a fee-schedule seed series
+   * with positive reported 24h volume), or — for an alert raised live in this browser that the
+   * archive has not seen yet — the same documented rule computed from the fields we have.
+   *
+   * Why the flag rather than the score: the score below is a heuristic that has never been
+   * backtested (F-26), and using it for membership meant the dashboard (49 picks), this page (47)
+   * and the category-page dock (46) showed three different "model" feeds over the same 61 alerts
+   * (measured 2026-11-22, D-02). A pick count that depends on which page you are reading is a
+   * defect, so membership now comes from one frozen, reproducible rule and the score is only a
+   * displayed ranking hint.
+   */
+  function modelPick(a) {
+    if (!a) return false;
+    if (a.high_roi_screen === true || a.high_roi === true) return true;
+    if (a.high_roi_screen === false) return false;
+    const m = S.markets.get(a.ticker) || {};
+    const basis = a.category_basis || m.category_basis || null;
+    const vol = num(a.volume_24h_fp) !== null ? num(a.volume_24h_fp) : num(m.volume_24h_fp);
+    return basis === "seed" && vol !== null && vol > 0;
   }
 
   // ---------------------------------------------------------------- alert feed storage
@@ -324,6 +365,16 @@ window.KDL = (() => {
     const rev = a.evidence_reversion;
     const revBit = rev && rev.gave_back_half === true
       ? `<span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "";
+    // T71: was the event behind this alert resolved, and how? The lifecycle is joined from the
+    // collector's snapshot (status/result are official fields); when KD is unavailable the chip is
+    // simply omitted rather than guessed.
+    let lifeBit = "";
+    try {
+      if (typeof KD !== "undefined" && KD.lifecycleChip && S.markets.size) {
+        const life = a.lifecycle || KD.lifecycleOf(S.markets.get(a.ticker));
+        lifeBit = KD.lifecycleChip(life);
+      }
+    } catch (e) { lifeBit = ""; }
     return `<div class="chat-msg ${up ? "up" : "down"}">
       <div class="chat-head">
         <span class="chat-time">${hh}</span>
@@ -333,6 +384,7 @@ window.KDL = (() => {
         ${modelBit}
         ${evBit}
         ${revBit}
+        ${lifeBit}
         <span class="badge dim">${esc(cat)}</span>
         <span class="badge ${a.origin === "live" ? "live" : "dim"}" title="${a.origin === "live" ? "Detected in your browser from the live demo API" : "Recovered from the collector's committed price history"}">${a.origin}</span>
       </div>
@@ -477,6 +529,16 @@ window.KDL = (() => {
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
       for (const a of entries) {
         if (!a || !a.ticker || num(a.delta) === null) continue;
+        // F-76 scope gate (2026-11-22): the append-only archive keeps every swing, including the
+        // 20 demo/test instruments whose own GET /series record files them under "Test". This page
+        // published the notice "20 archived swings are withheld as outside the five topics" while
+        // the engine was loading all 81 rows, so the notice and the chats disagreed. The gate is
+        // the same one assets/chatdock.js applies, and the count is kept for disclosure (D-05).
+        const seriesCats = (a.series_categories || []).map(String);
+        if (!a.category_id || seriesCats.includes("Test") || seriesCats.includes("Demo")) {
+          S.withheldScope = (S.withheldScope || 0) + 1;
+          continue;
+        }
         const full = collectorAlertFromEntry(a);
         if (known.has(full.id)) continue;
         known.add(full.id);
@@ -564,7 +626,7 @@ window.KDL = (() => {
       }
       const st = STRATS[sid];
       const count = opts.size || st.size;
-      const feeIn = takerFee(count, fill);
+      const feeIn = takerFee(count, fill, seriesTakerMult(row.ticker));
       if (feeIn === null) return null;
       const cost = count * fill + feeIn;
       if (cost > this.state.cash) return null;
@@ -596,7 +658,7 @@ window.KDL = (() => {
     close(pos, exitPrice, basis, reason) {
       const idx = this.state.positions.indexOf(pos);
       if (idx < 0) return null;
-      const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)));
+      const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)), seriesTakerMult(pos.ticker));
       // Economic P&L in the traded side's price terms: (exit - entry) x count.
       // For settlements exitPrice IS the per-contract payout ($1 winner / $0
       // loser), so a losing settled position books gross = -entry x count —
@@ -751,13 +813,13 @@ window.KDL = (() => {
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
     feedAlerts, clearFeed, renderFeed, bubble, pushAlert, makeAlert,
-    scoreMarket, scoreAlert,
+    scoreMarket, scoreAlert, modelPick,
     AT,
     onRows: addRowsListener,
     onAlert: (cb) => (S.onAlert.add(cb), () => S.onAlert.delete(cb)),
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
-    esc, num, cents, money, takerFee, bandOf,
+    esc, num, cents, money, takerFee, seriesTakerMult, SERIES_TAKER_MULT, seriesOf, bandOf,
     markets: S.markets
   };
 })();
