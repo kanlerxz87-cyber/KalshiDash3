@@ -1456,3 +1456,15 @@ the landing page serves the 2026-11-22T06:17:12Z snapshot.
 | T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
 
 Claimed before any edit; no other session names these files in an open scope.
+
+### Results (T69, T70)
+
+| ID | Result | Evidence |
+|----|--------|----------|
+| T69 | **done** — `G19` in `data/findings.json` now carries `"status": "proposed"` (the only row missing one). `suggestions.html` renders it under `#prop` as before; no other field or row touched | `git diff` one hunk; `scripts/verify_release.py` PASS on the branch after the change; DOM test K prints `11 implemented, 10 proposed` and still finds `G19` under `#prop` |
+| T70 | **done** — independent spot re-verification of the ledger against the official pages it cites, 2026-11-22, all four read live in this session | (1) C-01..C-04 demo endpoints: `getting_started/demo_env` shows the same table verbatim (REST recommended `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS recommended `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`) — match. (2) C-NN candlestick claim: `api-reference/market/get-market-candlesticks` states `period_interval` enum is `1`, `60`, `1440` minutes — match, and the site's "seconds resolution is accumulated by the collector" wording follows from this. (3) Settlement page: yes/no settles at $1 per contract, scalar sub-cent settlement fee may apply — matches the site's handling of `scalar` results. (4) `kalshi.com/docs/kalshi-fee-schedule.pdf` remains the fee source cited by `simulation.html`/`roi.html`; not re-fetched this session — left as previously verified |
+| T71 | in progress | — |
+
+Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
+
+Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
