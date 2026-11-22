@@ -1441,3 +1441,21 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 - `https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45`, `KXBTCY-27JAN0100-B32500`, `KXBTCY-27JAN0100-B52500` (CF Benchmarks BRTI 60-second simple average settlement rules)
 
 
+
+---
+
+## Session `arena-84a04f5b` — live line-by-line verification against the official demo API + defect fixes (branch `arena/84a04f5b-kalshidash3`)
+
+Base: `a159dd3ab161043705a8761e1c6bd40999396da6` (`main`, collector snapshot `2026-11-22T06:17:12Z` / desk `07:18:21Z`).
+No open PRs when this session started; no other session held a live claim in the previous 60 minutes.
+
+**Claim (written before work, committed immediately).** This sandbox's shell has no route to `*.kalshi.co`
+(`curl` → `SSL_ERROR_SYSCALL`), but the session's page-fetch tool does reach the official demo API and
+`docs.kalshi.com`, so every check below is made against the live official source rather than the committed copy.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T70 | Re-verify the committed layer against the live official demo API: every `/verification.html` claim that is checkable by request, the five category seeds, the resolution record, and the ≥$0.10 alert provenance | in progress | arena-84a04f5b | `data/live/spotcheck.json`, `data/live/verification_live.json` (new) | Live `GET` against `https://external-api.demo.kalshi.co/trade-api/v2/...`, recorded with the exact query URL and response fields |
+| T71 | Fix defects found by that pass | unclaimed | arena-84a04f5b | `data/findings.json`, pages that render it, `scripts/tests/*` | `scripts/verify_release.py` PASS on the merged tree |
+
+Scope is deliberately narrow and touches no file another session owns.
