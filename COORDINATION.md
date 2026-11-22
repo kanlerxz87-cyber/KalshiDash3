@@ -3,6 +3,27 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-5c8e3f0a` — demo safety and current release audit
+
+Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; remote main equals base. Existing historical claims above are closed out in their later logs or older than 60 minutes; taking over only the narrow scopes below. This session stays on Arena's assigned branch (branch naming is fixed by the environment).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | done | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
+| S5C-2 | Publish current audit and safety finding, update executor instructions; final release integration, PR, merge, deploy verification | in progress | arena-5c8e3f0a | `COORDINATION.md` (this section), `README.md` (executor safety), `executive-summary.html` (new audit section only), `data/findings.json` (one uniquely prefixed finding) | Baseline `python3 scripts/verify_release.py` PASS, 21 pages. GitHub Pages API reports legacy main/root, built. Account credentials not available; no signed requests or orders attempted. |
+
+- 2026-11-22: Read coordination board before work; inspected repository and workflows, ran full baseline release gate (PASS). Found `base_url()` trusts substring `demo` and `KALSHI_ALLOW_PRODUCTION=1`, inconsistent with this demo-only brief. Official demo endpoint table confirms exactly two supported REST roots. Will remove override, disallow redirects, and test without using credentials or calling Kalshi.
+- S5C-2 scope clarification before editing: executive-summary scope also includes correcting unsupported statements that an account/key "does not exist" (only absence of supplied credentials is known), removing a claim that credentials are the sole remaining integration blocker, and adding official source links per row in its two existing tables. No other page/navigation files are claimed. Initial claim push pulled main because this new branch did not yet have a remote ref; subsequent pushes pull this branch explicitly.
+- S5C-1 implementation complete: exact demo REST roots (one trailing slash), production override removed, rejected URLs not echoed, endpoint validation before key load, no redirect following, finite positive quantity checks, no silent price rounding. `test_client_safety.py`: 11 tests PASS, including real urllib redirect/error processing with a socket-free HTTPS fixture for GET/POST/DELETE × 301/302/303/307/308 × same/different origins. No credential or external request used.
+- S5C-2 verification before PR: full `python3 scripts/verify_release.py` PASS (all Python/JS suites, DOM checks across 21 pages, internal links). New regression also confirms all 27 executive-summary data rows have an official documentation reference. Added dated audit and SAFE-5C-01 to the existing Flagged ledger, preserving older findings. Re-read official demo_env, api_keys, quick_start_websockets, market_settlement, get-markets, get-market-orderbook, create-order-v2 (body/response chunks 0–2), demo-account help, and GitHub Pages static-hosting docs. These confirm endpoint/authentication/contracts, not exchange execution, fresh external market values, profitability or causal attribution. All remain explicitly unverified where applicable. Existing source-ledger claims were not falsely re-dated.
+
+### Integration log — arena-5c8e3f0a
+
+- PR #92 CI passed on runs 45001469245, 45001945214 and 45002088813. Main advanced with PRs #93, #94 and #95 while checking. Retained all parallel-session changes, including G19 status, landing no-trade labelling, browser series fee multipliers, their tests and complete coordination notes.
+- Resolved append conflicts in COORDINATION.md by preserving main verbatim and inserting this own session section near the top (not competing for its end). Resolved data/findings.json by keeping main's F-83/F-84 entries and appending SAFE-5C-01 unchanged. Executive-summary fee wording auto-merged. No force push and no authenticated exchange request or order. Re-running the combined release gate before merge.
+
+---
+
 ## Task board
 
 | ID | Task | Status | Owner (session) | Files in scope | Sources / verification | Irregularities |
@@ -887,7 +908,33 @@ in favour of main's rows with the same content. Attribution for the original PR 
 `arena-a3070ffa` / `arena-17d4ecfa`; integration credit with the sessions above.
 
 **Self-inflicted defect, found and repaired in this session (recorded, not hidden).** The first merge-conflict
-resolution script edited greedily on the substring `<<<<<<< HEAD`, which also occurs inside a *quoted* board log
+resolution script edited greedily on the substring `## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
+
+Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
+**PASS** on this branch as checked out (21 pages, all suites, jsdom@26 installed). `curl` to the public site from the
+sandbox returns 000 (no direct egress to github.io), so live-site checks go through the fetch service, which confirmed
+the landing page serves the 2026-11-22T06:17:12Z snapshot.
+
+| ID | Task | Status | Owner | Files in scope |
+|----|------|--------|-------|----------------|
+| T69 | Close the open request from arena-981efed5: add the missing `"status": "proposed"` to suggestion `G19` in `data/findings.json` | in progress | arena-38b89a30 | `data/findings.json` (G19 row only), `COORDINATION.md` (this section) |
+| T70 | Independent spot re-verification of ledger claims (C-nn) against the official Kalshi documentation pages they cite; record result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+| T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
+
+Claimed before any edit; no other session names these files in an open scope.
+
+### Results (T69, T70)
+
+| ID | Result | Evidence |
+|----|--------|----------|
+| T69 | **done** — `G19` in `data/findings.json` now carries `"status": "proposed"` (the only row missing one). `suggestions.html` renders it under `#prop` as before; no other field or row touched | `git diff` one hunk; `scripts/verify_release.py` PASS on the branch after the change; DOM test K prints `11 implemented, 10 proposed` and still finds `G19` under `#prop` |
+| T70 | **done** — independent spot re-verification of the ledger against the official pages it cites, 2026-11-22, all four read live in this session | (1) C-01..C-04 demo endpoints: `getting_started/demo_env` shows the same table verbatim (REST recommended `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS recommended `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`) — match. (2) C-NN candlestick claim: `api-reference/market/get-market-candlesticks` states `period_interval` enum is `1`, `60`, `1440` minutes — match, and the site's "seconds resolution is accumulated by the collector" wording follows from this. (3) Settlement page: yes/no settles at $1 per contract, scalar sub-cent settlement fee may apply — matches the site's handling of `scalar` results. (4) `kalshi.com/docs/kalshi-fee-schedule.pdf` remains the fee source cited by `simulation.html`/`roi.html`; not re-fetched this session — left as previously verified |
+| T71 | in progress | — |
+
+Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
+
+Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
+, which also occurs inside a *quoted* board log
 entry (the T17 README note about committed conflict markers). The edit deleted the 2026-11-20…2026-11-21T07:00Z
 session history (~800 lines, 17 `## Session` sections) from this file between the T17 sentence and this session's
 block. It was found by diffing the `## Session` headings against `origin/main` before opening the PR. Repair: the
@@ -1442,55 +1489,33 @@ Preserves 100% of `main`'s merged work (`F-73`–`F-81`, `D-01`, `C-nn`, `data-c
 
 
 
+---
 
-## Session `arena-5c8e3f0a` — demo safety and current release audit
+## Session `arena-ae1f84b0` — audit of the shipped tree at 2026-11-22T08:0xZ (branch `arena/ae1f84b0-kalshidash3`)
 
-Branch `arena/5c8e3f0a-kalshidash3`, base `a159dd3`. No open PRs at claim time; remote main equals base. Existing historical claims above are closed out in their later logs or older than 60 minutes; taking over only the narrow scopes below. This session stays on Arena's assigned branch (branch naming is fixed by the environment).
+Base: `a159dd3ab161043705a8761e1c6bd40999396da6` (`main`, "data: live-desk scan 2026-11-22T07:21Z"); branch created equal to `main`.
+Checked for parallel work **before** claiming: `gh pr list --state open` is empty, no branch on `origin` is ahead of `main`, and the
+only Actions work in flight is the scheduled collector / desk scan on `main` (which writes `data/live/*` only).
+`python3 scripts/verify_release.py` on the base tree: **PASS** (21 pages, all suites). So this session does not rebuild what already
+works; its scope is the defects the existing gates do not cover.
 
-| ID | Task | Status | Owner | Files in scope | Verification / sources |
-|----|------|--------|-------|----------------|------------------------|
-| S5C-1 | Fail-closed demo executor boundary, reject spoofed endpoints/redirects, validate order input locally; regression tests | done | arena-5c8e3f0a | `scripts/kalshi_client.py`, `scripts/tests/test_client_safety.py` (new) | Official demo roots read 2026-11-22: https://docs.kalshi.com/getting_started/demo_env ; signing: https://docs.kalshi.com/getting_started/api_keys |
-| S5C-2 | Publish current audit and safety finding, update executor instructions; final release integration, PR, merge, deploy verification | in progress | arena-5c8e3f0a | `COORDINATION.md` (this section), `README.md` (executor safety), `executive-summary.html` (new audit section only), `data/findings.json` (one uniquely prefixed finding) | Baseline `python3 scripts/verify_release.py` PASS, 21 pages. GitHub Pages API reports legacy main/root, built. Account credentials not available; no signed requests or orders attempted. |
+| ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-----------------|---------------------------|------------------------|----------------|
+| T70 | Landing table: a topic with **no traded market** currently headlines an arbitrary zero-volume listing and prints `$0 / 0.0¢ / 0 / 0` under the label "Largest live market" (measured: Culture, 51 open rows, `volume_fp` 0 on all 51, 2026-11-22T06:17Z snapshot). Label it as untraded, rank untraded topics by nearest published `close_time`, and say so in the footnote | in progress | arena-ae1f84b0 | `index.html` (the `#today` block + its footnote only), `scripts/tests/test_pages_dom.js` (Test F only) | `data/live/markets.json` (committed snapshot: `volume_fp`, `close_time`, `last_price_dollars` per row); `docs.kalshi.com` field semantics in `data/verified_facts.json` C-nn | New — the gate tested that a row *exists*, never that a zero-volume row is labelled |
+| T71 | Close the open request from `arena-981efed5`: `G19` in `data/findings.json` has no `status` key (the only suggestion without one), and record this session's finding as **F-83** | in progress | arena-ae1f84b0 | `data/findings.json` (G19 status append + F-83 append only) | `data/findings.json` contract read by `suggestions.html`; ledger shape re-checked by `scripts/check_site.py` | Request was logged in COORDINATION (T65) but never applied to the ledger |
+| T72 | Line-by-line re-verification of the external links the site publishes (24 `docs.kalshi.com` rows in `data/verified_facts.json` `doc_links`; catalyst-review links in `data/catalyst_review.json`), recorded with the exact URL fetched | in progress | arena-ae1f84b0 | `COORDINATION.md` (§ this session only) | `https://docs.kalshi.com/llms.txt` (official index) + each cited URL | T57 verified these once; nothing re-checks them, and `check_site.py` is internal-only |
+| T73 | Release gate, PR → `main`, merge without waiting, confirm the GitHub Pages deploy, record the PR link and result here | in progress | arena-ae1f84b0 | `COORDINATION.md` (§ this session only) | `scripts/verify_release.py`, Actions API, live URL fetch | DEPLOY-1 (Pages source is legacy branch publishing; API token gets 403) still open — not this session's to fix |
 
-- 2026-11-22: Read coordination board before work; inspected repository and workflows, ran full baseline release gate (PASS). Found `base_url()` trusts substring `demo` and `KALSHI_ALLOW_PRODUCTION=1`, inconsistent with this demo-only brief. Official demo endpoint table confirms exactly two supported REST roots. Will remove override, disallow redirects, and test without using credentials or calling Kalshi.
-- S5C-2 scope clarification before editing: executive-summary scope also includes correcting unsupported statements that an account/key "does not exist" (only absence of supplied credentials is known), removing a claim that credentials are the sole remaining integration blocker, and adding official source links per row in its two existing tables. No other page/navigation files are claimed. Initial claim push pulled main because this new branch did not yet have a remote ref; subsequent pushes pull this branch explicitly.
-- S5C-1 implementation complete: exact demo REST roots (one trailing slash), production override removed, rejected URLs not echoed, endpoint validation before key load, no redirect following, finite positive quantity checks, no silent price rounding. `test_client_safety.py`: 11 tests PASS, including real urllib redirect/error processing with a socket-free HTTPS fixture for GET/POST/DELETE × 301/302/303/307/308 × same/different origins. No credential or external request used.
-- S5C-2 verification before PR: full `python3 scripts/verify_release.py` PASS (all Python/JS suites, DOM checks across 21 pages, internal links). New regression also confirms all 27 executive-summary data rows have an official documentation reference. Added dated audit and SAFE-5C-01 to the existing Flagged ledger, preserving older findings. Re-read official demo_env, api_keys, quick_start_websockets, market_settlement, get-markets, get-market-orderbook, create-order-v2 (body/response chunks 0–2), demo-account help, and GitHub Pages static-hosting docs. These confirm endpoint/authentication/contracts, not exchange execution, fresh external market values, profitability or causal attribution. All remain explicitly unverified where applicable. Existing source-ledger claims were not falsely re-dated.
+Ownership note: `data/live/*` is written by the scheduled workflows on `main` only; this session never edits it by hand.
+`data/findings.json` is in this session's scope only while no other branch is open (verified above); if another session opens one
+before the push, this session merges rather than overwrites and says so in the log.
 
-## Session `arena-38b89a30` — closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)
+### Log (this session)
+- 2026-11-22 08:0xZ: claim written and pushed before any file edit. Base-tree gate re-run: PASS.
 
-Base: `a159dd3` (`main`, live-desk scan 2026-11-22T07:21Z). Executor state on claim: `python3 scripts/verify_release.py`
-**PASS** on this branch as checked out (21 pages, all suites, jsdom@26 installed). `curl` to the public site from the
-sandbox returns 000 (no direct egress to github.io), so live-site checks go through the fetch service, which confirmed
-the landing page serves the 2026-11-22T06:17:12Z snapshot.
-
-| ID | Task | Status | Owner | Files in scope |
-|----|------|--------|-------|----------------|
-| T69 | Close the open request from arena-981efed5: add the missing `"status": "proposed"` to suggestion `G19` in `data/findings.json` | in progress | arena-38b89a30 | `data/findings.json` (G19 row only), `COORDINATION.md` (this section) |
-| T70 | Independent spot re-verification of ledger claims (C-nn) against the official Kalshi documentation pages they cite; record result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
-| T71 | Close-out: release gate → PR → merge without waiting → confirm Pages deploy → record PR link/result | in progress | arena-38b89a30 | `COORDINATION.md` (this section only) |
-
-Claimed before any edit; no other session names these files in an open scope.
-
-### Results (T69, T70)
-
-| ID | Result | Evidence |
-|----|--------|----------|
-| T69 | **done** — `G19` in `data/findings.json` now carries `"status": "proposed"` (the only row missing one). `suggestions.html` renders it under `#prop` as before; no other field or row touched | `git diff` one hunk; `scripts/verify_release.py` PASS on the branch after the change; DOM test K prints `11 implemented, 10 proposed` and still finds `G19` under `#prop` |
-| T70 | **done** — independent spot re-verification of the ledger against the official pages it cites, 2026-11-22, all four read live in this session | (1) C-01..C-04 demo endpoints: `getting_started/demo_env` shows the same table verbatim (REST recommended `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS recommended `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`) — match. (2) C-NN candlestick claim: `api-reference/market/get-market-candlesticks` states `period_interval` enum is `1`, `60`, `1440` minutes — match, and the site's "seconds resolution is accumulated by the collector" wording follows from this. (3) Settlement page: yes/no settles at $1 per contract, scalar sub-cent settlement fee may apply — matches the site's handling of `scalar` results. (4) `kalshi.com/docs/kalshi-fee-schedule.pdf` remains the fee source cited by `simulation.html`/`roi.html`; not re-fetched this session — left as previously verified |
-| T71 | in progress | — |
-
-Live-site check from this session (via the fetch service; direct egress `curl` from the sandbox to github.io returns 000): the landing page serves the committed `2026-11-22T06:17:12Z` snapshot and honestly shows it is 2 h stale with the cadence banner; all five category KPIs render; `Live desk`, `ROI model`, `Alert chats` links resolve.
+### Additional claim (T74) — added before editing assets/ and portfolio.html
 
 Irregularities carried (unchanged, on the Flagged page): no demo API keys provided (F-07), the high-ROI screen is an unvalidated heuristic (F-14/F-26/F-77), cause links are search leads with no official cause feed (F-25), 20 out-of-scope Test-series swings withheld and counted (F-76), Pages legacy-publisher limitation (DEPLOY-1). No new irregularity was introduced by this session.
-
-
-
-### Integration log — arena-5c8e3f0a
-
-- While PR #92 was checking, main received PR #93 (G19 status and coordination notes) and the 08:07Z ROI snapshot. Integrated both without discarding any change. A COORDINATION.md append/append conflict was resolved by retaining both complete session sections; data/findings.json auto-merged the separate G19 and SAFE-5C-01 changes. Caught and removed unresolved board markers before pushing, and added a regression to prevent their publication. No authenticated exchange request or order was made.
-
-- arena-5c8e3f0a: final combined-tree `verify_release.py` PASS after PR #93 integration (including 11 safety/publication tests and no unresolved board markers). PR #92 initial CI build 45001469245 passed; final-head CI required again before merge.
 
 ### Close-out (T71)
 
@@ -1504,5 +1529,34 @@ Irregularities carried (unchanged, on the Flagged page): no demo API keys provid
 
 T69, T70, T71 are all **done**. No file outside `data/findings.json` (one row) and this section of `COORDINATION.md` was modified by this session.
 
+| ID | Task | Status | Owner (session) | Files in scope (exclusive) | Sources / verification | Irregularities |
+|----|------|--------|-----------------|---------------------------|------------------------|----------------|
+| T74 | Apply the fee schedule's **per-series taker multiplier** in the browser paper ledgers (`assets/alerts.js`, `assets/engine.js`, `portfolio.html`): all three charge a flat 0.07 and therefore charge a fee on series the official table lists at M = 0 | in progress | arena-ae1f84b0 | `assets/alerts.js`, `assets/engine.js`, `portfolio.html` (fee helper + its disclosure text), `executive-summary.html` (one sentence), `scripts/tests/engine.test.js`, `scripts/tests/test_fee_multipliers.js` (new), `scripts/verify_release.py` (test list only), `data/findings.json` (F-84 append only) | `https://kalshi.com/docs/kalshi-fee-schedule.pdf` — read this session, "Non-Standard Fees": KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0, KXAAAGASM 1/1, KXEMMY* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1, default M = 1; `data/strategies.json` `fee_model.multipliers` already carries the same table for `scripts/simulate.py` | New — measured on `data/live/alerts.json`: **44 of 61** archived alerts are KXBTCY, so most of the paper ledger was charged a fee the schedule says is zero. `portfolio.html` disclosed the simplification, so this is an accuracy defect, not a hidden claim (recorded as F-84) |
 
-- arena-5c8e3f0a: PR #92 final-head CI run 45001945214 passed. Merge initially refused because parallel PR #94 appended a closeout to the board; integrated main again, retained both append-only logs, reran safety/publication tests. Only the coordination log changed since the full green release.
+
+### T72 — external-link re-verification (the gap the DOM gate cannot cover)
+
+`scripts/check_site.py` resolves **internal** links only, and `test_verification_links.js` asserts a row's *hostname*, not that the
+page exists. This session therefore re-fetched every external source the ledger publishes and checked the claim against the live page.
+
+| Claim set | How it was verified this session | Result |
+|---|---|---|
+| The 24 `docs.kalshi.com` rows in `data/verified_facts.json` → `doc_links` | Fetched the official sitemap `https://docs.kalshi.com/sitemap.xml` (all 4 chunks, `lastmod` 2026-11-22T01:01Z for the API-reference pages) and matched every slug: `api-reference/events/get-events`, `api-reference/historical/get-historical-market-candlesticks`, `api-reference/market/get-market-candlesticks`, `…/get-market-orderbook`, `…/get-markets`, `…/get-multiple-market-orderbooks`, `…/get-series-list`, `api-reference/orders/create-order-v2`, `api-reference/portfolio/get-balance`, `…/get-fills`, `…/get-positions`, `getting_started/api_environments`, `…/api_keys`, `…/demo_env`, `…/historical_data`, `…/market_lifecycle`, `…/market_settlement`, `…/orderbook_responses`, `…/pagination`, `…/quick_start_create_order`, `…/quick_start_market_data`, `…/quick_start_websockets`, `…/rate_limits`, `welcome` | **24/24 present.** No dead docs link, no renamed slug |
+| Fee schedule `https://kalshi.com/docs/kalshi-fee-schedule.pdf` (cited 20+ times) | Fetched and read | Live, "Last updated and effective: July 7, 2026". General taker `ceil(M × 0.07 × C × P × (1−P))`, maker `0.0175`, "There is no settlement fee", default `M = 1`; Non-Standard table: **KXBTCY 0/0, KXETHY 0/0, KXELECTIRAN 0/0**, KXAAAGASM 1/1, KXEMMY\* 1/1, KXBTCMAX150 1/1, KXBALLONDOR 1/1 → **F-84** (below) |
+| Gas catalyst `https://gasprices.aaa.com/` (ledger: AAA 11/21/26 national regular `$3.6594`, down `$0.0304` vs yesterday) | Fetched | Page shows **$3.6594, "Price as of 11/21/26"**, yesterday **$3.6898** → difference **$0.0304**. Claim confirmed exactly |
+| Golf catalyst `https://www.pgatour.com/tournaments/2026/the-rsm-classic/R2026493/leaderboard` (ledger: R3 suspended for rain, no Saturday play, Michael Thorbjornsen T1 at −9) | Fetched | Page shows **"R3 Suspended"**, "Play has been suspended … due to rain", "there will be no play today. Round 3 will be on Sunday", leaderboard **T1 Thorbjornsen −9**. Claim confirmed exactly |
+| Exchange endpoints (`external-api.demo.kalshi.co`) and Coinbase candle URLs in the catalyst ledger | **Not re-fetched**: this sandbox has no network route to Kalshi or Coinbase (verified: `curl` exit 35 / HTTP 000). Their values remain as recorded by the sessions that fetched them, and are labelled as such on the page | **Unverified here — not contradicted.** Recorded rather than implied |
+
+### Overlap found and logged (board rule)
+
+- **G19 status**: `arena/38b89a30` claimed the same fix (claim `627960b`, fix `2a39999`, PR **#93** open) after this session's claim.
+  This session had set `"status": "proposed"` on G19; to avoid duplicate/conflicting edits of the same line it **adopted theirs and
+  reverted its own**, leaving `data/findings.json` G19 untouched here. PR #93 owns that row.
+- **Files that another open PR also edits**: PR **#92** (`arena/5c8e3f0a`) touches `data/findings.json` and `executive-summary.html`;
+  this session's edits there are additive (F-83/F-84 entries; one sentence about the fee multiplier). If #92 merges first, this branch
+  merges `main` again and keeps both sides verbatim; nothing is force-pushed.
+
+### Log (continued)
+- 2026-11-22 08:1xZ: T70 done (`2febcb3`), T74 done (`85d17d0`), ledgers updated (`8898bfd`). `scripts/verify_release.py` **PASS** on the
+  pre-change base and again on the changed tree (21 pages, all suites, including the new fee-multiplier test). `check_site.py` OK.
+

@@ -65,12 +65,28 @@ window.KDL = (() => {
 
   function money(v, d = 2) { return v === null || v === undefined ? "—" : "$" + Number(v).toFixed(d); }
 
+  // Per-series taker multipliers M from the "Non-Standard Fees" table of the official fee
+  // schedule (https://kalshi.com/docs/kalshi-fee-schedule.pdf, July 7, 2026 update). A series
+  // listed at M = 0 pays NO trading fee. Without this table the live auto-sim charged the
+  // general rate on KXBTCY — the series that dominates the demo's alert feed (44 of 61
+  // archived alerts at 2026-11-22T06:17Z) — so its paper P&L was overstated in cost (F-84).
+  // Absent series use M = 1, the documented default. Same table as data/strategies.json.
+  const SERIES_TAKER_MULT = { KXBTCY: 0, KXETHY: 0, KXELECTIRAN: 0 };
+
+  function seriesOf(ticker) { return String(ticker || "").split("-")[0].toUpperCase(); }
+
+  function seriesTakerMult(ticker) {
+    const s = seriesOf(ticker);
+    return Object.prototype.hasOwnProperty.call(SERIES_TAKER_MULT, s) ? SERIES_TAKER_MULT[s] : 1;
+  }
+
   function takerFee(count, price, mult = 1) {
     // Documented general taker rate: fee = ceil(M x 0.07 x C x P x (1-P)) in cents.
     // https://kalshi.com/docs/kalshi-fee-schedule.pdf — per-series multipliers can differ.
     // The product is rounded to 6 decimals BEFORE the cent-ceil so float noise
     // (0.07*100*0.5*0.5*100 = 175.00000000000003) cannot overcharge a cent.
     if (!(count > 0) || !(price > 0) || price >= 1) return null;
+    if (!mult) return 0;              // M = 0 in the schedule: no trading fee at all
     const centsRaw = mult * 0.07 * count * price * (1 - price) * 100;
     return Math.ceil(Number(centsRaw.toFixed(6))) / 100;
   }
@@ -564,7 +580,7 @@ window.KDL = (() => {
       }
       const st = STRATS[sid];
       const count = opts.size || st.size;
-      const feeIn = takerFee(count, fill);
+      const feeIn = takerFee(count, fill, seriesTakerMult(row.ticker));
       if (feeIn === null) return null;
       const cost = count * fill + feeIn;
       if (cost > this.state.cash) return null;
@@ -596,7 +612,7 @@ window.KDL = (() => {
     close(pos, exitPrice, basis, reason) {
       const idx = this.state.positions.indexOf(pos);
       if (idx < 0) return null;
-      const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)));
+      const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)), seriesTakerMult(pos.ticker));
       // Economic P&L in the traded side's price terms: (exit - entry) x count.
       // For settlements exitPrice IS the per-contract payout ($1 winner / $0
       // loser), so a losing settled position books gross = -entry x count —
@@ -757,7 +773,7 @@ window.KDL = (() => {
     onAlert: (cb) => (S.onAlert.add(cb), () => S.onAlert.delete(cb)),
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
-    esc, num, cents, money, takerFee, bandOf,
+    esc, num, cents, money, takerFee, seriesTakerMult, SERIES_TAKER_MULT, seriesOf, bandOf,
     markets: S.markets
   };
 })();

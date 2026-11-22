@@ -258,10 +258,32 @@ const KDA = (() => {
    * ------------------------------------------------------------------ */
   const TRADE_FEE_RATE = 0.07; // general taker fee: 0.07 × C × P × (1−P) — official fee schedule
 
+  // Per-series taker multipliers M from the "Non-Standard Fees" table of the official fee
+  // schedule (https://kalshi.com/docs/kalshi-fee-schedule.pdf, July 7, 2026 update). The
+  // formula is fee = ceil(M × 0.07 × C × P × (1−P)), so a series listed at M = 0 pays NO
+  // trading fee and charging it the general rate overstates its cost. Measured on
+  // data/live/alerts.json at 2026-11-22T06:17Z: 44 of the 61 archived alerts are KXBTCY,
+  // i.e. most of this page's paper ledger used to be charged a fee the exchange does not
+  // charge (F-84). Series absent from this table — including series absent from the
+  // schedule entirely — use M = 1, the documented default ("M defaults to 1 unless
+  // otherwise indicated"). scripts/simulate.py reads the same values from
+  // data/strategies.json fee_model.multipliers, so the browser and server ledgers agree.
+  const SERIES_TAKER_MULT = { KXBTCY: 0, KXETHY: 0, KXELECTIRAN: 0 };
+  function seriesOf(ticker) { return String(ticker || "").split("-")[0].toUpperCase(); }
+  function takerMult(ticker) {
+    const s = seriesOf(ticker);
+    return Object.prototype.hasOwnProperty.call(SERIES_TAKER_MULT, s) ? SERIES_TAKER_MULT[s] : 1;
+  }
+
   // Rounded up to the cent exactly like the manual paper ledger on portfolio.html
-  // (`ceil(0.07 × C × P × (1−P) × 100) / 100`), so both ledgers use the same math.
-  function fee(contracts, price) {
-    return Math.ceil(TRADE_FEE_RATE * contracts * price * (1 - price) * 100) / 100;
+  // (`ceil(M × 0.07 × C × P × (1−P) × 100) / 100`), so both ledgers use the same math.
+  function fee(contracts, price, ticker) {
+    const m = takerMult(ticker);
+    if (!m) return 0;
+    // Round the float product to 6 decimals BEFORE the cent-ceil, exactly as assets/engine.js
+    // and the old portfolio.html copy did: 0.07 x 100 x 0.5 x 0.5 x 100 evaluates to
+    // 175.00000000000003, and a naive ceil charged $1.76 for a documented $1.75 (F-84).
+    return Math.ceil(Number((TRADE_FEE_RATE * m * contracts * price * (1 - price) * 100).toFixed(6))) / 100;
   }
 
   function replayStrategies({ markets, hist, liq, stake = 100, topPerCat = 5, strategies = ["S1", "S2", "S3", "S4"] }) {
@@ -335,7 +357,7 @@ const KDA = (() => {
             if (id === "S3" && inBand && Math.abs(move) < 0.10) { pos.set(key, { lastObs: { price: ev.last, vol: ev.vol }, skipped: true }); continue; }
             const contracts = Math.floor(stake / fill);
             if (contracts >= 1) {
-              const f = fee(contracts, fill);
+              const f = fee(contracts, fill, ev.ticker);
               cash -= contracts * fill + f;
               tradeId++;
               pos.set(key, {
@@ -352,7 +374,7 @@ const KDA = (() => {
           p.lastObs = { price: ev.last, vol: ev.vol };
           if (ev.last <= p.peak - 0.05) {
             const fill = ev.bid && ev.bid > 0 && ev.bid < 1 ? ev.bid : ev.last;
-            const f = fee(p.contracts, fill);
+            const f = fee(p.contracts, fill, p.ticker);
             cash += p.contracts * fill - f;
             trades.push({
               id: p.id, strategy: p.strategy, ticker: p.ticker, title: p.row.title, category_id: p.row.category_id,
@@ -389,7 +411,7 @@ const KDA = (() => {
         if (!side || fill === null) continue;
         const contracts = Math.floor(stake / fill);
         if (contracts < 1) continue;
-        const f = fee(contracts, fill);
+        const f = fee(contracts, fill, ticker);
         cash -= contracts * fill + f;
         tradeId++;
         pos.set("S4:" + ticker, {
@@ -454,5 +476,5 @@ const KDA = (() => {
     };
   }
 
-  return { MODEL, RESEARCH, scoreAlert, loadJSON, normalizeAlert, normalizeFeed, indexMarkets, indexLiquidity, makeChat, makeSim, replayStrategies, fee, TRADE_FEE_RATE, mulberry32, esc, cents, num };
+  return { MODEL, RESEARCH, scoreAlert, loadJSON, normalizeAlert, normalizeFeed, indexMarkets, indexLiquidity, makeChat, makeSim, replayStrategies, fee, TRADE_FEE_RATE, SERIES_TAKER_MULT, takerMult, seriesOf, mulberry32, esc, cents, num };
 })();
