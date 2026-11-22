@@ -272,6 +272,20 @@ function commonAsserts(label, r) {
             `lead row ${i}: links must carry target=_blank rel=noopener`);
         });
       });
+      // F-93: the verdict identifier is a key, not a sentence. Every state must resolve to a
+      // human label, and the relation line must name which published series it is quoting.
+      const rawStates = ["best_quote_did_not_move", "reference_not_publicly_readable",
+        "published_reference_on_the_same_side_as_the_move", "no_external_move_supporting_this_swing"];
+      const leadText = box.textContent || "";
+      for (const s of rawStates) {
+        check(!leadText.includes(s), `alerts.html must not print the raw verdict identifier "${s}" (F-93)`);
+      }
+      check(/best bid and ask were identical/.test(leadText),
+        "alerts.html must render a human label for best_quote_did_not_move (F-93)");
+      check(/no public read/.test(leadText),
+        "alerts.html must render a human label for reference_not_publicly_readable (F-93)");
+      check(!/reference 3\.6594/.test(leadText) || /AAA US national average/.test(leadText),
+        "the AAA row must name the series it quotes rather than the bare word 'reference' (F-93)");
     } else {
       check(/No lead file has been published yet|could not be loaded/i.test(r.text),
         "with no lead file the page must say so instead of rendering nothing");
@@ -514,28 +528,38 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
-    // S-02 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING WINDOW, not the
-    // number the scan found in scope. The page must state the scan total
+    // S-02 / F-90 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING
+    // WINDOW, not the number the scan found in scope. The page must state the scan total
     // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
     // and never label either the window or the stored cap "in scope".
     const inScope = markets.counts.settled_in_scope_total ?? markets.counts.settled_in_scope;
+    const kept = markets.counts.settled_kept_window || markets.counts.settled_in_scope;
     const window_ = markets.counts.settled_in_scope;
     const stored = (markets.settled_markets || []).length;
     const flat = r.text.replace(/\s+/g, " ");
     check(flat.includes(inScope.toLocaleString()),
       `the KPI and banner must state the in-scope scan total (${inScope})`);
+    check(flat.includes(kept.toLocaleString()),
+      `the page must name the kept window (${kept}) as a number of its own`);
     check(flat.includes(stored.toLocaleString()),
       `the KPI or banner must name the published settled rows (${stored})`);
     // the original defect: a smaller count printed as the in-scope total
     check(!flat.includes(stored.toLocaleString() + " settled markets in scope"),
       `the published count (${stored}) must never be printed as "settled markets in scope"`);
     check(!flat.includes(stored.toLocaleString() + " settled rows in scope"),
-      `the published count (${stored}) must never be printed as "settled rows in scope"`);
+      `the stored count (${stored}) must never be printed as "settled rows in scope"`);
+    // F-90: the kept window (1,600) is not the scan total (6,927) and must not be called "in scope"
+    check(!flat.includes(kept.toLocaleString() + " settled in scope"),
+      `the kept window (${kept}) must not be printed as "settled in scope" — that phrase belongs to the scan total`);
     if (window_ && window_ !== stored) {
       check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
-    console.log(`  H index KPI     ok  (${stored} published rows named, ${inScope} in-scope scan total stated)`);
+    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
+    check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+    check(/Untraded topics in this snapshot/.test(flat),
+      "the page must name the untraded topics below the table (F-83)");
+    console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }
 
@@ -687,7 +711,17 @@ function commonAsserts(label, r) {
       "executive-summary.html must not advertise the retired 20-minute cadence (R-B8)");
     check(!/alerts-page auto-sim/.test(bodyText),
       "executive-summary.html must point auto-sim references at trading.html, not alerts.html (R-4)");
-    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, ${fd.suggestions.length} suggestions, ${fd.questions.length} questions)`);
+    // F-92: the catalyst row must state the coverage that is in the file, not a typed "done".
+    const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"));
+    const catLine = (r.doc.querySelector("#catCoverage") || {}).textContent || "";
+    const catStatus = (r.doc.querySelector("#catStatus") || {}).textContent || "";
+    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`),
+      `executive-summary.html must render the catalyst coverage from data/live/catalysts.json (got: ${catLine})`);
+    check(cat.counts.reviewed === cat.counts.archive_total || /partial/.test(catStatus),
+      `the catalyst status must say "partial" while any swing is unreviewed (got: ${catStatus})`);
+    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, `
+      + `${fd.suggestions.length} suggestions, ${fd.questions.length} questions, catalysts `
+      + `${cat.counts.reviewed}/${cat.counts.archive_total})`);
     r.close();
   }
   if (problems.length) {

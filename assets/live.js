@@ -1,7 +1,7 @@
 /* KalshiDash3 — browser-live layer (T13/T14/T15, session arena-d022c8de)
  *
  * Why this file exists: every other surface on this site renders a snapshot
- * committed by a scheduled collector (https://.../actions/workflows/collect.yml,
+ * committed by a scheduled collector (.github/workflows/collect.yml,
  * about every 15 minutes while the relay runs; each page shows the snapshot age).
  * That is auditable but it is not live. This layer talks to
  * the official public demo REST API directly from the page, so the alert chat and

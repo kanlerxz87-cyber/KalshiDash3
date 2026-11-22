@@ -96,12 +96,12 @@ check("isQaRow," in site_js, "isQaRow must be exported from the KD object")
 index_html = (ROOT / "index.html").read_text()
 check("KD.isQaRow(r)" in index_html, "index.html must skip QA fixtures when picking the largest market")
 # Three sessions have now worded this line differently; what matters (F-37/F-38, restated by S-02
-# on 2026-11-22) is that the count of PUBLISHED settled rows and the count the scan FOUND IN SCOPE
-# are both rendered as labelled, distinct values, and that neither is presented as the other.
-# S-02 was the exact failure: index.html read counts.settled_in_scope (the 1,600-row retained
-# paging window) and called it "settled markets in scope" while counts.settled_in_scope_total
-# held the scan total (6,927). The page now names the scan total, prints how it was obtained,
-# and labels the rows it lists as published.
+# on 2026-11-22 and by F-90 in parallel) is that the count of PUBLISHED settled rows and the count
+# the scan FOUND IN SCOPE are both rendered as labelled, distinct values, and that neither is
+# presented as the other. S-02 was the exact failure: index.html read counts.settled_in_scope
+# (the 1,600-row retained paging window) and called it "settled markets in scope" while
+# counts.settled_in_scope_total held the scan total (6,927). The page now names the scan total,
+# prints how it was obtained, and labels the rows it lists as published.
 check("settled_in_scope_total" in index_html,
       "index.html must render counts.settled_in_scope_total as the in-scope settled figure (S-02)")
 check("settled_in_scope_total_method" in index_html,
@@ -287,6 +287,10 @@ if live.exists():
 #    scan total. The collector now publishes both; assert that wherever a settled total is
 #    labelled "in scope" the page reads settled_in_scope_total, and that the stored count is
 #    labelled as stored/published.
+#
+#    (This section used to sit BELOW the verdict, so every assertion in it was
+#    unreachable-by-failure — the run printed "OK" and exited 0 while three of these checks were
+#    failing. The verdict is now the last statement in the file, so a failing check fails the run.)
 site_js = (ROOT / "assets" / "site.js").read_text()
 check("settled_in_scope_total" in site_js,
       "assets/site.js must read counts.settled_in_scope_total for the in-scope settled figure (F-72)")
@@ -319,12 +323,34 @@ check("open_published_rows" in categories_html,
 check("KD.num(snap.counts.open_in_scope)}" not in categories_html,
       "categories.html must not label the published open-row count as the scan total (S-02)")
 
+# 6. F-90: the three settled counts are different numbers and must not share one phrase.
+#    counts.settled_in_scope is the KEPT WINDOW (post-trim); settled_in_scope_total is the scan
+#    total; settled_published is what the pages render. index.html used to print the kept window
+#    as "settled in scope" while its own banner printed the scan total under the same words.
+#    (S-02 on main fixed the same wording from the other direction; both sets of assertions are
+#    kept, because they fail on different regressions.)
+kpi = index_html.split("Resolved yes/no captured", 1)[-1].split("],", 1)[0]
+check("settled_published" in kpi and "settled_in_scope_total" in kpi,
+      "index.html's settled KPI must read settled_published and settled_in_scope_total, not the kept window")
+check("settled_kept_window" in index_html,
+      "index.html must name the kept window as a number of its own, never as the scan total (F-90)")
+
+# 7. F-83 (main, PR #94/#95): a topic where NO open row has traded must be labelled `untraded`
+#    rather than presented as a ranking. The assertion here is on the shipped wording, so a
+#    refactor cannot quietly drop the disclosure.
+check("untraded" in index_html,
+      "index.html must label a topic with no traded market as 'untraded' (F-83)")
+check("Untraded topics in this snapshot" in index_html,
+      "index.html must name the untraded topics below the table (F-83)")
+
 
 # The report MUST be last. Before 2026-11-22 this block sat above the F-72 checks, so the
 # suite printed OK and exited 0 before any of them ran: nine assertions were dead code and
 # three of them were false at the time (the collector published no open_published_rows, no
 # settled_published_rows and no settled_in_scope_total_method). Found by running the file and
-# grepping collect.py for the fields the dead checks demanded.
+# grepping collect.py for the fields the dead checks demanded. This session (arena-d34a9f0d)
+# found the same defect independently and recorded it; main's fix was adopted rather than
+# duplicated, so no finding id is published for it here.
 if errors:
     print("FAIL")
     for e in errors:

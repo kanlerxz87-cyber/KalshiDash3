@@ -921,6 +921,18 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # FULL in-scope list first, and only the leftover window is trimmed for file size.
     rows["settled"], settled_published, settled_by_cat = split_and_select_settled(rows["settled"])
     rows["settled"] = rows["settled"][:SETTLED_KEEP]
+    # How the in-scope settled total was obtained, published with the number so the page can
+    # print the method instead of a bare count. Two sessions have now worded this line
+    # differently and a third left it out; the string lives here, next to the value it describes.
+    settled_scan_truncated = bool(raw.get("_truncated", {}).get("settled"))
+    settled_total_method = (
+        "exact count of every settled row the paged scan returned inside the five topics, "
+        "measured before the per-topic publish selection and before the size window"
+        + ("; the scan stopped at the safety cap, so this is a lower bound"
+           if settled_scan_truncated else "; the scan was not truncated, so this is exact")
+        + f" (safety_scan_cap {SAFETY_SCAN_CAP}, kept window {SETTLED_KEEP}, "
+          f"published {len(settled_published)} across the five topics)"
+    )
 
     # Liquidity depth for the top few open markets per category.
     depth_rows = []
@@ -1037,6 +1049,11 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "settled_published": len(settled_published),
             "settled_publish_cap": SETTLED_PUBLISH_CAP,
             "settled_published_by_category": settled_by_cat,
+            "settled_in_scope_total_method": settled_total_method,
+            # The row counts the pages actually render, named as counts rather than inferred
+            # from the length of a list that is itself capped.
+            "open_published_rows": len(rows["open"]),
+            "settled_published_rows": len(settled_published),
             "historical_cutoff_market_settled_ts": hist_cutoff,
             "historical_backfill_rows": len(hist_rows),
             "price_history_backfilled_from_candles": hist_backfilled,
