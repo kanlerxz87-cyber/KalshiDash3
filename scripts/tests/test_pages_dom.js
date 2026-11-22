@@ -413,6 +413,10 @@ function commonAsserts(label, r) {
       const badgeCount = rendered.filter(tr => /untraded/.test(tr.textContent)).length;
       check(badgeCount === noVol.length,
         `index.html: every topic with zero volume on all its open rows must carry the "untraded" label (F-83; data says ${noVol.length}, page shows ${badgeCount})`);
+      if (!noVol.length) {
+        check(!/Untraded topics in this snapshot:/.test(r.text),
+          "index.html: the footnote must not claim an untraded topic when every topic has trades (F-83)");
+      }
       if (noVol.length) {
         check(/Untraded topics in this snapshot:/.test(r.text),
           "index.html: untraded topics must be disclosed in the footnote, not only badged (F-83)");

@@ -67,23 +67,42 @@ jobs:
           PY
           cat age.env >> "$GITHUB_ENV"
 
-      - name: Dispatch one collection if (and only if) the snapshot is stale and none is running
+      # F-86: the decision (wait / cancel a wedged run / dispatch one) is made by
+      # scripts/freshness_guard.py so it can be unit-tested offline. Before this, the step
+      # skipped whenever ANY collect.yml run was in flight — which is exactly the state a
+      # wedged run leaves behind. On 2026-11-22 run 44970894475 held the concurrency group
+      # from 02:46Z while the newest collector commit stayed at 06:17Z, the snapshot aged
+      # past two hours, and this monitor stayed silent until a human cancelled the run.
+      - name: Decide what to do about a stale snapshot (never guesses, never loops)
         if: env.STALE == '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          in_flight=$(gh run list --workflow=collect.yml --limit 10 --json status \
-            --jq '[.[] | select(.status == "in_progress" or .status == "queued")] | length')
-          recent=$(gh run list --workflow=collect.yml --limit 40 --json createdAt,event --jq \
-            '[.[] | select(.event == "workflow_dispatch") | .createdAt | fromdateiso8601
-                  | select(. > (now - 3600))] | length')
-          echo "snapshot age ${AGE_MIN}m; in flight ${in_flight}; dispatches in the last hour ${recent}"
-          # Conservatively skip when any collector dispatch was created in the past hour,
-          # or while a collection is already in flight. The runaway loop this
-          # guards against is recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
-          if [ "$in_flight" -gt 0 ]; then echo "a collection is already running; not dispatching"; exit 0; fi
-          if [ "$recent" -ge 1 ]; then echo "a collector dispatch was created within the hour; waiting for the cron"; exit 0; fi
+          gh run list --workflow=collect.yml --limit 40 \
+            --json databaseId,status,createdAt,event > runs.json
+          python3 scripts/freshness_guard.py --age-min "${AGE_MIN}" --runs-json runs.json --env-file "$GITHUB_ENV"
+
+      - name: Cancel a wedged collection so the run queued behind it can start
+        if: env.GUARD_ACTION == 'cancel'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "::warning::snapshot ${AGE_MIN}m old and run ${GUARD_RUN_ID} has not refreshed it in >= 75 min — cancelling it"
+          # Safe by construction: scripts/collect_relay.py re-syncs to the remote head at the
+          # start of every pass and pushes are atomic, so a cancelled pass cannot leave a
+          # half-written snapshot. The run pending behind it in the concurrency group starts
+          # immediately and collects from the current head.
+          gh run cancel "${GUARD_RUN_ID}"
+
+      - name: Dispatch one collection if (and only if) nothing is in flight
+        if: env.GUARD_ACTION == 'dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "::notice::${GUARD_WHY}"
           # `gh workflow run` itself creates the workflow_dispatch event; there is no --event flag.
           # See https://cli.github.com/manual/gh_workflow_run (F-74).
           if gh workflow run collect.yml --ref main; then

@@ -3,9 +3,8 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
-<!-- Session sections are normally appended at the end. This one is inserted at the top because four concurrent
-     sessions were appending at end-of-file every few minutes on 2026-11-22 and each merge conflicted there.
-     This is an addition at a stable anchor; no other session's text was removed. -->
+<!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
+     every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
@@ -1654,6 +1653,11 @@ session — this session did not touch it.
 a scheduled `Collect Kalshi demo data` run (45002071047) was queued but not yet committed at merge time. That is the collector's own
 health signal and it is rendered rather than hidden — this session did not hand-edit `data/live/*`.
 
+- 2026-11-22 08:4xZ (follow-up, same session): edge case found while re-reading the F-83 diff — a topic with **zero** open rows would have
+  been counted as "untraded, 0 of 0 rows traded" in the footnote while its own cell said "none open in scope". `index.html` now skips the
+  untraded bookkeeping when a topic has no open rows, and DOM Test F asserts the footnote is absent when every topic has trades.
+  Went out as [PR #102](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/102) (full `verify_release.py` PASS before merge).
+
 ---
 
 ## Session `arena-a070c747` — pick-rule unification, alert→resolution tracking, verification of the live site
@@ -1776,6 +1780,14 @@ page exists. This session therefore re-fetched every external source the ledger 
 - Tests: new `scripts/tests/test_collect_retry.py` (6 offline cases: two 503s then success, bounded budget with no trailing sleep, 404 fails on attempt 1, URLError then success, 429 still retried, retry set is exactly the documented one). The release gate runs every `scripts/tests/test_*.py`, so it is picked up without touching `verify_release.py`.
 - Gate after the change: `verify_release.py` **PASS**, `check_site.py` **OK**, DOM test M: 72 facts / 70 flagged / 23 suggestions / 9 questions. (Findings grew to 70 because parallel sessions merged D-01..D-05 and others while this branch was open; no ids were duplicated — checked.)
 - No behaviour was changed for a *successful* read, and no value is ever invented on a failed one.
+
+### T95 (`arena-eed90ce4`) — self-healing freshness monitor (F-86)
+
+- Cause-level gap found by reading the monitor, not by guessing: `freshness-alarm.yml` skipped its rescue on `in_flight > 0`. A run that holds the concurrency group and never commits *is* in flight, so the one scenario the monitor exists for was the one it could not act on — exactly today's 02:46Z–08:26Z stall.
+- Fix: decision extracted to `scripts/freshness_guard.py` (pure function + CLI, env-file output) so it is unit-testable offline: fresh → nothing; stale + in-flight collector younger than 75 min → wait (a slow pass is not a wedged one); stale + in-flight collector ≥ 75 min → **cancel that oldest run**, and the run already pending behind it starts a fresh pass from the remote head; stale + nothing in flight → dispatch one, still capped at one dispatch per hour (F-63 guard).
+- Why cancelling is safe: `scripts/collect_relay.py` re-syncs (`git reset --hard FETCH_HEAD`) at the top of every pass and pushes atomically, so a cancelled pass cannot leave a half-written snapshot — the same remedy the script's own docstring documents for humans.
+- Tests: `scripts/tests/test_freshness_guard.py`, 11 offline cases (each branch, the F-63 guard, "cancel never also dispatches", oldest-active-run targeting, unknown age not guessed, documented thresholds 45/75). Gate globs `test_*.py`, so no gate edit.
+- Honest limit kept in the finding: the monitor itself rides the same `schedule` mechanism, so this narrows the exposure in F-67/F-85 rather than removing it. The site's staleness banner remains the real protection and it was accurate throughout the stall.
 
 <!-- repaired 2026-11-22 by arena-0553d7e9: this section was spliced into the T17 note by a greedy
      merge-resolution edit; rescued verbatim and moved here. Recorded as S-04. -->
