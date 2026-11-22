@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T08:50:27Z",
+ "generated_at": "2026-11-22T08:56:14Z",
  "snapshot_collected_at": "2026-11-22T06:17:12Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
@@ -37,8 +37,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -55,9 +55,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T06:02:12Z and 2026-11-22T06:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T06:02:12Z",
@@ -83,8 +83,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -101,9 +101,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:47:11Z",
@@ -129,8 +129,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -147,9 +147,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:47:11Z and 2026-11-22T06:02:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:47:11Z",
@@ -175,8 +175,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -193,9 +193,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:32:11Z",
@@ -221,8 +221,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -239,9 +239,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:32:11Z",
@@ -267,7 +267,7 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58799.99",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99",
+     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99__2026-11-22T0820Z",
      "fetched_at": "2026-11-22T08:20Z"
     }
    ],
@@ -287,7 +287,7 @@
    "note": "Printed \u25bc20\u00a2 (80\u00a2 \u2192 60\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58799.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known.",
    "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99"
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58799.99__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:32:11Z",
@@ -313,7 +313,7 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2201-T58999.99",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99",
+     "source_id": "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99__2026-11-22T0820Z",
      "fetched_at": "2026-11-22T08:20Z"
     }
    ],
@@ -333,7 +333,7 @@
    "note": "Printed \u25bc15\u00a2 (35\u00a2 \u2192 20\u00a2) between 2026-11-22T05:32:11Z and 2026-11-22T05:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 1.00 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the above 58999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted. The market's own record now shows result \u201cno\u201d (settlement_ts 2026-11-22T06:24:47.340002Z, settlement value 0.0000), so this swing was priced before the outcome was known.",
    "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99"
+    "KALSHI_MARKET_KXBTCD-26NOV2201-T58999.99__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:32:11Z",
@@ -359,8 +359,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -377,9 +377,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T05:17:12Z and 2026-11-22T05:32:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:17:12Z",
@@ -405,8 +405,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -423,9 +423,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T05:02:11Z and 2026-11-22T05:17:12Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T05:02:11Z",
@@ -451,8 +451,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -469,9 +469,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T04:47:11Z and 2026-11-22T05:02:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T04:47:11Z",
@@ -497,8 +497,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -515,9 +515,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-22T04:32:12Z and 2026-11-22T04:47:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T04:32:12Z",
@@ -549,7 +549,7 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+     "source_id": "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450__2026-11-22T0820Z",
      "fetched_at": "2026-11-22T08:20Z"
     }
    ],
@@ -572,7 +572,7 @@
    "note": "Printed \u25b223\u00a2 (0\u00a2 \u2192 23\u00a2) between 2026-11-22T03:47:11Z and 2026-11-22T04:02:11Z. The committed book did reprice (yes bid/ask 0.23/1.00 \u2192 0.00/1.00). AAA's published US national average for regular was $3.6594 as of 11/21/26, above the $3.6450 strike \u2014 but that is the prior day's print; the Nov 22 average this market settles on had not been published when it was read, so this is the published figure on the same side as the move and not a statement about the outcome.",
    "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450",
+    "KALSHI_MARKET_KXAAAGASD-26NOV22-3.6450__2026-11-22T0820Z",
     "AAA_NATIONAL_AVERAGE_2026-11-22T0820Z"
    ],
    "window": {
@@ -599,8 +599,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -617,9 +617,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T00:16:11Z",
@@ -645,8 +645,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -663,9 +663,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-22T00:16:11Z and 2026-11-22T00:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T00:16:11Z",
@@ -691,8 +691,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -709,9 +709,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/1.00), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T00:01:11Z",
@@ -737,8 +737,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -755,9 +755,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-22T00:01:11Z and 2026-11-22T00:16:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-22T00:01:11Z",
@@ -783,8 +783,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -801,9 +801,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T23:46:11Z",
@@ -829,8 +829,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -847,9 +847,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T23:46:11Z and 2026-11-22T00:01:11Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T23:46:11Z",
@@ -875,8 +875,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -893,9 +893,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:31:11Z and 2026-11-21T23:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T23:31:11Z",
@@ -921,8 +921,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -939,9 +939,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T23:16:11Z and 2026-11-21T23:31:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T23:16:11Z",
@@ -967,8 +967,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -985,9 +985,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T23:01:10Z and 2026-11-21T23:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T23:01:10Z",
@@ -1013,8 +1013,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -1031,9 +1031,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:46:10Z",
@@ -1059,8 +1059,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -1077,9 +1077,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:46:10Z",
@@ -1105,8 +1105,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1123,9 +1123,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T22:46:10Z and 2026-11-21T23:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:46:10Z",
@@ -1207,8 +1207,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -1225,9 +1225,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:31:10Z and 2026-11-21T22:46:10Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:31:10Z",
@@ -1253,8 +1253,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1271,9 +1271,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:16:10Z",
@@ -1299,8 +1299,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1317,9 +1317,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T22:16:10Z and 2026-11-21T22:31:10Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:16:10Z",
@@ -1345,8 +1345,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1363,9 +1363,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:01:10Z",
@@ -1391,8 +1391,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1409,9 +1409,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T22:01:10Z and 2026-11-21T22:16:10Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T22:01:10Z",
@@ -1437,8 +1437,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1455,9 +1455,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:46:11Z and 2026-11-21T22:01:10Z. The committed book did reprice (yes bid/ask 0.00/0.99 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:46:11Z",
@@ -1483,8 +1483,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1501,9 +1501,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:31:09Z",
@@ -1529,8 +1529,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B32500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1547,9 +1547,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.00/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 30000.00\u201334999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B32500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:31:09Z",
@@ -1575,8 +1575,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1593,9 +1593,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:31:09Z",
@@ -1621,8 +1621,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1639,9 +1639,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc89\u00a2 (99\u00a2 \u2192 10\u00a2) between 2026-11-21T21:31:09Z and 2026-11-21T21:46:11Z. The committed book did reprice (yes bid/ask 0.01/0.99 \u2192 0.09/0.10), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:31:09Z",
@@ -1667,8 +1667,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
-     "fetched_at": "2026-11-21T20:28Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1685,9 +1685,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc94\u00a2 (98\u00a2 \u2192 4\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.02/0.98 \u2192 0.03/0.04), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T20:28Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:16:11Z",
@@ -1713,8 +1713,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B52500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500",
-     "fetched_at": "2026-11-21T23:11Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1731,9 +1731,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b284\u00a2 (15\u00a2 \u2192 99\u00a2) between 2026-11-21T21:16:11Z and 2026-11-21T21:31:09Z. The committed book did reprice (yes bid/ask 0.12/0.15 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 50000.00\u201354999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T23:11Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B52500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:16:11Z",
@@ -1759,8 +1759,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -1777,9 +1777,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b297\u00a2 (2\u00a2 \u2192 99\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book did reprice (yes bid/ask 0.01/0.02 \u2192 0.01/0.99), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:10:21Z",
@@ -1805,8 +1805,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -1823,9 +1823,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T21:10:21Z and 2026-11-21T21:16:11Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.97 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T21:10:21Z",
@@ -2013,8 +2013,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -2031,9 +2031,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book was identical at both reads \u2014 yes bid 0.00 / ask 0.01 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T15:21:23Z",
@@ -2059,8 +2059,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B77500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500",
-     "fetched_at": "2026-11-21T20:28Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2077,9 +2077,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b293\u00a2 (5\u00a2 \u2192 98\u00a2) between 2026-11-21T15:21:23Z and 2026-11-21T20:30:54Z. The committed book did reprice (yes bid/ask 0.03/0.05 \u2192 0.02/0.98), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 75000.00\u201379999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T20:28Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B77500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T15:21:23Z",
@@ -2165,8 +2165,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2183,9 +2183,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc96\u00a2 (97\u00a2 \u2192 1\u00a2) between 2026-11-21T06:39:48Z and 2026-11-21T06:42:56Z. The committed book did reprice (yes bid/ask 0.00/0.97 \u2192 0.00/0.01), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T06:39:48Z",
@@ -2232,8 +2232,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2250,9 +2250,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b213\u00a2 (82\u00a2 \u2192 95\u00a2) between 2026-11-21T06:37:00Z and 2026-11-21T06:38:00Z. The committed book did reprice (yes bid/ask 0.85/0.90 \u2192 0.94/0.95), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T06:37:00Z",
@@ -2278,8 +2278,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2296,9 +2296,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b296\u00a2 (1\u00a2 \u2192 97\u00a2) between 2026-11-21T06:32:46Z and 2026-11-21T06:34:10Z. The committed book did reprice (yes bid/ask 0.00/0.01 \u2192 0.00/0.97), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 95000.00\u201399999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B97500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T06:32:46Z",
@@ -2345,8 +2345,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2363,9 +2363,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b212\u00a2 (70\u00a2 \u2192 82\u00a2) between 2026-11-21T06:33:00Z and 2026-11-21T06:34:00Z. The committed book did reprice (yes bid/ask 0.54/0.70 \u2192 0.79/0.82), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T06:33:00Z",
@@ -2391,8 +2391,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV210145-45",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2409,9 +2409,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b215\u00a2 (50\u00a2 \u2192 65\u00a2) between 2026-11-21T06:31:00Z and 2026-11-21T06:32:00Z. The committed book did reprice (yes bid/ask 0.49/0.50 \u2192 0.52/0.70), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays on CF Benchmarks' BRTI against its own earlier reading. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved. The market's own record now shows result \u201cyes\u201d (settlement_ts 2026-11-21T06:45:02.913537Z, settlement value 1.0000), so this swing was priced before the outcome was known.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTC15M-26NOV210145-45"
+    "KALSHI_MARKET_KXBTC15M-26NOV210145-45__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-21T06:31:00Z",
@@ -2605,8 +2605,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -2623,9 +2623,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc97\u00a2 (99\u00a2 \u2192 2\u00a2) between 2026-11-20T19:48:19Z and 2026-11-20T20:01:29Z. The committed book was identical at both reads \u2014 yes bid 0.01 / ask 0.02 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-20T19:48:19Z",
@@ -2651,8 +2651,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500",
-     "fetched_at": "2026-11-21T06:37Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "reference_not_publicly_readable",
@@ -2669,9 +2669,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25b295\u00a2 (4\u00a2 \u2192 99\u00a2) between 2026-11-20T19:30:14Z and 2026-11-20T19:48:19Z. The committed book did reprice (yes bid/ask 0.01/0.04 \u2192 0.01/0.02), so unlike the unchanged-book rows this is a real change in the quoted price. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 85000.00\u201389999.99 band on Jan 1, 2027. That index has no public read, so no reading of it is quoted and nothing is asserted about why the book moved.",
-   "reviewed_at": "2026-11-21T06:37Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B87500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-20T19:30:14Z",
@@ -2697,8 +2697,8 @@
     {
      "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B47500",
      "publisher": "Kalshi demo Trade API (the market's own official record)",
-     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500",
-     "fetched_at": "2026-11-20T19:47Z"
+     "source_id": "KALSHI_MARKET_KXBTCY-27JAN0100-B47500__2026-11-22T0820Z",
+     "fetched_at": "2026-11-22T08:20Z"
     }
    ],
    "state": "best_quote_did_not_move",
@@ -2715,9 +2715,9 @@
     "strike_side_after": "below"
    },
    "note": "Printed \u25bc92\u00a2 (98\u00a2 \u2192 6\u00a2) between 2026-11-20T19:22:42Z and 2026-11-20T19:30:14Z. The committed book was identical at both reads \u2014 yes bid 0.05 / ask 0.06 before and after \u2014 so the \u2265$0.10 change is in the last-traded print, not in the quoted price: nobody repriced this market between the two observations. The market pays only if the CF Benchmarks BRTI 60-second average lands in the 45000.00\u201349999.99 band on Jan 1, 2027; that index has no public read, so no reading of it is quoted.",
-   "reviewed_at": "2026-11-20T19:47Z",
+   "reviewed_at": "2026-11-22T08:20Z",
    "source_ids": [
-    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500"
+    "KALSHI_MARKET_KXBTCY-27JAN0100-B47500__2026-11-22T0820Z"
    ],
    "window": {
     "from": "2026-11-20T19:22:42Z",

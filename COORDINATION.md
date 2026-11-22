@@ -2016,3 +2016,16 @@ was awaiting merge. Two conflicts, both resolved additively and neither side dis
 | `COORDINATION.md` | main's new content kept first, this session's after it, both verbatim. A merge-record heading that an earlier resolution had left parked above this session's header was moved back inside it |
 
 `verify_release.py` **PASS** after the merge; `test_client_safety.py` (main's board-marker guard) **OK**.
+
+### Correction after the live deploy — source ids and `reviewed_at`
+
+Deploying and reading the live `catalysts.json` exposed a defect the validator could not see: seven of the ten market
+records this session re-read were already in the ledger **under the bare id `KALSHI_MARKET_{ticker}`** from an earlier
+session, so the writer skipped them and the new reviews cited the *earlier* read. The page then printed
+`reviewed_at 2026-11-21T06:37Z` beside a review written on 2026-11-22 — a true statement about the cited source and a
+false impression about when the read happened.
+
+Fixed: a re-read is a new observation, so it now gets its own id stamped with its fetch time
+(`KALSHI_MARKET_{ticker}__2026-11-22T0820Z`), and the 48 reviews cite that. `reviewed_at` is now the time the source
+was actually read (36 sources, 69 reviews; still 57/61 reviewed, 4 `not_reviewed` with a stated reason). The ledger was
+rebuilt from `main`'s version rather than from this branch's, so no earlier session's source was altered or dropped.
