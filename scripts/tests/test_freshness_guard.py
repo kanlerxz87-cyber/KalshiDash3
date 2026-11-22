@@ -117,7 +117,7 @@ class GuardTests(unittest.TestCase):
 
     def test_thresholds_match_the_documented_values(self):
         self.assertEqual(self.g.STALE_MIN, 45)
-        self.assertEqual(self.g.STALL_MIN, 75)
+        self.assertEqual(self.g.STALL_MIN, 60)
 
 
 if __name__ == "__main__":

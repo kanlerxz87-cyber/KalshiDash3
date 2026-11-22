@@ -17,7 +17,7 @@ Why this exists
 The rule
   * snapshot younger than STALE_MIN (45 min, the threshold the site's own banner uses)
     -> nothing to do.
-  * stale, and an in-flight `collect.yml` run is older than STALL_MIN (75 min = five
+  * stale, and an in-flight `collect.yml` run is older than STALL_MIN (60 min = four
     missed passes on the relay's 15-minute grid) -> that run is considered wedged:
     cancel it. Whatever run is pending behind it in the concurrency group then starts
     and does a fresh pass from the current remote head. Cancelling is safe by
@@ -25,7 +25,8 @@ The rule
     every pass (`git reset --hard FETCH_HEAD`) and pushes are atomic, so a cancelled run
     cannot leave a half-written snapshot behind.
   * stale, and an in-flight run is younger than STALL_MIN -> wait. It may be a normal
-    slow pass; cancelling here would fight the relay instead of helping it.
+    slow pass (the pipeline's own step timeouts allow ~50 min in the worst case); cancelling
+    here would fight the relay instead of helping it.
   * stale, nothing in flight, and no `workflow_dispatch` run of collect.yml created in
     the last hour -> dispatch exactly one run. The one-hour guard is what stops the
     runaway dispatch loop recorded as F-63 (a collection every 1-2 minutes on 2026-11-21).
@@ -46,7 +47,10 @@ import sys
 from pathlib import Path
 
 STALE_MIN = 45          # the staleness threshold the site's own banner uses
-STALL_MIN = 75          # five missed passes on the relay's 15-minute grid
+STALL_MIN = 60          # four missed passes on the relay's 15-minute grid. A pass can
+                        # legitimately take up to ~50 min if several pipeline steps hit their
+                        # own timeouts (collect 1200 s, each of the other three 600 s), so 60
+                        # leaves room for the slow case while still acting inside the hour.
 DISPATCH_WINDOW_MIN = 60  # at most one monitor dispatch per hour (F-63)
 ACTIVE_STATUSES = {"in_progress", "queued", "pending", "waiting", "requested"}
 
