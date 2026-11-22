@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-22T22:30:04Z",
- "snapshot_collected_at": "2026-11-22T22:30:03Z",
+ "generated_at": "2026-11-22T22:45:04Z",
+ "snapshot_collected_at": "2026-11-22T22:45:04Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 90,
+  "archive_total": 91,
   "reviewed": 57,
-  "not_reviewed": 33,
+  "not_reviewed": 34,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
   "best_quote_did_not_move": 19,
@@ -18,6 +18,27 @@
   "withheld_category_conflict": 20
  },
  "alerts": [
+  {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "to_time": "2026-11-22T22:45:04Z",
+   "from_time": "2026-11-22T22:30:03Z",
+   "from_price": 0.7,
+   "to_price": 0.29,
+   "delta": -0.41,
+   "direction": "down",
+   "category_id": "gas",
+   "title": "Will average **gas prices** be above $3.30?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If average regular gas prices for United States are strictly greater than $3.30 on Dec 31, 2026 according to AAA, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "reviewed_at": null
+  },
   {
    "ticker": "KXBTCD-26NOV2217-T60749.99",
    "to_time": "2026-11-22T20:28:55Z",

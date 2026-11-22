@@ -2,6 +2,55 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXAAAGASM-26DEC31-3.30",
+   "event_ticker": "KXAAAGASM-26DEC31",
+   "title": "Will average **gas prices** be above $3.30?",
+   "category_id": "gas",
+   "category_basis": "seed",
+   "series_categories": [
+    "Economics"
+   ],
+   "status": "active",
+   "from_time": "2026-11-22T22:30:03Z",
+   "to_time": "2026-11-22T22:45:04Z",
+   "from_price": 0.7,
+   "to_price": 0.29,
+   "delta": -0.41,
+   "direction": "down",
+   "volume_24h_fp": 2.9,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26DEC31-3.30",
+   "to_yes_bid": 0.29,
+   "to_yes_ask": 0.71,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-22T22:45:04Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 0.62,
+    "est_dollars": 0.18,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 411.78,
+    "volume_to": 412.4,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "0.62 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-22T22:45:04Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXBTCD-26NOV2217-T60749.99",
    "event_ticker": "KXBTCD-26NOV2217",
    "title": "Bitcoin price on Nov 22, 2026?",
