@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-22T01:02:20Z",
- "runtime_seconds": 130.9,
+ "collected_at": "2026-11-22T01:47:32Z",
+ "runtime_seconds": 125.6,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,13 +29,13 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 8005,
+  "open_in_scope": 8018,
   "eligible": 0,
   "picks": 0,
   "near_misses": 5,
-  "unscoreable": 8000,
-  "orderbooks": 8005,
-  "orderbooks_requested": 8005,
+  "unscoreable": 8013,
+  "orderbooks": 8018,
+  "orderbooks_requested": 8018,
   "alerts": 0,
   "markets_with_momentum": 184,
   "markets_with_catalyst_url": 0,
@@ -43,8 +43,8 @@
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 8005,
-  "returned": 8005,
+  "requested": 8018,
+  "returned": 8018,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -78,7 +78,7 @@
    "spread": 0.77,
    "depth": 20.0,
    "vol24": 0.0,
-   "ttc_hours": 3.9444444444444446,
+   "ttc_hours": 3.1911111111111112,
    "momentum": 0.0,
    "series_ticker": "KXAAAGASD",
    "fee_multiplier": {
@@ -116,6 +116,64 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV22-3.6450"
   },
   {
+   "ticker": "KXDEMOFUTHOURLY-26NOV22H02-UP",
+   "eligible": false,
+   "fails": [
+    "spread 85.0c > 10c cap",
+    "depth 3 < 50 contracts at the touch",
+    "YES entry 99.0c above 95c ceiling",
+    "net ROI -40.29% not above 0% floor",
+    "closes in 12 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.5915833333333333,
+   "mid": 0.565,
+   "micro": 0.7066666666666667,
+   "last": 0.45,
+   "bid": 0.14,
+   "ask": 0.99,
+   "spread": 0.85,
+   "depth": 3.0,
+   "vol24": 6701.0,
+   "ttc_hours": 0.20777777777777778,
+   "momentum": null,
+   "series_ticker": "KXDEMOFUTHOURLY",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.99,
+    "fee_unit": 0.0006930000000000006,
+    "cost": 0.990693,
+    "ev": -0.3991096666666667,
+    "roi": -0.40285907608781596
+   },
+   "score": -0.40285907608781596,
+   "dollars_traded_estimate": 3172.95,
+   "title": "Demo BTC at or above 60075.31 USD",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-22T02:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV22H02",
+   "status": "active",
+   "result": null,
+   "volume_fp": 7051.0,
+   "volume_24h_fp": 6701.0,
+   "open_interest_fp": 91.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 2.0,
+    "depth_at_ask": 1.0,
+    "bid_price": 0.19,
+    "ask_price": 0.99
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV22H02-UP"
+  },
+  {
    "ticker": "KXFEATURE-26NIT-DOJ",
    "eligible": false,
    "fails": [
@@ -136,7 +194,7 @@
    "spread": 0.99,
    "depth": 8.0,
    "vol24": 0.0,
-   "ttc_hours": 939.9444444444445,
+   "ttc_hours": 939.1911111111111,
    "momentum": 0.0,
    "series_ticker": "KXFEATURE",
    "fee_multiplier": {
@@ -194,7 +252,7 @@
    "spread": 0.99,
    "depth": 10.0,
    "vol24": 0.0,
-   "ttc_hours": 939.9444444444445,
+   "ttc_hours": 939.1911111111111,
    "momentum": 0.0,
    "series_ticker": "KXFEATURE",
    "fee_multiplier": {
@@ -232,64 +290,6 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXFEATURE-26NIT-BRE"
   },
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV22H02-UP",
-   "eligible": false,
-   "fails": [
-    "spread 99.0c > 10c cap",
-    "depth 10 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "NO entry 99.0c above 95c ceiling",
-    "net ROI -68.43% not above 0% floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.68725,
-   "mid": 0.505,
-   "micro": 1.0,
-   "last": 0.55,
-   "bid": 0.01,
-   "ask": 1.0,
-   "spread": 0.99,
-   "depth": 10.0,
-   "vol24": 0.0,
-   "ttc_hours": 0.9611111111111111,
-   "momentum": null,
-   "series_ticker": "KXDEMOFUTHOURLY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.99,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.990693,
-    "ev": -0.6779430000000001,
-    "roi": -0.684311890767372
-   },
-   "score": -0.684311890767372,
-   "dollars_traded_estimate": 165.0,
-   "title": "Demo BTC at or above 60075.31 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-22T02:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV22H02",
-   "status": "active",
-   "result": null,
-   "volume_fp": 300.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 30.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 10.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.01,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV22H02-UP"
-  },
-  {
    "ticker": "KXAAAGASD-26NOV22-3.6250",
    "eligible": false,
    "fails": [
@@ -310,7 +310,7 @@
    "spread": 0.98,
    "depth": 10.0,
    "vol24": 0.0,
-   "ttc_hours": 3.9444444444444446,
+   "ttc_hours": 3.1911111111111112,
    "momentum": 0.0,
    "series_ticker": "KXAAAGASD",
    "fee_multiplier": {
@@ -371,7 +371,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 7.0,
-   "ttc_hours": 4.961111111111111,
+   "ttc_hours": 4.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -423,7 +423,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 5.961111111111111,
+   "ttc_hours": 5.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -475,7 +475,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 6.961111111111111,
+   "ttc_hours": 6.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -527,7 +527,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 7.961111111111111,
+   "ttc_hours": 7.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -579,7 +579,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 7.961111111111111,
+   "ttc_hours": 7.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -631,7 +631,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 4.961111111111111,
+   "ttc_hours": 4.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -683,7 +683,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 5.961111111111111,
+   "ttc_hours": 5.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -735,7 +735,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 6.961111111111111,
+   "ttc_hours": 6.207777777777777,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -769,18 +769,17 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 172,
+  "candles_used": 138,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 8,
-  "baseline_always_yes_hits": 3,
+  "baseline_always_yes_bets": 2,
+  "baseline_always_yes_hits": 1,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 16,
-   "no candles in the 2h before close": 31,
-   "no side passed the replay gates": 8
+   "candle without a price": 22,
+   "no side passed the replay gates": 2
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -789,7 +788,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.375
+  "baseline_always_yes_hit_rate": 0.5
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
