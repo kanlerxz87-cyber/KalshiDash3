@@ -29,6 +29,7 @@ from pathlib import Path
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import textwrap
@@ -101,7 +102,11 @@ class AlarmChain(unittest.TestCase):
             gh = path / 'gh'
             gh.write_text(FAKE_GH)
             gh.chmod(0o755)
-            runs_file = path / 'runs.json'
+            # Mirror the runner layout inside the temp cwd: the decide step runs
+            # `python3 scripts/freshness_guard.py` and writes ./runs.json.
+            (path / 'scripts').mkdir()
+            shutil.copy(ROOT / 'scripts/freshness_guard.py', path / 'scripts/freshness_guard.py')
+            runs_file = path / 'runs_source.json'   # NOT runs.json: the step redirects into ./runs.json
             runs_file.write_text(json.dumps(runs))
             env_file = path / 'github_env'
             env_file.write_text('')
@@ -110,8 +115,9 @@ class AlarmChain(unittest.TestCase):
                        RUNS_JSON=str(runs_file), CALLS=str(calls), DISPATCH_RC=dispatch_rc,
                        CANCEL_RC=cancel_rc, GITHUB_ENV=str(env_file), STALE=stale)
 
+            # cwd=temp so the step's `> runs.json` lands in the sandbox, never in the repo.
             decided = subprocess.run(['bash', '-c', step_block('Decide what to do')],
-                                     env=env, text=True, capture_output=True)
+                                     env=env, text=True, capture_output=True, cwd=temp)
             self.assertEqual(decided.returncode, 0, decided.stderr)
             env.update(dict(line.split('=', 1) for line in env_file.read_text().strip().splitlines()
                             if '=' in line))
@@ -120,7 +126,7 @@ class AlarmChain(unittest.TestCase):
             for marker in ('Cancel a wedged collection', 'Dispatch one collection'):
                 if step_runs(marker, env):
                     ran.append(subprocess.run(['bash', '-c', step_block(marker)],
-                                              env=env, text=True, capture_output=True))
+                                              env=env, text=True, capture_output=True, cwd=temp))
             return decided, ran, (calls.read_text().splitlines() if calls.exists() else [])
 
     # --- 1/2: dispatch path -------------------------------------------------------------
