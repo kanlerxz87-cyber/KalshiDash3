@@ -11,6 +11,55 @@
     "Crypto"
    ],
    "status": "active",
+   "from_time": "2026-11-23T06:15:58Z",
+   "to_time": "2026-11-23T06:30:58Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 3549.78,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-23T06:30:58Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 72.59,
+    "est_dollars": 70.41,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72330604.68,
+    "volume_to": 72330677.27,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "72.59 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-23T06:30:58Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
    "from_time": "2026-11-23T06:00:58Z",
    "to_time": "2026-11-23T06:15:58Z",
    "from_price": 0.97,
@@ -44,10 +93,10 @@
     "decided_at": "2026-11-23T06:15:59Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
+    "still_open": false
    }
   },
   {
@@ -93,7 +142,7 @@
     "decided_at": "2026-11-23T06:00:59Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -142,7 +191,7 @@
     "decided_at": "2026-11-23T05:45:59Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.96,
     "gave_back_half": false,
     "still_open": false
@@ -4198,22 +4247,22 @@
    ],
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 18.57,
-    "est_dollars": 0.19,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 72319504.47,
-    "volume_to": 72319523.04,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "18.57 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:25:04Z"
+    "decided_at": "2026-11-23T06:30:58Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
