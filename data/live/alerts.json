@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-23T04:30:59Z",
- "snapshot_collected_at": "2026-11-23T04:30:58Z",
+ "generated_at": "2026-11-23T04:46:00Z",
+ "snapshot_collected_at": "2026-11-23T04:45:59Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -19,11 +19,11 @@
   "withheld_reasons": {},
   "evidence": {
    "traded_ge_floor": 23,
-   "traded_below_floor": 57,
+   "traded_below_floor": 56,
    "quote_only": 0,
    "counter_reset": 0,
    "candle_unquantified": 5,
-   "unknown_no_observations": 6,
+   "unknown_no_observations": 7,
    "gave_back_half_within_3": 0,
    "held_false": 0,
    "floor_contracts": 100.0
@@ -4392,22 +4392,22 @@
    ],
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 26.6,
-    "est_dollars": 1.6,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 80178705.51,
-    "volume_to": 80178732.11,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "26.6 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:25:04Z"
+    "decided_at": "2026-11-23T04:46:00Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
