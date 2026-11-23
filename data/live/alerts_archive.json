@@ -4959,22 +4959,22 @@
    ],
    "series_categories_source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM",
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 10.06,
-    "est_dollars": 7.14,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 385.82,
-    "volume_to": 395.88,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "10.06 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-21T23:25:04Z"
+    "decided_at": "2026-11-23T04:15:59Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
