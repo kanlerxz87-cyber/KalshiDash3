@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-23T02:30:58Z",
- "started_at": "2026-11-23T02:30:32Z",
+ "collected_at": "2026-11-23T02:45:58Z",
+ "started_at": "2026-11-23T02:45:32Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -14,13 +14,13 @@
  "counts": {
   "open_total_scanned": 25369,
   "settled_total_scanned": 30552,
-  "open_in_scope": 475,
-  "open_in_scope_total": 16881,
-  "open_published_rows": 475,
+  "open_in_scope": 491,
+  "open_in_scope_total": 15060,
+  "open_published_rows": 491,
   "settled_in_scope": 1600,
   "settled_published_rows": 200,
-  "open_out_of_scope": 8406,
-  "settled_out_of_scope": 17609,
+  "open_out_of_scope": 10227,
+  "settled_out_of_scope": 17710,
   "open_excluded_multivariate": 0,
   "settled_excluded_multivariate": 0,
   "open_excluded_off_topic_or_qa": 0,
@@ -106,8 +106,8 @@
   "open_paging_truncated_at_safety_cap": true,
   "settled_paging_truncated_at_safety_cap": true,
   "safety_scan_cap": 25000,
-  "settled_rows_trimmed_for_size": 11251,
-  "settled_in_scope_total": 12851,
+  "settled_rows_trimmed_for_size": 11150,
+  "settled_in_scope_total": 12750,
   "settled_in_scope_total_method": "exact count of every settled row the paged scan returned inside the five topics, measured before the per-topic publish selection and before the size window; the scan stopped at the safety cap, so this is a lower bound (safety_scan_cap 25000, kept window 1600, published 200 across the five topics)",
   "settled_kept_window": 1600,
   "settled_published": 200,
@@ -190,7 +190,7 @@
     "url": "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXPGASOLHEIM&limit=1000"
    }
   },
-  "open_rows_trimmed_for_size": 16406,
+  "open_rows_trimmed_for_size": 14569,
   "rows_dropped_wrong_status": 0
  },
  "series_index": {
@@ -1855,6 +1855,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXFBUGAME"
   },
+  "KXFIBAGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "FIBA Game",
+   "tags": [
+    "Basketball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXFIBAGAME"
+  },
   "KXFRAPLWBTTS": {
    "categories": [
     "Sports"
@@ -3390,6 +3400,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNBLTOTAL"
   },
+  "KXNCAAFFIRSTTDTEAM": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "College Football First Team to Score a Touchdown",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNCAAFFIRSTTDTEAM"
+  },
   "KXNCAAFOT": {
    "categories": [
     "Sports"
@@ -3677,6 +3697,26 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL1HTEAMTOTAL"
   },
+  "KXNFL1QBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score in 1st Quarter",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL1QBTTS"
+  },
+  "KXNFL1QSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football 1st Quarter Spread",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL1QSPREAD"
+  },
   "KXNFL2HSPREAD": {
    "categories": [
     "Sports"
@@ -3686,6 +3726,16 @@
     "Football"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL2HSPREAD"
+  },
+  "KXNFL2QBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score in 2nd Quarter",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL2QBTTS"
   },
   "KXNFL2QSPREAD": {
    "categories": [
@@ -3697,6 +3747,26 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL2QSPREAD"
   },
+  "KXNFL3QBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score in 3rd Quarter",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL3QBTTS"
+  },
+  "KXNFL4QBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score in 4th Quarter",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL4QBTTS"
+  },
   "KXNFL4QSPREAD": {
    "categories": [
     "Sports"
@@ -3706,6 +3776,36 @@
     "Football"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFL4QSPREAD"
+  },
+  "KXNFLBOTH": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score Points",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLBOTH"
+  },
+  "KXNFLDSTTD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football D/ST Touchdown",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLDSTTD"
+  },
+  "KXNFLEQBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Both Teams to Score in Every Quarter",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLEQBTTS"
   },
   "KXNFLESCALATORREC": {
    "categories": [
@@ -3727,6 +3827,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLESCALATORRECYDS"
   },
+  "KXNFLFFPTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Player Fantasy Points",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLFFPTS"
+  },
   "KXNFLFFWEEKTOP": {
    "categories": [
     "Sports"
@@ -3737,6 +3847,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLFFWEEKTOP"
   },
+  "KXNFLFG": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Field Goals",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLFG"
+  },
   "KXNFLFIRSTTD": {
    "categories": [
     "Sports"
@@ -3746,6 +3866,16 @@
     "Football"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLFIRSTTD"
+  },
+  "KXNFLFIRSTTDTEAM": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football First Team to Score a Touchdown",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLFIRSTTDTEAM"
   },
   "KXNFLLADDERREC": {
    "categories": [
@@ -3875,6 +4005,16 @@
    "tags": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLPASSYDSPROT"
   },
+  "KXNFLRACE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Race to Points",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLRACE"
+  },
   "KXNFLREC": {
    "categories": [
     "Sports"
@@ -3959,6 +4099,16 @@
    "tags": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLRSHYDSPROT"
   },
+  "KXNFLSFTY": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Safety",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLSFTY"
+  },
   "KXNFLSPREAD": {
    "categories": [
     "Sports"
@@ -3999,6 +4149,26 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTEAMFIRSTTD"
   },
+  "KXNFLTEAMSACK": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Team Sacks",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTEAMSACK"
+  },
+  "KXNFLTEAMYDS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Team Yards",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTEAMYDS"
+  },
   "KXNFLTOTAL": {
    "categories": [
     "Sports"
@@ -4008,6 +4178,36 @@
     "Football"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTOTAL"
+  },
+  "KXNFLTOTALPRECISE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Total Precise",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTOTALPRECISE"
+  },
+  "KXNFLWINMARGIN": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Pro Football Win Margin",
+   "tags": [
+    "Football"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLWINMARGIN"
+  },
+  "KXNHL1PSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Period Spread",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL1PSPREAD"
   },
   "KXNHL1PTOTAL": {
    "categories": [
@@ -4139,6 +4339,26 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLTOTAL"
   },
+  "KXNKLGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Lithuania NKL Game",
+   "tags": [
+    "Basketball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNKLGAME"
+  },
+  "KXODIMATCH": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Men's ODI Cricket Match",
+   "tags": [
+    "Cricket"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXODIMATCH"
+  },
   "KXPERLIGA1BTTS": {
    "categories": [
     "Sports"
@@ -4178,6 +4398,16 @@
     "Golf"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGA3BALL"
+  },
+  "KXPGAROUNDSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Golf Round Scores",
+   "tags": [
+    "Golf"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGAROUNDSCORE"
   },
   "KXPGARYDER": {
    "categories": [
@@ -4801,6 +5031,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSWISSLEAGUETOTAL"
   },
+  "KXT20MATCH": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Men's T20 Cricket Match",
+   "tags": [
+    "Cricket"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXT20MATCH"
+  },
   "KXTACAPORTBTTS": {
    "categories": [
     "Sports"
@@ -4951,6 +5191,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTHAIL1TOTAL"
   },
+  "KXTRUEV": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "Truflation EV",
+   "tags": [
+    "Econ Daily"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTRUEV"
+  },
   "KXTRUMPACTD": {
    "categories": [
     "Politics"
@@ -4971,6 +5221,16 @@
     "Recurring"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTRUMPAPPROVE"
+  },
+  "KXTRUTHSOCIALD": {
+   "categories": [
+    "Politics"
+   ],
+   "title": "Number of Trump Truth Social posts today?",
+   "tags": [
+    "Recurring"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTRUTHSOCIALD"
   },
   "KXTWEEDEDIVSPREAD": {
    "categories": [
@@ -5222,6 +5482,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXVTBTOTAL"
   },
+  "KXWNBLGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NBL Australia (W) Game",
+   "tags": [
+    "Basketball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXWNBLGAME"
+  },
   "KXWTACHALLENGERMATCH": {
    "categories": [
     "Sports"
@@ -5445,10 +5715,10 @@
    "yes_ask_dollars": 0.23,
    "no_bid_dollars": 0.77,
    "no_ask_dollars": 0.78,
-   "volume_fp": 49032183.93,
-   "volume_24h_fp": 4736.47,
+   "volume_fp": 49032188.01,
+   "volume_24h_fp": 4740.55,
    "open_interest_fp": 8370290.74,
-   "dollars_traded_estimate": 11277402.3,
+   "dollars_traded_estimate": 11277403.24,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -5730,8 +6000,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 67430274.78,
    "volume_24h_fp": 94419.78,
@@ -5762,8 +6032,8 @@
    "result": null,
    "last_price_dollars": 0.04,
    "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.02,
-   "no_bid_dollars": 0.98,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.99,
    "volume_fp": 49205840.63,
    "volume_24h_fp": 3836.21,
@@ -5857,10 +6127,10 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.03,
-   "yes_bid_dollars": 0.02,
-   "yes_ask_dollars": 0.03,
-   "no_bid_dollars": 0.97,
-   "no_ask_dollars": 0.98,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.99,
+   "no_bid_dollars": 0.01,
+   "no_ask_dollars": 1.0,
    "volume_fp": 52369048.03,
    "volume_24h_fp": 3766.26,
    "open_interest_fp": 7026607.33,
@@ -5922,8 +6192,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 125490150.66,
    "volume_24h_fp": 395.83,
@@ -6146,8 +6416,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 81942302.73,
    "volume_24h_fp": 941.82,
@@ -6210,8 +6480,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.97,
-   "no_bid_dollars": 0.03,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 72330205.2,
    "volume_24h_fp": 3935.45,
@@ -6242,8 +6512,8 @@
    "result": null,
    "last_price_dollars": 0.02,
    "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.04,
-   "no_bid_dollars": 0.96,
+   "yes_ask_dollars": 0.02,
+   "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
    "volume_fp": 35528469.92,
    "volume_24h_fp": 16726.16,
@@ -6402,8 +6672,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 46726593.67,
    "volume_24h_fp": 31811.81,
@@ -6789,10 +7059,10 @@
    "yes_ask_dollars": 0.089,
    "no_bid_dollars": 0.911,
    "no_ask_dollars": 0.918,
-   "volume_fp": 451140.41,
-   "volume_24h_fp": 8257.3,
-   "open_interest_fp": 420461.46,
-   "dollars_traded_estimate": 40151.5,
+   "volume_fp": 451237.77,
+   "volume_24h_fp": 8236.43,
+   "open_interest_fp": 420558.82,
+   "dollars_traded_estimate": 40160.16,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -6947,10 +7217,10 @@
    "yes_ask_dollars": 0.17,
    "no_bid_dollars": 0.83,
    "no_ask_dollars": 0.84,
-   "volume_fp": 108996.22,
-   "volume_24h_fp": 9715.9,
-   "open_interest_fp": 71926.89,
-   "dollars_traded_estimate": 18529.36,
+   "volume_fp": 109085.2,
+   "volume_24h_fp": 9684.71,
+   "open_interest_fp": 72015.87,
+   "dollars_traded_estimate": 18544.48,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7011,10 +7281,10 @@
    "yes_ask_dollars": 0.059,
    "no_bid_dollars": 0.941,
    "no_ask_dollars": 0.945,
-   "volume_fp": 238844.36,
-   "volume_24h_fp": 6145.36,
-   "open_interest_fp": 230944.34,
-   "dollars_traded_estimate": 14091.82,
+   "volume_fp": 238938.24,
+   "volume_24h_fp": 6240.19,
+   "open_interest_fp": 231038.22,
+   "dollars_traded_estimate": 14097.36,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7043,10 +7313,10 @@
    "yes_ask_dollars": 0.052,
    "no_bid_dollars": 0.948,
    "no_ask_dollars": 0.952,
-   "volume_fp": 243962.72,
-   "volume_24h_fp": 8102.81,
+   "volume_fp": 244055.35,
+   "volume_24h_fp": 8069.97,
    "open_interest_fp": 213828.09,
-   "dollars_traded_estimate": 12686.06,
+   "dollars_traded_estimate": 12690.88,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7075,10 +7345,10 @@
    "yes_ask_dollars": 0.033,
    "no_bid_dollars": 0.967,
    "no_ask_dollars": 0.97,
-   "volume_fp": 322478.36,
-   "volume_24h_fp": 13051.13,
-   "open_interest_fp": 311525.33,
-   "dollars_traded_estimate": 10641.79,
+   "volume_fp": 322563.38,
+   "volume_24h_fp": 13021.17,
+   "open_interest_fp": 311610.35,
+   "dollars_traded_estimate": 10644.59,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7139,10 +7409,10 @@
    "yes_ask_dollars": 0.047,
    "no_bid_dollars": 0.953,
    "no_ask_dollars": 0.955,
-   "volume_fp": 188660.23,
-   "volume_24h_fp": 8207.25,
-   "open_interest_fp": 183737.64,
-   "dollars_traded_estimate": 8867.03,
+   "volume_fp": 188768.28,
+   "volume_24h_fp": 8189.26,
+   "open_interest_fp": 183845.69,
+   "dollars_traded_estimate": 8872.11,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7203,10 +7473,10 @@
    "yes_ask_dollars": 0.038,
    "no_bid_dollars": 0.962,
    "no_ask_dollars": 0.967,
-   "volume_fp": 153912.72,
-   "volume_24h_fp": 14011.33,
+   "volume_fp": 153992.03,
+   "volume_24h_fp": 13963.41,
    "open_interest_fp": 131193.83,
-   "dollars_traded_estimate": 5848.68,
+   "dollars_traded_estimate": 5851.7,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7299,10 +7569,10 @@
    "yes_ask_dollars": 0.027,
    "no_bid_dollars": 0.973,
    "no_ask_dollars": 0.979,
-   "volume_fp": 159028.32,
-   "volume_24h_fp": 15385.68,
-   "open_interest_fp": 150546.52,
-   "dollars_traded_estimate": 4293.76,
+   "volume_fp": 159101.63,
+   "volume_24h_fp": 15356.92,
+   "open_interest_fp": 150619.83,
+   "dollars_traded_estimate": 4295.74,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7331,10 +7601,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.986,
-   "volume_fp": 196335.15,
-   "volume_24h_fp": 4088.68,
-   "open_interest_fp": 188452.76,
-   "dollars_traded_estimate": 3534.03,
+   "volume_fp": 196432.18,
+   "volume_24h_fp": 4182.98,
+   "open_interest_fp": 188549.79,
+   "dollars_traded_estimate": 3535.78,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7363,10 +7633,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 1175893.92,
-   "volume_24h_fp": 7588.76,
-   "open_interest_fp": 1170405.03,
-   "dollars_traded_estimate": 3527.68,
+   "volume_fp": 1175975.72,
+   "volume_24h_fp": 7591.86,
+   "open_interest_fp": 1170486.83,
+   "dollars_traded_estimate": 3527.93,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7426,10 +7696,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.983,
-   "volume_fp": 157947.88,
-   "volume_24h_fp": 8111.92,
-   "open_interest_fp": 147278.37,
-   "dollars_traded_estimate": 3158.96,
+   "volume_fp": 158031.29,
+   "volume_24h_fp": 8075.08,
+   "open_interest_fp": 147361.78,
+   "dollars_traded_estimate": 3160.63,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7490,10 +7760,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.988,
-   "volume_fp": 211600.98,
-   "volume_24h_fp": 8207.57,
-   "open_interest_fp": 155461.79,
-   "dollars_traded_estimate": 2750.81,
+   "volume_fp": 211676.68,
+   "volume_24h_fp": 8186.55,
+   "open_interest_fp": 155537.49,
+   "dollars_traded_estimate": 2751.8,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7523,7 +7793,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.999,
    "volume_fp": 138035.12,
-   "volume_24h_fp": 7773.99,
+   "volume_24h_fp": 7649.04,
    "open_interest_fp": 128283.38,
    "dollars_traded_estimate": 2484.63,
    "close_time": "2026-12-06T00:00:00Z",
@@ -7586,10 +7856,10 @@
    "yes_ask_dollars": 0.016,
    "no_bid_dollars": 0.984,
    "no_ask_dollars": 0.987,
-   "volume_fp": 133135.51,
-   "volume_24h_fp": 6165.53,
-   "open_interest_fp": 69917.08,
-   "dollars_traded_estimate": 2130.17,
+   "volume_fp": 133235.08,
+   "volume_24h_fp": 6264.05,
+   "open_interest_fp": 70016.65,
+   "dollars_traded_estimate": 2131.76,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7650,10 +7920,10 @@
    "yes_ask_dollars": 0.044,
    "no_bid_dollars": 0.956,
    "no_ask_dollars": 0.958,
-   "volume_fp": 46895.82,
-   "volume_24h_fp": 8255.67,
-   "open_interest_fp": 46895.82,
-   "dollars_traded_estimate": 2063.42,
+   "volume_fp": 47004.03,
+   "volume_24h_fp": 8243.84,
+   "open_interest_fp": 47004.03,
+   "dollars_traded_estimate": 2068.18,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7715,7 +7985,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.999,
    "volume_fp": 197856.68,
-   "volume_24h_fp": 6841.17,
+   "volume_24h_fp": 6717.96,
    "open_interest_fp": 122363.26,
    "dollars_traded_estimate": 1978.57,
    "close_time": "2026-12-06T00:00:00Z",
@@ -7809,10 +8079,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.99,
-   "volume_fp": 136619.97,
-   "volume_24h_fp": 4300.86,
-   "open_interest_fp": 134543.08,
-   "dollars_traded_estimate": 1776.06,
+   "volume_fp": 136708.44,
+   "volume_24h_fp": 4384.6,
+   "open_interest_fp": 134631.55,
+   "dollars_traded_estimate": 1777.21,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -7918,6 +8188,38 @@
    "rules_primary": "If average regular gas prices for United States are strictly greater than $4.80 on Nov 30, 2026 according to AAA, then the market resolves to Yes."
   },
   {
+   "ticker": "KXPGATOUR-THRC26-JVAN",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "The RSM Classic: John VanDerLaan wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.004,
+   "yes_bid_dollars": 0.002,
+   "yes_ask_dollars": 0.004,
+   "no_bid_dollars": 0.996,
+   "no_ask_dollars": 0.998,
+   "volume_fp": 416769.68,
+   "volume_24h_fp": 61229.02,
+   "open_interest_fp": 305901.27,
+   "dollars_traded_estimate": 1667.08,
+   "close_time": "2026-12-06T00:00:00Z",
+   "expected_expiration_time": "2026-11-22T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JVAN",
+   "rules_primary": "If John VanDerLaan wins the The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
+  },
+  {
    "ticker": "KXPGATOUR-THRC26-NDUN",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -8000,10 +8302,10 @@
    "yes_ask_dollars": 0.058,
    "no_bid_dollars": 0.942,
    "no_ask_dollars": 0.946,
-   "volume_fp": 27112.32,
-   "volume_24h_fp": 4199.7,
-   "open_interest_fp": 27112.32,
-   "dollars_traded_estimate": 1572.51,
+   "volume_fp": 27200.51,
+   "volume_24h_fp": 4284.3,
+   "open_interest_fp": 27200.51,
+   "dollars_traded_estimate": 1577.63,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8065,7 +8367,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.999,
    "volume_fp": 129161.46,
-   "volume_24h_fp": 8302.74,
+   "volume_24h_fp": 8175.15,
    "open_interest_fp": 110154.44,
    "dollars_traded_estimate": 1420.78,
    "close_time": "2026-12-06T00:00:00Z",
@@ -8127,10 +8429,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 0.993,
-   "volume_fp": 130746.24,
-   "volume_24h_fp": 35934.96,
-   "open_interest_fp": 95723.13,
-   "dollars_traded_estimate": 1307.46,
+   "volume_fp": 130828.14,
+   "volume_24h_fp": 35896.97,
+   "open_interest_fp": 95805.03,
+   "dollars_traded_estimate": 1308.28,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8265,38 +8567,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-4.60",
    "rules_primary": "If average regular gas prices for United States are strictly greater than $4.60 on Nov 30, 2026 according to AAA, then the market resolves to Yes."
-  },
-  {
-   "ticker": "KXPGATOUR-THRC26-JVAN",
-   "event_ticker": "KXPGATOUR-THRC26",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "The RSM Classic: John VanDerLaan wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.003,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.004,
-   "no_bid_dollars": 0.996,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 416681.92,
-   "volume_24h_fp": 61231.62,
-   "open_interest_fp": 305872.06,
-   "dollars_traded_estimate": 1250.05,
-   "close_time": "2026-12-06T00:00:00Z",
-   "expected_expiration_time": "2026-11-22T00:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-JVAN",
-   "rules_primary": "If John VanDerLaan wins the The RSM Classic, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
    "ticker": "KXAAAGASM-26NOV30-4.70",
@@ -8471,13 +8741,13 @@
    "result": null,
    "last_price_dollars": 0.004,
    "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.004,
-   "no_bid_dollars": 0.996,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 263954.29,
-   "volume_24h_fp": 61078.7,
-   "open_interest_fp": 157984.0,
-   "dollars_traded_estimate": 1055.82,
+   "volume_fp": 264068.71,
+   "volume_24h_fp": 61109.76,
+   "open_interest_fp": 158067.33,
+   "dollars_traded_estimate": 1056.27,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8506,10 +8776,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 207048.37,
-   "volume_24h_fp": 8209.78,
-   "open_interest_fp": 167368.87,
-   "dollars_traded_estimate": 1035.24,
+   "volume_fp": 207137.38,
+   "volume_24h_fp": 8175.81,
+   "open_interest_fp": 167457.88,
+   "dollars_traded_estimate": 1035.69,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8517,38 +8787,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-KBRA",
    "rules_primary": "If Keegan Bradley wins the The RSM Classic, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
-  },
-  {
-   "ticker": "KXPGATOUR-THRC26-CBEZ",
-   "event_ticker": "KXPGATOUR-THRC26",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "The RSM Classic: Christiaan Bezuidenhout wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.004,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 240309.76,
-   "volume_24h_fp": 61078.04,
-   "open_interest_fp": 239150.03,
-   "dollars_traded_estimate": 961.24,
-   "close_time": "2026-12-06T00:00:00Z",
-   "expected_expiration_time": "2026-11-22T00:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CBEZ",
-   "rules_primary": "If Christiaan Bezuidenhout wins the The RSM Classic, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
@@ -8571,7 +8809,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.999,
    "volume_fp": 118072.82,
-   "volume_24h_fp": 8122.06,
+   "volume_24h_fp": 7987.8,
    "open_interest_fp": 99022.35,
    "dollars_traded_estimate": 944.58,
    "close_time": "2026-12-06T00:00:00Z",
@@ -8633,10 +8871,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 0.992,
-   "volume_fp": 89374.94,
-   "volume_24h_fp": 8366.79,
-   "open_interest_fp": 77007.54,
-   "dollars_traded_estimate": 893.75,
+   "volume_fp": 89465.56,
+   "volume_24h_fp": 8343.18,
+   "open_interest_fp": 77098.16,
+   "dollars_traded_estimate": 894.66,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8666,7 +8904,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.999,
    "volume_fp": 176391.35,
-   "volume_24h_fp": 7837.64,
+   "volume_24h_fp": 7730.31,
    "open_interest_fp": 149981.35,
    "dollars_traded_estimate": 881.96,
    "close_time": "2026-12-06T00:00:00Z",
@@ -8743,6 +8981,38 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
+   "ticker": "KXPGATOUR-THRC26-CKIR",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "The RSM Classic: Chris Kirk wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.013,
+   "yes_bid_dollars": 0.012,
+   "yes_ask_dollars": 0.013,
+   "no_bid_dollars": 0.987,
+   "no_ask_dollars": 0.988,
+   "volume_fp": 64819.1,
+   "volume_24h_fp": 6286.79,
+   "open_interest_fp": 61498.07,
+   "dollars_traded_estimate": 842.65,
+   "close_time": "2026-12-06T00:00:00Z",
+   "expected_expiration_time": "2026-11-22T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CKIR",
+   "rules_primary": "If Chris Kirk wins the The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
+  },
+  {
    "ticker": "KXPGATOUR-THRC26-AECK",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -8775,38 +9045,6 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
-   "ticker": "KXPGATOUR-THRC26-CKIR",
-   "event_ticker": "KXPGATOUR-THRC26",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "The RSM Classic: Chris Kirk wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.013,
-   "yes_bid_dollars": 0.012,
-   "yes_ask_dollars": 0.013,
-   "no_bid_dollars": 0.987,
-   "no_ask_dollars": 0.988,
-   "volume_fp": 64728.2,
-   "volume_24h_fp": 6195.83,
-   "open_interest_fp": 61407.17,
-   "dollars_traded_estimate": 841.47,
-   "close_time": "2026-12-06T00:00:00Z",
-   "expected_expiration_time": "2026-11-22T00:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CKIR",
-   "rules_primary": "If Chris Kirk wins the The RSM Classic, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
-  },
-  {
    "ticker": "KXPGATOUR-THRC26-ZBLA",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -8825,10 +9063,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 278110.37,
-   "volume_24h_fp": 7423.36,
-   "open_interest_fp": 272336.24,
-   "dollars_traded_estimate": 834.33,
+   "volume_fp": 278196.08,
+   "volume_24h_fp": 7415.86,
+   "open_interest_fp": 272421.95,
+   "dollars_traded_estimate": 834.59,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8921,10 +9159,10 @@
    "yes_ask_dollars": 0.006,
    "no_bid_dollars": 0.994,
    "no_ask_dollars": 0.995,
-   "volume_fp": 132707.32,
-   "volume_24h_fp": 59687.29,
-   "open_interest_fp": 118788.17,
-   "dollars_traded_estimate": 796.24,
+   "volume_fp": 132802.82,
+   "volume_24h_fp": 59672.49,
+   "open_interest_fp": 118883.67,
+   "dollars_traded_estimate": 796.82,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8953,10 +9191,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 263061.45,
-   "volume_24h_fp": 63101.3,
-   "open_interest_fp": 187126.23,
-   "dollars_traded_estimate": 789.18,
+   "volume_fp": 263140.13,
+   "volume_24h_fp": 63097.99,
+   "open_interest_fp": 187204.91,
+   "dollars_traded_estimate": 789.42,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -8999,6 +9237,38 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
+   "ticker": "KXPGATOUR-THRC26-SVAL",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "The RSM Classic: Sami Valimaki wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.013,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.013,
+   "no_bid_dollars": 0.987,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 57577.45,
+   "volume_24h_fp": 8264.69,
+   "open_interest_fp": 50752.04,
+   "dollars_traded_estimate": 748.51,
+   "close_time": "2026-12-06T00:00:00Z",
+   "expected_expiration_time": "2026-11-22T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SVAL",
+   "rules_primary": "If Sami Valimaki wins the The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
+  },
+  {
    "ticker": "KXPGATOUR-THRC26-KVIL",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -9031,11 +9301,11 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
-   "ticker": "KXPGATOUR-THRC26-SVAL",
+   "ticker": "KXPGATOUR-THRC26-CBEZ",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
    "series_ticker_from_api": null,
-   "title": "The RSM Classic: Sami Valimaki wins",
+   "title": "The RSM Classic: Christiaan Bezuidenhout wins",
    "category_id": "golf",
    "category_basis": "seed",
    "series_categories": [
@@ -9044,22 +9314,22 @@
    "category_matched_by": "official",
    "status": "active",
    "result": null,
-   "last_price_dollars": 0.013,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.013,
-   "no_bid_dollars": 0.987,
-   "no_ask_dollars": 0.99,
-   "volume_fp": 57476.72,
-   "volume_24h_fp": 8282.65,
-   "open_interest_fp": 50651.31,
-   "dollars_traded_estimate": 747.2,
+   "last_price_dollars": 0.003,
+   "yes_bid_dollars": 0.002,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
+   "no_ask_dollars": 0.998,
+   "volume_fp": 240393.4,
+   "volume_24h_fp": 61089.44,
+   "open_interest_fp": 239222.01,
+   "dollars_traded_estimate": 721.18,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
    "settlement_value_dollars": null,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SVAL",
-   "rules_primary": "If Sami Valimaki wins the The RSM Classic, then the market resolves to Yes.",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-CBEZ",
+   "rules_primary": "If Christiaan Bezuidenhout wins the The RSM Classic, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
@@ -9112,10 +9382,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.996,
-   "volume_fp": 138677.44,
-   "volume_24h_fp": 41580.8,
-   "open_interest_fp": 102304.99,
-   "dollars_traded_estimate": 693.39,
+   "volume_fp": 138779.78,
+   "volume_24h_fp": 41566.7,
+   "open_interest_fp": 102407.33,
+   "dollars_traded_estimate": 693.9,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -9144,10 +9414,10 @@
    "yes_ask_dollars": 0.015,
    "no_bid_dollars": 0.985,
    "no_ask_dollars": 0.986,
-   "volume_fp": 45864.52,
-   "volume_24h_fp": 8519.24,
-   "open_interest_fp": 45864.52,
-   "dollars_traded_estimate": 687.97,
+   "volume_fp": 45963.77,
+   "volume_24h_fp": 8491.75,
+   "open_interest_fp": 45963.77,
+   "dollars_traded_estimate": 689.46,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -9315,6 +9585,38 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JRAH",
    "rules_primary": "If Jon Rahm wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-PCOO",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "The RSM Classic: Pierceson Coody wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.004,
+   "yes_bid_dollars": 0.002,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
+   "no_ask_dollars": 0.998,
+   "volume_fp": 150030.56,
+   "volume_24h_fp": 63273.66,
+   "open_interest_fp": 125675.95,
+   "dollars_traded_estimate": 600.12,
+   "close_time": "2026-12-06T00:00:00Z",
+   "expected_expiration_time": "2026-11-22T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-PCOO",
+   "rules_primary": "If Pierceson Coody wins the The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
    "ticker": "KXPGATOUR-THRC26-BMAR",
@@ -9495,10 +9797,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 159203.24,
-   "volume_24h_fp": 2762.91,
-   "open_interest_fp": 156528.87,
-   "dollars_traded_estimate": 477.61,
+   "volume_fp": 159275.19,
+   "volume_24h_fp": 2836.18,
+   "open_interest_fp": 156600.82,
+   "dollars_traded_estimate": 477.83,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -9572,38 +9874,6 @@
    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.60 on Nov 30, 2026 according to AAA, then the market resolves to Yes."
   },
   {
-   "ticker": "KXPGATOUR-THRC26-PCOO",
-   "event_ticker": "KXPGATOUR-THRC26",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "The RSM Classic: Pierceson Coody wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.003,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 149918.48,
-   "volume_24h_fp": 63231.6,
-   "open_interest_fp": 125578.08,
-   "dollars_traded_estimate": 449.76,
-   "close_time": "2026-12-06T00:00:00Z",
-   "expected_expiration_time": "2026-11-22T00:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-PCOO",
-   "rules_primary": "If Pierceson Coody wins the The RSM Classic, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
-  },
-  {
    "ticker": "KXPGATOUR-THRC26-KMIT",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -9618,14 +9888,14 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.003,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 144879.12,
-   "volume_24h_fp": 5470.66,
-   "open_interest_fp": 127070.98,
-   "dollars_traded_estimate": 434.64,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 144949.01,
+   "volume_24h_fp": 5465.67,
+   "open_interest_fp": 127140.87,
+   "dollars_traded_estimate": 434.85,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -9814,10 +10084,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 128176.96,
-   "volume_24h_fp": 62929.05,
-   "open_interest_fp": 124279.54,
-   "dollars_traded_estimate": 384.53,
+   "volume_fp": 128269.05,
+   "volume_24h_fp": 62953.64,
+   "open_interest_fp": 124371.63,
+   "dollars_traded_estimate": 384.81,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10195,10 +10465,10 @@
    "yes_ask_dollars": 0.011,
    "no_bid_dollars": 0.989,
    "no_ask_dollars": 0.99,
-   "volume_fp": 29794.22,
-   "volume_24h_fp": 8230.58,
-   "open_interest_fp": 29242.22,
-   "dollars_traded_estimate": 327.74,
+   "volume_fp": 29882.89,
+   "volume_24h_fp": 8210.94,
+   "open_interest_fp": 29330.89,
+   "dollars_traded_estimate": 328.71,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10273,38 +10543,6 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
-   "ticker": "KXPGATOUR-THRC26-DCHA",
-   "event_ticker": "KXPGATOUR-THRC26",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "The RSM Classic: Davis Chatfield wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.004,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.004,
-   "no_bid_dollars": 0.996,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 71074.58,
-   "volume_24h_fp": 62733.96,
-   "open_interest_fp": 70064.32,
-   "dollars_traded_estimate": 284.3,
-   "close_time": "2026-12-06T00:00:00Z",
-   "expected_expiration_time": "2026-11-22T00:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-DCHA",
-   "rules_primary": "If Davis Chatfield wins the The RSM Classic, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
-  },
-  {
    "ticker": "KXPGATOUR-THRC26-ASMA",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -10355,10 +10593,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 93335.4,
-   "volume_24h_fp": 4030.48,
-   "open_interest_fp": 80230.13,
-   "dollars_traded_estimate": 280.01,
+   "volume_fp": 93389.86,
+   "volume_24h_fp": 4082.45,
+   "open_interest_fp": 80284.59,
+   "dollars_traded_estimate": 280.17,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10575,14 +10813,14 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.003,
-   "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
-   "no_ask_dollars": 0.998,
-   "volume_fp": 79781.99,
-   "volume_24h_fp": 3574.11,
-   "open_interest_fp": 75809.04,
-   "dollars_traded_estimate": 239.35,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 79817.41,
+   "volume_24h_fp": 3520.79,
+   "open_interest_fp": 75844.46,
+   "dollars_traded_estimate": 239.45,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10657,6 +10895,38 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
   },
   {
+   "ticker": "KXPGATOUR-THRC26-DCHA",
+   "event_ticker": "KXPGATOUR-THRC26",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "The RSM Classic: Davis Chatfield wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.003,
+   "yes_bid_dollars": 0.002,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
+   "no_ask_dollars": 0.998,
+   "volume_fp": 71164.51,
+   "volume_24h_fp": 62818.87,
+   "open_interest_fp": 70143.85,
+   "dollars_traded_estimate": 213.49,
+   "close_time": "2026-12-06T00:00:00Z",
+   "expected_expiration_time": "2026-11-22T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-DCHA",
+   "rules_primary": "If Davis Chatfield wins the The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value"
+  },
+  {
    "ticker": "KXPGATOUR-THRC26-DMCC",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -10675,10 +10945,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 68557.97,
-   "volume_24h_fp": 5759.54,
-   "open_interest_fp": 68034.15,
-   "dollars_traded_estimate": 205.67,
+   "volume_fp": 68659.37,
+   "volume_24h_fp": 5769.98,
+   "open_interest_fp": 68135.55,
+   "dollars_traded_estimate": 205.98,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10863,14 +11133,14 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.003,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 52536.66,
-   "volume_24h_fp": 2790.88,
-   "open_interest_fp": 46987.48,
-   "dollars_traded_estimate": 157.61,
+   "yes_bid_dollars": 0.002,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
+   "no_ask_dollars": 0.998,
+   "volume_fp": 52589.81,
+   "volume_24h_fp": 2844.43,
+   "open_interest_fp": 47040.63,
+   "dollars_traded_estimate": 157.77,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -10991,10 +11261,10 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.29,
-   "yes_bid_dollars": 0.29,
+   "yes_bid_dollars": 0.3,
    "yes_ask_dollars": 0.71,
    "no_bid_dollars": 0.29,
-   "no_ask_dollars": 0.71,
+   "no_ask_dollars": 0.7,
    "volume_fp": 412.4,
    "volume_24h_fp": 1.54,
    "open_interest_fp": 210.54,
@@ -11058,10 +11328,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 37744.11,
-   "volume_24h_fp": 5105.82,
-   "open_interest_fp": 37744.11,
-   "dollars_traded_estimate": 113.23,
+   "volume_fp": 37826.16,
+   "volume_24h_fp": 5105.99,
+   "open_interest_fp": 37826.16,
+   "dollars_traded_estimate": 113.48,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -11250,10 +11520,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 25863.1,
-   "volume_24h_fp": 7610.88,
-   "open_interest_fp": 25863.1,
-   "dollars_traded_estimate": 77.59,
+   "volume_fp": 25949.17,
+   "volume_24h_fp": 7614.92,
+   "open_interest_fp": 25949.17,
+   "dollars_traded_estimate": 77.85,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -11443,7 +11713,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 9113.34,
-   "volume_24h_fp": 1304.63,
+   "volume_24h_fp": 1231.99,
    "open_interest_fp": 9113.34,
    "dollars_traded_estimate": 27.34,
    "close_time": "2026-12-06T00:00:00Z",
@@ -11474,10 +11744,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 8220.41,
-   "volume_24h_fp": 5251.67,
-   "open_interest_fp": 8220.41,
-   "dollars_traded_estimate": 24.66,
+   "volume_fp": 8276.52,
+   "volume_24h_fp": 5237.42,
+   "open_interest_fp": 8276.52,
+   "dollars_traded_estimate": 24.83,
    "close_time": "2026-12-06T00:00:00Z",
    "expected_expiration_time": "2026-11-22T00:00:00Z",
    "settlement_ts": null,
@@ -12371,6 +12641,518 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGARYDER-RC27-EUR",
    "rules_primary": "If Team Europe wins the 2027 Ryder Cup, then the market resolves to Yes.",
    "rules_secondary": "If the 2027 Ryder Cup ends in a tie after all scheduled matches are completed, the \u201cTie\u201d market will resolve to Yes, regardless of the Ryder Cup\u2019s official tiebreaking rule in which the previous holder retains the trophy."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-RNEE67",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Rasmus Neergaard-Petersen shoot under 67.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-RNEE67",
+   "rules_primary": "If Rasmus Neergaard-Petersen records under 67.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Rasmus Neergaard-Petersen does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-RHOJ68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Rasmus Hojgaard shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-RHOJ68",
+   "rules_primary": "If Rasmus Hojgaard records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Rasmus Hojgaard does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-RCAS69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Ricky Castillo shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-RCAS69",
+   "rules_primary": "If Ricky Castillo records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Ricky Castillo does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-PKIZ69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Patton Kizzire shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-PKIZ69",
+   "rules_primary": "If Patton Kizzire records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Patton Kizzire does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-MTHO67",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Michael Thorbjornsen shoot under 67.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-MTHO67",
+   "rules_primary": "If Michael Thorbjornsen records under 67.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Michael Thorbjornsen does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-MPEN68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Marco Penge shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-MPEN68",
+   "rules_primary": "If Marco Penge records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Marco Penge does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-MMCG68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Max McGreevy shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-MMCG68",
+   "rules_primary": "If Max McGreevy records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Max McGreevy does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-MGRE69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Max Greyserman shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-MGRE69",
+   "rules_primary": "If Max Greyserman records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Max Greyserman does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-LHOD68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Lee Hodges shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-LHOD68",
+   "rules_primary": "If Lee Hodges records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Lee Hodges does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-JSVE68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Jesper Svensson shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-JSVE68",
+   "rules_primary": "If Jesper Svensson records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Jesper Svensson does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-HLI68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Hao-Tong Li shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-HLI68",
+   "rules_primary": "If Hao-Tong Li records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Hao-Tong Li does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-HLEB70",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Hank Lebioda shoot under 70.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-HLEB70",
+   "rules_primary": "If Hank Lebioda records under 70.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Hank Lebioda does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-HHAL69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Harry Hall shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-HHAL69",
+   "rules_primary": "If Harry Hall records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Harry Hall does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-HENG69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Harris English shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-HENG69",
+   "rules_primary": "If Harris English records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Harris English does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-DRIL68",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Davis Riley shoot under 68.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-DRIL68",
+   "rules_primary": "If Davis Riley records under 68.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Davis Riley does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGAROUNDSCORE-THRC26R4-ADUM69",
+   "event_ticker": "KXPGAROUNDSCORE-THRC26R4",
+   "series_ticker": "KXPGAROUNDSCORE",
+   "series_ticker_from_api": null,
+   "title": "Will Adrien Dumont De Chassart shoot under 69.5 in Round 4?",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-12-08T15:00:00Z",
+   "expected_expiration_time": "2026-11-24T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGAROUNDSCORE-THRC26R4-ADUM69",
+   "rules_primary": "If Adrien Dumont De Chassart records under 69.5 strokes in Round 4 of the 2026 The RSM Classic, then the market resolves to Yes.",
+   "rules_secondary": "If Adrien Dumont De Chassart does not complete Round 4 this market will resolve to a fair market price at the time of withdrawal. \n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
    "ticker": "KXPGA3BALL-THRC26R4MBRENDUNAPUT-NDUN",
@@ -20468,6 +21250,246 @@
  ],
  "settled_markets": [
   {
+   "ticker": "KXNEAR15M-26NOV222145-45",
+   "event_ticker": "KXNEAR15M-26NOV222145",
+   "series_ticker": "KXNEAR15M",
+   "series_ticker_from_api": null,
+   "title": "NEAR price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957683Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNEAR15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXZEC15M-26NOV222145-45",
+   "event_ticker": "KXZEC15M-26NOV222145",
+   "series_ticker": "KXZEC15M",
+   "series_ticker_from_api": null,
+   "title": "ZEC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957628Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXHYPE15M-26NOV222145-45",
+   "event_ticker": "KXHYPE15M-26NOV222145",
+   "series_ticker": "KXHYPE15M",
+   "series_ticker_from_api": null,
+   "title": "HYPE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957581Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXDOGE15M-26NOV222145-45",
+   "event_ticker": "KXDOGE15M-26NOV222145",
+   "series_ticker": "KXDOGE15M",
+   "series_ticker_from_api": null,
+   "title": "DOGE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.33,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.33,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957537Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXBNB15M-26NOV222145-45",
+   "event_ticker": "KXBNB15M-26NOV222145",
+   "series_ticker": "KXBNB15M",
+   "series_ticker_from_api": null,
+   "title": "BNB price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.95747Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXSOL15M-26NOV222145-45",
+   "event_ticker": "KXSOL15M-26NOV222145",
+   "series_ticker": "KXSOL15M",
+   "series_ticker_from_api": null,
+   "title": "SOL price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.32,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.32,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957425Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOL15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXETH15M-26NOV222145-45",
+   "event_ticker": "KXETH15M-26NOV222145",
+   "series_ticker": "KXETH15M",
+   "series_ticker_from_api": null,
+   "title": "ETH price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.33,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 10.0,
+   "volume_24h_fp": 10.0,
+   "open_interest_fp": 10.0,
+   "dollars_traded_estimate": 3.3,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.95741Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETH15M-26NOV222145-45"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV222145-45",
+   "event_ticker": "KXBTC15M-26NOV222145",
+   "series_ticker": "KXBTC15M",
+   "series_ticker_from_api": null,
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.004,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 6618.36,
+   "volume_24h_fp": 6618.36,
+   "open_interest_fp": 2053.48,
+   "dollars_traded_estimate": 26.47,
+   "close_time": "2026-11-23T02:45:00Z",
+   "expected_expiration_time": "2026-11-23T02:50:00Z",
+   "settlement_ts": "2026-11-23T02:45:04.957377Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV222145-45"
+  },
+  {
    "ticker": "KXNEAR15M-26NOV222130-30",
    "event_ticker": "KXNEAR15M-26NOV222130",
    "series_ticker": "KXNEAR15M",
@@ -21726,246 +22748,6 @@
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221900-BTC"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221945-XRP",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221945",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:30PM EST to 7:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:45:00Z",
-   "expected_expiration_time": "2026-11-23T00:50:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953654Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221945-XRP"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221945-SOL",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221945",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:30PM EST to 7:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:45:00Z",
-   "expected_expiration_time": "2026-11-23T00:50:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953654Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221945-SOL"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221945-HYPE",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221945",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:30PM EST to 7:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:45:00Z",
-   "expected_expiration_time": "2026-11-23T00:50:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953654Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221945-HYPE"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221945-ETH",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221945",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:30PM EST to 7:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:45:00Z",
-   "expected_expiration_time": "2026-11-23T00:50:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953654Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221945-ETH"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221945-BTC",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221945",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:30PM EST to 7:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:45:00Z",
-   "expected_expiration_time": "2026-11-23T00:50:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953654Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221945-BTC"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221930-XRP",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221930",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:15PM EST to 7:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:30:00Z",
-   "expected_expiration_time": "2026-11-23T00:35:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953612Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221930-XRP"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221930-SOL",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221930",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:15PM EST to 7:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:30:00Z",
-   "expected_expiration_time": "2026-11-23T00:35:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953612Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221930-SOL"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV221930-HYPE",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV221930",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 22 - 7:15PM EST to 7:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-23T00:30:00Z",
-   "expected_expiration_time": "2026-11-23T00:35:00Z",
-   "settlement_ts": "2026-11-23T01:32:54.953612Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV221930-HYPE"
   },
   {
    "ticker": "KXAAAGASD-26NOV22-3.7000",
@@ -26476,7 +27258,7 @@
     "yes_bids": [
      {
       "price": 0.01,
-      "contracts": 95.5
+      "contracts": 75.5
      },
      {
       "price": 0.02,
@@ -26520,9 +27302,9 @@
     "best_yes_ask_derived": 0.18,
     "contracts_at_best_yes_ask": 925.92,
     "contracts_at_best_yes_bid": 1960.78,
-    "visible_contracts_total": 9003.26,
+    "visible_contracts_total": 8983.26,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26546,7 +27328,7 @@
     "contracts_at_best_yes_bid": 200.0,
     "visible_contracts_total": 200.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B147500/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26562,7 +27344,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26578,7 +27360,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26594,7 +27376,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26642,7 +27424,7 @@
      },
      {
       "price": 0.911,
-      "contracts": 1404.35
+      "contracts": 1309.45
      }
     ],
     "best_yes_bid": {
@@ -26651,14 +27433,14 @@
     },
     "best_no_bid": {
      "price": 0.911,
-     "contracts": 1404.35
+     "contracts": 1309.45
     },
     "best_yes_ask_derived": 0.089,
-    "contracts_at_best_yes_ask": 1404.35,
+    "contracts_at_best_yes_ask": 1309.45,
     "contracts_at_best_yes_bid": 2032.52,
-    "visible_contracts_total": 18288.14,
+    "visible_contracts_total": 18193.24,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MPEN/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26674,7 +27456,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26690,7 +27472,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26706,7 +27488,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-SSTR/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26754,7 +27536,7 @@
      },
      {
       "price": 0.83,
-      "contracts": 275.98
+      "contracts": 188.17
      }
     ],
     "best_yes_bid": {
@@ -26763,14 +27545,14 @@
     },
     "best_no_bid": {
      "price": 0.83,
-     "contracts": 275.98
+     "contracts": 188.17
     },
     "best_yes_ask_derived": 0.17,
-    "contracts_at_best_yes_ask": 275.98,
+    "contracts_at_best_yes_ask": 188.17,
     "contracts_at_best_yes_bid": 2254.57,
-    "visible_contracts_total": 9923.01,
+    "visible_contracts_total": 9835.2,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-MTHO/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26786,7 +27568,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26802,7 +27584,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.40/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   },
   {
@@ -26818,7 +27600,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-23T02:30:58Z"
+    "fetched_at": "2026-11-23T02:45:58Z"
    }
   }
  ],
