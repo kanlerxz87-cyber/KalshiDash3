@@ -3799,22 +3799,22 @@
    "first_seen_at": "2026-11-22T00:16:11Z",
    "high_roi": true,
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 58.43,
-    "est_dollars": 1.17,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 35511468.3,
-    "volume_to": 35511526.73,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "58.43 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-22T00:16:11Z"
+    "decided_at": "2026-11-24T13:19:45Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -3848,22 +3848,22 @@
    "first_seen_at": "2026-11-22T00:16:11Z",
    "high_roi": true,
    "evidence": {
-    "state": "traded_ge_floor",
-    "contracts_traded": 100.71,
-    "est_dollars": 97.69,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 72325863.96,
-    "volume_to": 72325964.67,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "100.71 contracts traded in the interval, at or above this project's 100-contract floor",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-22T00:16:11Z"
+    "decided_at": "2026-11-24T13:19:45Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -3915,10 +3915,10 @@
     "decided_at": "2026-11-24T13:04:44Z"
    },
    "evidence_reversion": {
-    "observed_after": 3,
-    "min_distance_from_from_price": 0.0,
-    "gave_back_half": true,
-    "still_open": false
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
    }
   },
   {
@@ -3964,10 +3964,10 @@
     "decided_at": "2026-11-24T13:04:44Z"
    },
    "evidence_reversion": {
-    "observed_after": 3,
-    "min_distance_from_from_price": 0.0,
-    "gave_back_half": true,
-    "still_open": false
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
    }
   },
   {
