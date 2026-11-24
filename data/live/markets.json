@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-24T15:04:44Z",
- "started_at": "2026-11-24T15:04:10Z",
+ "collected_at": "2026-11-24T15:19:44Z",
+ "started_at": "2026-11-24T15:19:10Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -15,16 +15,16 @@
   "open_total_scanned": 25214,
   "settled_total_scanned": 30552,
   "open_in_scope": 394,
-  "open_in_scope_total": 21718,
+  "open_in_scope_total": 20995,
   "open_published_rows": 394,
   "settled_in_scope": 1600,
   "settled_published_rows": 200,
-  "open_out_of_scope": 3415,
-  "settled_out_of_scope": 13263,
+  "open_out_of_scope": 4138,
+  "settled_out_of_scope": 13284,
   "open_excluded_multivariate": 0,
   "settled_excluded_multivariate": 0,
   "open_excluded_off_topic_or_qa": 0,
-  "settled_excluded_off_topic_or_qa": 40,
+  "settled_excluded_off_topic_or_qa": 41,
   "open_excluded_series": 80,
   "settled_excluded_series": 40,
   "excluded_series_detail": {
@@ -106,8 +106,8 @@
   "open_paging_truncated_at_safety_cap": true,
   "settled_paging_truncated_at_safety_cap": true,
   "safety_scan_cap": 25000,
-  "settled_rows_trimmed_for_size": 15581,
-  "settled_in_scope_total": 17181,
+  "settled_rows_trimmed_for_size": 15559,
+  "settled_in_scope_total": 17159,
   "settled_in_scope_total_method": "exact count of every settled row the paged scan returned inside the five topics, measured before the per-topic publish selection and before the size window; the scan stopped at the safety cap, so this is a lower bound (safety_scan_cap 25000, kept window 1600, published 200 across the five topics)",
   "settled_kept_window": 1600,
   "settled_published": 200,
@@ -190,7 +190,7 @@
     "url": "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXPGASOLHEIM&limit=1000"
    }
   },
-  "open_rows_trimmed_for_size": 21324,
+  "open_rows_trimmed_for_size": 20601,
   "rows_dropped_wrong_status": 0
  },
  "series_index": {
@@ -910,6 +910,46 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
   },
+  "KXAFCCL2BTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Both teams to score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAFCCL2BTTS"
+  },
+  "KXAFCCL2SPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAFCCL2SPREAD"
+  },
+  "KXAFCCL2TOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAFCCL2TOTAL"
+  },
+  "KXAFCCLBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAFCCLBTTS"
+  },
   "KXAFCCLSPREAD": {
    "categories": [
     "Sports"
@@ -1231,6 +1271,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCS2MAP"
   },
+  "KXCS2SPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "CS2 Spread",
+   "tags": [
+    "Esports"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCS2SPREAD"
+  },
   "KXCS2TOTALMAPS": {
    "categories": [
     "Sports"
@@ -1398,6 +1448,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLAST"
   },
+  "KXEPLCORNERS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL Corners",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLCORNERS"
+  },
   "KXEPLFIRSTGOAL": {
    "categories": [
     "Sports"
@@ -1427,6 +1487,16 @@
     "Soccer"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLSOA"
+  },
+  "KXEPLTCORNERS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL Team Corners",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLTCORNERS"
   },
   "KXESOCCERGAME": {
    "categories": [
@@ -1564,6 +1634,16 @@
     "HYPE"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXHYPED"
+  },
+  "KXINDSLTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXINDSLTOTAL"
   },
   "KXINXMAXMON": {
    "categories": [
@@ -2625,6 +2705,26 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEATEAMTOTAL"
   },
+  "KXSERIECBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIECBTTS"
+  },
+  "KXSERIECSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIECSPREAD"
+  },
   "KXSERIECTOTAL": {
    "categories": [
     "Sports"
@@ -2656,6 +2756,17 @@
     "Silver"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSILVERH"
+  },
+  "KXSOFRD": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "Daily SOFR",
+   "tags": [
+    "Fed",
+    "Econ Daily"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSOFRD"
   },
   "KXSOL15M": {
    "categories": [
@@ -2800,6 +2911,17 @@
     "Hourly temperature"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTEMPNYCHS"
+  },
+  "KXTSAD": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "Daily TSA passenger screenings",
+   "tags": [
+    "Jobs & Economy",
+    "Econ Daily"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTSAD"
   },
   "KXUKRPLBTTS": {
    "categories": [
@@ -3160,10 +3282,10 @@
    "yes_ask_dollars": 0.23,
    "no_bid_dollars": 0.77,
    "no_ask_dollars": 0.78,
-   "volume_fp": 49044516.23,
-   "volume_24h_fp": 9419.11,
+   "volume_fp": 49044614.06,
+   "volume_24h_fp": 9456.21,
    "open_interest_fp": 8372739.14,
-   "dollars_traded_estimate": 11280238.73,
+   "dollars_traded_estimate": 11280261.23,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3192,10 +3314,10 @@
    "yes_ask_dollars": 0.16,
    "no_bid_dollars": 0.84,
    "no_ask_dollars": 0.87,
-   "volume_fp": 65046816.85,
-   "volume_24h_fp": 9704.46,
-   "open_interest_fp": 13426547.17,
-   "dollars_traded_estimate": 10407490.7,
+   "volume_fp": 65046885.45,
+   "volume_24h_fp": 9733.69,
+   "open_interest_fp": 13426615.77,
+   "dollars_traded_estimate": 10407501.67,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3224,10 +3346,10 @@
    "yes_ask_dollars": 0.18,
    "no_bid_dollars": 0.82,
    "no_ask_dollars": 0.83,
-   "volume_fp": 43020647.29,
-   "volume_24h_fp": 6323.83,
+   "volume_fp": 43020717.08,
+   "volume_24h_fp": 6356.9,
    "open_interest_fp": 7169945.27,
-   "dollars_traded_estimate": 7743716.51,
+   "dollars_traded_estimate": 7743729.07,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3256,10 +3378,10 @@
    "yes_ask_dollars": 0.1,
    "no_bid_dollars": 0.9,
    "no_ask_dollars": 0.91,
-   "volume_fp": 61771333.56,
-   "volume_24h_fp": 15279.46,
+   "volume_fp": 61771418.23,
+   "volume_24h_fp": 15285.77,
    "open_interest_fp": 7790754.99,
-   "dollars_traded_estimate": 6177133.36,
+   "dollars_traded_estimate": 6177141.82,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3288,10 +3410,10 @@
    "yes_ask_dollars": 0.05,
    "no_bid_dollars": 0.95,
    "no_ask_dollars": 0.96,
-   "volume_fp": 80244770.94,
-   "volume_24h_fp": 15976.36,
-   "open_interest_fp": 26595077.12,
-   "dollars_traded_estimate": 4012238.55,
+   "volume_fp": 80244851.24,
+   "volume_24h_fp": 16005.98,
+   "open_interest_fp": 26595157.42,
+   "dollars_traded_estimate": 4012242.56,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3320,10 +3442,10 @@
    "yes_ask_dollars": 0.09,
    "no_bid_dollars": 0.91,
    "no_ask_dollars": 0.92,
-   "volume_fp": 35322583.83,
-   "volume_24h_fp": 13021.46,
+   "volume_fp": 35322673.13,
+   "volume_24h_fp": 13033.85,
    "open_interest_fp": 4725216.25,
-   "dollars_traded_estimate": 3179032.54,
+   "dollars_traded_estimate": 3179040.58,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3352,10 +3474,10 @@
    "yes_ask_dollars": 0.07,
    "no_bid_dollars": 0.93,
    "no_ask_dollars": 0.95,
-   "volume_fp": 39615628.39,
-   "volume_24h_fp": 21243.23,
+   "volume_fp": 39615709.97,
+   "volume_24h_fp": 21274.13,
    "open_interest_fp": 5968304.27,
-   "dollars_traded_estimate": 2773093.99,
+   "dollars_traded_estimate": 2773099.7,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3384,10 +3506,10 @@
    "yes_ask_dollars": 0.03,
    "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.98,
-   "volume_fp": 89263750.37,
-   "volume_24h_fp": 17461.55,
+   "volume_fp": 89263821.92,
+   "volume_24h_fp": 17472.59,
    "open_interest_fp": 25244656.04,
-   "dollars_traded_estimate": 2677912.51,
+   "dollars_traded_estimate": 2677914.66,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3417,7 +3539,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 81945156.07,
-   "volume_24h_fp": 913.54,
+   "volume_24h_fp": 885.85,
    "open_interest_fp": 24988749.65,
    "dollars_traded_estimate": 1638903.12,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3448,10 +3570,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 162379010.57,
-   "volume_24h_fp": 65427.1,
+   "volume_fp": 162379070.65,
+   "volume_24h_fp": 65440.59,
    "open_interest_fp": 23550502.17,
-   "dollars_traded_estimate": 1623790.11,
+   "dollars_traded_estimate": 1623790.71,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3480,10 +3602,10 @@
    "yes_ask_dollars": 0.03,
    "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.98,
-   "volume_fp": 49228457.26,
-   "volume_24h_fp": 6486.8,
-   "open_interest_fp": 4886245.26,
-   "dollars_traded_estimate": 1476853.72,
+   "volume_fp": 49228543.25,
+   "volume_24h_fp": 6520.99,
+   "open_interest_fp": 4886331.25,
+   "dollars_traded_estimate": 1476856.3,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3576,10 +3698,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 125555741.94,
-   "volume_24h_fp": 63529.93,
-   "open_interest_fp": 21075147.21,
-   "dollars_traded_estimate": 1255557.42,
+   "volume_fp": 125555775.02,
+   "volume_24h_fp": 63510.23,
+   "open_interest_fp": 21075154.04,
+   "dollars_traded_estimate": 1255557.75,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3608,10 +3730,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 58486210.89,
-   "volume_24h_fp": 20574.11,
+   "volume_fp": 58486287.22,
+   "volume_24h_fp": 20604.68,
    "open_interest_fp": 6099834.62,
-   "dollars_traded_estimate": 1169724.22,
+   "dollars_traded_estimate": 1169725.74,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3672,10 +3794,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 52391155.07,
-   "volume_24h_fp": 6118.06,
-   "open_interest_fp": 7032659.66,
-   "dollars_traded_estimate": 1047823.1,
+   "volume_fp": 52391229.81,
+   "volume_24h_fp": 6130.35,
+   "open_interest_fp": 7032700.32,
+   "dollars_traded_estimate": 1047824.6,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3800,10 +3922,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 83549957.18,
-   "volume_24h_fp": 4968.96,
-   "open_interest_fp": 39623539.54,
-   "dollars_traded_estimate": 835499.57,
+   "volume_fp": 83550045.7,
+   "volume_24h_fp": 5018.3,
+   "open_interest_fp": 39623628.06,
+   "dollars_traded_estimate": 835500.46,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3864,10 +3986,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 73934840.72,
-   "volume_24h_fp": 5794.9,
-   "open_interest_fp": 6923164.73,
-   "dollars_traded_estimate": 739348.41,
+   "volume_fp": 73934908.39,
+   "volume_24h_fp": 5851.21,
+   "open_interest_fp": 6923232.4,
+   "dollars_traded_estimate": 739349.08,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3896,10 +4018,10 @@
    "yes_ask_dollars": 0.04,
    "no_bid_dollars": 0.96,
    "no_ask_dollars": 1.0,
-   "volume_fp": 72400313.86,
-   "volume_24h_fp": 36740.34,
+   "volume_fp": 72400404.99,
+   "volume_24h_fp": 36770.51,
    "open_interest_fp": 7329053.41,
-   "dollars_traded_estimate": 724003.14,
+   "dollars_traded_estimate": 724004.05,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3928,10 +4050,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 69843744.92,
-   "volume_24h_fp": 22639.92,
+   "volume_fp": 69843831.64,
+   "volume_24h_fp": 22671.92,
    "open_interest_fp": 19463256.62,
-   "dollars_traded_estimate": 698437.45,
+   "dollars_traded_estimate": 698438.32,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3960,10 +4082,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 67438043.9,
-   "volume_24h_fp": 5848.44,
+   "volume_fp": 67438137.2,
+   "volume_24h_fp": 5894.07,
    "open_interest_fp": 6474610.96,
-   "dollars_traded_estimate": 674380.44,
+   "dollars_traded_estimate": 674381.37,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3992,10 +4114,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 65581872.02,
-   "volume_24h_fp": 35453.47,
+   "volume_fp": 65581953.04,
+   "volume_24h_fp": 35503.18,
    "open_interest_fp": 12744518.53,
-   "dollars_traded_estimate": 655818.72,
+   "dollars_traded_estimate": 655819.53,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4057,7 +4179,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 56238676.94,
-   "volume_24h_fp": 2826.1,
+   "volume_24h_fp": 2794.05,
    "open_interest_fp": 11432563.86,
    "dollars_traded_estimate": 562386.77,
    "close_time": "2027-01-01T05:00:00Z",
@@ -4088,10 +4210,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 52124276.95,
-   "volume_24h_fp": 65135.98,
+   "volume_fp": 52124305.91,
+   "volume_24h_fp": 65116.92,
    "open_interest_fp": 9353562.15,
-   "dollars_traded_estimate": 521242.77,
+   "dollars_traded_estimate": 521243.06,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4120,10 +4242,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 46793420.28,
-   "volume_24h_fp": 34366.77,
-   "open_interest_fp": 8431195.61,
-   "dollars_traded_estimate": 467934.2,
+   "volume_fp": 46793473.9,
+   "volume_24h_fp": 34382.71,
+   "open_interest_fp": 8431249.23,
+   "dollars_traded_estimate": 467934.74,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4184,10 +4306,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 35553760.11,
-   "volume_24h_fp": 5854.86,
+   "volume_fp": 35553828.25,
+   "volume_24h_fp": 5895.36,
    "open_interest_fp": 6340715.01,
-   "dollars_traded_estimate": 355537.6,
+   "dollars_traded_estimate": 355538.28,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4568,10 +4690,10 @@
    "yes_ask_dollars": 0.03,
    "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.979,
-   "volume_fp": 826473.23,
-   "volume_24h_fp": 343.59,
-   "open_interest_fp": 826445.23,
-   "dollars_traded_estimate": 24794.2,
+   "volume_fp": 826550.29,
+   "volume_24h_fp": 408.9,
+   "open_interest_fp": 826522.29,
+   "dollars_traded_estimate": 24796.51,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -4662,10 +4784,10 @@
    "yes_ask_dollars": 0.18,
    "no_bid_dollars": 0.82,
    "no_ask_dollars": 0.83,
-   "volume_fp": 47304.89,
-   "volume_24h_fp": 352.09,
+   "volume_fp": 47394.0,
+   "volume_24h_fp": 436.96,
    "open_interest_fp": 46296.0,
-   "dollars_traded_estimate": 8514.88,
+   "dollars_traded_estimate": 8530.92,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -4689,15 +4811,15 @@
    "category_matched_by": "seed",
    "status": "active",
    "result": null,
-   "last_price_dollars": 0.83,
+   "last_price_dollars": 0.84,
    "yes_bid_dollars": 0.83,
    "yes_ask_dollars": 0.84,
    "no_bid_dollars": 0.16,
    "no_ask_dollars": 0.17,
-   "volume_fp": 9556.51,
-   "volume_24h_fp": 2589.49,
-   "open_interest_fp": 6240.16,
-   "dollars_traded_estimate": 7931.9,
+   "volume_fp": 9661.51,
+   "volume_24h_fp": 2693.97,
+   "open_interest_fp": 6135.16,
+   "dollars_traded_estimate": 8115.67,
    "close_time": "2026-11-30T04:59:00Z",
    "expected_expiration_time": "2026-11-30T15:00:00Z",
    "settlement_ts": null,
@@ -4725,10 +4847,10 @@
    "yes_ask_dollars": 0.006,
    "no_bid_dollars": 0.994,
    "no_ask_dollars": 0.995,
-   "volume_fp": 348999.25,
-   "volume_24h_fp": 376.57,
-   "open_interest_fp": 348999.25,
-   "dollars_traded_estimate": 2094.0,
+   "volume_fp": 349071.42,
+   "volume_24h_fp": 436.17,
+   "open_interest_fp": 349071.42,
+   "dollars_traded_estimate": 2094.43,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -4943,10 +5065,10 @@
    "yes_ask_dollars": 0.008,
    "no_bid_dollars": 0.992,
    "no_ask_dollars": 0.997,
-   "volume_fp": 155918.58,
-   "volume_24h_fp": 345.33,
-   "open_interest_fp": 155918.58,
-   "dollars_traded_estimate": 1247.35,
+   "volume_fp": 155996.97,
+   "volume_24h_fp": 426.86,
+   "open_interest_fp": 155996.97,
+   "dollars_traded_estimate": 1247.98,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5099,10 +5221,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 176150.89,
-   "volume_24h_fp": 334.56,
-   "open_interest_fp": 176150.89,
-   "dollars_traded_estimate": 880.75,
+   "volume_fp": 176241.53,
+   "volume_24h_fp": 423.06,
+   "open_interest_fp": 176241.53,
+   "dollars_traded_estimate": 881.21,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5131,10 +5253,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 167051.65,
-   "volume_24h_fp": 356.86,
-   "open_interest_fp": 167049.65,
-   "dollars_traded_estimate": 835.26,
+   "volume_fp": 167128.73,
+   "volume_24h_fp": 425.9,
+   "open_interest_fp": 167126.73,
+   "dollars_traded_estimate": 835.64,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5225,10 +5347,10 @@
    "yes_ask_dollars": 0.05,
    "no_bid_dollars": 0.95,
    "no_ask_dollars": 0.953,
-   "volume_fp": 8714.63,
-   "volume_24h_fp": 357.79,
-   "open_interest_fp": 8714.63,
-   "dollars_traded_estimate": 435.73,
+   "volume_fp": 8801.51,
+   "volume_24h_fp": 432.58,
+   "open_interest_fp": 8801.51,
+   "dollars_traded_estimate": 440.08,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5350,10 +5472,10 @@
    "yes_ask_dollars": 0.003,
    "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
-   "volume_fp": 111478.3,
-   "volume_24h_fp": 55904.81,
-   "open_interest_fp": 111478.3,
-   "dollars_traded_estimate": 334.43,
+   "volume_fp": 111556.31,
+   "volume_24h_fp": 55971.63,
+   "open_interest_fp": 111556.31,
+   "dollars_traded_estimate": 334.67,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5446,10 +5568,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 55904.46,
-   "volume_24h_fp": 336.13,
-   "open_interest_fp": 55904.46,
-   "dollars_traded_estimate": 279.52,
+   "volume_fp": 56002.76,
+   "volume_24h_fp": 420.42,
+   "open_interest_fp": 56002.76,
+   "dollars_traded_estimate": 280.01,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5478,10 +5600,10 @@
    "yes_ask_dollars": 0.04,
    "no_bid_dollars": 0.96,
    "no_ask_dollars": 0.965,
-   "volume_fp": 5163.4,
-   "volume_24h_fp": 372.85,
-   "open_interest_fp": 5163.4,
-   "dollars_traded_estimate": 206.54,
+   "volume_fp": 5246.92,
+   "volume_24h_fp": 450.15,
+   "open_interest_fp": 5246.92,
+   "dollars_traded_estimate": 209.88,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5541,10 +5663,10 @@
    "yes_ask_dollars": 0.095,
    "no_bid_dollars": 0.905,
    "no_ask_dollars": 0.921,
-   "volume_fp": 426.98,
-   "volume_24h_fp": 357.8,
-   "open_interest_fp": 378.98,
-   "dollars_traded_estimate": 40.56,
+   "volume_fp": 517.53,
+   "volume_24h_fp": 440.96,
+   "open_interest_fp": 469.53,
+   "dollars_traded_estimate": 49.17,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5604,10 +5726,10 @@
    "yes_ask_dollars": 0.05,
    "no_bid_dollars": 0.95,
    "no_ask_dollars": 0.983,
-   "volume_fp": 475.71,
-   "volume_24h_fp": 341.8,
-   "open_interest_fp": 353.71,
-   "dollars_traded_estimate": 23.79,
+   "volume_fp": 556.12,
+   "volume_24h_fp": 411.34,
+   "open_interest_fp": 434.12,
+   "dollars_traded_estimate": 27.81,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5636,10 +5758,10 @@
    "yes_ask_dollars": 0.023,
    "no_bid_dollars": 0.977,
    "no_ask_dollars": 0.979,
-   "volume_fp": 479.8,
-   "volume_24h_fp": 325.84,
-   "open_interest_fp": 339.8,
-   "dollars_traded_estimate": 11.04,
+   "volume_fp": 575.72,
+   "volume_24h_fp": 412.01,
+   "open_interest_fp": 435.72,
+   "dollars_traded_estimate": 13.24,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5668,10 +5790,10 @@
    "yes_ask_dollars": 0.028,
    "no_bid_dollars": 0.972,
    "no_ask_dollars": 0.977,
-   "volume_fp": 390.69,
-   "volume_24h_fp": 340.03,
-   "open_interest_fp": 364.69,
-   "dollars_traded_estimate": 10.94,
+   "volume_fp": 464.84,
+   "volume_24h_fp": 409.48,
+   "open_interest_fp": 438.84,
+   "dollars_traded_estimate": 13.02,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5700,10 +5822,10 @@
    "yes_ask_dollars": 0.028,
    "no_bid_dollars": 0.972,
    "no_ask_dollars": 0.993,
-   "volume_fp": 370.04,
-   "volume_24h_fp": 351.1,
-   "open_interest_fp": 370.04,
-   "dollars_traded_estimate": 10.36,
+   "volume_fp": 442.45,
+   "volume_24h_fp": 427.12,
+   "open_interest_fp": 442.45,
+   "dollars_traded_estimate": 12.39,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5711,38 +5833,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-TWOO",
    "rules_primary": "If Tiger Woods wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-BDEC",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Bryson DeChambeau wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.025,
-   "yes_bid_dollars": 0.024,
-   "yes_ask_dollars": 0.025,
-   "no_bid_dollars": 0.975,
-   "no_ask_dollars": 0.976,
-   "volume_fp": 401.96,
-   "volume_24h_fp": 380.65,
-   "open_interest_fp": 401.96,
-   "dollars_traded_estimate": 10.05,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-BDEC",
-   "rules_primary": "If Bryson DeChambeau wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -5764,10 +5854,10 @@
    "yes_ask_dollars": 0.025,
    "no_bid_dollars": 0.975,
    "no_ask_dollars": 0.976,
-   "volume_fp": 398.72,
-   "volume_24h_fp": 376.64,
-   "open_interest_fp": 398.72,
-   "dollars_traded_estimate": 9.97,
+   "volume_fp": 475.31,
+   "volume_24h_fp": 450.6,
+   "open_interest_fp": 475.31,
+   "dollars_traded_estimate": 11.88,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5775,6 +5865,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-CMOR",
    "rules_primary": "If Collin Morikawa wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-BDEC",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Bryson DeChambeau wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.025,
+   "yes_bid_dollars": 0.024,
+   "yes_ask_dollars": 0.025,
+   "no_bid_dollars": 0.975,
+   "no_ask_dollars": 0.976,
+   "volume_fp": 462.54,
+   "volume_24h_fp": 444.35,
+   "open_interest_fp": 462.54,
+   "dollars_traded_estimate": 11.56,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-BDEC",
+   "rules_primary": "If Bryson DeChambeau wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -5796,10 +5918,10 @@
    "yes_ask_dollars": 0.023,
    "no_bid_dollars": 0.977,
    "no_ask_dollars": 0.979,
-   "volume_fp": 390.24,
-   "volume_24h_fp": 363.95,
-   "open_interest_fp": 386.24,
-   "dollars_traded_estimate": 8.98,
+   "volume_fp": 447.81,
+   "volume_24h_fp": 420.22,
+   "open_interest_fp": 443.81,
+   "dollars_traded_estimate": 10.3,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5828,10 +5950,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 424.13,
-   "volume_24h_fp": 354.49,
-   "open_interest_fp": 372.13,
-   "dollars_traded_estimate": 8.48,
+   "volume_fp": 502.29,
+   "volume_24h_fp": 426.88,
+   "open_interest_fp": 450.29,
+   "dollars_traded_estimate": 10.05,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5839,70 +5961,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-HMAT",
    "rules_primary": "If Hideki Matsuyama wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-SKIM",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Si Woo Kim wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.02,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.02,
-   "no_bid_dollars": 0.98,
-   "no_ask_dollars": 0.99,
-   "volume_fp": 371.95,
-   "volume_24h_fp": 344.02,
-   "open_interest_fp": 371.95,
-   "dollars_traded_estimate": 7.44,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SKIM",
-   "rules_primary": "If Si Woo Kim wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-SLOW",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Shane Lowry wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.018,
-   "yes_bid_dollars": 0.007,
-   "yes_ask_dollars": 0.018,
-   "no_bid_dollars": 0.982,
-   "no_ask_dollars": 0.993,
-   "volume_fp": 406.83,
-   "volume_24h_fp": 347.01,
-   "open_interest_fp": 360.83,
-   "dollars_traded_estimate": 7.32,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SLOW",
-   "rules_primary": "If Shane Lowry wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -5924,10 +5982,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.988,
-   "volume_fp": 366.16,
-   "volume_24h_fp": 336.41,
-   "open_interest_fp": 364.16,
-   "dollars_traded_estimate": 7.32,
+   "volume_fp": 462.15,
+   "volume_24h_fp": 435.89,
+   "open_interest_fp": 460.15,
+   "dollars_traded_estimate": 9.24,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5935,6 +5993,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JKOI",
    "rules_primary": "If Jackson Koivun wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-SKIM",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Si Woo Kim wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.02,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.02,
+   "no_bid_dollars": 0.98,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 445.07,
+   "volume_24h_fp": 417.84,
+   "open_interest_fp": 445.07,
+   "dollars_traded_estimate": 8.9,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SKIM",
+   "rules_primary": "If Si Woo Kim wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -5956,10 +6046,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 352.27,
-   "volume_24h_fp": 332.9,
-   "open_interest_fp": 352.27,
-   "dollars_traded_estimate": 7.05,
+   "volume_fp": 426.37,
+   "volume_24h_fp": 405.26,
+   "open_interest_fp": 426.37,
+   "dollars_traded_estimate": 8.53,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5967,6 +6057,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-VHOV",
    "rules_primary": "If Viktor Hovland wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-SLOW",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Shane Lowry wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.018,
+   "yes_bid_dollars": 0.007,
+   "yes_ask_dollars": 0.018,
+   "no_bid_dollars": 0.982,
+   "no_ask_dollars": 0.993,
+   "volume_fp": 473.42,
+   "volume_24h_fp": 408.27,
+   "open_interest_fp": 427.42,
+   "dollars_traded_estimate": 8.52,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SLOW",
+   "rules_primary": "If Shane Lowry wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -5988,10 +6110,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.99,
-   "volume_fp": 384.56,
-   "volume_24h_fp": 375.25,
-   "open_interest_fp": 384.56,
-   "dollars_traded_estimate": 6.92,
+   "volume_fp": 468.7,
+   "volume_24h_fp": 442.55,
+   "open_interest_fp": 468.7,
+   "dollars_traded_estimate": 8.44,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -5999,38 +6121,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JSPI",
    "rules_primary": "If Jordan Spieth wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-MBRE",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Michael Brennan wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.018,
-   "yes_bid_dollars": 0.017,
-   "yes_ask_dollars": 0.018,
-   "no_bid_dollars": 0.982,
-   "no_ask_dollars": 0.983,
-   "volume_fp": 379.75,
-   "volume_24h_fp": 357.79,
-   "open_interest_fp": 379.75,
-   "dollars_traded_estimate": 6.84,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MBRE",
-   "rules_primary": "If Michael Brennan wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6052,10 +6142,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.988,
-   "volume_fp": 371.55,
-   "volume_24h_fp": 349.46,
-   "open_interest_fp": 371.55,
-   "dollars_traded_estimate": 6.69,
+   "volume_fp": 468.72,
+   "volume_24h_fp": 440.18,
+   "open_interest_fp": 468.72,
+   "dollars_traded_estimate": 8.44,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6063,6 +6153,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JTHO",
    "rules_primary": "If Justin Thomas wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-MBRE",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Michael Brennan wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.018,
+   "yes_bid_dollars": 0.017,
+   "yes_ask_dollars": 0.018,
+   "no_bid_dollars": 0.982,
+   "no_ask_dollars": 0.983,
+   "volume_fp": 447.22,
+   "volume_24h_fp": 424.22,
+   "open_interest_fp": 447.22,
+   "dollars_traded_estimate": 8.05,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MBRE",
+   "rules_primary": "If Michael Brennan wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6084,10 +6206,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.985,
-   "volume_fp": 371.57,
-   "volume_24h_fp": 353.58,
-   "open_interest_fp": 371.57,
-   "dollars_traded_estimate": 6.69,
+   "volume_fp": 446.3,
+   "volume_24h_fp": 423.98,
+   "open_interest_fp": 446.3,
+   "dollars_traded_estimate": 8.03,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6116,10 +6238,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.988,
-   "volume_fp": 369.2,
-   "volume_24h_fp": 346.79,
-   "open_interest_fp": 369.2,
-   "dollars_traded_estimate": 6.65,
+   "volume_fp": 436.28,
+   "volume_24h_fp": 421.16,
+   "open_interest_fp": 436.28,
+   "dollars_traded_estimate": 7.85,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6127,38 +6249,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-CGOT",
    "rules_primary": "If Chris Gotterup wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-JNIE",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Joaquin Niemann wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.011,
-   "yes_bid_dollars": 0.006,
-   "yes_ask_dollars": 0.011,
-   "no_bid_dollars": 0.989,
-   "no_ask_dollars": 0.994,
-   "volume_fp": 570.73,
-   "volume_24h_fp": 365.63,
-   "open_interest_fp": 388.73,
-   "dollars_traded_estimate": 6.28,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JNIE",
-   "rules_primary": "If Joaquin Niemann wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6180,10 +6270,10 @@
    "yes_ask_dollars": 0.018,
    "no_bid_dollars": 0.982,
    "no_ask_dollars": 0.988,
-   "volume_fp": 340.19,
-   "volume_24h_fp": 325.07,
-   "open_interest_fp": 340.19,
-   "dollars_traded_estimate": 6.12,
+   "volume_fp": 405.13,
+   "volume_24h_fp": 382.4,
+   "open_interest_fp": 405.13,
+   "dollars_traded_estimate": 7.29,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6212,10 +6302,10 @@
    "yes_ask_dollars": 0.016,
    "no_bid_dollars": 0.984,
    "no_ask_dollars": 0.996,
-   "volume_fp": 368.11,
-   "volume_24h_fp": 348.31,
-   "open_interest_fp": 368.11,
-   "dollars_traded_estimate": 5.89,
+   "volume_fp": 447.98,
+   "volume_24h_fp": 433.27,
+   "open_interest_fp": 447.98,
+   "dollars_traded_estimate": 7.17,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6223,6 +6313,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JSPA",
    "rules_primary": "If J.J. Spaun wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-JNIE",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Joaquin Niemann wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.011,
+   "yes_bid_dollars": 0.006,
+   "yes_ask_dollars": 0.011,
+   "no_bid_dollars": 0.989,
+   "no_ask_dollars": 0.994,
+   "volume_fp": 645.65,
+   "volume_24h_fp": 442.86,
+   "open_interest_fp": 463.65,
+   "dollars_traded_estimate": 7.1,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-JNIE",
+   "rules_primary": "If Joaquin Niemann wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6244,10 +6366,10 @@
    "yes_ask_dollars": 0.015,
    "no_bid_dollars": 0.985,
    "no_ask_dollars": 0.993,
-   "volume_fp": 386.33,
-   "volume_24h_fp": 363.36,
-   "open_interest_fp": 386.33,
-   "dollars_traded_estimate": 5.79,
+   "volume_fp": 460.21,
+   "volume_24h_fp": 438.52,
+   "open_interest_fp": 460.21,
+   "dollars_traded_estimate": 6.9,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6255,6 +6377,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-TKIM",
    "rules_primary": "If Tom Kim wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-MTHO",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Michael Thorbjornsen wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.013,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.013,
+   "no_bid_dollars": 0.987,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 497.18,
+   "volume_24h_fp": 468.25,
+   "open_interest_fp": 497.18,
+   "dollars_traded_estimate": 6.46,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MTHO",
+   "rules_primary": "If Michael Thorbjornsen wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6276,10 +6430,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.99,
-   "volume_fp": 412.07,
-   "volume_24h_fp": 393.81,
-   "open_interest_fp": 412.07,
-   "dollars_traded_estimate": 5.36,
+   "volume_fp": 493.25,
+   "volume_24h_fp": 467.91,
+   "open_interest_fp": 493.25,
+   "dollars_traded_estimate": 6.41,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6308,10 +6462,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.988,
-   "volume_fp": 411.72,
-   "volume_24h_fp": 380.55,
-   "open_interest_fp": 411.72,
-   "dollars_traded_estimate": 5.35,
+   "volume_fp": 488.97,
+   "volume_24h_fp": 462.02,
+   "open_interest_fp": 488.97,
+   "dollars_traded_estimate": 6.36,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6319,6 +6473,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ABHA",
    "rules_primary": "If Akshay Bhatia wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-PCAN",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Patrick Cantlay wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.013,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.013,
+   "no_bid_dollars": 0.987,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 469.04,
+   "volume_24h_fp": 438.64,
+   "open_interest_fp": 469.04,
+   "dollars_traded_estimate": 6.1,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-PCAN",
+   "rules_primary": "If Patrick Cantlay wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6340,10 +6526,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.988,
-   "volume_fp": 406.44,
-   "volume_24h_fp": 388.61,
-   "open_interest_fp": 406.44,
-   "dollars_traded_estimate": 5.28,
+   "volume_fp": 466.29,
+   "volume_24h_fp": 449.24,
+   "open_interest_fp": 466.29,
+   "dollars_traded_estimate": 6.06,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6351,38 +6537,6 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MWLE",
    "rules_primary": "If Min Woo Lee wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-MTHO",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Michael Thorbjornsen wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.013,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.013,
-   "no_bid_dollars": 0.987,
-   "no_ask_dollars": 0.99,
-   "volume_fp": 402.42,
-   "volume_24h_fp": 380.72,
-   "open_interest_fp": 402.42,
-   "dollars_traded_estimate": 5.23,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MTHO",
-   "rules_primary": "If Michael Thorbjornsen wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6404,10 +6558,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.996,
-   "volume_fp": 381.21,
-   "volume_24h_fp": 366.12,
-   "open_interest_fp": 381.21,
-   "dollars_traded_estimate": 4.96,
+   "volume_fp": 457.63,
+   "volume_24h_fp": 435.45,
+   "open_interest_fp": 457.63,
+   "dollars_traded_estimate": 5.95,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6436,10 +6590,10 @@
    "yes_ask_dollars": 0.013,
    "no_bid_dollars": 0.987,
    "no_ask_dollars": 0.994,
-   "volume_fp": 380.85,
-   "volume_24h_fp": 359.45,
-   "open_interest_fp": 380.85,
-   "dollars_traded_estimate": 4.95,
+   "volume_fp": 455.33,
+   "volume_24h_fp": 430.58,
+   "open_interest_fp": 455.33,
+   "dollars_traded_estimate": 5.92,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6450,11 +6604,11 @@
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
-   "ticker": "KXPGATOUR-MAST27-PCAN",
+   "ticker": "KXPGATOUR-MAST27-MMCN",
    "event_ticker": "KXPGATOUR-MAST27",
    "series_ticker": "KXPGATOUR",
    "series_ticker_from_api": null,
-   "title": "Masters Tournament: Patrick Cantlay wins",
+   "title": "Masters Tournament: Maverick McNealy wins",
    "category_id": "golf",
    "category_basis": "seed",
    "series_categories": [
@@ -6463,22 +6617,86 @@
    "category_matched_by": "official",
    "status": "active",
    "result": null,
-   "last_price_dollars": 0.013,
+   "last_price_dollars": 0.011,
    "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.013,
-   "no_bid_dollars": 0.987,
+   "yes_ask_dollars": 0.011,
+   "no_bid_dollars": 0.989,
    "no_ask_dollars": 0.99,
-   "volume_fp": 372.8,
-   "volume_24h_fp": 357.41,
-   "open_interest_fp": 372.8,
-   "dollars_traded_estimate": 4.85,
+   "volume_fp": 453.7,
+   "volume_24h_fp": 432.75,
+   "open_interest_fp": 453.7,
+   "dollars_traded_estimate": 4.99,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
    "settlement_value_dollars": null,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-PCAN",
-   "rules_primary": "If Patrick Cantlay wins the Masters Tournament, then the market resolves to Yes.",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MMCN",
+   "rules_primary": "If Maverick McNealy wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-RFOW",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Rickie Fowler wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.011,
+   "yes_bid_dollars": 0.003,
+   "yes_ask_dollars": 0.011,
+   "no_bid_dollars": 0.989,
+   "no_ask_dollars": 0.997,
+   "volume_fp": 437.39,
+   "volume_24h_fp": 411.1,
+   "open_interest_fp": 437.39,
+   "dollars_traded_estimate": 4.81,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RFOW",
+   "rules_primary": "If Rickie Fowler wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-KKIT",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Kurt Kitayama wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.011,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.011,
+   "no_bid_dollars": 0.989,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 422.93,
+   "volume_24h_fp": 401.75,
+   "open_interest_fp": 422.93,
+   "dollars_traded_estimate": 4.65,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-KKIT",
+   "rules_primary": "If Kurt Kitayama wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6513,11 +6731,11 @@
    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.5950 on Nov 25, 2026 according to AAA, then the market resolves to Yes."
   },
   {
-   "ticker": "KXPGATOUR-MAST27-MMCN",
+   "ticker": "KXPGATOUR-MAST27-SJIM",
    "event_ticker": "KXPGATOUR-MAST27",
    "series_ticker": "KXPGATOUR",
    "series_ticker_from_api": null,
-   "title": "Masters Tournament: Maverick McNealy wins",
+   "title": "Masters Tournament: Sungjae Im wins",
    "category_id": "golf",
    "category_basis": "seed",
    "series_categories": [
@@ -6526,86 +6744,22 @@
    "category_matched_by": "official",
    "status": "active",
    "result": null,
-   "last_price_dollars": 0.011,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.011,
-   "no_bid_dollars": 0.989,
-   "no_ask_dollars": 0.99,
-   "volume_fp": 377.82,
-   "volume_24h_fp": 353.2,
-   "open_interest_fp": 377.82,
-   "dollars_traded_estimate": 4.16,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MMCN",
-   "rules_primary": "If Maverick McNealy wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-RFOW",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Rickie Fowler wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.011,
+   "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.003,
-   "yes_ask_dollars": 0.011,
-   "no_bid_dollars": 0.989,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 0.997,
-   "volume_fp": 361.67,
-   "volume_24h_fp": 341.35,
-   "open_interest_fp": 361.67,
-   "dollars_traded_estimate": 3.98,
+   "volume_fp": 428.94,
+   "volume_24h_fp": 408.48,
+   "open_interest_fp": 428.94,
+   "dollars_traded_estimate": 4.29,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
    "settlement_value_dollars": null,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RFOW",
-   "rules_primary": "If Rickie Fowler wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
-   "ticker": "KXPGATOUR-MAST27-KKIT",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Kurt Kitayama wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.011,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.011,
-   "no_bid_dollars": 0.989,
-   "no_ask_dollars": 0.99,
-   "volume_fp": 350.24,
-   "volume_24h_fp": 325.59,
-   "open_interest_fp": 350.24,
-   "dollars_traded_estimate": 3.85,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-KKIT",
-   "rules_primary": "If Kurt Kitayama wins the Masters Tournament, then the market resolves to Yes.",
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SJIM",
+   "rules_primary": "If Sungjae Im wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6640,38 +6794,6 @@
    "rules_primary": "If average regular gas prices for United States are strictly greater than $3.10 on Dec 31, 2026 according to AAA, then the market resolves to Yes."
   },
   {
-   "ticker": "KXPGATOUR-MAST27-SJIM",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Sungjae Im wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.01,
-   "yes_bid_dollars": 0.003,
-   "yes_ask_dollars": 0.01,
-   "no_bid_dollars": 0.99,
-   "no_ask_dollars": 0.997,
-   "volume_fp": 348.12,
-   "volume_24h_fp": 337.06,
-   "open_interest_fp": 348.12,
-   "dollars_traded_estimate": 3.48,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SJIM",
-   "rules_primary": "If Sungjae Im wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
    "ticker": "KXPGATOUR-MAST27-KREI",
    "event_ticker": "KXPGATOUR-MAST27",
    "series_ticker": "KXPGATOUR",
@@ -6690,10 +6812,10 @@
    "yes_ask_dollars": 0.008,
    "no_bid_dollars": 0.992,
    "no_ask_dollars": 0.997,
-   "volume_fp": 366.67,
-   "volume_24h_fp": 345.2,
-   "open_interest_fp": 366.67,
-   "dollars_traded_estimate": 2.93,
+   "volume_fp": 458.95,
+   "volume_24h_fp": 418.91,
+   "open_interest_fp": 458.95,
+   "dollars_traded_estimate": 3.67,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6701,6 +6823,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-KREI",
    "rules_primary": "If Kristoffer Reitan wins the Masters Tournament, then the market resolves to Yes.",
+   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-BGRI",
+   "event_ticker": "KXPGATOUR-MAST27",
+   "series_ticker": "KXPGATOUR",
+   "series_ticker_from_api": null,
+   "title": "Masters Tournament: Ben Griffin wins",
+   "category_id": "golf",
+   "category_basis": "seed",
+   "series_categories": [
+    "Sports"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.008,
+   "yes_bid_dollars": 0.003,
+   "yes_ask_dollars": 0.008,
+   "no_bid_dollars": 0.992,
+   "no_ask_dollars": 0.997,
+   "volume_fp": 410.77,
+   "volume_24h_fp": 386.71,
+   "open_interest_fp": 410.77,
+   "dollars_traded_estimate": 3.29,
+   "close_time": "2027-04-25T23:00:00Z",
+   "expected_expiration_time": "2027-04-11T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-BGRI",
+   "rules_primary": "If Ben Griffin wins the Masters Tournament, then the market resolves to Yes.",
    "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
   },
   {
@@ -6735,38 +6889,6 @@
    "rules_primary": "If Iran holds a presidential election before January 1, 2027, then the market resolves to Yes."
   },
   {
-   "ticker": "KXPGATOUR-MAST27-BGRI",
-   "event_ticker": "KXPGATOUR-MAST27",
-   "series_ticker": "KXPGATOUR",
-   "series_ticker_from_api": null,
-   "title": "Masters Tournament: Ben Griffin wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "series_categories": [
-    "Sports"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.008,
-   "yes_bid_dollars": 0.003,
-   "yes_ask_dollars": 0.008,
-   "no_bid_dollars": 0.992,
-   "no_ask_dollars": 0.997,
-   "volume_fp": 336.34,
-   "volume_24h_fp": 317.59,
-   "open_interest_fp": 336.34,
-   "dollars_traded_estimate": 2.69,
-   "close_time": "2027-04-25T23:00:00Z",
-   "expected_expiration_time": "2027-04-11T23:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-BGRI",
-   "rules_primary": "If Ben Griffin wins the Masters Tournament, then the market resolves to Yes.",
-   "rules_secondary": "If a golfer forfeits, withdraws, or does not participate prior to teeing off, their contracts will resolve as follows:\nTournament Winner and End of Round Leader markets will resolve to No\nFinishing Position, Make the Cut, Head-to-Head, and 3-Ball markets will resolve to Fair Market Value\n\nKalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the PGA or Augusta National, Inc. All trademarks, logos, and brand names are the property of their respective owners."
-  },
-  {
    "ticker": "KXPGATOUR-MAST27-ARAI",
    "event_ticker": "KXPGATOUR-MAST27",
    "series_ticker": "KXPGATOUR",
@@ -6785,10 +6907,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 372.51,
-   "volume_24h_fp": 357.69,
-   "open_interest_fp": 372.51,
-   "dollars_traded_estimate": 1.86,
+   "volume_fp": 466.77,
+   "volume_24h_fp": 431.44,
+   "open_interest_fp": 466.77,
+   "dollars_traded_estimate": 2.33,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -6817,10 +6939,10 @@
    "yes_ask_dollars": 0.005,
    "no_bid_dollars": 0.995,
    "no_ask_dollars": 0.997,
-   "volume_fp": 362.5,
-   "volume_24h_fp": 348.2,
-   "open_interest_fp": 362.5,
-   "dollars_traded_estimate": 1.81,
+   "volume_fp": 435.04,
+   "volume_24h_fp": 415.02,
+   "open_interest_fp": 435.04,
+   "dollars_traded_estimate": 2.18,
    "close_time": "2027-04-25T23:00:00Z",
    "expected_expiration_time": "2027-04-11T23:00:00Z",
    "settlement_ts": null,
@@ -15904,6 +16026,156 @@
  ],
  "settled_markets": [
   {
+   "ticker": "KXBNB15M-26NOV241015-15",
+   "event_ticker": "KXBNB15M-26NOV241015",
+   "series_ticker": "KXBNB15M",
+   "series_ticker_from_api": null,
+   "title": "BNB price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T15:15:00Z",
+   "expected_expiration_time": "2026-11-24T15:20:00Z",
+   "settlement_ts": "2026-11-24T15:15:05.399088Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB15M-26NOV241015-15"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV241015-15",
+   "event_ticker": "KXBTC15M-26NOV241015",
+   "series_ticker": "KXBTC15M",
+   "series_ticker_from_api": null,
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.005,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 3414.42,
+   "volume_24h_fp": 3414.42,
+   "open_interest_fp": 2398.47,
+   "dollars_traded_estimate": 17.07,
+   "close_time": "2026-11-24T15:15:00Z",
+   "expected_expiration_time": "2026-11-24T15:20:00Z",
+   "settlement_ts": "2026-11-24T15:15:05.39907Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV241015-15"
+  },
+  {
+   "ticker": "KXNEAR15M-26NOV241015-15",
+   "event_ticker": "KXNEAR15M-26NOV241015",
+   "series_ticker": "KXNEAR15M",
+   "series_ticker_from_api": null,
+   "title": "NEAR price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T15:15:00Z",
+   "expected_expiration_time": "2026-11-24T15:20:00Z",
+   "settlement_ts": "2026-11-24T15:15:05.398502Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNEAR15M-26NOV241015-15"
+  },
+  {
+   "ticker": "KXZEC15M-26NOV241015-15",
+   "event_ticker": "KXZEC15M-26NOV241015",
+   "series_ticker": "KXZEC15M",
+   "series_ticker_from_api": null,
+   "title": "ZEC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T15:15:00Z",
+   "expected_expiration_time": "2026-11-24T15:20:00Z",
+   "settlement_ts": "2026-11-24T15:15:05.398461Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV241015-15"
+  },
+  {
+   "ticker": "KXHYPE15M-26NOV241015-15",
+   "event_ticker": "KXHYPE15M-26NOV241015",
+   "series_ticker": "KXHYPE15M",
+   "series_ticker_from_api": null,
+   "title": "HYPE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T15:15:00Z",
+   "expected_expiration_time": "2026-11-24T15:20:00Z",
+   "settlement_ts": "2026-11-24T15:15:05.398425Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE15M-26NOV241015-15"
+  },
+  {
    "ticker": "KXBTC15M-26NOV241000-00",
    "event_ticker": "KXBTC15M-26NOV241000",
    "series_ticker": "KXBTC15M",
@@ -17254,156 +17526,6 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240845-HYPE"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV240845-ETH",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV240845",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 24 - 8:30AM EST to 8:45AM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-24T13:45:00Z",
-   "expected_expiration_time": "2026-11-24T13:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399853Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240845-ETH"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV240845-BTC",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV240845",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 24 - 8:30AM EST to 8:45AM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-24T13:45:00Z",
-   "expected_expiration_time": "2026-11-24T13:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399853Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240845-BTC"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV240745-XRP",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV240745",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 24 - 7:30AM EST to 7:45AM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-24T12:45:00Z",
-   "expected_expiration_time": "2026-11-24T12:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399809Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240745-XRP"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV240745-SOL",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV240745",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 24 - 7:30AM EST to 7:45AM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-24T12:45:00Z",
-   "expected_expiration_time": "2026-11-24T12:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399809Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240745-SOL"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV240745-HYPE",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV240745",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 24 - 7:30AM EST to 7:45AM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-24T12:45:00Z",
-   "expected_expiration_time": "2026-11-24T12:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399809Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV240745-HYPE"
-  },
-  {
    "ticker": "KXPGATOUR-THRC26-BHAA",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -18383,7 +18505,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 62077.1,
-   "volume_24h_fp": 1109.53,
+   "volume_24h_fp": 1069.49,
    "open_interest_fp": 55251.69,
    "dollars_traded_estimate": 807.0,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18533,7 +18655,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 132800.1,
-   "volume_24h_fp": 1104.3,
+   "volume_24h_fp": 1046.59,
    "open_interest_fp": 128902.68,
    "dollars_traded_estimate": 398.4,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18623,7 +18745,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 39776.45,
-   "volume_24h_fp": 1284.75,
+   "volume_24h_fp": 1222.75,
    "open_interest_fp": 34010.21,
    "dollars_traded_estimate": 8750.82,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18683,7 +18805,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 42420.04,
-   "volume_24h_fp": 1179.94,
+   "volume_24h_fp": 1143.1,
    "open_interest_fp": 42420.04,
    "dollars_traded_estimate": 127.26,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18713,7 +18835,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 252781.05,
-   "volume_24h_fp": 1181.0,
+   "volume_24h_fp": 1137.98,
    "open_interest_fp": 241482.54,
    "dollars_traded_estimate": 3791.72,
    "close_time": "2026-11-23T19:54:03Z",
@@ -21918,7 +22040,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:42Z"
    }
   },
   {
@@ -21934,7 +22056,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:42Z"
    }
   },
   {
@@ -21978,7 +22100,7 @@
      },
      {
       "price": 0.77,
-      "contracts": 564.66
+      "contracts": 472.26
      }
     ],
     "best_yes_bid": {
@@ -21987,14 +22109,14 @@
     },
     "best_no_bid": {
      "price": 0.77,
-     "contracts": 564.66
+     "contracts": 472.26
     },
     "best_yes_ask_derived": 0.23,
-    "contracts_at_best_yes_ask": 564.66,
+    "contracts_at_best_yes_ask": 472.26,
     "contracts_at_best_yes_bid": 757.57,
-    "visible_contracts_total": 6872.18,
+    "visible_contracts_total": 6779.78,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B62500/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22034,7 +22156,7 @@
      },
      {
       "price": 0.84,
-      "contracts": 1019.52
+      "contracts": 954.32
      }
     ],
     "best_yes_bid": {
@@ -22043,14 +22165,14 @@
     },
     "best_no_bid": {
      "price": 0.84,
-     "contracts": 1019.52
+     "contracts": 954.32
     },
     "best_yes_ask_derived": 0.16,
-    "contracts_at_best_yes_ask": 1019.52,
+    "contracts_at_best_yes_ask": 954.32,
     "contracts_at_best_yes_bid": 2564.1,
-    "visible_contracts_total": 8434.46,
+    "visible_contracts_total": 8369.26,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22086,7 +22208,7 @@
      },
      {
       "price": 0.97,
-      "contracts": 10751.24
+      "contracts": 10674.99
      }
     ],
     "best_yes_bid": {
@@ -22095,14 +22217,14 @@
     },
     "best_no_bid": {
      "price": 0.97,
-     "contracts": 10751.24
+     "contracts": 10674.99
     },
     "best_yes_ask_derived": 0.03,
-    "contracts_at_best_yes_ask": 10751.24,
+    "contracts_at_best_yes_ask": 10674.99,
     "contracts_at_best_yes_bid": 15873.0,
-    "visible_contracts_total": 82024.08,
+    "visible_contracts_total": 81947.83,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22118,7 +22240,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22134,7 +22256,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22166,7 +22288,7 @@
      },
      {
       "price": 0.82,
-      "contracts": 2405.96
+      "contracts": 2317.24
      }
     ],
     "best_yes_bid": {
@@ -22175,14 +22297,14 @@
     },
     "best_no_bid": {
      "price": 0.82,
-     "contracts": 2405.96
+     "contracts": 2317.24
     },
     "best_yes_ask_derived": 0.18,
-    "contracts_at_best_yes_ask": 2405.96,
+    "contracts_at_best_yes_ask": 2317.24,
     "contracts_at_best_yes_bid": 2941.17,
-    "visible_contracts_total": 16937.0,
+    "visible_contracts_total": 16848.28,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SSCH/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22192,7 +22314,7 @@
     "yes_bids": [
      {
       "price": 0.01,
-      "contracts": 80.0
+      "contracts": 100.0
      },
      {
       "price": 0.63,
@@ -22207,12 +22329,8 @@
       "contracts": 349.18
      },
      {
-      "price": 0.73,
-      "contracts": 5.0
-     },
-     {
-      "price": 0.76,
-      "contracts": 1.65
+      "price": 0.74,
+      "contracts": 0.3
      },
      {
       "price": 0.81,
@@ -22242,7 +22360,7 @@
      },
      {
       "price": 0.16,
-      "contracts": 202.41
+      "contracts": 92.41
      }
     ],
     "best_yes_bid": {
@@ -22251,14 +22369,14 @@
     },
     "best_no_bid": {
      "price": 0.16,
-     "contracts": 202.41
+     "contracts": 92.41
     },
     "best_yes_ask_derived": 0.84,
-    "contracts_at_best_yes_ask": 202.41,
+    "contracts_at_best_yes_ask": 92.41,
     "contracts_at_best_yes_bid": 94.8,
-    "visible_contracts_total": 2590.96,
+    "visible_contracts_total": 2494.61,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22290,7 +22408,7 @@
      },
      {
       "price": 0.994,
-      "contracts": 27389.24
+      "contracts": 27315.65
      }
     ],
     "best_yes_bid": {
@@ -22299,14 +22417,14 @@
     },
     "best_no_bid": {
      "price": 0.994,
-     "contracts": 27389.24
+     "contracts": 27315.65
     },
     "best_yes_ask_derived": 0.006,
-    "contracts_at_best_yes_ask": 27389.24,
+    "contracts_at_best_yes_ask": 27315.65,
     "contracts_at_best_yes_bid": 33333.33,
-    "visible_contracts_total": 202587.63,
+    "visible_contracts_total": 202514.04,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22322,7 +22440,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.40/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22354,7 +22472,7 @@
      },
      {
       "price": 0.992,
-      "contracts": 41301.66
+      "contracts": 41222.58
      }
     ],
     "best_yes_bid": {
@@ -22363,14 +22481,14 @@
     },
     "best_no_bid": {
      "price": 0.992,
-     "contracts": 41301.66
+     "contracts": 41222.58
     },
     "best_yes_ask_derived": 0.008,
-    "contracts_at_best_yes_ask": 41301.66,
+    "contracts_at_best_yes_ask": 41222.58,
     "contracts_at_best_yes_bid": 111111.1,
-    "visible_contracts_total": 722823.08,
+    "visible_contracts_total": 722744.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ASMA/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22386,7 +22504,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22410,7 +22528,7 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.295/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22434,7 +22552,7 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.290/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22458,7 +22576,7 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.285/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:43Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   },
   {
@@ -22482,7 +22600,7 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.280/orderbook?depth=10",
-    "fetched_at": "2026-11-24T15:04:44Z"
+    "fetched_at": "2026-11-24T15:19:43Z"
    }
   }
  ],
