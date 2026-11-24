@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-24T14:06:07Z",
- "runtime_seconds": 123.5,
+ "collected_at": "2026-11-24T14:50:55Z",
+ "runtime_seconds": 154.7,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -33,11 +33,11 @@
   "eligible": 0,
   "picks": 0,
   "near_misses": 8,
-  "unscoreable": 17136,
+  "unscoreable": 17134,
   "orderbooks": 17146,
   "orderbooks_requested": 17146,
   "alerts": 0,
-  "markets_with_momentum": 242,
+  "markets_with_momentum": 259,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
@@ -59,6 +59,62 @@
  "picks": [],
  "near_misses": [
   {
+   "ticker": "KXAAAGASCDUT-26NOV25-MC",
+   "eligible": false,
+   "fails": [
+    "spread 92.0c > 10c cap",
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -56.01% not above 0% floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.593,
+   "mid": 0.54,
+   "micro": 1.0,
+   "last": 0.0,
+   "bid": 0.08,
+   "ask": 1.0,
+   "spread": 0.92,
+   "depth": 62.0,
+   "vol24": 0.0,
+   "ttc_hours": 192.1513888888889,
+   "momentum": null,
+   "series_ticker": "KXAAAGASCDUT",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "NO",
+    "entry": 0.92,
+    "fee_unit": 0.005151999999999999,
+    "cost": 0.9251520000000001,
+    "ev": -0.5181520000000001,
+    "roi": -0.560072290823562
+   },
+   "score": -0.560072290823562,
+   "dollars_traded_estimate": 0.0,
+   "title": "Will gas prices show a minimal change?",
+   "category_id": "gas",
+   "category_basis": "keyword",
+   "close_time": "2026-12-02T15:00:00Z",
+   "event_ticker": "KXAAAGASCDUT-26NOV25",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 62.0,
+    "depth_at_ask": 0.0,
+    "bid_price": 0.08,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASCDUT-26NOV25-MC"
+  },
+  {
    "ticker": "KXNATGASD-26NOV2417-T3.295",
    "eligible": false,
    "fails": [
@@ -76,10 +132,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -108,7 +164,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -133,10 +189,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -165,7 +221,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -190,10 +246,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -222,7 +278,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -247,10 +303,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -279,7 +335,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -304,10 +360,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -336,7 +392,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -361,10 +417,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -393,7 +449,7 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
@@ -418,10 +474,10 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 480.0,
+   "depth": 400.0,
    "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
+   "ttc_hours": 7.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXNATGASD",
    "fee_multiplier": {
     "taker": 1,
@@ -450,72 +506,67 @@
    "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 400.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
    },
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.265"
-  },
+  }
+ ],
+ "unscoreable": [
   {
-   "ticker": "KXNATGASD-26NOV2417-T3.260",
+   "ticker": "KXBTCD-26NOV2502-T62699.99",
    "eligible": false,
    "fails": [
-    "spread 99.0c > 10c cap",
-    "24h volume 0.0 < 100 contracts",
-    "NO entry 99.0c above 95c ceiling",
-    "net ROI -57.33% not above 0% floor",
+    "spread 100.0c > 10c cap",
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 8.0 < 100 contracts",
+    "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
-   "reasons": [],
-   "q": 0.57725,
-   "mid": 0.505,
-   "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.01,
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.43,
+   "mid": 0.5,
+   "micro": 0.5,
+   "last": 0.13,
+   "bid": 0.0,
    "ask": 1.0,
-   "spread": 0.99,
-   "depth": 480.0,
-   "vol24": 0.0,
-   "ttc_hours": 7.898055555555556,
-   "momentum": null,
-   "series_ticker": "KXNATGASD",
+   "spread": 1.0,
+   "depth": 0,
+   "vol24": 8.0,
+   "ttc_hours": 16.15138888888889,
+   "momentum": 0.020000000000000004,
+   "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
     "listed": false
    },
-   "entry": {
-    "side": "NO",
-    "entry": 0.99,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.990693,
-    "ev": -0.5679430000000001,
-    "roi": -0.5732785030276787
-   },
-   "score": -0.5732785030276787,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will the natural gas close price be above 3.260 USD/MMBtu on November 24, 2026 at 5:00 PM EST?",
-   "category_id": "gas",
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 1.04,
+   "title": "Bitcoin price on Nov 25, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-24T22:00:00Z",
-   "event_ticker": "KXNATGASD-26NOV2417",
+   "close_time": "2026-11-25T07:00:00Z",
+   "event_ticker": "KXBTCD-26NOV2502",
    "status": "active",
    "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
+   "volume_fp": 8.0,
+   "volume_24h_fp": 8.0,
+   "open_interest_fp": 8.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 480.0,
+    "depth_at_bid": 0.0,
     "depth_at_ask": 0.0,
-    "bid_price": 0.01,
+    "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.260"
-  }
- ],
- "unscoreable": [
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2502-T62699.99"
+  },
   {
    "ticker": "KXBTCD-26NOV2503-T62899.99",
    "eligible": false,
@@ -538,8 +589,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 17.898055555555555,
-   "momentum": null,
+   "ttc_hours": 17.15138888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -590,8 +641,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 15.898055555555555,
-   "momentum": null,
+   "ttc_hours": 15.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -642,8 +693,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 15.898055555555555,
-   "momentum": null,
+   "ttc_hours": 15.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -694,8 +745,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 15.898055555555555,
-   "momentum": null,
+   "ttc_hours": 15.151388888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -746,8 +797,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 16.898055555555555,
-   "momentum": null,
+   "ttc_hours": 16.15138888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -798,8 +849,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 16.898055555555555,
-   "momentum": null,
+   "ttc_hours": 16.15138888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -850,8 +901,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 17.898055555555555,
-   "momentum": null,
+   "ttc_hours": 17.15138888888889,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -879,75 +930,23 @@
     "ask_price": null
    },
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2503-T62599.99"
-  },
-  {
-   "ticker": "KXBTCD-26NOV2501-T62799.99",
-   "eligible": false,
-   "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 6.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.42,
-   "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.1,
-   "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 0,
-   "vol24": 6.0,
-   "ttc_hours": 15.898055555555555,
-   "momentum": null,
-   "series_ticker": "KXBTCD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.6,
-   "title": "Bitcoin price on Nov 25, 2026?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-25T06:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2501",
-   "status": "active",
-   "result": null,
-   "volume_fp": 6.0,
-   "volume_24h_fp": 6.0,
-   "open_interest_fp": 6.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2501-T62799.99"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 188,
+  "candles_used": 88,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 14,
-  "baseline_always_yes_hits": 8,
+  "baseline_always_yes_bets": 4,
+  "baseline_always_yes_hits": 4,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "no candles in the 2h before close": 47,
-   "no side passed the replay gates": 14,
-   "candle without a price": 10
+   "candle without a price": 20,
+   "no side passed the replay gates": 4,
+   "no candles in the 2h before close": 30
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -956,7 +955,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.5714
+  "baseline_always_yes_hit_rate": 1.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
