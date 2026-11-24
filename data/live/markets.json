@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-24T14:34:44Z",
- "started_at": "2026-11-24T14:34:10Z",
+ "collected_at": "2026-11-24T14:49:44Z",
+ "started_at": "2026-11-24T14:49:10Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -20,11 +20,11 @@
   "settled_in_scope": 1600,
   "settled_published_rows": 200,
   "open_out_of_scope": 3415,
-  "settled_out_of_scope": 13176,
+  "settled_out_of_scope": 13197,
   "open_excluded_multivariate": 0,
   "settled_excluded_multivariate": 0,
   "open_excluded_off_topic_or_qa": 0,
-  "settled_excluded_off_topic_or_qa": 38,
+  "settled_excluded_off_topic_or_qa": 39,
   "open_excluded_series": 80,
   "settled_excluded_series": 40,
   "excluded_series_detail": {
@@ -106,8 +106,8 @@
   "open_paging_truncated_at_safety_cap": true,
   "settled_paging_truncated_at_safety_cap": true,
   "safety_scan_cap": 25000,
-  "settled_rows_trimmed_for_size": 15671,
-  "settled_in_scope_total": 17271,
+  "settled_rows_trimmed_for_size": 15649,
+  "settled_in_scope_total": 17249,
   "settled_in_scope_total_method": "exact count of every settled row the paged scan returned inside the five topics, measured before the per-topic publish selection and before the size window; the scan stopped at the safety cap, so this is a lower bound (safety_scan_cap 25000, kept window 1600, published 200 across the five topics)",
   "settled_kept_window": 1600,
   "settled_published": 200,
@@ -3147,10 +3147,10 @@
    "yes_ask_dollars": 0.23,
    "no_bid_dollars": 0.77,
    "no_ask_dollars": 0.78,
-   "volume_fp": 49044347.65,
-   "volume_24h_fp": 9333.44,
+   "volume_fp": 49044450.84,
+   "volume_24h_fp": 9374.18,
    "open_interest_fp": 8372739.14,
-   "dollars_traded_estimate": 11280199.96,
+   "dollars_traded_estimate": 11280223.69,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3179,10 +3179,10 @@
    "yes_ask_dollars": 0.16,
    "no_bid_dollars": 0.84,
    "no_ask_dollars": 0.87,
-   "volume_fp": 65046654.83,
-   "volume_24h_fp": 9642.56,
+   "volume_fp": 65046749.85,
+   "volume_24h_fp": 9674.94,
    "open_interest_fp": 13426528.97,
-   "dollars_traded_estimate": 10407464.77,
+   "dollars_traded_estimate": 10407479.98,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3211,10 +3211,10 @@
    "yes_ask_dollars": 0.18,
    "no_bid_dollars": 0.82,
    "no_ask_dollars": 0.83,
-   "volume_fp": 43020503.3,
-   "volume_24h_fp": 6294.98,
+   "volume_fp": 43020571.7,
+   "volume_24h_fp": 6299.05,
    "open_interest_fp": 7169945.27,
-   "dollars_traded_estimate": 7743690.59,
+   "dollars_traded_estimate": 7743702.91,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3243,10 +3243,10 @@
    "yes_ask_dollars": 0.1,
    "no_bid_dollars": 0.9,
    "no_ask_dollars": 0.91,
-   "volume_fp": 61771182.79,
-   "volume_24h_fp": 15235.61,
+   "volume_fp": 61771259.63,
+   "volume_24h_fp": 15278.09,
    "open_interest_fp": 7790754.99,
-   "dollars_traded_estimate": 6177118.28,
+   "dollars_traded_estimate": 6177125.96,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3275,10 +3275,10 @@
    "yes_ask_dollars": 0.05,
    "no_bid_dollars": 0.95,
    "no_ask_dollars": 0.96,
-   "volume_fp": 80244621.65,
-   "volume_24h_fp": 15943.53,
-   "open_interest_fp": 26594927.83,
-   "dollars_traded_estimate": 4012231.08,
+   "volume_fp": 80244693.92,
+   "volume_24h_fp": 15949.88,
+   "open_interest_fp": 26595000.1,
+   "dollars_traded_estimate": 4012234.7,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3307,10 +3307,10 @@
    "yes_ask_dollars": 0.09,
    "no_bid_dollars": 0.91,
    "no_ask_dollars": 0.92,
-   "volume_fp": 35322426.56,
-   "volume_24h_fp": 12959.15,
+   "volume_fp": 35322498.19,
+   "volume_24h_fp": 13003.8,
    "open_interest_fp": 4725216.25,
-   "dollars_traded_estimate": 3179018.39,
+   "dollars_traded_estimate": 3179024.84,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3336,13 +3336,13 @@
    "result": null,
    "last_price_dollars": 0.04,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.04,
-   "no_bid_dollars": 0.96,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 72400179.92,
-   "volume_24h_fp": 36681.14,
+   "volume_fp": 72400249.7,
+   "volume_24h_fp": 36723.43,
    "open_interest_fp": 7329053.41,
-   "dollars_traded_estimate": 2896007.2,
+   "dollars_traded_estimate": 2896009.99,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3371,10 +3371,10 @@
    "yes_ask_dollars": 0.07,
    "no_bid_dollars": 0.93,
    "no_ask_dollars": 0.95,
-   "volume_fp": 39615482.03,
-   "volume_24h_fp": 21197.48,
+   "volume_fp": 39615556.58,
+   "volume_24h_fp": 21220.54,
    "open_interest_fp": 5968304.27,
-   "dollars_traded_estimate": 2773083.74,
+   "dollars_traded_estimate": 2773088.96,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3403,10 +3403,10 @@
    "yes_ask_dollars": 0.03,
    "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.98,
-   "volume_fp": 89263594.9,
-   "volume_24h_fp": 17396.15,
+   "volume_fp": 89263680.76,
+   "volume_24h_fp": 17421.86,
    "open_interest_fp": 25244656.04,
-   "dollars_traded_estimate": 2677907.85,
+   "dollars_traded_estimate": 2677910.42,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3436,7 +3436,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 81945156.07,
-   "volume_24h_fp": 981.22,
+   "volume_24h_fp": 950.74,
    "open_interest_fp": 24988749.65,
    "dollars_traded_estimate": 1638903.12,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3464,13 +3464,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.01,
-   "no_bid_dollars": 0.99,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 162378907.88,
-   "volume_24h_fp": 65403.55,
+   "volume_fp": 162378951.58,
+   "volume_24h_fp": 65414.09,
    "open_interest_fp": 23550502.17,
-   "dollars_traded_estimate": 1623789.08,
+   "dollars_traded_estimate": 1623789.52,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3499,10 +3499,10 @@
    "yes_ask_dollars": 0.03,
    "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.98,
-   "volume_fp": 49228286.65,
-   "volume_24h_fp": 6417.65,
-   "open_interest_fp": 4886074.65,
-   "dollars_traded_estimate": 1476848.6,
+   "volume_fp": 49228374.21,
+   "volume_24h_fp": 6449.32,
+   "open_interest_fp": 4886162.21,
+   "dollars_traded_estimate": 1476851.23,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3595,10 +3595,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 125555660.67,
-   "volume_24h_fp": 63542.97,
-   "open_interest_fp": 21075121.18,
-   "dollars_traded_estimate": 1255556.61,
+   "volume_fp": 125555697.5,
+   "volume_24h_fp": 63542.87,
+   "open_interest_fp": 21075131.5,
+   "dollars_traded_estimate": 1255556.98,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3627,10 +3627,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 58486052.6,
-   "volume_24h_fp": 20504.57,
+   "volume_fp": 58486131.05,
+   "volume_24h_fp": 20530.5,
    "open_interest_fp": 6099834.62,
-   "dollars_traded_estimate": 1169721.05,
+   "dollars_traded_estimate": 1169722.62,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3687,14 +3687,14 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.02,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 52391050.09,
-   "volume_24h_fp": 6113.24,
-   "open_interest_fp": 7032615.01,
-   "dollars_traded_estimate": 1047821.0,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.02,
+   "no_bid_dollars": 0.98,
+   "no_ask_dollars": 0.99,
+   "volume_fp": 52391111.09,
+   "volume_24h_fp": 6130.44,
+   "open_interest_fp": 7032635.66,
+   "dollars_traded_estimate": 1047822.22,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3819,10 +3819,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 83549798.93,
-   "volume_24h_fp": 4885.76,
-   "open_interest_fp": 39623381.29,
-   "dollars_traded_estimate": 835497.99,
+   "volume_fp": 83549869.13,
+   "volume_24h_fp": 4924.0,
+   "open_interest_fp": 39623451.49,
+   "dollars_traded_estimate": 835498.69,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3883,10 +3883,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 73934681.74,
-   "volume_24h_fp": 5723.67,
-   "open_interest_fp": 6923005.75,
-   "dollars_traded_estimate": 739346.82,
+   "volume_fp": 73934749.32,
+   "volume_24h_fp": 5757.7,
+   "open_interest_fp": 6923073.33,
+   "dollars_traded_estimate": 739347.49,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3915,10 +3915,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 69843595.75,
-   "volume_24h_fp": 22582.06,
+   "volume_fp": 69843664.2,
+   "volume_24h_fp": 22602.31,
    "open_interest_fp": 19463256.62,
-   "dollars_traded_estimate": 698435.96,
+   "dollars_traded_estimate": 698436.64,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3947,10 +3947,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 67437903.33,
-   "volume_24h_fp": 5789.15,
+   "volume_fp": 67437967.95,
+   "volume_24h_fp": 5804.23,
    "open_interest_fp": 6474610.96,
-   "dollars_traded_estimate": 674379.03,
+   "dollars_traded_estimate": 674379.68,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3979,10 +3979,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 65581701.06,
-   "volume_24h_fp": 35351.52,
+   "volume_fp": 65581784.57,
+   "volume_24h_fp": 35391.37,
    "open_interest_fp": 12744518.53,
-   "dollars_traded_estimate": 655817.01,
+   "dollars_traded_estimate": 655817.85,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4044,7 +4044,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 56238676.94,
-   "volume_24h_fp": 2906.23,
+   "volume_24h_fp": 2867.81,
    "open_interest_fp": 11432563.86,
    "dollars_traded_estimate": 562386.77,
    "close_time": "2027-01-01T05:00:00Z",
@@ -4072,13 +4072,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 52124203.14,
-   "volume_24h_fp": 65165.03,
+   "volume_fp": 52124241.98,
+   "volume_24h_fp": 65164.9,
    "open_interest_fp": 9353562.15,
-   "dollars_traded_estimate": 521242.03,
+   "dollars_traded_estimate": 521242.42,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4104,13 +4104,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 46793307.27,
-   "volume_24h_fp": 34320.04,
-   "open_interest_fp": 8431082.6,
-   "dollars_traded_estimate": 467933.07,
+   "volume_fp": 46793372.12,
+   "volume_24h_fp": 34345.77,
+   "open_interest_fp": 8431147.45,
+   "dollars_traded_estimate": 467933.72,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4171,10 +4171,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 35553599.33,
-   "volume_24h_fp": 5759.28,
+   "volume_fp": 35553663.61,
+   "volume_24h_fp": 5789.33,
    "open_interest_fp": 6340715.01,
-   "dollars_traded_estimate": 355535.99,
+   "dollars_traded_estimate": 355536.64,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -5498,7 +5498,7 @@
    "no_bid_dollars": 0.29,
    "no_ask_dollars": 0.72,
    "volume_fp": 487.6,
-   "volume_24h_fp": 16.58,
+   "volume_24h_fp": 0.0,
    "open_interest_fp": 249.12,
    "dollars_traded_estimate": 141.4,
    "close_time": "2026-12-31T04:59:00Z",
@@ -6870,7 +6870,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 8.0,
-   "volume_24h_fp": 2.0,
+   "volume_24h_fp": 8.0,
    "open_interest_fp": 8.0,
    "dollars_traded_estimate": 1.04,
    "close_time": "2026-11-25T07:00:00Z",
@@ -15888,6 +15888,216 @@
  ],
  "settled_markets": [
   {
+   "ticker": "KXBNB15M-26NOV240945-45",
+   "event_ticker": "KXBNB15M-26NOV240945",
+   "series_ticker": "KXBNB15M",
+   "series_ticker_from_api": null,
+   "title": "BNB price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.397211Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXXRP15M-26NOV240945-45",
+   "event_ticker": "KXXRP15M-26NOV240945",
+   "series_ticker": "KXXRP15M",
+   "series_ticker_from_api": null,
+   "title": "XRP price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.44,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 30.0,
+   "volume_24h_fp": 30.0,
+   "open_interest_fp": 30.0,
+   "dollars_traded_estimate": 13.2,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.397179Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXSOL15M-26NOV240945-45",
+   "event_ticker": "KXSOL15M-26NOV240945",
+   "series_ticker": "KXSOL15M",
+   "series_ticker_from_api": null,
+   "title": "SOL price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.397087Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOL15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXNEAR15M-26NOV240945-45",
+   "event_ticker": "KXNEAR15M-26NOV240945",
+   "series_ticker": "KXNEAR15M",
+   "series_ticker_from_api": null,
+   "title": "NEAR price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.397023Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNEAR15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXZEC15M-26NOV240945-45",
+   "event_ticker": "KXZEC15M-26NOV240945",
+   "series_ticker": "KXZEC15M",
+   "series_ticker_from_api": null,
+   "title": "ZEC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.396973Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXHYPE15M-26NOV240945-45",
+   "event_ticker": "KXHYPE15M-26NOV240945",
+   "series_ticker": "KXHYPE15M",
+   "series_ticker_from_api": null,
+   "title": "HYPE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.396925Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE15M-26NOV240945-45"
+  },
+  {
+   "ticker": "KXDOGE15M-26NOV240945-45",
+   "event_ticker": "KXDOGE15M-26NOV240945",
+   "series_ticker": "KXDOGE15M",
+   "series_ticker_from_api": null,
+   "title": "DOGE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-24T14:45:00Z",
+   "expected_expiration_time": "2026-11-24T14:50:00Z",
+   "settlement_ts": "2026-11-24T14:45:05.396879Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV240945-45"
+  },
+  {
    "ticker": "KXBNB15M-26NOV240930-30",
    "event_ticker": "KXBNB15M-26NOV240930",
    "series_ticker": "KXBNB15M",
@@ -17178,216 +17388,6 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240745-45"
   },
   {
-   "ticker": "KXXRP15M-26NOV240830-30",
-   "event_ticker": "KXXRP15M-26NOV240830",
-   "series_ticker": "KXXRP15M",
-   "series_ticker_from_api": null,
-   "title": "XRP price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.63,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 20.0,
-   "volume_24h_fp": 20.0,
-   "open_interest_fp": 20.0,
-   "dollars_traded_estimate": 12.6,
-   "close_time": "2026-11-24T13:30:00Z",
-   "expected_expiration_time": "2026-11-24T13:35:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399641Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240830-30"
-  },
-  {
-   "ticker": "KXXRP15M-26NOV240815-15",
-   "event_ticker": "KXXRP15M-26NOV240815",
-   "series_ticker": "KXXRP15M",
-   "series_ticker_from_api": null,
-   "title": "XRP price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.48,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 2.0,
-   "volume_24h_fp": 2.0,
-   "open_interest_fp": 2.0,
-   "dollars_traded_estimate": 0.96,
-   "close_time": "2026-11-24T13:15:00Z",
-   "expected_expiration_time": "2026-11-24T13:20:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399577Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240815-15"
-  },
-  {
-   "ticker": "KXXRP15M-26NOV240845-45",
-   "event_ticker": "KXXRP15M-26NOV240845",
-   "series_ticker": "KXXRP15M",
-   "series_ticker_from_api": null,
-   "title": "XRP price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.65,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 9.0,
-   "volume_24h_fp": 9.0,
-   "open_interest_fp": 9.0,
-   "dollars_traded_estimate": 5.85,
-   "close_time": "2026-11-24T13:45:00Z",
-   "expected_expiration_time": "2026-11-24T13:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399514Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240845-45"
-  },
-  {
-   "ticker": "KXXRP15M-26NOV240800-00",
-   "event_ticker": "KXXRP15M-26NOV240800",
-   "series_ticker": "KXXRP15M",
-   "series_ticker_from_api": null,
-   "title": "XRP price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.42,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 8.0,
-   "volume_24h_fp": 8.0,
-   "open_interest_fp": 8.0,
-   "dollars_traded_estimate": 3.36,
-   "close_time": "2026-11-24T13:00:00Z",
-   "expected_expiration_time": "2026-11-24T13:05:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399433Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV240800-00"
-  },
-  {
-   "ticker": "KXSOL15M-26NOV240845-45",
-   "event_ticker": "KXSOL15M-26NOV240845",
-   "series_ticker": "KXSOL15M",
-   "series_ticker_from_api": null,
-   "title": "SOL price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.75,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 1.0,
-   "volume_24h_fp": 1.0,
-   "open_interest_fp": 1.0,
-   "dollars_traded_estimate": 0.75,
-   "close_time": "2026-11-24T13:45:00Z",
-   "expected_expiration_time": "2026-11-24T13:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399372Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOL15M-26NOV240845-45"
-  },
-  {
-   "ticker": "KXETH15M-26NOV240845-45",
-   "event_ticker": "KXETH15M-26NOV240845",
-   "series_ticker": "KXETH15M",
-   "series_ticker_from_api": null,
-   "title": "ETH price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.49,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 2.0,
-   "volume_24h_fp": 2.0,
-   "open_interest_fp": 2.0,
-   "dollars_traded_estimate": 0.98,
-   "close_time": "2026-11-24T13:45:00Z",
-   "expected_expiration_time": "2026-11-24T13:50:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399316Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETH15M-26NOV240845-45"
-  },
-  {
-   "ticker": "KXDOGE15M-26NOV240900-00",
-   "event_ticker": "KXDOGE15M-26NOV240900",
-   "series_ticker": "KXDOGE15M",
-   "series_ticker_from_api": null,
-   "title": "DOGE price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.69,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 1.0,
-   "volume_24h_fp": 1.0,
-   "open_interest_fp": 1.0,
-   "dollars_traded_estimate": 0.69,
-   "close_time": "2026-11-24T14:00:00Z",
-   "expected_expiration_time": "2026-11-24T14:05:00Z",
-   "settlement_ts": "2026-11-24T14:04:50.399225Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV240900-00"
-  },
-  {
    "ticker": "KXPGATOUR-THRC26-BHAA",
    "event_ticker": "KXPGATOUR-THRC26",
    "series_ticker": "KXPGATOUR",
@@ -18367,7 +18367,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 62077.1,
-   "volume_24h_fp": 1219.19,
+   "volume_24h_fp": 1178.39,
    "open_interest_fp": 55251.69,
    "dollars_traded_estimate": 807.0,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18517,7 +18517,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 132800.1,
-   "volume_24h_fp": 1209.86,
+   "volume_24h_fp": 1150.74,
    "open_interest_fp": 128902.68,
    "dollars_traded_estimate": 398.4,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18607,7 +18607,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 39776.45,
-   "volume_24h_fp": 1390.93,
+   "volume_24h_fp": 1338.04,
    "open_interest_fp": 34010.21,
    "dollars_traded_estimate": 8750.82,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18667,7 +18667,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 42420.04,
-   "volume_24h_fp": 1264.65,
+   "volume_24h_fp": 1215.79,
    "open_interest_fp": 42420.04,
    "dollars_traded_estimate": 127.26,
    "close_time": "2026-11-23T19:54:03Z",
@@ -18697,7 +18697,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 252781.05,
-   "volume_24h_fp": 1281.33,
+   "volume_24h_fp": 1218.64,
    "open_interest_fp": 241482.54,
    "dollars_traded_estimate": 3791.72,
    "close_time": "2026-11-23T19:54:03Z",
@@ -21902,7 +21902,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -21918,7 +21918,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -21926,6 +21926,10 @@
    "category_id": "crypto",
    "orderbook": {
     "yes_bids": [
+     {
+      "price": 0.01,
+      "contracts": 20.0
+     },
      {
       "price": 0.02,
       "contracts": 32.7
@@ -21962,7 +21966,7 @@
      },
      {
       "price": 0.77,
-      "contracts": 10.77
+      "contracts": 632.01
      }
     ],
     "best_yes_bid": {
@@ -21971,14 +21975,14 @@
     },
     "best_no_bid": {
      "price": 0.77,
-     "contracts": 10.77
+     "contracts": 632.01
     },
     "best_yes_ask_derived": 0.23,
-    "contracts_at_best_yes_ask": 10.77,
+    "contracts_at_best_yes_ask": 632.01,
     "contracts_at_best_yes_bid": 757.57,
-    "visible_contracts_total": 6318.29,
+    "visible_contracts_total": 6959.53,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B62500/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22018,7 +22022,7 @@
      },
      {
       "price": 0.84,
-      "contracts": 1183.01
+      "contracts": 1087.43
      }
     ],
     "best_yes_bid": {
@@ -22027,14 +22031,14 @@
     },
     "best_no_bid": {
      "price": 0.84,
-     "contracts": 1183.01
+     "contracts": 1087.43
     },
     "best_yes_ask_derived": 0.16,
-    "contracts_at_best_yes_ask": 1183.01,
+    "contracts_at_best_yes_ask": 1087.43,
     "contracts_at_best_yes_bid": 2564.1,
-    "visible_contracts_total": 8597.95,
+    "visible_contracts_total": 8502.37,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22086,7 +22090,7 @@
     "contracts_at_best_yes_bid": 15873.0,
     "visible_contracts_total": 82040.35,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22102,7 +22106,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22118,7 +22122,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22126,10 +22130,6 @@
    "category_id": "golf",
    "orderbook": {
     "yes_bids": [
-     {
-      "price": 0.001,
-      "contracts": 20.0
-     },
      {
       "price": 0.15,
       "contracts": 3333.33
@@ -22168,9 +22168,9 @@
     "best_yes_ask_derived": 0.18,
     "contracts_at_best_yes_ask": 2425.67,
     "contracts_at_best_yes_bid": 2941.17,
-    "visible_contracts_total": 16976.71,
+    "visible_contracts_total": 16956.71,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SSCH/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22180,7 +22180,7 @@
     "yes_bids": [
      {
       "price": 0.01,
-      "contracts": 80.0
+      "contracts": 100.0
      },
      {
       "price": 0.63,
@@ -22240,9 +22240,9 @@
     "best_yes_ask_derived": 0.84,
     "contracts_at_best_yes_ask": 197.41,
     "contracts_at_best_yes_bid": 94.8,
-    "visible_contracts_total": 2580.96,
+    "visible_contracts_total": 2600.96,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22290,7 +22290,7 @@
     "contracts_at_best_yes_bid": 33333.33,
     "visible_contracts_total": 202599.59,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:43Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22306,7 +22306,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.40/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22354,7 +22354,7 @@
     "contracts_at_best_yes_bid": 111111.1,
     "visible_contracts_total": 722842.75,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ASMA/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22370,7 +22370,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22394,7 +22394,7 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.295/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:43Z"
    }
   },
   {
@@ -22418,11 +22418,35 @@
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.290/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:44Z"
    }
   },
   {
    "ticker": "KXNATGASD-26NOV2417-T3.285",
+   "category_id": "culture",
+   "orderbook": {
+    "yes_bids": [
+     {
+      "price": 0.01,
+      "contracts": 430.0
+     }
+    ],
+    "no_bids": [],
+    "best_yes_bid": {
+     "price": 0.01,
+     "contracts": 430.0
+    },
+    "best_no_bid": null,
+    "best_yes_ask_derived": null,
+    "contracts_at_best_yes_ask": null,
+    "contracts_at_best_yes_bid": 430.0,
+    "visible_contracts_total": 430.0,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.285/orderbook?depth=10",
+    "fetched_at": "2026-11-24T14:49:44Z"
+   }
+  },
+  {
+   "ticker": "KXNATGASD-26NOV2417-T3.280",
    "category_id": "culture",
    "orderbook": {
     "yes_bids": [
@@ -22441,40 +22465,8 @@
     "contracts_at_best_yes_ask": null,
     "contracts_at_best_yes_bid": 440.0,
     "visible_contracts_total": 440.0,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.285/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
-   }
-  },
-  {
-   "ticker": "KXNATGASD-26NOV2417-T3.280",
-   "category_id": "culture",
-   "orderbook": {
-    "yes_bids": [
-     {
-      "price": 0.01,
-      "contracts": 430.0
-     }
-    ],
-    "no_bids": [
-     {
-      "price": 0.2,
-      "contracts": 10.0
-     }
-    ],
-    "best_yes_bid": {
-     "price": 0.01,
-     "contracts": 430.0
-    },
-    "best_no_bid": {
-     "price": 0.2,
-     "contracts": 10.0
-    },
-    "best_yes_ask_derived": 0.8,
-    "contracts_at_best_yes_ask": 10.0,
-    "contracts_at_best_yes_bid": 430.0,
-    "visible_contracts_total": 440.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.280/orderbook?depth=10",
-    "fetched_at": "2026-11-24T14:34:44Z"
+    "fetched_at": "2026-11-24T14:49:44Z"
    }
   }
  ],
