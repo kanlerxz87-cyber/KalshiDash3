@@ -2,6 +2,153 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-24T17:51:34Z",
+   "to_time": "2026-11-25T12:16:44Z",
+   "from_price": 0.02,
+   "to_price": 0.99,
+   "delta": 0.97,
+   "direction": "up",
+   "volume_24h_fp": 1029876.24,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T12:16:45Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 1028064.16,
+    "est_dollars": 1017783.52,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 58487143.67,
+    "volume_to": 59515207.83,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "1.02806e+06 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T12:16:45Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXAAAGASM-26NOV30-3.70",
+   "event_ticker": "KXAAAGASM-26NOV30",
+   "title": "Will average **gas prices** be above $3.70?",
+   "category_id": "gas",
+   "category_basis": "seed",
+   "series_categories": [
+    "Economics"
+   ],
+   "status": "active",
+   "from_time": "2026-11-24T17:51:34Z",
+   "to_time": "2026-11-25T12:16:44Z",
+   "from_price": 0.09,
+   "to_price": 0.75,
+   "delta": 0.66,
+   "direction": "up",
+   "volume_24h_fp": 5.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.70",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.75,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T12:16:45Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 5.0,
+    "est_dollars": 3.75,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 15441.22,
+    "volume_to": 15446.22,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "5 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T12:16:45Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXETHY-27JAN0100-B2125",
+   "event_ticker": "KXETHY-27JAN0100",
+   "title": "ETH price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-24T17:51:34Z",
+   "to_time": "2026-11-25T12:16:44Z",
+   "from_price": 0.01,
+   "to_price": 0.23,
+   "delta": 0.22,
+   "direction": "up",
+   "volume_24h_fp": 2.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B2125",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.24,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T12:16:45Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 2.0,
+    "est_dollars": 0.46,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 13682784.57,
+    "volume_to": 13682786.57,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T12:16:45Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
    "title": "BTC price  on Jan 1, 2027?",
@@ -3554,22 +3701,22 @@
    "first_seen_at": "2026-11-22T05:02:12Z",
    "high_roi": true,
    "evidence": {
-    "state": "traded_below_floor",
-    "contracts_traded": 91.71,
-    "est_dollars": 88.96,
+    "state": "unknown_no_observations",
+    "contracts_traded": null,
+    "est_dollars": null,
     "est_dollars_is_an_estimate": true,
-    "volume_from": 72326501.5,
-    "volume_to": 72326593.21,
+    "volume_from": null,
+    "volume_to": null,
     "policy_floor_contracts": 100.0,
     "policy_floor_is_a_kalshi_field": false,
-    "why": "91.71 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "why": "the two observations that bound this swing are not in the committed price history (the market was pruned or the row is archive-only)",
     "sources": {
      "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
      "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
      "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
      "demo": "https://docs.kalshi.com/getting_started/demo_env"
     },
-    "decided_at": "2026-11-22T05:02:12Z"
+    "decided_at": "2026-11-25T12:16:45Z"
    },
    "evidence_reversion": {
     "observed_after": 3,
@@ -3621,10 +3768,10 @@
     "decided_at": "2026-11-24T17:51:35Z"
    },
    "evidence_reversion": {
-    "observed_after": 3,
-    "min_distance_from_from_price": 0.97,
-    "gave_back_half": false,
-    "still_open": false
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
    }
   },
   {
