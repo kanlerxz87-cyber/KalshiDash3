@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T14:22:20Z",
- "started_at": "2026-11-25T14:21:21Z",
+ "collected_at": "2026-11-25T14:37:20Z",
+ "started_at": "2026-11-25T14:36:21Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -20,11 +20,11 @@
   "settled_in_scope": 1600,
   "settled_published_rows": 200,
   "open_out_of_scope": 5406,
-  "settled_out_of_scope": 9174,
+  "settled_out_of_scope": 9203,
   "open_excluded_multivariate": 0,
   "settled_excluded_multivariate": 0,
   "open_excluded_off_topic_or_qa": 0,
-  "settled_excluded_off_topic_or_qa": 57,
+  "settled_excluded_off_topic_or_qa": 58,
   "open_excluded_series": 80,
   "settled_excluded_series": 40,
   "excluded_series_detail": {
@@ -106,8 +106,8 @@
   "open_paging_truncated_at_safety_cap": true,
   "settled_paging_truncated_at_safety_cap": true,
   "safety_scan_cap": 25000,
-  "settled_rows_trimmed_for_size": 19655,
-  "settled_in_scope_total": 21255,
+  "settled_rows_trimmed_for_size": 19625,
+  "settled_in_scope_total": 21225,
   "settled_in_scope_total_method": "exact count of every settled row the paged scan returned inside the five topics, measured before the per-topic publish selection and before the size window; the scan stopped at the safety cap, so this is a lower bound (safety_scan_cap 25000, kept window 1600, published 200 across the five topics)",
   "settled_kept_window": 1600,
   "settled_published": 200,
@@ -2540,6 +2540,17 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSILVERH"
   },
+  "KXSOFRD": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "Daily SOFR",
+   "tags": [
+    "Fed",
+    "Econ Daily"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSOFRD"
+  },
   "KXSOL15M": {
    "categories": [
     "Crypto"
@@ -3039,10 +3050,10 @@
    "yes_ask_dollars": 0.24,
    "no_bid_dollars": 0.76,
    "no_ask_dollars": 0.79,
-   "volume_fp": 65052508.75,
-   "volume_24h_fp": 5930.18,
+   "volume_fp": 65052581.76,
+   "volume_24h_fp": 5914.87,
    "open_interest_fp": 13426131.31,
-   "dollars_traded_estimate": 15612602.1,
+   "dollars_traded_estimate": 15612619.62,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3103,10 +3114,10 @@
    "yes_ask_dollars": 0.23,
    "no_bid_dollars": 0.77,
    "no_ask_dollars": 0.78,
-   "volume_fp": 49049237.49,
-   "volume_24h_fp": 4955.27,
-   "open_interest_fp": 8376262.42,
-   "dollars_traded_estimate": 11281324.62,
+   "volume_fp": 49049307.18,
+   "volume_24h_fp": 4949.31,
+   "open_interest_fp": 8376332.11,
+   "dollars_traded_estimate": 11281340.65,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3135,10 +3146,10 @@
    "yes_ask_dollars": 0.13,
    "no_bid_dollars": 0.87,
    "no_ask_dollars": 0.88,
-   "volume_fp": 61777535.42,
-   "volume_24h_fp": 6418.68,
+   "volume_fp": 61777612.8,
+   "volume_24h_fp": 6414.14,
    "open_interest_fp": 7787564.28,
-   "dollars_traded_estimate": 8031079.6,
+   "dollars_traded_estimate": 8031089.66,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3167,10 +3178,10 @@
    "yes_ask_dollars": 0.16,
    "no_bid_dollars": 0.84,
    "no_ask_dollars": 0.86,
-   "volume_fp": 43029874.28,
-   "volume_24h_fp": 9429.82,
+   "volume_fp": 43029954.07,
+   "volume_24h_fp": 9432.82,
    "open_interest_fp": 7169945.27,
-   "dollars_traded_estimate": 6884779.88,
+   "dollars_traded_estimate": 6884792.65,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3199,10 +3210,10 @@
    "yes_ask_dollars": 0.06,
    "no_bid_dollars": 0.94,
    "no_ask_dollars": 0.95,
-   "volume_fp": 80255435.56,
-   "volume_24h_fp": 10874.38,
-   "open_interest_fp": 26597882.69,
-   "dollars_traded_estimate": 4815326.13,
+   "volume_fp": 80255509.03,
+   "volume_24h_fp": 10880.7,
+   "open_interest_fp": 26597956.16,
+   "dollars_traded_estimate": 4815330.54,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3264,7 +3275,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 89265077.31,
-   "volume_24h_fp": 1553.9,
+   "volume_24h_fp": 1481.03,
    "open_interest_fp": 25244656.04,
    "dollars_traded_estimate": 2677952.32,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3295,10 +3306,10 @@
    "yes_ask_dollars": 0.07,
    "no_bid_dollars": 0.93,
    "no_ask_dollars": 0.94,
-   "volume_fp": 35332355.07,
-   "volume_24h_fp": 9999.63,
+   "volume_fp": 35332437.74,
+   "volume_24h_fp": 9999.88,
    "open_interest_fp": 4727597.2,
-   "dollars_traded_estimate": 2473264.85,
+   "dollars_traded_estimate": 2473270.64,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3324,13 +3335,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 162410754.28,
-   "volume_24h_fp": 31877.14,
-   "open_interest_fp": 23521082.97,
-   "dollars_traded_estimate": 1624107.54,
+   "volume_fp": 162410798.82,
+   "volume_24h_fp": 31888.57,
+   "open_interest_fp": 23521099.89,
+   "dollars_traded_estimate": 1624107.99,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3359,10 +3370,10 @@
    "yes_ask_dollars": 0.04,
    "no_bid_dollars": 0.96,
    "no_ask_dollars": 0.97,
-   "volume_fp": 39632805.06,
-   "volume_24h_fp": 17375.71,
+   "volume_fp": 39632881.64,
+   "volume_24h_fp": 17385.31,
    "open_interest_fp": 5968304.27,
-   "dollars_traded_estimate": 1585312.2,
+   "dollars_traded_estimate": 1585315.27,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3388,13 +3399,13 @@
    "result": null,
    "last_price_dollars": 0.04,
    "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.02,
-   "no_bid_dollars": 0.98,
+   "yes_ask_dollars": 0.04,
+   "no_bid_dollars": 0.96,
    "no_ask_dollars": 0.99,
-   "volume_fp": 35595714.75,
-   "volume_24h_fp": 42182.01,
-   "open_interest_fp": 6350586.86,
-   "dollars_traded_estimate": 1423828.59,
+   "volume_fp": 35595785.14,
+   "volume_24h_fp": 42180.57,
+   "open_interest_fp": 6350628.74,
+   "dollars_traded_estimate": 1423831.41,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3487,10 +3498,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 125588209.93,
-   "volume_24h_fp": 32570.14,
-   "open_interest_fp": 21070081.23,
-   "dollars_traded_estimate": 1255882.1,
+   "volume_fp": 125588256.33,
+   "volume_24h_fp": 32595.22,
+   "open_interest_fp": 21070094.53,
+   "dollars_traded_estimate": 1255882.56,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3551,10 +3562,10 @@
    "yes_ask_dollars": 0.04,
    "no_bid_dollars": 0.96,
    "no_ask_dollars": 0.99,
-   "volume_fp": 52421703.25,
-   "volume_24h_fp": 30701.68,
-   "open_interest_fp": 7039843.61,
-   "dollars_traded_estimate": 1048434.07,
+   "volume_fp": 52421785.05,
+   "volume_24h_fp": 30724.13,
+   "open_interest_fp": 7039891.47,
+   "dollars_traded_estimate": 1048435.7,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3615,10 +3626,10 @@
    "yes_ask_dollars": 0.02,
    "no_bid_dollars": 0.98,
    "no_ask_dollars": 0.99,
-   "volume_fp": 49231115.81,
-   "volume_24h_fp": 2889.4,
-   "open_interest_fp": 4887676.79,
-   "dollars_traded_estimate": 984622.32,
+   "volume_fp": 49231175.44,
+   "volume_24h_fp": 2881.85,
+   "open_interest_fp": 4887693.8,
+   "dollars_traded_estimate": 984623.51,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3711,10 +3722,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 83580684.25,
-   "volume_24h_fp": 30947.51,
+   "volume_fp": 83580754.4,
+   "volume_24h_fp": 30943.71,
    "open_interest_fp": 39644241.03,
-   "dollars_traded_estimate": 835806.84,
+   "dollars_traded_estimate": 835807.54,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3743,10 +3754,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 81977654.09,
-   "volume_24h_fp": 32490.49,
-   "open_interest_fp": 25003396.76,
-   "dollars_traded_estimate": 819776.54,
+   "volume_fp": 81977698.42,
+   "volume_24h_fp": 32536.98,
+   "open_interest_fp": 25003411.54,
+   "dollars_traded_estimate": 819776.98,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3807,10 +3818,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 73992891.28,
-   "volume_24h_fp": 58283.07,
+   "volume_fp": 73992940.24,
+   "volume_24h_fp": 58249.1,
    "open_interest_fp": 6929195.04,
-   "dollars_traded_estimate": 739928.91,
+   "dollars_traded_estimate": 739929.4,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3839,10 +3850,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 72433787.23,
-   "volume_24h_fp": 33673.23,
+   "volume_fp": 72433847.64,
+   "volume_24h_fp": 33666.03,
    "open_interest_fp": 7299156.92,
-   "dollars_traded_estimate": 724337.87,
+   "dollars_traded_estimate": 724338.48,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3871,10 +3882,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 69873479.72,
-   "volume_24h_fp": 29946.5,
-   "open_interest_fp": 19463594.21,
-   "dollars_traded_estimate": 698734.8,
+   "volume_fp": 69873526.02,
+   "volume_24h_fp": 29921.04,
+   "open_interest_fp": 19463600.48,
+   "dollars_traded_estimate": 698735.26,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3903,10 +3914,10 @@
    "yes_ask_dollars": 1.0,
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 67496021.93,
-   "volume_24h_fp": 58176.77,
+   "volume_fp": 67496079.54,
+   "volume_24h_fp": 58166.67,
    "open_interest_fp": 6478082.34,
-   "dollars_traded_estimate": 674960.22,
+   "dollars_traded_estimate": 674960.8,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -3936,7 +3947,7 @@
    "no_bid_dollars": 0.0,
    "no_ask_dollars": 1.0,
    "volume_fp": 65583211.48,
-   "volume_24h_fp": 1595.7,
+   "volume_24h_fp": 1506.13,
    "open_interest_fp": 12744518.53,
    "dollars_traded_estimate": 655832.11,
    "close_time": "2027-01-01T05:00:00Z",
@@ -3964,13 +3975,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.01,
-   "no_bid_dollars": 0.99,
+   "yes_ask_dollars": 0.99,
+   "no_bid_dollars": 0.01,
    "no_ask_dollars": 1.0,
-   "volume_fp": 59515676.55,
-   "volume_24h_fp": 1029694.8,
-   "open_interest_fp": 7000590.59,
-   "dollars_traded_estimate": 595156.77,
+   "volume_fp": 59515758.41,
+   "volume_24h_fp": 1029691.97,
+   "open_interest_fp": 7000660.7,
+   "dollars_traded_estimate": 595157.58,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4063,10 +4074,10 @@
    "yes_ask_dollars": 0.01,
    "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 52156795.24,
-   "volume_24h_fp": 32624.66,
-   "open_interest_fp": 9376633.93,
-   "dollars_traded_estimate": 521567.95,
+   "volume_fp": 52156842.45,
+   "volume_24h_fp": 32634.97,
+   "open_interest_fp": 9376651.48,
+   "dollars_traded_estimate": 521568.42,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4092,13 +4103,13 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
-   "volume_fp": 46856417.37,
-   "volume_24h_fp": 63145.81,
+   "volume_fp": 46856465.08,
+   "volume_24h_fp": 63146.51,
    "open_interest_fp": 8437405.84,
-   "dollars_traded_estimate": 468564.17,
+   "dollars_traded_estimate": 468564.65,
    "close_time": "2027-01-01T05:00:00Z",
    "expected_expiration_time": "2027-01-01T05:05:00Z",
    "settlement_ts": null,
@@ -4976,8 +4987,8 @@
    "result": null,
    "last_price_dollars": 0.003,
    "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.005,
-   "no_bid_dollars": 0.995,
+   "yes_ask_dollars": 0.003,
+   "no_bid_dollars": 0.997,
    "no_ask_dollars": 0.998,
    "volume_fp": 333881.35,
    "volume_24h_fp": 166847.84,
@@ -15169,161 +15180,11 @@
  ],
  "settled_markets": [
   {
-   "ticker": "KXETH15M-26NOV250915-15",
-   "event_ticker": "KXETH15M-26NOV250915",
-   "series_ticker": "KXETH15M",
+   "ticker": "KXXRPD-26NOV2508-T1.6399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "ETH price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T14:15:00Z",
-   "expected_expiration_time": "2026-11-25T14:20:00Z",
-   "settlement_ts": "2026-11-25T14:15:02.176409Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETH15M-26NOV250915-15"
-  },
-  {
-   "ticker": "KXBTC15M-26NOV250915-15",
-   "event_ticker": "KXBTC15M-26NOV250915",
-   "series_ticker": "KXBTC15M",
-   "series_ticker_from_api": null,
-   "title": "BTC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.991,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 2552.71,
-   "volume_24h_fp": 2552.71,
-   "open_interest_fp": 1609.07,
-   "dollars_traded_estimate": 2529.74,
-   "close_time": "2026-11-25T14:15:00Z",
-   "expected_expiration_time": "2026-11-25T14:20:00Z",
-   "settlement_ts": "2026-11-25T14:15:02.176392Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV250915-15"
-  },
-  {
-   "ticker": "KXNEAR15M-26NOV250915-15",
-   "event_ticker": "KXNEAR15M-26NOV250915",
-   "series_ticker": "KXNEAR15M",
-   "series_ticker_from_api": null,
-   "title": "NEAR price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T14:15:00Z",
-   "expected_expiration_time": "2026-11-25T14:20:00Z",
-   "settlement_ts": "2026-11-25T14:15:02.175936Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNEAR15M-26NOV250915-15"
-  },
-  {
-   "ticker": "KXZEC15M-26NOV250915-15",
-   "event_ticker": "KXZEC15M-26NOV250915",
-   "series_ticker": "KXZEC15M",
-   "series_ticker_from_api": null,
-   "title": "ZEC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T14:15:00Z",
-   "expected_expiration_time": "2026-11-25T14:20:00Z",
-   "settlement_ts": "2026-11-25T14:15:02.175901Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV250915-15"
-  },
-  {
-   "ticker": "KXHYPE15M-26NOV250915-15",
-   "event_ticker": "KXHYPE15M-26NOV250915",
-   "series_ticker": "KXHYPE15M",
-   "series_ticker_from_api": null,
-   "title": "HYPE price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T14:15:00Z",
-   "expected_expiration_time": "2026-11-25T14:20:00Z",
-   "settlement_ts": "2026-11-25T14:15:02.175862Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE15M-26NOV250915-15"
-  },
-  {
-   "ticker": "KXHYPED-26NOV2508-T99.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
-   "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15343,17 +15204,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T99.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.6399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T98.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.6199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15373,17 +15234,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T98.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.6199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T98.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.5999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15403,17 +15264,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T98.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.5999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T98.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.5799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15433,17 +15294,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T98.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.5799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T98.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.5599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15463,17 +15324,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T98.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.5599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T97.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.5399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15493,17 +15354,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T97.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.5399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T97.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.5199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15523,17 +15384,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T97.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.5199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T97.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.4999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15553,17 +15414,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T97.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.4999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T97.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.4799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15583,17 +15444,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T97.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.4799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T96.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.4599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15613,17 +15474,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T96.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.4599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T96.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.4399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15643,17 +15504,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T96.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.4399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T96.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.4199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15673,17 +15534,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T96.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.4199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T96.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.3999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15703,17 +15564,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T96.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.3999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T95.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.3799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15733,17 +15594,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T95.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.3799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T95.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.3599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15763,17 +15624,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T95.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.3599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T95.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.3399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15793,17 +15654,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T95.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.3399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T95.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.3199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15823,17 +15684,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T95.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.3199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T94.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.2999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15853,17 +15714,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T94.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.2999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T94.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.2799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15883,17 +15744,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T94.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.2799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T94.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.2599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15913,17 +15774,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T94.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.2599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T94.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.2399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15943,17 +15804,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T94.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.2399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T93.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.2199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -15973,17 +15834,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T93.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.2199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T93.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.1999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16003,17 +15864,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T93.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.1999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T93.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.1799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16033,17 +15894,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T93.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.1799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T93.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.1599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16063,17 +15924,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T93.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.1599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T92.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.1399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16093,17 +15954,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T92.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.1399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T92.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.1199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16123,17 +15984,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T92.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.1199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T92.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.0999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16153,17 +16014,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T92.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.0999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T92.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.0799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16183,17 +16044,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T92.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.0799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T91.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.0599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16213,17 +16074,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T91.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.0599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T91.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.0399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16243,17 +16104,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T91.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.0399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T91.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T1.0199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16273,17 +16134,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T91.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T1.0199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T91.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.9999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16303,17 +16164,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T91.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.9999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T90.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.9799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16333,17 +16194,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T90.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.9799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T90.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.9599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16363,17 +16224,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T90.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.9599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T90.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.9399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16393,17 +16254,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T90.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.9399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T90.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.9199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16423,17 +16284,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T90.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.9199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T89.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.8999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16453,17 +16314,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T89.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.8999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T89.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.8799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16483,17 +16344,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T89.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.8799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T89.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.8599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16513,17 +16374,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T89.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.8599"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T89.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.8399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16543,17 +16404,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T89.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.8399"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T88.9999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.8199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16573,17 +16434,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T88.9999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.8199"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T88.7499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.7999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16603,17 +16464,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T88.7499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.7999"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T88.4999",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.7799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16633,17 +16494,17 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T88.4999"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.7799"
   },
   {
-   "ticker": "KXHYPED-26NOV2508-T88.2499",
-   "event_ticker": "KXHYPED-26NOV2508",
-   "series_ticker": "KXHYPED",
+   "ticker": "KXXRPD-26NOV2508-T0.7599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
    "series_ticker_from_api": null,
-   "title": "HYPE price on Nov 25, 2026?",
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
    "category_id": "crypto",
    "category_basis": "keyword",
    "series_categories": [
@@ -16663,10 +16524,160 @@
    "dollars_traded_estimate": 0.0,
    "close_time": "2026-11-25T13:00:00Z",
    "expected_expiration_time": "2026-11-25T13:05:00Z",
-   "settlement_ts": "2026-11-25T14:06:02.38041Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPED-26NOV2508-T88.2499"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.7599"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2508-T0.7399",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
+   "series_ticker_from_api": null,
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T13:00:00Z",
+   "expected_expiration_time": "2026-11-25T13:05:00Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.7399"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2508-T0.7199",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
+   "series_ticker_from_api": null,
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T13:00:00Z",
+   "expected_expiration_time": "2026-11-25T13:05:00Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.7199"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2508-T0.6999",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
+   "series_ticker_from_api": null,
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T13:00:00Z",
+   "expected_expiration_time": "2026-11-25T13:05:00Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.6999"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2508-T0.6799",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
+   "series_ticker_from_api": null,
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T13:00:00Z",
+   "expected_expiration_time": "2026-11-25T13:05:00Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.6799"
+  },
+  {
+   "ticker": "KXXRPD-26NOV2508-T0.6599",
+   "event_ticker": "KXXRPD-26NOV2508",
+   "series_ticker": "KXXRPD",
+   "series_ticker_from_api": null,
+   "title": "Ripple price at Nov 25, 2026 at 8am EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T13:00:00Z",
+   "expected_expiration_time": "2026-11-25T13:05:00Z",
+   "settlement_ts": "2026-11-25T14:34:57.184922Z",
+   "settlement_value_dollars": 0.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRPD-26NOV2508-T0.6599"
   },
   {
    "ticker": "KXPGATOUR-THRC26-BHAA",
@@ -21183,7 +21194,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:18Z"
+    "fetched_at": "2026-11-25T14:37:18Z"
    }
   },
   {
@@ -21215,7 +21226,7 @@
     "no_bids": [
      {
       "price": 0.76,
-      "contracts": 177.19
+      "contracts": 109.37
      }
     ],
     "best_yes_bid": {
@@ -21224,14 +21235,14 @@
     },
     "best_no_bid": {
      "price": 0.76,
-     "contracts": 177.19
+     "contracts": 109.37
     },
     "best_yes_ask_derived": 0.24,
-    "contracts_at_best_yes_ask": 177.19,
+    "contracts_at_best_yes_ask": 109.37,
     "contracts_at_best_yes_bid": 793.65,
-    "visible_contracts_total": 2741.86,
+    "visible_contracts_total": 2674.04,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:18Z"
+    "fetched_at": "2026-11-25T14:37:18Z"
    }
   },
   {
@@ -21247,7 +21258,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:18Z"
+    "fetched_at": "2026-11-25T14:37:18Z"
    }
   },
   {
@@ -21269,45 +21280,45 @@
      },
      {
       "price": 0.2,
-      "contracts": 2499.99
+      "contracts": 1666.66
      },
      {
       "price": 0.21,
-      "contracts": 2380.95
+      "contracts": 1587.3
      },
      {
       "price": 0.22,
-      "contracts": 2095.76
+      "contracts": 1515.14
      }
     ],
     "no_bids": [
      {
       "price": 0.75,
-      "contracts": 1999.98
+      "contracts": 1333.32
      },
      {
       "price": 0.76,
-      "contracts": 1633.33
+      "contracts": 1388.88
      },
      {
       "price": 0.77,
-      "contracts": 97.25
+      "contracts": 28.16
      }
     ],
     "best_yes_bid": {
      "price": 0.22,
-     "contracts": 2095.76
+     "contracts": 1515.14
     },
     "best_no_bid": {
      "price": 0.77,
-     "contracts": 97.25
+     "contracts": 28.16
     },
     "best_yes_ask_derived": 0.23,
-    "contracts_at_best_yes_ask": 97.25,
-    "contracts_at_best_yes_bid": 2095.76,
-    "visible_contracts_total": 10784.96,
+    "contracts_at_best_yes_ask": 28.16,
+    "contracts_at_best_yes_bid": 1515.14,
+    "visible_contracts_total": 7597.16,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B62500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:18Z"
+    "fetched_at": "2026-11-25T14:37:18Z"
    }
   },
   {
@@ -21323,7 +21334,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:18Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21339,7 +21350,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21403,7 +21414,7 @@
     "contracts_at_best_yes_bid": 26.23,
     "visible_contracts_total": 73521.07,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21427,7 +21438,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 70.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.70/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21475,7 +21486,7 @@
     "contracts_at_best_yes_bid": 980.39,
     "visible_contracts_total": 5769.6,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SSCH/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21485,10 +21496,10 @@
     "yes_bids": [
      {
       "price": 0.01,
-      "contracts": 80.0
+      "contracts": 100.0
      },
      {
-      "price": 0.41,
+      "price": 0.4,
       "contracts": 5.0
      },
      {
@@ -21537,9 +21548,9 @@
     "best_yes_ask_derived": 0.51,
     "contracts_at_best_yes_ask": 326.79,
     "contracts_at_best_yes_bid": 333.33,
-    "visible_contracts_total": 2310.43,
+    "visible_contracts_total": 2330.43,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:19Z"
    }
   },
   {
@@ -21591,7 +21602,7 @@
     "contracts_at_best_yes_bid": 66666.66,
     "visible_contracts_total": 406032.32,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:19Z"
+    "fetched_at": "2026-11-25T14:37:20Z"
    }
   },
   {
@@ -21639,7 +21650,7 @@
     "contracts_at_best_yes_bid": 55555.55,
     "visible_contracts_total": 361674.04,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ASMA/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:20Z"
+    "fetched_at": "2026-11-25T14:37:20Z"
    }
   },
   {
@@ -21655,7 +21666,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-25T14:22:20Z"
+    "fetched_at": "2026-11-25T14:37:20Z"
    }
   }
  ],
