@@ -6,6 +6,48 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+
+## Session `arena-1aaa3a61` — current-snapshot release-gate repair
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| CSG-1 | Reconcile DOM regression assertions with the live committed snapshot and the chat's 80-row visible window; preserve checks for the real UI contract rather than historical totals. | done | arena-1aaa3a61 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS; committed `data/live/markets.json` and `data/live/alerts_archive.json` fixtures |
+
+- 2026-11-25: Read the coordination board and ran the release gate on base `68827bd`. First run blocked because the workspace lacked `jsdom`; installed the test-only dependency with `npm install --no-save --package-lock=false jsdom@26`. Baseline exposed stale assertions: chat rendered only the 80 newest events but compared its model rows to 96 archive-wide picks; landing-page assertions required a ticker even when a topic correctly said "none open in scope", and unconditionally required an untraded disclosure when the current snapshot has traded rows in every open topic. Fixed the test contracts to derive the expected rendered model from the current 80-event window, require a truthful model badge, permit the explicit no-open state, and condition the untraded disclosure check on actual snapshot volume. Production UI/data and verified facts remain unchanged.
+- Verification: `node scripts/tests/test_chatdock.js` PASS; `node scripts/tests/test_pages_dom.js` PASS; full `python3 scripts/verify_release.py` PASS, including offline validators, DOM tests, and `scripts/check_site.py` (21 pages, internal links resolved). Release gate explicitly does not certify live API availability, account access, or external URLs; this run saw transient demo `/series` TLS and simulated 500 warnings in offline failure-path tests, which were handled by existing fallbacks.
+- No new Kalshi fact was asserted; the updated expected values derive from the committed snapshot and archive. Existing documented sources remain linked from the data records; official API, balance, authentication, live trade, ROI, and causal-catalyst claims remain outside this test-only task.
+
+### Release close-out
+- PR [#115](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/115) merged on 2026-11-25T12:31:28Z as `eaf77adb17ae3b040b65b920d003ced5be47822c`.
+- GitHub Actions deploy run [45614582749](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45614582749) completed successfully: build + deploy succeeded. GitHub Pages builds API reported `status=built` for `60f8d2922f9c25565d6b98f98791781d8fb412cc`, a subsequent demo-snapshot commit whose parent is the PR merge commit.
+- Release warning, non-blocking: Actions emitted the runner's Node.js 20 deprecation notice for pinned `actions/*@v4` steps (currently executed on Node.js 24). No change to workflow scope was made; review/updating action versions separately.
+- No authentication, Kalshi account, balances, or orders were used. Full verification was offline except GitHub Actions / Pages status APIs; external website/API reachability is not certified by this task.
+
+
+## Session `arena-748b2c0e` — snapshot regression follow-up (2026-11-25)
+
+Branch `arena/748b2c0e-kalshidash3`, based on `68827bd8e8cf3056bc9f39603d4362a439908271`.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| N25-1 | Independently run the release gate against the 12:16Z snapshot, then add a data-independent check that live alerts only link to settlement-reference URLs literally extracted from the market's own rules text. Avoid duplicate changes already landed in CSG-1. | **done — CSG-1 overlap integrated; unique source-link assertion retained** | arena-748b2c0e | `COORDINATION.md`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS on both 12:16Z and merged 12:31Z snapshots; extraction assertion exercises `KDLIVE.catalystLinks` with rules-text fixture; source URLs enumerated in `data/verified_facts.json` and `data/catalyst_review.json` | The 12:01Z `collector_health.json` failure predates the 12:16Z snapshot and later snapshots validate; health file remains a historical last-failure record. No live API or external-site reachability claimed. |
+| N25-2 | Repair the post-PR #117 regression-gate syntax error found when re-running the full release gate after main advanced; verify tests and report the conflict/handoff. | **done** | arena-748b2c0e | `COORDINATION.md`, `scripts/tests/test_pages_dom.js` | `node --check scripts/tests/test_pages_dom.js`; `python3 scripts/verify_release.py` PASS on merged main + fix (full validators, DOM suites, and `check_site.py`) | Found an extra closing brace in the H/index DOM test block after the new untraded-topic conditional (introduced in main commit `79d6115`). Removed only the unmatched brace; no product UI/data changes. |
+
+### N25-1 close-out
+- Baseline on `68827bd` initially failed the release gate due to data-dependent assertions: the chat compared visible rows with the entire archive, the landing table rejected its honest `none open in scope` state, and untraded-topic assertions were unconditional. The live-page test also required a particular URL to appear in a poll response even when rules text was absent.
+- Main advanced with PRs #115/#116 from `arena-1aaa3a61` fixing the overlapping chat/index assertions (CSG-1). `git pull --rebase origin main` encountered a `COORDINATION.md` conflict; after stopping the rebase, a merge encountered conflicts in `COORDINATION.md` and both DOM test files. Resolved by retaining main's CSG-1 and fresh snapshot/test changes verbatim, dropping duplicate chat/index changes, and keeping only the independent literal-rules URL extraction assertion. No other session's work was discarded; no force push.
+- The added DOM assertion calls `KDLIVE.catalystLinks` with a rule string containing a literal official reference URL and checks exact extraction; rendered alerts must either show the market-record settlement reference or state that the record has no URL. It does not claim any link caused a price move.
+- Full gate passed before and after integration. Merged-tree `python3 scripts/verify_release.py` checked the 12:31Z snapshot: 374 open and 200 settled published rows; 149 archived alerts with 129 five-topic leads and 20 withheld Test-series records; 98 rows in the experimental model screen. `validate_alerts.py`, `validate_catalysts.py`, `validate_live.py`, strategy simulation tests, DOM tests, and `check_site.py` all passed. ROI scan remains from 2026-11-24 and has 0 picks / 8 near misses; this is not evidence of profitable strategy performance. Scan cap remains reached, so the settled in-scope scan count is a lower bound. Each data row retains its source URL.
+- `collector_health.json` still contains a 12:01Z failed validator record, predating the newer snapshots; it is a historical last-failure record, not proof of a current failure. No Kalshi credentials or account orders were used.
+- No new official market/API fact was added; existing source/claim ledgers and cited Kalshi docs remain the source for those statements. This session verified repository snapshots and tests, not fresh external URL availability.
+
+### N25-2 close-out — post-PR #117 gate repair
+- After main advanced to `dd73c79`, the release gate failed immediately: `scripts/tests/test_pages_dom.js` had an unmatched `}` before the dashboard DOM test block (Node reported `Unexpected token '{'` at line 597). This was a test syntax regression, not a published-site runtime error.
+- Removed the single extra brace. `node --check scripts/tests/test_pages_dom.js` passed, then `python3 scripts/verify_release.py` passed against the merged tree (live/alert/catalyst validators, simulation, all DOM checks, and 21-page internal-link validation). The ROI scan still reports zero picks; this is a measured current state, not an investment-performance claim.
+- The mandatory `git pull --rebase origin main` encountered a coordination-board conflict because earlier claim commits were already pushed; no force push was used. Main was merged into the current branch, conflicts were preserved by taking the newer main files and reapplying only this session's scoped line/test record, then the final gate passed.
+
+---
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
