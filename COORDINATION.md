@@ -6,6 +6,20 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-71d4866f` — alert-scope regression coverage and current release audit
+
+Arena-assigned branch: `arena/71d4866f-kalshidash3` (branch identity is fixed for this session). This session is taking over only the still-missing regression-test portion of stale PR [#98](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/98): PR #98 was last updated 2026-11-22 08:35 UTC and remains open/dirty as of 2026-11-25. Its alert-scope implementation is already present in the current main tree (`assets/engine.js` `loadCollectorAlerts`, lines around 532–540); the current DOM test does not yet assert that excluded archived tickers stay out of the two feeds. No duplicate application fix is planned. The old PR's missing test is being adopted under this stale-claim handoff; its branch will not be modified.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T99 | Add a DOM regression assertion that `alerts.html`'s two chats exclude archive rows whose official series categories are Test/Demo or whose `category_id` is null; run the combined offline release gate against the current committed tree and record deploy/test status | in progress | arena-71d4866f | `scripts/tests/test_pages_dom.js` (block D only), `COORDINATION.md` (this section only) | committed `data/live/alerts_archive.json`; `scripts/verify_release.py`; `scripts/check_site.py`; GitHub Actions/Pages status |
+
+No shared page data, navigation, source ledger, collector output or existing finding is in this session's scope. The current `loadCollectorAlerts()` scope gate is being verified, not rewritten.
+
+### Log
+
+- 2026-11-25: Read the task board before claiming. Identified PR #98 as stale (>60 minutes without a commit); confirmed from the current tree that its F-76 app-code fix already exists, while its DOM regression test is absent. Claimed only the missing test plus a current-tree audit, on the Arena-assigned branch.
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
