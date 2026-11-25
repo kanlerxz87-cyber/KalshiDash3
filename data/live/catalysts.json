@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-25T15:37:21Z",
- "snapshot_collected_at": "2026-11-25T15:37:21Z",
+ "generated_at": "2026-11-25T15:52:21Z",
+ "snapshot_collected_at": "2026-11-25T15:52:20Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 137,
+  "archive_total": 138,
   "reviewed": 57,
-  "not_reviewed": 80,
+  "not_reviewed": 81,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
   "best_quote_did_not_move": 19,
@@ -18,6 +18,27 @@
   "withheld_category_conflict": 20
  },
  "alerts": [
+  {
+   "ticker": "KXBTCY-27JAN0100-B72500",
+   "to_time": "2026-11-25T15:52:20Z",
+   "from_time": "2026-11-25T15:37:21Z",
+   "from_price": 0.07,
+   "to_price": 0.95,
+   "delta": 0.88,
+   "direction": "up",
+   "category_id": "crypto",
+   "title": "BTC price  on Jan 1, 2027?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B72500",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' BRTI before 12 AM EST is between 70000.00-74999.99 at 12 AM EST on Jan 1, 2027, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B72500",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "reviewed_at": null
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B87500",
    "to_time": "2026-11-25T15:07:21Z",
