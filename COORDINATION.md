@@ -24,7 +24,7 @@ and keeps both sides.
 | T110 | Re-verify the published rows against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`), field by field, for every category's headline market, every published alert's ticker, and every resolved row shown in the resolution tracker | done | arena-a490dfa2 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route, confirmed `GET /exchange/status` → `trading_active: true`) |
 | T111 | Independent audit of what the pages **render** against the committed data (all 21 pages in jsdom): every published number, count and badge recomputed from the JSON, plus the internal/external link inventory | done | arena-a490dfa2 | `COORDINATION.md` (this section) | two independent jsdom harnesses written for this session (not committed): the landing table + KPI cards, and the five category pages + the alert chats, each recomputed from `data/live/*.json` |
 | T112 | Repair any real defect found by T110/T111, with a regression test that fails before the fix | done (F-97, F-98, F-99) | arena-a490dfa2 | `scripts/collect.py`, `scripts/collect_relay.py`, `scripts/tests/test_topic_integrity.py` (new), `scripts/tests/test_price_history_retention.py` (new), `scripts/tests/test_collect_health.py`, `culture.html`, `README.md` | mutation-checked regressions; `python3 scripts/verify_release.py` PASS |
-| T113 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | in progress | arena-a490dfa2 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+| T113 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | done (PR #130, merged, deployed) | arena-a490dfa2 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
 
 ### T110 — what was re-read from the official demo API this session (2026-11-25)
 
@@ -78,6 +78,26 @@ number from `data/live/*.json`:
 - 2026-11-25: published F-97/F-98/F-99 and suggestion G24 in `data/findings.json`; the Flagged page renders the
   count from that ledger, so the three rows appear with their official source links.
 - 2026-11-25: `python3 scripts/verify_release.py` **PASS** after the changes (21 pages, every validator and suite).
+
+### T113 — release, PR, merge and deployment (2026-11-25)
+
+| Step | Result |
+|---|---|
+| Release gate | `python3 scripts/verify_release.py` → **PASS**, re-run after the findings and documentation edits (21 pages, every validator, every suite, `check_site.py` link check) |
+| Branch | `arena/a490dfa2-kalshidash3`, rebased onto `origin/main` (`34093d5`) before the push so the PR contained no stale data commits |
+| PR | **#130** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/130 (mergeable, CLEAN) |
+| Merge | **merged** 2026-11-25T13:43:32Z, merge commit `7e23e57` (not waited on) |
+| Pages build | "pages build and deployment" run `45626507656` → **success**; "Deploy site to GitHub Pages" run `45626508731` → **success** |
+| Pages status | `built`, source `main /`, `https://kanlerxz87-cyber.github.io/KalshiDash3/` |
+| Live check | the deployed `flagged.html` renders **85 flagged irregularities / 27 high severity**, the counts the merged ledger produces (the pre-merge ledger had 82 / 26) |
+
+**The three repairs, confirmed on the live site rather than only offline:**
+
+| ID | Live confirmation (2026-11-25) |
+|---|---|
+| **F-97** | the collector pass at `13:52:21Z` published **0** rows whose series is `KXNATGASD` (the `13:46:45Z` pass already published 0, the first pass after the merge); `counts.excluded_series_reasons` now carries the reason with the official series URL; the Culture topic's 50 settled rows are now **all** `KXSUPERBOWLHEADLINE` — the series Kalshi files under Entertainment with the tag *Live Music*; the deployed `culture.html` lists no natural-gas row and shows the F-97 note |
+| **F-98** | the relay that had loaded the old module at 11:45Z was cancelled (`gh run cancel 45607339513`) and a fresh one dispatched (`45627805649`); its first pass wrote `{"outcome": "ok", "detail": "snapshot committed", "snapshot_collected_at": "2026-11-25T13:52:21Z"}` into `data/live/collector_health.json` **in the same commit as that snapshot** (`4eac27c`), replacing the stale `failed` record; the deployed file reads `ok` |
+| **F-99** | after the fix, **5** observations that an archived alert cites sit outside the newest-120 window and are still present in `data/live/price_history.json` — they survive only because the pin keeps them, and the 13:52 pass deleted **0** cited observations. The other **129** cited observations are absent because they were deleted before the fix landed: `GET /markets` no longer returns those settled markets and Kalshi's candles are per-period closes, so they cannot be re-read and this change does not restore them |
 
 ## Session `arena-0b0ca3c1` — restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)
 
