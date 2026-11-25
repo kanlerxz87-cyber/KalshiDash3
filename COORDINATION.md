@@ -6,6 +6,79 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
+
+Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
+`main`, and every task row in the sections below is closed out. `origin/main` = `2f0bac1` ("data: live-desk scan
+2026-11-25T13:20Z"; snapshot `2026-11-25T13:16:43Z`). Baseline release gate on the base tree: **PASS**
+(`python3 scripts/verify_release.py` — 21 pages, every validator and DOM suite; `jsdom@26` installed with
+`npm install --no-save --package-lock=false jsdom@26`).
+
+This session does **not** rebuild the site. It re-verifies the published tree line by line against the official
+Kalshi demo API and the official documentation, repairs real defects it finds, and publishes. No other session
+holds an open scope, so the files below are free; if a concurrent session appears, this branch merges `origin/main`
+and keeps both sides.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T110 | Re-verify the published rows against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`), field by field, for every category's headline market, every published alert's ticker, and every resolved row shown in the resolution tracker | done | arena-a490dfa2 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route, confirmed `GET /exchange/status` → `trading_active: true`) |
+| T111 | Independent audit of what the pages **render** against the committed data (all 21 pages in jsdom): every published number, count and badge recomputed from the JSON, plus the internal/external link inventory | done | arena-a490dfa2 | `COORDINATION.md` (this section) | two independent jsdom harnesses written for this session (not committed): the landing table + KPI cards, and the five category pages + the alert chats, each recomputed from `data/live/*.json` |
+| T112 | Repair any real defect found by T110/T111, with a regression test that fails before the fix | done (F-97, F-98, F-99) | arena-a490dfa2 | `scripts/collect.py`, `scripts/collect_relay.py`, `scripts/tests/test_topic_integrity.py` (new), `scripts/tests/test_price_history_retention.py` (new), `scripts/tests/test_collect_health.py`, `culture.html`, `README.md` | mutation-checked regressions; `python3 scripts/verify_release.py` PASS |
+| T113 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | in progress | arena-a490dfa2 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
+### T110 — what was re-read from the official demo API this session (2026-11-25)
+
+Every value below was fetched from the demo Trade API through the platform fetch route and compared field by field
+with the committed snapshot (`data/live/markets.json`, collected `2026-11-25T13:16:43Z`).
+
+| Fetched record | Result |
+|---|---|
+| `GET /exchange/status` | `trading_active: true`, four demo shards active — the exchange is answering |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, `volume_24h_fp 0.00` — **identical** to the snapshot row (gas headline, `$23,271` est.) |
+| `GET /markets/KXAAAGASM-26NOV30-3.70` | `last 0.7500`, `volume_fp 15446.22`, `open_interest_fp 13222.63`, `volume_24h_fp 5.00`, `previous_price_dollars 0.0900` — identical, and `previous_price_dollars` is the alert's own `from_price` (0.09) |
+| `GET /markets/KXELECTIRAN-27JAN01` | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` — identical (elections headline) |
+| `GET /markets/KXELECTIRAN-26JUL01` | `result "no"`, `status finalized`, `settlement_ts 2026-07-01T15:24:15.984157Z` — identical to the published resolution row (F-82's constant still holds) |
+| `GET /markets/KXNEAR15M-26NOV250815-15` | `result "no"`, `settlement_ts 2026-11-25T13:15:02.175266Z`, `settlement_value_dollars 0.0000` — identical (a published resolved row) |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` — identical; `volume_24h_fp` 7452.05 → 7391.30, the expected drift of a *rolling* 24 h window while the cumulative `volume_fp` is unchanged (golf headline) |
+| `GET /markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10` | `yes_dollars [[0.01,55.50],[0.02,5.00],[0.19,877.19],[0.20,833.33],[0.21,793.65]]`, `no_dollars [[0.76,390.11]]` — **identical** to the published liquidity ladder, including the derived ask `1 − 0.76 = 0.24` |
+| `GET /series/KXNATGASD` | `categories ["Entertainment"]`, `tags ["Oil & Gas"]`, `title "Natural Gas Daily"`, `scope "Natural Gas"`, Pyth settlement — **this is the F-97 defect** |
+| `GET /series/KXSUPERBOWLHEADLINE` | `categories ["Entertainment"]`, `tags ["Live Music"]`, `scope "Halftime Headliner"` — a genuine Culture series, correctly published |
+
+Nothing in the published data contradicted the official API.
+
+### T111 — what the pages render, recomputed independently
+
+Two jsdom harnesses written for this session (kept out of the repository; the repository's own suite is
+`scripts/tests/test_pages_dom.js`) rendered the pages against the committed data and recomputed every published
+number from `data/live/*.json`:
+
+| Check | Result |
+|---|---|
+| Landing table: ticker, dollars (est.), last price, contracts, open interest and the source link of all five topic rows | all match an independent recomputation (`volume_fp × last_price_dollars`, traded = `volume_fp > 0`, tie-break by nearest `close_time`) |
+| Landing KPIs: open in scope, confirmed by the exchange, resolved yes/no, demo QA fixtures, snapshot age | all match the data |
+| Five category pages: open rows, resolved rows, row counts, the literal `result` cell, and the three KPIs | all match the data |
+| `alerts.html`: swings served 130, model picks 99, withheld 20, "no history" 52 | all match `data/live/alerts.json` |
+
+### T112 — the three defects this session found and fixed
+
+| ID | Severity | Defect | Fix | Regression |
+|----|----------|--------|-----|------------|
+| **F-97** | high | 20 natural-gas futures rows published inside the **Culture** topic (KXNATGASD is `categories ["Entertainment"]`, `tags ["Oil & Gas"]`); the category-only integrity rule could not see it | the series is excluded from every topic with the official record as the reason, and a new rule refuses any row whose official **tags** name another topic's domain | `scripts/tests/test_topic_integrity.py` (10 cases; mutation-checked: removing the exclusion makes 4 cases fail) |
+| **F-98** | medium | the collector's health file was written only on failure, so it still read `outcome: failed · 12:01:52Z` while the collector was publishing healthy snapshots | a committing pass now writes `outcome: ok` with the snapshot it was written with, in the same commit as that snapshot | `scripts/tests/test_collect_health.py` (5 new cases) |
+| **F-99** | medium | the 120-observation retention window deleted the observations that **bound** an archived swing: 62 of 150 archived swings had lost both bounds, so 52 of the 130 swings the page serves could not be quantified | the observations an alert cites are pinned and kept in addition to the window, in time order | `scripts/tests/test_price_history_retention.py` (8 cases) |
+
+### Log (this session)
+
+- 2026-11-25: read the board, claimed T110–T113, pushed the claim before any edit. Baseline gate **PASS**.
+- 2026-11-25: re-read the load-bearing official records through the platform fetch route; every published value
+  matched (T110).
+- 2026-11-25: found F-97 while auditing all 574 published rows against their own series records: it is the **only**
+  topic/series contradiction in the snapshot. Fixed in `scripts/collect.py`.
+- 2026-11-25: found F-98 (stale health record) and F-99 (deleted bounding observations) in the same pass.
+- 2026-11-25: published F-97/F-98/F-99 and suggestion G24 in `data/findings.json`; the Flagged page renders the
+  count from that ledger, so the three rows appear with their official source links.
+- 2026-11-25: `python3 scripts/verify_release.py` **PASS** after the changes (21 pages, every validator and suite).
+
 ## Session `arena-0b0ca3c1` — restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)
 
 Claimed 2026-11-25 before any edit. Checked first: `origin/main` = `68827bd` (snapshot 2026-11-25T12:16:44Z). The
