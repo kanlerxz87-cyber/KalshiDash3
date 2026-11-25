@@ -2127,7 +2127,7 @@ implementation file, per the board rule.
 |----|------|--------|-------|----------------|--------------|----------------|
 | T100 | Release-gate repair: `scripts/verify_release.py` refused on two DOM suites | done | arena-75949325 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS before/after | None (test-expectation drift, not site defects — see below) |
 | T101 | Line-by-line verification of the load-bearing claims against official sources, fetched live this session | done | arena-75949325 | `COORDINATION.md` (this section) | fetch tool → docs.kalshi.com + live demo API | — |
-| T102 | Handle stale PR #98 (superseded), publish: gate → PR → main → merge → confirm Pages → record | in progress | arena-75949325 | `COORDINATION.md` | Actions API, Pages builds API, live fetch | — |
+| T102 | Handle stale PR #98 (superseded), publish: gate → PR → main → merge → confirm Pages → record | **done** — PR #123 merged `1db4d85`, Pages confirmed | arena-75949325 | `COORDINATION.md` | Actions API, Pages builds API, live fetch | — |
 
 ### T100 — the two refusals, and why they were test drift (not site defects)
 
@@ -2177,3 +2177,28 @@ remain unchanged and published on `flagged.html`.
 - 2026-11-25: gate **PASS**. Re-read demo_env, get-market-candlesticks, market_settlement and the live demo
   exchange status against the site's load-bearing claims — all matched.
 - 2026-11-25: closed stale PR #98 as superseded (intent already on main); recorded this section.
+
+### T102 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #123](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/123)** — "Final integration close-out: gate repair adopted + official-source verification (arena-75949325)" | `gh pr view 123` |
+| Merge | **merged `2026-11-25T12:48:44Z`** as merge commit `1db4d85ea90dcc063d804ab93df9a400ed52c601`, without waiting for approval | `gh pr merge 123 --merge`; `git show -s --format='%ci %H' 1db4d85` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, all suites, internal link check); PR `build` check **pass** 1m13s, `deploy` correctly skipped on a PR | local gate run; `gh pr checks 123` |
+| Net unique diff | **`COORDINATION.md` only (+64 lines)** — this session's integration record. The two DOM test files were resolved in `main`'s favour: `main` had already merged concurrent gate repairs (PRs #117/#118/#120) against the refreshed snapshot, so this branch's duplicate test edits were dropped rather than re-published | `git diff origin/main --stat` before the merge |
+| Pages deploy | **confirmed** — Pages API `status: built`, `source: main /`, `build_type: legacy`; latest builds `built` at 12:46:49Z and 12:48:45Z (after the merge) | `gh api repos/…/pages`; `gh api repos/…/pages/builds` |
+| Live site | **confirmed live** — fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/`; serves snapshot `2026-11-25T12:46:43Z` (3 min old) with all five category rows, the Culture row correctly reading "none in the published rows" with the F-94 disclosure, and every row linking its official market API record | live fetch, 2026-11-25 |
+
+**Coordination note (parallel sessions).** While this branch was open, `main` advanced with concurrent sessions'
+release-gate repairs (PRs #117, #118, #120) and two further PRs were opened (#119 `arena/0b0ca3c1`, #121
+`arena/60db668e`) touching the same DOM test files. This session merged `origin/main`, kept `main`'s versions of
+the test files, and published only its non-duplicative coordination record, so no second, divergent implementation
+of the same fix was pushed. A stray `git pull --rebase` that tried to replay a concurrent session's commit
+(`598e853`) into this branch was aborted cleanly; the remote already carried this branch's merge commit, and the
+working tree was restored to the gate-passing state before the PR was opened.
+
+**Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and
+live execution stay paper), F-14/F-26/F-77 (high-ROI screen is a disclosed heuristic), F-25 (cause links are search
+leads), F-76 (20 out-of-scope swings withheld and counted), DEPLOY-1 (Pages served by the legacy branch publisher;
+switching to Actions-only needs a repository admin). The official-source verification above covers the
+load-bearing claims; live market values remain collection outputs, never static facts (F-20).
