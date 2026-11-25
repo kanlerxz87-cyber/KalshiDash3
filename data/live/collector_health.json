@@ -1,10 +1,10 @@
 {
  "schema": 1,
- "generated_at": "2026-11-25T01:55:53Z",
- "pass": 19,
+ "generated_at": "2026-11-25T02:11:47Z",
+ "pass": 20,
  "outcome": "failed",
- "detail": "API probe HTTP 503",
- "stderr_tail": "HTTP 503",
+ "detail": "validators: validate_alerts",
+ "stderr_tail": "",
  "run": {
   "workflow": "collect.yml",
   "run_id": "45485317637",
