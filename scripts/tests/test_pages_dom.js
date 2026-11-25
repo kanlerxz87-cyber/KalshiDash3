@@ -385,8 +385,10 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t)),
-      "index.html: every category row must name a real ticker or say none is open");
+    // T102: a topic with no published row must say so ("none in the published rows"); the old
+    // wording "none open in scope" overstated what a truncated scan can show (F-94).
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none in the published rows|none open/.test(t)),
+      "index.html: every category row must name a real ticker or say none is in the published rows");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
       check(/demo QA fixtures in the snapshot/.test(r.text),
@@ -556,9 +558,15 @@ function commonAsserts(label, r) {
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
     // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
-    check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
-    check(/Untraded topics in this snapshot/.test(flat),
-      "the page must name the untraded topics below the table (F-83)");
+    // T102: the F-83 label is driven by the data. The check is that the label and the footnote
+    // agree with the rendered rows in BOTH directions, so it neither goes stale when a snapshot
+    // has no untraded topic (this one does not) nor hides one that does.
+    const untradedBadges = r.doc.querySelectorAll("#today .badge.warn").length;
+    const untradedNote = /Untraded topics in this snapshot/.test(flat);
+    check((untradedBadges > 0) === untradedNote,
+      `an untraded row and the 'Untraded topics' footnote must agree (rows ${untradedBadges}, footnote ${untradedNote})`);
+    if (untradedNote) check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+    console.log(`  F-83 untraded labels: ${untradedBadges} row badge(s), footnote ${untradedNote ? "shown" : "absent"}`);
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }

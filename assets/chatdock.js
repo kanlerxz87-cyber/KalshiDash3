@@ -46,7 +46,11 @@ const KDCHAT = (() => {
   const POLL_MS = (typeof window !== "undefined" && Number(window.__KDCHAT_POLL_MS)) || 12000;
   const FIRST_POLL_MS = Math.min(POLL_MS, 2500);
   const POLS = `every ${Math.round(POLL_MS / 1000)}s`;
+  // Rows each chat SHOWS (newest last). The buffer below holds every qualifying row so the model
+  // chat is a filter over the whole archive, not over whatever survived the display window (T100:
+  // with a single 80-row buffer the model chat showed 58 of the 96 frozen high_roi rows).
   const MAX_ROWS = 80;
+  const FEED_CAP = 2000;
   const REPO = "kanlerxz87-cyber/KalshiDash3";
 
   const CAT_LABEL = {
@@ -109,7 +113,7 @@ const KDCHAT = (() => {
     S.seen.add(k);
     S.feed.push(row);
     S.feed.sort((a, b) => a.t - b.t);
-    if (S.feed.length > MAX_ROWS) S.feed = S.feed.slice(-MAX_ROWS);
+    if (S.feed.length > FEED_CAP) S.feed = S.feed.slice(-FEED_CAP);
     return true;
   }
 
@@ -504,6 +508,7 @@ const KDCHAT = (() => {
         : '<div class="cd-empty">No swing has passed the experimental screen yet (a fee-schedule seed series with positive reported 24-hour volume — not an ROI prediction).</div>';
       if (nearBottom(mbox)) mbox.scrollTop = mbox.scrollHeight;
     }
+    // Counts are the rows HELD (the whole qualifying set); each list shows its newest MAX_ROWS.
     const cAll = document.getElementById("kdCountAll");
     if (cAll) cAll.textContent = String(all.length);
     const cModel = document.getElementById("kdCountModel");

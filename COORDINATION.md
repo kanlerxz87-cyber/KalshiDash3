@@ -16,11 +16,41 @@ board rules above; all pushes go only to that branch.
 
 | ID | Task | Status | Owner | Files in scope | Verification |
 |----|------|--------|-------|----------------|--------------|
-| T99 | Restore the release gate on `main`: `verify_release.py` refuses `test_pages_dom.js` and `test_chatdock.js` | in progress | arena-0b0ca3c1 | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py` (local, jsdom@26) |
-| T100 | Real defect: the chat dock's model chat is a filter over the newest 80 events, so 58 of the 96 frozen `high_roi` rows show | in progress | arena-0b0ca3c1 | `assets/chatdock.js` | `scripts/tests/test_chatdock.js` |
-| T101 | Real defect: the live page's all-events chat builds alerts from every price-history series (Demo/Test instruments such as `KXDEMOFUTHOURLY-*` appear with no topic); the feed is also ordered by insertion, not time | in progress | arena-0b0ca3c1 | `assets/live.js`, `live.html` (feed order only) | `scripts/tests/test_pages_dom.js` section B |
-| T102 | Test assertions tied to today's snapshot rather than to the data: the Culture row (no open rows in the published window), the "untraded" label (no untraded topic exists in this snapshot), the row-regex | in progress | arena-0b0ca3c1 | `scripts/tests/test_pages_dom.js`, `index.html` (Culture wording only) | `scripts/tests/test_pages_dom.js` |
-| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | in progress | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
+| T99 | Restore the release gate on `main`: `verify_release.py` refuses `test_pages_dom.js` and `test_chatdock.js` | done | arena-0b0ca3c1 | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py` (local, jsdom@26) |
+| T100 | Real defect: the chat dock's model chat is a filter over the newest 80 events, so 58 of the 96 frozen `high_roi` rows show | done (F-95) | arena-0b0ca3c1 | `assets/chatdock.js` | `scripts/tests/test_chatdock.js` |
+| T101 | Real defect: the live page's all-events chat builds alerts from every price-history series (Demo/Test instruments such as `KXDEMOFUTHOURLY-*` appear with no topic); the feed is also ordered by insertion, not time; `KXBALLONDOR` filed under Culture against the exchange record | done (F-96) | arena-0b0ca3c1 | `assets/live.js`, `live.html` (feed order only) | `scripts/tests/test_pages_dom.js` section B |
+| T102 | Test assertions tied to today's snapshot rather than to the data: the Culture row (no open rows in the published window), the "untraded" label (no untraded topic exists in this snapshot), the row-regex; Culture wording overstated a truncated scan | done (F-94) | arena-0b0ca3c1 | `scripts/tests/test_pages_dom.js`, `index.html` (Culture wording only) | `scripts/tests/test_pages_dom.js` |
+| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | in progress (see close-out) | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
+
+
+### Close-out (`arena-0b0ca3c1`) — what was checked, what changed, what was flagged
+
+**Starting state, measured:** `main` = `68827bd` (snapshot 2026-11-25T12:16:44Z, 374 open / 200 settled published).
+`pages.yml` run 45612234145 on `68827bd`: `build` **failure** at `Verify release` (so `deploy` was skipped). The
+earlier `Live desk scan` run 45607607008 also failed at `Page render smoke test`. Both failures reproduced locally
+with `npm install --no-save --package-lock=false jsdom@26` and `python3 scripts/verify_release.py`:
+`test_pages_dom.js` (4 checks) and `test_chatdock.js` (1 check).
+
+**Diagnosis, per failing check (each one read against the data before any edit):**
+
+| Check | Finding | Fix |
+|---|---|---|
+| `test_chatdock`: model chat count = frozen screen (96) | real defect: the model chat filtered the newest 80 events (58 shown) | `assets/chatdock.js`: buffer 2,000 rows, each chat renders its newest 80 → **F-95** |
+| `test_pages_dom` B: catalyst link | real defect: live feed showed Demo instruments with no topic, and was not time-ordered, so the fixture's gas alert fell outside the 60-row window | `assets/live.js` topic gate + `live.html` newest-first → **F-96** |
+| `test_pages_dom` F-83 "untraded" label | the snapshot has no untraded topic, so the label is correctly absent; the test required it unconditionally | test now requires the badge and footnote to agree with the rendered rows (T102) |
+| `test_pages_dom` row regex | Culture row says "none open in scope", which the regex refused, although the test's own message allows it | regex accepts the honest wording; index now says "none in the published rows" and discloses the truncated scan → **F-94** |
+
+**Sources read live this session (2026-11-25):**
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR` → `categories: ["Sports"]`, `tags: ["Soccer"]`, `product_metadata.scope: "Awards"` (matches `scripts/collect.py`'s exclusion).
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY` → `categories: ["Test"]`, `tags: ["Demo"]`.
+- `https://docs.kalshi.com/api-reference/market/get-markets` (cited by F-94).
+- Repo files: `data/live/markets.json` (`open_paging_truncated_at_safety_cap: true`, `open_rows_trimmed_for_size: 21243`), `data/live/price_history.json` (407 series, incl. Demo/Test tickers), `data/live/alerts_archive.json` (96 frozen `high_roi` rows).
+
+**Gate:** `python3 scripts/verify_release.py` → **PASS** (215 checks; `test_scope.py` PASS; `test_pages_dom.js` PASS; `test_chatdock.js` PASS).
+
+**Flagged, not blocking:** F-94 (medium), F-95 (medium), F-96 (high) on `flagged.html`, with source links.
+Also noted, not changed: open PR #98 (`arena/6cd28bd2-kalshidash3`, 2026-11-22) belongs to another session and was left alone.
+Also noted: the open-market scan is truncated at its safety cap, so the published 374 open rows are not the whole in-scope market.
 
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 

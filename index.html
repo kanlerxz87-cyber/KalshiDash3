@@ -186,7 +186,7 @@ KD.nav("");
       title: r ? `<a href="dashboard.html#${KD.esc(r.ticker)}">${KD.esc((r.title || "").replace(/\*\*/g, "").slice(0, 68))}</a>` +
                  `<div class="small mut mono">${KD.esc(r.ticker)}</div>` +
                  (isUntraded ? ' <span class="badge warn" title="No open market in this topic has traded in this snapshot (volume 0 on every row), so no market is the largest. The row shown is the one with the nearest published close_time.">untraded</span>' : '')
-               : '<span class="na">none open in scope</span>',
+               : '<span class="na">none in the published rows</span>',
       dollars: r ? KD.money(r.dollars_traded_estimate, 0) + (isUntraded ? ' <span class="small mut">no trades</span>' : '') : '<span class="na">—</span>',
       price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
       vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
@@ -221,6 +221,14 @@ KD.nav("");
           return parts.join(", ");
         }).join("; ") +
         `. In a topic with no trades, “$0” and “0.0¢” are the API's literal values and the row is <b>not</b> a ranking result: no market there is the largest (<a href="flagged.html">F-83</a>).</p>`
+      : "")
+   // T102 / F-94: a topic with no published row is NOT "none open". The open scan stopped at its
+   // safety cap and the file records how many in-scope rows it trimmed, so absence here is a
+   // statement about the published rows only.
+   + ((snap.counts?.open_paging_truncated_at_safety_cap && Object.keys(live).some(id => !top[id]))
+      ? `<p class="small mut"><b>No published row:</b> ${Object.keys(live).filter(id => !top[id]).map(id => KD.esc(live[id] || id)).join(", ")}. `
+        + `The open-market scan stopped at its safety cap and ${KD.num(snap.counts.open_rows_trimmed_for_size || 0)} in-scope open rows were trimmed from this file, `
+        + `so a topic with no published row is not evidence that it has no open market (<a href="flagged.html">F-94</a>).</p>`
       : "");
 
   // ---- resolution tracker (brief: follow events until they resolve, YES or NO) ----

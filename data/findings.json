@@ -1326,6 +1326,44 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_collect_health.py",
     "https://docs.github.com/en/actions/reference/limits"
    ]
+  },
+  {
+    "id": "F-94",
+    "severity": "medium",
+    "item": "Landing table printed \"none open in scope\" for a topic with no published row, while the open-market scan had been truncated at its safety cap",
+    "why": "`data/live/markets.json` (collected 2026-11-25T12:16:44Z) records `open_paging_truncated_at_safety_cap: true` and `open_rows_trimmed_for_size: 21243`, and publishes 374 open rows. None of the 374 is a Culture row, so `index.html` showed Culture as \"none open in scope\". That claim is about the whole market, but the file cannot show it: the scan stopped at the cap and 21,243 in-scope open rows were not written. The Culture absence is a fact about the published rows only.",
+    "action": "Fixed in T102 (arena-0b0ca3c1): the row now reads \"none in the published rows\", and when the scan is truncated the page prints the trimmed count beside it. `test_pages_dom.js` accepts that wording. Open question for a later collector pass: whether the open scan should page further so Culture rows are visible at all.",
+    "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html",
+      "https://docs.kalshi.com/api-reference/market/get-markets"
+    ]
+  },
+  {
+    "id": "F-95",
+    "severity": "medium",
+    "item": "Chat dock model chat showed 58 of the 96 frozen high-ROI swings, because it filtered the newest 80 events instead of the whole archive",
+    "why": "`assets/chatdock.js` kept one 80-row buffer for all events and derived the model chat from it. Any model pick older than the newest 80 qualifying swings was dropped, so the model chat undercounted the screen that `alerts.html` and the dashboard show (96 frozen `high_roi` rows in `data/live/alerts_archive.json`, 2026-11-25 snapshot). `scripts/tests/test_chatdock.js` caught it (`model chat count equals the frozen high_roi screen`).",
+    "action": "Fixed in T100 (arena-0b0ca3c1): the buffer holds up to 2,000 qualifying rows; each chat renders its newest 80. The model chat now shows 80 of 96 (the display window), and the counts in the headers are the rows held. Verified by `scripts/tests/test_chatdock.js` (PASS).",
+    "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/chatdock.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_chatdock.js"
+    ]
+  },
+  {
+    "id": "F-96",
+    "severity": "high",
+    "item": "Live all-events chat showed Demo/Test instrument swings (e.g. KXDEMOFUTHOURLY-*) with no topic, and showed swings in insertion order rather than time order",
+    "why": "`assets/live.js` built swing alerts from every series in `data/live/price_history.json` with no topic gate, so rows for `KXDEMOFUTHOURLY-*` (official series record: `categories: [\"Test\"]`, `tags: [\"Demo\"]`) appeared with an empty topic pill. The page states \"every market in the five topics\". Separately, `renderChats` sliced the first 60 alerts by insertion order, so a newer live tick could fall outside the window. The same file also filed `KXBALLONDOR` under Culture by seed, but the exchange files that series under Sports (`categories: [\"Sports\"]`, `tags: [\"Soccer\"]`), which is why `scripts/collect.py` refuses it.",
+    "action": "Fixed in T101 (arena-0b0ca3c1): a swing is shown only when its market has a confirmed topic and is not a Test/Demo series; withheld swings are counted in the chat header. Alerts are sorted newest-first by their own time. `KXBALLONDOR` is no longer classified as Culture. Verified by `scripts/tests/test_pages_dom.js` (PASS). Note: closed markets that are not in the open snapshot (e.g. `KXBTCD-*`) now also have no topic on this page and are withheld; they remain on `alerts.html`, which carries the archive's topic.",
+    "sources": [
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/live.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/live.html",
+      "https://docs.kalshi.com/getting_started/demo_env"
+    ]
   }
  ]
 }
