@@ -125,11 +125,18 @@ function counts(w) {
   const c = counts(w);
   // F-76: a ≥$0.10 row is replayed only when it is in one of the five topics. Rows whose series
   // GET /series files under Test/Demo, or with no confirmed topic, are withheld and counted.
-  const inScope = archiveWithDecoy.alerts.filter((a) => {
+  // `ingestible` mirrors assets/chatdock.js exactly: a row is pushed only when it has a ticker, a
+  // parseable to_time and numeric from/to prices (never invent a row), plus the >= $0.10 rule.
+  const ingestible = (a) => {
     const cats = (a.series_categories || []).map(String);
-    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
-      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
-  }).length;
+    const from = Number(a.from_price);
+    const toP = Number(a.to_price);
+    const to = Date.parse(a.to_time || "");
+    return Math.abs(toP - from) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
+      && !!a.ticker && !Number.isNaN(to) && !Number.isNaN(from) && !Number.isNaN(toP);
+  };
+  const inScope = archiveWithDecoy.alerts.filter(ingestible).length;
   check(c.all > 0, `history replay rendered ${c.all} rows`);
   check(c.all === Math.min(inScope, 80), `row count equals the in-scope ≥$0.10 archive rows (${inScope})`);
   const text = panel.textContent;
@@ -148,13 +155,17 @@ function counts(w) {
   // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
   // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
   // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
-  const frozen = archiveWithDecoy.alerts.filter((a) => {
-    const cats = (a.series_categories || []).map(String);
-    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
-      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
-      && a.high_roi === true;
-  }).length;
-  check(c.model === Math.min(frozen, 80), `model chat count equals the frozen high_roi screen (${frozen})`);
+  const inScopeRows = archiveWithDecoy.alerts.filter(ingestible);
+  // The dock sorts its feed by to_time and keeps the 80 most recent rows (assets/chatdock.js push()),
+  // so the model chat shows the frozen high_roi rows among those kept rows, not the whole archive. The
+  // archive has grown past the cap, so the expectation is measured from the time-ordered capped set.
+  const frozen = inScopeRows.filter((a) => a.high_roi === true).length;
+  const expectedModel = inScopeRows
+    .slice()
+    .sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time))
+    .slice(-80)
+    .filter((a) => a.high_roi === true).length;
+  check(c.model === expectedModel, `model chat count equals high_roi rows in the capped feed (${expectedModel} of ${frozen} frozen, cap 80)`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),

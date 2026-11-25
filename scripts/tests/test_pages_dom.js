@@ -385,7 +385,7 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t)),
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/i.test(t)),
       "index.html: every category row must name a real ticker or say none is open");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
@@ -555,10 +555,24 @@ function commonAsserts(label, r) {
       check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
-    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
-    check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
-    check(/Untraded topics in this snapshot/.test(flat),
-      "the page must name the untraded topics below the table (F-83)");
+    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked. Only assert when the
+    // snapshot actually contains one: a topic with open rows whose volume is 0 on every row. A topic
+    // with no open rows at all is labelled "none open in scope", which is a different (also correct)
+    // state, so demanding the untraded label there would be a stale expectation, not a real defect.
+    if (markets && markets.open_markets) {
+      const byCat = new Map();
+      for (const r of markets.open_markets) {
+        if (!r.category_id) continue;
+        const e = byCat.get(r.category_id) || { n: 0, v: 0 };
+        e.n += 1; e.v += Number(r.volume_fp) || 0; byCat.set(r.category_id, e);
+      }
+      const untradedTopics = [...byCat.entries()].filter(([, e]) => e.n > 0 && e.v === 0).map(([c]) => c);
+      if (untradedTopics.length) {
+        check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+        check(/Untraded topics in this snapshot/.test(flat),
+          "the page must name the untraded topics below the table (F-83)");
+      }
+    }
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }
