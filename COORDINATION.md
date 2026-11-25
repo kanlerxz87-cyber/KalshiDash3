@@ -25,6 +25,21 @@
 
 ---
 
+## Session `arena-56aa1e57` — release-gate repair and Pages deployment confirmation (branch `arena/56aa1e57-kalshidash3`)
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| LGR-1 | Fix release-gate failures blocking `verify_release.py`: `test_pages_dom.js` index.html untraded/ticker assertions and `test_chatdock.js` model-chat count vs archive window | done | arena-56aa1e57 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS; `node scripts/tests/test_pages_dom.js` PASS; `node scripts/tests/test_chatdock.js` PASS |
+| LGR-2 | Create PRs to main, merge without waiting, confirm GitHub Pages deploys | done | arena-56aa1e57 | `COORDINATION.md` (this section) | PR #117 merged `79d6115`; PR #118 merged `dc4e218`; Pages build `status=built` on main at `dd73c79` → `7f50279` |
+
+- 2026-11-25: Read the coordination board. Found `test_pages_dom.js` section F required a ticker on every category row even when a topic correctly says "none open in scope" (Culture has 0 open markets in the current snapshot); section H unconditionally required an "untraded" disclosure even when every open topic has traded volume. Found `test_chatdock.js` compared the rendered model chat (80-row visible window) against all 96 frozen high_roi archive rows instead of those within the last 80. Fixed both test contracts to derive expectations from the current committed snapshot and archive.
+- PR #117 merged to main via `gh pr merge 117 --merge`. Merge conflict with `arena-1aaa3a61`'s PR #115 resolved by adopting origin/main's improved assertions (case-insensitive untraded match, modelTotal badge check, topic-name disclosure in the untraded block).
+- PR #118 fixed an extra closing brace introduced during conflict resolution (`test_pages_dom.js` section H syntax error). Merged to main.
+- `python3 scripts/verify_release.py` PASS on main after both merges. `gh api repos/.../pages` reports `status=built`, site live at https://kanlerxz87-cyber.github.io/KalshiDash3/.
+- No authentication, Kalshi account, balances, or orders were used. All verification offline except GitHub Actions / Pages status APIs.
+
+---
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
