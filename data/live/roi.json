@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T21:55:16Z",
- "runtime_seconds": 79.3,
+ "collected_at": "2026-11-25T22:40:16Z",
+ "runtime_seconds": 93.3,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,22 +29,22 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 5412,
+  "open_in_scope": 3461,
   "eligible": 0,
   "picks": 0,
   "near_misses": 1,
-  "unscoreable": 5411,
-  "orderbooks": 5412,
-  "orderbooks_requested": 5412,
+  "unscoreable": 3460,
+  "orderbooks": 3461,
+  "orderbooks_requested": 3461,
   "alerts": 0,
-  "markets_with_momentum": 128,
+  "markets_with_momentum": 127,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 5412,
-  "returned": 5412,
+  "requested": 3461,
+  "returned": 3461,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -59,27 +59,26 @@
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV25H22-UP",
+   "ticker": "KXDEMOFUTHOURLY-26NOV25H23-UP",
    "eligible": false,
    "fails": [
     "spread 99.0c > 10c cap",
     "depth 10 < 50 contracts at the touch",
     "NO entry 99.0c above 95c ceiling",
-    "net ROI -70.45% not above 0% floor",
-    "closes in 5 min < 15 min floor",
+    "net ROI -68.43% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [],
-   "q": 0.7072499999999999,
+   "q": 0.68725,
    "mid": 0.505,
    "micro": 1.0,
-   "last": 0.65,
+   "last": 0.55,
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
    "depth": 10.0,
-   "vol24": 8220.0,
-   "ttc_hours": 0.07888888888888888,
+   "vol24": 5990.0,
+   "ttc_hours": 0.3288888888888889,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -92,21 +91,21 @@
     "entry": 0.99,
     "fee_unit": 0.0006930000000000006,
     "cost": 0.990693,
-    "ev": -0.697943,
-    "roi": -0.7044997794473161
+    "ev": -0.6779430000000001,
+    "roi": -0.684311890767372
    },
-   "score": -0.7044997794473161,
-   "dollars_traded_estimate": 5343.0,
-   "title": "Demo BTC at or above 60193.72 USD",
+   "score": -0.684311890767372,
+   "dollars_traded_estimate": 3308.25,
+   "title": "Demo BTC at or above 60161.82 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-25T22:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV25H22",
+   "close_time": "2026-11-25T23:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV25H23",
    "status": "active",
    "result": null,
-   "volume_fp": 8220.0,
-   "volume_24h_fp": 8220.0,
-   "open_interest_fp": 30.0,
+   "volume_fp": 6015.0,
+   "volume_24h_fp": 5990.0,
+   "open_interest_fp": 55.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 10.0,
@@ -114,7 +113,7 @@
     "bid_price": 0.01,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV25H22-UP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV25H23-UP"
   }
  ],
  "unscoreable": [
@@ -140,7 +139,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 13.078888888888889,
+   "ttc_hours": 12.328888888888889,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -171,58 +170,6 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2606-T58999.99"
   },
   {
-   "ticker": "KXBTCD-26NOV2607-T59899.99",
-   "eligible": false,
-   "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 10.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.438,
-   "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.19,
-   "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 0,
-   "vol24": 10.0,
-   "ttc_hours": 14.078888888888889,
-   "momentum": 0.0,
-   "series_ticker": "KXBTCD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 1.9,
-   "title": "Bitcoin price on Nov 26, 2026?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-26T12:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2607",
-   "status": "active",
-   "result": null,
-   "volume_fp": 10.0,
-   "volume_24h_fp": 10.0,
-   "open_interest_fp": 10.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2607-T59899.99"
-  },
-  {
    "ticker": "KXBTCD-26NOV2601-T67799.99",
    "eligible": false,
    "fails": [
@@ -244,7 +191,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 4.0,
-   "ttc_hours": 8.078888888888889,
+   "ttc_hours": 7.328888888888889,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -275,7 +222,7 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2601-T67799.99"
   },
   {
-   "ticker": "KXNFLTD-26NOV29NOCIN-NOODELP4-1",
+   "ticker": "KXCRYPTOLEAD15M-26NOV260045-XRP",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -295,9 +242,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 140.07888888888888,
+   "ttc_hours": 7.078888888888889,
    "momentum": null,
-   "series_ticker": "KXNFLTD",
+   "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -306,11 +253,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Oscar Delp: 1+ touchdowns",
-   "category_id": "culture",
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-01T18:00:00Z",
-   "event_ticker": "KXNFLTD-26NOV29NOCIN",
+   "close_time": "2026-11-26T05:45:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -323,10 +270,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNFLTD-26NOV29NOCIN-NOODELP4-1"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-XRP"
   },
   {
-   "ticker": "KXNFLTDPROT-26NOV29NOCIN-NOODELP4-1",
+   "ticker": "KXCRYPTOLEAD15M-26NOV260045-SOL",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -346,9 +293,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 140.07888888888888,
+   "ttc_hours": 7.078888888888889,
    "momentum": null,
-   "series_ticker": "KXNFLTDPROT",
+   "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -357,11 +304,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Oscar Delp: 1+ touchdowns (Protected)",
-   "category_id": "culture",
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-01T18:00:00Z",
-   "event_ticker": "KXNFLTDPROT-26NOV29NOCIN",
+   "close_time": "2026-11-26T05:45:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -374,10 +321,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNFLTDPROT-26NOV29NOCIN-NOODELP4-1"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-SOL"
   },
   {
-   "ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE",
+   "ticker": "KXCRYPTOLEAD15M-26NOV260045-HYPE",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -397,9 +344,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 103.06222222222222,
-   "momentum": 0.0,
-   "series_ticker": "KXBILLBOARDRUNNERUPALBUM",
+   "ttc_hours": 7.078888888888889,
+   "momentum": null,
+   "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -408,11 +355,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will everything i said i am. / everything she said she is. be #2 on the Billboard 200 during the week of Dec 5, 2026",
-   "category_id": "culture",
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-30T04:59:00Z",
-   "event_ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC05",
+   "close_time": "2026-11-26T05:45:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -425,10 +372,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-HYPE"
   },
   {
-   "ticker": "KXVANHOLLENBACKERS-27JAN03-RCOO",
+   "ticker": "KXCRYPTOLEAD15M-26NOV260045-ETH",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -448,9 +395,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 919.0622222222222,
-   "momentum": 0.0,
-   "series_ticker": "KXVANHOLLENBACKERS",
+   "ttc_hours": 7.078888888888889,
+   "momentum": null,
+   "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -459,11 +406,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will it be confirmed that Roy Cooper publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him?",
-   "category_id": "elections",
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2027-01-03T04:59:00Z",
-   "event_ticker": "KXVANHOLLENBACKERS-27JAN03",
+   "close_time": "2026-11-26T05:45:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -476,10 +423,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-RCOO"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-ETH"
   },
   {
-   "ticker": "KXVANHOLLENBACKERS-27JAN03-EMAR",
+   "ticker": "KXCRYPTOLEAD15M-26NOV260045-BTC",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -499,9 +446,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 919.0622222222222,
-   "momentum": 0.0,
-   "series_ticker": "KXVANHOLLENBACKERS",
+   "ttc_hours": 7.078888888888889,
+   "momentum": null,
+   "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -510,11 +457,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will it be confirmed that Ed Markey publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him?",
-   "category_id": "elections",
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2027-01-03T04:59:00Z",
-   "event_ticker": "KXVANHOLLENBACKERS-27JAN03",
+   "close_time": "2026-11-26T05:45:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -527,24 +474,74 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-EMAR"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-BTC"
+  },
+  {
+   "ticker": "KXCRYPTOLEAD15M-26NOV260015-XRP",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 6.578888888888889,
+   "momentum": null,
+   "series_ticker": "KXCRYPTOLEAD15M",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:00AM EST to 12:15AM EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-26T05:15:00Z",
+   "event_ticker": "KXCRYPTOLEAD15M-26NOV260015",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260015-XRP"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 105,
+  "candles_used": 168,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 15,
-  "baseline_always_yes_hits": 6,
+  "baseline_always_yes_bets": 8,
+  "baseline_always_yes_hits": 1,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "no side passed the replay gates": 15,
-   "candle without a price": 9,
-   "no candles in the 2h before close": 30
+   "candle without a price": 16,
+   "no side passed the replay gates": 8
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -553,7 +550,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.4
+  "baseline_always_yes_hit_rate": 0.125
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
