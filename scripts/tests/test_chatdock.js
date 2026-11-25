@@ -148,13 +148,17 @@ function counts(w) {
   // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
   // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
   // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
-  const frozen = archiveWithDecoy.alerts.filter((a) => {
+  // The dock keeps at most MAX_ROWS (80) archive rows in S.feed (newest first), so model chat
+  // can only show high_roi rows within that window — not all 96 frozen rows when the archive
+  // holds more than 80 in-scope swings.
+  const inScopeSorted = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
     return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
-      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
-      && a.high_roi === true;
-  }).length;
-  check(c.model === Math.min(frozen, 80), `model chat count equals the frozen high_roi screen (${frozen})`);
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).sort((a, b) => Date.parse(a.to_time || "") - Date.parse(b.to_time || ""));
+  const inWindow = inScopeSorted.slice(-80);
+  const frozenInWindow = inWindow.filter((a) => a.high_roi === true).length;
+  check(c.model === frozenInWindow, `model chat count equals high_roi rows within the last 80 archive swings (${frozenInWindow})`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),
