@@ -71,6 +71,20 @@ SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is publis
 #    Verified: GET /markets/KXGRAMMYNOMROTY-QA7CECC5-QA -> rules_primary "Demo portfolio test only."
 EXCLUDE_KEYWORD_SERIES: dict[str, str] = {
     "KXNATGAS15M": "natural-gas futures (Commodities, Pyth NATGAS), not retail gasoline prices",
+    # F-97: the SAME correction applied to the daily natural-gas contract, which reached the
+    # site through a different door. Kalshi files this series under Entertainment:
+    #   GET /series/KXNATGASD -> {"categories":["Entertainment"],"title":"Natural Gas Daily",
+    #     "tags":["Oil & Gas"],"product_metadata":{"scope":"Natural Gas"},
+    #     "settlement_sources":[{"name":"Pyth"}]}
+    # so the official-category discovery (GET /series?category=Entertainment -> Culture) put
+    # 20 natural-gas rows inside the Culture topic in the 2026-11-25T13:16:43Z snapshot, even
+    # though the keyword classifier would have said "gas" and the sibling series KXNATGAS15M
+    # is already excluded above for exactly this reason. It is neither a culture event nor a
+    # retail gasoline price, so it is excluded from every topic.
+    "KXNATGASD": "natural gas daily futures (official series categories ['Entertainment'], "
+                 "tags ['Oil & Gas'], scope 'Natural Gas', Pyth settlement): not a culture "
+                 "event and not retail gasoline prices "
+                 "(https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD)",
 }
 EXCLUDE_TITLE_RE = re.compile(r"demo portfolio test|portfolio cash out|\bqa\s*\d", re.I)
 
@@ -106,6 +120,33 @@ CATEGORY_COMPATIBLE = {
 # Official Kalshi categories that can never belong to any of the five topics, whatever a title
 # keyword says. Kept explicit so the exclusion is auditable rather than a silent side effect.
 CATEGORY_NEVER_IN_SCOPE = {"Test", "Demo"}
+
+# F-97: the official CATEGORY is a coarse bucket; the official TAGS are the domain. A series
+# that carries another topic's domain tag cannot be published inside this topic, whatever
+# category the exchange files it under. The case that prompted this rule is on the record:
+#   GET /series/KXNATGASD -> {"categories":["Entertainment"],"title":"Natural Gas Daily",
+#     "tags":["Oil & Gas"],"product_metadata":{"scope":"Natural Gas"}}
+# "Entertainment" is a Culture category, so the category-only rule put natural-gas futures
+# inside Culture (20 published rows in the 2026-11-25T13:16:43Z snapshot). The tags said
+# "Oil & Gas". Both are official fields of the same record
+# (https://docs.kalshi.com/api-reference/market/get-series-list), so the tag is the narrower
+# statement and is used as the tie-break.
+# Only tags that unambiguously name one of the five topics' own domains are listed. A tag that
+# names no domain (frequency tags such as "15 min" or "Hourly", or a format tag such as
+# "Econ Daily") never excludes a row: absence of a domain is not a contradiction.
+TAG_DOMAIN_TOPIC = {
+    "Oil & Gas": "gas",
+    "Oil and energy": "gas",
+    "Crypto": "crypto",
+    "Bitcoin": "crypto",
+    "Ethereum": "crypto",
+    "Solana": "crypto",
+    "XRP": "crypto",
+    "DOGE": "crypto",
+    "BNB": "crypto",
+    "HYPE": "crypto",
+    "Golf": "golf",
+}
 
 # F-66: a broad official category can contain the topic AND everything next to it. Sports is
 # the case that matters: it is where Kalshi files golf, and also every other sport. Naming a
@@ -286,7 +327,7 @@ def official_categories(series_record) -> list[str]:
 
 
 def category_conflict(cat_id: str, official: list[str], basis: str, tags: list[str] | None = None) -> str | None:
-    """Return a reason when the series' official category contradicts the topic, else None.
+    """Return a reason when the series' official category or tags contradict the topic, else None.
 
     Applied to every row, seed or keyword, because a series can be in the fee schedule and
     still not be one of the five topics: KXBALLONDOR ("Ballon d'Or") is a fee-schedule seed
@@ -297,8 +338,21 @@ def category_conflict(cat_id: str, official: list[str], basis: str, tags: list[s
     Unknown categories ([] ) never conflict. A known category that is in the topic's
     compatible set never conflicts. A known category outside it does conflict, and the reason
     names the official category so the count on the page is auditable.
+
+    F-97: the category is a coarse bucket and the TAGS are the domain, so a series whose
+    official tags name a DIFFERENT topic's domain conflicts even when its category is
+    compatible with this one. KXNATGASD is categories ["Entertainment"] (Culture) with tags
+    ["Oil & Gas"] (gas). Tags that name no topic's domain never conflict, and a row whose
+    tags are unknown ([]) is left alone: an absent field is not evidence.
     """
-    if not official or not cat_id:
+    if not cat_id:
+        return None
+    for t in (tags or []):
+        owner = TAG_DOMAIN_TOPIC.get(str(t))
+        if owner and owner != cat_id:
+            return (f"official series tags {list(tags)} name the {owner} domain, "
+                    f"not {cat_id}")
+    if not official:
         return None
     ok = CATEGORY_COMPATIBLE.get(cat_id, set())
     if any(o in ok for o in official):
@@ -480,13 +534,21 @@ def orderbook_summary(ticker, depth=10):
     }
 
 
-def update_price_history(hist, rows):
+def update_price_history(hist, rows, pinned=None):
     """Append a live observation per market and keep a bounded window.
 
     Seconds-resolution history cannot be requested from Kalshi: candlesticks
     only support 1/60/1440-minute intervals (F-29). So the only way to have a
     seconds-resolution series is to accumulate REST observations over time,
     which is exactly what this file does on every run.
+
+    F-99: `pinned` maps a ticker to the observation timestamps an archived alert cites.
+    The retention window is a cap on the SERIES, not on the swings: without this, the two
+    observations that BOUND an archived swing were dropped once the series grew past
+    PRICE_HISTORY_LIMIT, and the swing could no longer be read back - 62 of the 150
+    archived swings had lost both bounds in the 2026-11-25T13:16:43Z snapshot, which is why
+    the evidence layer reported "unknown_no_observations" for 52 of the 130 swings the page
+    serves. The pinned observations are kept in addition to the window, in time order.
     """
     now = utcnow()
     for m in rows:
@@ -505,9 +567,50 @@ def update_price_history(hist, rows):
                 "volume_fp": m.get("volume_fp"),
             }
         )
-        series["observations"] = obs[-PRICE_HISTORY_LIMIT:]
+        series["observations"] = keep_observations(obs, (pinned or {}).get(t))
         hist[t] = series
     return hist
+
+
+def keep_observations(obs, pin=None):
+    """The newest PRICE_HISTORY_LIMIT observations, plus any pinned by an archived alert.
+
+    Pinning is by exact timestamp: an alert cites the two observations that bound it, so
+    those two are the ones that must survive. Nothing else is kept, so the file does not
+    grow without bound.
+    """
+    keep = list(obs[-PRICE_HISTORY_LIMIT:])
+    if pin:
+        older = obs[:max(0, len(obs) - PRICE_HISTORY_LIMIT)]
+        extra = [o for o in older if o.get("t") in pin]
+        if extra:
+            keep = sorted(keep + extra, key=lambda o: o.get("t") or "")
+    return keep
+
+
+def pinned_alert_times(path=None) -> dict:
+    """The observation timestamps an archived alert cites, per ticker (F-99).
+
+    The archive is written by scripts/build_alerts.py and is the authority on which
+    observations matter: each entry names the two observations that bounded the swing
+    (from_time, to_time). They are pinned so the retention window cannot delete them.
+    A missing or unreadable archive yields no pins, never a guess.
+    """
+    p = path or (LIVE / "alerts_archive.json")
+    try:
+        archive = json.loads(p.read_text()).get("alerts") or []
+    except (OSError, json.JSONDecodeError, AttributeError):
+        return {}
+    pins = {}
+    for a in archive:
+        t = a.get("ticker")
+        if not t:
+            continue
+        s = pins.setdefault(t, set())
+        for k in ("from_time", "to_time"):
+            if a.get(k):
+                s.add(a[k])
+    return pins
 
 
 def backfill_from_candles(hist, tickers, max_series=12):
@@ -861,9 +964,12 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             # Category integrity (F-65): the exchange's own view of the series' category is
             # recorded on the row and, when it is known and contradicts the topic, the row is
             # dropped and counted by reason. See CATEGORY_COMPATIBLE / category_conflict.
+            # F-97 adds the series' official TAGS to that check: the category is a coarse
+            # bucket ("Entertainment" also holds natural gas), the tag is the domain.
             record_series(st)
             official = ledger.get(st, {}).get("categories") or []
-            conflict = category_conflict(cat_id, official, basis)
+            official_tags = ledger.get(st, {}).get("tags") or []
+            conflict = category_conflict(cat_id, official, basis, official_tags)
             if conflict:
                 cat_conflicts[status] += 1
                 conflict_reasons[conflict] = conflict_reasons.get(conflict, 0) + 1
@@ -952,7 +1058,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             hist = json.loads(hist_path.read_text()).get("series", {})
         except json.JSONDecodeError:
             hist = {}
-    update_price_history(hist, raw["open"])
+    update_price_history(hist, raw["open"], pinned_alert_times())
     # Keep history for markets that are shown AND for every market that still carries a
     # recorded price swing, so an alert never points at an empty graph.
     # The original rule kept only `rows["open"]` (the capped, ranked window). A swing is

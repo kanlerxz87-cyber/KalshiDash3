@@ -57,6 +57,8 @@ scripts/tests/test_watchdog.py  freshness limits (a fresh snapshot must never di
 scripts/tests/test_settled_selection.py  topic-fair settlement allocation + retention contract
 scripts/tests/validate_alerts.py  provenance: re-derives every alert from the committed observations and reproduces the feeds from the archive + rules
 scripts/tests/test_collect_coverage.py  offline: the scan uses the documented mve_filter, and price history is never pruned for a market an alert cites
+scripts/tests/test_topic_integrity.py  offline: a published row may not contradict its own official series record (F-97)
+scripts/tests/test_price_history_retention.py  offline: the retention window may not delete the observations an alert cites (F-99)
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
 scripts/tests/test_lifecycle.js  lifecycle join (resolved YES/NO vs determined vs not-in-snapshot) and the single model-pick rule shared by engine, page and dock
 .github/workflows/collect.yml   scheduled collection

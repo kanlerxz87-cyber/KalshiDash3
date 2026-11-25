@@ -414,6 +414,55 @@ def record_health(pass_no: int, detail: str, tail: str = "", ref: str | None = N
     return "failed"
 
 
+def write_health_ok(pass_no: int, ref: str | None = None) -> str:
+    """Record that the MOST RECENT pass committed, so the health file is never stale (F-98).
+
+    Why: data/live/collector_health.json was written only when a pass FAILED, so after the
+    collector recovered the file still said "outcome": "failed" with the old timestamp. On
+    2026-11-25 the file read "failed · validators: validate_alerts · 12:01:52Z" while the
+    collector was publishing a healthy snapshot every 15 minutes (13:16:43Z and later).
+    A reader - a human, or the next session, which the file's own note says is who reads it -
+    would conclude the collector was broken when it was not. The file is now the outcome of
+    the most recent pass in BOTH directions.
+
+    It is written to the working tree before the snapshot commit, and commit_and_push()
+    stages data/live, so the "ok" record lands in the same commit as the snapshot it
+    describes: no extra commit, no extra push, no race with the relay's own history.
+    """
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    collected = None
+    try:
+        collected = json.loads((ROOT / "data" / "live" / "markets.json").read_text()).get("collected_at")
+    except (OSError, json.JSONDecodeError, AttributeError):
+        collected = None
+    doc = {
+        "schema": 1,
+        "generated_at": stamp,
+        "pass": pass_no,
+        "outcome": "ok",
+        "detail": "snapshot committed",
+        "snapshot_collected_at": collected,
+        "stderr_tail": "",
+        "run": {
+            "workflow": "collect.yml",
+            "run_id": os.environ.get("GITHUB_RUN_ID"),
+            "attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+            "sha": os.environ.get("GITHUB_SHA"),
+        },
+        "note": ("Written by scripts/collect_relay.py for EVERY pass: 'failed' when a pass could not "
+                 "commit, 'ok' when it did. Read by humans; the site's staleness banner is what readers "
+                 "see. Never contains credentials."),
+    }
+    try:
+        path = (HEALTH_ROOT or ROOT) / HEALTH_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(doc, indent=1) + "\n")
+        return "written"
+    except Exception as e:  # a diagnostic must never break the relay
+        print(f"  ! health record (ok) failed: {type(e).__name__}: {e}")
+        return "failed"
+
+
 def make_pass(plan: Plan):
     def do_pass(n: int) -> tuple[str, str]:
         def fail(detail: str, tail: str = "") -> tuple[str, str]:
@@ -470,6 +519,10 @@ def make_pass(plan: Plan):
         if not plan.commit:
             discard_changes()
             return "validated", f"dry run on {head}; nothing committed"
+        # F-98: the health file must describe the MOST RECENT pass, so a pass that commits
+        # also records that it committed. commit_and_push() stages data/live, so this lands in
+        # the same commit as the snapshot.
+        write_health_ok(n, plan.ref)
         return commit_and_push(plan.ref)
     return do_pass
 

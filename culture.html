@@ -25,8 +25,10 @@
     labelled dollars estimate is <b>not</b> a market with traded volume: every Culture row currently shows
     $0 traded, so the dollar ranking of this topic is meaningless right now and is shown as $0 rather than
     dressed up. The demo QA fixture that used to headline this page (<code>KXGRAMMYNOMROTY-QA7CECC5-QA</code>,
-    rules “Demo portfolio test only.”) is excluded, and the Ballon d'Or moved out because Kalshi files it
-    under Sports. See <a href="flagged.html">Flagged for Review</a> (F-38, F-65, F-66).
+    rules “Demo portfolio test only.”) is excluded, the Ballon d'Or moved out because Kalshi files it
+    under Sports, and natural gas moved out because Kalshi files the daily contract
+    <code>KXNATGASD</code> under Entertainment with the tag <code>Oil &amp; Gas</code>.
+    See <a href="flagged.html">Flagged for Review</a> (F-38, F-65, F-66, F-97).
   </div>
 
   <div id="snapshotBanner"></div>
@@ -53,7 +55,7 @@
       <tr><td>Seed series used</td><td><code>KXEMMY*</code></td>
           <td><a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule (PDF)</a></td></tr>
       <tr><td>How a market joins this category</td>
-          <td>Category membership comes first from the exchange's own classification — series returned by <code>GET /series?category=Entertainment</code> — then from the fee-schedule seed list, then a keyword match. The path that decided each row is recorded as its basis and in <code>category_matched_by</code>. The Ballon d'Or is <b>not</b> a Culture market: Kalshi files it under Sports/Soccer (see <a href="flagged.html">F-66</a>).</td>
+          <td>Category membership comes first from the exchange's own classification — series returned by <code>GET /series?category=Entertainment</code> — then from the fee-schedule seed list, then a keyword match. The path that decided each row is recorded as its basis and in <code>category_matched_by</code>. The Ballon d'Or is <b>not</b> a Culture market: Kalshi files it under Sports/Soccer (see <a href="flagged.html">F-66</a>). Natural gas is <b>not</b> a Culture market either: Kalshi files the daily contract <code>KXNATGASD</code> under Entertainment with the tag <code>Oil &amp; Gas</code>, so it is excluded from every topic (see <a href="flagged.html">F-97</a>).</td>
           <td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a></td></tr>
       <tr><td>Ranking metric</td>
           <td><code>volume_fp × last_price_dollars</code>, an estimate computed by this project. Kalshi has no official dollars-traded field.</td>

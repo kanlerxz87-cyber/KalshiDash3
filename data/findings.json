@@ -383,6 +383,19 @@
    "effort": "Medium: aggregate data/live/alerts.json counts.evidence and the alert lifecycle by category_id; render one small table on categories.html. No new data collection.",
    "risk": "A per-topic 'accuracy' column on a sample of a few demo markets would look far more authoritative than it is. Mitigate by showing counts with the sample size attached, never a percentage alone, and by labelling any direction statistic as descriptive until the sample is large enough to be published with an interval (F-87).",
    "success_metric": "The scoreboard renders on every category page from committed data only, its numbers reconcile with the alert page to the row, and a reader can see the sample size next to every rate."
+  },
+  {
+    "id": "G24",
+    "status": "proposed",
+    "suggestion": "Show each published row's own series record (official categories, tags, scope) with a link to it, so a topic mismatch is visible on the page instead of only in the collector",
+    "why_it_helps_decisions": "F-97 is the argument: the exchange files a natural-gas series under \"Entertainment\", and the site published it inside Culture until a collector rule caught it. A trader reading the Culture page cannot see WHY a row is there - the row carries a basis badge (seed / keyword / official) but not the record that decided it. Rendering the deciding record next to the row (categories, tags, scope, and the GET /series link) makes every classification auditable in one click, and turns the basis badge from a label into evidence. It is the difference between a dashboard you trust and a dashboard you check.",
+    "effort": "Low: the snapshot already carries series_categories per row and the full series_index; render them in a collapsed details cell on the category pages and the dashboard table, with the official series link. No new collection.",
+    "risk": "Too much text on a table that is meant to be scannable. Mitigate by keeping the record behind a collapsed row, showing the one decisive field by default, and never hiding the topic badge itself. A second risk is that the record is read as an endorsement of the row: the copy must say it is the exchange's own classification of the SERIES, and that the topic on this project is a decision made on top of it.",
+    "success_metric": "Every published row on every topic page can be opened to the exact GET /series record that classified it, and the class of mismatch F-97 represents is visible on the page without opening the collector.",
+    "sources": [
+      "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD"
+    ]
   }
  ],
  "flagged": [
@@ -1363,6 +1376,46 @@
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/live.js",
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/live.html",
       "https://docs.kalshi.com/getting_started/demo_env"
+    ]
+  },
+  {
+    "id": "F-97",
+    "severity": "high",
+    "item": "The Culture topic published 20 natural-gas futures rows: Kalshi files the daily contract KXNATGASD under \"Entertainment\", so a category-only topic rule accepted it",
+    "why": "F-38 (2026-11-21) found natural-gas futures inside *Gas Prices* and excluded the 15-minute series KXNATGAS15M. The same underlying reached the site again through a different door. The exchange's own series record for the DAILY contract is GET /series/KXNATGASD -> {\"categories\":[\"Entertainment\"],\"title\":\"Natural Gas Daily\",\"tags\":[\"Oil & Gas\"],\"product_metadata\":{\"scope\":\"Natural Gas\"},\"settlement_sources\":[{\"name\":\"Pyth\"}]}. Because \"Entertainment\" is a Culture category, the collector's official-category discovery (GET /series?category=Entertainment -> Culture) put the series in Culture, and the category-only integrity rule could not object: the row's own category WAS compatible with the topic. The title keyword \"gas\" would have said Gas Prices. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: 20 published rows (KXNATGASD-26NOV2417-T3.295 and 19 siblings) carried category_id=culture, and they were 40% of the Culture topic's 50 published rows; the other 30 were KXSUPERBOWLHEADLINE. A full audit of all 574 published rows against their own series records found this as the ONLY topic/series contradiction - every other row's official categories, tags and title agree with the topic it is published under.",
+    "action": "Fixed in scripts/collect.py. (1) KXNATGASD is excluded from every topic, exactly like its 15-minute sibling, and the reason quotes the official series record (https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD); the reason is published in counts.excluded_series_reasons. (2) A new rule refuses a row whose official TAGS name another topic's domain, whatever category the exchange files it under: the category is a coarse bucket (\"Entertainment\" also holds natural gas), the tag is the domain (\"Oil & Gas\"). Only tags that unambiguously name one of the five topics' own domains are used, so a frequency tag such as \"15 min\" never excludes a row. Pinned offline by scripts/tests/test_topic_integrity.py (10 cases: the exclusion and its source, the classifier returning no topic for the series, the tag rule accepting the owning topic and refusing the others, and the committed snapshot containing no row whose own series record contradicts its topic). The rows leave the published snapshot on the next collector pass, which is the only writer of data/live.",
+    "sources": [
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD",
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGAS15M",
+      "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.295",
+      "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "https://docs.kalshi.com/api-reference/market/get-markets",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py"
+    ]
+  },
+  {
+    "id": "F-98",
+    "severity": "medium",
+    "item": "The collector's health file was written only when a pass FAILED, so it kept reporting a stale failure while the collector was healthy",
+    "why": "scripts/collect_relay.py records a failed pass in data/live/collector_health.json (F-85/F-87) and commits that file alone; nothing ever cleared it. Measured on 2026-11-25: the committed file read {\"outcome\": \"failed\", \"detail\": \"validators: validate_alerts\", \"generated_at\": \"2026-11-25T12:01:52Z\", \"run_id\": \"45607339513\"} while the collector was publishing healthy snapshots after it - data/live/markets.json carried collected_at 2026-11-25T13:16:43Z and later. The file's own note says it is \"Read by humans\", and F-87 calls it \"the first file any later session should read\", so a stale failure record is exactly the wrong thing to leave there: a reader would conclude the collector was broken when it was publishing every 15 minutes.",
+    "action": "Fixed in scripts/collect_relay.py: the health file is now the outcome of the MOST RECENT pass in both directions. A pass that commits writes {\"outcome\": \"ok\", \"detail\": \"snapshot committed\", \"snapshot_collected_at\": <the snapshot it was written with>} before the commit, so it lands in the same commit as the snapshot it describes - no extra commit, no extra push, no race with the relay's own history - and a failing pass still writes \"failed\" and commits that file alone as before. Pinned offline by scripts/tests/test_collect_health.py (5 new cases: the documented fields of the ok record, the snapshot timestamp it names, the repository's own health file never being rewritten by the suite, the committing path writing the record BEFORE the commit that stages data/live, and the failure path still writing \"failed\").",
+    "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
+      "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+    ]
+  },
+  {
+    "id": "F-99",
+    "severity": "medium",
+    "item": "The per-ticker price-history window silently deleted the observations that BOUND an archived swing, so most swings the page serves could no longer be quantified",
+    "why": "scripts/collect.py keeps at most PRICE_HISTORY_LIMIT = 120 observations per ticker so the committed file stays small, and it trimmed the series to the newest 120 without regard for what the alert archive cites. The two observations that bound a swing are the ones that matter: the archive (data/live/alerts_archive.json, written by scripts/build_alerts.py) names them as from_time and to_time, and the evidence layer (scripts/alert_evidence.py) needs both to say how many contracts traded in the interval and whether the book actually repriced. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: of the 150 archived swings, 62 had lost BOTH bounds and 2 had lost one - every cited ticker was still present, but the specific observations were gone. That is why the published evidence counts read traded_ge_floor 12, traded_below_floor 61, candle_unquantified 5 and unknown_no_observations 52: 52 of the 130 swings the alert chats serve could not be quantified at all, and the dashboard chart for those tickers no longer contains the swing the alert points at.",
+    "action": "Fixed in scripts/collect.py. The archive is now read as the authority on which observations matter, and the observations an alert cites are PINNED: keep_observations() keeps the newest PRICE_HISTORY_LIMIT observations plus any observation whose timestamp an archived alert cites, in time order, so the chart and the evidence layer can still read the swing back. pinned_alert_times() reads from_time and to_time from data/live/alerts_archive.json and returns nothing (never a guess) when that file is missing or unreadable. The cap still bounds the file: only the observations an alert actually cites are kept in addition to the window. Pinned offline by scripts/tests/test_price_history_retention.py (8 cases: the window unchanged without pins, a pinned observation surviving the cap, an unpinned one still dropping out, the series staying in time order, a real append keeping the pin, both bounds pinned from the archive, and an absent or unreadable archive pinning nothing). The 62 swings already lost are not restored by this: a settled market is never returned by GET /markets again, and its candles are per-period closes, so the historical rows stay as they are - the fix stops the bleeding for every swing archived from now on.",
+    "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
+      "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+      "https://docs.kalshi.com/api-reference/market/get-markets"
     ]
   }
  ]

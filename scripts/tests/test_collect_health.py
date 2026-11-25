@@ -72,6 +72,63 @@ class FakeSh:
         return subprocess.CompletedProcess(args=joined, returncode=code, stdout="", stderr="")
 
 
+class HealthRecordOkTests(unittest.TestCase):
+    """F-98: the health file must describe the MOST RECENT pass, not the last failure."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.mod = load_relay()
+
+    def test_a_successful_pass_writes_an_ok_record(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with mock.patch.object(self.mod, "HEALTH_ROOT", root):
+                result = self.mod.write_health_ok(7, "main")
+            written = root / self.mod.HEALTH_PATH
+            self.assertTrue(written.exists(), "a committing pass must record that it committed")
+            doc = json.loads(written.read_text())
+        self.assertEqual(result, "written")
+        self.assertEqual(doc["schema"], 1)
+        self.assertEqual(doc["pass"], 7)
+        self.assertEqual(doc["outcome"], "ok")
+        self.assertEqual(doc["detail"], "snapshot committed")
+        self.assertIn("generated_at", doc)
+        self.assertIn("run", doc)
+        self.assertEqual(doc["stderr_tail"], "")
+
+    def test_the_ok_record_names_the_snapshot_it_describes(self):
+        snapshot = json.loads((ROOT / "data" / "live" / "markets.json").read_text())
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            with mock.patch.object(self.mod, "HEALTH_ROOT", root):
+                self.mod.write_health_ok(1, "main")
+            doc = json.loads((root / self.mod.HEALTH_PATH).read_text())
+        self.assertEqual(doc.get("snapshot_collected_at"), snapshot.get("collected_at"),
+                         "the health record must name the snapshot it was written with")
+
+    def test_the_ok_record_never_touches_the_repository_working_tree(self):
+        """The suite must not leave a health file behind in the repo it runs in."""
+        before = (ROOT / self.mod.HEALTH_PATH).read_text() if (ROOT / self.mod.HEALTH_PATH).exists() else None
+        with tempfile.TemporaryDirectory() as temp:
+            with mock.patch.object(self.mod, "HEALTH_ROOT", Path(temp)):
+                self.mod.write_health_ok(2, "main")
+        after = (ROOT / self.mod.HEALTH_PATH).read_text() if (ROOT / self.mod.HEALTH_PATH).exists() else None
+        self.assertEqual(before, after, "the repository's health file must not be rewritten by a test")
+
+    def test_the_committing_path_writes_the_ok_record_before_the_commit(self):
+        source = (ROOT / "scripts" / "collect_relay.py").read_text()
+        body = source.split("def do_pass(n: int)", 1)[1]
+        self.assertIn("write_health_ok(n, plan.ref)", body,
+                      "the committing path must record that it committed")
+        self.assertLess(body.index("write_health_ok(n, plan.ref)"), body.index("commit_and_push(plan.ref)"),
+                        "the record must be written before the commit that stages data/live")
+
+    def test_a_failing_pass_still_writes_failed(self):
+        source = (ROOT / "scripts" / "collect_relay.py").read_text()
+        self.assertIn('"outcome": "failed"', source)
+        self.assertIn('"outcome": "ok"', source)
+
+
 class HealthRecordTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
