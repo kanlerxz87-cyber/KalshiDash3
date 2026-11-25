@@ -395,8 +395,10 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/i.test(t)),
-      "index.html: every category row must name a real ticker or say none is open in scope");
+    // T102 (F-94): a topic with no published row says so: "none in the published rows". Main's earlier
+    // wording "none open in scope" is still accepted; both are the honest form of "no row here".
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none in the published rows|none open in scope/i.test(t)),
+      "index.html: every category row must name a real ticker or say none is in the published rows");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
       check(/demo QA fixtures in the snapshot/.test(r.text),
@@ -585,6 +587,11 @@ function commonAsserts(label, r) {
       check(!/Untraded topics in this snapshot/.test(flat),
         "the page must not claim an untraded topic when current rows all have volume (F-83)");
     }
+    // T102: the row badge and the footnote must agree in BOTH directions with the rendered rows.
+    const untradedBadges = r.doc.querySelectorAll("#today .badge.warn").length;
+    const untradedNote = /Untraded topics in this snapshot/.test(flat);
+    check((untradedBadges > 0) === untradedNote,
+      `an untraded row and the 'Untraded topics' footnote must agree (rows ${untradedBadges}, footnote ${untradedNote})`);
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }

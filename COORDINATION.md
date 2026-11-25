@@ -6,6 +6,69 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-0b0ca3c1` — restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)
+
+Claimed 2026-11-25 before any edit. Checked first: `origin/main` = `68827bd` (snapshot 2026-11-25T12:16:44Z). The
+`pages.yml` build on `68827bd` **failed** at `scripts/verify_release.py` (run 45612234145), so the latest data was not
+deployed through the gate. Open PR #98 (`arena/6cd28bd2-kalshidash3`, 2026-11-22) is another session's work and is not touched.
+Branch note: this session's branch is `arena/0b0ca3c1-kalshidash3` (fixed by the session), not the `session-<id>/<task>` form in the
+board rules above; all pushes go only to that branch.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T99 | Restore the release gate on `main`: `verify_release.py` refuses `test_pages_dom.js` and `test_chatdock.js` | done | arena-0b0ca3c1 | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py` (local, jsdom@26) |
+| T100 | Real defect: the chat dock's model chat is a filter over the newest 80 events, so 58 of the 96 frozen `high_roi` rows show | done (F-95) | arena-0b0ca3c1 | `assets/chatdock.js` | `scripts/tests/test_chatdock.js` |
+| T101 | Real defect: the live page's all-events chat builds alerts from every price-history series (Demo/Test instruments such as `KXDEMOFUTHOURLY-*` appear with no topic); the feed is also ordered by insertion, not time; `KXBALLONDOR` filed under Culture against the exchange record | done (F-96) | arena-0b0ca3c1 | `assets/live.js`, `live.html` (feed order only) | `scripts/tests/test_pages_dom.js` section B |
+| T102 | Test assertions tied to today's snapshot rather than to the data: the Culture row (no open rows in the published window), the "untraded" label (no untraded topic exists in this snapshot), the row-regex; Culture wording overstated a truncated scan | done (F-94) | arena-0b0ca3c1 | `scripts/tests/test_pages_dom.js`, `index.html` (Culture wording only) | `scripts/tests/test_pages_dom.js` |
+| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | in progress (see close-out) | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
+
+
+### Close-out (`arena-0b0ca3c1`) — what was checked, what changed, what was flagged
+
+**Starting state, measured:** `main` = `68827bd` (snapshot 2026-11-25T12:16:44Z, 374 open / 200 settled published).
+`pages.yml` run 45612234145 on `68827bd`: `build` **failure** at `Verify release` (so `deploy` was skipped). The
+earlier `Live desk scan` run 45607607008 also failed at `Page render smoke test`. Both failures reproduced locally
+with `npm install --no-save --package-lock=false jsdom@26` and `python3 scripts/verify_release.py`:
+`test_pages_dom.js` (4 checks) and `test_chatdock.js` (1 check).
+
+**Diagnosis, per failing check (each one read against the data before any edit):**
+
+| Check | Finding | Fix |
+|---|---|---|
+| `test_chatdock`: model chat count = frozen screen (96) | real defect: the model chat filtered the newest 80 events (58 shown) | `assets/chatdock.js`: buffer 2,000 rows, each chat renders its newest 80 → **F-95** |
+| `test_pages_dom` B: catalyst link | real defect: live feed showed Demo instruments with no topic, and was not time-ordered, so the fixture's gas alert fell outside the 60-row window | `assets/live.js` topic gate + `live.html` newest-first → **F-96** |
+| `test_pages_dom` F-83 "untraded" label | the snapshot has no untraded topic, so the label is correctly absent; the test required it unconditionally | test now requires the badge and footnote to agree with the rendered rows (T102) |
+| `test_pages_dom` row regex | Culture row says "none open in scope", which the regex refused, although the test's own message allows it | regex accepts the honest wording; index now says "none in the published rows" and discloses the truncated scan → **F-94** |
+
+**Sources read live this session (2026-11-25):**
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR` → `categories: ["Sports"]`, `tags: ["Soccer"]`, `product_metadata.scope: "Awards"` (matches `scripts/collect.py`'s exclusion).
+- `https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY` → `categories: ["Test"]`, `tags: ["Demo"]`.
+- `https://docs.kalshi.com/api-reference/market/get-markets` (cited by F-94).
+- Repo files: `data/live/markets.json` (`open_paging_truncated_at_safety_cap: true`, `open_rows_trimmed_for_size: 21243`), `data/live/price_history.json` (407 series, incl. Demo/Test tickers), `data/live/alerts_archive.json` (96 frozen `high_roi` rows).
+
+**Gate:** `python3 scripts/verify_release.py` → **PASS** (215 checks; `test_scope.py` PASS; `test_pages_dom.js` PASS; `test_chatdock.js` PASS).
+
+**Flagged, not blocking:** F-94 (medium), F-95 (medium), F-96 (high) on `flagged.html`, with source links.
+Also noted, not changed: open PR #98 (`arena/6cd28bd2-kalshidash3`, 2026-11-22) belongs to another session and was left alone.
+Also noted: the open-market scan is truncated at its safety cap, so the published 374 open rows are not the whole in-scope market.
+
+
+### Merge record — `arena/0b0ca3c1` merging `origin/main` (during this session)
+
+While this branch was open, `main` received PRs #115–#118 from `arena-1aaa3a61` (CSG-1, "current-snapshot release-gate
+repair") and a `56aa1e57` fix, which edited the same two test files. The branch was **merged**, not rebased, because its
+two commits were already on `origin` and rebasing would rewrite pushed history. (A rebase attempt was aborted before any
+push; its half-resolved commit was never pushed.) Resolutions, neither side discarded:
+
+| File | Resolution |
+|---|---|
+| `COORDINATION.md` | both sections kept (this one, then `arena-1aaa3a61`); no markers left (checked) |
+| `scripts/tests/test_pages_dom.js` §F row regex | accepts both `none in the published rows` (F-94) and main's `none open in scope` |
+| `scripts/tests/test_pages_dom.js` §H untraded | **main's data-driven block kept** (derives the untraded topics from `markets.open_markets`); my row-badge/footnote agreement check added after it |
+| `scripts/tests/test_chatdock.js` model check | main's `modelTotal` badge assertion kept. **Changed expectation:** main compared the model chat with the frozen rows inside the newest 80 events, which accepts the F-95 truncation. The model chat is now asserted against the whole frozen screen up to the display window: `c.model === min(frozen, 80)` and `badge === frozen` (98 in the 12:36Z snapshot). Reason: the page's own comment says the model chat must be "exactly the archive's frozen high_roi screen". |
+| `data/live/*` | taken from `origin/main` (the 12:36Z collector pass); this branch does not change them |
+
+Gate after the merge: `verify_release.py` PASS (215+ checks), `test_scope.py` PASS.
 
 ## Session `arena-1aaa3a61` — current-snapshot release-gate repair
 
