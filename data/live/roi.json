@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T17:38:28Z",
- "runtime_seconds": 149.3,
+ "collected_at": "2026-11-25T18:23:24Z",
+ "runtime_seconds": 117.0,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,13 +29,13 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 12146,
+  "open_in_scope": 9766,
   "eligible": 0,
   "picks": 0,
   "near_misses": 1,
-  "unscoreable": 12145,
-  "orderbooks": 12146,
-  "orderbooks_requested": 12146,
+  "unscoreable": 9765,
+  "orderbooks": 9766,
+  "orderbooks_requested": 9766,
   "alerts": 0,
   "markets_with_momentum": 244,
   "markets_with_catalyst_url": 0,
@@ -43,8 +43,8 @@
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 12146,
-  "returned": 12146,
+  "requested": 9766,
+  "returned": 9766,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -59,11 +59,10 @@
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV25H18-UP",
+   "ticker": "KXDEMOFUTHOURLY-26NOV25H19-UP",
    "eligible": false,
    "fails": [
     "spread 99.0c > 10c cap",
-    "depth 10 < 50 contracts at the touch",
     "NO entry 99.0c above 95c ceiling",
     "net ROI -64.39% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
@@ -76,9 +75,9 @@
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
-   "depth": 10.0,
-   "vol24": 5235.0,
-   "ttc_hours": 0.35888888888888887,
+   "depth": 420.0,
+   "vol24": 2985.0,
+   "ttc_hours": 0.61,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -95,25 +94,25 @@
     "roi": -0.6439361134074835
    },
    "score": -0.6439361134074835,
-   "dollars_traded_estimate": 2003.75,
-   "title": "Demo BTC at or above 58530.86 USD",
+   "dollars_traded_estimate": 1216.25,
+   "title": "Demo BTC at or above 59521.03 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-25T18:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV25H18",
+   "close_time": "2026-11-25T19:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV25H19",
    "status": "active",
    "result": null,
-   "volume_fp": 5725.0,
-   "volume_24h_fp": 5235.0,
-   "open_interest_fp": 75.0,
+   "volume_fp": 3475.0,
+   "volume_24h_fp": 2985.0,
+   "open_interest_fp": 35.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 10.0,
+    "depth_at_bid": 420.0,
     "depth_at_ask": 0.0,
     "bid_price": 0.01,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV25H18-UP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV25H19-UP"
   }
  ],
  "unscoreable": [
@@ -139,7 +138,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 17.358888888888888,
+   "ttc_hours": 16.61,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -191,7 +190,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 10.0,
-   "ttc_hours": 18.358888888888888,
+   "ttc_hours": 17.61,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -234,7 +233,7 @@
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.4,
+   "q": 0.402,
    "mid": 0.5,
    "micro": 0.5,
    "last": 0.01,
@@ -243,8 +242,8 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 4.0,
-   "ttc_hours": 12.358888888888888,
-   "momentum": -0.01,
+   "ttc_hours": 11.61,
+   "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
     "taker": 1,
@@ -274,6 +273,110 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2601-T67799.99"
   },
   {
+   "ticker": "KXGOODREADS-26MEM-SS",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "closes in 401 d > 90 d horizon",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 9620.61,
+   "momentum": null,
+   "series_ticker": "KXGOODREADS",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Swan Song to win Memoir at the 2026 Goodreads Choice Awards?",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "close_time": "2027-12-31T15:00:00Z",
+   "event_ticker": "KXGOODREADS-26MEM",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-SS"
+  },
+  {
+   "ticker": "KXISRHEALTHMIN-26OCT27-UMAK",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "closes in 336 d > 90 d horizon",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 8059.61,
+   "momentum": null,
+   "series_ticker": "KXISRHEALTHMIN",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Will Uri Maklev be Minister of Health as a result of the government formation following the 2026 Israeli legislative election?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "close_time": "2027-10-27T14:00:00Z",
+   "event_ticker": "KXISRHEALTHMIN-26OCT27",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXISRHEALTHMIN-26OCT27-UMAK"
+  },
+  {
    "ticker": "KXPGATOUR-FAISG26-WCLA",
    "eligible": false,
    "fails": [
@@ -293,7 +396,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 393.3588888888889,
+   "ttc_hours": 392.61,
    "momentum": 0.0,
    "series_ticker": "KXPGATOUR",
    "fee_multiplier": {
@@ -343,7 +446,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 393.3588888888889,
+   "ttc_hours": 392.61,
    "momentum": 0.0,
    "series_ticker": "KXPGATOUR",
    "fee_multiplier": {
@@ -393,7 +496,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 393.3588888888889,
+   "ttc_hours": 392.61,
    "momentum": 0.0,
    "series_ticker": "KXPGATOUR",
    "fee_multiplier": {
@@ -422,124 +525,23 @@
     "ask_price": null
    },
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-JKOI"
-  },
-  {
-   "ticker": "KXPGATOUR-FAISG26-BKOE",
-   "eligible": false,
-   "fails": [
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.01,
-   "mid": 0.0,
-   "micro": 0.0,
-   "last": 0.0,
-   "bid": 0.0,
-   "ask": 0.0,
-   "spread": 0.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 393.3588888888889,
-   "momentum": 0.0,
-   "series_ticker": "KXPGATOUR",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 1,
-    "listed": true
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.0,
-   "title": "Farmers Insurance Skins Game: Brooks Koepka wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "close_time": "2026-12-12T03:00:00Z",
-   "event_ticker": "KXPGATOUR-FAISG26",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-BKOE"
-  },
-  {
-   "ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC12-YOU",
-   "eligible": false,
-   "fails": [
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.01,
-   "mid": 0.0,
-   "micro": 0.0,
-   "last": 0.0,
-   "bid": 0.0,
-   "ask": 0.0,
-   "spread": 0.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 275.34222222222223,
-   "momentum": null,
-   "series_ticker": "KXBILLBOARDRUNNERUPALBUM",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will you seem pretty sad for a girl so in love be #2 on the Billboard 200 during the week of Dec 12, 2026",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "close_time": "2026-12-07T04:59:00Z",
-   "event_ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC12",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBILLBOARDRUNNERUPALBUM-26DEC12-YOU"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 106,
+  "candles_used": 175,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 3,
+  "baseline_always_yes_bets": 4,
   "baseline_always_yes_hits": 2,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 21,
-   "no side passed the replay gates": 3,
-   "no candles in the 2h before close": 30
+   "candle without a price": 20,
+   "no candles in the 2h before close": 5,
+   "no side passed the replay gates": 4
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -548,7 +550,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.6667
+  "baseline_always_yes_hit_rate": 0.5
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
