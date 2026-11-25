@@ -12,13 +12,14 @@ Arena-assigned branch: `arena/71d4866f-kalshidash3` (branch identity is fixed fo
 
 | ID | Task | Status | Owner | Files in scope | Verification |
 |----|------|--------|-------|----------------|--------------|
-| T99 | Add a DOM regression assertion that `alerts.html`'s two chats exclude archive rows whose official series categories are Test/Demo or whose `category_id` is null; run the combined offline release gate against the current committed tree and record deploy/test status | in progress | arena-71d4866f | `scripts/tests/test_pages_dom.js` (block D only), `COORDINATION.md` (this section only) | committed `data/live/alerts_archive.json`; `scripts/verify_release.py`; `scripts/check_site.py`; GitHub Actions/Pages status |
+| T99 | Add a DOM regression assertion that `alerts.html`'s two chats exclude archive rows whose official series categories are Test/Demo or whose `category_id` is null; repair stale DOM assumptions for a category with no open rows / no currently untraded topic; run the combined offline release gate against the current committed tree and record deploy/test status | in progress | arena-71d4866f | `scripts/tests/test_pages_dom.js` (blocks D, F, H only), `COORDINATION.md` (this section only) | committed `data/live/alerts_archive.json` and `markets.json`; `scripts/verify_release.py`; `scripts/check_site.py`; GitHub Actions/Pages status |
 
 No shared page data, navigation, source ledger, collector output or existing finding is in this session's scope. The current `loadCollectorAlerts()` scope gate is being verified, not rewritten.
 
 ### Log
 
-- 2026-11-25: Read the task board before claiming. Identified PR #98 as stale (>60 minutes without a commit); confirmed from the current tree that its F-76 app-code fix already exists, while its DOM regression test is absent. Claimed only the missing test plus a current-tree audit, on the Arena-assigned branch.
+- 2026-11-25: Read the task board before claiming. Identified PR #98 as stale (>60 minutes without a commit); confirmed from the current tree that its F-76 app-code fix already exists, while its DOM regression test is absent. Claimed only test/audit work, on the Arena-assigned branch.
+- 2026-11-25: Scope expanded within the same test file after a baseline `node scripts/tests/test_pages_dom.js` run exposed stale snapshot assumptions. The shipped `markets.json` has 374 open rows; Culture has zero and the other four open topics have volume, so `index.html` correctly says "none open in scope" for Culture and has no untraded footnote. Tests F/H incorrectly require a ticker in all five rows and unconditionally require an untraded label. These are test expectations, not a site defect; they are now in scope for correction. The same run also raised the existing catalyst-link assertion; its cause is being isolated before close-out.
 
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
