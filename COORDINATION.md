@@ -52,6 +52,42 @@ with `npm install --no-save --package-lock=false jsdom@26` and `python3 scripts/
 Also noted, not changed: open PR #98 (`arena/6cd28bd2-kalshidash3`, 2026-11-22) belongs to another session and was left alone.
 Also noted: the open-market scan is truncated at its safety cap, so the published 374 open rows are not the whole in-scope market.
 
+
+### Merge record — `arena/0b0ca3c1` merging `origin/main` (during this session)
+
+While this branch was open, `main` received PRs #115–#118 from `arena-1aaa3a61` (CSG-1, "current-snapshot release-gate
+repair") and a `56aa1e57` fix, which edited the same two test files. The branch was **merged**, not rebased, because its
+two commits were already on `origin` and rebasing would rewrite pushed history. (A rebase attempt was aborted before any
+push; its half-resolved commit was never pushed.) Resolutions, neither side discarded:
+
+| File | Resolution |
+|---|---|
+| `COORDINATION.md` | both sections kept (this one, then `arena-1aaa3a61`); no markers left (checked) |
+| `scripts/tests/test_pages_dom.js` §F row regex | accepts both `none in the published rows` (F-94) and main's `none open in scope` |
+| `scripts/tests/test_pages_dom.js` §H untraded | **main's data-driven block kept** (derives the untraded topics from `markets.open_markets`); my row-badge/footnote agreement check added after it |
+| `scripts/tests/test_chatdock.js` model check | main's `modelTotal` badge assertion kept. **Changed expectation:** main compared the model chat with the frozen rows inside the newest 80 events, which accepts the F-95 truncation. The model chat is now asserted against the whole frozen screen up to the display window: `c.model === min(frozen, 80)` and `badge === frozen` (98 in the 12:36Z snapshot). Reason: the page's own comment says the model chat must be "exactly the archive's frozen high_roi screen". |
+| `data/live/*` | taken from `origin/main` (the 12:36Z collector pass); this branch does not change them |
+
+Gate after the merge: `verify_release.py` PASS (215+ checks), `test_scope.py` PASS.
+
+## Session `arena-1aaa3a61` — current-snapshot release-gate repair
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| CSG-1 | Reconcile DOM regression assertions with the live committed snapshot and the chat's 80-row visible window; preserve checks for the real UI contract rather than historical totals. | done | arena-1aaa3a61 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS; committed `data/live/markets.json` and `data/live/alerts_archive.json` fixtures |
+
+- 2026-11-25: Read the coordination board and ran the release gate on base `68827bd`. First run blocked because the workspace lacked `jsdom`; installed the test-only dependency with `npm install --no-save --package-lock=false jsdom@26`. Baseline exposed stale assertions: chat rendered only the 80 newest events but compared its model rows to 96 archive-wide picks; landing-page assertions required a ticker even when a topic correctly said "none open in scope", and unconditionally required an untraded disclosure when the current snapshot has traded rows in every open topic. Fixed the test contracts to derive the expected rendered model from the current 80-event window, require a truthful model badge, permit the explicit no-open state, and condition the untraded disclosure check on actual snapshot volume. Production UI/data and verified facts remain unchanged.
+- Verification: `node scripts/tests/test_chatdock.js` PASS; `node scripts/tests/test_pages_dom.js` PASS; full `python3 scripts/verify_release.py` PASS, including offline validators, DOM tests, and `scripts/check_site.py` (21 pages, internal links resolved). Release gate explicitly does not certify live API availability, account access, or external URLs; this run saw transient demo `/series` TLS and simulated 500 warnings in offline failure-path tests, which were handled by existing fallbacks.
+- No new Kalshi fact was asserted; the updated expected values derive from the committed snapshot and archive. Existing documented sources remain linked from the data records; official API, balance, authentication, live trade, ROI, and causal-catalyst claims remain outside this test-only task.
+
+### Release close-out
+- PR [#115](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/115) merged on 2026-11-25T12:31:28Z as `eaf77adb17ae3b040b65b920d003ced5be47822c`.
+- GitHub Actions deploy run [45614582749](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/45614582749) completed successfully: build + deploy succeeded. GitHub Pages builds API reported `status=built` for `60f8d2922f9c25565d6b98f98791781d8fb412cc`, a subsequent demo-snapshot commit whose parent is the PR merge commit.
+- Release warning, non-blocking: Actions emitted the runner's Node.js 20 deprecation notice for pinned `actions/*@v4` steps (currently executed on Node.js 24). No change to workflow scope was made; review/updating action versions separately.
+- No authentication, Kalshi account, balances, or orders were used. Full verification was offline except GitHub Actions / Pages status APIs; external website/API reachability is not certified by this task.
+
+---
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,

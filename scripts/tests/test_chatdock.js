@@ -99,6 +99,7 @@ function counts(w) {
   return {
     all: w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length,
     model: w.document.getElementById("kdChatModel").querySelectorAll(".cd-msg").length,
+    modelTotal: w.document.getElementById("kdCountModel").textContent,
     tab: w.document.getElementById("kdTabCount").textContent,
   };
 }
@@ -146,15 +147,22 @@ function counts(w) {
   check(origins.length > 0 && origins.every((o) => o === "history"), "history rows are labelled 'history', not 'live'");
   check(c.model <= c.all, `model chat (${c.model}) is a subset of all events (${c.all})`);
   // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
-  // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
-  // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
-  const frozen = archiveWithDecoy.alerts.filter((a) => {
+  // rule of its own, and it must not be a filter over the all-events display window (F-95: with a
+  // single 80-row buffer the model chat showed 58 of the 96 frozen rows). The two interfaces are:
+  //   - the rendered model list shows the newest MAX_ROWS (80) of the WHOLE frozen screen;
+  //   - the model badge reports the WHOLE frozen screen.
+  // (main's earlier version compared against the frozen rows inside the newest 80 events; that
+  // tolerated the truncation. This version keeps main's badge check and restores the screen check.)
+  const frozenScreen = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
     return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
       && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
       && a.high_roi === true;
   }).length;
-  check(c.model === Math.min(frozen, 80), `model chat count equals the frozen high_roi screen (${frozen})`);
+  check(c.model === Math.min(frozenScreen, 80),
+    `rendered model rows equal the frozen high_roi screen up to the 80-row display window (min(${frozenScreen}, 80))`);
+  check(Number(c.modelTotal) === frozenScreen,
+    `model count badge equals the whole frozen high_roi screen (${frozenScreen})`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),
