@@ -11,6 +11,55 @@
     "Crypto"
    ],
    "status": "active",
+   "from_time": "2026-11-25T13:31:42Z",
+   "to_time": "2026-11-25T13:46:45Z",
+   "from_price": 0.01,
+   "to_price": 0.97,
+   "delta": 0.96,
+   "direction": "up",
+   "volume_24h_fp": 33697.11,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.97,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T13:46:45Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 63.91,
+    "est_dollars": 61.99,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72433556.42,
+    "volume_to": 72433620.33,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "63.91 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T13:46:45Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
    "from_time": "2026-11-25T12:31:43Z",
    "to_time": "2026-11-25T12:46:43Z",
    "from_price": 0.97,
