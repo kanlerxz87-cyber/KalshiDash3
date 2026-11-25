@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T20:54:08Z",
- "started_at": "2026-11-25T20:52:42Z",
+ "collected_at": "2026-11-25T21:09:09Z",
+ "started_at": "2026-11-25T21:07:42Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -14,17 +14,17 @@
  "counts": {
   "open_total_scanned": 25214,
   "settled_total_scanned": 30552,
-  "open_in_scope": 499,
-  "open_in_scope_total": 12958,
-  "open_published_rows": 499,
+  "open_in_scope": 501,
+  "open_in_scope_total": 10153,
+  "open_published_rows": 501,
   "settled_in_scope": 1600,
   "settled_published_rows": 200,
-  "open_out_of_scope": 12167,
-  "settled_out_of_scope": 11212,
+  "open_out_of_scope": 14970,
+  "settled_out_of_scope": 11230,
   "open_excluded_multivariate": 0,
   "settled_excluded_multivariate": 0,
   "open_excluded_off_topic_or_qa": 0,
-  "settled_excluded_off_topic_or_qa": 83,
+  "settled_excluded_off_topic_or_qa": 84,
   "open_excluded_series": 80,
   "settled_excluded_series": 40,
   "excluded_series_detail": {
@@ -61,11 +61,12 @@
    }
   ],
   "official_discovery_series": 5813,
-  "open_excluded_category_conflict": 9,
-  "settled_excluded_category_conflict": 32,
+  "open_excluded_category_conflict": 11,
+  "settled_excluded_category_conflict": 33,
   "category_conflict_reasons": {
    "official series categories ['Economics'] are not culture (compatible: ['Awards', 'Culture', 'Entertainment', 'Media', 'Pop Culture'])": 8,
-   "official series categories ['Test'] are test/demo instruments, not a live event in crypto": 33
+   "official series categories ['Sports'] are not culture (compatible: ['Awards', 'Culture', 'Entertainment', 'Media', 'Pop Culture'])": 2,
+   "official series categories ['Test'] are test/demo instruments, not a live event in crypto": 34
   },
   "category_compatible_official": {
    "gas": [
@@ -107,8 +108,8 @@
   "open_paging_truncated_at_safety_cap": true,
   "settled_paging_truncated_at_safety_cap": true,
   "safety_scan_cap": 25000,
-  "settled_rows_trimmed_for_size": 17585,
-  "settled_in_scope_total": 19185,
+  "settled_rows_trimmed_for_size": 17565,
+  "settled_in_scope_total": 19165,
   "settled_in_scope_total_method": "exact count of every settled row the paged scan returned inside the five topics, measured before the per-topic publish selection and before the size window; the scan stopped at the safety cap, so this is a lower bound (safety_scan_cap 25000, kept window 1600, published 200 across the five topics)",
   "settled_kept_window": 1600,
   "settled_published": 200,
@@ -191,7 +192,7 @@
     "url": "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets?series_ticker=KXPGASOLHEIM&limit=1000"
    }
   },
-  "open_rows_trimmed_for_size": 12459,
+  "open_rows_trimmed_for_size": 9652,
   "rows_dropped_wrong_status": 0
  },
  "series_index": {
@@ -232,6 +233,17 @@
    "title": "US 2Y Treasury yield hourly",
    "tags": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KX2YRRATEH"
+  },
+  "KX30YMORTW": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "30-year mortgage rate this week",
+   "tags": [
+    "Econ Weekly",
+    "Housing"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KX30YMORTW"
   },
   "KX30YRRATE15M": {
    "categories": [
@@ -816,78 +828,6 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDUT"
   },
-  "KXAAAGASCDVA": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "Virginia gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDVA"
-  },
-  "KXAAAGASCDVT": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "Vermont gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDVT"
-  },
-  "KXAAAGASCDWA": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "Washington gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDWA"
-  },
-  "KXAAAGASCDWI": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "Wisconsin gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDWI"
-  },
-  "KXAAAGASCDWV": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "West Virginia gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDWV"
-  },
-  "KXAAAGASCDWY": {
-   "categories": [
-    "Economics",
-    "Commodities"
-   ],
-   "title": "Wyoming gas price",
-   "tags": [
-    "Oil and energy",
-    "Econ Daily"
-   ],
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASCDWY"
-  },
   "KXAAAGASD": {
    "categories": [
     "Economics"
@@ -1213,6 +1153,156 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
   },
+  "KXBUNDESLIGA1H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Bundesliga First Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA1H"
+  },
+  "KXBUNDESLIGA1HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA1HBTTS"
+  },
+  "KXBUNDESLIGA1HSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA1HSCORE"
+  },
+  "KXBUNDESLIGA1HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA1HSPREAD"
+  },
+  "KXBUNDESLIGA1HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA1HTOTAL"
+  },
+  "KXBUNDESLIGA2H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA2H"
+  },
+  "KXBUNDESLIGA2HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA2HBTTS"
+  },
+  "KXBUNDESLIGA2HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA2HSPREAD"
+  },
+  "KXBUNDESLIGA2HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGA2HTOTAL"
+  },
+  "KXBUNDESLIGAFTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "First Team to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGAFTTS"
+  },
+  "KXBUNDESLIGASCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGASCORE"
+  },
+  "KXBUNDESLIGATEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Team Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBUNDESLIGATEAMTOTAL"
+  },
+  "KXCONMEBOLLIBBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCONMEBOLLIBBTTS"
+  },
+  "KXCONMEBOLLIBSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCONMEBOLLIBSPREAD"
+  },
+  "KXCONMEBOLLIBTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Point Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCONMEBOLLIBTOTAL"
+  },
   "KXCONTCLAIMS": {
    "categories": [
     "Economics"
@@ -1223,6 +1313,36 @@
     "Jobs & Economy"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCONTCLAIMS"
+  },
+  "KXCOPPAITALIABTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCOPPAITALIABTTS"
+  },
+  "KXCOPPAITALIASPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Copa Italia Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCOPPAITALIASPREAD"
+  },
+  "KXCOPPAITALIATOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Coppa Italia Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCOPPAITALIATOTAL"
   },
   "KXCOPPER15M": {
    "categories": [
@@ -1457,6 +1577,46 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEFLCHAMPIONSHIPTOTAL"
   },
+  "KXEFLL11H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEFLL11H"
+  },
+  "KXEFLL11HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEFLL11HBTTS"
+  },
+  "KXEFLL11HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEFLL11HSPREAD"
+  },
+  "KXEFLL11HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEFLL11HTOTAL"
+  },
   "KXEFLL1BTTS": {
    "categories": [
     "Sports"
@@ -1524,6 +1684,17 @@
     "Soccer"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEGYPLTOTAL"
+  },
+  "KXEIACRUDEW": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "U.S. crude oil inventories",
+   "tags": [
+    "Econ Weekly",
+    "Oil and energy"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEIACRUDEW"
   },
   "KXELECTIRAN": {
    "categories": [
@@ -1602,6 +1773,156 @@
     "Soccer"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXENGNLTOTAL"
+  },
+  "KXEPL1H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Premier League First Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL1H"
+  },
+  "KXEPL1HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL 1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL1HBTTS"
+  },
+  "KXEPL1HSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL1HSCORE"
+  },
+  "KXEPL1HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL 1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL1HSPREAD"
+  },
+  "KXEPL1HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL 1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL1HTOTAL"
+  },
+  "KXEPL2H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL2H"
+  },
+  "KXEPL2HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL2HBTTS"
+  },
+  "KXEPL2HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL2HSPREAD"
+  },
+  "KXEPL2HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPL2HTOTAL"
+  },
+  "KXEPLBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "EPL Both Teams to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLBTTS"
+  },
+  "KXEPLFTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "First Team to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLFTTS"
+  },
+  "KXEPLSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLSCORE"
+  },
+  "KXEPLSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "English Premier League Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLSPREAD"
+  },
+  "KXEPLTEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Team Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLTEAMTOTAL"
+  },
+  "KXEPLTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "English Premier League Total Goals",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEPLTOTAL"
   },
   "KXEREDIVISIEBTTS": {
    "categories": [
@@ -1684,6 +2005,17 @@
     "Basketball"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEUROLEAGUETOTAL"
+  },
+  "KXEUROVISION": {
+   "categories": [
+    "Entertainment"
+   ],
+   "title": "Eurovision winner",
+   "tags": [
+    "Eurovision",
+    "Television"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXEUROVISION"
   },
   "KXEURUSD15M": {
    "categories": [
@@ -1908,6 +2240,96 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXJOBLESSCLAIMS"
   },
+  "KXLALIGA1H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "La Liga First Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA1H"
+  },
+  "KXLALIGA1HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA1HBTTS"
+  },
+  "KXLALIGA1HSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA1HSCORE"
+  },
+  "KXLALIGA1HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA1HSPREAD"
+  },
+  "KXLALIGA1HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA1HTOTAL"
+  },
+  "KXLALIGA2H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA2H"
+  },
+  "KXLALIGA2HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA2HBTTS"
+  },
+  "KXLALIGA2HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA2HSPREAD"
+  },
+  "KXLALIGA2HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGA2HTOTAL"
+  },
   "KXLALIGABTTS": {
    "categories": [
     "Sports"
@@ -1917,6 +2339,16 @@
     "Soccer"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGABTTS"
+  },
+  "KXLALIGAFTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "First Team to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGAFTTS"
   },
   "KXLALIGAGAME": {
    "categories": [
@@ -1928,6 +2360,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGAGAME"
   },
+  "KXLALIGASCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGASCORE"
+  },
   "KXLALIGASPREAD": {
    "categories": [
     "Sports"
@@ -1938,6 +2380,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGASPREAD"
   },
+  "KXLALIGATEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Team Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGATEAMTOTAL"
+  },
   "KXLALIGATOTAL": {
    "categories": [
     "Sports"
@@ -1947,6 +2399,16 @@
     "Soccer"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLALIGATOTAL"
+  },
+  "KXLIDOMGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Dominican Winter League (LIDOM)",
+   "tags": [
+    "Baseball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIDOMGAME"
   },
   "KXLIGAPORTUGALBTTS": {
    "categories": [
@@ -1988,6 +2450,136 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGAPROMATCH"
   },
+  "KXLIGUE11H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Ligue 1 First Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE11H"
+  },
+  "KXLIGUE11HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE11HBTTS"
+  },
+  "KXLIGUE11HSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE11HSCORE"
+  },
+  "KXLIGUE11HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE11HSPREAD"
+  },
+  "KXLIGUE11HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE11HTOTAL"
+  },
+  "KXLIGUE12H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE12H"
+  },
+  "KXLIGUE12HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE12HBTTS"
+  },
+  "KXLIGUE12HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE12HSPREAD"
+  },
+  "KXLIGUE12HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE12HTOTAL"
+  },
+  "KXLIGUE1FTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "First Team to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE1FTTS"
+  },
+  "KXLIGUE1SCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE1SCORE"
+  },
+  "KXLIGUE1TEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Team Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIGUE1TEAMTOTAL"
+  },
+  "KXLIIGAGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Liiga Game",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLIIGAGAME"
+  },
   "KXLMPGAME": {
    "categories": [
     "Sports"
@@ -1997,6 +2589,22 @@
     "Baseball"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLMPGAME"
+  },
+  "KXLVBPGAME": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Venezuelan Winter League (LVBP)",
+   "tags": [
+    "Baseball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXLVBPGAME"
+  },
+  "KXMACYSBALLOONS": {
+   "categories": null,
+   "title": null,
+   "tags": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXMACYSBALLOONS"
   },
   "KXMBAAPPS": {
    "categories": [
@@ -2295,6 +2903,16 @@
     "Basketball"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNBAREBPROT"
+  },
+  "KXNBAROY": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NBA Rookie of the Year",
+   "tags": [
+    "Basketball"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNBAROY"
   },
   "KXNBASPREAD": {
    "categories": [
@@ -2698,6 +3316,12 @@
    "tags": null,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNCAAMBWINMARGIN"
   },
+  "KXNCAAMSOCCER": {
+   "categories": null,
+   "title": null,
+   "tags": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNCAAMSOCCER"
+  },
   "KXNCAAWB1H": {
    "categories": [
     "Sports"
@@ -2797,6 +3421,12 @@
     "Basketball"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNCAAWBTOTAL"
+  },
+  "KXNCAAWSOCCER": {
+   "categories": null,
+   "title": null,
+   "tags": null,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNCAAWSOCCER"
   },
   "KXNCAAWVMATCH": {
    "categories": [
@@ -3045,6 +3675,46 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNFLTEAMFIRSTTD"
   },
+  "KXNHL1P": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL 1st Period Winner",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL1P"
+  },
+  "KXNHL1PSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Period Spread",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL1PSPREAD"
+  },
+  "KXNHL1PTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL 1st Period Total",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL1PTOTAL"
+  },
+  "KXNHL2P": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL 2nd Period Winner",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL2P"
+  },
   "KXNHL2PSPREAD": {
    "categories": [
     "Sports"
@@ -3064,6 +3734,26 @@
     "Hockey"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL2PTOTAL"
+  },
+  "KXNHL3P": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL 3rd Period Winner",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL3P"
+  },
+  "KXNHL3PSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL 3rd Period Spread",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHL3PSPREAD"
   },
   "KXNHL3PTOTAL": {
    "categories": [
@@ -3085,6 +3775,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLAST"
   },
+  "KXNHLF10G": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL Goal in First 10 Minutes",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLF10G"
+  },
   "KXNHLFIRSTGOAL": {
    "categories": [
     "Sports"
@@ -3104,6 +3804,16 @@
     "Hockey"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLGOAL"
+  },
+  "KXNHLOT": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL Overtime",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLOT"
   },
   "KXNHLPTS": {
    "categories": [
@@ -3135,6 +3845,16 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLSPREAD"
   },
+  "KXNHLTEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "NHL Team Goals Scored During Game",
+   "tags": [
+    "Hockey"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLTEAMTOTAL"
+  },
   "KXNHLTOTAL": {
    "categories": [
     "Sports"
@@ -3144,6 +3864,16 @@
     "Hockey"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHLTOTAL"
+  },
+  "KXNHSALES": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "New home sales in time period",
+   "tags": [
+    "Housing"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNHSALES"
   },
   "KXNZDUSDAD": {
    "categories": [
@@ -3711,6 +4441,126 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSCOTTISHPREMTOTAL"
   },
+  "KXSERIEA1H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Serie A First Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA1H"
+  },
+  "KXSERIEA1HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA1HBTTS"
+  },
+  "KXSERIEA1HSCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA1HSCORE"
+  },
+  "KXSERIEA1HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA1HSPREAD"
+  },
+  "KXSERIEA1HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "1st Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA1HTOTAL"
+  },
+  "KXSERIEA2H": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Winner",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA2H"
+  },
+  "KXSERIEA2HBTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half BTTS",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA2HBTTS"
+  },
+  "KXSERIEA2HSPREAD": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Spread",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA2HSPREAD"
+  },
+  "KXSERIEA2HTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "2nd Half Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEA2HTOTAL"
+  },
+  "KXSERIEAFTTS": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "First Team to Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEAFTTS"
+  },
+  "KXSERIEASCORE": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Correct Score",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEASCORE"
+  },
+  "KXSERIEATEAMTOTAL": {
+   "categories": [
+    "Sports"
+   ],
+   "title": "Team Total",
+   "tags": [
+    "Soccer"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSERIEATEAMTOTAL"
+  },
   "KXSERIEBSPREAD": {
    "categories": [
     "Sports"
@@ -3827,6 +4677,17 @@
     "Solana"
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSOLE"
+  },
+  "KXSPRLVL": {
+   "categories": [
+    "Economics"
+   ],
+   "title": "SPR level on date",
+   "tags": [
+    "Econ Weekly",
+    "Oil and energy"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSPRLVL"
   },
   "KXSRBSLBTTS": {
    "categories": [
@@ -4411,6 +5272,17 @@
    ],
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXVALORANTTOTALMAPS"
   },
+  "KXVANHOLLENBACKERS": {
+   "categories": [
+    "Politics"
+   ],
+   "title": "Which senators will back Van Hollen for Senate Democratic leader?",
+   "tags": [
+    "Congress",
+    "Leadership & committees"
+   ],
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXVANHOLLENBACKERS"
+  },
   "KXWCBAGAME": {
    "categories": [
     "Sports"
@@ -4945,8 +5817,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 69904345.43,
    "volume_24h_fp": 59575.34,
@@ -5169,8 +6041,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.02,
-   "yes_ask_dollars": 0.03,
-   "no_bid_dollars": 0.97,
+   "yes_ask_dollars": 0.04,
+   "no_bid_dollars": 0.96,
    "no_ask_dollars": 0.98,
    "volume_fp": 39638842.6,
    "volume_24h_fp": 7869.76,
@@ -5552,10 +6424,10 @@
    "status": "active",
    "result": null,
    "last_price_dollars": 0.01,
-   "yes_bid_dollars": 0.01,
-   "yes_ask_dollars": 0.02,
-   "no_bid_dollars": 0.98,
-   "no_ask_dollars": 0.99,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.99,
+   "no_bid_dollars": 0.01,
+   "no_ask_dollars": 1.0,
    "volume_fp": 59516139.53,
    "volume_24h_fp": 1028760.65,
    "open_interest_fp": 7000903.8,
@@ -5617,8 +6489,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 56238676.94,
    "volume_24h_fp": 0.0,
@@ -6440,8 +7312,8 @@
    "result": null,
    "last_price_dollars": 0.003,
    "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
+   "yes_ask_dollars": 0.004,
+   "no_bid_dollars": 0.996,
    "no_ask_dollars": 0.998,
    "volume_fp": 389436.9,
    "volume_24h_fp": 222222.2,
@@ -6722,8 +7594,8 @@
    "result": null,
    "last_price_dollars": 0.003,
    "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
    "no_ask_dollars": 0.998,
    "volume_fp": 222250.06,
    "volume_24h_fp": 55555.55,
@@ -7103,8 +7975,8 @@
    "result": null,
    "last_price_dollars": 0.027,
    "yes_bid_dollars": 0.027,
-   "yes_ask_dollars": 0.028,
-   "no_bid_dollars": 0.972,
+   "yes_ask_dollars": 0.03,
+   "no_bid_dollars": 0.97,
    "no_ask_dollars": 0.973,
    "volume_fp": 12345.66,
    "volume_24h_fp": 12315.16,
@@ -8807,37 +9679,1250 @@
    "rules_secondary": "If the 2027 Ryder Cup ends in a tie after all scheduled matches are completed, the \u201cTie\u201d market will resolve to Yes, regardless of the Ryder Cup\u2019s official tiebreaking rule in which the previous holder retains the trophy."
   },
   {
-   "ticker": "KXBTCD-26NOV2610-T66099.99",
-   "event_ticker": "KXBTCD-26NOV2610",
-   "series_ticker": "KXBTCD",
+   "ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE",
+   "event_ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC05",
+   "series_ticker": "KXBILLBOARDRUNNERUPALBUM",
    "series_ticker_from_api": null,
-   "title": "Bitcoin price on Nov 26, 2026?",
-   "category_id": "crypto",
+   "title": "Will everything i said i am. / everything she said she is. be #2 on the Billboard 200 during the week of Dec 5, 2026",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
    "category_matched_by": "official",
    "status": "active",
    "result": null,
-   "last_price_dollars": 0.01,
+   "last_price_dollars": 0.0,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
    "no_ask_dollars": 1.0,
-   "volume_fp": 1.0,
-   "volume_24h_fp": 1.0,
-   "open_interest_fp": 1.0,
-   "dollars_traded_estimate": 0.01,
-   "close_time": "2026-11-26T15:00:00Z",
-   "expected_expiration_time": "2026-11-26T15:05:00Z",
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-30T04:59:00Z",
+   "expected_expiration_time": "2026-12-09T15:00:00Z",
    "settlement_ts": null,
    "settlement_value_dollars": null,
    "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2610-T66099.99",
-   "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' Bitcoin Real-Time Index (BRTI) before 10 AM EST is above 66099.99 at 10 AM EST on Nov 26, 2026, then the market resolves to Yes.",
-   "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices.",
-   "subtitle": "$66,100 or above"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE",
+   "rules_primary": "If everything i said i am. / everything she said she is. is #2 on the Billboard 200  chart for the Week of Dec 5, 2026, then the market resolves to Yes.",
+   "rules_secondary": "This market and these products have not been endorsed by Billboard. Any references to \"Billboard\", the \"Hot 100,\" or any other associated marks are descriptive only, and do not indicate an endorsement of this product or any affiliation between Billboard and Kalshi.",
+   "subtitle": ":: YFN Lucci"
+  },
+  {
+   "ticker": "KXTOPALBUM-26DEC05-EVE",
+   "event_ticker": "KXTOPALBUM-26DEC05",
+   "series_ticker": "KXTOPALBUM",
+   "series_ticker_from_api": null,
+   "title": "Will everything i said i am. / everything she said she is. be #1 on the Billboard 200 during the week of Dec 5, 2026",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-30T04:59:00Z",
+   "expected_expiration_time": "2026-12-09T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTOPALBUM-26DEC05-EVE",
+   "rules_primary": "If everything i said i am. / everything she said she is. is #1 on the Billboard 200  chart for the Week of Dec 5, 2026, then the market resolves to Yes.",
+   "rules_secondary": "This market and these products have not been endorsed by Billboard. Any references to \"Billboard\", the \"Hot 100,\" or any other associated marks are descriptive only, and do not indicate an endorsement of this product or any affiliation between Billboard and Kalshi.",
+   "subtitle": ":: YFN Lucci"
+  },
+  {
+   "ticker": "KXVANHOLLENBACKERS-27JAN03-RCOO",
+   "event_ticker": "KXVANHOLLENBACKERS-27JAN03",
+   "series_ticker": "KXVANHOLLENBACKERS",
+   "series_ticker_from_api": null,
+   "title": "Will it be confirmed that Roy Cooper publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Politics"
+   ],
+   "category_matched_by": "keyword",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-01-03T04:59:00Z",
+   "expected_expiration_time": "2027-01-10T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-RCOO",
+   "rules_primary": "If Roy Cooper publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him after Issuance and before Jan 3, 2027, then the market resolves to Yes.",
+   "rules_secondary": "This must be confirmed, verified, or established as factual by at least one Source Agency.\n\n\"The caucus vote\" refers to the Senate Democratic caucus's vote on its leader for the 120th Congress. A senator backs Chris Van Hollen by publicly stating that they support him or plan to vote for him as leader. Support conditioned only on Chris Van Hollen remaining a candidate qualifies; support subject to any other condition does not.\n\nThe market resolves to Yes if either of the following is confirmed:\nBacking Chris Van Hollen is the senator's public position when the caucus votes.\nBy the end of the day after the vote, the senator says they voted for Chris Van Hollen, including saying \"aye\" on a voice vote.\n\nA senator's own account of their vote governs over earlier statements. A senator who says they voted against Chris Van Hollen, abstained, or did not vote for him resolves to No. A senator who had not publicly backed Chris Van Hollen before the vote resolves to No if, by the end of the day after the vote, they only say they support him going forward or decline to say whether they supported him. If Chris Van Hollen is elected by acclamation without a vote, only the first route applies.\n\nOnce the day after the caucus elects its leader has ended, a senator who has met neither route above resolves to No, without waiting for Jan 3, 2027. A route met by then still counts if a Source Agency confirms it before the market settles. Each market resolves to No if Chris Van Hollen withdraws from the leadership election or the caucus does not elect its leader before Jan 3, 2027. A person who is not eligible to vote in the caucus vote as a senator or senator-elect, including a candidate whose Senate race has not been called by then, resolves to No."
+  },
+  {
+   "ticker": "KXVANHOLLENBACKERS-27JAN03-EMAR",
+   "event_ticker": "KXVANHOLLENBACKERS-27JAN03",
+   "series_ticker": "KXVANHOLLENBACKERS",
+   "series_ticker_from_api": null,
+   "title": "Will it be confirmed that Ed Markey publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Politics"
+   ],
+   "category_matched_by": "keyword",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-01-03T04:59:00Z",
+   "expected_expiration_time": "2027-01-10T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-EMAR",
+   "rules_primary": "If Ed Markey publicly backs Chris Van Hollen for Senate Democratic leader when the caucus votes, or says by the end of the next day that they voted for him after Issuance and before Jan 3, 2027, then the market resolves to Yes.",
+   "rules_secondary": "This must be confirmed, verified, or established as factual by at least one Source Agency.\n\n\"The caucus vote\" refers to the Senate Democratic caucus's vote on its leader for the 120th Congress. A senator backs Chris Van Hollen by publicly stating that they support him or plan to vote for him as leader. Support conditioned only on Chris Van Hollen remaining a candidate qualifies; support subject to any other condition does not.\n\nThe market resolves to Yes if either of the following is confirmed:\nBacking Chris Van Hollen is the senator's public position when the caucus votes.\nBy the end of the day after the vote, the senator says they voted for Chris Van Hollen, including saying \"aye\" on a voice vote.\n\nA senator's own account of their vote governs over earlier statements. A senator who says they voted against Chris Van Hollen, abstained, or did not vote for him resolves to No. A senator who had not publicly backed Chris Van Hollen before the vote resolves to No if, by the end of the day after the vote, they only say they support him going forward or decline to say whether they supported him. If Chris Van Hollen is elected by acclamation without a vote, only the first route applies.\n\nOnce the day after the caucus elects its leader has ended, a senator who has met neither route above resolves to No, without waiting for Jan 3, 2027. A route met by then still counts if a Source Agency confirms it before the market settles. Each market resolves to No if Chris Van Hollen withdraws from the leadership election or the caucus does not elect its leader before Jan 3, 2027. A person who is not eligible to vote in the caucus vote as a senator or senator-elect, including a candidate whose Senate race has not been called by then, resolves to No."
+  },
+  {
+   "ticker": "KXEUROVISION-27-UNI",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-UNI",
+   "rules_primary": "If United Kingdom wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-UKR",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-UKR",
+   "rules_primary": "If Ukraine wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-SWI",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-SWI",
+   "rules_primary": "If Switzerland wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-SWE",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-SWE",
+   "rules_primary": "If Sweden wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-SEB",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-SEB",
+   "rules_primary": "If Serbia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-SAN",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-SAN",
+   "rules_primary": "If San Marino wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-ROM",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-ROM",
+   "rules_primary": "If Romania wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-POR",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-POR",
+   "rules_primary": "If Portugal wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-POL",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-POL",
+   "rules_primary": "If Poland wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-NOR",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-NOR",
+   "rules_primary": "If Norway wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-MON",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-MON",
+   "rules_primary": "If Montenegro wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-MOL",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-MOL",
+   "rules_primary": "If Moldova wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-MKD",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-MKD",
+   "rules_primary": "If North Macedonia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-MAL",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-MAL",
+   "rules_primary": "If Malta wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-LUX",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-LUX",
+   "rules_primary": "If Luxembourg wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-LIT",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-LIT",
+   "rules_primary": "If Lithuania wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-LAT",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-LAT",
+   "rules_primary": "If Latvia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-ITA",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-ITA",
+   "rules_primary": "If Italy wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-ISR",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-ISR",
+   "rules_primary": "If Israel wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-GRE",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-GRE",
+   "rules_primary": "If Greece wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-GER",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-GER",
+   "rules_primary": "If Germany wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-GEO",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-GEO",
+   "rules_primary": "If Georgia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-FRA",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-FRA",
+   "rules_primary": "If France wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-FIN",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-FIN",
+   "rules_primary": "If Finland wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-EST",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-EST",
+   "rules_primary": "If Estonia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-DEN",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-DEN",
+   "rules_primary": "If Denmark wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-CYR",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-CYR",
+   "rules_primary": "If Cyprus wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-CRO",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-CRO",
+   "rules_primary": "If Croatia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-CAN",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-CAN",
+   "rules_primary": "If Canada wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-BUL",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-BUL",
+   "rules_primary": "If Bulgaria wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-BEL",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-BEL",
+   "rules_primary": "If Belgium wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-AZE",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-AZE",
+   "rules_primary": "If Azerbaijan wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-AUST",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-AUST",
+   "rules_primary": "If Austria wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-AUS",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-AUS",
+   "rules_primary": "If Australia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-ARM",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-ARM",
+   "rules_primary": "If Armenia wins the Eurovision Song Contest, then the market resolves to Yes."
+  },
+  {
+   "ticker": "KXEUROVISION-27-ALB",
+   "event_ticker": "KXEUROVISION-27",
+   "series_ticker": "KXEUROVISION",
+   "series_ticker_from_api": null,
+   "title": "Eurovision Winner 2027",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2027-12-31T15:00:00Z",
+   "expected_expiration_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-ALB",
+   "rules_primary": "If Albania wins the Eurovision Song Contest, then the market resolves to Yes."
   },
   {
    "ticker": "KXGOODREADS-26DEBUT-YES",
@@ -11544,1260 +13629,6 @@
    "rules_primary": "If The Unknown achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
    "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
    "subtitle": "The Unknown"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-TSM",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "This Story Might Save Your Life to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-TSM",
-   "rules_primary": "If This Story Might Save Your Life achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "This Story Might Save Your Life"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-MM",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Mad Mabel to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-MM",
-   "rules_primary": "If Mad Mabel achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Mad Mabel"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-MHW",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "My Husband's Wife to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-MHW",
-   "rules_primary": "If My Husband's Wife achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "My Husband's Wife"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-MGA",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Murder at the Grand Alpine Hotel to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-MGA",
-   "rules_primary": "If Murder at the Grand Alpine Hotel achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Murder at the Grand Alpine Hotel"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-JS",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Judge Stone to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-JS",
-   "rules_primary": "If Judge Stone achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Judge Stone"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-DD",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Dear Debbie to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-DD",
-   "rules_primary": "If Dear Debbie achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Dear Debbie"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-BOW",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Best Offer Wins to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-BOW",
-   "rules_primary": "If Best Offer Wins achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Best Offer Wins"
-  },
-  {
-   "ticker": "KXGOODREADS-26MYST-BLT",
-   "event_ticker": "KXGOODREADS-26MYST",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Big Little Truths to win Mystery & Thriller at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-BLT",
-   "rules_primary": "If Big Little Truths achieves first in Mystery & Thriller on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Big Little Truths"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-YWS",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "You With the Sad Eyes to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-YWS",
-   "rules_primary": "If You With the Sad Eyes achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "You With the Sad Eyes"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-TIM",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "This Is Me to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-TIM",
-   "rules_primary": "If This Is Me achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "This Is Me"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-STR",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Strangers to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-STR",
-   "rules_primary": "If Strangers achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Strangers"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-SS",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Swan Song to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-SS",
-   "rules_primary": "If Swan Song achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Swan Song"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-SM",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Simply More to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-SM",
-   "rules_primary": "If Simply More achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Simply More"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-SE",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "In the Shadow of Eight to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-SE",
-   "rules_primary": "If In the Shadow of Eight achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "In the Shadow of Eight"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-NSD",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Never Say Die to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-NSD",
-   "rules_primary": "If Never Say Die achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Never Say Die"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-HL",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "A Hymn to Life to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-HL",
-   "rules_primary": "If A Hymn to Life achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "A Hymn to Life"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-FAM",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Famesick to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-FAM",
-   "rules_primary": "If Famesick achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Famesick"
-  },
-  {
-   "ticker": "KXGOODREADS-26MEM-DBO",
-   "event_ticker": "KXGOODREADS-26MEM",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Dogs, Boys, and Other Things I\u2019ve Cried About to win Memoir at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-DBO",
-   "rules_primary": "If Dogs, Boys, and Other Things I\u2019ve Cried About achieves first in Memoir on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Dogs, Boys, and Other Things I\u2019ve Cried About"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-PQ",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The Pirate Queen to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-PQ",
-   "rules_primary": "If The Pirate Queen achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The Pirate Queen"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-LT",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Lady Tremaine to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-LT",
-   "rules_primary": "If Lady Tremaine achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Lady Tremaine"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-LAN",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Land to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-LAN",
-   "rules_primary": "If Land achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Land"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-KLC",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Keeper of Lost Children to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-KLC",
-   "rules_primary": "If Keeper of Lost Children achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Keeper of Lost Children"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-KIN",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Kin to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-KIN",
-   "rules_primary": "If Kin achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Kin"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-DIS",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The Disappearers to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-DIS",
-   "rules_primary": "If The Disappearers achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The Disappearers"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-CLE",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Cleopatra to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-CLE",
-   "rules_primary": "If Cleopatra achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Cleopatra"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-CC",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The Calamity Club to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-CC",
-   "rules_primary": "If The Calamity Club achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The Calamity Club"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-BDM",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Burn Down Master's House to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-BDM",
-   "rules_primary": "If Burn Down Master's House achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Burn Down Master's House"
-  },
-  {
-   "ticker": "KXGOODREADS-26HISTFIC-AH",
-   "event_ticker": "KXGOODREADS-26HISTFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "American Hagwon to win Historical Fiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26HISTFIC-AH",
-   "rules_primary": "If American Hagwon achieves first in Historical Fiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "American Hagwon"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-NM",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The New Menopause to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-NM",
-   "rules_primary": "If The New Menopause achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The New Menopause"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-MA",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Monsters in the Archives to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-MA",
-   "rules_primary": "If Monsters in the Archives achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Monsters in the Archives"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-LIP",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The Land and Its People to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-LIP",
-   "rules_primary": "If The Land and Its People achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The Land and Its People"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-LF",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "London Falling to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-LF",
-   "rules_primary": "If London Falling achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "London Falling"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-HBO",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "How to Be Okay When Nothing Is Okay to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-HBO",
-   "rules_primary": "If How to Be Okay When Nothing Is Okay achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "How to Be Okay When Nothing Is Okay"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-CWD",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Crossing the Wine-Dark Sea to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-CWD",
-   "rules_primary": "If Crossing the Wine-Dark Sea achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Crossing the Wine-Dark Sea"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-BW",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Biological War to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-BW",
-   "rules_primary": "If Biological War achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Biological War"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-BV",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "Birth Vibes to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-BV",
-   "rules_primary": "If Birth Vibes achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "Birth Vibes"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-BDW",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The Best Dog in the World to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-BDW",
-   "rules_primary": "If The Best Dog in the World achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The Best Dog in the World"
-  },
-  {
-   "ticker": "KXGOODREADS-26NONFIC-AWK",
-   "event_ticker": "KXGOODREADS-26NONFIC",
-   "series_ticker": "KXGOODREADS",
-   "series_ticker_from_api": null,
-   "title": "The American Way of Killing to win Nonfiction at the 2026 Goodreads Choice Awards?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Entertainment"
-   ],
-   "category_matched_by": "official",
-   "status": "active",
-   "result": null,
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2027-12-31T15:00:00Z",
-   "expected_expiration_time": "2026-12-03T15:00:00Z",
-   "settlement_ts": null,
-   "settlement_value_dollars": null,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26NONFIC-AWK",
-   "rules_primary": "If The American Way of Killing achieves first in Nonfiction on Goodreads Choice Awards for 2026, the market resolves to Yes.",
-   "rules_secondary": "Kalshi is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Goodreads. All trademarks, logos, and brand names are the property of their respective owners.",
-   "subtitle": "The American Way of Killing"
   },
   {
    "ticker": "KXISRHEALTHMIN-26OCT27-UMAK",
@@ -16669,6 +17500,38 @@
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE-26NOV2601-B65.875",
    "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' HYPEUSD_RTI before 1 AM EST is between $65.75-65.9999 at 1 AM EST on Nov 26, 2026, then the market resolves to Yes.",
+   "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices."
+  },
+  {
+   "ticker": "KXHYPE-26NOV2601-B65.625",
+   "event_ticker": "KXHYPE-26NOV2601",
+   "series_ticker": "KXHYPE",
+   "series_ticker_from_api": null,
+   "title": "HYPE price on Nov 26, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "active",
+   "result": null,
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "no_bid_dollars": 1.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-26T06:00:00Z",
+   "expected_expiration_time": "2026-11-26T06:05:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE-26NOV2601-B65.625",
+   "rules_primary": "If the simple average of the sixty seconds of CF Benchmarks' HYPEUSD_RTI before 1 AM EST is between $65.50-65.7499 at 1 AM EST on Nov 26, 2026, then the market resolves to Yes.",
    "rules_secondary": "Not all cryptocurrency price data is the same. While checking a source like Google or Coinbase may help guide your decision, the price used to determine this market is based on CF Benchmarks' corresponding Real Time Index (RTI). At the last minute before expiration, 60 RTI prices are collected. The official and final value is the average of these prices."
   },
   {
@@ -20847,6 +21710,246 @@
  ],
  "settled_markets": [
   {
+   "ticker": "KXETH15M-26NOV251600-00",
+   "event_ticker": "KXETH15M-26NOV251600",
+   "series_ticker": "KXETH15M",
+   "series_ticker_from_api": null,
+   "title": "ETH price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.98,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 5.0,
+   "volume_24h_fp": 5.0,
+   "open_interest_fp": 5.0,
+   "dollars_traded_estimate": 4.9,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276276Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETH15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXNEAR15M-26NOV251600-00",
+   "event_ticker": "KXNEAR15M-26NOV251600",
+   "series_ticker": "KXNEAR15M",
+   "series_ticker_from_api": null,
+   "title": "NEAR price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.992,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.99,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276204Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNEAR15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXHYPE15M-26NOV251600-00",
+   "event_ticker": "KXHYPE15M-26NOV251600",
+   "series_ticker": "KXHYPE15M",
+   "series_ticker_from_api": null,
+   "title": "HYPE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276156Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXHYPE15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXZEC15M-26NOV251600-00",
+   "event_ticker": "KXZEC15M-26NOV251600",
+   "series_ticker": "KXZEC15M",
+   "series_ticker_from_api": null,
+   "title": "ZEC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "dollars_traded_estimate": 0.0,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276129Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXDOGE15M-26NOV251600-00",
+   "event_ticker": "KXDOGE15M-26NOV251600",
+   "series_ticker": "KXDOGE15M",
+   "series_ticker_from_api": null,
+   "title": "DOGE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.992,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.99,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276123Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV251600-00",
+   "event_ticker": "KXBTC15M-26NOV251600",
+   "series_ticker": "KXBTC15M",
+   "series_ticker_from_api": null,
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.997,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1623.36,
+   "volume_24h_fp": 1623.36,
+   "open_interest_fp": 588.15,
+   "dollars_traded_estimate": 1618.49,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.276101Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXBNB15M-26NOV251600-00",
+   "event_ticker": "KXBNB15M-26NOV251600",
+   "series_ticker": "KXBNB15M",
+   "series_ticker_from_api": null,
+   "title": "BNB price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.992,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.99,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.275679Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB15M-26NOV251600-00"
+  },
+  {
+   "ticker": "KXSOL15M-26NOV251600-00",
+   "event_ticker": "KXSOL15M-26NOV251600",
+   "series_ticker": "KXSOL15M",
+   "series_ticker_from_api": null,
+   "title": "SOL price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "category_matched_by": "official",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.992,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "no_bid_dollars": 0.0,
+   "no_ask_dollars": 1.0,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 1.0,
+   "open_interest_fp": 1.0,
+   "dollars_traded_estimate": 0.99,
+   "close_time": "2026-11-25T21:00:00Z",
+   "expected_expiration_time": "2026-11-25T21:05:00Z",
+   "settlement_ts": "2026-11-25T21:00:02.275638Z",
+   "settlement_value_dollars": 1.0,
+   "notional_value_dollars": 1.0,
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSOL15M-26NOV251600-00"
+  },
+  {
    "ticker": "KXNEAR15M-26NOV251545-45",
    "event_ticker": "KXNEAR15M-26NOV251545",
    "series_ticker": "KXNEAR15M",
@@ -22105,246 +23208,6 @@
    "settlement_value_dollars": 0.0,
    "notional_value_dollars": 1.0,
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251430-XRP"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251430-SOL",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251430",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:15PM EST to 2:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:30:00Z",
-   "expected_expiration_time": "2026-11-25T19:35:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481294Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251430-SOL"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251430-HYPE",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251430",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:15PM EST to 2:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:30:00Z",
-   "expected_expiration_time": "2026-11-25T19:35:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481294Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251430-HYPE"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251430-ETH",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251430",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:15PM EST to 2:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:30:00Z",
-   "expected_expiration_time": "2026-11-25T19:35:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481294Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251430-ETH"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251430-BTC",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251430",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:15PM EST to 2:30PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:30:00Z",
-   "expected_expiration_time": "2026-11-25T19:35:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481294Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251430-BTC"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251445-XRP",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251445",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:30PM EST to 2:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "yes",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:45:00Z",
-   "expected_expiration_time": "2026-11-25T19:50:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481256Z",
-   "settlement_value_dollars": 1.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251445-XRP"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251445-SOL",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251445",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:30PM EST to 2:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:45:00Z",
-   "expected_expiration_time": "2026-11-25T19:50:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481256Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251445-SOL"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251445-HYPE",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251445",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:30PM EST to 2:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:45:00Z",
-   "expected_expiration_time": "2026-11-25T19:50:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481256Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251445-HYPE"
-  },
-  {
-   "ticker": "KXCRYPTOLEAD15M-26NOV251445-ETH",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV251445",
-   "series_ticker": "KXCRYPTOLEAD15M",
-   "series_ticker_from_api": null,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 25 - 2:30PM EST to 2:45PM EST?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "series_categories": [
-    "Crypto"
-   ],
-   "category_matched_by": "official",
-   "status": "finalized",
-   "result": "no",
-   "last_price_dollars": 0.0,
-   "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.0,
-   "no_bid_dollars": 1.0,
-   "no_ask_dollars": 1.0,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "dollars_traded_estimate": 0.0,
-   "close_time": "2026-11-25T19:45:00Z",
-   "expected_expiration_time": "2026-11-25T19:50:00Z",
-   "settlement_ts": "2026-11-25T20:02:17.481256Z",
-   "settlement_value_dollars": 0.0,
-   "notional_value_dollars": 1.0,
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV251445-ETH"
   },
   {
    "ticker": "KXPGATOUR-THRC26-BHAA",
@@ -26861,7 +27724,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:03Z"
+    "fetched_at": "2026-11-25T21:09:04Z"
    }
   },
   {
@@ -26889,7 +27752,7 @@
     "contracts_at_best_yes_bid": 5.0,
     "visible_contracts_total": 60.5,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:04Z"
+    "fetched_at": "2026-11-25T21:09:05Z"
    }
   },
   {
@@ -26905,7 +27768,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:04Z"
+    "fetched_at": "2026-11-25T21:09:05Z"
    }
   },
   {
@@ -26965,7 +27828,7 @@
     "contracts_at_best_yes_bid": 1120.71,
     "visible_contracts_total": 11518.68,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B62500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:04Z"
+    "fetched_at": "2026-11-25T21:09:05Z"
    }
   },
   {
@@ -26981,7 +27844,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:04Z"
+    "fetched_at": "2026-11-25T21:09:05Z"
    }
   },
   {
@@ -26997,7 +27860,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:05Z"
+    "fetched_at": "2026-11-25T21:09:06Z"
    }
   },
   {
@@ -27049,7 +27912,7 @@
     "contracts_at_best_yes_bid": 7272.6,
     "visible_contracts_total": 76896.58,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:05Z"
+    "fetched_at": "2026-11-25T21:09:06Z"
    }
   },
   {
@@ -27073,7 +27936,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 70.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.70/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:05Z"
+    "fetched_at": "2026-11-25T21:09:06Z"
    }
   },
   {
@@ -27083,7 +27946,7 @@
     "yes_bids": [
      {
       "price": 0.001,
-      "contracts": 60.0
+      "contracts": 40.0
      },
      {
       "price": 0.15,
@@ -27123,9 +27986,9 @@
     "best_yes_ask_derived": 0.18,
     "contracts_at_best_yes_ask": 1851.84,
     "contracts_at_best_yes_bid": 1960.78,
-    "visible_contracts_total": 11599.2,
+    "visible_contracts_total": 11579.2,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SSCH/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:05Z"
+    "fetched_at": "2026-11-25T21:09:06Z"
    }
   },
   {
@@ -27136,6 +27999,10 @@
      {
       "price": 0.01,
       "contracts": 60.0
+     },
+     {
+      "price": 0.28,
+      "contracts": 5.0
      },
      {
       "price": 0.48,
@@ -27195,9 +28062,9 @@
     "best_yes_ask_derived": 0.57,
     "contracts_at_best_yes_ask": 290.69,
     "contracts_at_best_yes_bid": 239.13,
-    "visible_contracts_total": 3034.99,
+    "visible_contracts_total": 3039.99,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:06Z"
+    "fetched_at": "2026-11-25T21:09:07Z"
    }
   },
   {
@@ -27211,45 +28078,45 @@
      },
      {
       "price": 0.003,
-      "contracts": 111111.1
+      "contracts": 55555.55
      },
      {
       "price": 0.004,
-      "contracts": 83333.32
+      "contracts": 41666.66
      },
      {
       "price": 0.005,
-      "contracts": 66666.66
+      "contracts": 33333.33
      }
     ],
     "no_bids": [
      {
       "price": 0.992,
-      "contracts": 41666.66
+      "contracts": 20833.33
      },
      {
       "price": 0.993,
-      "contracts": 47619.04
+      "contracts": 23809.52
      },
      {
       "price": 0.994,
-      "contracts": 55555.54
+      "contracts": 27777.77
      }
     ],
     "best_yes_bid": {
      "price": 0.005,
-     "contracts": 66666.66
+     "contracts": 33333.33
     },
     "best_no_bid": {
      "price": 0.994,
-     "contracts": 55555.54
+     "contracts": 27777.77
     },
     "best_yes_ask_derived": 0.006,
-    "contracts_at_best_yes_ask": 55555.54,
-    "contracts_at_best_yes_bid": 66666.66,
-    "visible_contracts_total": 406032.32,
+    "contracts_at_best_yes_ask": 27777.77,
+    "contracts_at_best_yes_bid": 33333.33,
+    "visible_contracts_total": 203056.16,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:06Z"
+    "fetched_at": "2026-11-25T21:09:07Z"
    }
   },
   {
@@ -27259,7 +28126,7 @@
     "yes_bids": [
      {
       "price": 0.001,
-      "contracts": 166766.66
+      "contracts": 166786.66
      },
      {
       "price": 0.002,
@@ -27295,9 +28162,9 @@
     "best_yes_ask_derived": 0.006,
     "contracts_at_best_yes_ask": 27777.77,
     "contracts_at_best_yes_bid": 55555.55,
-    "visible_contracts_total": 378076.16,
+    "visible_contracts_total": 378096.16,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ASMA/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:06Z"
+    "fetched_at": "2026-11-25T21:09:07Z"
    }
   },
   {
@@ -27313,11 +28180,11 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:06Z"
+    "fetched_at": "2026-11-25T21:09:07Z"
    }
   },
   {
-   "ticker": "KXGOODREADS-26DEBUT-YES",
+   "ticker": "KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE",
    "category_id": "culture",
    "orderbook": {
     "yes_bids": [],
@@ -27328,12 +28195,12 @@
     "contracts_at_best_yes_ask": null,
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26DEBUT-YES/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:07Z"
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBILLBOARDRUNNERUPALBUM-26DEC05-EVE/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:08Z"
    }
   },
   {
-   "ticker": "KXGOODREADS-26DEBUT-TSM",
+   "ticker": "KXTOPALBUM-26DEC05-EVE",
    "category_id": "culture",
    "orderbook": {
     "yes_bids": [],
@@ -27344,12 +28211,44 @@
     "contracts_at_best_yes_ask": null,
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26DEBUT-TSM/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:07Z"
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTOPALBUM-26DEC05-EVE/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:08Z"
    }
   },
   {
-   "ticker": "KXGOODREADS-26DEBUT-PE",
+   "ticker": "KXVANHOLLENBACKERS-27JAN03-RCOO",
+   "category_id": "elections",
+   "orderbook": {
+    "yes_bids": [],
+    "no_bids": [],
+    "best_yes_bid": null,
+    "best_no_bid": null,
+    "best_yes_ask_derived": null,
+    "contracts_at_best_yes_ask": null,
+    "contracts_at_best_yes_bid": null,
+    "visible_contracts_total": 0,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-RCOO/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:08Z"
+   }
+  },
+  {
+   "ticker": "KXVANHOLLENBACKERS-27JAN03-EMAR",
+   "category_id": "elections",
+   "orderbook": {
+    "yes_bids": [],
+    "no_bids": [],
+    "best_yes_bid": null,
+    "best_no_bid": null,
+    "best_yes_ask_derived": null,
+    "contracts_at_best_yes_ask": null,
+    "contracts_at_best_yes_bid": null,
+    "visible_contracts_total": 0,
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVANHOLLENBACKERS-27JAN03-EMAR/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:08Z"
+   }
+  },
+  {
+   "ticker": "KXEUROVISION-27-UNI",
    "category_id": "culture",
    "orderbook": {
     "yes_bids": [],
@@ -27360,12 +28259,12 @@
     "contracts_at_best_yes_ask": null,
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26DEBUT-PE/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:07Z"
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-UNI/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:09Z"
    }
   },
   {
-   "ticker": "KXGOODREADS-26DEBUT-PBG",
+   "ticker": "KXEUROVISION-27-UKR",
    "category_id": "culture",
    "orderbook": {
     "yes_bids": [],
@@ -27376,8 +28275,8 @@
     "contracts_at_best_yes_ask": null,
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
-    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26DEBUT-PBG/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:07Z"
+    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXEUROVISION-27-UKR/orderbook?depth=10",
+    "fetched_at": "2026-11-25T21:09:09Z"
    }
   },
   {
@@ -27393,7 +28292,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXISRHEALTHMIN-26OCT27-UMAK/orderbook?depth=10",
-    "fetched_at": "2026-11-25T20:54:08Z"
+    "fetched_at": "2026-11-25T21:09:09Z"
    }
   }
  ],
