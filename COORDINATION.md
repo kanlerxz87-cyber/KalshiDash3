@@ -20,7 +20,7 @@ board rules above; all pushes go only to that branch.
 | T100 | Real defect: the chat dock's model chat is a filter over the newest 80 events, so 58 of the 96 frozen `high_roi` rows show | done (F-95) | arena-0b0ca3c1 | `assets/chatdock.js` | `scripts/tests/test_chatdock.js` |
 | T101 | Real defect: the live page's all-events chat builds alerts from every price-history series (Demo/Test instruments such as `KXDEMOFUTHOURLY-*` appear with no topic); the feed is also ordered by insertion, not time; `KXBALLONDOR` filed under Culture against the exchange record | done (F-96) | arena-0b0ca3c1 | `assets/live.js`, `live.html` (feed order only) | `scripts/tests/test_pages_dom.js` section B |
 | T102 | Test assertions tied to today's snapshot rather than to the data: the Culture row (no open rows in the published window), the "untraded" label (no untraded topic exists in this snapshot), the row-regex; Culture wording overstated a truncated scan | done (F-94) | arena-0b0ca3c1 | `scripts/tests/test_pages_dom.js`, `index.html` (Culture wording only) | `scripts/tests/test_pages_dom.js` |
-| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | in progress (see close-out) | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
+| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | done (see release record) | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
 
 
 ### Close-out (`arena-0b0ca3c1`) — what was checked, what changed, what was flagged
@@ -69,6 +69,17 @@ push; its half-resolved commit was never pushed.) Resolutions, neither side disc
 | `data/live/*` | taken from `origin/main` (the 12:36Z collector pass); this branch does not change them |
 
 Gate after the merge: `verify_release.py` PASS (215+ checks), `test_scope.py` PASS.
+### Release record — `arena-0b0ca3c1` (T103)
+
+| Item | Result |
+|---|---|
+| Pull request | **[PR #119](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/119)** "Restore the Pages release gate on main (T99–T102)" — head `e5a2869`, `MERGEABLE`; PR-level Pages run `45616647027` **build success** (`verify_release.py` on the PR), deploy skipped on PRs by design |
+| Merge | **merged 2026-11-25T12:45:53Z** with a merge commit, `gh pr merge 119 --merge` (no approval wait, no `--auto`) → `3a1f19a` |
+| Pages deploy of the merge | push run **`45616906765` build success, deploy success** on `3a1f19a` |
+| Live check (cache-busted `?v=3a1f19a`) | `live.html` shows the new withheld-count line (\"35 swing(s) withheld: no confirmed topic or Test/Demo instrument\"); `index.html` shows Culture as \"none in the published rows\" with the truncated-scan note (F-94) |
+| Gate on the merged tree (local) | `python3 scripts/verify_release.py` PASS; `python3 scripts/tests/test_scope.py` PASS |
+| Concurrent merges | other sessions merged to `main` while this PR was open (#115, #116, #117, #118, #122, #123, #124, #125). The conflicts are recorded in the merge record above; nothing from them was dropped |
+| Not done in this session, on purpose | the open-market scan still stops at its 25,000-row safety cap (`open_rows_trimmed_for_size` 21,264 in the 12:46Z snapshot); widening it is a collector change and needs a measured run, not a guess. Open PR #98 (another session, 2026-11-22) untouched |
 
 ## Session `arena-1aaa3a61` — current-snapshot release-gate repair
 
