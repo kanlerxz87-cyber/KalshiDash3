@@ -6,6 +6,17 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+
+## Session `arena-1aaa3a61` — current-snapshot release-gate repair
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| CSG-1 | Reconcile DOM regression assertions with the live committed snapshot and the chat's 80-row visible window; preserve checks for the real UI contract rather than historical totals. | in progress | arena-1aaa3a61 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; committed `data/live/markets.json` and `data/live/alerts_archive.json` fixtures |
+
+- 2026-11-25: Read the coordination board and ran the release gate on base `68827bd`. First run blocked because the workspace lacked `jsdom`; installed the test-only dependency with `npm install --no-save --package-lock=false jsdom@26`. Baseline exposed assertions that encode an older data snapshot rather than current requirements: the chat asserts the archive-wide model count against rows actually rendered from the 80-most-recent all-events window; the index DOM test unconditionally requires an untraded-topic disclosure although the current snapshot has trades in every topic. Additional errors are being investigated before changing tests. No market data, verified facts, or production UI logic will be changed under this scope.
+
+---
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
