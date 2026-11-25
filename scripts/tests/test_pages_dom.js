@@ -575,6 +575,7 @@ function commonAsserts(label, r) {
       check(!/Untraded topics in this snapshot/.test(flat),
         "the page must not claim an untraded topic when current rows all have volume (F-83)");
     }
+    }
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }
