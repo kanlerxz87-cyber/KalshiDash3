@@ -228,12 +228,15 @@ function msgHtml(a) {
 const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u.slice(0, 30); } };
 
 function renderChats() {
-  const all = S.alerts.slice(0, 60);
+  // Newest first by the alert's own time (T101). Insertion order put snapshot-history swings in
+  // front of a live tick that was newer, so the newest alerts could fall outside the 60-row window.
+  const tOf = (a) => Date.parse(a.t || a.to_time || "") || 0;
+  const all = S.alerts.slice().sort((a, b) => tOf(b) - tOf(a)).slice(0, 60);
   KD.$("#feedAll").innerHTML = all.length
     ? all.map(msgHtml).join("")
     : `<div class="none">No swing of ±${((eng.S.model?.swing_alert?.threshold_dollars || 0.1) * 100).toFixed(0)}¢ in this session or in the retained collector history. The feeds fill in as prices move; nothing is back-filled by guessing.</div>`;
   KD.$("#allCount").textContent = all.length + " shown";
-  KD.$("#allSub").textContent = `every market in the five topics · ${eng.S.markets.size} markets tracked · threshold ±${((eng.S.model?.swing_alert?.threshold_dollars || 0.1) * 100).toFixed(0)}¢`;
+  KD.$("#allSub").textContent = `every market in the five topics · ${eng.S.markets.size} markets tracked · threshold ±${((eng.S.model?.swing_alert?.threshold_dollars || 0.1) * 100).toFixed(0)}¢` + (eng.S.withheld ? ` · ${eng.S.withheld} swing(s) withheld: no confirmed topic or Test/Demo instrument` : "");
 
   const livePicks = eng.S.picks || [];
   const ciPicks = (!livePicks.length && S.ci?.picks?.length) ? S.ci.picks.map(p => ({ ...p, at: S.ci.collected_at, ci: true })) : [];

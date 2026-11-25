@@ -217,6 +217,19 @@ function commonAsserts(label, r) {
     const roiNone = r.doc.querySelectorAll("#feedRoi .none").length;
     check(roiMsgs >= 1 || roiNone >= 1, "the ROI feed must show the qualifying market or its explanation");
 
+    // T102: a particular settlement URL is not guaranteed to be in every market poll response,
+    // so test literal extraction from official rules text directly, then ensure every rendered
+    // swing reports either that market-record reference or the explicit no-source state.
+    const ruleLinks = r.dom.window.KDLIVE.catalystLinks({
+      rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
+    });
+    check(ruleLinks.length === 1 && ruleLinks[0].url === "https://gasprices.aaa.com/national-average",
+      "the live catalyst extractor copies the literal URL from market rules text");
+    const causeStates = [...r.doc.querySelectorAll("#feedAll .cause")];
+    check(causeStates.length >= msgs && causeStates.every(el =>
+      /source this market settles on|no source URL in the market's own record/.test(el.textContent)),
+      "each rendered alert labels a literal settlement reference or says the record has no source URL");
+
     // Exercise the real page engine and renderer deterministically instead of waiting for the
     // six-second polling timer. The stub's next poll returns 61¢; seed the engine with a 48¢
     // observation and a market record whose rules_primary contains the catalyst URL.
@@ -469,8 +482,10 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/i.test(t)),
-      "index.html: every category row must name a real ticker or say none is open in scope");
+    // T102 (F-94): a topic with no published row says so: "none in the published rows". Main's earlier
+    // wording "none open in scope" is still accepted; both are the honest form of "no row here".
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none in the published rows|none open in scope/i.test(t)),
+      "index.html: every category row must name a real ticker or say none is in the published rows");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
       check(/demo QA fixtures in the snapshot/.test(r.text),
@@ -659,6 +674,11 @@ function commonAsserts(label, r) {
       check(!/Untraded topics in this snapshot/.test(flat),
         "the page must not claim an untraded topic when current rows all have volume (F-83)");
     }
+    // T102: the row badge and the footnote must agree in BOTH directions with the rendered rows.
+    const untradedBadges = r.doc.querySelectorAll("#today .badge.warn").length;
+    const untradedNote = /Untraded topics in this snapshot/.test(flat);
+    check((untradedBadges > 0) === untradedNote,
+      `an untraded row and the 'Untraded topics' footnote must agree (rows ${untradedBadges}, footnote ${untradedNote})`);
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }

@@ -346,6 +346,21 @@ const KDLIVE = (() => {
 
     function addAlert(ticker, prev, obs) {
       const m = S.markets.get(ticker) || {};
+      // Scope (T101): the all-events chat covers the five topics only. A swing whose market has no
+      // confirmed topic here (a Test/Demo instrument, or a closed market absent from the open
+      // snapshot) is withheld and counted, never shown under no topic. Price history for such
+      // tickers is kept; only this chat excludes them.
+      // The first alert of a market can arrive before the scorer has classified it, so classify
+      // here with the same rule the scorer uses (line ~557) instead of withholding it.
+      if (!m.category_id) {
+        m.category_id = classifyTicker(ticker, m);
+        m.category_basis = m.category_basis || (SEED_SERIES.has(String(ticker).split("-")[0].toUpperCase()) ? "seed" : "keyword");
+      }
+      const seriesCats = (m.series_categories || []).map(String);
+      if (!m.category_id || seriesCats.includes("Test") || seriesCats.includes("Demo")) {
+        S.withheld = (S.withheld || 0) + 1;
+        return;
+      }
       const delta = obs.last - prev.last;
       const a = {
         id: `${ticker}|${prev.last.toFixed(4)}|${obs.last.toFixed(4)}|${obs.t}`,
@@ -579,7 +594,11 @@ const KDLIVE = (() => {
       // Word-boundary matching, not substring: a substring test once put "yes Vegas,yes Tie"
       // into Gas Prices because "vegas" contains "gas". Same rule as scripts/collect.py.
       const st = String(ticker).split("-")[0].toUpperCase();
-      const bySeed = { KXAAAGASM: "gas", KXELECTIRAN: "elections", KXBTCMAX150: "crypto", KXBTCY: "crypto", KXETHY: "crypto", KXPGATOUR: "golf", KXPGARYDER: "golf", KXPGASOLHEIM: "golf", KXBALLONDOR: "culture" }[st];
+      // T101: the exchange's own series record files Ballon d'Or under Sports (categories ["Sports"],
+      // tags ["Soccer"]; GET /series/KXBALLONDOR, 2026-11-25). scripts/collect.py refuses it for that
+      // reason, so the live page must not file it under Culture by keyword ("ballon").
+      if (st === "KXBALLONDOR") return null;
+      const bySeed = { KXAAAGASM: "gas", KXELECTIRAN: "elections", KXBTCMAX150: "crypto", KXBTCY: "crypto", KXETHY: "crypto", KXPGATOUR: "golf", KXPGARYDER: "golf", KXPGASOLHEIM: "golf" }[st];
       if (bySeed) return bySeed;
       const hay = `${m.title || ""} ${m.yes_sub_title || ""} ${m.subtitle || ""}`.toLowerCase();
       for (const [id, kws] of Object.entries(KW)) {
