@@ -2,8 +2,8 @@
  "schema": 1,
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T19:22:23Z",
- "started_at": "2026-11-25T19:21:22Z",
+ "collected_at": "2026-11-25T19:24:11Z",
+ "started_at": "2026-11-25T19:22:42Z",
  "sources": {
   "environments": "https://docs.kalshi.com/getting_started/api_environments",
   "markets": "https://docs.kalshi.com/api-reference/market/get-markets",
@@ -4463,8 +4463,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 0.97,
-   "no_bid_dollars": 0.03,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 72464810.0,
    "volume_24h_fp": 32880.46,
@@ -4527,8 +4527,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 69904345.43,
    "volume_24h_fp": 59575.34,
@@ -4623,8 +4623,8 @@
    "result": null,
    "last_price_dollars": 0.03,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 46887280.85,
    "volume_24h_fp": 62569.26,
@@ -4943,8 +4943,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 81977960.11,
    "volume_24h_fp": 32179.41,
@@ -5103,8 +5103,8 @@
    "result": null,
    "last_price_dollars": 0.01,
    "yes_bid_dollars": 0.0,
-   "yes_ask_dollars": 1.0,
-   "no_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.01,
+   "no_bid_dollars": 0.99,
    "no_ask_dollars": 1.0,
    "volume_fp": 65583211.48,
    "volume_24h_fp": 265.28,
@@ -6022,8 +6022,8 @@
    "result": null,
    "last_price_dollars": 0.003,
    "yes_bid_dollars": 0.002,
-   "yes_ask_dollars": 0.003,
-   "no_bid_dollars": 0.997,
+   "yes_ask_dollars": 0.004,
+   "no_bid_dollars": 0.996,
    "no_ask_dollars": 0.998,
    "volume_fp": 389436.9,
    "volume_24h_fp": 222222.2,
@@ -26392,7 +26392,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:20Z"
+    "fetched_at": "2026-11-25T19:24:06Z"
    }
   },
   {
@@ -26420,7 +26420,7 @@
     "contracts_at_best_yes_bid": 5.0,
     "visible_contracts_total": 60.5,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:20Z"
+    "fetched_at": "2026-11-25T19:24:07Z"
    }
   },
   {
@@ -26436,7 +26436,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-B3875/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:20Z"
+    "fetched_at": "2026-11-25T19:24:07Z"
    }
   },
   {
@@ -26446,7 +26446,7 @@
     "yes_bids": [
      {
       "price": 0.01,
-      "contracts": 100.0
+      "contracts": 80.0
      },
      {
       "price": 0.02,
@@ -26494,9 +26494,9 @@
     "best_yes_ask_derived": 0.23,
     "contracts_at_best_yes_ask": 1303.71,
     "contracts_at_best_yes_bid": 1120.71,
-    "visible_contracts_total": 11538.68,
+    "visible_contracts_total": 11518.68,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B62500/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:21Z"
+    "fetched_at": "2026-11-25T19:24:07Z"
    }
   },
   {
@@ -26512,7 +26512,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:21Z"
+    "fetched_at": "2026-11-25T19:24:07Z"
    }
   },
   {
@@ -26528,7 +26528,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:21Z"
+    "fetched_at": "2026-11-25T19:24:08Z"
    }
   },
   {
@@ -26580,7 +26580,7 @@
     "contracts_at_best_yes_bid": 7272.6,
     "visible_contracts_total": 76896.58,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:21Z"
+    "fetched_at": "2026-11-25T19:24:08Z"
    }
   },
   {
@@ -26604,7 +26604,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 70.0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.70/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:21Z"
+    "fetched_at": "2026-11-25T19:24:08Z"
    }
   },
   {
@@ -26656,7 +26656,7 @@
     "contracts_at_best_yes_bid": 1960.78,
     "visible_contracts_total": 11579.2,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-SSCH/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:22Z"
+    "fetched_at": "2026-11-25T19:24:08Z"
    }
   },
   {
@@ -26728,7 +26728,7 @@
     "contracts_at_best_yes_bid": 239.13,
     "visible_contracts_total": 3034.99,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.50/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:22Z"
+    "fetched_at": "2026-11-25T19:24:09Z"
    }
   },
   {
@@ -26780,7 +26780,7 @@
     "contracts_at_best_yes_bid": 66666.66,
     "visible_contracts_total": 406012.32,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:22Z"
+    "fetched_at": "2026-11-25T19:24:09Z"
    }
   },
   {
@@ -26828,7 +26828,7 @@
     "contracts_at_best_yes_bid": 55555.55,
     "visible_contracts_total": 378076.16,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-ASMA/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:22Z"
+    "fetched_at": "2026-11-25T19:24:09Z"
    }
   },
   {
@@ -26844,7 +26844,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:22Z"
+    "fetched_at": "2026-11-25T19:24:09Z"
    }
   },
   {
@@ -26860,7 +26860,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-WIT/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:23Z"
+    "fetched_at": "2026-11-25T19:24:10Z"
    }
   },
   {
@@ -26876,7 +26876,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-UNK/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:23Z"
+    "fetched_at": "2026-11-25T19:24:10Z"
    }
   },
   {
@@ -26892,7 +26892,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-TSM/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:23Z"
+    "fetched_at": "2026-11-25T19:24:10Z"
    }
   },
   {
@@ -26908,7 +26908,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MYST-MM/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:23Z"
+    "fetched_at": "2026-11-25T19:24:10Z"
    }
   },
   {
@@ -26924,7 +26924,7 @@
     "contracts_at_best_yes_bid": null,
     "visible_contracts_total": 0,
     "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXISRHEALTHMIN-26OCT27-UMAK/orderbook?depth=10",
-    "fetched_at": "2026-11-25T19:22:23Z"
+    "fetched_at": "2026-11-25T19:24:11Z"
    }
   }
  ],
