@@ -385,7 +385,7 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t)),
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/.test(t)),
       "index.html: every category row must name a real ticker or say none is open");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
@@ -556,9 +556,19 @@ function commonAsserts(label, r) {
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
     // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
-    check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
-    check(/Untraded topics in this snapshot/.test(flat),
-      "the page must name the untraded topics below the table (F-83)");
+    // Only applicable when a topic has open rows but none have traded. Computed from the
+    // committed snapshot so the test cannot pass on hand-written copy.
+    const openRowsH = (markets.open_markets || []);
+    const catsH = [...new Set(openRowsH.map(x => x.category_id))];
+    const noVolH = catsH.filter(c => {
+      const mine = openRowsH.filter(x => x.category_id === c);
+      return mine.length > 0 && mine.every(x => !((x.volume_fp || 0) > 0));
+    });
+    if (noVolH.length) {
+      check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+      check(/Untraded topics in this snapshot/.test(flat),
+        "the page must name the untraded topics below the table (F-83)");
+    }
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
   }
