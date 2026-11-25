@@ -11,6 +11,104 @@
     "Crypto"
    ],
    "status": "active",
+   "from_time": "2026-11-25T14:07:20Z",
+   "to_time": "2026-11-25T14:22:20Z",
+   "from_price": 0.99,
+   "to_price": 0.01,
+   "delta": -0.98,
+   "direction": "down",
+   "volume_24h_fp": 1029694.8,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T14:22:20Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 88.97,
+    "est_dollars": 0.89,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 59515587.58,
+    "volume_to": 59515676.55,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "88.97 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T14:22:20Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B97500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-25T14:07:20Z",
+   "to_time": "2026-11-25T14:22:20Z",
+   "from_price": 0.97,
+   "to_price": 0.01,
+   "delta": -0.96,
+   "direction": "down",
+   "volume_24h_fp": 33673.23,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.01,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-25T14:22:20Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 77.85,
+    "est_dollars": 0.78,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 72433709.38,
+    "volume_to": 72433787.23,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "77.85 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-25T14:22:20Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
    "from_time": "2026-11-25T13:46:45Z",
    "to_time": "2026-11-25T13:52:21Z",
    "from_price": 0.01,
@@ -44,9 +142,9 @@
     "decided_at": "2026-11-25T13:52:22Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
-    "min_distance_from_from_price": 0.98,
-    "gave_back_half": false,
+    "observed_after": 2,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -93,9 +191,9 @@
     "decided_at": "2026-11-25T13:46:45Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
-    "min_distance_from_from_price": 0.96,
-    "gave_back_half": false,
+    "observed_after": 3,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -3475,8 +3573,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.84,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.07,
+    "gave_back_half": true,
     "still_open": false
    }
   },
