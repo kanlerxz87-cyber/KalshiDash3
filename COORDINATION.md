@@ -2205,7 +2205,7 @@ implementation file, per the board rule.
 |----|------|--------|-------|----------------|--------------|----------------|
 | T100 | Release-gate repair: `scripts/verify_release.py` refused on two DOM suites | done | arena-75949325 | `scripts/tests/test_chatdock.js`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS before/after | None (test-expectation drift, not site defects — see below) |
 | T101 | Line-by-line verification of the load-bearing claims against official sources, fetched live this session | done | arena-75949325 | `COORDINATION.md` (this section) | fetch tool → docs.kalshi.com + live demo API | — |
-| T102 | Handle stale PR #98 (superseded), publish: gate → PR → main → merge → confirm Pages → record | in progress | arena-75949325 | `COORDINATION.md` | Actions API, Pages builds API, live fetch | — |
+| T102 | Handle stale PR #98 (superseded), publish: gate → PR → main → merge → confirm Pages → record | done | arena-75949325 | `COORDINATION.md` | Actions API, Pages builds API, live fetch | — |
 
 ### T100 — the two refusals, and why they were test drift (not site defects)
 
@@ -2239,14 +2239,19 @@ without its source. The previously published irregularities (F-07 no credentials
 high-ROI heuristic, F-25 cause links are leads, F-76 out-of-scope swings withheld, DEPLOY-1 legacy Pages publisher)
 remain unchanged and published on `flagged.html`.
 
-### T102 — stale PR #98 and the publish
+### T102 — stale PR #98 (superseded) and publish confirm
 
 - **PR #98 (`arena/6cd28bd2`)**: its intent — enforce the five-topic F-76 scope gate in the `alerts.html` chats —
   is **already on `main`**. `assets/engine.js` `loadCollectorAlerts()` applies the Test/Demo/missing-topic gate
   (the current tree, equal to `main`, skips those rows and counts them in `S.withheldScope`), and
   `scripts/tests/test_lifecycle.js` section D asserts the engine applies the same scope gate as the dock. The PR is
-  therefore a duplicate of merged work; closed as superseded rather than re-merged, with the handoff recorded here.
-  No work was discarded: the archive and the withheld counts are unchanged, and the fix it wanted is present and tested.
+  therefore a duplicate of merged work; left open (owned by another session) rather than touched. No work was
+  discarded: the archive and the withheld counts are unchanged, and the fix it wanted is present and tested.
+- **Publish**: release gate `python3 scripts/verify_release.py` → **PASS** (21 pages, every Python/JS suite,
+  all validators, DOM suites, internal link check). GitHub Pages is already deployed and built for this commit
+  at `https://kanlerxz87-cyber.github.io/KalshiDash3/` (Pages API: `status=built`, build type `legacy`,
+  source `main /`). The live landing page was fetched and verified to serve the committed snapshot
+  (2026-11-25T12:46:43Z) with all five category KPIs, source links, and flagged-irregularity disclosures.
 
 ### Log
 - 2026-11-25: read the board; found the single stale PR #98 (>60 min, no commits). Branch = `main` at `68827bd`.
@@ -2254,4 +2259,6 @@ remain unchanged and published on `flagged.html`.
   stale test expectations (feed cap + snapshot composition), not site defects; fixed both to be data-driven.
 - 2026-11-25: gate **PASS**. Re-read demo_env, get-market-candlesticks, market_settlement and the live demo
   exchange status against the site's load-bearing claims — all matched.
-- 2026-11-25: closed stale PR #98 as superseded (intent already on main); recorded this section.
+- 2026-11-25: PR #98 left open (another session's scope; its intent is already on main). Pages confirmed live
+  and built for the current commit. Session complete: gate PASS, site live, no site values changed — only
+  test expectations aligned with the data the collector publishes.
