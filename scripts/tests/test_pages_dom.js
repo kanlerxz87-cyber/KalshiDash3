@@ -385,8 +385,8 @@ function commonAsserts(label, r) {
     check(/Dollars traded \(est\.\)/.test(r.text),
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
-    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/.test(t)),
-      "index.html: every category row must name a real ticker or say none is open");
+    check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/i.test(t)),
+      "index.html: every category row must name a real ticker or say none is open in scope");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
       check(/demo QA fixtures in the snapshot/.test(r.text),
@@ -555,18 +555,26 @@ function commonAsserts(label, r) {
       check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
-    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked.
-    // Only assert when the snapshot actually has untraded topics; this snapshot has none.
-    const openRowsH = (markets.open_markets || []);
-    const catsH = [...new Set(openRowsH.map(x => x.category_id))];
-    const noVolH = catsH.filter(c => {
-      const mine = openRowsH.filter(x => x.category_id === c);
-      return mine.length > 0 && mine.every(x => !((x.volume_fp || 0) > 0));
+    // F-83: require the untraded disclosure only when current snapshot data actually
+    // contains a topic with open rows and zero reported volume; the collector snapshot changes.
+    const openRows = markets.open_markets || [];
+    const categories = [...new Set(openRows.map(x => x.category_id).filter(Boolean))];
+    const untradedTopics = categories.filter(category => {
+      const rows = openRows.filter(x => x.category_id === category);
+      return rows.length > 0 && rows.every(x => !(Number(x.volume_fp) > 0));
     });
-    if (noVolH.length) {
+    if (untradedTopics.length) {
       check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
       check(/Untraded topics in this snapshot/.test(flat),
         "the page must name the untraded topics below the table (F-83)");
+      for (const category of untradedTopics) {
+        const label = ({gas: "Gas Prices", elections: "Elections", culture: "Culture", crypto: "Crypto", golf: "Golf"})[category] || category;
+        check(flat.includes(label), `the untraded disclosure must include the current topic (${label})`);
+      }
+    } else {
+      check(!/Untraded topics in this snapshot/.test(flat),
+        "the page must not claim an untraded topic when current rows all have volume (F-83)");
+    }
     }
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
