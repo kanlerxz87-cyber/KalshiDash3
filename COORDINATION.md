@@ -6,6 +6,26 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
+
+Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
+`main`, and every task row in the sections below is closed out. `origin/main` = `2f0bac1` ("data: live-desk scan
+2026-11-25T13:20Z"; snapshot `2026-11-25T13:16:43Z`). Baseline release gate on the base tree: **PASS**
+(`python3 scripts/verify_release.py` — 21 pages, every validator and DOM suite; `jsdom@26` installed with
+`npm install --no-save --package-lock=false jsdom@26`).
+
+This session does **not** rebuild the site. It re-verifies the published tree line by line against the official
+Kalshi demo API and the official documentation, repairs real defects it finds, and publishes. No other session
+holds an open scope, so the files below are free; if a concurrent session appears, this branch merges `origin/main`
+and keeps both sides.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T110 | Re-verify the published rows against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`), field by field, for every category's headline market, every published alert's ticker, and every resolved row shown in the resolution tracker | in progress | arena-a490dfa2 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route, confirmed `GET /exchange/status` → `trading_active: true`) |
+| T111 | Independent audit of what the pages **render** against the committed data (all 21 pages in jsdom): every published number, count and badge recomputed from the JSON, plus the internal/external link inventory | in progress | arena-a490dfa2 | `COORDINATION.md` (this section) | `scripts/tests/test_pages_dom.js`, `scripts/check_site.py` |
+| T112 | Repair any real defect found by T110/T111, with a regression test that fails before the fix | pending | arena-a490dfa2 | implementation files named in the log, plus `scripts/tests/*` | mutation-checked regression (fails on the old behaviour, passes on the new) |
+| T113 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | pending | arena-a490dfa2 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
 ## Session `arena-0b0ca3c1` — restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)
 
 Claimed 2026-11-25 before any edit. Checked first: `origin/main` = `68827bd` (snapshot 2026-11-25T12:16:44Z). The
