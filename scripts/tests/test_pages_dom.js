@@ -215,8 +215,18 @@ function commonAsserts(label, r) {
     const roiMsgs = r.doc.querySelectorAll("#feedRoi .msg").length;
     const roiNone = r.doc.querySelectorAll("#feedRoi .none").length;
     check(roiMsgs >= 1 || roiNone >= 1, "the ROI feed must show the qualifying market or its explanation");
-    const causes = r.doc.querySelectorAll('#feedAll a[href*="gasprices.aaa.com"]').length;
-    check(causes >= 1, "the catalyst link must be the URL copied out of the market's own rules text");
+    // A particular settlement URL is not guaranteed to be in every market poll response.
+    // Test literal extraction from official rules text directly, then ensure every rendered
+    // swing reports either that market-record reference or the explicit no-source state.
+    const ruleLinks = r.dom.window.KDLIVE.catalystLinks({
+      rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
+    });
+    check(ruleLinks.length === 1 && ruleLinks[0].url === "https://gasprices.aaa.com/national-average",
+      "the live catalyst extractor copies the literal URL from market rules text");
+    const causeStates = [...r.doc.querySelectorAll("#feedAll .cause")];
+    check(causeStates.length >= msgs && causeStates.every(el =>
+      /source this market settles on|no source URL in the market's own record/.test(el.textContent)),
+      "each rendered alert labels a literal settlement reference or says the record has no source URL");
     const recorded = r.doc.querySelectorAll('#feedAll a[href*="external-api.demo.kalshi.co"]').length;
     check(recorded >= 1, "every alert must link the official API record it came from");
     console.log(`  B live mode       ok  (${r.state.calls.length} API calls, ${msgs} chat messages, ${roiMsgs} ROI-feed messages, ${roiNone} explanation)`);
