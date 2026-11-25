@@ -6,6 +6,16 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+
+## Session `arena-748b2c0e` — current snapshot regression audit (2026-11-25)
+
+Branch `arena/748b2c0e-kalshidash3`, based on `68827bd8e8cf3056bc9f39603d4362a439908271`.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources | Irregularities |
+|----|------|--------|-------|----------------|------------------------|----------------|
+| N25-1 | Run the published-tree release gate and independently check the latest committed market/alert/simulation snapshot for provenance, limitations, and any current collector-health warning; record only reproducible results. Repair a discovered defect only within this session's uniquely scoped tests/coordination, not another claimed file. | in progress | arena-748b2c0e | `COORDINATION.md`; contingent narrow test file only if a specific test defect is reproducible | `scripts/verify_release.py`, `scripts/tests/validate_live.py`, `scripts/tests/validate_alerts.py`, `scripts/check_site.py`; official-source evidence already linked per row in `data/live/*.json` and `data/verified_facts.json` | Initial spot check: latest collector health record at 12:01Z reports a failed `validate_alerts` pass; latest alert snapshot is 12:16Z and independently passed `validate_alerts.py` at session start. Determine whether the record is historical or unresolved before close-out. |
+
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
