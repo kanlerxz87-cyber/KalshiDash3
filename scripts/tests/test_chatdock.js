@@ -99,6 +99,7 @@ function counts(w) {
   return {
     all: w.document.getElementById("kdChatAll").querySelectorAll(".cd-msg").length,
     model: w.document.getElementById("kdChatModel").querySelectorAll(".cd-msg").length,
+    modelTotal: w.document.getElementById("kdCountModel").textContent,
     tab: w.document.getElementById("kdTabCount").textContent,
   };
 }
@@ -125,18 +126,11 @@ function counts(w) {
   const c = counts(w);
   // F-76: a ≥$0.10 row is replayed only when it is in one of the five topics. Rows whose series
   // GET /series files under Test/Demo, or with no confirmed topic, are withheld and counted.
-  // `ingestible` mirrors assets/chatdock.js exactly: a row is pushed only when it has a ticker, a
-  // parseable to_time and numeric from/to prices (never invent a row), plus the >= $0.10 rule.
-  const ingestible = (a) => {
+  const inScope = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
-    const from = Number(a.from_price);
-    const toP = Number(a.to_price);
-    const to = Date.parse(a.to_time || "");
-    return Math.abs(toP - from) >= 0.10 - 1e-9
-      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
-      && !!a.ticker && !Number.isNaN(to) && !Number.isNaN(from) && !Number.isNaN(toP);
-  };
-  const inScope = archiveWithDecoy.alerts.filter(ingestible).length;
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).length;
   check(c.all > 0, `history replay rendered ${c.all} rows`);
   check(c.all === Math.min(inScope, 80), `row count equals the in-scope ≥$0.10 archive rows (${inScope})`);
   const text = panel.textContent;
@@ -153,19 +147,18 @@ function counts(w) {
   check(origins.length > 0 && origins.every((o) => o === "history"), "history rows are labelled 'history', not 'live'");
   check(c.model <= c.all, `model chat (${c.model}) is a subset of all events (${c.all})`);
   // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
-  // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
-  // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
-  const inScopeRows = archiveWithDecoy.alerts.filter(ingestible);
-  // The dock sorts its feed by to_time and keeps the 80 most recent rows (assets/chatdock.js push()),
-  // so the model chat shows the frozen high_roi rows among those kept rows, not the whole archive. The
-  // archive has grown past the cap, so the expectation is measured from the time-ordered capped set.
-  const frozen = inScopeRows.filter((a) => a.high_roi === true).length;
-  const expectedModel = inScopeRows
-    .slice()
-    .sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time))
-    .slice(-80)
-    .filter((a) => a.high_roi === true).length;
-  check(c.model === expectedModel, `model chat count equals high_roi rows in the capped feed (${expectedModel} of ${frozen} frozen, cap 80)`);
+  // rule of its own. The feed stores/renders only the 80 newest in-scope events, while the badge
+  // reports the full model total; compare those two interfaces against their matching windows.
+  const inScopeRows = archiveWithDecoy.alerts.filter((a) => {
+    const cats = (a.series_categories || []).map(String);
+    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time));
+  const visibleFrozen = inScopeRows.slice(-80).filter((a) => a.high_roi === true).length;
+  check(c.model === visibleFrozen,
+    `rendered model rows equal frozen high_roi rows within the 80-event window (${visibleFrozen})`);
+  check(Number(c.modelTotal) === visibleFrozen,
+    `model count badge equals the visible frozen high_roi rows (${visibleFrozen})`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),

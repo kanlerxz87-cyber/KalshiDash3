@@ -215,8 +215,18 @@ function commonAsserts(label, r) {
     const roiMsgs = r.doc.querySelectorAll("#feedRoi .msg").length;
     const roiNone = r.doc.querySelectorAll("#feedRoi .none").length;
     check(roiMsgs >= 1 || roiNone >= 1, "the ROI feed must show the qualifying market or its explanation");
-    const causes = r.doc.querySelectorAll('#feedAll a[href*="gasprices.aaa.com"]').length;
-    check(causes >= 1, "the catalyst link must be the URL copied out of the market's own rules text");
+    // A particular settlement URL is not guaranteed to be in every market poll response.
+    // Test literal extraction from official rules text directly, then ensure every rendered
+    // swing reports either that market-record reference or the explicit no-source state.
+    const ruleLinks = r.dom.window.KDLIVE.catalystLinks({
+      rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
+    });
+    check(ruleLinks.length === 1 && ruleLinks[0].url === "https://gasprices.aaa.com/national-average",
+      "the live catalyst extractor copies the literal URL from market rules text");
+    const causeStates = [...r.doc.querySelectorAll("#feedAll .cause")];
+    check(causeStates.length >= msgs && causeStates.every(el =>
+      /source this market settles on|no source URL in the market's own record/.test(el.textContent)),
+      "each rendered alert labels a literal settlement reference or says the record has no source URL");
     const recorded = r.doc.querySelectorAll('#feedAll a[href*="external-api.demo.kalshi.co"]').length;
     check(recorded >= 1, "every alert must link the official API record it came from");
     console.log(`  B live mode       ok  (${r.state.calls.length} API calls, ${msgs} chat messages, ${roiMsgs} ROI-feed messages, ${roiNone} explanation)`);
@@ -386,7 +396,7 @@ function commonAsserts(label, r) {
       "index.html: the ranking metric must be labelled as an estimate");
     const bodies = [...(today ? today.querySelectorAll("tbody tr") : [])].map(tr => tr.textContent);
     check(bodies.every(t => /KX[A-Z0-9-]+/.test(t) || /none open in scope/i.test(t)),
-      "index.html: every category row must name a real ticker or say none is open");
+      "index.html: every category row must name a real ticker or say none is open in scope");
     // The QA fixture must not be a headline, but its presence in the snapshot must be disclosed.
     if (markets && (markets.open_markets || []).concat(markets.settled_markets || []).some(x => /QA/i.test(x.ticker))) {
       check(/demo QA fixtures in the snapshot/.test(r.text),
@@ -555,23 +565,25 @@ function commonAsserts(label, r) {
       check(!flat.includes(window_.toLocaleString() + " settled markets in scope"),
         `the retained paging window (${window_}) must never be printed as "settled markets in scope"`);
     }
-    // F-83 (main, PR #94/#95): an untraded topic must be labelled, not ranked. Only assert when the
-    // snapshot actually contains one: a topic with open rows whose volume is 0 on every row. A topic
-    // with no open rows at all is labelled "none open in scope", which is a different (also correct)
-    // state, so demanding the untraded label there would be a stale expectation, not a real defect.
-    if (markets && markets.open_markets) {
-      const byCat = new Map();
-      for (const r of markets.open_markets) {
-        if (!r.category_id) continue;
-        const e = byCat.get(r.category_id) || { n: 0, v: 0 };
-        e.n += 1; e.v += Number(r.volume_fp) || 0; byCat.set(r.category_id, e);
+    // F-83: require the untraded disclosure only when current snapshot data actually
+    // contains a topic with open rows and zero reported volume; the collector snapshot changes.
+    const openRows = markets.open_markets || [];
+    const categories = [...new Set(openRows.map(x => x.category_id).filter(Boolean))];
+    const untradedTopics = categories.filter(category => {
+      const rows = openRows.filter(x => x.category_id === category);
+      return rows.length > 0 && rows.every(x => !(Number(x.volume_fp) > 0));
+    });
+    if (untradedTopics.length) {
+      check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
+      check(/Untraded topics in this snapshot/.test(flat),
+        "the page must name the untraded topics below the table (F-83)");
+      for (const category of untradedTopics) {
+        const label = ({gas: "Gas Prices", elections: "Elections", culture: "Culture", crypto: "Crypto", golf: "Golf"})[category] || category;
+        check(flat.includes(label), `the untraded disclosure must include the current topic (${label})`);
       }
-      const untradedTopics = [...byCat.entries()].filter(([, e]) => e.n > 0 && e.v === 0).map(([c]) => c);
-      if (untradedTopics.length) {
-        check(/untraded/i.test(flat), "an untraded topic must be labelled 'untraded' (F-83)");
-        check(/Untraded topics in this snapshot/.test(flat),
-          "the page must name the untraded topics below the table (F-83)");
-      }
+    } else {
+      check(!/Untraded topics in this snapshot/.test(flat),
+        "the page must not claim an untraded topic when current rows all have volume (F-83)");
     }
     console.log(`  H index KPI     ok  (${inScope} scan total, ${kept} kept window, ${stored} stored rows named)`);
     r.close();
