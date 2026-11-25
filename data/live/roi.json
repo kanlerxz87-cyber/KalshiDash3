@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-25T19:08:41Z",
- "runtime_seconds": 86.3,
+ "collected_at": "2026-11-25T19:40:12Z",
+ "runtime_seconds": 125.1,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,22 +29,22 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 9918,
+  "open_in_scope": 7606,
   "eligible": 0,
   "picks": 0,
   "near_misses": 1,
-  "unscoreable": 9917,
-  "orderbooks": 9918,
-  "orderbooks_requested": 9918,
+  "unscoreable": 7605,
+  "orderbooks": 7606,
+  "orderbooks_requested": 7606,
   "alerts": 0,
-  "markets_with_momentum": 246,
+  "markets_with_momentum": 126,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 9918,
-  "returned": 9918,
+  "requested": 7606,
+  "returned": 7606,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -65,20 +65,20 @@
     "spread 99.0c > 10c cap",
     "depth 10 < 50 contracts at the touch",
     "NO entry 99.0c above 95c ceiling",
-    "net ROI -68.43% not above 0% floor",
+    "net ROI -70.45% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [],
-   "q": 0.68725,
+   "q": 0.7072499999999999,
    "mid": 0.505,
    "micro": 1.0,
-   "last": 0.55,
+   "last": 0.65,
    "bid": 0.01,
    "ask": 1.0,
    "spread": 0.99,
    "depth": 10.0,
-   "vol24": 725.0,
-   "ttc_hours": 0.8552777777777778,
+   "vol24": 1255.0,
+   "ttc_hours": 0.33,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -91,11 +91,11 @@
     "entry": 0.99,
     "fee_unit": 0.0006930000000000006,
     "cost": 0.990693,
-    "ev": -0.6779430000000001,
-    "roi": -0.684311890767372
+    "ev": -0.697943,
+    "roi": -0.7044997794473161
    },
-   "score": -0.684311890767372,
-   "dollars_traded_estimate": 651.75,
+   "score": -0.7044997794473161,
+   "dollars_traded_estimate": 815.75,
    "title": "Demo BTC at or above 59651.99 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
@@ -103,9 +103,9 @@
    "event_ticker": "KXDEMOFUTHOURLY-26NOV25H20",
    "status": "active",
    "result": null,
-   "volume_fp": 1185.0,
-   "volume_24h_fp": 725.0,
-   "open_interest_fp": 65.0,
+   "volume_fp": 1255.0,
+   "volume_24h_fp": 1255.0,
+   "open_interest_fp": 105.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 10.0,
@@ -139,7 +139,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 6.0,
-   "ttc_hours": 15.855277777777777,
+   "ttc_hours": 15.33,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -191,7 +191,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 10.0,
-   "ttc_hours": 16.85527777777778,
+   "ttc_hours": 16.33,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -243,7 +243,7 @@
    "spread": 1.0,
    "depth": 0,
    "vol24": 4.0,
-   "ttc_hours": 10.855277777777777,
+   "ttc_hours": 10.33,
    "momentum": 0.0,
    "series_ticker": "KXBTCD",
    "fee_multiplier": {
@@ -274,13 +274,12 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2601-T67799.99"
   },
   {
-   "ticker": "KXGOODREADS-26MEM-SS",
+   "ticker": "KXPCEHEAD-26DEC23-T0.7",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
-    "closes in 401 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -295,9 +294,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 9619.855277777779,
-   "momentum": 0.0,
-   "series_ticker": "KXGOODREADS",
+   "ttc_hours": 665.8133333333334,
+   "momentum": null,
+   "series_ticker": "KXPCEHEAD",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -306,11 +305,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Swan Song to win Memoir at the 2026 Goodreads Choice Awards?",
+   "title": "Will headline PCE inflation for November 2026 be above 0.7%?",
    "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2027-12-31T15:00:00Z",
-   "event_ticker": "KXGOODREADS-26MEM",
+   "close_time": "2026-12-23T13:29:00Z",
+   "event_ticker": "KXPCEHEAD-26DEC23",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -323,16 +322,15 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOODREADS-26MEM-SS"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPCEHEAD-26DEC23-T0.7"
   },
   {
-   "ticker": "KXISRHEALTHMIN-26OCT27-UMAK",
+   "ticker": "KXPCEHEAD-26DEC23-T0.6",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
-    "closes in 336 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -347,9 +345,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 8058.855277777778,
-   "momentum": 0.0,
-   "series_ticker": "KXISRHEALTHMIN",
+   "ttc_hours": 665.8133333333334,
+   "momentum": null,
+   "series_ticker": "KXPCEHEAD",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -358,11 +356,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Uri Maklev be Minister of Health as a result of the government formation following the 2026 Israeli legislative election?",
-   "category_id": "elections",
+   "title": "Will headline PCE inflation for November 2026 be above 0.6%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2027-10-27T14:00:00Z",
-   "event_ticker": "KXISRHEALTHMIN-26OCT27",
+   "close_time": "2026-12-23T13:29:00Z",
+   "event_ticker": "KXPCEHEAD-26DEC23",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -375,15 +373,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXISRHEALTHMIN-26OCT27-UMAK"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPCEHEAD-26DEC23-T0.6"
   },
   {
-   "ticker": "KXPGATOUR-FAISG26-WCLA",
+   "ticker": "KXPCEHEAD-26DEC23-T0.5",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
-    "no buyable side"
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
@@ -397,22 +396,22 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 391.85527777777776,
-   "momentum": 0.0,
-   "series_ticker": "KXPGATOUR",
+   "ttc_hours": 665.8133333333334,
+   "momentum": null,
+   "series_ticker": "KXPCEHEAD",
    "fee_multiplier": {
     "taker": 1,
-    "maker": 1,
-    "listed": true
+    "maker": 0,
+    "listed": false
    },
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Farmers Insurance Skins Game: Wyndham Clark wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "close_time": "2026-12-12T03:00:00Z",
-   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Will headline PCE inflation for November 2026 be above 0.5%?",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "close_time": "2026-12-23T13:29:00Z",
+   "event_ticker": "KXPCEHEAD-26DEC23",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -425,15 +424,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-WCLA"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPCEHEAD-26DEC23-T0.5"
   },
   {
-   "ticker": "KXPGATOUR-FAISG26-JTHO",
+   "ticker": "KXPCEHEAD-26DEC23-T0.4",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
-    "no buyable side"
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
@@ -447,22 +447,22 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 391.85527777777776,
-   "momentum": 0.0,
-   "series_ticker": "KXPGATOUR",
+   "ttc_hours": 665.8133333333334,
+   "momentum": null,
+   "series_ticker": "KXPCEHEAD",
    "fee_multiplier": {
     "taker": 1,
-    "maker": 1,
-    "listed": true
+    "maker": 0,
+    "listed": false
    },
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Farmers Insurance Skins Game: Justin Thomas wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "close_time": "2026-12-12T03:00:00Z",
-   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Will headline PCE inflation for November 2026 be above 0.4%?",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "close_time": "2026-12-23T13:29:00Z",
+   "event_ticker": "KXPCEHEAD-26DEC23",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -475,15 +475,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-JTHO"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPCEHEAD-26DEC23-T0.4"
   },
   {
-   "ticker": "KXPGATOUR-FAISG26-JKOI",
+   "ticker": "KXPCEHEAD-26DEC23-T0.3",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
-    "no buyable side"
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
@@ -497,22 +498,22 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 391.85527777777776,
-   "momentum": 0.0,
-   "series_ticker": "KXPGATOUR",
+   "ttc_hours": 665.8133333333334,
+   "momentum": null,
+   "series_ticker": "KXPCEHEAD",
    "fee_multiplier": {
     "taker": 1,
-    "maker": 1,
-    "listed": true
+    "maker": 0,
+    "listed": false
    },
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Farmers Insurance Skins Game: Jackson Koivun wins",
-   "category_id": "golf",
-   "category_basis": "seed",
-   "close_time": "2026-12-12T03:00:00Z",
-   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Will headline PCE inflation for November 2026 be above 0.3%?",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "close_time": "2026-12-23T13:29:00Z",
+   "event_ticker": "KXPCEHEAD-26DEC23",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -525,24 +526,23 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-JKOI"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPCEHEAD-26DEC23-T0.3"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 155,
+  "candles_used": 152,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 10,
-  "baseline_always_yes_hits": 7,
+  "baseline_always_yes_bets": 11,
+  "baseline_always_yes_hits": 11,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "no side passed the replay gates": 10,
-   "candle without a price": 14,
-   "no candles in the 2h before close": 30
+   "no side passed the replay gates": 11,
+   "candle without a price": 13
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -551,7 +551,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.7
+  "baseline_always_yes_hit_rate": 1.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
