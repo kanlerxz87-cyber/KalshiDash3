@@ -98,6 +98,7 @@ function mkFetch(mode, state) {
     }
     // same-origin files: read from the repo
     const rel = u.replace(/^\.\//, "").split("?")[0].replace(/^.*\/KalshiDash3\//, "");
+    if (Object.prototype.hasOwnProperty.call(state.fixtures, rel)) return send(state.fixtures[rel]);
     const file = path.join(ROOT, rel);
     if (file.startsWith(ROOT) && fs.existsSync(file)) {
       const txt = fs.readFileSync(file, "utf8");
@@ -123,7 +124,7 @@ function inlineAssets(html) {
 
 async function loadPage(file, mode, opts = {}) {
   const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
-  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, closed: false };
+  const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, fixtures: opts.fixtures || {}, closed: false };
   const errors = [];
   const dom = new JSDOM(html, {
     url: "https://kalshidash3.invalid/" + file + (opts.hash ? "#" + encodeURIComponent(opts.hash) : ""),
@@ -137,10 +138,10 @@ async function loadPage(file, mode, opts = {}) {
       window.__errors = errors;
     },
   });
-  // let the boot sequence, a couple of poll cycles and the 60s-snapshot timer all run
-  // long enough in api mode to cover one full poll cycle (the page polls every 6s), so a
-  // live-tick alert — not just a snapshot-history alert — is exercised
-  await new Promise(r => setTimeout(r, mode === "api" ? 7500 : 900));
+  // By default, let the boot sequence and one full live poll interval run (the page polls
+  // every 6s). A deterministic test may pass opts.waitMs and drive the next tick explicitly.
+  const waitMs = Number.isFinite(opts.waitMs) ? Math.max(0, opts.waitMs) : (mode === "api" ? 7500 : 900);
+  await new Promise(r => setTimeout(r, waitMs));
   const doc = dom.window.document;
   // The test inlines the page's own JS into the document, so script source must be excluded
   // before asserting on visible text — otherwise "undefined" in the code reads as a leak.
@@ -197,7 +198,7 @@ function commonAsserts(label, r) {
 
   /* --- B. working API: live mode, alert raised by a 13c jump --- */
   {
-    const r = await loadPage("live.html", "api");
+    const r = await loadPage("live.html", "api", { waitMs: 1500 });
     commonAsserts("live.html live", r);
     check(/LIVE · direct demo API/.test(r.text), "live mode must be announced in the status bar");
     check(r.state.calls.some(u => u.includes("status=open")), "the desk must discover markets itself, not wait for input");
@@ -215,8 +216,9 @@ function commonAsserts(label, r) {
     const roiMsgs = r.doc.querySelectorAll("#feedRoi .msg").length;
     const roiNone = r.doc.querySelectorAll("#feedRoi .none").length;
     check(roiMsgs >= 1 || roiNone >= 1, "the ROI feed must show the qualifying market or its explanation");
-    // A particular settlement URL is not guaranteed to be in every market poll response.
-    // Test literal extraction from official rules text directly, then ensure every rendered
+
+    // T102: a particular settlement URL is not guaranteed to be in every market poll response,
+    // so test literal extraction from official rules text directly, then ensure every rendered
     // swing reports either that market-record reference or the explicit no-source state.
     const ruleLinks = r.dom.window.KDLIVE.catalystLinks({
       rules_primary: "Settles per https://gasprices.aaa.com/national-average.",
@@ -227,6 +229,44 @@ function commonAsserts(label, r) {
     check(causeStates.length >= msgs && causeStates.every(el =>
       /source this market settles on|no source URL in the market's own record/.test(el.textContent)),
       "each rendered alert labels a literal settlement reference or says the record has no source URL");
+
+    // Exercise the real page engine and renderer deterministically instead of waiting for the
+    // six-second polling timer. The stub's next poll returns 61¢; seed the engine with a 48¢
+    // observation and a market record whose rules_primary contains the catalyst URL.
+    const triggerTicker = "KXAAAGASM-26DEC31-4.00";
+    r.state.tick = 0; // the next /markets?tickers= response is the 61¢ fixture
+    await r.dom.window.eval(`(() => {
+      eng.stop();
+      S.alerts = [];
+      eng.S.alerts = [];
+      eng.S.mode = "live-api";
+      eng.S.watch = [${JSON.stringify(triggerTicker)}];
+      eng.S.discoveredAt = Date.now();
+      eng.S.lastSnapshotAt = Date.now();
+      eng.S.lastBookAt = Date.now();
+      eng.S.markets.set(${JSON.stringify(triggerTicker)}, {
+        ticker: ${JSON.stringify(triggerTicker)}, title: "smoke test gas market",
+        category_id: "gas", category_basis: "seed",
+        rules_primary: "Settles per https://gasprices.aaa.com/national-average."
+      });
+      eng.S.ticks.set(${JSON.stringify(triggerTicker)}, [{
+        t: new Date(Date.now() - 1000).toISOString(), last: 0.48,
+        yes_bid: 0.47, yes_ask: 0.49, volume_fp: 100
+      }]);
+      renderChats();
+      return eng.tick();
+    })()`);
+    const liveCards = [...r.doc.querySelectorAll("#feedAll article.msg")];
+    const triggered = liveCards.find(card => card.getAttribute("data-t") === triggerTicker);
+    check(!!triggered, "a deterministic 13¢ live move must render in the all-events chat");
+    if (triggered) {
+      check(/13\.0¢/.test((triggered.querySelector(".move") || {}).textContent || ""),
+        "the rendered live card must retain the fixture's exact 13¢ delta");
+      check([...triggered.querySelectorAll("a")].some(a => a.href === "https://gasprices.aaa.com/national-average"),
+        "the live alert must link the exact URL copied from its market's rules_primary");
+      check([...triggered.querySelectorAll("a")].some(a => a.href === `https://external-api.demo.kalshi.co/trade-api/v2/markets/${triggerTicker}`),
+        "the rendered live alert must also link its official demo market record");
+    }
     const recorded = r.doc.querySelectorAll('#feedAll a[href*="external-api.demo.kalshi.co"]').length;
     check(recorded >= 1, "every alert must link the official API record it came from");
     console.log(`  B live mode       ok  (${r.state.calls.length} API calls, ${msgs} chat messages, ${roiMsgs} ROI-feed messages, ${roiNone} explanation)`);
@@ -251,10 +291,57 @@ function commonAsserts(label, r) {
   /* --- D. alerts.html: two chats + the fetched-lead table (the page this repo's brief cares
           most about getting right: nothing rendered may read as a proven cause) --- */
   {
-    const r = await loadPage("alerts.html", "snapshot");
+    // F-76 regression: the append-only archive retains Test/Demo and unclassified rows, but
+    // neither chat may surface them as one of the five requested topics. Require both real
+    // archived exclusions and transient, deliberately high_roi canaries so the model-feed check
+    // cannot pass only because today's real excluded rows are not model picks.
+    const archiveDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts_archive.json"), "utf8"));
+    const archiveRows = archiveDoc.alerts || [];
+    const excludedTickers = new Set(archiveRows.filter(a => {
+      const cats = (a.series_categories || []).map(String);
+      return cats.includes("Test") || cats.includes("Demo") || !a.category_id;
+    }).map(a => a.ticker).filter(Boolean));
+    check(excludedTickers.size > 0,
+      "scope fixture check: the committed archive must contain a Test/Demo or unclassified swing");
+    // Test-only high_roi rows are appended to this mocked response, never the committed archive.
+    // If the scope gate is removed, each canary is eligible for both the all-events and model feeds.
+    const now = Date.now();
+    const scopeCanaries = [
+      { ticker: "KXDOMTEST-F76-CANARY", category_id: "crypto", series_categories: ["Test"] },
+      { ticker: "KXDOMDEMO-F76-CANARY", category_id: "crypto", series_categories: ["Demo"] },
+      { ticker: "KXDOMUNCLASSIFIED-F76-CANARY", category_id: null, series_categories: [] },
+    ].map((row, i) => ({
+      ...row,
+      title: `test-only scope canary ${row.ticker}`,
+      category_basis: row.category_id ? "keyword" : null,
+      from_time: new Date(now - 60_000).toISOString(),
+      to_time: new Date(now + i + 1).toISOString(),
+      from_price: 0.48, to_price: 0.58, delta: 0.10, direction: "up",
+      volume_24h_fp: 250, high_roi: true,
+    }));
+    scopeCanaries.forEach(a => excludedTickers.add(a.ticker));
+    const archiveFixture = { ...archiveDoc, alerts: archiveRows.concat(scopeCanaries) };
+    const fetchFixtures = { "data/live/alerts_archive.json": archiveFixture };
+    const r = await loadPage("alerts.html", "snapshot", { fixtures: fetchFixtures });
     commonAsserts("alerts.html", r);
     check(r.doc.querySelectorAll("#feedAll").length === 1 && r.doc.querySelectorAll("#feedModel").length === 1,
       "alerts page must render both chat feeds");
+    const liveFeedDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
+    const liveFeedRows = liveFeedDoc.alerts || liveFeedDoc.all_events || [];
+    const isExcluded = a => !a.category_id || (a.series_categories || []).some(c => c === "Test" || c === "Demo");
+    const baseWithheld = archiveRows.concat(liveFeedRows).filter(a => a && a.ticker
+      && Number.isFinite(Number(a.delta)) && isExcluded(a)).length;
+    check(r.dom.window.KDL.state.withheldScope === baseWithheld + scopeCanaries.length,
+      `alerts.html must load and withhold every archived canary (${scopeCanaries.length}) in addition to the committed excluded rows`);
+    const allFeedTickers = [...r.doc.querySelectorAll("#feedAll .chat-ticker")].map(n => n.textContent.trim());
+    const modelFeedTickers = [...r.doc.querySelectorAll("#feedModel .chat-ticker")].map(n => n.textContent.trim());
+    check(allFeedTickers.length > 0, "the all-events chat must render at least one in-scope archive swing");
+    for (const ticker of excludedTickers) {
+      check(!allFeedTickers.includes(ticker),
+        `alerts.html all-events chat must not render withheld archived ticker ${ticker} (F-76)`);
+      check(!modelFeedTickers.includes(ticker),
+        `alerts.html model-picks chat must not render withheld archived ticker ${ticker} (F-76)`);
+    }
     const box = r.doc.querySelector("#leads");
     check(!!box, "the lead panel must exist on the alerts page");
     const leadsRows = r.doc.querySelectorAll("#leads tbody tr").length;
@@ -302,7 +389,7 @@ function commonAsserts(label, r) {
     }
     check(!/\bcaused\b|\btriggered by\b|\bdue to\b/i.test(r.text),
       "the rendered alerts page must not use causal wording — a public quote cannot see why a price moved");
-    console.log(`  D alerts page   ok  (${leadsRows} lead rows rendered, both feeds present, no causal wording)`);
+    console.log(`  D alerts page   ok  (${leadsRows} lead rows, ${scopeCanaries.length} excluded scope canaries withheld from both feeds, no causal wording)`);
     r.close();
   }
 

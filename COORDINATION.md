@@ -138,6 +138,26 @@ Branch `arena/748b2c0e-kalshidash3`, based on `68827bd8e8cf3056bc9f39603d4362a43
 
 ---
 
+## Session `arena-71d4866f` — alert-scope regression coverage and current release audit
+
+Arena-assigned branch: `arena/71d4866f-kalshidash3` (fixed by the environment). This session took over only the missing regression-test portion of stale PR [#98](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/98): PR #98 was last updated 2026-11-22 08:35 UTC and remained open/dirty when inspected on 2026-11-25. Its F-76 app-code filter is already present in `assets/engine.js` `loadCollectorAlerts()`; no duplicate application fix is planned. While this audit was in progress, PR #115 from `arena-1aaa3a61` merged the overlapping current-snapshot test repairs (chat-dock model window and index-page states). Those changes are retained from `origin/main`; this session adopts them and narrows its remaining scope to the distinct alerts-page filter regression and the timing-dependent live-catalyst assertion.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T99 | Add a DOM regression proving `alerts.html`'s two chats exclude archived Test/Demo or unclassified tickers; make the live-catalyst test exercise a deterministic real engine tick and check the exact rules URL; run the integrated release gate and record the result | done | arena-71d4866f | `scripts/tests/test_pages_dom.js` (blocks B and D only), `COORDINATION.md` (this section only) | `node scripts/tests/test_pages_dom.js` blocks A–M PASS; `python3 scripts/verify_release.py` PASS (offline); GitHub Actions/Pages after merge |
+
+No shared page data, navigation, source ledger, collector output or existing finding is in this session's scope. The current `loadCollectorAlerts()` scope gate is being verified, not rewritten.
+
+### Log
+
+- 2026-11-25: Read the task board before claiming. Identified PR #98 as stale (>60 minutes without a commit); confirmed from the current tree that its F-76 app-code fix already exists, while the DOM regression test is absent. Claimed only test/audit work on the Arena-assigned branch.
+- 2026-11-25: Baseline `node scripts/tests/test_pages_dom.js` showed the block-B catalyst assertion could inspect only historical chat rows before a second live poll. Updated scope to trigger a deterministic tick through the page's real `KDLIVE` engine and assert the rendered 13¢ move, exact URL from `rules_primary`, and official market-record link.
+- 2026-11-25: The full gate exposed separate stale test expectations for the dock's 80-row window and for current topic rows; before this session could edit those files, PR #115 merged their fixes. Adopted PR #115's `test_chatdock.js` and index-state assertions unchanged rather than duplicate them.
+- 2026-11-25: `git pull --rebase origin main` encountered a top-of-board conflict after PR #115 landed. Aborted that rebase attempt and merged `origin/main` instead; this conflict resolution retains the complete `arena-1aaa3a61` section and its shipped test/data changes plus this session's distinct scope. No other session's work was discarded. Re-run the combined gate after resolving the remaining test-file overlap.
+- 2026-11-25: Finished the two distinct T99 checks in `test_pages_dom.js` on top of `origin/main`'s version. Block D now loads `alerts.html` with a mocked archive response carrying three transient `high_roi` canaries (Test, Demo, unclassified — test-only tickers, never written to the committed archive) and asserts neither chat renders any excluded archived ticker, plus a positive assertion that the engine's scope gate counted every canary as withheld (`KDL.state.withheldScope`); block B drives one deterministic real `eng.tick()` (48¢ baseline → 61¢ poll response) and asserts the rendered 13¢ move, the exact `https://gasprices.aaa.com/national-average` URL copied from `rules_primary`, and the official demo market-record link. main's `KDLIVE.catalystLinks` extraction test, `.cause` label checks, and T102 index assertions are kept unchanged alongside.
+- 2026-11-25: Integrated `origin/main` three times as it advanced (PRs #117–#123, #125); the only hand-resolved conflicts were in `scripts/tests/test_pages_dom.js` (both sessions' block-B and D additions combined) — `COORDINATION.md`, `test_chatdock.js`, assets and all `data/live/*` took main's newer content. `node scripts/tests/test_pages_dom.js` blocks A–M and `node scripts/tests/test_chatdock.js` pass on each merged tree, and the integrated offline gate `python3 scripts/verify_release.py` PASSES (all validators, both DOM suites, `check_site.py` 21 pages; "Live API, account access and external URLs not certified"). No production UI or data file was changed by this session.
+
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
