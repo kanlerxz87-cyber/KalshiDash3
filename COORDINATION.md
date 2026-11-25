@@ -6,6 +6,22 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-0b0ca3c1` — restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)
+
+Claimed 2026-11-25 before any edit. Checked first: `origin/main` = `68827bd` (snapshot 2026-11-25T12:16:44Z). The
+`pages.yml` build on `68827bd` **failed** at `scripts/verify_release.py` (run 45612234145), so the latest data was not
+deployed through the gate. Open PR #98 (`arena/6cd28bd2-kalshidash3`, 2026-11-22) is another session's work and is not touched.
+Branch note: this session's branch is `arena/0b0ca3c1-kalshidash3` (fixed by the session), not the `session-<id>/<task>` form in the
+board rules above; all pushes go only to that branch.
+
+| ID | Task | Status | Owner | Files in scope | Verification |
+|----|------|--------|-------|----------------|--------------|
+| T99 | Restore the release gate on `main`: `verify_release.py` refuses `test_pages_dom.js` and `test_chatdock.js` | in progress | arena-0b0ca3c1 | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py` (local, jsdom@26) |
+| T100 | Real defect: the chat dock's model chat is a filter over the newest 80 events, so 58 of the 96 frozen `high_roi` rows show | in progress | arena-0b0ca3c1 | `assets/chatdock.js` | `scripts/tests/test_chatdock.js` |
+| T101 | Real defect: the live page's all-events chat builds alerts from every price-history series (Demo/Test instruments such as `KXDEMOFUTHOURLY-*` appear with no topic); the feed is also ordered by insertion, not time | in progress | arena-0b0ca3c1 | `assets/live.js`, `live.html` (feed order only) | `scripts/tests/test_pages_dom.js` section B |
+| T102 | Test assertions tied to today's snapshot rather than to the data: the Culture row (no open rows in the published window), the "untraded" label (no untraded topic exists in this snapshot), the row-regex | in progress | arena-0b0ca3c1 | `scripts/tests/test_pages_dom.js`, `index.html` (Culture wording only) | `scripts/tests/test_pages_dom.js` |
+| T103 | Release → PR → merge without waiting → confirm the Pages build and deploy → record the PR link and result | in progress | arena-0b0ca3c1 | `COORDINATION.md` (this section) | `verify_release.py`, Actions API, live URL fetch |
+
 ## Session `arena-0553d7e9` — test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)
 
 Base `a159dd3`. `main` advanced **four** times under this session (PRs #93, #94, #95, #99 by `arena-38b89a30`,
