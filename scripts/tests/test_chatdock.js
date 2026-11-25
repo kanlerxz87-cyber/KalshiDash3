@@ -148,13 +148,20 @@ function counts(w) {
   // T70/D-02: the model chat must be exactly the archive's frozen high_roi screen, not an inline
   // rule of its own. Before this assertion the dock selected 46 of 61 rows while the dashboard
   // selected 49 (the dock's old rule was ">=25% relative move and >=100 contracts").
-  const frozen = archiveWithDecoy.alerts.filter((a) => {
+  // The dock intentionally keeps only the latest MAX_ROWS=80 messages in memory. Compare
+  // model membership against that same retained chronological window, not the whole archive:
+  // the all-chat rendering is bounded for browser performance while alerts.html owns the full
+  // archive. The old assertion compared 58 rendered model rows with all 96 frozen archive picks.
+  const retained = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
-    return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
-      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id
-      && a.high_roi === true;
-  }).length;
-  check(c.model === Math.min(frozen, 80), `model chat count equals the frozen high_roi screen (${frozen})`);
+    const from = Number(a.from_price), to = Number(a.to_price);
+    return a.ticker && Number.isFinite(Date.parse(a.to_time || ""))
+      && Number.isFinite(from) && Number.isFinite(to)
+      && Math.abs(to - from) >= 0.10 - 1e-9
+      && !cats.includes("Test") && !cats.includes("Demo") && !!a.category_id;
+  }).sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time)).slice(-80);
+  const frozen = retained.filter((a) => a.high_roi === true).length;
+  check(c.model === frozen, `model chat count equals the frozen high_roi screen in the retained window (${frozen})`);
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),
