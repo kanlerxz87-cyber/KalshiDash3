@@ -2985,8 +2985,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.97,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -3475,8 +3475,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.79,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.02,
+    "gave_back_half": true,
     "still_open": false
    }
   },

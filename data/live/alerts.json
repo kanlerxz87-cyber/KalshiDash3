@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-26T19:42:22Z",
- "snapshot_collected_at": "2026-11-26T19:42:21Z",
+ "generated_at": "2026-11-26T19:57:21Z",
+ "snapshot_collected_at": "2026-11-26T19:57:21Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -3018,8 +3018,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.97,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -3508,8 +3508,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.79,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.02,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -9411,8 +9411,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.97,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -9754,8 +9754,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.79,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.02,
+    "gave_back_half": true,
     "still_open": false
    }
   },
