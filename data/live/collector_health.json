@@ -1,16 +1,16 @@
 {
  "schema": 1,
- "generated_at": "2026-11-26T23:57:23Z",
- "pass": 23,
+ "generated_at": "2026-11-26T23:59:09Z",
+ "pass": 1,
  "outcome": "ok",
  "detail": "snapshot committed",
- "snapshot_collected_at": "2026-11-26T23:57:22Z",
+ "snapshot_collected_at": "2026-11-26T23:59:08Z",
  "stderr_tail": "",
  "run": {
   "workflow": "collect.yml",
-  "run_id": "45852631725",
+  "run_id": "45903560356",
   "attempt": "1",
-  "sha": "8d6ad77738fb097304e26baae9b6c004da98d545"
+  "sha": "7c5db3368c61311a3fb8a41477e2870cfc6ff4ff"
  },
  "note": "Written by scripts/collect_relay.py for EVERY pass: 'failed' when a pass could not commit, 'ok' when it did. Read by humans; the site's staleness banner is what readers see. Never contains credentials."
 }
