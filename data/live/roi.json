@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-26T01:15:16Z",
- "runtime_seconds": 96.8,
+ "collected_at": "2026-11-26T02:00:12Z",
+ "runtime_seconds": 78.8,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,13 +29,13 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 2667,
+  "open_in_scope": 1194,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 1,
-  "unscoreable": 2666,
-  "orderbooks": 2667,
-  "orderbooks_requested": 2667,
+  "near_misses": 0,
+  "unscoreable": 1194,
+  "orderbooks": 1194,
+  "orderbooks_requested": 1194,
   "alerts": 0,
   "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
@@ -43,42 +43,44 @@
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 2667,
-  "returned": 2667,
+  "requested": 1194,
+  "returned": 1194,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
   "docs": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks"
  },
  "historical_cutoff": {
-  "market_positions_last_updated_ts": "2026-09-26T00:00:00Z",
-  "market_settled_ts": "2026-09-26T00:00:00Z",
-  "orders_updated_ts": "2026-11-11T00:00:00Z",
-  "trades_created_ts": "2026-09-26T00:00:00Z"
+  "market_positions_last_updated_ts": "2026-09-27T00:00:00Z",
+  "market_settled_ts": "2026-09-27T00:00:00Z",
+  "orders_updated_ts": "2026-11-12T00:00:00Z",
+  "trades_created_ts": "2026-09-27T00:00:00Z"
  },
  "picks": [],
- "near_misses": [
+ "near_misses": [],
+ "unscoreable": [
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV26H02-UP",
+   "ticker": "KXDEMOFUTHOURLY-26NOV26H03-UP",
    "eligible": false,
    "fails": [
-    "spread 99.0c > 10c cap",
-    "depth 10 < 50 contracts at the touch",
-    "NO entry 99.0c above 95c ceiling",
-    "net ROI -68.43% not above 0% floor",
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
-   "reasons": [],
-   "q": 0.68725,
-   "mid": 0.505,
-   "micro": 1.0,
-   "last": 0.55,
-   "bid": 0.01,
-   "ask": 1.0,
-   "spread": 0.99,
-   "depth": 10.0,
-   "vol24": 2235.0,
-   "ttc_hours": 0.7455555555555555,
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 0.9966666666666667,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -86,80 +88,19 @@
     "maker": 0,
     "listed": false
    },
-   "entry": {
-    "side": "NO",
-    "entry": 0.99,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.990693,
-    "ev": -0.6779430000000001,
-    "roi": -0.684311890767372
-   },
-   "score": -0.684311890767372,
-   "dollars_traded_estimate": 1237.5,
-   "title": "Demo BTC at or above 60433.78 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-26T02:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV26H02",
-   "status": "active",
-   "result": null,
-   "volume_fp": 2250.0,
-   "volume_24h_fp": 2235.0,
-   "open_interest_fp": 60.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 10.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.01,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV26H02-UP"
-  }
- ],
- "unscoreable": [
-  {
-   "ticker": "KXBTCD-26NOV2601-T67799.99",
-   "eligible": false,
-   "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 4.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.402,
-   "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.01,
-   "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 0,
-   "vol24": 4.0,
-   "ttc_hours": 4.745555555555556,
-   "momentum": null,
-   "series_ticker": "KXBTCD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 0.04,
-   "title": "Bitcoin price on Nov 26, 2026?",
+   "dollars_traded_estimate": 0.0,
+   "title": "Demo BTC at or above 60783.96 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T06:00:00Z",
-   "event_ticker": "KXBTCD-26NOV2601",
+   "close_time": "2026-11-26T03:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV26H03",
    "status": "active",
    "result": null,
-   "volume_fp": 4.0,
-   "volume_24h_fp": 4.0,
-   "open_interest_fp": 4.0,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 0.0,
@@ -167,10 +108,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2601-T67799.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV26H03-UP"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260045-XRP",
+   "ticker": "KXWTI-26NOV3014-T90.99",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -190,9 +131,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.495555555555556,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -201,11 +142,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 90.99 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:45:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -218,10 +159,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-XRP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T90.99"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260045-SOL",
+   "ticker": "KXWTI-26NOV3014-T90.49",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -241,9 +182,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.495555555555556,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -252,11 +193,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 90.49 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:45:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -269,10 +210,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-SOL"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T90.49"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260045-HYPE",
+   "ticker": "KXWTI-26NOV3014-T89.99",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -292,9 +233,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.495555555555556,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -303,11 +244,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 89.99 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:45:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -320,10 +261,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-HYPE"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T89.99"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260045-ETH",
+   "ticker": "KXWTI-26NOV3014-T89.49",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -343,9 +284,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.495555555555556,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -354,11 +295,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 89.49 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:45:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -371,10 +312,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-ETH"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T89.49"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260045-BTC",
+   "ticker": "KXWTI-26NOV3014-T88.99",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -394,9 +335,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.495555555555556,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -405,11 +346,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:30AM EST to 12:45AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 88.99 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:45:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260045",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -422,10 +363,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260045-BTC"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T88.99"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260015-XRP",
+   "ticker": "KXWTI-26NOV3014-T88.49",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -445,9 +386,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 3.9955555555555557,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -456,11 +397,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 88.49 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260015",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -473,10 +414,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260015-XRP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T88.49"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV260015-SOL",
+   "ticker": "KXWTI-26NOV3014-T87.99",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -496,9 +437,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 3.9955555555555557,
+   "ttc_hours": 113.49666666666667,
    "momentum": null,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "series_ticker": "KXWTI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -507,11 +448,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 26 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the WTI crude oil settlement price be above 87.99 USD/Bbl on Nov 30, 2026?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-26T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV260015",
+   "close_time": "2026-11-30T19:30:00Z",
+   "event_ticker": "KXWTI-26NOV3014",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -524,24 +465,23 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV260015-SOL"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXWTI-26NOV3014-T87.99"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 179,
+  "candles_used": 147,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 10,
-  "baseline_always_yes_hits": 4,
+  "baseline_always_yes_bets": 5,
+  "baseline_always_yes_hits": 3,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 14,
-   "no side passed the replay gates": 10,
-   "no candles in the 2h before close": 27
+   "candle without a price": 19,
+   "no side passed the replay gates": 5
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -550,7 +490,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.4
+  "baseline_always_yes_hit_rate": 0.6
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
