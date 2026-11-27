@@ -181,6 +181,21 @@ class HealthRecordTests(unittest.TestCase):
         self.assertTrue(doc, "the file is still written even when the push fails")
         self.assertTrue([c for c in calls if c[:2] == ["git", "fetch"]])
 
+    def test_dry_run_validator_failure_never_writes_health(self):
+        path = "scripts/tests/validate_alerts.py"
+        result = mock.Mock(returncode=1, stdout="", stderr="archive row proof missing")
+        with mock.patch.object(self.mod, "sync_to_remote", return_value="fake"), \
+             mock.patch.object(self.mod, "probe_api", return_value=(True, "OK")), \
+             mock.patch.object(self.mod, "PRECHECKS", []), mock.patch.object(self.mod, "PIPELINE", []), \
+             mock.patch.object(self.mod, "VALIDATORS", [("validate_alerts", path)]), \
+             mock.patch.object(self.mod, "sh", return_value=result), mock.patch.object(self.mod, "annotate"), \
+             mock.patch.object(self.mod, "record_health") as health, \
+             mock.patch.object(self.mod, "discard_changes") as discard:
+            outcome = self.mod.make_pass(self.mod.make_plan("main", commit_in="false"))(1)
+        self.assertEqual(outcome, ("failed", "validators: validate_alerts"))
+        discard.assert_called_once_with()
+        health.assert_not_called()
+
     def test_failure_paths_write_a_record(self):
         """make_pass must route its failure returns through record_health."""
         source = (ROOT / "scripts" / "collect_relay.py").read_text()

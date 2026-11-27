@@ -26,8 +26,8 @@ which exists only while the market is in the open scan. YES buys at the yes ask;
 NO buys at 1 - yes bid (documented reciprocal relation:
 https://docs.kalshi.com/getting_started/orderbook_responses). Nothing is filled
 from a last-trade price.
-Settlement: only when the market is in the settled list with result yes or no
-(https://docs.kalshi.com/getting_started/market_settlement).
+Settlement: only from the published settled list or the collector's finalized lifecycle
+records, using the literal result (https://docs.kalshi.com/getting_started/market_settlement).
 Fee: the official taker fee (https://kalshi.com/docs/kalshi-fee-schedule.pdf).
 
 Run: python3 scripts/simulate.py
@@ -141,8 +141,14 @@ def main() -> int:
     now = utcnow()
 
     open_rows = {r["ticker"]: r for r in (markets.get("open_markets") or []) if r.get("ticker")}
-    settled_rows = {r["ticker"]: r for r in (markets.get("settled_markets") or [])
-                    if r.get("ticker") and r.get("result") in ("yes", "no", "scalar")}
+    followed = (markets.get("alert_lifecycle") or {}).get("rows") or []
+    # Match the browser join: a current ranked record supersedes a follow-up for the same
+    # ticker. A determined or otherwise nonfinal record cannot close a paper position.
+    lifecycle_rows = {r["ticker"]: r for r in followed if r.get("ticker")}
+    lifecycle_rows.update(open_rows)
+    lifecycle_rows.update({r["ticker"]: r for r in markets.get("settled_markets") or [] if r.get("ticker")})
+    settled_rows = {ticker: r for ticker, r in lifecycle_rows.items()
+                    if r.get("status") == "finalized" and r.get("result") in ("yes", "no", "scalar")}
     base = markets.get("base_url") or "https://external-api.demo.kalshi.co/trade-api/v2"
 
     strategies = strat["strategies"]
@@ -286,7 +292,8 @@ def main() -> int:
         res = settled_rows.get(p["ticker"])
         if res and res["result"] == "scalar":
             p.update(status="settled_scalar", settled_result="scalar", settled_at=res.get("settlement_ts"),
-                     outcome="not_scored", mark_note="scalar settlement: not scored as yes/no")
+                     settlement_source=res.get("source"), outcome="not_scored",
+                     mark_note="scalar settlement: not scored as yes/no")
             closed.append(p)
             del positions[pid]
             continue
@@ -294,7 +301,8 @@ def main() -> int:
             won = res["result"] == p["side"]
             net = round((1.0 if won else 0.0) - p["entry_price"] - p["entry_fee"], 4)
             p.update(status="settled", settled_result=res["result"], settled_at=res.get("settlement_ts"),
-                     outcome="win" if won else "loss", realized_net=net, unrealized_net=None)
+                     settlement_source=res.get("source"), outcome="win" if won else "loss",
+                     realized_net=net, unrealized_net=None)
             bump(counters, p["strategy"], "settled")
             bump(counters, p["strategy"], "wins" if won else "losses")
             bump(counters, p["strategy"], "realized_net", net)

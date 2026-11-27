@@ -123,7 +123,11 @@ function inlineAssets(html) {
 }
 
 async function loadPage(file, mode, opts = {}) {
-  const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
+  let source = fs.readFileSync(path.join(ROOT, file), "utf8");
+  // The dock has its own suite. Load it in the lifecycle fixture too, where we need to
+  // compare it with the full alert chats. It waits for DOMContentLoaded on inline load.
+  if (opts.includeDock) source = source.replace('src="assets/chatdock.js" defer', 'src="assets/chatdock.js"');
+  const html = inlineAssets(source);
   const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, fixtures: opts.fixtures || {}, closed: false };
   const errors = [];
   const dom = new JSDOM(html, {
@@ -789,6 +793,60 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- J2. A collector follow-up outside the rankings reaches the chats and the ledger. --- */
+  {
+    const base = "https://external-api.demo.kalshi.co/trade-api/v2";
+    const prior = "2026-11-27T19:50:00Z", next = "2026-11-27T20:05:00Z";
+    const datedRows = ["DETERMINED", "DEFERRED", "FINAL"].map((suffix, i) => {
+      const ticker = `KXAAAGASM-TEST-${suffix}`;
+      return { ticker, title: suffix, category_id: i === 1 ? "crypto" : "gas", category_basis: "seed",
+        from_time: "2026-11-27T19:35:00Z", to_time: prior, direction: "up", delta: 0.12,
+        from_price: 0.40, to_price: 0.52, volume_24h_fp: 450,
+        market_source: `${base}/markets/${ticker}`, high_roi: true };
+    });
+    const [det, unknown, final] = datedRows;
+    const historical = `${base}/historical/markets/${final.ticker}`;
+    const followed = [
+      { ticker: det.ticker, source: det.market_source, status: "determined", result: "yes", observed_at: prior },
+      { ticker: unknown.ticker, source: unknown.market_source, status: null, result: null, reason: "lookup deferred" },
+      { ticker: final.ticker, source: historical, status: "finalized", result: "no", observed_at: prior },
+    ];
+    const snapshot = { collected_at: prior, settled_markets: [],
+      open_markets: [{ ticker: "KXAAAGASM-TEST-OPEN", category_id: "gas", status: "active", last_price_dollars: 0.42 }],
+      alert_lifecycle: { rows: followed } };
+    const file = "data/live/markets.json";
+    const r = await loadPage("alerts.html", "snapshot", { includeDock: true, fixtures: {
+      [file]: snapshot,
+      "data/live/alerts_archive.json": { alerts: datedRows },
+      "data/live/alerts.json": { all_events: datedRows, high_roi: datedRows },
+    } });
+    commonAsserts("alerts.html (follow-ups)", r);
+    const selector = (ticker) => [...r.doc.querySelectorAll("#outcomes tbody tr")].find(x => x.textContent.includes(ticker));
+    const chips = () => new Map([...r.doc.querySelectorAll("#lifecycleBar .kchip")].map(x => x.textContent.split(": ")));
+    check(chips().get("settled") === "1" && chips().get("result set · not paid") === "1" && chips().get("status unverified") === "1",
+      "distinct follow-ups are counted once, and nonfinal results are not counted as settlements");
+    check(selector(final.ticker)?.querySelector("a")?.getAttribute("href") === historical && selector(final.ticker)?.textContent.includes(prior),
+      "rank-excluded settlement row cites its exact historical source and verification time");
+    check(selector(unknown.ticker)?.querySelector("td:nth-child(5)")?.textContent === "—", "unverified result cell is blank");
+    check(/settled NO/.test(r.doc.querySelector("#kdChatAll")?.textContent || "") && /settled NO/.test(r.doc.querySelector("#kdChatModel")?.textContent || ""),
+      "both dock feeds show the rank-excluded final result");
+    check(/result set · not paid yet/.test(r.doc.querySelector("#feedAll").textContent), "the full chat shows the initial determination");
+
+    r.state.fixtures[file] = { ...snapshot, collected_at: next, alert_lifecycle: { rows: [
+      { ...followed[0], status: "finalized", result: "yes", observed_at: next }, ...followed.slice(1),
+    ] } };
+    await r.dom.window.eval("refreshCollector()");
+    check(chips().get("settled") === "2" && chips().get("result set · not paid") === "0", "later snapshot advances to finalized");
+    check(/settled YES/.test(r.doc.querySelector("#feedAll").textContent) && /settled YES/.test(r.doc.querySelector("#feedModel").textContent),
+      "both full-page feeds update on the first refresh render");
+    r.doc.querySelector('#catTabs [data-c="gas"]').click();
+    check(r.doc.querySelectorAll("#feedAll .chat-msg").length === 2 && r.doc.querySelector("#dropNote").textContent === "",
+      "topic filtering renders two messages without mistaking the hidden topic for an archive-cap drop");
+    check(r.errors.length === 0, "follow-up refresh and filter have no script errors");
+    console.log("  J2 follow-ups  ok  (chat states, exact citations, and finalized refresh)");
+    r.close();
+  }
+
   /* --- K. suggestions.html: handles missing status (G19) and multi-word status (G9) --- */
   {
     const r = await loadPage("suggestions.html", "snapshot");
@@ -829,7 +887,9 @@ function commonAsserts(label, r) {
     const vText = (r.doc.querySelector("#verifiedCounts") || {}).textContent || "";
     const sText = (r.doc.querySelector('[data-count="suggestions"]') || {}).textContent || "";
     const qText = (r.doc.querySelector('[data-count="questions"]') || {}).textContent || "";
-    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
+    const release = JSON.parse(fs.readFileSync(path.join(ROOT, "data/release_findings.json"), "utf8"));
+    const flaggedCount = fd.flagged.length + release.flagged.length;
+    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${flaggedCount} irregularities`),
       `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
     check(sText.includes(`${fd.suggestions.length}`),
       `executive-summary.html must render live suggestions count (got: ${sText})`);
@@ -844,8 +904,8 @@ function commonAsserts(label, r) {
     const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"));
     const catLine = (r.doc.querySelector("#catCoverage") || {}).textContent || "";
     const catStatus = (r.doc.querySelector("#catStatus") || {}).textContent || "";
-    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`),
-      `executive-summary.html must render the catalyst coverage from data/live/catalysts.json (got: ${catLine})`);
+    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`) && catLine.includes(cat.generated_at),
+      `executive-summary.html must render the catalyst file timestamp and coverage (got: ${catLine})`);
     check(cat.counts.reviewed === cat.counts.archive_total || /partial/.test(catStatus),
       `the catalyst status must say "partial" while any swing is unreviewed (got: ${catStatus})`);
     // F-104: the requirements table typed "the sample is one settled alert" (true on
@@ -856,7 +916,7 @@ function commonAsserts(label, r) {
     // lifecycleOf/lifecycleTally) and refuse any typed sample size that disagrees.
     if (markets) {
       const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
-      const idx = new Map();
+      const idx = new Map((markets.alert_lifecycle?.rows || []).map(r => [r.ticker, r]));
       for (const row of (markets.open_markets || []).concat(markets.settled_markets || [])) {
         if (row && row.ticker) idx.set(row.ticker, row);   // settled rows win, as on the page
       }
@@ -881,7 +941,7 @@ function commonAsserts(label, r) {
       console.log(`  M F-104 guard   ok  (settled-alert sample recomputed: ${settledAlerted} of ${served.size} served tickers; `
         + `typed sample sizes found: ${typed.length})`);
     }
-    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, `
+    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${flaggedCount} flagged, `
       + `${fd.suggestions.length} suggestions, ${fd.questions.length} questions, catalysts `
       + `${cat.counts.reviewed}/${cat.counts.archive_total})`);
     r.close();

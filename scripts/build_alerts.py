@@ -308,8 +308,9 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    def newest_first(rows):
-        return rows[:MAX_ALERTS_PER_FEED]
+    # Each feed is a separate newest-first window into the archive.
+    all_window = all_feed[:MAX_ALERTS_PER_FEED]
+    roi_window = roi_feed[:MAX_ALERTS_PER_FEED]
 
     out = {
         "schema": 1,
@@ -319,8 +320,8 @@ def main() -> int:
         "rules_status": rules.get("status"),
         "high_roi_rule": roi,
         "counts": {
-            "all_events": len(all_feed),
-            "high_roi": len(roi_feed),
+            "all_events": len(all_window),
+            "high_roi": len(roi_window),
             "archive_total": len(archive["alerts"]),
             "new_this_run": new_count,
             # F-65: archived, but withheld from the feeds because the snapshot's own row for the
@@ -334,8 +335,8 @@ def main() -> int:
             "withheld_out_of_scope": scope_count,
             "withheld_out_of_scope_reasons": dict(sorted(out_of_scope.items())),
         },
-        "all_events": newest_first(all_feed),
-        "high_roi": newest_first(roi_feed),
+        "all_events": all_window,
+        "high_roi": roi_window,
         "disclaimers": [
             "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
             "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
@@ -344,13 +345,13 @@ def main() -> int:
             "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
             "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
             "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
-            "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten.",
+            "Each feed contains its own newest 300 qualifying rows. Feed counts describe those windows; evidence counts describe the full in-scope archive.",
             "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",
             "Scope: the chats cover the five topics only. An archived swing whose series GET /series files under Test/Demo, or for which no single topic can be confirmed, is withheld and counted (counts.withheld_out_of_scope) rather than shown under the wrong topic.",
         ],
     }
     (LIVE / "alerts.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
-    print(f"OK: new={new_count} all_events={len(all_feed)} high_roi={len(roi_feed)} "
+    print(f"OK: new={new_count} all_events={len(all_window)} high_roi={len(roi_window)} "
           f"withheld={withheld} (conflicts={conflict_count}, out_of_scope={scope_count}) "
           f"threshold=${threshold:.2f}")
     return 0

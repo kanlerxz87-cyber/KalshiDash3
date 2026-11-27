@@ -232,7 +232,8 @@ function render(sim, rules) {
     (sim.settled_positions || []).map((p) => posRow(p, {
       result: p.status === "voided"
         ? `<span class="badge warn" title="${esc(p.mark_note || "")}">VOID</span>`
-        : p.settled_result ? `<span class="badge ${p.settled_result === p.side ? "ok" : "bad"}">${esc(p.settled_result.toUpperCase())}</span>` : '<span class="na">—</span>',
+        : p.settled_result ? `<span class="badge ${p.settled_result === p.side ? "ok" : "dim"}">${esc(p.settled_result.toUpperCase())}</span>`
+          + (p.settlement_source ? ` ${KD.srcLink(p.settlement_source, "official result")}` : "") : '<span class="na">—</span>',
       net: signedMoney(p.realized_net),
     })),
     { empty: "No settled or voided paper positions yet." }

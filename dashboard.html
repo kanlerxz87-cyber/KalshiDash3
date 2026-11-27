@@ -30,7 +30,7 @@
       </section>
       <section class="card alert-card" aria-labelledby="modelAlertsTitle">
         <div class="alert-heading"><h3 id="modelAlertsTitle">Model watch · experimental screen</h3><span id="modelAlertCount" class="badge warn">0</span></div>
-        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, frozen at detection, ordered by that volume — the same one rule the alert page and the chat dock use (D-02). It has no demonstrated profitability. Each alert also carries the event's lifecycle: <b>settled YES/NO</b> once Kalshi's own <code>result</code> field is final, <b>still open</b>, or <b>not in snapshot</b> (the snapshot is a ranked window, not the exchange — D-03).</p>
+        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, frozen at detection, ordered by that volume — the same one rule the alert page and the chat dock use (D-02). It has no demonstrated profitability. Each alert also shows the contract’s lifecycle. The collector follows alerted tickers after they leave the rankings, and shows <b>settled YES/NO</b> only when the <a href="https://docs.kalshi.com/getting_started/market_lifecycle">official market record</a> is finalized.</p>
         <div id="modelAlerts" class="alert-feed" role="log" aria-live="polite" aria-label="Experimental screened price swing alerts"></div>
       </section>
     </div>
