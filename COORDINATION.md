@@ -58,6 +58,7 @@ Claimed 2026-11-27 before implementation work. At claim time, the newest recorde
 |---|---|---|---|---|---|
 | T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | done (offline/source-path audit; live values not re-fetched) | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`; independent exact-link audit of 714 market rows and 154 alerts; official docs re-read 2026-11-27 (links below) |
 | T115 | Repair the executive-summary heading that still labels the current release audit 22 November despite the 27 November snapshot; state the scope and limits of this audit explicitly | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS after edit; rendered DOM suite confirms all pages load without errors |
+| T116 | After the collector advanced the snapshot to 17:30Z, correct executive-summary copy that still called the 17:15Z snapshot “current”; label static metrics by their observation time and link readers to the live snapshot | in progress | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Compare executive-summary timestamps to `data/live/markets.json`, `alerts.json`, `simulation.json` and `roi.json`; full release gate |
 
 ### T114/T115 — 2026-11-27 audit results
 
