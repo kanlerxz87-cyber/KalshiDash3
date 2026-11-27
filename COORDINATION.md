@@ -379,7 +379,7 @@ ask-ladder defect, and the only shared files are the append-only ledger and this
 | T117 | Baseline release gate on the base tree, then independent re-verification of the published snapshot against the **live official demo API**: five category headline markets, published alert tickers, resolved rows, the liquidity ladder, and series/topic integrity | done | arena-01961271 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS (21 pages, every validator and suite); live records below via the platform fetch route |
 | T118 | Re-verify the load-bearing official documentation claims (demo endpoints, candlestick intervals, settlement, fees, order V2, WebSocket auth, fee-schedule seeds) and the live Pages site | done | arena-01961271 | `COORDINATION.md` (this section) | docs.kalshi.com + kalshi.com fee schedule PDF + live Pages fetch, all re-read this session |
 | T119 | Repair the real defect found (F-104: executive summary typed a volatile settled-alert count that the committed data contradicts) with a regression that fails before the fix; publish it on the Flagged for Review page | done | arena-01961271 | `executive-summary.html`, `scripts/tests/test_pages_dom.js`, `data/findings.json` (append only) | mutation-checked regression; full gate PASS after fix |
-| T120 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | in progress | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
+| T120 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | done | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
 
 ### T117 — what was re-read from the official demo API this session (2026-11-27, ~17:25–17:40Z)
 
@@ -455,6 +455,40 @@ re-derived by hand against the official fee table (0.07×0.22×0.78 → ceil-to-
   "Page build failed.") superseded 10 seconds later by the successful build of `bd6f467` (PR #137's merge,
   17:36:33Z, `built`). The site never stopped serving the last good build; no action needed beyond this record.
   Builds API: https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/pages/builds
+
+### T120 close-out — PR, merge, Pages deploy (2026-11-27)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #139](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/139)** — "verify: independent live-API line-by-line pass (T117-T118) + F-104 exec-summary stale-count fix with regression" | `gh pr view 139` |
+| PR build | **pass** 1m23s (run [46044376764](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46044376764)); `deploy` correctly skipped on the PR | `gh pr checks 139` |
+| Merge | **merged 2026-11-27T17:48:30Z** as merge commit `b3119d5d1a21c9bb5f53bccc33b82b874176ee86`, without waiting for approval | `gh pr merge 139 --merge` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** locally on the rebased tree (21 pages, every validator and suite — including PR #138's four new audit suites — DOM render tests, internal links); re-run after the second rebase onto `94d996a` | local gate runs |
+| Pages deploy | **confirmed** — Pages build for `b3119d5` `built` at 17:48:31Z; the push-triggered *Deploy site to GitHub Pages* run [46044695780](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46044695780) completed **success**; the newest main commit at confirmation time (`665d977`, which contains this fix) also `built` at 17:49:30Z | Pages builds API, Actions API |
+| Live site | **confirmed serving the fix** — `https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html?v=b3119d5` renders "a bare count, never a rate, because the settled sample is small and changes as markets resolve — the current count is rendered live … (D-04, F-104)" | live fetch with cache-buster |
+
+**Rebases and conflict resolutions (parallel sessions).** PR #138 (`arena-f33fe827`) merged as `94d996a`
+while PR #139 was being opened, making it CONFLICTING. This branch rebased twice onto `origin/main`
+(`bd6f467`, then `94d996a`); each time the conflicts were only in the shared append-only files
+(`COORDINATION.md` top anchor, `data/findings.json` end-of-array). Resolved by keeping **main's sections and
+entries first and this session's after**, both verbatim — no other session's line was dropped. After the second
+rebase the full gate was re-run and passed, including PR #138's new suites. The finding was renumbered F-100 →
+**F-104** before the first push because PR #138 publishes F-100…F-103.
+
+**Live-fetch caching note (for future deploy verifications).** The first live fetch of
+`executive-summary.html` after the merge returned the pre-fix text although the Pages build for the merge commit
+had already succeeded; re-fetching with a cache-buster query (`?v=b3119d5`) returned the fixed text. A stale
+read through the fetch route is therefore not evidence of a failed deploy — check the Pages builds API for the
+merge commit and re-fetch with a cache-buster before concluding anything. (This session also observed two
+transient legacy-build failures on rapidly successive relay commits, `3a97688` 17:36:23Z and `99edf54`
+17:49:24Z, each superseded within ~10 s by a successful build of the next commit; the site kept serving the last
+good build throughout.)
+
+**Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio
+and live execution stay paper), F-14/F-26/F-77 (high-ROI screen is a disclosed heuristic), F-25 (cause links are
+leads), F-76 (out-of-scope swings withheld and counted), DEPLOY-1 (Pages served by the legacy branch publisher;
+this session re-tested the Actions-only switch and was refused with HTTP 403 again — a repository administrator
+must change it under Settings → Pages).
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
