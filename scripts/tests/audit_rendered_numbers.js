@@ -216,6 +216,41 @@ const numFromText = (s) => Number(String(s).replace(/[^0-9.\-]/g, ""));
     r.close();
   }
 
+  /* ================= dashboard.html: the ranked market cards ================= */
+  {
+    const r = await loadPage("dashboard.html", { waitMs: 1500 });
+    check(r.errors.length === 0, `dashboard.html: uncaught error ${r.errors.slice(0, 2).join(" | ")}`);
+    // One card per topic, each showing the top 8 open markets of that topic ranked by the
+    // labelled dollars estimate. Recompute that ranking here from the snapshot and compare the
+    // rendered tickers and figures, so a stale or invented row cannot survive.
+    const NAMES = { gas: "Gas Prices", elections: "Elections", culture: "Culture", crypto: "Crypto", golf: "Golf" };
+    const cards = [...r.doc.querySelectorAll("#tables .card")];
+    check(cards.length === CATS.length, `dashboard.html must render ${CATS.length} topic cards, rendered ${cards.length}`);
+    let totalRows = 0;
+    for (const cat of CATS) {
+      const card = cards.find((c) => ((c.querySelector("h3") || {}).textContent || "").includes(NAMES[cat]));
+      if (!card) { problems.push(`dashboard.html: no card for topic ${NAMES[cat]}`); continue; }
+      const trs = [...card.querySelectorAll("table tbody tr")];
+      totalRows += trs.length;
+      const mine = OPEN.filter((m) => m.category_id === cat)
+        .slice().sort((a, b) => (b.dollars_traded_estimate || 0) - (a.dollars_traded_estimate || 0));
+      const want = mine.slice(0, 8);
+      check(trs.length === want.length,
+        `dashboard.html ${NAMES[cat]} card renders ${trs.length} rows but the top ${want.length} are expected`);
+      trs.forEach((tr, i) => {
+        const t = tr.textContent.replace(/\s+/g, " ");
+        const hit = want[i];
+        if (!hit) return;
+        check(t.includes(hit.ticker),
+          `dashboard.html ${NAMES[cat]} row ${i + 1} must be ${hit.ticker} (rank ${i + 1} by dollars estimate); row reads: ${t.slice(0, 150)}`);
+        check(t.includes(cents(hit.last_price_dollars)),
+          `dashboard.html ${NAMES[cat]} row ${hit.ticker} must print its committed last price ${cents(hit.last_price_dollars)}; row reads: ${t.slice(0, 150)}`);
+      });
+    }
+    console.log(`  dashboard.html    ok  (${cards.length} topic cards, ${totalRows} ranked rows recomputed row by row)`);
+    r.close();
+  }
+
   /* ================= the five category pages ================= */
   for (const cat of CATS) {
     const page = cat + ".html";
