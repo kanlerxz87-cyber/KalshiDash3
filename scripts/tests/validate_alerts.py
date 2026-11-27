@@ -240,16 +240,20 @@ def main() -> int:
     # The assignment is verified against the SAME official reading it was made from: the row's
     # own recorded series_categories first (build_alerts.py records them, with their source URL,
     # at assignment time), and the current snapshot only as a fallback for legacy rows that carry
-    # none. Re-deriving from the snapshot alone made this check clock-dependent (F-107):
+    # none. Re-deriving from the snapshot alone made this check clock-dependent (F-109):
     # collect.py rebuilds series_index every pass from the series present in that pass's scan, so
     # when KXAAAGASD's last open market left the 25k newest-first window on 2026-11-27 the ledger
     # entry disappeared and six consecutive collector passes (18:16Z..19:23Z, runs 46012505508 /
     # 46053185236) failed on a Nov-20 gas alert whose row still carries ["Economics"] from
-    # GET /series/KXAAAGASD. Same precedence as the high_roi screen below (F-39): the row's stored
-    # inputs are authoritative; the snapshot rolls. No official reading anywhere = unknown, not a
-    # contradiction (the builder never assigns a topic from an empty categories list). A series
-    # Kalshi later reclassifies is still corrected live: the feed-serving check below reads the
-    # current snapshot and withholds the row from both chats.
+    # GET /series/KXAAAGASD. The collector-side retention fix (F-107 / PR #151, arena-72ae7bca)
+    # re-fetches archive-cited series so they stay in the ledger; this validator-side change is the
+    # complementary defense in depth, because record_series still stores categories=null when that
+    # re-fetch fails transiently, which would otherwise re-trip the snapshot-only check. Same
+    # precedence as the high_roi screen below (F-39): the row's stored inputs are authoritative; the
+    # snapshot rolls. No official reading anywhere = unknown, not a contradiction (the builder never
+    # assigns a topic from an empty categories list). A series Kalshi later reclassifies is still
+    # corrected live: the feed-serving check below reads the current snapshot and withholds the row
+    # from both chats.
     for a in archive:
         if not a.get("category_assigned_from"):
             continue

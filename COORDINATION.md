@@ -3,6 +3,30 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-72ae7bca` — independent source-provenance audit and release integration
+
+Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `arena/72ae7bca-kalshidash3` is the integration branch for this session (no branch creation). Existing concurrent scopes are preserved: in particular F250-1 and PR #148's ledger formatting are not edited here.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | in progress | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi OpenAPI/docs via available official GitHub sources; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
+| 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | in progress | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
+
+### 72AE verification and integration checkpoint (2026-11-27T19:45Z)
+
+- `72AE-1`: **done** — exact demo-host/route/ticker citation audit + 15 regression tests. The existing release gate discovers the new test automatically. `SOURCE_AUDIT.md` records scope honestly: citation integrity is not verification of numeric values or external URL availability. Read official `demo_env`, WebSocket quick start, orderbook responses, Get Series, market settlement and demo exchange status using the platform fetch route; live `GET /series/KXAAAGASD` returned Economics + AAA. No credentials used and no orders placed.
+- `72AE-3`: **done, pending publication** — seven-line collector fix, no validator relaxation. Four offline tests include the real build → alert builder → strict validator; current category changes stay authoritative, failed lookup remains null. Baseline diagnostic [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625) **failed** before the fix; post-fix diagnostic [46058408653](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058408653) **success** at `57b201b`, completed 19:42:33Z. Dry run: no market snapshot committed. The failed branch diagnostic did write a branch-specific collector health commit; that health file is restored to current main before integration so it is not passed off as main's current operational state.
+- `python3 scripts/verify_release.py` **PASS** after all code + F-107 review-ledger integration (21 pages; all validators/unit/DOM suites; every audited numeric rendering recomputed; internal links resolve). `git diff --check` clean. F-107 is appended without editing PR #148's F-105 scope. PR #150 appeared during this session and changes the live-desk workflow/test scope; no overlap with this fix.
+- `72AE-2`: still **in progress** — PR/check/merge/Pages/data-refresh results follow here; not asserted in advance.
+
+### 72AE-3 — collector failure diagnosed; narrow handoff/claim (2026-11-27T19:40Z)
+
+Independent dry-run [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625) failed. Official check annotation [140705144837](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations) identifies two `KXAAAGASD-26NOV21-3.6600` archived alerts: their `category_assigned_from` is retained but the new `series_index` drops `KXAAAGASD` once the scan no longer encounters it. This is distinct from F-106: F250-1 is already merged via PR #149 at 18:29Z (confirmed with `gh pr list --state all`); PR #148 only owns F-105 indentation. No other open PR touches this fix.
+
+| ID | Task | Status | Owner | Files in scope | Evidence |
+|---|---|---|---|---|---|
+| 72AE-3 | Re-fetch official categories for archive-cited series even after all their market rows leave the bounded scan; keep validator strict; test complete collector build and dry-run Actions | in progress | arena-72ae7bca | `scripts/collect.py` (archive-watch block only), `scripts/tests/test_archive_series_retention.py` (new); final integration adds F-107 to `data/findings.json` (append only; not F-105/PR #148); this board section | Check annotation linked above; `GET /series/KXAAAGASD`; official Get Series docs |
+
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
