@@ -19,8 +19,8 @@ publishes findings on the Flagged page, and closes out gate → PR → `main` �
 |----|------|--------|-------|----------------|------------------------|
 | T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | **done** — PASS (21 pages, every validator and suite, `check_site.py` OK) | arena-251f5c3d | `COORDINATION.md` (this section) | gate run 2026-11-27 on `fe245d8` + claim commit |
 | T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | **done** — every record matched, see T115 table below | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
-| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | claimed | arena-251f5c3d | defect-fix files only as needed (named here when touched), `data/findings.json` (append only) | `python3 scripts/verify_release.py` PASS after each fix |
-| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | claimed | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, Pages API, live URL fetch |
+| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | **done** — two audit passes (render recomputation + source-link/count sweep) found 9 real defects, all fixed and regression-pinned by `test_pages_dom.js` section N; gate **PASS** after the fixes | arena-251f5c3d | `assets/site.js`, `index.html` (via money()), `dashboard.html`, `alerts.html`, `portfolio.html`, `simulation.html`, `trading.html`, `strategies.html`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS 2026-11-27; findings F-100..F-104 in `data/findings.json` |
+| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | in progress — F-100..F-104 appended (flagged ledger now 90 rows), gate **PASS** on the final tree; PR/merge/Pages pending below | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; Actions API, Pages API, live URL fetch to follow |
 
 ### T115 — official-source verification, fetched live 2026-11-27
 
@@ -43,6 +43,31 @@ as sessions arena-a490dfa2 / arena-75949325). Snapshot under test: `data/live/ma
 | [docs.kalshi.com/getting_started/market_settlement](https://docs.kalshi.com/getting_started/market_settlement) | C-13/C-14: $1 per contract, net positions, zero settlement fee for yes/no | verbatim: "Yes contract holders receive $1 per contract"; "No contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
 
 Nothing published in the snapshot contradicted the official records.
+
+### T116 — audit passes, defects found, fixes, regression tests
+
+Two jsdom audit harnesses rendered every page against the committed JSON and recomputed what the
+pages claim (harnesses kept out of the repo, run from the checkout):
+
+| # | Defect found | Where | Fix | Regression |
+|---|---|---|---|---|
+| 1 | `money()` printed dollars without thousands separators: index showed `$23271` while gas.html showed `$23,271` for the same market (crypto `$16436950`, golf `$19179`) | `assets/site.js` `money()` | group thousands; negatives render `−$x`; `$0` unchanged (F-83 contract) | `test_pages_dom.js` N1 |
+| 2 | Dashboard badges read `100 shown` while the feed serves 154 (all) / 123 (model) swings | `dashboard.html` | badges read `N of M shown` (N = rendered, M = json total) | N2 |
+| 3 | Evidence note said "Of the 100 swings served" while its own parts summed to 154 (21+75+0+0+5+53) | `dashboard.html` | denominator = `counts.all_events` (parts-sum fallback) | N2 |
+| 4 | alerts chips claimed `154 in view` over a chat rendering the newest 120 bubbles | `alerts.html` `render()` | chips count the rendered bubbles; `X of Y shown` when capped/filtered | N3 |
+| 5 | Evidence bar's `swings served` used the category-filtered length against global evidence parts (golf tab: 7 vs parts summing 154) | `alerts.html` `renderEvidenceBar` | denominator = `KDL.feedAlerts().length` (global on every tab) | N3 (golf tab) |
+| 6 | portfolio mixed raw `"$"+toFixed(2)` with `KD.money` for the same quantities | `portfolio.html` | all ledger cash/P&L/fee displays go through `KD.money` | N4 (`pCash` = `$10,000.00`) |
+| 7 | A missing unrealised/fee value rendered `−$0.00` (inferred) instead of blank | `portfolio.html` open/closed/by-strategy rows | `KD.money(null)` → em-dash (blank, never inferred) | N4 + N2 pattern |
+| 8 | Derived results tables (simulation by-strategy/topic/trade-type, trading leaderboard, strategy candidates) had no source link | `simulation.html`, `trading.html`, `strategies.html` | provenance notes linking `data/live/simulation.json` / `alerts_archive.json` / `strategies.json`; official references linked in-row (fee schedule, Order Book Responses, Market Settlement, `GET /portfolio/fills` → [docs.kalshi.com/api-reference/portfolio/get-fills](https://docs.kalshi.com/api-reference/portfolio/get-fills), fetched 2026-11-27) | N5 |
+| 9 | trading.html's own `fmt()` and KPI cards used ungrouped raw dollars | `trading.html` | `fmt()` groups thousands; KPIs use `KD.money` | N5 + N4 pattern |
+
+Not defects (audit false positives, corrected in the harness): the stratTable has no `filled`
+column (`fillTable` holds it); a leading `\bKX` identity test fails when `textContent`
+concatenates title and ticker (`…winsKXPGATOUR-…`) — every position row already carried its
+`srclink`. Source-link sweep after the fixes: **no unlinked rows anywhere** (simulation 54/54 open,
+7/7 settled, alerts leads 154/154, live watch 25/25, all feeds fully linked).
+
+`python3 scripts/verify_release.py` → **PASS** after the fixes and again after the findings append.
 
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)

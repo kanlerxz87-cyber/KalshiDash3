@@ -18,8 +18,17 @@ const KD = (() => {
       ? '<span class="na" title="Not returned by the API — left blank rather than guessed">—</span>'
       : Number(v).toLocaleString(undefined, { maximumFractionDigits: d });
 
-  const money = (v, d = 2) =>
-    v === null || v === undefined || Number.isNaN(Number(v)) ? '<span class="na">—</span>' : "$" + Number(v).toFixed(d);
+  // T116 (F-100): group thousands so the same quantity renders the same way everywhere —
+  // the landing table used to print "$23271" while gas.html printed "$23,271" for the same
+  // market (index called money(v, 0); category KPIs used toLocaleString). The "$0" case is
+  // unchanged, which is what F-83's "no trades" disclosure asserts against.
+  const money = (v, d = 2) => {
+    if (v === null || v === undefined || Number.isNaN(Number(v))) return '<span class="na">—</span>';
+    const n = Number(v);
+    const [i, f] = Math.abs(n).toFixed(d).split(".");
+    const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return (n < 0 ? "−$" : "$") + grouped + (f ? "." + f : "");
+  };
 
   const cents = (v) =>
     v === null || v === undefined || Number.isNaN(Number(v)) ? '<span class="na">—</span>' : (Number(v) * 100).toFixed(1) + "¢";

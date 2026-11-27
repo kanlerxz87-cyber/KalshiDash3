@@ -42,14 +42,14 @@
     <tbody>
       <tr>
         <td><b>S1</b></td>
-        <td><b>Size-weighted momentum.</b> Only consider the top 3 markets by dollars traded per category; enter with the trend when the last price moved more than 5¢ inside one collected window and volume grew.</td>
+        <td><b>Size-weighted momentum.</b> Only consider the top 3 markets by <a href="questions.html">dollars traded</a> per category; enter with the trend when the last price moved more than 5¢ inside one collected window and volume grew.</td>
         <td>Resolved-market backtest over at least 30 markets per category, fee-adjusted, with the same window length used live.</td>
         <td>Chasing crowded markets into a reversal; slippage larger than the move; the window is one collector run, so a "move" can be an artefact of the sampling interval.</td>
         <td><span class="badge warn">untested</span></td>
       </tr>
       <tr>
         <td><b>S2</b></td>
-        <td><b>Liquidity floor.</b> Skip any market with fewer than 100 contracts resting at the best ask, regardless of how attractive the price is.</td>
+        <td><b>Liquidity floor.</b> Skip any market with fewer than 100 contracts resting at the <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">best ask</a>, regardless of how attractive the price is.</td>
         <td>Fill-rate comparison between filtered and unfiltered paper trades, recorded per trade.</td>
         <td>Excludes thin but genuinely mispriced markets; the depth snapshot goes stale between runs.</td>
         <td><span class="badge warn">untested</span></td>
@@ -57,19 +57,24 @@
       <tr>
         <td><b>S3</b></td>
         <td><b>Fee-aware band selection.</b> Prefer bands where the modelled fee is below 1% of stake, i.e. avoid roughly 25–75¢ unless the expected move justifies it.</td>
-        <td>Fee-as-%-of-stake measured from real fills (<code>fee_cost</code> in <code>GET /portfolio/fills</code>) rather than the general formula.</td>
+        <td>Fee-as-%-of-stake measured from real fills (<code>fee_cost</code> in <a href="https://docs.kalshi.com/api-reference/portfolio/get-fills" target="_blank" rel="noopener"><code>GET /portfolio/fills</code></a>) rather than the general formula.</td>
         <td>Ignores that near-50¢ markets are where the most information is priced in; per-series multipliers can be 0/0, which destroys the premise.</td>
         <td><span class="badge warn">untested</span></td>
       </tr>
       <tr>
         <td><b>S4</b></td>
-        <td><b>Resolution fade.</b> Take the opposite side of a market priced below 10¢ or above 90¢ only when the order book is one-sided (no resting bids on the opposing side).</td>
+        <td><b>Resolution fade.</b> Take the opposite side of a market priced below 10¢ or above 90¢ only when the <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">order book</a> is one-sided (no resting bids on the opposing side).</td>
         <td>Backtest against settled markets with the literal <code>result</code> field; report tail loss explicitly, since a binary pays all or nothing.</td>
         <td>Extreme prices are usually correct. This strategy's failure mode is a cluster of total losses, which a win-rate number hides.</td>
         <td><span class="badge warn">untested</span></td>
       </tr>
     </tbody>
-  </table></div>
+  </table>
+    <p class="small mut">Rules as implemented: <a href="data/strategies.json">data/strategies.json</a>
+      drives <code>assets/engine.js</code>. The evidence bars are this project's own standard, not
+      Kalshi guidance; the fee basis is the <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+      target="_blank" rel="noopener">fee schedule</a>.</p>
+  </div>
 
   <h2>What the collected data can already test</h2>
   <div class="notice warn" id="readiness">

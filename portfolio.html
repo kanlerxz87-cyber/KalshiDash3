@@ -234,10 +234,10 @@ function render() {
   const gross = L.trades.reduce((a, t) => a + t.count * t.price, 0);
   const fees = L.trades.reduce((a, t) => a + t.fee, 0);
   const openRisk = L.trades.filter(t => t.unresolved).reduce((a, t) => a + t.count * t.price, 0);
-  KD.$("#pCash").textContent = "$" + L.cash.toFixed(2);
-  KD.$("#pGross").textContent = "$" + gross.toFixed(2);
-  KD.$("#pFees").textContent = "$" + fees.toFixed(2);
-  KD.$("#pOpen").textContent = "$" + openRisk.toFixed(2);
+  KD.$("#pCash").textContent = KD.money(L.cash);
+  KD.$("#pGross").textContent = KD.money(gross);
+  KD.$("#pFees").textContent = KD.money(fees);
+  KD.$("#pOpen").textContent = KD.money(openRisk);
 
   // By category
   const byCat = {};
@@ -305,7 +305,7 @@ KD.$("#tGo").addEventListener("click", () => {
   const fee = takerFee(count, price, ticker);
   const cost = count * price + fee;
   const L = load();
-  if (cost > L.cash) { msg.textContent = `Insufficient paper cash: need $${cost.toFixed(2)}, have $${L.cash.toFixed(2)}.`; return; }
+  if (cost > L.cash) { msg.textContent = `Insufficient paper cash: need ${KD.money(cost)}, have ${KD.money(L.cash)}.`; return; }
   L.cash -= cost;
   L.trades.push({
     ts: Date.now(), ticker, side, count, price, fee, cost,
@@ -317,7 +317,7 @@ KD.$("#tGo").addEventListener("click", () => {
   });
   save(L);
   msg.innerHTML = `Recorded: ${count} × ${side.toUpperCase()} on <code>${KD.esc(ticker)}</code> at ${KD.cents(price)},
-    fee $${fee.toFixed(2)} modelled at the schedule rate for this series (M = ${KDA.takerMult(ticker)}, so the general 0.07 rate applies only when M = 1; F-84). This is a paper trade in this browser only.`;
+    fee ${KD.money(fee)} modelled at the schedule rate for this series (M = ${KDA.takerMult(ticker)}, so the general 0.07 rate applies only when M = 1; F-84). This is a paper trade in this browser only.`;
   render();
 });
 
@@ -411,12 +411,12 @@ function renderAuto() {
   const equityNow = r.ending_cash + open.reduce((s, t) => s + t.contracts * t.mark_price, 0);
   KD.$("#aMeta").innerHTML = `ran ${KD.esc(auto.ran_at)} over snapshot ${KD.esc(auto.snapshot_at)} · universe: ${KD.esc(auto.universe === "0" ? "all in-scope open markets" : "top " + auto.universe + " per category")} · ${KD.num(r.events)} collected observations · ${KD.num(r.universe_size)} markets in universe`;
   host.innerHTML = [
-    ["$" + equityNow.toFixed(2), "paper equity (cash + marks)"],
+    [KD.money(equityNow), "paper equity (cash + marks)"],
     [(closed.length ? (100 * wins / closed.length).toFixed(1) + "%" : "—"), "win rate of closed trades"],
-    ["$" + realized.toFixed(2), "realised P&L, net of fees"],
-    ["$" + unreal.toFixed(2), "unrealised P&L (open marks)"],
-    ["$" + fees.toFixed(2), "modelled fees paid"],
-    ["$" + (r.max_drawdown_portfolio || 0).toFixed(2), "max drawdown of the curve"],
+    [KD.money(realized), "realised P&L, net of fees"],
+    [KD.money(unreal), "unrealised P&L (open marks)"],
+    [KD.money(fees), "modelled fees paid"],
+    [KD.money(r.max_drawdown_portfolio), "max drawdown of the curve"],
   ].map(([v, l]) => `<div class="card"><div class="kpi">${v}<small>${l}</small></div></div>`).join("");
 
   KD.$("#aByStrategy").innerHTML = KD.table([
@@ -428,9 +428,9 @@ function renderAuto() {
     s: `<b>${KD.esc(s.name)}</b>`,
     tr: KD.num(s.trades), cl: KD.num(s.closed), op: KD.num(s.open),
     wr: s.win_rate === null ? '<span class="na">—</span>' : KD.pct(s.win_rate, 1),
-    rp: (s.realized_pnl >= 0 ? "+$" : "−$") + Math.abs(s.realized_pnl).toFixed(2),
-    up: (s.unrealized_pnl >= 0 ? "+$" : "−$") + Math.abs(s.unrealized_pnl).toFixed(2),
-    fe: "$" + s.fees.toFixed(2),
+    rp: KD.money(s.realized_pnl),
+    up: KD.money(s.unrealized_pnl),
+    fe: KD.money(s.fees),
   })));
 
   // strategy × category matrix
@@ -449,7 +449,7 @@ function renderAuto() {
       const row = { s: `<b>${KD.esc(id)}</b>` };
       for (const c of CATS) {
         const m = matrix[id + "|" + c];
-        row[c] = m ? `${KD.num(m.n)} trades · <span style="color:${m.pnl >= 0 ? "var(--ok)" : "var(--bad)"}">${m.pnl >= 0 ? "+$" : "−$"}${Math.abs(m.pnl).toFixed(2)}</span> · fees $${m.fees.toFixed(2)}` : '<span class="na">—</span>';
+        row[c] = m ? `${KD.num(m.n)} trades · <span style="color:${m.pnl >= 0 ? "var(--ok)" : "var(--bad)"}">${KD.money(m.pnl)}</span> · fees ${KD.money(m.fees)}` : '<span class="na">—</span>';
       }
       return row;
     }),
@@ -465,7 +465,7 @@ function renderAuto() {
     s: KD.esc(t.strategy), cat: KD.CAT_LABEL[t.category_id] || KD.esc(t.category_id || "—"),
     side: t.side === "yes" ? '<span class="badge ok">YES</span>' : '<span class="badge bad">NO</span>',
     c: KD.num(t.contracts), ef: KD.cents(t.entry_fill), mk: KD.cents(t.mark_price),
-    u: (t.unrealized >= 0 ? "+$" : "−$") + Math.abs(t.unrealized).toFixed(2),
+    u: KD.money(t.unrealized),
     src: KD.srcLink(t.source, "API query"),
   })), { empty: "No open paper positions." });
 
@@ -481,8 +481,8 @@ function renderAuto() {
     cat: KD.CAT_LABEL[t.category_id] || KD.esc(t.category_id || "—"),
     band: KD.esc(bandOf(t.entry_fill)), ef: KD.cents(t.entry_fill),
     xf: t.exit_fill === null || t.exit_fill === undefined ? '<span class="na">—</span>' : KD.cents(t.exit_fill),
-    c: KD.num(t.contracts), fe: "$" + (t.fees || 0).toFixed(2),
-    pnl: t.pnl === null || t.pnl === undefined ? '<span class="na">—</span>' : (t.pnl >= 0 ? "+$" : "−$") + Math.abs(t.pnl).toFixed(2),
+    c: KD.num(t.contracts), fe: KD.money(t.fees),
+    pnl: KD.money(t.pnl),
     st: t.status === "settled" ? '<span class="badge ok">settled</span>' : '<span class="badge warn">closed</span>',
     src: KD.srcLink(t.source, "API query"),
   })), { empty: "No closed trades in the latest session." });

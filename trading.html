@@ -97,7 +97,8 @@
           <td>Open stake is not marked-to-market in the headline number; unrealised estimates are per-position below.</td></tr>
       <tr><td>Win rate</td><td>Closed trades with net P&amp;L &gt; 0 ÷ closed.</td>
           <td>Meaningless before positions resolve or hit exits; strategies stay open until then by design.</td></tr>
-      <tr><td>Settlement P&amp;L</td><td>Positions held to resolution pay $1 per winning contract.</td>
+      <tr><td>Settlement P&amp;L</td><td>Positions held to resolution pay $1 per winning contract
+          (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">market settlement</a>).</td>
           <td>Only simple yes/no results settle this way; scalar results are left open (flagged F-28).</td></tr>
     </tbody>
   </table></div>
@@ -116,7 +117,13 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 KD.nav("trading.html");
 const AT = KDL.AT;
 
-function fmt(v, d = 2) { return v === null || v === undefined || Number.isNaN(v) ? '<span class="na">—</span>' : Number(v).toFixed(d); }
+function fmt(v, d = 2) {
+  if (v === null || v === undefined || Number.isNaN(v)) return '<span class="na">—</span>';
+  const n = Number(v);
+  const [i, f] = Math.abs(n).toFixed(d).split(".");
+  // T116 (F-100): group thousands to match KD.money everywhere else on the site.
+  return (n < 0 ? "-" : "") + i.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (f ? "." + f : "");
+}
 function roi(st) { return st.stake > 0 ? st.net / st.stake : null; }
 
 function strategyTable() {
@@ -138,7 +145,11 @@ function strategyTable() {
     { key: "on", label: "State" }, { key: "n", label: "Trades", num: true }, { key: "open", label: "Open", num: true },
     { key: "w", label: "Wins / losses", num: true }, { key: "stake", label: "Gross stake", num: true },
     { key: "fees", label: "Fees", num: true }, { key: "net", label: "Net P&L", num: true }, { key: "roi", label: "ROI on stake", num: true },
-  ], rows, { empty: "No trades yet — the engine opens its first paper position on the next qualifying alert." });
+  ], rows, { empty: "No trades yet — the engine opens its first paper position on the next qualifying alert." })
+    + `<p class="small mut">Derived from this browser's paper ledger (localStorage — export it with
+      Export ledger JSON). Entry quotes follow <a href="https://docs.kalshi.com/getting_started/orderbook_responses"
+      target="_blank" rel="noopener">Order Book Responses</a>; modelled fees use the
+      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>.</p>`;
 }
 
 function catTable() {
@@ -241,12 +252,12 @@ function closedTable() {
 function kpis() {
   const s = AT.stats();
   const kp = [
-    ["Paper cash", "$" + s.cash.toFixed(2)],
-    ["Equity (cash + open stake at entry)", "$" + s.equity.toFixed(2)],
-    ["Realised net P&L", `<span class="${s.realized >= 0 ? "pos" : "neg"}">$${s.realized.toFixed(2)}</span>`],
-    ["Modelled fees", "$" + s.fees.toFixed(2)],
+    ["Paper cash", KD.money(s.cash)],
+    ["Equity (cash + open stake at entry)", KD.money(s.equity)],
+    ["Realised net P&L", `<span class="${s.realized >= 0 ? "pos" : "neg"}">${KD.money(s.realized)}</span>`],
+    ["Modelled fees", KD.money(s.fees)],
     ["Open positions", String(s.openCount)],
-    ["Open risk (stake at entry)", "$" + s.openRisk.toFixed(2)]
+    ["Open risk (stake at entry)", KD.money(s.openRisk)]
   ];
   KD.$("#kpis").innerHTML = kp.map(([k, v]) => `<div class="card"><div class="kpi">${v}</div><small class="mut">${k}</small></div>`).join("");
 }

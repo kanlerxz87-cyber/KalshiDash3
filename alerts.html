@@ -304,12 +304,19 @@ function render() {
   // chronological order, newest at the BOTTOM: renderFeed auto-scrolls there.
   const shownAll = all.filter(tradedFilter);
   const shownModel = model.filter(tradedFilter);
-  KDL.renderFeed(KD.$("#feedAll"), shownAll.slice(-120), { catLabels: KD.CAT_LABEL });
-  KDL.renderFeed(KD.$("#feedModel"), shownModel.slice(-120), { catLabels: KD.CAT_LABEL, showWhy: true });
-  renderEvidenceBar(all.length, shownAll.length);
+  // T116 (F-102): the feed renders the newest 120 rows (slice), so the chip must count what
+  // is actually on screen — it used to print the pre-slice length, "154 in view" over a chat
+  // with 120 bubbles. The evidence bar, by contrast, describes the WHOLE archive feed
+  // (counts.evidence sums to counts.all_events), so its denominator is the global feed
+  // length on every category tab, not the category-filtered count.
+  const renderedAll = shownAll.slice(-120);
+  const renderedModel = shownModel.slice(-120);
+  KDL.renderFeed(KD.$("#feedAll"), renderedAll, { catLabels: KD.CAT_LABEL });
+  KDL.renderFeed(KD.$("#feedModel"), renderedModel, { catLabels: KD.CAT_LABEL, showWhy: true });
+  renderEvidenceBar(KDL.feedAlerts().length, renderedAll.length);
   renderOutcomes();
-  KD.$("#allCount").textContent = shownAll.length + (shownAll.length === all.length ? " in view" : ` of ${all.length} shown`);
-  KD.$("#modelCount").textContent = shownModel.length + (shownModel.length === model.length ? " in view" : ` of ${model.length} shown`);
+  KD.$("#allCount").textContent = renderedAll.length + (renderedAll.length === all.length ? " in view" : ` of ${all.length} shown`);
+  KD.$("#modelCount").textContent = renderedModel.length + (renderedModel.length === model.length ? " in view" : ` of ${model.length} shown`);
   const f = KDL.feedAlerts();
   const up = f.filter((a) => a.dir === "up").length, down = f.length - up;
   KD.$("#counts").textContent = `▲ ${up} · ▼ ${down}`;

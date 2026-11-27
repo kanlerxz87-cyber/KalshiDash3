@@ -1,6 +1,6 @@
 {
  "generated": "2026-11-22T09:40:00Z",
- "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes. Session arena-ae1f84b0 (2026-11-22T08:0xZ) added F-83 (landing table labelled a zero-volume market as a topic's largest) and re-verified the external links it cites; the missing G19 status is left to session arena-38b89a30, which claimed it first (see COORDINATION.md overlap note), after re-running the release gate on a159dd3 to confirm it was green before changing anything. Session arena-ae1f84b0 (2026-11-22T08:2xZ) added F-84 (browser paper ledgers charged the general taker fee on the schedule's M = 0 series and over-ceiled a cent) and fixed it in assets/alerts.js, assets/engine.js and portfolio.html with a new release-gate test. Session arena-eed90ce4 (2026-11-22T08:4xZ) added F-85 (a collect.yml relay run held the concurrency group for ~2 h with no commit, so the snapshot aged; desk.yml and freshness-alarm.yml job timeouts were bounded in the same change). It appended rather than replaced F-83/F-84, which merged from session arena-ae1f84b0 first. Session arena-a070c747 added D-02 (three divergent model-pick counts, fixed), D-03 (alerted markets that rotate out of the snapshot are labelled 'not in snapshot'), D-04 (the move-vs-outcome count is 0 of 1, so no hit rate is claimed) and D-05 (the alert page said 20 swings were withheld while showing all 81, fixed), corrected F-78, and added G22/G23. D-nn is used deliberately: four sessions were minting F-nn ids concurrently, this session's rows were written as F-83..F-86 and then F-85..F-88, and both ranges were merged by other sessions while this branch was open. Session arena-eed90ce4 also added F-86 (the freshness monitor's in-flight blind spot) with the guard it now runs; it appended to the board rather than renumbering anyone else's rows, and it checked for duplicate ids after every rebase.",
+ "note": "Decision inputs for this project. Every entry names the official source it rests on. `unknown` entries list exactly what information is missing and how to obtain it, so a decision is not made on absent data. Nothing here is implemented before the owner picks a path. Session arena-a2fca5db added F-24..F-28 and G11..G17 (G11-G13 shipped: in-browser live mode, alert chats, live auto-sim) after integrating the parallel sessions' F-14..F-23 / G1..G10 series. Session arena-2a36471a added F-30 (live-desk scan divide-by-zero) after merging PR #31. Session arena-d243bfa7 added fact F-55 (the two endpoints differ in list encoding, both live URLs recorded) and folded its order-book finding into F-33 as a verified resolution instead of minting a duplicate id; its own divide-by-zero and fixture-time-bomb findings were left as F-30 (PR #31) and F-32 (PR #34). Session arena-968ce6ec added F-38 (culture QA test market tops keyword ranking) and F-39 (PR #38 freeze port, renumbered from colliding F-34) and closed F-37 (index KPI label). Session arena-6a6e8f22 added F-65 (topic-fair settled-row publication) and F-66 (rarely-settling topics and the historical cutoff; the condition was described as F-42 on a parallel branch that never merged, and F-40 was already taken here). Session arena-42e3b260 (2026-11-21T23:5xZ) closed R-B1 as F-75, added F-76 (five-topic alert scope: 20 archived swings withheld and counted) and F-77 (demo BTC range markets oscillate, which dominates the model feed), and renumbered the verification ledger to C-nn so F-nn on this page is unambiguous. It merged, rather than replaced, session arena-2a7c58f1's F-73/F-74 fixes. Session arena-ae1f84b0 (2026-11-22T08:0xZ) added F-83 (landing table labelled a zero-volume market as a topic's largest) and re-verified the external links it cites; the missing G19 status is left to session arena-38b89a30, which claimed it first (see COORDINATION.md overlap note), after re-running the release gate on a159dd3 to confirm it was green before changing anything. Session arena-ae1f84b0 (2026-11-22T08:2xZ) added F-84 (browser paper ledgers charged the general taker fee on the schedule's M = 0 series and over-ceiled a cent) and fixed it in assets/alerts.js, assets/engine.js and portfolio.html with a new release-gate test. Session arena-eed90ce4 (2026-11-22T08:4xZ) added F-85 (a collect.yml relay run held the concurrency group for ~2 h with no commit, so the snapshot aged; desk.yml and freshness-alarm.yml job timeouts were bounded in the same change). It appended rather than replaced F-83/F-84, which merged from session arena-ae1f84b0 first. Session arena-a070c747 added D-02 (three divergent model-pick counts, fixed), D-03 (alerted markets that rotate out of the snapshot are labelled 'not in snapshot'), D-04 (the move-vs-outcome count is 0 of 1, so no hit rate is claimed) and D-05 (the alert page said 20 swings were withheld while showing all 81, fixed), corrected F-78, and added G22/G23. D-nn is used deliberately: four sessions were minting F-nn ids concurrently, this session's rows were written as F-83..F-86 and then F-85..F-88, and both ranges were merged by other sessions while this branch was open. Session arena-eed90ce4 also added F-86 (the freshness monitor's in-flight blind spot) with the guard it now runs; it appended to the board rather than renumbering anyone else's rows, and it checked for duplicate ids after every rebase. Session arena-251f5c3d added F-100..F-104 (T117: money grouping, dashboard/alerts count honesty, portfolio money alignment and null handling, derived-table provenance), each fixed in the same session and pinned by scripts/tests/test_pages_dom.js section N.",
  "questions": [
   {
    "id": "Q1",
@@ -385,17 +385,17 @@
    "success_metric": "The scoreboard renders on every category page from committed data only, its numbers reconcile with the alert page to the row, and a reader can see the sample size next to every rate."
   },
   {
-    "id": "G24",
-    "status": "proposed",
-    "suggestion": "Show each published row's own series record (official categories, tags, scope) with a link to it, so a topic mismatch is visible on the page instead of only in the collector",
-    "why_it_helps_decisions": "F-97 is the argument: the exchange files a natural-gas series under \"Entertainment\", and the site published it inside Culture until a collector rule caught it. A trader reading the Culture page cannot see WHY a row is there - the row carries a basis badge (seed / keyword / official) but not the record that decided it. Rendering the deciding record next to the row (categories, tags, scope, and the GET /series link) makes every classification auditable in one click, and turns the basis badge from a label into evidence. It is the difference between a dashboard you trust and a dashboard you check.",
-    "effort": "Low: the snapshot already carries series_categories per row and the full series_index; render them in a collapsed details cell on the category pages and the dashboard table, with the official series link. No new collection.",
-    "risk": "Too much text on a table that is meant to be scannable. Mitigate by keeping the record behind a collapsed row, showing the one decisive field by default, and never hiding the topic badge itself. A second risk is that the record is read as an endorsement of the row: the copy must say it is the exchange's own classification of the SERIES, and that the topic on this project is a decision made on top of it.",
-    "success_metric": "Every published row on every topic page can be opened to the exact GET /series record that classified it, and the class of mismatch F-97 represents is visible on the page without opening the collector.",
-    "sources": [
-      "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD"
-    ]
+   "id": "G24",
+   "status": "proposed",
+   "suggestion": "Show each published row's own series record (official categories, tags, scope) with a link to it, so a topic mismatch is visible on the page instead of only in the collector",
+   "why_it_helps_decisions": "F-97 is the argument: the exchange files a natural-gas series under \"Entertainment\", and the site published it inside Culture until a collector rule caught it. A trader reading the Culture page cannot see WHY a row is there - the row carries a basis badge (seed / keyword / official) but not the record that decided it. Rendering the deciding record next to the row (categories, tags, scope, and the GET /series link) makes every classification auditable in one click, and turns the basis badge from a label into evidence. It is the difference between a dashboard you trust and a dashboard you check.",
+   "effort": "Low: the snapshot already carries series_categories per row and the full series_index; render them in a collapsed details cell on the category pages and the dashboard table, with the official series link. No new collection.",
+   "risk": "Too much text on a table that is meant to be scannable. Mitigate by keeping the record behind a collapsed row, showing the one decisive field by default, and never hiding the topic badge itself. A second risk is that the record is read as an endorsement of the row: the copy must say it is the exchange's own classification of the SERIES, and that the topic on this project is a decision made on top of it.",
+   "success_metric": "Every published row on every topic page can be opened to the exact GET /series record that classified it, and the class of mismatch F-97 represents is visible on the page without opening the collector.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD"
+   ]
   }
  ],
  "flagged": [
@@ -1341,82 +1341,145 @@
    ]
   },
   {
-    "id": "F-94",
-    "severity": "medium",
-    "item": "Landing table printed \"none open in scope\" for a topic with no published row, while the open-market scan had been truncated at its safety cap",
-    "why": "`data/live/markets.json` (collected 2026-11-25T12:16:44Z) records `open_paging_truncated_at_safety_cap: true` and `open_rows_trimmed_for_size: 21243`, and publishes 374 open rows. None of the 374 is a Culture row, so `index.html` showed Culture as \"none open in scope\". That claim is about the whole market, but the file cannot show it: the scan stopped at the cap and 21,243 in-scope open rows were not written. The Culture absence is a fact about the published rows only.",
-    "action": "Fixed in T102 (arena-0b0ca3c1): the row now reads \"none in the published rows\", and when the scan is truncated the page prints the trimmed count beside it. `test_pages_dom.js` accepts that wording. Open question for a later collector pass: whether the open scan should page further so Culture rows are visible at all.",
-    "sources": [
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html",
-      "https://docs.kalshi.com/api-reference/market/get-markets"
-    ]
+   "id": "F-94",
+   "severity": "medium",
+   "item": "Landing table printed \"none open in scope\" for a topic with no published row, while the open-market scan had been truncated at its safety cap",
+   "why": "`data/live/markets.json` (collected 2026-11-25T12:16:44Z) records `open_paging_truncated_at_safety_cap: true` and `open_rows_trimmed_for_size: 21243`, and publishes 374 open rows. None of the 374 is a Culture row, so `index.html` showed Culture as \"none open in scope\". That claim is about the whole market, but the file cannot show it: the scan stopped at the cap and 21,243 in-scope open rows were not written. The Culture absence is a fact about the published rows only.",
+   "action": "Fixed in T102 (arena-0b0ca3c1): the row now reads \"none in the published rows\", and when the scan is truncated the page prints the trimmed count beside it. `test_pages_dom.js` accepts that wording. Open question for a later collector pass: whether the open scan should page further so Culture rows are visible at all.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
   },
   {
-    "id": "F-95",
-    "severity": "medium",
-    "item": "Chat dock model chat showed 58 of the 96 frozen high-ROI swings, because it filtered the newest 80 events instead of the whole archive",
-    "why": "`assets/chatdock.js` kept one 80-row buffer for all events and derived the model chat from it. Any model pick older than the newest 80 qualifying swings was dropped, so the model chat undercounted the screen that `alerts.html` and the dashboard show (96 frozen `high_roi` rows in `data/live/alerts_archive.json`, 2026-11-25 snapshot). `scripts/tests/test_chatdock.js` caught it (`model chat count equals the frozen high_roi screen`).",
-    "action": "Fixed in T100 (arena-0b0ca3c1): the buffer holds up to 2,000 qualifying rows; each chat renders its newest 80. The model chat now shows 80 of 96 (the display window), and the counts in the headers are the rows held. Verified by `scripts/tests/test_chatdock.js` (PASS).",
-    "sources": [
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/chatdock.js",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_chatdock.js"
-    ]
+   "id": "F-95",
+   "severity": "medium",
+   "item": "Chat dock model chat showed 58 of the 96 frozen high-ROI swings, because it filtered the newest 80 events instead of the whole archive",
+   "why": "`assets/chatdock.js` kept one 80-row buffer for all events and derived the model chat from it. Any model pick older than the newest 80 qualifying swings was dropped, so the model chat undercounted the screen that `alerts.html` and the dashboard show (96 frozen `high_roi` rows in `data/live/alerts_archive.json`, 2026-11-25 snapshot). `scripts/tests/test_chatdock.js` caught it (`model chat count equals the frozen high_roi screen`).",
+   "action": "Fixed in T100 (arena-0b0ca3c1): the buffer holds up to 2,000 qualifying rows; each chat renders its newest 80. The model chat now shows 80 of 96 (the display window), and the counts in the headers are the rows held. Verified by `scripts/tests/test_chatdock.js` (PASS).",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/chatdock.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_chatdock.js"
+   ]
   },
   {
-    "id": "F-96",
-    "severity": "high",
-    "item": "Live all-events chat showed Demo/Test instrument swings (e.g. KXDEMOFUTHOURLY-*) with no topic, and showed swings in insertion order rather than time order",
-    "why": "`assets/live.js` built swing alerts from every series in `data/live/price_history.json` with no topic gate, so rows for `KXDEMOFUTHOURLY-*` (official series record: `categories: [\"Test\"]`, `tags: [\"Demo\"]`) appeared with an empty topic pill. The page states \"every market in the five topics\". Separately, `renderChats` sliced the first 60 alerts by insertion order, so a newer live tick could fall outside the window. The same file also filed `KXBALLONDOR` under Culture by seed, but the exchange files that series under Sports (`categories: [\"Sports\"]`, `tags: [\"Soccer\"]`), which is why `scripts/collect.py` refuses it.",
-    "action": "Fixed in T101 (arena-0b0ca3c1): a swing is shown only when its market has a confirmed topic and is not a Test/Demo series; withheld swings are counted in the chat header. Alerts are sorted newest-first by their own time. `KXBALLONDOR` is no longer classified as Culture. Verified by `scripts/tests/test_pages_dom.js` (PASS). Note: closed markets that are not in the open snapshot (e.g. `KXBTCD-*`) now also have no topic on this page and are withheld; they remain on `alerts.html`, which carries the archive's topic.",
-    "sources": [
-      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
-      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/live.js",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/live.html",
-      "https://docs.kalshi.com/getting_started/demo_env"
-    ]
+   "id": "F-96",
+   "severity": "high",
+   "item": "Live all-events chat showed Demo/Test instrument swings (e.g. KXDEMOFUTHOURLY-*) with no topic, and showed swings in insertion order rather than time order",
+   "why": "`assets/live.js` built swing alerts from every series in `data/live/price_history.json` with no topic gate, so rows for `KXDEMOFUTHOURLY-*` (official series record: `categories: [\"Test\"]`, `tags: [\"Demo\"]`) appeared with an empty topic pill. The page states \"every market in the five topics\". Separately, `renderChats` sliced the first 60 alerts by insertion order, so a newer live tick could fall outside the window. The same file also filed `KXBALLONDOR` under Culture by seed, but the exchange files that series under Sports (`categories: [\"Sports\"]`, `tags: [\"Soccer\"]`), which is why `scripts/collect.py` refuses it.",
+   "action": "Fixed in T101 (arena-0b0ca3c1): a swing is shown only when its market has a confirmed topic and is not a Test/Demo series; withheld swings are counted in the chat header. Alerts are sorted newest-first by their own time. `KXBALLONDOR` is no longer classified as Culture. Verified by `scripts/tests/test_pages_dom.js` (PASS). Note: closed markets that are not in the open snapshot (e.g. `KXBTCD-*`) now also have no topic on this page and are withheld; they remain on `alerts.html`, which carries the archive's topic.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/live.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/live.html",
+    "https://docs.kalshi.com/getting_started/demo_env"
+   ]
   },
   {
-    "id": "F-97",
-    "severity": "high",
-    "item": "The Culture topic published 20 natural-gas futures rows: Kalshi files the daily contract KXNATGASD under \"Entertainment\", so a category-only topic rule accepted it",
-    "why": "F-38 (2026-11-21) found natural-gas futures inside *Gas Prices* and excluded the 15-minute series KXNATGAS15M. The same underlying reached the site again through a different door. The exchange's own series record for the DAILY contract is GET /series/KXNATGASD -> {\"categories\":[\"Entertainment\"],\"title\":\"Natural Gas Daily\",\"tags\":[\"Oil & Gas\"],\"product_metadata\":{\"scope\":\"Natural Gas\"},\"settlement_sources\":[{\"name\":\"Pyth\"}]}. Because \"Entertainment\" is a Culture category, the collector's official-category discovery (GET /series?category=Entertainment -> Culture) put the series in Culture, and the category-only integrity rule could not object: the row's own category WAS compatible with the topic. The title keyword \"gas\" would have said Gas Prices. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: 20 published rows (KXNATGASD-26NOV2417-T3.295 and 19 siblings) carried category_id=culture, and they were 40% of the Culture topic's 50 published rows; the other 30 were KXSUPERBOWLHEADLINE. A full audit of all 574 published rows against their own series records found this as the ONLY topic/series contradiction - every other row's official categories, tags and title agree with the topic it is published under.",
-    "action": "Fixed in scripts/collect.py. (1) KXNATGASD is excluded from every topic, exactly like its 15-minute sibling, and the reason quotes the official series record (https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD); the reason is published in counts.excluded_series_reasons. (2) A new rule refuses a row whose official TAGS name another topic's domain, whatever category the exchange files it under: the category is a coarse bucket (\"Entertainment\" also holds natural gas), the tag is the domain (\"Oil & Gas\"). Only tags that unambiguously name one of the five topics' own domains are used, so a frequency tag such as \"15 min\" never excludes a row. Pinned offline by scripts/tests/test_topic_integrity.py (10 cases: the exclusion and its source, the classifier returning no topic for the series, the tag rule accepting the owning topic and refusing the others, and the committed snapshot containing no row whose own series record contradicts its topic). The rows leave the published snapshot on the next collector pass, which is the only writer of data/live. Verified live on 2026-11-25: the collector pass at 13:52:21Z published 0 rows whose series is KXNATGASD (the 13:46:45Z pass already published 0), the reason is published in counts.excluded_series_reasons, and the Culture topic's 50 settled rows are now all KXSUPERBOWLHEADLINE - the series Kalshi files under Entertainment with the tag Live Music. The deployed culture.html lists no natural-gas row.",
-    "sources": [
-      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD",
-      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGAS15M",
-      "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.295",
-      "https://docs.kalshi.com/api-reference/market/get-series-list",
-      "https://docs.kalshi.com/api-reference/market/get-markets",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py"
-    ]
+   "id": "F-97",
+   "severity": "high",
+   "item": "The Culture topic published 20 natural-gas futures rows: Kalshi files the daily contract KXNATGASD under \"Entertainment\", so a category-only topic rule accepted it",
+   "why": "F-38 (2026-11-21) found natural-gas futures inside *Gas Prices* and excluded the 15-minute series KXNATGAS15M. The same underlying reached the site again through a different door. The exchange's own series record for the DAILY contract is GET /series/KXNATGASD -> {\"categories\":[\"Entertainment\"],\"title\":\"Natural Gas Daily\",\"tags\":[\"Oil & Gas\"],\"product_metadata\":{\"scope\":\"Natural Gas\"},\"settlement_sources\":[{\"name\":\"Pyth\"}]}. Because \"Entertainment\" is a Culture category, the collector's official-category discovery (GET /series?category=Entertainment -> Culture) put the series in Culture, and the category-only integrity rule could not object: the row's own category WAS compatible with the topic. The title keyword \"gas\" would have said Gas Prices. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: 20 published rows (KXNATGASD-26NOV2417-T3.295 and 19 siblings) carried category_id=culture, and they were 40% of the Culture topic's 50 published rows; the other 30 were KXSUPERBOWLHEADLINE. A full audit of all 574 published rows against their own series records found this as the ONLY topic/series contradiction - every other row's official categories, tags and title agree with the topic it is published under.",
+   "action": "Fixed in scripts/collect.py. (1) KXNATGASD is excluded from every topic, exactly like its 15-minute sibling, and the reason quotes the official series record (https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD); the reason is published in counts.excluded_series_reasons. (2) A new rule refuses a row whose official TAGS name another topic's domain, whatever category the exchange files it under: the category is a coarse bucket (\"Entertainment\" also holds natural gas), the tag is the domain (\"Oil & Gas\"). Only tags that unambiguously name one of the five topics' own domains are used, so a frequency tag such as \"15 min\" never excludes a row. Pinned offline by scripts/tests/test_topic_integrity.py (10 cases: the exclusion and its source, the classifier returning no topic for the series, the tag rule accepting the owning topic and refusing the others, and the committed snapshot containing no row whose own series record contradicts its topic). The rows leave the published snapshot on the next collector pass, which is the only writer of data/live. Verified live on 2026-11-25: the collector pass at 13:52:21Z published 0 rows whose series is KXNATGASD (the 13:46:45Z pass already published 0), the reason is published in counts.excluded_series_reasons, and the Culture topic's 50 settled rows are now all KXSUPERBOWLHEADLINE - the series Kalshi files under Entertainment with the tag Live Music. The deployed culture.html lists no natural-gas row.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGAS15M",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXNATGASD-26NOV2417-T3.295",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py"
+   ]
   },
   {
-    "id": "F-98",
-    "severity": "medium",
-    "item": "The collector's health file was written only when a pass FAILED, so it kept reporting a stale failure while the collector was healthy",
-    "why": "scripts/collect_relay.py records a failed pass in data/live/collector_health.json (F-85/F-87) and commits that file alone; nothing ever cleared it. Measured on 2026-11-25: the committed file read {\"outcome\": \"failed\", \"detail\": \"validators: validate_alerts\", \"generated_at\": \"2026-11-25T12:01:52Z\", \"run_id\": \"45607339513\"} while the collector was publishing healthy snapshots after it - data/live/markets.json carried collected_at 2026-11-25T13:16:43Z and later. The file's own note says it is \"Read by humans\", and F-87 calls it \"the first file any later session should read\", so a stale failure record is exactly the wrong thing to leave there: a reader would conclude the collector was broken when it was publishing every 15 minutes.",
-    "action": "Fixed in scripts/collect_relay.py: the health file is now the outcome of the MOST RECENT pass in both directions. A pass that commits writes {\"outcome\": \"ok\", \"detail\": \"snapshot committed\", \"snapshot_collected_at\": <the snapshot it was written with>} before the commit, so it lands in the same commit as the snapshot it describes - no extra commit, no extra push, no race with the relay's own history - and a failing pass still writes \"failed\" and commits that file alone as before. Pinned offline by scripts/tests/test_collect_health.py (5 new cases: the documented fields of the ok record, the snapshot timestamp it names, the repository's own health file never being rewritten by the suite, the committing path writing the record BEFORE the commit that stages data/live, and the failure path still writing \"failed\"). Verified live on 2026-11-25: the pass at 13:52:22Z wrote {\"outcome\": \"ok\", \"detail\": \"snapshot committed\", \"snapshot_collected_at\": \"2026-11-25T13:52:21Z\"} into the file in the same commit as that snapshot (commit 4eac27c), replacing the stale failure record; the relay that had loaded the old module at 11:45Z was cancelled and restarted so the fix could take effect.",
-    "sources": [
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
-      "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
-    ]
+   "id": "F-98",
+   "severity": "medium",
+   "item": "The collector's health file was written only when a pass FAILED, so it kept reporting a stale failure while the collector was healthy",
+   "why": "scripts/collect_relay.py records a failed pass in data/live/collector_health.json (F-85/F-87) and commits that file alone; nothing ever cleared it. Measured on 2026-11-25: the committed file read {\"outcome\": \"failed\", \"detail\": \"validators: validate_alerts\", \"generated_at\": \"2026-11-25T12:01:52Z\", \"run_id\": \"45607339513\"} while the collector was publishing healthy snapshots after it - data/live/markets.json carried collected_at 2026-11-25T13:16:43Z and later. The file's own note says it is \"Read by humans\", and F-87 calls it \"the first file any later session should read\", so a stale failure record is exactly the wrong thing to leave there: a reader would conclude the collector was broken when it was publishing every 15 minutes.",
+   "action": "Fixed in scripts/collect_relay.py: the health file is now the outcome of the MOST RECENT pass in both directions. A pass that commits writes {\"outcome\": \"ok\", \"detail\": \"snapshot committed\", \"snapshot_collected_at\": <the snapshot it was written with>} before the commit, so it lands in the same commit as the snapshot it describes - no extra commit, no extra push, no race with the relay's own history - and a failing pass still writes \"failed\" and commits that file alone as before. Pinned offline by scripts/tests/test_collect_health.py (5 new cases: the documented fields of the ok record, the snapshot timestamp it names, the repository's own health file never being rewritten by the suite, the committing path writing the record BEFORE the commit that stages data/live, and the failure path still writing \"failed\"). Verified live on 2026-11-25: the pass at 13:52:22Z wrote {\"outcome\": \"ok\", \"detail\": \"snapshot committed\", \"snapshot_collected_at\": \"2026-11-25T13:52:21Z\"} into the file in the same commit as that snapshot (commit 4eac27c), replacing the stale failure record; the relay that had loaded the old module at 11:45Z was cancelled and restarted so the fix could take effect.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows"
+   ]
   },
   {
-    "id": "F-99",
-    "severity": "medium",
-    "item": "The per-ticker price-history window silently deleted the observations that BOUND an archived swing, so most swings the page serves could no longer be quantified",
-    "why": "scripts/collect.py keeps at most PRICE_HISTORY_LIMIT = 120 observations per ticker so the committed file stays small, and it trimmed the series to the newest 120 without regard for what the alert archive cites. The two observations that bound a swing are the ones that matter: the archive (data/live/alerts_archive.json, written by scripts/build_alerts.py) names them as from_time and to_time, and the evidence layer (scripts/alert_evidence.py) needs both to say how many contracts traded in the interval and whether the book actually repriced. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: of the 150 archived swings, 62 had lost BOTH bounds and 2 had lost one - every cited ticker was still present, but the specific observations were gone. That is why the published evidence counts read traded_ge_floor 12, traded_below_floor 61, candle_unquantified 5 and unknown_no_observations 52: 52 of the 130 swings the alert chats serve could not be quantified at all, and the dashboard chart for those tickers no longer contains the swing the alert points at.",
-    "action": "Fixed in scripts/collect.py. The archive is now read as the authority on which observations matter, and the observations an alert cites are PINNED: keep_observations() keeps the newest PRICE_HISTORY_LIMIT observations plus any observation whose timestamp an archived alert cites, in time order, so the chart and the evidence layer can still read the swing back. pinned_alert_times() reads from_time and to_time from data/live/alerts_archive.json and returns nothing (never a guess) when that file is missing or unreadable. The cap still bounds the file: only the observations an alert actually cites are kept in addition to the window. Pinned offline by scripts/tests/test_price_history_retention.py (8 cases: the window unchanged without pins, a pinned observation surviving the cap, an unpinned one still dropping out, the series staying in time order, a real append keeping the pin, both bounds pinned from the archive, and an absent or unreadable archive pinning nothing). The 62 swings already lost are not restored by this: a settled market is never returned by GET /markets again, and its candles are per-period closes, so the historical rows stay as they are - the fix stops the bleeding for every swing archived from now on. Verified live on 2026-11-25: after the fix, 5 observations that an archived alert cites sit outside the newest-120 window and are still present in data/live/price_history.json - they are present only because the pin keeps them, and the pass at 13:52:21Z deleted 0 cited observations. The other 129 cited observations are absent because they were deleted before the fix landed; Kalshi's GET /markets no longer returns those settled markets and its candles are per-period closes, so they cannot be re-read and are not restored by this change.",
-    "sources": [
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
-      "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
-      "https://docs.kalshi.com/api-reference/market/get-markets"
-    ]
+   "id": "F-99",
+   "severity": "medium",
+   "item": "The per-ticker price-history window silently deleted the observations that BOUND an archived swing, so most swings the page serves could no longer be quantified",
+   "why": "scripts/collect.py keeps at most PRICE_HISTORY_LIMIT = 120 observations per ticker so the committed file stays small, and it trimmed the series to the newest 120 without regard for what the alert archive cites. The two observations that bound a swing are the ones that matter: the archive (data/live/alerts_archive.json, written by scripts/build_alerts.py) names them as from_time and to_time, and the evidence layer (scripts/alert_evidence.py) needs both to say how many contracts traded in the interval and whether the book actually repriced. Measured on the committed snapshot collected 2026-11-25T13:16:43Z: of the 150 archived swings, 62 had lost BOTH bounds and 2 had lost one - every cited ticker was still present, but the specific observations were gone. That is why the published evidence counts read traded_ge_floor 12, traded_below_floor 61, candle_unquantified 5 and unknown_no_observations 52: 52 of the 130 swings the alert chats serve could not be quantified at all, and the dashboard chart for those tickers no longer contains the swing the alert points at.",
+   "action": "Fixed in scripts/collect.py. The archive is now read as the authority on which observations matter, and the observations an alert cites are PINNED: keep_observations() keeps the newest PRICE_HISTORY_LIMIT observations plus any observation whose timestamp an archived alert cites, in time order, so the chart and the evidence layer can still read the swing back. pinned_alert_times() reads from_time and to_time from data/live/alerts_archive.json and returns nothing (never a guess) when that file is missing or unreadable. The cap still bounds the file: only the observations an alert actually cites are kept in addition to the window. Pinned offline by scripts/tests/test_price_history_retention.py (8 cases: the window unchanged without pins, a pinned observation surviving the cap, an unpinned one still dropping out, the series staying in time order, a real append keeping the pin, both bounds pinned from the archive, and an absent or unreadable archive pinning nothing). The 62 swings already lost are not restored by this: a settled market is never returned by GET /markets again, and its candles are per-period closes, so the historical rows stay as they are - the fix stops the bleeding for every swing archived from now on. Verified live on 2026-11-25: after the fix, 5 observations that an archived alert cites sit outside the newest-120 window and are still present in data/live/price_history.json - they are present only because the pin keeps them, and the pass at 13:52:21Z deleted 0 cited observations. The other 129 cited observations are absent because they were deleted before the fix landed; Kalshi's GET /markets no longer returns those settled markets and its candles are per-period closes, so they cannot be re-read and are not restored by this change.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts_archive.json",
+    "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+    "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
+  },
+  {
+   "id": "F-100",
+   "severity": "medium",
+   "item": "money() printed dollars without thousands separators, so the landing page showed $23271 while gas.html showed $23,271 for the same market",
+   "why": "assets/site.js money() built its output from Number(v).toFixed(d) alone. index.html's headline dollars column calls money(v, 0) while the category KPI cards use toLocaleString, so one quantity rendered in two formats across pages: audit pass 1 (session arena-251f5c3d) recomputed gas $23,271, crypto $16,436,950 and golf $19,179 from data/live/markets.json and found the index cells ungrouped ($23271, $16436950, $19179).",
+   "action": "Fixed in assets/site.js: money() groups thousands and renders negatives as −$x (the site's signed style). The $0 output is unchanged, which is what F-83's \"a $0 dollars cell must say no trades\" assertion checks against. Regression pinned by scripts/tests/test_pages_dom.js section N1.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/site.js",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/index.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/gas.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json"
+   ]
+  },
+  {
+   "id": "F-101",
+   "severity": "medium",
+   "item": "Dashboard badges read \"100 shown\" while the feed serves 154 (all) / 123 (model) swings, and the evidence note said \"Of the 100 swings served\" while its own parts summed to 154",
+   "why": "dashboard.html sliced the feed to the newest 100 rows and reused that sliced length for the badge text AND for the evidence-note denominator, while counts.evidence is computed by scripts/alert_evidence.py over the whole served feed. The enumerated parts (21 traded + 75 thin + 0 no-trades + 5 volume-n/a + 5 candle-sourced + 53 no-history = 154) therefore contradicted the stated denominator (100) in the same sentence.",
+   "action": "Fixed in dashboard.html: badges now read \"N of M shown\" (N = rows rendered, M = the json feed/screen total, plain \"M shown\" when uncapped), and the evidence note's denominator is counts.all_events with a parts-sum fallback. Regression pinned by scripts/tests/test_pages_dom.js section N2.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/dashboard.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/alert_evidence.py"
+   ]
+  },
+  {
+   "id": "F-102",
+   "severity": "medium",
+   "item": "alerts.html chips claimed \"154 in view\" while the chat renders the newest 120 bubbles, and the evidence bar's \"swings served\" shrank with the category filter while its evidence parts stayed global",
+   "why": "render() counted shownAll (before the slice(-120) that builds the chats) for #allCount/#modelCount, so the chip overstated what was on screen. Separately, renderEvidenceBar received the category-filtered length while the other chips come from counts.evidence, which sums to counts.all_events on every tab — on a golf tab the denominator would read 7 against parts summing 154 (audit pass 2, session arena-251f5c3d).",
+   "action": "Fixed in alerts.html: the chips count the rendered bubbles and say \"X of Y shown\" when capped or filtered, and renderEvidenceBar receives KDL.feedAlerts().length (the global feed) so its denominator matches the global parts on every category tab. Regression pinned by scripts/tests/test_pages_dom.js section N3 (default tab and golf tab).",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/alerts.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_pages_dom.js"
+   ]
+  },
+  {
+   "id": "F-103",
+   "severity": "medium",
+   "item": "portfolio.html mixed raw \"$\"+toFixed(2) with KD.money for the same quantities, and a missing unrealised/fee value could render as −$0.00 instead of blank",
+   "why": "KPI cards, the by-strategy table, the topic matrix and the open/closed tables built dollars strings by hand ((t.unrealized >= 0 ? \"+$\" : \"−$\") + Math.abs(...).toFixed(2)). A null unrealized took the negative branch and printed −$0.00 — an inferred value, which the brief forbids. Once money() grouped thousands (F-100), the mixed styles would have shown $10,000.00 next to $10000.00 for the same ledger.",
+   "action": "Fixed in portfolio.html: every display of ledger cash, P&L, stake and fees now goes through KD.money, which groups thousands and renders missing or non-numeric as an em-dash (blank, never inferred). The chart-axis tick and the trade-price input defaults are separate contexts and were left as-is; the insufficient-cash and fee-confirm messages quote the same ledger cash/fee and were converted.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/portfolio.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/site.js"
+   ]
+  },
+  {
+   "id": "F-104",
+   "severity": "low",
+   "item": "Derived results tables (simulation by-strategy/topic/trade-type, trading leaderboard, strategy candidates) carried no source link, so a reviewer could not trace the counts to the committed run",
+   "why": "The brief requires every table row to link an official source. Open and settled position rows already link their market record and fillTable had a footnote, but stratTable, catTable, ttTable, trading.html's leaderboard and strategies.html's candidate rules were bare tables (audit pass 2, session arena-251f5c3d).",
+   "action": "Fixed in simulation.html, trading.html and strategies.html: each derived table now carries a provenance note linking data/live/simulation.json, data/live/alerts_archive.json or data/strategies.json, and rows that cite official material link it directly — fee schedule, Order Book Responses, Market Settlement and GET /portfolio/fills (docs.kalshi.com/api-reference/portfolio/get-fills, verified 2026-11-27). Regression pinned by scripts/tests/test_pages_dom.js section N5.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/simulation.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/trading.html",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/strategies.html",
+    "https://docs.kalshi.com/api-reference/portfolio/get-fills",
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
   }
  ]
 }
