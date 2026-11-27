@@ -947,7 +947,7 @@ function commonAsserts(label, r) {
     r.close();
   }
 
-  /* --- N. T116 (F-111..F-115): number formatting + cross-surface count honesty ---
+  /* --- N. T116 (F-116..F-120): number formatting + cross-surface count honesty ---
    * money() must group thousands everywhere (the landing table printed "$23271" while
    * gas.html printed "$23,271" for the same market); every badge/chip must lead with the
    * number of rows actually rendered and state the feed total it caps; the dashboard
@@ -964,7 +964,7 @@ function commonAsserts(label, r) {
     };
     const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
 
-    // N1. index dollars cells must render the grouped form of their own number (F-111).
+    // N1. index dollars cells must render the grouped form of their own number (F-116).
     {
       const r = await loadPage("index.html", "snapshot");
       commonAsserts("index.html N", r);
@@ -985,7 +985,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N2. dashboard badges + evidence note denominator (F-112).
+    // N2. dashboard badges + evidence note denominator (F-117).
     {
       const r = await loadPage("dashboard.html", "snapshot");
       commonAsserts("dashboard.html N", r);
@@ -1020,7 +1020,7 @@ function commonAsserts(label, r) {
     }
 
     // N3. alerts chips count the rendered bubbles; the evidence bar stays global on every
-    // category tab (F-113, candidate #4).
+    // category tab (F-118, candidate #4).
     {
       const r = await loadPage("alerts.html", "snapshot");
       commonAsserts("alerts.html N", r);
@@ -1037,7 +1037,7 @@ function commonAsserts(label, r) {
         `alerts #allCount must relate to counts.all_events ${alertsDoc.counts.all_events} (got shown=${allB.shown} total=${allB.total})`);
       // The bar's first chip is the denominator (label as of the F-105 chat refactor:
       // "swings in scope (archive)"); it is computed from the global evidence parts, so it
-      // must equal counts.all_events on every category tab (F-113).
+      // must equal counts.all_events on every category tab (F-118).
       const evDenom = (t) => { const m = /(\d[\d,]*)/.exec(t); return m ? Number(m[1].replace(/,/g, "")) : null; };
       if (alertsDoc.counts.evidence) {
         const ev1 = evDenom((r.doc.querySelector("#evBar") || {}).textContent || "");
@@ -1065,7 +1065,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N4. portfolio KPI cash must use the grouped money format (F-114).
+    // N4. portfolio KPI cash must use the grouped money format (F-119).
     {
       const r = await loadPage("portfolio.html", "snapshot");
       commonAsserts("portfolio.html N", r);
@@ -1076,7 +1076,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N5. derived results tables must carry a source link or a provenance note (F-115).
+    // N5. derived results tables must carry a source link or a provenance note (F-120).
     {
       const noteHasLink = (tb) => {
         // KD.table() wraps its output in <div class="tw">, so a note may sit beside the
