@@ -12,6 +12,14 @@ Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `are
 | 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | in progress | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi OpenAPI/docs via available official GitHub sources; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
 | 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | in progress | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
 
+### 72AE-3 — collector failure diagnosed; narrow handoff/claim (2026-11-27T19:40Z)
+
+Independent dry-run [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625) failed. Official check annotation [140705144837](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations) identifies two `KXAAAGASD-26NOV21-3.6600` archived alerts: their `category_assigned_from` is retained but the new `series_index` drops `KXAAAGASD` once the scan no longer encounters it. This is distinct from F-106: F250-1 is already merged via PR #149 at 18:29Z (confirmed with `gh pr list --state all`); PR #148 only owns F-105 indentation. No other open PR touches this fix.
+
+| ID | Task | Status | Owner | Files in scope | Evidence |
+|---|---|---|---|---|---|
+| 72AE-3 | Re-fetch official categories for archive-cited series even after all their market rows leave the bounded scan; keep validator strict; test complete collector build and dry-run Actions | in progress | arena-72ae7bca | `scripts/collect.py` (archive-watch block only), `scripts/tests/test_archive_series_retention.py` (new); final integration adds F-107 to `data/findings.json` (append only; not F-105/PR #148); this board section | Check annotation linked above; `GET /series/KXAAAGASD`; official Get Series docs |
+
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
