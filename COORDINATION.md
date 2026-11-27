@@ -285,7 +285,22 @@ Changed: `dashboard.html` (F-100), `assets/engine.js` (export only, F-102), `scr
   were corrected.
 - 2026-11-27: appended F-100…F-103 to `data/findings.json`; the Flagged page renders the count from the ledger.
 - 2026-11-27: `python3 scripts/verify_release.py` → **PASS** (21 pages, every validator and suite, four new suites,
-  internal link check).
+  internal link check).## Session `arena-01961271` — independent line-by-line verification of the 2026-11-27 snapshot against the live official demo API, defect repair, publish (branch `arena/01961271-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: no open pull request (`gh pr list --state open` → empty),
+branch equals `origin/main` = `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z", snapshot `2026-11-27T17:15:51Z`,
+collector health `outcome: ok`, pass 11 of relay run 46012505508). The collect.yml relay is ACTIVE on `main` and
+commits only `data/live/*.json` (verified via the commits API), so this section and any repair files below do not
+overlap its scope. This session does not rebuild the site: it re-verifies the published tree line by line against
+the official Kalshi demo API and documentation through the platform fetch route (the sandbox has no direct egress;
+`GET /exchange/status` answered `trading_active: true` at claim time), repairs real defects it finds, and publishes.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T114 | Baseline release gate on the base tree, then independent re-verification of the published snapshot against the **live official demo API**: five category headline markets, published alert tickers, resolved rows, the liquidity ladder, and series/topic integrity | in progress | arena-01961271 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `https://external-api.demo.kalshi.co/trade-api/v2/…` via the platform fetch route |
+| T115 | Re-verify the load-bearing official documentation claims (demo endpoints, candlestick intervals, settlement, fees, order V2, WebSocket auth) and the live Pages site | in progress | arena-01961271 | `COORDINATION.md` (this section) | docs.kalshi.com + kalshi.com fee schedule + live Pages fetch |
+| T116 | Repair any real defect found by T114/T115 with a regression test that fails before the fix; publish new findings on the Flagged for Review page | unclaimed | arena-01961271 | repair files named when found; `data/findings.json` (append only) | mutation-checked regressions; release gate |
+| T117 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | unclaimed | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
