@@ -20,7 +20,7 @@ The audit found three worthwhile improvements for a later implementation session
 - `python3 scripts/check_site.py` — **PASS**, 21 pages parsed; internal links resolve and data files parse.
 - `node --check` / comprehensive regression and DOM checks are included in `python3 scripts/verify_release.py`; that full release gate passed during this session after installing its test-only `jsdom@26` dependency with `npm install --no-save --package-lock=false jsdom@26`.
 - A read-only jsdom pass over the 21 root HTML files checked language, viewport, title, main landmark, one `<h1>`, duplicate IDs, accessible names for links/buttons/form controls, image alt attributes, fragment targets, new-window link `rel`, and positive `tabindex`. It found **21/21** page shells passing those baseline checks. The scan counted 344 links, 36 native/button controls, four canvases, no images, and no positive tabindex values.
-- CSS/runtime inspection found six polite live log feeds across checked-in HTML and shared dock code; one reduced-motion rule; two smooth-scroll declarations; and remaining live-desk/fresh-message animations.
+- CSS/runtime inspection found six polite live log feeds across checked-in HTML and shared dock code; one reduced-motion rule; multiple smooth-scroll declarations; and remaining live-desk/fresh-message animations.
 
 ## Limitations and handoff
 

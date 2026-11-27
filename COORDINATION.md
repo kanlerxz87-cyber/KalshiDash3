@@ -30,6 +30,8 @@ Claimed 2026-11-27 before implementation after reading this task board and confi
 | Published audit | [`UX_AUDIT.md`](https://raw.githubusercontent.com/kanlerxz87-cyber/KalshiDash3/main/UX_AUDIT.md) is on main; contains the scoped findings and explicit limits. | Cache-visible fetch of the main-branch file |
 | Irregularity | CI reports a non-blocking Node.js 20 action-runtime deprecation annotation; it did not fail the build or deploy. | Actions run [46077249199](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077249199) |
 
+**Post-merge sync note (2026-11-27):** after correcting the audit's smooth-scroll count, `git pull --rebase origin arena/699eb329-kalshidash3` attempted to replay main's already-merged PR history and conflicted in `COORDINATION.md`. The rebase was aborted; no other session's work was discarded. Current `main` already contains all those merged board sections and this session's audit; the remaining report correction is a descendant of the current branch tip and will be pushed as a normal fast-forward, not a force push.
+
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
 
