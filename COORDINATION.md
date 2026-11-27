@@ -6,6 +6,19 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-b447d5a4` — full live-site sweep: all 21 deployed pages, data parity, publish record (branch `arena/b447d5a4-kalshidash3`, base `fe245d8` + merge of `origin/main` `bd6f467`)
+
+Claimed 2026-11-27 **before any edit**. Board read first. `origin/main` advanced to `bd6f467` after this branch was
+cut (PRs #133/#134/#135/#136/#137 merged 2026-11-27); `origin/main` was merged into this branch before the baseline
+gate ran. Baseline: `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator, DOM
+suites, internal-link check; `jsdom@26` installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
+Open PRs at claim time: none by this session; `#137` was merged by its owner before this branch synced.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T120 | Live sweep of all 21 deployed pages on GitHub Pages: HTTP 200, page-specific content markers, and deployed `data/live/*.json` parity with the committed files (snapshot time, alert counts, flagged count) | in progress | arena-b447d5a4 | `COORDINATION.md` (this section); any single page only if the sweep finds breakage (narrowed and logged here first) | `fetch_page` per page (platform fetch route); repo files for parity check; release gate re-run before publish |
+| T121 | Publish: commit → push → PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | unclaimed | arena-b447d5a4 | `COORDINATION.md` (this section) | `gh pr`, `gh api repos/…/pages(+builds)`, live URL fetch |
+
 ## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
