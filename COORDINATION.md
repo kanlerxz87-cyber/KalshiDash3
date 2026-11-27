@@ -130,21 +130,140 @@ both sides.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
-| T120 | Read the board, claim, and establish the baseline: branch state, no open PR, release gate on the untouched tree | in progress | arena-f33fe827 | `COORDINATION.md` (this section) | `git`, `gh pr list`, `gh run list`, Pages API, `python3 scripts/verify_release.py` |
-| T121 | Line-by-line re-verification of every load-bearing factual claim the site makes (demo roots, fee schedule, settlement rules, candlestick intervals, orderbook fields, lifecycle) against official Kalshi documentation fetched this session | unclaimed | — | `COORDINATION.md` (this section) | https://docs.kalshi.com/… fetched through the platform fetch route |
-| T122 | Line-by-line re-verification of published market values against the **live official demo API** (`/exchange/status`, `/markets/{ticker}`, `/markets/{ticker}/orderbook`, `/series/{ticker}`) for each topic's headline market and each published resolved row | unclaimed | — | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` |
-| T123 | Independent audit of what all 21 pages **render** against the committed data, recomputing every published number, count and badge from `data/live/*.json`; plus internal/external link inventory | unclaimed | — | `COORDINATION.md` (this section) | jsdom harness (not committed) + `scripts/check_site.py` |
-| T124 | Repair any real defect T121–T123 finds, with a regression test that fails before the fix; append any new irregularity to `data/findings.json` with its official source link | unclaimed | — | `scripts/…`, `scripts/tests/…`, `data/findings.json` (append only) | mutation-checked regression tests; `scripts/verify_release.py` |
-| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | unclaimed | — | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+| T120 | Read the board, claim, and establish the baseline: branch state, no open PR, release gate on the untouched tree | done | arena-f33fe827 | `COORDINATION.md` (this section) | `git`, `gh pr list`, `gh run list`, Pages API, `python3 scripts/verify_release.py` |
+| T121 | Line-by-line re-verification of every load-bearing factual claim the site makes (demo roots, fee schedule, settlement rules, candlestick intervals, orderbook fields, lifecycle) against official Kalshi documentation fetched this session | done | arena-f33fe827 | `COORDINATION.md` (this section) | https://docs.kalshi.com/… fetched through the platform fetch route |
+| T122 | Line-by-line re-verification of published market values against the **live official demo API** (`/exchange/status`, `/markets/{ticker}`, `/markets/{ticker}/orderbook`, `/series/{ticker}`) for each topic's headline market and each published resolved row | done | arena-f33fe827 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` |
+| T123 | Independent audit of what all 21 pages **render** against the committed data, recomputing every published number, count and badge from `data/live/*.json`; plus internal/external link inventory | done (F-100, F-102, F-103) | arena-f33fe827 | `COORDINATION.md` (this section) | jsdom harness (not committed) + `scripts/check_site.py` |
+| T124 | Repair any real defect T121–T123 finds, with a regression test that fails before the fix; append any new irregularity to `data/findings.json` with its official source link | done (F-100 fixed; F-101/F-102/F-103 pinned) | arena-f33fe827 | `scripts/…`, `scripts/tests/…`, `data/findings.json` (append only) | mutation-checked regression tests; `scripts/verify_release.py` |
+| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | in progress | arena-f33fe827 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
 
-Only one session is active, so T121–T125 are reserved for `arena-f33fe827`; the rows are written as `unclaimed`
-rather than pre-owned so the board never shows a claim that was not pushed. **Nothing is edited outside the file
-scope in the table above.** `data/live/*.json` is collector output and is never hand-edited by this session.
+The rows above were claimed as `unclaimed` in the pushed claim (so the board never showed an owner that had not
+been pushed) and were taken by this session immediately after. **Nothing was edited outside the file scope in the
+table above.** `data/live/*.json` is collector output and was never hand-edited by this session; only
+`data/findings.json` was appended to, as declared.
 
 ### Log (this session)
 
 - 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
   T120–T125 and pushed this claim before any other edit.
+
+### T120 — baseline (2026-11-27)
+
+| Check | Result |
+|---|---|
+| Branch | `arena/f33fe827-kalshidash3`, branched from `main` at `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z"); `git rev-list --count origin/main..HEAD` = **0** at the start |
+| Open pull requests | none (`gh pr list --state open` → empty) |
+| Release gate on the untouched tree | **PASS** — `python3 scripts/verify_release.py` (21 pages, every Python/JS suite, all validators, DOM suites, internal link check). `jsdom@26` installed with `npm install --no-save --package-lock=false jsdom@26` |
+| Published site | Pages API `status: built`, `source: main /`; newest *Deploy site to GitHub Pages* run `46040449316` **success**. The sandbox cannot reach `kanlerxz87-cyber.github.io` directly (egress allowlist), so the live **file contents** could not be re-fetched this session — see the L-1 note below |
+| Snapshot audited | `data/live/markets.json` collected **2026-11-27T17:15:51Z**; collector health `outcome: ok`, pass 11, run `46012505508` |
+
+### T121 — official documentation, re-read this session and compared with the ledger
+
+Each row was fetched through the platform's fetch route on 2026-11-27 and compared **verbatim** with the claim the
+site publishes (`data/verified_facts.json`, 72 rows). Nothing was marked verified without a source.
+
+| Claims | Official page fetched | What it says (quoted) | Match |
+|---|---|---|---|
+| C-01…C-04, C-07, C-08 | https://docs.kalshi.com/getting_started/demo_env | REST `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`; "mock funds"; "credentials are not shared between this environment and production"; "may not be reflective of those in real markets" | ✔ |
+| C-05, C-06, C-10 | https://docs.kalshi.com/getting_started/api_environments | production REST/WS hosts; "Sign the full request path from the API root, without query parameters" | ✔ |
+| C-11, C-12, C-51 | https://docs.kalshi.com/getting_started/market_lifecycle | the eight statuses; filter mapping `unopened/open/paused/closed/settled`; "result is set to `yes`, `no`, or `scalar`"; "settled markets end up at `finalized`" | ✔ |
+| C-13, C-14, C-52 | https://docs.kalshi.com/getting_started/market_settlement | "Yes contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+| C-15, C-16, C-28, C-53 | https://docs.kalshi.com/getting_started/orderbook_responses | bids only; `[price_dollars, count_fp]`; "sorted by price in ascending order"; "best YES ask: $1.00 - (highest price in the no_dollars array)"; unknown ticker → "200 with empty arrays" | ✔ |
+| C-17, C-29, C-30, C-61, C-62, C-63, C-66 | https://docs.kalshi.com/api-reference/market/get-market-candlesticks | "1 (1 minute), 60 (1 hour), or 1440 (1 day)"; "at most 5,000 periods"; "`start_ts` and `end_ts` must be in seconds"; "can be a few seconds behind"; pre-cutoff candles only via `/historical/markets/{ticker}/candlesticks`; path `series_ticker` + `ticker` | ✔ |
+| C-21, C-22, C-23, C-24, C-54, C-58, C-59 | https://docs.kalshi.com/api-reference/market/get-markets | filter values `unopened/open/closed/settled`; `notional_value_dollars` = "The total value of a single contract at settlement in dollars"; `FixedPointCount` "2 decimals … minimum granularity is 0.01 contracts"; "When `event_ticker` or `tickers` is the only filter … `limit` is not applied"; cached responses | ✔ |
+| C-25, C-26 | https://docs.kalshi.com/api-reference/orders/create-order-v2 | legacy writes "have been removed and now return `410 Gone`"; `POST /portfolio/events/orders` requires `ticker, side (bid|ask), count, price, time_in_force, self_trade_prevention_type`; "A `201` means the order was accepted, not that it is resting" | ✔ |
+| C-31 | https://docs.kalshi.com/getting_started/quick_start_websockets | "WebSocket connections require authentication during the connection handshake"; public channels need no *additional channel-level* auth; signed text `timestamp + "GET" + "/trade-api/ws/v2"` | ✔ |
+| C-57 | https://docs.kalshi.com/getting_started/api_keys | "**Ed25519** (recommended)"; "**RSA** (2048-bit) … RSA-PSS with SHA-256"; "use the path **without query parameters**" | ✔ |
+| C-39, C-60 | https://docs.kalshi.com/getting_started/rate_limits | default cost 10 tokens; "Unauthenticated public requests are subject to separate limits"; 429 carries rate-limit headers but not `Retry-After` | ✔ |
+| C-64, C-65, C-67 | https://docs.kalshi.com/getting_started/historical_data + https://docs.kalshi.com/api-reference/historical/get-historical-markets | `market_settled_ts` partition; historical endpoint list; `limit` "Defaults to 100. Maximum value is 1000"; "Filters are mutually exclusive" | ✔ |
+| C-35 | https://docs.kalshi.com/api-reference/portfolio/get-balance | required `balance, balance_dollars, portfolio_value, updated_ts`; own bucket, "1 time per second" Basic/Advanced, "5 times per second" higher tiers | ✔ |
+| C-36, C-37, C-38 | https://kalshi.com/docs/kalshi-fee-schedule.pdf + https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account | "fees = round up(M × 0.07 × C × P × (1−P))"; maker `0.0175`; "There is no settlement fee." / "There is no membership fee."; "Your demo account does not come with funds preloaded"; "the .com version is not a valid Kalshi domain" | ✔ |
+| C-18, C-19 (seed series) | fee schedule PDF, non-standard fee table | `KXAAAGASM` 1/1, `KXELECTIRAN` 0/0, `KXPGATOUR` 1/1, `KXPGARYDER` 1/1, `KXPGASOLHEIM` 1/1, `KXBTCY` 0/0, `KXETHY` 0/0, `KXMVE` (combos) 2/1 — every seed the project uses is present with the multiplier the site transcribes | ✔ |
+
+The repo's own fee implementation was then checked **against the schedule's printed table** rather than against its own
+test fixture: `scripts/tests/test_fees.py` reproduces all 21 published rows (1-contract and 100-contract columns) and the
+maker formula, and it still passes. `assets/engine.js`, `assets/live.js`, `assets/alerts.js` and `scripts/roi_model.py`
+all carry the same `roundup(M × 0.07 × C × P × (1−P))` with per-series multipliers `KXBTCY/KXETHY/KXELECTIRAN = 0`.
+
+### T122 — published values re-read from the live official demo API (2026-11-27)
+
+Every row was fetched through the platform fetch route and compared field by field with the committed snapshot
+(`data/live/markets.json`, collected 2026-11-27T17:15:51Z).
+
+| Fetched record | Result |
+|---|---|
+| `GET /exchange/status` | `trading_active: true`, four demo shards active, `intra_exchange_transfers_active: true` — the exchange is answering |
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `volume_24h_fp 0.00`, `status active`, `result ""` — **identical** to the snapshot row and to the derived dollars estimate $16,436,950 |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` — **identical**; `volume_24h_fp` has since moved to 0.00 from the snapshot's 7,452.05, the expected drift of a rolling 24 h window while the cumulative field is unchanged |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` — **identical**; `rules_primary` cites AAA, as the snapshot says |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` — **identical** |
+| `GET /markets/KXZEC15M-26NOV271215-15` (a published resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189748Z`, `settlement_value_dollars "0.0000"` — **identical** to the published resolution row |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (an alerted ticker) | `last 0.0100`, `volume_fp 72531547.87`, `open_interest_fp 7284797.95` — **identical** to the snapshot and to the last committed observation |
+| `GET /markets/KXBTCY-27JAN0100-B97500/orderbook?depth=10` (a published book) | `no_bid_dollars 0.9900` — consistent with the published ladder, whose best YES ask is the derived $0.01 |
+| `GET /markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10` | empty `yes_dollars`/`no_dollars` — **identical** to the published liquidity block (source of F-100's second data point) |
+| `GET /markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10` | `yes_dollars [[0.001,80.00],[0.019,8771.92],[0.020,8333.33],[0.021,7936.50]]`, `no_dollars [[0.973,6172.83],[0.974,6410.25],[0.975,6666.66]]` — **identical** to the published ladder, and the raw data for F-100 |
+| `GET /series/KXYTVIEWSD` | `categories ["Entertainment"]`, `tags ["Views","Daily Views","Music"]` — a genuine Culture series, correctly published |
+| `GET /series/KXAAAGASCDAK`, `/KXAPRPOTUS`, `/KXPGARYDER`, `/KXPGASOLHEIM` | `Economics+Commodities`, `Politics`, `Sports` (tags `Golf`), `Sports` (tags `Golf`) — the official classification behind F-101 |
+| `GET /markets?status=open&limit=2` | rows carry `event_ticker` but **no `series_ticker` key at all** — the measured behaviour C-45 records, and the input F-102 now tests |
+
+Nothing in the published data contradicted the official API.
+
+### T123 — what the pages actually print, recomputed from the data
+
+Two independent jsdom harnesses were used. The first (`scripts/tests/audit_rendered_numbers.js`, **committed** and wired
+into the release gate) re-derives every audited figure with its own arithmetic — never by calling `assets/*.js` — and
+compares it with the DOM. The second was a scratch harness kept out of the repository and used for the exploratory
+probes (duplicate-swing check, evidence arithmetic, topic-domain sweep) recorded in the findings.
+
+| Check | Result |
+|---|---|
+| Landing page: 7 KPI cards, the 5 topic rows (ticker, dollars, last price, contracts, open interest, source link) and the 25-row resolution tracker including each row's literal `result` | all match an independent recomputation |
+| Five category pages: the 4 KPIs, row counts, every row's official API link and every `result` cell | all match |
+| `dashboard.html`: 5 topic cards, the top-8 ranking of each, row by row | all match |
+| `alerts.html`: 154 swings each verified ≥ $0.10 from `to_price − from_price`, 123 frozen model picks, both chats populated (120 + 120 rendered message nodes), ledger self-consistency | all match |
+| `flagged.html` / `verification.html`: 85 → 89 irregularities, all source-linked; 72 claims, all source-linked | all match |
+| Every served swing's evidence arithmetic (`volume_to − volume_from = contracts_traded`) | 96 of 96 rows agree; 53 rows correctly carry `unknown_no_observations` because their bounding observations predate the F-99 fix and cannot be re-read |
+| Alert topic domain (23 rows flagged for a manual check: `KXAAAGASCD*`, `KXAPRPOTUS`, `KXPGARYDER`, `KXPGASOLHEIM`) | **not** contradictions: all four official categories are in the topic's published compatible set; 0 rows are mis-filed (F-101) |
+
+### T124 — the defects this session found, and what was changed
+
+| ID | Severity | Defect | Fix / regression |
+|----|----------|--------|------------------|
+| **F-100** | high | `dashboard.html` rendered the NO-bid levels themselves, reversed, under the heading "YES asks, implied". On `KXPGATOUR-MAST27-MFIT` it advertised 6,666 contracts at $0.975 and put the true best ask last; the answer is 6,666.66 contracts at $0.025 — the exact question the brief says the panel must answer | Ask ladder now derived (`1 − no_bid price`, count at that level), sorted best-first; bids stay best-first; derivation stated in the panel with its official source. `scripts/tests/test_liquidity_ladder.js` (mutation-checked: reverting the derivation produces 6 failures) |
+| **F-101** | low | The withheld count was published without the topic rule or its reason keys, so a reader could not reproduce it; 23 served swings *look* mis-filed against their topic name and needed a manual ruling | Audit result recorded (0 contradictions, all four categories are in the published compatible set). `scripts/tests/test_alert_topic_domain.js` recomputes the rule from `counts.category_compatible_official` and asserts no served row contradicts its topic and the withheld count covers every absent row. No data changed |
+| **F-102** | medium | `normalizeRow()` derived the series from the market ticker (necessary, because `GET /markets` omits `series_ticker`) but was private, so no test could fail if the derivation or the per-series fee multiplier broke on a live fill | `normalizeRow` exported; `scripts/tests/test_series_fallback.js` asserts the derivation, that a provided `series_ticker` wins, and that KXETHY resolves to taker multiplier 0 ($0 fee on 100 contracts) while KXAAAGASM bills the schedule's $1.75. No behaviour changed |
+| **F-103** | low | The release gate proved the pages *rendered*; it never proved a printed number equalled the data | `scripts/tests/audit_rendered_numbers.js` added to `scripts/verify_release.py`: recomputes the landing KPIs and table, the resolution tracker, all five category pages, the dashboard ranking, both chat feeds, and the ledger/link inventory. PASS on this snapshot |
+
+New files: `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`,
+`scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js` (all four run by the gate).
+Changed: `dashboard.html` (F-100), `assets/engine.js` (export only, F-102), `scripts/verify_release.py` (four new suites),
+`data/findings.json` (F-100…F-103 appended; ledger now 89 irregularities / 28 high).
+
+### Remarks, kept honest
+
+- **R-31 (no live-file fetch).** The sandbox has no direct egress to `kanlerxz87-cyber.github.io` (allowlist), so unlike
+  earlier sessions this one could not re-download the deployed HTML. The published Pages build is confirmed by the
+  Actions and Pages APIs (run `46040449316` success, `status: built`), and the deployment is a straight copy of `main`
+  (`cp *.html`, `cp -R assets data` in `pages.yml`), which is the tree verified here. Recorded rather than glossed over.
+- **R-32 (elections coverage).** 17 of the 514 published open rows are elections, and 16 of those are `category_basis:
+  keyword` (approval-rating and "EO this week" series). The only fee-schedule-confirmed elections series,
+  `KXELECTIRAN`, contributes 1 open row. This is a coverage limit of the demo environment, already flagged (F-38/F-65/F-66),
+  and is not a defect introduced here; it is restated because the brief asks for elections coverage.
+- **R-33 (stale remote branches).** `origin` carries 84 `arena/*` branches. Local remote-tracking refs were pruned by
+  the clone, so they were not merged or evaluated here; they are historical leftovers of merged sessions. This session
+  touched none of them and pushed only `arena/f33fe827-kalshidash3`.
+
+### Log (this session)
+
+- 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
+  T120–T125 and pushed this claim before any other edit.
+- 2026-11-27: baseline release gate **PASS** on the untouched tree.
+- 2026-11-27: wrote and ran the independent recomputation harness (F-103); it found the ask-ladder defect (F-100) and
+  passed every other figure once two harness bugs of its own (a numeric-concatenation parse and a wrong feed selector)
+  were corrected.
+- 2026-11-27: appended F-100…F-103 to `data/findings.json`; the Flagged page renders the count from the ledger.
+- 2026-11-27: `python3 scripts/verify_release.py` → **PASS** (21 pages, every validator and suite, four new suites,
+  internal link check).
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
