@@ -219,7 +219,7 @@ class ClientSafety(unittest.TestCase):
         self.assertIn("https://docs.kalshi.com/getting_started/demo_env", row["sources"])
         self.assertIn("no production override", row["action"])
         summary = (root / "executive-summary.html").read_text()
-        self.assertIn('id="audit-2026-11-22"', summary)
+        self.assertIn('id="audit-2026-11-27"', summary)
         self.assertIn("SAFE-5C-01", summary)
         board = (root / "COORDINATION.md").read_text()
         self.assertIsNone(re.search(r"^(?:<{7} |={7}$|>{7} )", board, re.MULTILINE),
