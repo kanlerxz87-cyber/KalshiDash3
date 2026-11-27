@@ -1035,9 +1035,15 @@ function commonAsserts(label, r) {
         `alerts #modelCount leading ${modelB.shown} must equal rendered bubbles ${modelN}`);
       check(allB.total === alertsDoc.counts.all_events || allB.shown === alertsDoc.counts.all_events,
         `alerts #allCount must relate to counts.all_events ${alertsDoc.counts.all_events} (got shown=${allB.shown} total=${allB.total})`);
-      const evOf = (t) => { const m = /swings served:\s*(\d+)/.exec(t); return m ? Number(m[1]) : null; };
-      check(evOf((r.doc.querySelector("#evBar") || {}).textContent || "") === alertsDoc.counts.all_events,
-        `alerts evidence bar "swings served" must be the global feed total ${alertsDoc.counts.all_events}`);
+      // The bar's first chip is the denominator (label as of the F-105 chat refactor:
+      // "swings in scope (archive)"); it is computed from the global evidence parts, so it
+      // must equal counts.all_events on every category tab (F-113).
+      const evDenom = (t) => { const m = /(\d[\d,]*)/.exec(t); return m ? Number(m[1].replace(/,/g, "")) : null; };
+      if (alertsDoc.counts.evidence) {
+        const ev1 = evDenom((r.doc.querySelector("#evBar") || {}).textContent || "");
+        check(ev1 === alertsDoc.counts.all_events,
+          `alerts evidence bar denominator must be the global feed total ${alertsDoc.counts.all_events} (got ${ev1})`);
+      }
       const golfBtn = [...r.doc.querySelectorAll("#catTabs .tabbtn")].find(b => b.dataset.c === "golf");
       check(!!golfBtn, "alerts.html: #catTabs category buttons must exist");
       if (golfBtn) {
@@ -1049,8 +1055,11 @@ function commonAsserts(label, r) {
           `golf tab: #allCount leading ${golfB.shown} must equal rendered bubbles ${golfN}`);
         check(golfB.total === golfJson,
           `golf tab: #allCount must state the golf total ${golfJson} (got ${golfB.total})`);
-        check(evOf((r.doc.querySelector("#evBar") || {}).textContent || "") === alertsDoc.counts.all_events,
-          `golf tab: evidence bar "swings served" must stay the global total ${alertsDoc.counts.all_events}`);
+        if (alertsDoc.counts.evidence) {
+          const ev2 = evDenom((r.doc.querySelector("#evBar") || {}).textContent || "");
+          check(ev2 === alertsDoc.counts.all_events,
+            `golf tab: evidence bar denominator must stay the global total ${alertsDoc.counts.all_events} (got ${ev2})`);
+        }
         console.log(`  N3 alerts         ok  (chips "${allB.shown}/${allB.total}", golf tab "${golfB.shown}/${golfB.total}", evidence bar global)`);
       }
       r.close();
