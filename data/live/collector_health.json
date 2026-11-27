@@ -1,9 +1,10 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T11:59:55Z",
- "pass": 12,
- "outcome": "failed",
- "detail": "validators: validate_alerts",
+ "generated_at": "2026-11-27T12:14:54Z",
+ "pass": 13,
+ "outcome": "ok",
+ "detail": "snapshot committed",
+ "snapshot_collected_at": "2026-11-27T12:14:53Z",
  "stderr_tail": "",
  "run": {
   "workflow": "collect.yml",
@@ -11,5 +12,5 @@
   "attempt": "1",
   "sha": "479e253cd5a4b863c198964832b35fcd3db5c4c5"
  },
- "note": "Written by scripts/collect_relay.py when a pass does not commit. Read by humans; the site's staleness banner is what readers see. Never contains credentials."
+ "note": "Written by scripts/collect_relay.py for EVERY pass: 'failed' when a pass could not commit, 'ok' when it did. Read by humans; the site's staleness banner is what readers see. Never contains credentials."
 }
