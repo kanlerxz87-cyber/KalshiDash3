@@ -37,9 +37,24 @@ class ArchivedSeriesRetention(unittest.TestCase):
         live = root / "data/live"
         live.mkdir(parents=True)
         shutil.copy(ROOT / "data/alert_rules.json", root / "data/alert_rules.json")
-        original = json.loads((ROOT / "data/live/alerts_archive.json").read_text())
-        alerts = [a for a in original["alerts"] if a["ticker"].startswith("KXAAAGASD-")]
-        self.assertTrue(alerts, "the original failure's two archived gas alerts must remain reproducible")
+        # Fixed regression fixtures model the two assignment-bearing entries in
+        # the original failure. Do not depend on a rolling production archive:
+        # its documented 5,000-row cap may legitimately retire those entries.
+        ticker = "KXAAAGASD-26NOV21-3.6600"
+        alerts = [{
+            "ticker": ticker, "category_id": "gas", "category_basis": "official-series",
+            "series_categories": ["Economics"],
+            "category_assigned_from": "GET /series categories (series_categories)",
+            "market_source": collect.BASE + "/markets/" + ticker,
+            "from_time": start, "to_time": end,
+            "from_price": before, "to_price": after, "delta": round(after - before, 4),
+            "direction": "up" if after > before else "down", "high_roi": False,
+            "volume_24h_fp": None, "cause_link": None,
+            "cause_status": "unverified: no official cause source collected",
+        } for start, end, before, after in (
+            ("2026-11-20T22:10:00Z", "2026-11-20T22:41:00Z", 0.07, 0.21),
+            ("2026-11-20T21:42:00Z", "2026-11-20T22:04:00Z", 0.19, 0.09),
+        )]
         # Two distinct alert rows reference one series. Neither market is in raw.
         (live / "alerts_archive.json").write_text(json.dumps({"schema": 1, "alerts": alerts}))
         requests = []
@@ -86,6 +101,16 @@ class ArchivedSeriesRetention(unittest.TestCase):
             validator.RULES = root / "data/alert_rules.json"
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(validator.main(), 0, "\n".join(validator.errors))
+            # Negative control: removing the retained entry reproduces the old
+            # failure. A relaxed validator would incorrectly pass this case.
+            payload["series_index"].pop("KXAAAGASD")
+            (live / "markets.json").write_text(json.dumps(payload))
+            validator = validator_module()
+            validator.LIVE = live
+            validator.RULES = root / "data/alert_rules.json"
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                self.assertEqual(validator.main(), 1)
+            self.assertTrue(any("assigned topic" in e for e in validator.errors))
 
     def test_failed_official_lookup_stays_unknown_never_inferred(self):
         with tempfile.TemporaryDirectory() as tmp:
