@@ -290,6 +290,22 @@ work was dropped, and their `test_archive_series_retention.py` passes unchanged 
 Non-overlap: this session does not touch `assets/*`, the 21 pages or `data/live/*` (collector-owned). `data/findings.json`
 is append-only.
 
+### A8D3-5 close-out — PR, merge, deployment, collector recovery (verified, not assumed)
+
+| Step | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #152](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152)** — "fix(collector): unblock the stalled relay — validator treats an unknown series as unknown (F-108) + records a failing validator's output (F-109)" | `gh pr view 152` |
+| PR checks | `build` **pass** 1m28s; `deploy` correctly **skipped** on the PR | Actions run [46059444202](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059444202) |
+| Merge | **merged 2026-11-27T19:51:49Z** without waiting for approval, as `8f4aae7fba6c281e4ecbf86535a4d463d05de0b4` | `gh api repos/…/pulls/152` (`state=closed`, `merged_at` set) |
+| Pages deploy | **success** for the merge commit itself — `pages build and deployment` run [46059651976](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059651976) and `Deploy site to GitHub Pages` run [46059648640](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059648640); Pages API `status: built`; later builds for the collector's own commits are `built` too (`70f5eb4` at 20:05:03Z) | Pages builds API, Actions API |
+| Live site (deployed files, fetched through the platform route) | `data/live/collector_health.json` serves **`outcome: ok`, `snapshot_collected_at: 2026-11-27T20:04:59Z`** (the frozen `19:38:04Z failed` record is gone); `data/findings.json` serves **F-108 and F-109** verbatim at the end of the ledger | `fetch_page` 2026-11-27 ~20:07Z |
+| **Collector recovered on `main`** | Data commits resumed at **19:47Z** (`3cb118b`), **19:50Z** (`acbb2e3`) and **20:04:59Z**; health reads `outcome: ok` at 19:50:02Z and 20:05:01Z with `snapshot_collected_at` set. The merged code is provably running: the 20:04:59Z snapshot is the first to publish **`counts.series_ledger_carried_forward = 0`** — F-107's per-series re-read answered for every archived series that pass, so the fallback legitimately carried nothing | `git log origin/main`, `data/live/collector_health.json`, `data/live/markets.json` on `main` |
+| Snapshot content after recovery | 614 open / 200 settled rows, collected 20:04:59Z (was 514 open at the frozen 18:00:57Z snapshot) | `data/live/markets.json` |
+
+**What was NOT verified, stated plainly:** no demo-account credentials exist, so account balance/fills/real execution remain
+unavailable (F-07); the ROI screen and paper strategies are unchanged by this session; the demo exchange can change its own
+series records at any time, and the fallback deliberately keeps the last *verified* record rather than inventing one.
+
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
 Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
