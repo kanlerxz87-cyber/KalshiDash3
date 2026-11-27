@@ -17,10 +17,33 @@ publishes findings on the Flagged page, and closes out gate → PR → `main` �
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
-| T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | claimed | arena-251f5c3d | `COORDINATION.md` (this section) | gate output recorded below |
-| T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | claimed | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
+| T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | **done** — PASS (21 pages, every validator and suite, `check_site.py` OK) | arena-251f5c3d | `COORDINATION.md` (this section) | gate run 2026-11-27 on `fe245d8` + claim commit |
+| T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | **done** — every record matched, see T115 table below | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
 | T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | claimed | arena-251f5c3d | defect-fix files only as needed (named here when touched), `data/findings.json` (append only) | `python3 scripts/verify_release.py` PASS after each fix |
 | T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | claimed | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, Pages API, live URL fetch |
+
+### T115 — official-source verification, fetched live 2026-11-27
+
+The sandbox has no direct egress to Kalshi; records below were read through the platform fetch route (same method
+as sessions arena-a490dfa2 / arena-75949325). Snapshot under test: `data/live/markets.json`,
+`collected_at 2026-11-27T17:15:51Z`.
+
+| Record fetched | Snapshot value | Official value (fetched 2026-11-27) | Match |
+|---|---|---|---|
+| `GET /exchange/status` | collector's own health implies trading | `exchange_active: true`, `trading_active: true`, four demo shards active | ✔ |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, `close_time 2026-11-30T04:59:00Z`, `status active` | identical, `previous_price_dollars 0.7500` | ✔ |
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `close_time 2027-01-01T05:00:00Z` | identical | ✔ |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` | identical | ✔ |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` | identical | ✔ |
+| `GET /markets/KXYTVIEWSD-BAD26NOV30-34.0M` (culture headline - untraded) | `last 0.0000`, `volume_fp 0.00`, `open_interest_fp 0.00`, `status active` | identical (market created 2026-11-27T16:06Z, about an hour before the snapshot) | ✔ |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (newest published alert's ticker) | alert `0.97 -> 0.01` at `2026-11-27T16:45:51Z`; market `status active` | `status active`, `last_price_dollars 0.0100` (equals the alert's `to_price`), `volume_fp 72531547.87` | ✔ |
+| `GET /markets/KXDOGE15M-26NOV271215-15` (newest published resolved row) | `result yes`, `settlement_ts 2026-11-27T17:15:02.189654Z`, `settlement_value_dollars 1.0000` | `result "yes"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189654Z` (identical to the microsecond), `settlement_value_dollars "1.0000"` | ✔ |
+| [docs.kalshi.com/getting_started/demo_env](https://docs.kalshi.com/getting_started/demo_env) | C-01..C-04 roots, C-07/C-08 mock funds | verbatim: REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`); WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`); "mock funds"; "credentials are not shared"; "may not be reflective of those in real markets" | ✔ |
+| [docs.kalshi.com/api-reference/market/get-market-candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) | C-17/C-29/C-61: intervals 1/60/1440 only | verbatim: "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)"; demo roots listed among base URLs | ✔ |
+| [docs.kalshi.com/getting_started/market_settlement](https://docs.kalshi.com/getting_started/market_settlement) | C-13/C-14: $1 per contract, net positions, zero settlement fee for yes/no | verbatim: "Yes contract holders receive $1 per contract"; "No contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+
+Nothing published in the snapshot contradicted the official records.
+
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
