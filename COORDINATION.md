@@ -3053,21 +3053,18 @@ Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snaps
 - 2026-11-27: rebased onto `origin/main` (`bd6f467`, four concurrent PRs merged) and resolved three conflicts keeping
   both sides; re-ran the full gate on the merged tree → **PASS**; audits re-verified against the `17:30:51Z` snapshot.
 
-### T125 close-out — PR, merge, Pages deploy
-
-| Item | Result | Evidence |
-|---|---|---|
-| Pull request | **[PR #138](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/138)** — "verify: independent line-by-line pass, ask-ladder fix (F-100), and four automated audits (F-100…F-103)", base `main`, head `arena/f33fe827-kalshidash3`, 9 files +1084/−92 | `gh pr create` |
-| Conflict resolution before merge | Branch was `CONFLICTING` against `bd6f467`; rebased, three conflicts merged structurally (both sessions' `COORDINATION.md` sections kept, `assets/engine.js` keeps `quotedBid` **and** `normalizeRow`, `data/findings.json` rebuilt from `origin/main` plus only F-100…F-103 → 91/30, valid JSON, no duplicate IDs) | conflict-resolution table in this section |
-| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** (83 s) on the merged tree: rendered-number audit, both new suites, `test_liquidity_ladder.js`, `check_site.py` 21 pages OK | local run |
-| PR check | `build` **pass** 1m26s (scope tests + offline release gate + Pages artifact); `deploy` correctly skipped on a PR — merge state `MERGEABLE`/`UNSTABLE` only because of that skip | `gh pr checks 138` |
-| Merge | **merged `2026-11-27T17:42:21Z`** as merge commit `94d996adc1e0bafe63f07b8d019a1b4ea8b748a1`, without waiting for approval | `gh pr merge 138 --merge` |
-| Pages deploy | **confirmed** — `Deploy site to GitHub Pages` run **46043922829** `success` (build job 140658301034 completed 17:44:03Z, steps *Verify release* and *Upload pages artifact* both success); `pages build and deployment` run **46043922440** `success`; Pages API `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true` | `gh run view`/`gh run list`; `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` |
-| Live check | **not possible from this sandbox** — no egress to `kanlerxz87-cyber.github.io` (allowlist). The deploy is a straight copy of the merged `main` tree (`pages.yml`: verify release → stage public files → upload artifact), i.e. exactly the tree that passed the gate locally and in CI. Recorded, not glossed over (R-31) | R-31 in this section |
-| Net unique diff | `dashboard.html`, `assets/engine.js`, `scripts/verify_release.py`, `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`, `scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js`, `data/findings.json`, `COORDINATION.md` | `gh pr view 138 --json files` |
-
 **Still open after this PR (not in it, published on `flagged.html` as non-blocking):** book-sanity guard for the
 `KXBTCY-27JAN0100-B97500` "0.97 → 0.01" `last_price` artefact (the 53 `unknown_no_observations` rows whose pre-F-99
 bounds are unrecoverable) — a guard would refuse to publish a swing whose book never crossed; elections coverage stays
 structurally thin (R-32). F-07 (no demo credentials), F-25 (cause links are search leads) and DEPLOY-1 (legacy Pages
 publisher) remain as previously flagged.
+
+---
+
+## Session `arena-f2501a43` — topic-integrity & cross-pipeline scope enforcement (`roi_scan.py`, `collect.py`, `live.js`, `chatdock.js`) + full verification (2026-11-27)
+
+Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/#140..#147 and snapshot `2026-11-27T18:00Z`).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| F250-1 | Eliminate `KXDEMOFUT*` / `KXBALLONDOR` prefix leakage in `assets/chatdock.js` and `SEED_SERIES` / `KXDEMOFUT*` / `KXAPRPOTUS` / `KXTRUMPNOMNUM` / `KXEOWEEK` exclusions in `assets/live.js` & `scripts/collect.py`; clean up overwritten duplicate keys in `scripts/collect.py` `payload["counts"]`; clarify `KD.basisBadge(b, matchedBy)` across `assets/site.js` & category/dashboard/index tables so official `GET /series` matches render `official series` instead of `keyword` warning; align `trading.html` & `G13` fee-multiplier disclosures with `F-84`; record verified finding `F-106` + unit/DOM regression tests | in progress | arena-f2501a43 | `scripts/collect.py`, `assets/live.js`, `assets/chatdock.js`, `assets/site.js`, `index.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `dashboard.html`, `trading.html`, `data/findings.json`, `scripts/tests/test_topic_integrity.py`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (no edits to `data/live/*`, owned by `collect.yml` / `desk.yml`) | `python3 scripts/verify_release.py` PASS required; official Kalshi demo API (`GET /exchange/status`, `GET /series/KXAPRPOTUS`, `GET /series/KXTRUMPNOMNUM`, `GET /series/KXEOWEEK`, `GET /series/KXDEMOFUTHOURLY`, `GET /series?category=Elections`, `GET /markets/...`, `GET /historical/markets`) and `kalshi-fee-schedule.pdf` + `demo_env` verified live on 2026-11-27 |
