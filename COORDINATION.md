@@ -126,6 +126,38 @@ Claimed 2026-11-27 before implementation work. At claim time, the newest recorde
 After the collector advanced the snapshot to `2026-11-27T17:30:51Z`, the summary still called the prior `17:15:51Z` snapshot “current”; `roi.json` was separately generated at `17:01:58Z`. This session corrected the stale copy on its branch and kept all metrics timestamped. Before PR #133 could merge, the concurrent mainline summary refresh updated its snapshot figures to 17:30:51Z; during integration we retained that newer main version rather than overwriting it with the 17:15 historical wording. No values were recalculated or inferred.
 
 
+## Session `arena-f33fe827` — independent line-by-line verification of the shipped tree, defect repair, and publish (branch `arena/f33fe827-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: no open pull request (`gh pr list --state open` → empty),
+and every task row in the sections below is closed out. The branch was created from `fe245d8` ("data: demo snapshot
+2026-11-27T17:15Z") and `git rev-list --count origin/main..HEAD` was **0**, i.e. the branch starts equal to `main`.
+Release history on `main` is green: `gh run list` shows the newest *Deploy site to GitHub Pages*
+(`workflow_dispatch`, run `46040449316`) **success**, the Pages API reports `status: built`, `source: main /`.
+
+This session does **not** rebuild the site. It re-verifies the published tree line by line against the official
+Kalshi documentation and the live official DEMO Trade API, repairs real defects it finds (each with a regression
+test that fails before the fix), publishes any new irregularities on the *Flagged for Review* page with official
+source links, then runs the release gate → PR → `main` → merge → confirms the Pages build and deploy, and records
+the result here. No other session holds an open scope; if one appears, this branch merges `origin/main` and keeps
+both sides.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T120 | Read the board, claim, and establish the baseline: branch state, no open PR, release gate on the untouched tree | in progress | arena-f33fe827 | `COORDINATION.md` (this section) | `git`, `gh pr list`, `gh run list`, Pages API, `python3 scripts/verify_release.py` |
+| T121 | Line-by-line re-verification of every load-bearing factual claim the site makes (demo roots, fee schedule, settlement rules, candlestick intervals, orderbook fields, lifecycle) against official Kalshi documentation fetched this session | unclaimed | — | `COORDINATION.md` (this section) | https://docs.kalshi.com/… fetched through the platform fetch route |
+| T122 | Line-by-line re-verification of published market values against the **live official demo API** (`/exchange/status`, `/markets/{ticker}`, `/markets/{ticker}/orderbook`, `/series/{ticker}`) for each topic's headline market and each published resolved row | unclaimed | — | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` |
+| T123 | Independent audit of what all 21 pages **render** against the committed data, recomputing every published number, count and badge from `data/live/*.json`; plus internal/external link inventory | unclaimed | — | `COORDINATION.md` (this section) | jsdom harness (not committed) + `scripts/check_site.py` |
+| T124 | Repair any real defect T121–T123 finds, with a regression test that fails before the fix; append any new irregularity to `data/findings.json` with its official source link | unclaimed | — | `scripts/…`, `scripts/tests/…`, `data/findings.json` (append only) | mutation-checked regression tests; `scripts/verify_release.py` |
+| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | unclaimed | — | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
+Only one session is active, so T121–T125 are reserved for `arena-f33fe827`; the rows are written as `unclaimed`
+rather than pre-owned so the board never shows a claim that was not pushed. **Nothing is edited outside the file
+scope in the table above.** `data/live/*.json` is collector output and is never hand-edited by this session.
+
+### Log (this session)
+
+- 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
+  T120–T125 and pushed this claim before any other edit.
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
