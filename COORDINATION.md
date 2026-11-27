@@ -16,6 +16,7 @@ any such work will be noted before editing shared implementation files.
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
 | T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | in progress | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`, committed data validators, official references recorded in `data/verified_facts.json`; no live API claim until independently fetched |
+| T115 | Repair the executive-summary heading that still labels the current release audit 22 November despite the 27 November snapshot; state the scope and limits of this audit explicitly | in progress | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Re-read official demo, candlestick, settlement, orderbook, V2 order and WebSocket docs on 2026-11-27; `scripts/verify_release.py` DOM suite |
 
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
