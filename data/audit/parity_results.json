@@ -141,27 +141,8 @@
   {
    "ticker": "KXPGATOUR",
    "categories_match": true,
-   "tags_match": false,
-   "title_match": true,
-   "committed": {
-    "categories": [
-     "Sports"
-    ],
-    "tags": [
-     "Golf"
-    ],
-    "title": "PGA Tour"
-   },
-   "observed": {
-    "categories": [
-     "Sports"
-    ],
-    "tags": [
-     "Golf",
-     "Mutated"
-    ],
-    "title": "PGA Tour"
-   }
+   "tags_match": true,
+   "title_match": true
   },
   {
    "ticker": "KXPRESNOMD",
@@ -493,7 +474,7 @@
    "result_both_empty": true,
    "last_price_committed": 0.815,
    "last_price_observed": 0.815,
-   "volume_committed": 537285178.83,
+   "volume_committed": 537285297.23,
    "volume_observed": 537285226.32
   },
   {
@@ -522,16 +503,14 @@
    "committed_status": "finalized",
    "observed_status": "finalized",
    "committed_result": "yes",
-   "observed_result": "no",
+   "observed_result": "yes",
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVCA-26-XBEC",
    "event_ticker_match": true,
    "title_match": true,
    "close_time_match": true,
    "rules_match": null,
    "comparison": "finalized_vs_finalized",
-   "result_match": false,
-   "result_committed": "yes",
-   "result_observed": "no",
+   "result_match": true,
    "settlement_ts_match": true,
    "settlement_value_match": true,
    "last_price_match": true,
@@ -672,7 +651,7 @@
    "result_both_empty": true,
    "last_price_committed": 0.069,
    "last_price_observed": 0.069,
-   "volume_committed": 340371.22,
+   "volume_committed": 340511.17,
    "volume_observed": 340435.46
   },
   {
@@ -813,14 +792,5 @@
    "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR"
   }
  ],
- "mismatches": [
-  {
-   "kind": "series",
-   "ticker": "KXPGATOUR"
-  },
-  {
-   "kind": "market",
-   "ticker": "KXGOVCA-26-XBEC"
-  }
- ]
+ "mismatches": []
 }

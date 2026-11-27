@@ -91,6 +91,24 @@ collector **cadence** shown in the snapshot banner (F-73) and the **counts** in 
 references: [demo environment](https://docs.kalshi.com/getting_started/demo_env) and
 [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets).
 
+## Live parity audit (independent, against the live official API)
+
+`data/audit/` records a field-by-field re-check of the committed snapshot against the
+**live** official demo Trade API and the official docs index, performed 2026-11-27 by
+session `arena-035cd7c0` (record: [`data/audit/REPORT.md`](data/audit/REPORT.md)).
+Coverage: 39/39 series classifications (every distinct series behind every published row,
+plus the exclusion-reason series), 15/15 finalized sample rows matching on `result`
+YES/NO plus all five settlement fields exactly, 12/12 active rows consistent, 4 live
+order-book ladders (including the ladder the site's test asserts), 24/24 doc links in the
+official index, and the high-stakes claim pages re-read. Three items were flagged rather
+than fixed (F-111 fee-multiplier conflict between two official sources, F-109
+`KXMAXSHARDINGTEST` scope question, F-113 out-of-window alert resolutions).
+
+```bash
+python3 scripts/audit_live_parity.py --compare data/audit/live_observations.json  # offline re-check
+python3 scripts/audit_live_parity.py --fetch   # re-fetch live first (needs egress to the demo host)
+```
+
 ## How to re-run everything
 
 Public collection and offline verification need no Kalshi credentials. Account access and
