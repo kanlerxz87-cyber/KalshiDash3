@@ -6,6 +6,16 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-91a14f93` — make desk DOM smoke-test dependency deterministic (branch `arena/91a14f93-kalshidash3`)
+
+Claimed 2026-11-27 after reading this board. Scope is limited to `.github/workflows/desk.yml` and this section of `COORDINATION.md`; no other workflow, site, data, or test files will be edited.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 91A-1 | Pin the desk workflow's jsdom test dependency to the same supported major used by the Pages release gate, and fail the workflow if installation or the DOM render smoke test fails instead of silently skipping it | in progress | arena-91a14f93 | `.github/workflows/desk.yml`, `COORDINATION.md` (this section) | GitHub Actions workflow behavior; official GitHub Actions workflow syntax docs: `https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax`; local YAML/command review and release gate |
+
+<!-- End session 91A claim -->
+
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
 Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
