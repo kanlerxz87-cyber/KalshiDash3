@@ -904,8 +904,8 @@ function commonAsserts(label, r) {
     const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"));
     const catLine = (r.doc.querySelector("#catCoverage") || {}).textContent || "";
     const catStatus = (r.doc.querySelector("#catStatus") || {}).textContent || "";
-    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`),
-      `executive-summary.html must render the catalyst coverage from data/live/catalysts.json (got: ${catLine})`);
+    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`) && catLine.includes(cat.generated_at),
+      `executive-summary.html must render the catalyst file timestamp and coverage (got: ${catLine})`);
     check(cat.counts.reviewed === cat.counts.archive_total || /partial/.test(catStatus),
       `the catalyst status must say "partial" while any swing is unreviewed (got: ${catStatus})`);
     // F-104: the requirements table typed "the sample is one settled alert" (true on

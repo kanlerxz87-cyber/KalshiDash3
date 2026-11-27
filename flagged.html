@@ -49,6 +49,7 @@
   <div id="blank"></div>
   <h2>Tracked contracts with unverified status</h2>
   <p class="small mut">A missing result is left blank. The linked official market page may have changed since the last lookup.</p>
+  <p id="followupStamp" class="small mut">Follow-up snapshot timestamp unverified.</p>
   <div id="followupFlags"></div>
 
 </main>
@@ -98,6 +99,9 @@ KD.nav("flagged.html");
   try {
     const snapshot = await KD.json("data/live/markets.json");
     if (!Array.isArray(snapshot?.alert_lifecycle?.rows)) throw new Error("no lifecycle data");
+    if (snapshot.collected_at) {
+      KD.$("#followupStamp").textContent = `Collector snapshot ${snapshot.collected_at} (${KD.ago(snapshot.collected_at)}).`;
+    }
     followups.innerHTML = KD.table([
       { key: "ticker", label: "Contract" }, { key: "why", label: "Why unverified" },
       { key: "when", label: "Last attempt (UTC)" }, { key: "source", label: "Official market record" },

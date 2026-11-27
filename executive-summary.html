@@ -252,21 +252,23 @@ auditMetric("auditSimulation", "simulation", d => {
   try {
     const leads = await KD.json("data/live/catalysts.json");
     const c = leads.counts || {};
-    const reviewed = Number(c.reviewed), total = Number(c.archive_total);
+    const reviewed = c.reviewed, total = c.archive_total;
     const status = document.getElementById("catStatus");
     const line = document.getElementById("catCoverage");
-    if (Number.isFinite(reviewed) && Number.isFinite(total) && total > 0) {
+    if (Number.isInteger(reviewed) && Number.isInteger(total) && total > 0) {
       const pct = Math.round((reviewed / total) * 100);
       if (status) {
         status.textContent = reviewed === total ? "done — every swing reviewed" : `partial — ${reviewed} of ${total} reviewed`;
         status.className = "badge " + (pct >= 90 ? "ok" : pct >= 50 ? "warn" : "bad");
       }
       if (line) {
-        line.textContent = `${reviewed} of ${total} archived swings (${pct}%) carry a review that names a source fetched `
-          + `and read for that minute; ${total - reviewed} are left not_reviewed with the reason stated on the row, `
-          + `because the observations that bound them are no longer in the committed history. `
-          + `Of the reviewed rows, ${c.best_quote_did_not_move || 0} show a best bid and ask that did not move at all — `
-          + `the ≥$0.10 change is in the last-traded print, not the quoted price (F-77, F-93).`;
+        const when = leads.generated_at ? `Review file ${leads.generated_at} (${KD.ago(leads.generated_at)}). `
+          : "Review timestamp unverified. ";
+        const quotes = Number.isInteger(c.best_quote_did_not_move)
+          ? ` Of the reviewed rows, ${c.best_quote_did_not_move} show a best bid and ask that did not move — `
+            + `the ≥$0.10 change is in the last-traded print, not the quoted price (F-77, F-93).` : "";
+        line.textContent = when + `${reviewed} of ${total} archived swings (${pct}%) carry a review that names a source fetched `
+          + `and read for that minute; ${total - reviewed} are labelled not reviewed, with the reason on each row.` + quotes;
       }
     } else if (line) {
       line.textContent = "Coverage could not be read from data/live/catalysts.json.";
