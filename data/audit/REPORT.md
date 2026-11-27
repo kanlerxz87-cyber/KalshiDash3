@@ -69,6 +69,14 @@ for re-runs and is **not claimed as exercised in this sandbox**.
    tickers would close this gap. Left as flagged.
    Source: https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR
 
+### F-113 follow-up — named lifecycle gap now closed (2026-11-27)
+
+The F-113 status above describes what the 20:20Z parity audit could see then; it is historical, not the latest site state. The collector's subsequent snapshot, `data/live/markets.json` (`collected_at: 2026-11-27T22:20:02Z`), now carries `alert_lifecycle` for the out-of-window archived alert `KXPGATOUR-THRC26-BHAR`. The sidecar row reports `status: finalized`, literal `result: no`, `settlement_ts: 2026-11-23T19:58:03.108438Z`, `settlement_value_dollars: 0.0000`, and its exact market source; the row's observation time is `2026-11-27T20:35:02Z`. The ticker remains in the alert archive and is absent from the ranked open/settled slices, so this verifies the follow-up path itself.
+
+I re-fetched the official demo [`GET /markets/KXPGATOUR-THRC26-BHAR`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR) through the platform page-fetch route on 2026-11-27. The response's `status`, `result`, settlement timestamp and settlement value exactly match the stored lifecycle row. The official [`Get Market`](https://docs.kalshi.com/api-reference/market/get-market), [market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle) and [market settlement](https://docs.kalshi.com/getting_started/market_settlement) pages define these fields and distinguish finalized settlement from an intermediate determination.
+
+**Disposition:** the named RSM Classic example no longer reads “not in snapshot”; F-113's action on the site's review page is updated to resolved and the verbatim selected fields are preserved in [`f113_resolution_observation.json`](f113_resolution_observation.json). This closes the specific out-of-window follow-up gap evidenced by F-113. It does not claim every future alert is followed in the same collection pass: newly detected swings may be joined on the next pass, and deferred/failed or out-of-scope records remain unverified rather than inferred. Regression: `scripts/tests/test_f113_resolution.py`.
+
 ## Manual-review link list (official sources, all reachable 2026-11-27)
 
 - Live API root used throughout: https://external-api.demo.kalshi.co/trade-api/v2
