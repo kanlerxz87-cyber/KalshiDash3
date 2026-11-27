@@ -2406,3 +2406,14 @@ live execution stay paper), F-14/F-26/F-77 (high-ROI screen is a disclosed heuri
 leads), F-76 (20 out-of-scope swings withheld and counted), DEPLOY-1 (Pages served by the legacy branch publisher;
 switching to Actions-only needs a repository admin). The official-source verification above covers the
 load-bearing claims; live market values remain collection outputs, never static facts (F-20).
+
+## Session `arena-b2286891` — executive-summary refresh + empty-topic UX + ROI clarification (2026-11-27)
+
+Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snapshot).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| B228-1 | Refresh executive-summary audit (2026-11-22 → 2026-11-27) with current committed numbers; add data-derived no-trading notices to elections/culture pages; clarify the two high-ROI definitions on live.html; verify gate, PR, merge, Pages | in progress | arena-b2286891 | `executive-summary.html`, `elections.html`, `culture.html`, `live.html`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS required; numbers from `data/live/*.json` only; official docs re-read live 2026-11-27 (demo_env, candlesticks, settlement) |
+
+- 2026-11-27: read the board (2408 lines), ran the release gate → PASS (after `npm install jsdom@26`). No open PRs. Pages API: `status=built`, `build_type=legacy` (DEPLOY-1 unchanged), latest build `fe245d8` at 17:15:55Z. Snapshot `2026-11-27T17:15:51Z`: 514 open / 200 settled published; alerts 154 all / 123 high_roi / 174 archive; simulation 7 settled (all strategies insufficient sample); ROI scan 0 picks / 0 eligible / 13,730 unscoreable; catalysts 57/154 reviewed, 0 coincides; elections 17 open (1 traded), culture 120 open (0 traded).
+- Official-source re-verification (platform fetch, 2026-11-27): demo_env confirms REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, mock funds, "may not be reflective of those in real markets" — matches C-01…C-08. Candlesticks confirms "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)" — matches C-17/C-61. Settlement confirms "$1 per contract", "Only net positions are settled", "Settlement fees are zero for simple yes/no determinations" — matches C-13/C-14. Sandbox has no direct egress to Kalshi (TLS blocked), so live market values are collector outputs, never re-fetched here.
