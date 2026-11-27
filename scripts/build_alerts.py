@@ -50,7 +50,7 @@ EPS = 1e-9
 # (schema: https://docs.kalshi.com/api-reference/market/get-series-list).
 CATEGORY_COMPATIBLE = {
     "gas": {"Economics", "Commodities", "Financials"},
-    "elections": {"Elections", "Politics", "World", "International"},
+    "elections": {"Elections"},
     "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
     "crypto": {"Crypto", "Financials"},
     "golf": {"Sports", "Golf"},

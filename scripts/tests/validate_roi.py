@@ -19,8 +19,12 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+import collect as COLLECT  # noqa: E402
+
 DEFAULT = ROOT / "data" / "live" / "roi.json"
 ALLOWED_RESULT = {None, "", "yes", "no", "scalar"}
+VALID_CATEGORIES = {"gas", "elections", "culture", "crypto", "golf"}
 
 errors: list[str] = []
 warns: list[str] = []
@@ -64,10 +68,45 @@ def main() -> int:
         for c in a.get("catalysts") or []:
             check(str(c.get("url", "")).startswith(("http://", "https://")), f"{tag} catalyst is not a URL")
 
+    # Load committed series_index when validating a synthetic/temp roi.json, and notice
+    # when checking the pre-refresh committed roi.json written before E9D9-2 landed.
+    markets_path = ROOT / "data" / "live" / "markets.json"
+    committed_series = {}
+    if markets_path.exists():
+        try:
+            committed_series = json.loads(markets_path.read_text()).get("series_index") or {}
+        except (OSError, json.JSONDecodeError):
+            committed_series = {}
+    is_default_committed = (path.resolve() == DEFAULT.resolve()
+                            and "open_excluded_category_conflict" not in (doc.get("counts") or {}))
+
     for key in ("picks", "near_misses", "unscoreable"):
         for p in doc.get(key) or []:
             tag = f"{key} {p.get('ticker')}"
             check(str(p.get("source", "")).startswith("https://"), f"{tag} has no https source link")
+            check(p.get("category_id") in VALID_CATEGORIES, f"{tag} out-of-scope category {p.get('category_id')!r}")
+            st = COLLECT.series_of(p)
+            check(st not in COLLECT.EXCLUDE_KEYWORD_SERIES,
+                  f"{tag} belongs to excluded series {st} ({COLLECT.EXCLUDE_KEYWORD_SERIES.get(st)})")
+            check(COLLECT.excluded_series_reason(p.get("category_id") or "", st) is None,
+                  f"{tag} belongs to topic-excluded series {st}")
+            check(not COLLECT.EXCLUDE_TITLE_RE.search(str(p.get("title") or "")),
+                  f"{tag} matches QA/benchmark title exclusion: {p.get('title')!r}")
+            series_cats = p.get("series_categories")
+            if series_cats is None and st in committed_series:
+                series_cats = (committed_series.get(st) or {}).get("categories") or []
+            series_tags = (committed_series.get(st) or {}).get("tags") or []
+            conflict = COLLECT.category_conflict(
+                p.get("category_id") or "",
+                list(series_cats or []),
+                p.get("category_basis") or "keyword",
+                list(series_tags),
+            )
+            if conflict:
+                if is_default_committed:
+                    warns.append(f"pre-refresh {tag} has category conflict ({conflict}); next desk.yml run drops it")
+                else:
+                    check(False, f"{tag} contradicts official series record: {conflict}")
             e = p.get("entry") or {}
             if key == "unscoreable":
                 # by definition there is no priced side here; the only honest output is the

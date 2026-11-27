@@ -583,6 +583,15 @@ const KDLIVE = (() => {
 
     const SEED_SERIES = new Set(["KXAAAGASM", "KXELECTIRAN", "KXEMMYCACTO", "KXEMMYCACTR", "KXEMMYCSERIES",
       "KXBALLONDOR", "KXSUPERBOWLHEADLINE", "KXBTCMAX150", "KXBTCY", "KXETHY", "KXPGATOUR", "KXPGARYDER", "KXPGASOLHEIM"]);
+    const EXCLUDED_SERIES = new Set(["KXBALLONDOR", "KXGOLFTENNISMAJORS", "KXNATGAS15M", "KXNATGASD", "KXNATGASMON", "KXDEMOFUTHOURLY"]);
+    const QA_TITLE_RE = /demo portfolio test|portfolio cash out|\bqa\s*\d|\bbench\s+(?:run|probe)\s*\d*\b/i;
+    const COMPATIBLE_CATS = {
+      gas: new Set(["Economics", "Commodities", "Financials"]),
+      elections: new Set(["Elections"]),
+      culture: new Set(["Entertainment", "Culture", "Pop Culture", "Awards", "Media"]),
+      crypto: new Set(["Crypto", "Financials"]),
+      golf: new Set(["Sports", "Golf"]),
+    };
     const KW = {
       gas: ["gas", "gasoline", "diesel"],
       elections: ["election", "president", "senate", "congress", "mayor", "governor", "nominee"],
@@ -591,20 +600,38 @@ const KDLIVE = (() => {
       golf: ["golf", "pga", "ryder cup", "solheim", "masters", "open championship"],
     };
     function classifyTicker(ticker, m) {
-      // Word-boundary matching, not substring: a substring test once put "yes Vegas,yes Tie"
-      // into Gas Prices because "vegas" contains "gas". Same rule as scripts/collect.py.
+      // Word-boundary matching + scope exclusions matching scripts/collect.py (T101, F-97, E9D9-2/3).
       const st = String(ticker).split("-")[0].toUpperCase();
-      // T101: the exchange's own series record files Ballon d'Or under Sports (categories ["Sports"],
-      // tags ["Soccer"]; GET /series/KXBALLONDOR, 2026-11-25). scripts/collect.py refuses it for that
-      // reason, so the live page must not file it under Culture by keyword ("ballon").
-      if (st === "KXBALLONDOR") return null;
-      const bySeed = { KXAAAGASM: "gas", KXELECTIRAN: "elections", KXBTCMAX150: "crypto", KXBTCY: "crypto", KXETHY: "crypto", KXPGATOUR: "golf", KXPGARYDER: "golf", KXPGASOLHEIM: "golf" }[st];
-      if (bySeed) return bySeed;
-      const hay = `${m.title || ""} ${m.yes_sub_title || ""} ${m.subtitle || ""}`.toLowerCase();
-      for (const [id, kws] of Object.entries(KW)) {
-        for (const kw of kws) if (new RegExp(`(?<![a-z0-9])${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![a-z0-9])`).test(hay)) return id;
+      if (EXCLUDED_SERIES.has(st)) return null;
+      const rawTitle = `${m.title || ""} ${m.yes_sub_title || ""} ${m.subtitle || ""} ${m.rules_primary || ""}`;
+      if (QA_TITLE_RE.test(rawTitle)) return null;
+      const seriesRec = (S.seriesIndex && S.seriesIndex[st]) || null;
+      const officialCats = (m.series_categories || (seriesRec && seriesRec.categories) || []).map(String).filter(Boolean);
+      if (officialCats.includes("Test") || officialCats.includes("Demo")) return null;
+      const bySeed = {
+        KXAAAGASM: "gas", KXELECTIRAN: "elections",
+        KXEMMYCACTO: "culture", KXEMMYCACTR: "culture", KXEMMYCSERIES: "culture", KXSUPERBOWLHEADLINE: "culture",
+        KXBTCMAX150: "crypto", KXBTCY: "crypto", KXETHY: "crypto",
+        KXPGATOUR: "golf", KXPGARYDER: "golf", KXPGASOLHEIM: "golf",
+      }[st];
+      let cid = bySeed || null;
+      if (!cid) {
+        const hay = rawTitle.toLowerCase();
+        for (const [id, kws] of Object.entries(KW)) {
+          for (const kw of kws) {
+            if (new RegExp(`(?<![a-z0-9])${kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![a-z0-9])`).test(hay)) {
+              cid = id;
+              break;
+            }
+          }
+          if (cid) break;
+        }
       }
-      return null;
+      if (cid && officialCats.length) {
+        const compat = COMPATIBLE_CATS[cid];
+        if (compat && !officialCats.some((c) => compat.has(c))) return null;
+      }
+      return cid;
     }
 
     /* ---- snapshot fallback: the committed CI data, refreshed on a timer ---- */
@@ -613,8 +640,10 @@ const KDLIVE = (() => {
       try {
         const snap = await j(snapshotUrls.markets);
         S.snapshotAge = snap.collected_at || null;
+        S.seriesIndex = snap.series_index || S.seriesIndex || {};
         for (const m of snap.open_markets || []) {
           const row = { ...m };
+          if (!classifyTicker(row.ticker, row)) continue;
           S.markets.set(m.ticker, row);
         }
         let hist = { series: {} };

@@ -74,6 +74,12 @@ OPEN = [
      "mve_collection_ticker": "KXMVE-26NOV20", "status": "active", "yes_bid_dollars": "0.3000",
      "yes_ask_dollars": "0.3200", "last_price_dollars": "0.3100", "volume_fp": "10.00",
      "volume_24h_fp": "10.00", "close_time": CLOSE},
+    # E9D9-2: Test-category instrument matching Crypto keyword ("BTC") that leaked into near_misses
+    mkt("KXDEMOFUTHOURLY-26NOV27H18-UP", 0.01, 1.00, 0.55, 0.0, "Demo BTC at or above 59876.36 USD"),
+    # E9D9-3: non-election Politics series matching Elections keyword ("president")
+    mkt("KXAPRPOTUS-26DEC04-38.6", 0.40, 0.44, 0.42, 100.0, "President approval rating above 38.6%?"),
+    # E9D9-2: daily natural-gas series filed under Entertainment/Oil & Gas
+    mkt("KXNATGASD-26NOV27-3.30", 0.45, 0.49, 0.47, 500.0, "Will natural gas close above 3.30?"),
 ]
 # tiny size on the golf market so its own book is thin
 OPEN[1]["yes_bid_size_fp"] = "20.00"
@@ -107,7 +113,15 @@ def fake_get(path, params=None, retries=3):
 
     url = f"{roi_scan.BASE}{path}"
     if path == "/series":
+        if not params:
+            return {"series": [
+                {"ticker": "KXDEMOFUTHOURLY", "categories": ["Test"], "tags": ["Demo"], "title": "Demo hourly event contract futures"},
+                {"ticker": "KXAPRPOTUS", "categories": ["Politics"], "tags": ["Recurring", "Trump"], "title": "Potus approval rating"},
+                {"ticker": "KXNATGASD", "categories": ["Entertainment"], "tags": ["Oil & Gas"], "title": "Natural Gas Daily"},
+            ]}, url
         return {"series": []}, url
+    if path.startswith("/series/") and not path.endswith("/candlesticks"):
+        return {"series": {}}, url
     if path == "/historical/cutoff":
         return {"market_settled_ts": "2026-09-01T00:00:00Z", "trades_created_ts": "2026-10-01T00:00:00Z"}, url
     if path.startswith("/markets/orderbooks"):
@@ -173,7 +187,21 @@ def main() -> int:
         ]}}}))
     orig_get, orig_collect_get, orig_live = roi_scan.get, collect.get, roi_scan.LIVE
     roi_scan.get = fake_get
-    collect.get = lambda path, params=None, retries=3: ({"series": []}, path)
+
+    def fake_collect_get(path, params=None, retries=3):
+        if path == "/series" and not params:
+            return {"series": [
+                {"ticker": "KXDEMOFUTHOURLY", "categories": ["Test"], "tags": ["Demo"], "title": "Demo hourly event contract futures"},
+                {"ticker": "KXAPRPOTUS", "categories": ["Politics"], "tags": ["Recurring", "Trump"], "title": "Potus approval rating"},
+                {"ticker": "KXNATGASD", "categories": ["Entertainment"], "tags": ["Oil & Gas"], "title": "Natural Gas Daily"},
+            ]}, path
+        if path == "/series" and params:
+            return {"series": []}, path
+        if path.startswith("/series/"):
+            return {"series": {}}, path
+        return {"series": []}, path
+
+    collect.get = fake_collect_get
     roi_scan.LIVE = tmp
     try:
         out = tmp / "roi.json"
@@ -187,8 +215,16 @@ def main() -> int:
         if not cond:
             problems.append(msg)
 
-    yes(doc["counts"]["open_scanned"] == 4, f"scanned {doc['counts']['open_scanned']} open markets, expected 4")
-    yes(doc["counts"]["open_in_scope"] == 3, f"in scope {doc['counts']['open_in_scope']}, expected 3 (the combo must be excluded)")
+    yes(doc["counts"]["open_scanned"] == 7, f"scanned {doc['counts']['open_scanned']} open markets, expected 7")
+    yes(doc["counts"]["open_in_scope"] == 3,
+        f"in scope {doc['counts']['open_in_scope']}, expected 3 (combo + Test + Politics + KXNATGASD must be excluded)")
+    yes(doc["counts"].get("open_excluded_category_conflict") == 2,
+        f"expected 2 category conflicts (KXDEMOFUTHOURLY + KXAPRPOTUS), got {doc['counts'].get('open_excluded_category_conflict')}")
+    yes(doc["counts"].get("open_excluded_off_topic_or_qa") == 1,
+        f"expected 1 off-topic/QA exclusion (KXNATGASD), got {doc['counts'].get('open_excluded_off_topic_or_qa')}")
+    all_out_tickers = {p["ticker"] for k in ("picks", "near_misses", "unscoreable") for p in doc[k]}
+    for forbidden in ("KXDEMOFUTHOURLY-26NOV27H18-UP", "KXAPRPOTUS-26DEC04-38.6", "KXNATGASD-26NOV27-3.30"):
+        yes(forbidden not in all_out_tickers, f"{forbidden} must not appear in picks/near_misses/unscoreable")
     tickers = [p["ticker"] for p in doc["picks"]]
     yes("KXAAAGASM-26DEC31-4.00" in tickers, f"the qualifying gas market must be a pick, got {tickers}")
     yes("KXMVE-26NOV20-A" not in tickers, "a combo must never be picked")
@@ -254,6 +290,17 @@ def main() -> int:
     if d4["picks"]:
         d4["picks"][0]["category_basis"] = "keyword"
     bad_cases["a keyword-only match presented as a pick"] = (d4, "keyword-only")
+    d5 = json.loads(out.read_text())
+    d5["near_misses"].append({
+        "ticker": "KXDEMOFUTHOURLY-26NOV27H18-UP", "eligible": False,
+        "fails": ["spread 99.0c > 10c cap"], "reasons": [], "score": -0.68,
+        "bid": 0.01, "ask": 1.0, "last": 0.55,
+        "entry": {"side": "NO", "entry": 0.99, "cost": 0.9907, "roi": -0.68, "fee_unit": 0.0007, "ev": -0.67},
+        "title": "Demo BTC at or above 59876.36 USD", "category_id": "crypto",
+        "category_basis": "keyword", "series_categories": ["Test"],
+        "result": None, "catalysts": [], "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H18-UP",
+    })
+    bad_cases["a Test-category instrument in near_misses"] = (d5, "contradicts official series record")
     for label, (doc_bad, needle) in bad_cases.items():
         f = gate_dir / f"{abs(hash(label))}.json"
         f.write_text(json.dumps(doc_bad))

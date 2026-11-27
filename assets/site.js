@@ -52,9 +52,9 @@ const KD = (() => {
   // landing page presented a test instrument as a live culture event. scripts/collect.py now
   // excludes these from every category and publishes the counts; this guard keeps a stale or
   // hand-edited snapshot from putting one back at the top of a "largest live market" table.
-  const QA_RE = /demo portfolio test|portfolio cash out|\bqa\s*\d/i;
+  const QA_RE = /demo portfolio test|portfolio cash out|\bqa\s*\d|\bbench\s+(?:run|probe)\s*\d*\b/i;
   function isQaRow(r) {
-    return !r || QA_RE.test(String((r.title || "") + " " + (r.rules_primary || "")));
+    return !r || QA_RE.test(String((r.title || "") + " " + (r.yes_sub_title || "") + " " + (r.rules_primary || "")));
   }
 
   function basisBadge(b) {
