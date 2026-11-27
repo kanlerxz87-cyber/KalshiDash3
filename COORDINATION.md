@@ -6,6 +6,28 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-a8d317a1` — collector stall after PR #149: make the failing validator say WHY, then fix the cause (branch `arena/a8d317a1-kalshidash3`, base `a4a19cc`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading this board and checking the live state:
+`gh pr list --state open` → PR #148 only (another session's whitespace fix, not this scope); `main` = `a4a19cc`;
+no branch ahead of `main`. **Live defect observed, not inferred:** every collector relay pass since PR #149
+(`3348682`, 18:29Z) has failed with `detail: validators: validate_alerts` — `data/live/collector_health.json`
+records `failed` at 18:46Z, 19:01Z, 19:08Z and 19:23Z, and the published snapshot is frozen at
+`collected_at 2026-11-27T18:00:57Z` (the collector cannot commit, so the site's own snapshot ages).
+The validator passes on the committed tree (`python3 scripts/tests/validate_alerts.py` → OK, 174 archived
+alerts), so the failure is produced by *freshly collected* data and repeats every pass.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| A8D3-1 | Record the failing validator's own output in `data/live/collector_health.json`. `make_pass()` called `fail("validators: …")` with **no tail**, so a validator failure left only its name in the repository and only its text in stdout — and Actions job logs are unreadable from this sandbox (recorded on this board repeatedly), which is why nobody could diagnose the 2026-11-25 or today's stall | in progress | arena-a8d317a1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_relay.py` | `python3 scripts/tests/test_collect_relay.py`; mutation check (the new assertion fails on the pre-fix tree) |
+| A8D3-2 | Reproduce the failure on this branch with `collect.yml` (single pass, blank `RELAY_MINUTES`) and read the exact validator error from the health record instead of guessing | in progress | arena-a8d317a1 | `data/live/collector_health.json` (workflow-written only) | `gh workflow run collect.yml --ref arena/a8d317a1-kalshidash3`; the health commit on this branch |
+| A8D3-3 | Fix the root cause with a regression test that fails before the fix and passes after | in progress | arena-a8d317a1 | the file(s) the reproduction names | `python3 scripts/verify_release.py` |
+| A8D3-4 | Publish the finding on *Flagged for Review* and record it here with its official sources | in progress | arena-a8d317a1 | `data/findings.json` (append only), `COORDINATION.md` (this section) | official Kalshi docs / demo API URLs cited per row |
+| A8D3-5 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy **and** that the collector commits again on `main` | in progress | arena-a8d317a1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
+Non-overlap: this session does not touch `assets/*`, the 21 pages, `data/live/*` (collector-owned) or another
+session's ledger rows. `data/findings.json` is append-only (next free id taken at write time).
+
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
 Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
