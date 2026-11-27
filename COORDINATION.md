@@ -3847,3 +3847,18 @@ Read this board and ran the release gate on `ba847e8` (snapshot `2026-11-27T22:2
 | Data ownership respected | The PR contains **no** `data/live/*` change; the block arrived through `collect.yml`, as the board requires. | `git diff --stat 13968c2^1 13968c2` |
 
 **Carried, not fixed here (all already published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and live execution stay paper), F-14/F-26/F-77 (the high-ROI screen is a disclosed heuristic; the fee-aware screen reports 0 picks; demo BTC oscillation still dominates the model feed — **the frozen `high_roi` flag was deliberately not re-scored by this task**), F-25 (cause links are search leads), DEPLOY-1 (Pages served by the legacy branch publisher). The book-sanity item the board had left open is now addressed as a **per-row disclosure, not a suppression**: publication is unchanged, and each row states that its print sat outside the book with the distance (F-121). No other new irregularity was found. Other sessions' open PRs (#148, #150) were left untouched.
+
+### 49BA-2 — freshness note now quotes the official caching/WebSocket wording
+
+Requested by nobody but needed by the standing "every claim carries an official source link, never infer" rule: `alerts.html`'s live-detection note asserted *"Kalshi documents that REST responses are cached briefly, so prices can lag the exchange by seconds — polling faster than that cannot add information"* with **no direct link on that sentence**, and the second half ("cannot add information") was this project's inference rather than a documented statement.
+
+- **Re-verified against the official page** ([Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), fetched this session): "Responses **are cached for a short time**, so prices, sizes and `status` can lag the exchange by several seconds, and filtered listings can lag longer than a read of a single market. **Use the WebSocket API when you need current state.**"
+- The note now quotes that wording verbatim with its own link, drops the unsourced inference, and replaces it with the checkable bound: *freshness is bounded by that cache, not by the poll interval*.
+- It also now states **why the page polls REST instead of streaming**, which the old text left unexplained: the WebSocket handshake requires API-key authentication ([WebSocket Connection](https://docs.kalshi.com/websockets/websocket-connection), fetched this session: "API key authentication required for WebSocket connections. The API key should be provided during the WebSocket handshake"), and this site holds no demo credentials ([F-07](https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/flagged.html)).
+- No new claim: both halves were already in the verified ledger (`data/verified_facts.json` **C-31** "WebSocket sessions require an API key; there is no anonymous WebSocket" and **C-58** "GET /markets responses are cached server-side and can lag the exchange by several seconds"); this change only attaches the two facts to the sentence that relied on them.
+
+| Item | Result | Evidence |
+|---|---|---|
+| Files touched | `alerts.html` (one paragraph, static note above the chats) + this section. No `data/live/*`, no script, no test contract. | `git diff --stat` |
+| Gate before commit | `check_site.py` 21 pages OK, `test_pages_dom.js` OK (incl. N2 `100/164` + `100/124`, N3 `120/164`), `audit_rendered_numbers.js` OK (72 claims each with an https source), `verify_release.py` **PASS** | local run, this session |
+| Sources | Get Markets (caching + WebSocket advice), WebSocket Connection (handshake auth), `data/verified_facts.json` C-31 / C-58 | fetched 2026-11-27 |

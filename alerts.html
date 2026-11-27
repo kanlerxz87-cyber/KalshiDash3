@@ -77,9 +77,15 @@
     Live detection polls <code>GET /markets?tickers=…</code>, which returns every matching market in one
     response when <code>tickers</code> is the only filter
     (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>).
-    Kalshi documents that REST responses are cached briefly, so prices can lag the exchange by seconds — polling
-    faster than that cannot add information. Unauthenticated requests have separate rate limits; the engine backs
-    off exponentially on HTTP 429 (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>).
+    Kalshi documents that those responses <q>are cached for a short time, so prices, sizes and <code>status</code> can
+    lag the exchange by several seconds</q> and advises <q>Use the WebSocket API when you need current state</q>
+    (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>) —
+    so this view's freshness is bounded by that cache, not by the poll interval you pick below. It polls REST instead of
+    streaming because the WebSocket handshake requires API-key authentication
+    (<a href="https://docs.kalshi.com/websockets/websocket-connection" target="_blank" rel="noopener">WebSocket Connection</a>)
+    and this site holds no demo credentials (<a href="flagged.html">F-07</a>). Unauthenticated requests have separate
+    rate limits; the engine backs off exponentially on HTTP 429
+    (<a href="https://docs.kalshi.com/getting_started/rate_limits" target="_blank" rel="noopener">Rate Limits</a>).
     Without live REST, the chats replay the collector's committed history (<code>scripts/build_alerts.py</code> →
     <code>data/live/alerts_archive.json</code>, an append-only archive, so swings survive a market closing).
     "News leads" links are search queries computed from the market title, not verified causes — the archive keeps
