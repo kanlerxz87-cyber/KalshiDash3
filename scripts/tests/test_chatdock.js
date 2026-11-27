@@ -150,9 +150,15 @@ function counts(w) {
   // rule of its own, and it must not be a filter over the all-events display window (F-95: with a
   // single 80-row buffer the model chat showed 58 of the 96 frozen rows). The two interfaces are:
   //   - the rendered model list shows the newest MAX_ROWS (80) of the WHOLE frozen screen;
-  //   - the model badge reports the WHOLE frozen screen.
+  //   - the model counter reports the WHOLE frozen screen, AND how many of them are on screen.
   // (main's earlier version compared against the frozen rows inside the newest 80 events; that
   // tolerated the truncation. This version keeps main's badge check and restores the screen check.)
+  //
+  // F-105 (2026-11-27): the badge used to print the held count alone ("123") next to a list of
+  // 80 rows, so the badge claimed 123 model picks while the reader could see 80 of them. The
+  // counter now prints both numbers ("80 of 123"). The check below keeps the original intent —
+  // the held number must be the whole frozen screen, never a subset of it — and adds the F-105
+  // property that the shown number matches the rows actually rendered.
   const frozenScreen = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
     return Math.abs(Number(a.delta)) >= 0.10 - 1e-9
@@ -161,8 +167,14 @@ function counts(w) {
   }).length;
   check(c.model === Math.min(frozenScreen, 80),
     `rendered model rows equal the frozen high_roi screen up to the 80-row display window (min(${frozenScreen}, 80))`);
-  check(Number(c.modelTotal) === frozenScreen,
-    `model count badge equals the whole frozen high_roi screen (${frozenScreen})`);
+  const modelCounter = /^(\d+)(?:\s+of\s+(\d+))?$/.exec(String(c.modelTotal).trim());
+  check(!!modelCounter, `the model counter is a plain count, or a count of what is shown (read "${c.modelTotal}")`);
+  if (modelCounter) {
+    check(Number(modelCounter[2] === undefined ? modelCounter[1] : modelCounter[2]) === frozenScreen,
+      `the model counter's held number equals the whole frozen high_roi screen (${frozenScreen})`);
+    check(Number(modelCounter[1]) === c.model,
+      `the model counter's shown number (${modelCounter[1]}) equals the rows rendered (${c.model})`);
+  }
   check(w.document.querySelector(".kd-note").textContent.includes("Not an ROI prediction"),
     "model chat states it is not an ROI prediction");
   check(panel.textContent.includes("project requirement, not a Kalshi figure"),

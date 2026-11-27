@@ -61,6 +61,7 @@ scripts/tests/test_topic_integrity.py  offline: a published row may not contradi
 scripts/tests/test_price_history_retention.py  offline: the retention window may not delete the observations an alert cites (F-99)
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
 scripts/tests/test_lifecycle.js  lifecycle join (resolved YES/NO vs determined vs not-in-snapshot) and the single model-pick rule shared by engine, page and dock
+scripts/tests/test_chat_counts.js  offline: every chat counter states exactly what its list holds — the header may never claim more rows than the feed renders (F-105)
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
