@@ -20,6 +20,7 @@ Claimed 2026-11-27 after reading this board. Scope is limited to `.github/workfl
 - Change: pin desk's runtime to Node 22 and `jsdom@26`; installation/render failures now fail the job, consistently with the release gate.
 - Verification: `npm install --no-save --package-lock=false jsdom@26`; `python3 scripts/verify_release.py` PASS (21 pages, validators, Python/DOM suites, rendered-number audit, internal-link check). No live API or account claim was made by this task.
 - Official review link: [GitHub Actions workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
+- Pull request: [#150](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/150), `build` check passed (1m22s); deploy correctly skipped for a PR. Merge and Pages deployment are pending final integration because the shared board still has other in-progress tasks.
 
 <!-- End session 91A claim -->
 
