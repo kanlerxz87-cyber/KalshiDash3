@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T23:05:58Z",
+ "generated_at": "2026-11-27T23:22:12Z",
  "source": "/home/user/KalshiDash3/COORDINATION.md",
  "note": "Claim ledger parsed from the shared board. A claim is live when its status is not recorded as done. A conflict is one path claimed live by two or more sessions. The board records no commit times, so this report does NOT decide staleness: a claim from a session that stopped hours ago looks the same as one from a minute ago. Cross-check a session's branch before taking a claim over.",
  "sessions": [

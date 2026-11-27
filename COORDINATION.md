@@ -3833,8 +3833,17 @@ Read this board and ran the release gate on `ba847e8` (snapshot `2026-11-27T22:2
 - The quote block is deterministic on the committed snapshot (both sides are frozen fields): rebuilding `build_alerts.py` on the same `price_history.json` reproduces `inside_quote 134 / outside_quote 29 / unknown_quote 1` byte-for-byte.
 - The three conservative demo cells the site already discloses (F-07 paper-only, F-14/F-77 experimental screen, F-25 causes) are unchanged. `high_roi` was intentionally not re-scored, so pick counts do not move: 164 served / 124 picks before and after.
 
-### 49BA-1 close-out
+### 49BA-1 close-out — merged, deployed, and confirmed in production
 
 | Item | Result | Evidence |
 |---|---|---|
-| Pull request | pending | `gh pr create` |
+| Pull request | **[PR #180](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/180)** merged to `main` at **2026-11-27T23:10:36Z** as merge commit **`13968c2651a228d797be5d33e1c606ca545a7707`**, without waiting for approval. Rebased twice onto `main` (PRs #179, #181 and a fresh snapshot landed while it was open); the only conflict each time was the generated `data/session_claims.json`, resolved by regenerating it from the merged board. | `gh pr merge 180 --merge`; `git show -s origin/main` |
+| PR release gate | `build` **pass** 1m31s; `deploy` correctly skipped on a PR | [run 46080708098](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46080708098) |
+| Main release + Pages deploy | **success**, 4m38s, on the merge commit | [run 46080989682](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46080989682) |
+| Pages API | `status: built` for `13968c2` (created 23:10:37Z) and for the next data commit `c089fe9` | `gh api repos/…/pages/builds/latest` |
+| Live site, first check | Served the new page before the data existed: the method paragraph “Was the move even in the book?” was present and the evidence bar said **“quote check: not published in this feed”** — the honest interim state, not a fabricated zero. | `alerts.html?audit=49ba-2316` (23:16Z) |
+| Production pipeline writes and validates the block | The **very next collector pass** (`collect.yml`, snapshot **2026-11-27T23:20:02Z**, commit **`c089fe9`**) ran the new `build_alerts.py` **and** the new `validate_alerts.py` and committed `counts.quote_check {inside_quote 135, outside_quote 29, unknown_quote 1, rows 165}`. No code change from this session was needed for the pipeline to accept it. | [data commit c089fe9](https://github.com/kanlerxz87-cyber/KalshiDash3/commit/c089fe9); `git show origin/main:data/live/alerts.json` |
+| Live site, verified render | `alerts.html` now renders **“print inside quote: 135 · print ≠ book: 29 · quote unknown: 1”** in the evidence bar and a per-row chip such as **“print ≠ book · 97.0¢ outside”** on `KXBTCY-27JAN0100-B87500` (a 2¢ → 99¢ print recorded against a wide book). | `alerts.html?audit=49ba-2324` (23:24Z) |
+| Data ownership respected | The PR contains **no** `data/live/*` change; the block arrived through `collect.yml`, as the board requires. | `git diff --stat 13968c2^1 13968c2` |
+
+**Carried, not fixed here (all already published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and live execution stay paper), F-14/F-26/F-77 (the high-ROI screen is a disclosed heuristic; the fee-aware screen reports 0 picks; demo BTC oscillation still dominates the model feed — **the frozen `high_roi` flag was deliberately not re-scored by this task**), F-25 (cause links are search leads), DEPLOY-1 (Pages served by the legacy branch publisher). The book-sanity item the board had left open is now addressed as a **per-row disclosure, not a suppression**: publication is unchanged, and each row states that its print sat outside the book with the distance (F-121). No other new irregularity was found. Other sessions' open PRs (#148, #150) were left untouched.
