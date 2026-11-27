@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T22:20:02Z",
- "snapshot_collected_at": "2026-11-27T22:20:02Z",
+ "generated_at": "2026-11-27T22:35:02Z",
+ "snapshot_collected_at": "2026-11-27T22:35:01Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -14,7 +14,7 @@
   "all_events": 164,
   "high_roi": 124,
   "archive_total": 184,
-  "new_this_run": 3,
+  "new_this_run": 0,
   "withheld_category_conflict": 0,
   "withheld_reasons": {},
   "evidence": {
@@ -77,10 +77,10 @@
     "decided_at": "2026-11-27T22:20:02Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.35,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -126,10 +126,10 @@
     "decided_at": "2026-11-27T22:20:02Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.22,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -175,10 +175,10 @@
     "decided_at": "2026-11-27T22:20:02Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.22,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -8136,10 +8136,10 @@
     "decided_at": "2026-11-27T22:20:02Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.22,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
