@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T17:46:54Z",
- "runtime_seconds": 144.8,
+ "collected_at": "2026-11-27T18:18:54Z",
+ "runtime_seconds": 93.6,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,22 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 13862,
+  "open_in_scope": 3907,
+  "open_excluded_category_conflict": 19,
+  "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 1,
-  "unscoreable": 13861,
-  "orderbooks": 13862,
-  "orderbooks_requested": 13862,
+  "near_misses": 0,
+  "unscoreable": 3907,
+  "orderbooks": 3907,
+  "orderbooks_requested": 3907,
   "alerts": 0,
-  "markets_with_momentum": 136,
+  "markets_with_momentum": 240,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 13862,
-  "returned": 13862,
+  "requested": 3907,
+  "returned": 3907,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -57,67 +59,10 @@
   "trades_created_ts": "2026-09-28T00:00:00Z"
  },
  "picks": [],
- "near_misses": [
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV27H18-UP",
-   "eligible": false,
-   "fails": [
-    "depth 2 < 50 contracts at the touch",
-    "net ROI -6.84% not above 0% floor",
-    "closes in 13 min < 15 min floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.49,
-   "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.45,
-   "bid": 0.47,
-   "ask": 0.53,
-   "spread": 0.06000000000000005,
-   "depth": 2.0,
-   "vol24": 6731.0,
-   "ttc_hours": 0.21833333333333332,
-   "momentum": null,
-   "series_ticker": "KXDEMOFUTHOURLY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.53,
-    "fee_unit": 0.017437,
-    "cost": 0.5474370000000001,
-    "ev": -0.037437000000000054,
-    "roi": -0.06838595126014509
-   },
-   "score": -0.06838595126014509,
-   "dollars_traded_estimate": 3141.45,
-   "title": "Demo BTC at or above 59876.36 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-27T18:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H18",
-   "status": "active",
-   "result": null,
-   "volume_fp": 6981.0,
-   "volume_24h_fp": 6731.0,
-   "open_interest_fp": 87.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 1.0,
-    "depth_at_ask": 1.0,
-    "bid_price": 0.47,
-    "ask_price": 0.53
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H18-UP"
-  }
- ],
+ "near_misses": [],
  "unscoreable": [
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.6",
+   "ticker": "KXTIME-26-ROY",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -137,9 +82,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 826.6683333333333,
+   "momentum": null,
+   "series_ticker": "KXTIME",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -148,11 +93,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be above 38.5 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Roy Cooper be Time Person of the Year in 2026?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "close_time": "2027-01-01T04:59:00Z",
+   "event_ticker": "KXTIME-26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -165,10 +113,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.6"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTIME-26-ROY"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.4",
+   "ticker": "KXUNSEC-27JAN-KTOK",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -188,9 +136,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 932.685,
+   "momentum": null,
+   "series_ticker": "KXUNSEC",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -199,11 +147,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 38.3 and 38.5 according to RealClearPolitics?",
+   "title": "Who will be the next Secretary-General of UN?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2027-01-05T15:00:00Z",
+   "event_ticker": "KXUNSEC-27JAN",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -216,10 +167,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.4"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXUNSEC-27JAN-KTOK"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.1",
+   "ticker": "KXKYGOVRUN-27-27JAN09-SMAD",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -239,9 +190,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 1028.685,
+   "momentum": null,
+   "series_ticker": "KXKYGOVRUN",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -250,11 +201,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 38.0 and 38.2 according to RealClearPolitics?",
+   "title": "Will Savannah Maddox announce a run for Governor of Kentucky in 2027?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2027-01-09T15:00:00Z",
+   "event_ticker": "KXKYGOVRUN-27",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -267,15 +221,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.1"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXKYGOVRUN-27-27JAN09-SMAD"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.8",
+   "ticker": "KXCHIMAYORADVANCE-27MAR17-ZMA",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 109 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -290,9 +245,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 2625.6683333333335,
+   "momentum": null,
+   "series_ticker": "KXCHIMAYORADVANCE",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -301,11 +256,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.7 and 37.9 according to RealClearPolitics?",
+   "title": "Will Zoe Ma qualify for the runoff in the 2027 Chicago mayoral election?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2027-03-17T03:59:00Z",
+   "event_ticker": "KXCHIMAYORADVANCE-27MAR17",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -318,15 +276,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.8"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCHIMAYORADVANCE-27MAR17-ZMA"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.5",
+   "ticker": "KXCHIMAYORADVANCE-27MAR17-WQUI",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 109 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -341,9 +300,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 2625.6683333333335,
+   "momentum": null,
+   "series_ticker": "KXCHIMAYORADVANCE",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -352,11 +311,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.4 and 37.6 according to RealClearPolitics?",
+   "title": "Will William J. Quinlan qualify for the runoff in the 2027 Chicago mayoral election?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2027-03-17T03:59:00Z",
+   "event_ticker": "KXCHIMAYORADVANCE-27MAR17",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -369,15 +331,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.5"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCHIMAYORADVANCE-27MAR17-WQUI"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.2",
+   "ticker": "KXCHIMAYORADVANCE-27MAR17-LNEE",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 109 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -392,9 +355,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 2625.6683333333335,
+   "momentum": null,
+   "series_ticker": "KXCHIMAYORADVANCE",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -403,11 +366,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.1 and 37.3 according to RealClearPolitics?",
+   "title": "Will Lisa Nee qualify for the runoff in the 2027 Chicago mayoral election?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2027-03-17T03:59:00Z",
+   "event_ticker": "KXCHIMAYORADVANCE-27MAR17",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -420,15 +386,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.2"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCHIMAYORADVANCE-27MAR17-LNEE"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-36.9",
+   "ticker": "KXGOVKYNOMR-27-DTHA",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 537 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -443,9 +410,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 12883.685,
+   "momentum": null,
+   "series_ticker": "KXGOVKYNOMR",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -454,11 +421,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 36.8 and 37.0 according to RealClearPolitics?",
+   "title": "Will Damon Thayer be the Republican nominee for Governor in Kentucky?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-05-17T14:00:00Z",
+   "event_ticker": "KXGOVKYNOMR-27",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -471,15 +441,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.9"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVKYNOMR-27-DTHA"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-36.7",
+   "ticker": "KXGOVKYNOMR-27-BSTA",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 537 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -494,9 +465,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.21833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXAPRPOTUS",
+   "ttc_hours": 12883.685,
+   "momentum": null,
+   "series_ticker": "KXGOVKYNOMR",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -505,11 +476,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be below 36.8 according to RealClearPolitics?",
+   "title": "Will Brett St. Amand be the Republican nominee for Governor in Kentucky?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-05-17T14:00:00Z",
+   "event_ticker": "KXGOVKYNOMR-27",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -522,24 +496,23 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.7"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVKYNOMR-27-BSTA"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 121,
+  "candles_used": 124,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 4,
-  "baseline_always_yes_hits": 2,
+  "baseline_always_yes_bets": 1,
+  "baseline_always_yes_hits": 0,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 20,
-   "no side passed the replay gates": 4,
-   "no candles in the 2h before close": 10
+   "candle without a price": 23,
+   "no side passed the replay gates": 1
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -548,7 +521,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.5
+  "baseline_always_yes_hit_rate": 0.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
