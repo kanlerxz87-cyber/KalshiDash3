@@ -56,7 +56,7 @@
     ]
   },
  "quote_check": {
-  "description": "49BA-1 quote check. last_price_dollars is the last TRADED price; yes_bid_dollars and yes_ask_dollars are the two-sided quote of the SAME Get Markets read (https://docs.kalshi.com/api-reference/market/get-markets, documented as cached and able to lag the exchange). Every alert therefore also records evidence.quote: inside_quote when the printed end price sits within [to_yes_bid, to_yes_ask], outside_quote when it does not (with outside_by_dollars and the spread), unknown_quote when no usable quote was recorded with the read. It is a comparison of two recorded official fields, it does not claim why the two differ, and it does not re-score the frozen high_roi flag (that remains the owner's decision, F-26/F-77).",
+  "description": "49BA-1 quote check. last_price_dollars is the last TRADED price; yes_bid_dollars and yes_ask_dollars are the two-sided quote of the SAME Get Markets read (https://docs.kalshi.com/api-reference/market/get-markets); the book behind it is a point-in-time read (https://docs.kalshi.com/getting_started/orderbook_responses). Every alert therefore also records evidence.quote: inside_quote when the printed end price sits within [to_yes_bid, to_yes_ask], outside_quote when it does not (with outside_by_dollars and the spread), unknown_quote when no usable quote was recorded with the read. It is a comparison of two recorded official fields, it does not claim why the two differ, and it does not re-score the frozen high_roi flag (that remains the owner's decision, F-26/F-77).",
   "states": [
    "inside_quote",
    "outside_quote",

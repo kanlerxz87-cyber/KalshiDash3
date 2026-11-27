@@ -39,9 +39,10 @@ The quote check (49BA-1) — is the printed price even inside the book?
   `evidence.state` above says whether a trade happened. It does not say whether the recorded
   end price was *executable*: last_price_dollars is a print, while yes_bid_dollars and
   yes_ask_dollars are the two-sided quote read at the same instant from the same Get Markets
-  response (https://docs.kalshi.com/api-reference/market/get-markets, and the response is
-  documented as cached/lagging the exchange by several seconds). A print can therefore sit
-  outside the current quote — either side — with no trade at the quote at all.
+  response (https://docs.kalshi.com/api-reference/market/get-markets). The order book behind
+  that quote is documented as "a point-in-time read"
+  (https://docs.kalshi.com/getting_started/orderbook_responses), so a print can sit outside the
+  quote recorded beside it — on either side — with no trade available at that quote.
 
   `evidence.quote` publishes that comparison per row:
     inside_quote    to_price is within [to_yes_bid, to_yes_ask] of the same read

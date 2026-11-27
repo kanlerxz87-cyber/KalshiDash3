@@ -108,7 +108,7 @@
     <b>Was the move even in the book?</b> The rule watches <code>last_price_dollars</code>, the last traded price, while
     <code>yes_bid_dollars</code> / <code>yes_ask_dollars</code> are the two-sided quote read in the same
     <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>
-    response (documented as cached, so the quote can lag the exchange by seconds). Each alert therefore also compares its
+    response, and the book behind it is a point-in-time read, so the quote can differ from a print. Each alert therefore also compares its
     printed end price with that quote: <span class="badge warn">print ≠ book</span> means the price printed
     <i>outside</i> the recorded bid/ask band, so the move was not available at the quote a reader could have traded, and the
     chip states by how much. Rows that carry no usable quote are counted as <b>quote unknown</b> and nothing is inferred.
