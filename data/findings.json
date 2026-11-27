@@ -1574,6 +1574,20 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py"
    ]
+  },
+  {
+   "id": "F-107",
+   "severity": "high",
+   "item": "Collector dropped official series evidence for archived alerts once their entire series left the bounded market scan",
+   "why": "On 2026-11-27, collector health reported repeated validate_alerts failures while the published market snapshot remained at 18:00:57Z. Independent dry-run 46058016625 reproduced the failure: two archived KXAAAGASD-26NOV21-3.6600 alerts retained category_assigned_from but the new snapshot no longer included KXAAAGASD in series_index, so the strict validator could not reproduce that assignment. The official GET /series/KXAAAGASD record was re-read in this session and returned categories ['Economics'], title 'US gas price up', and AAA as a settlement source. This was not the elections compatibility-table drift described in F-106.",
+   "action": "Fixed scripts/collect.py to record the distinct series of every archive-cited ticker as well as scanned markets, using the existing official series lookup and deduplication. No category is inferred and no validator is relaxed. Added an end-to-end offline regression that runs the collector build, alert builder and validator with the gas series absent from both current market buckets; additional tests cover one request per series, reuse of an official bulk answer, current category changes and unavailable API answers remaining null. Live collection recovery is tracked in COORDINATION.md; a passing offline suite alone does not establish freshness.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625",
+    "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://docs.kalshi.com/api-reference/market/get-series",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_archive_series_retention.py"
+   ]
   }
  ]
 }
