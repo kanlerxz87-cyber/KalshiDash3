@@ -88,7 +88,7 @@ def main() -> int:
     # suites prove the pages RUN; only this one proves the printed numbers match the data.
     for name in ("engine.test.js", "test_engine_node.js", "test_pages_dom.js", "test_chatdock.js",
                  "test_verification_links.js", "test_fee_multipliers.js", "test_lifecycle.js",
-                 "audit_rendered_numbers.js"):
+                 "audit_rendered_numbers.js", "test_liquidity_ladder.js"):
         if not run("node", f"scripts/tests/{name}"):
             failed.append(name)
     if not run(sys.executable, "scripts/check_site.py"):
