@@ -6,6 +6,65 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-b447d5a4` — full live-site sweep: all 21 deployed pages, data parity, publish record (branch `arena/b447d5a4-kalshidash3`, base `fe245d8` + merge of `origin/main` `bd6f467`)
+
+Claimed 2026-11-27 **before any edit**. Board read first. `origin/main` advanced to `bd6f467` after this branch was
+cut (PRs #133/#134/#135/#136/#137 merged 2026-11-27); `origin/main` was merged into this branch before the baseline
+gate ran. Baseline: `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator, DOM
+suites, internal-link check; `jsdom@26` installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
+Open PRs at claim time: none by this session; `#137` was merged by its owner before this branch synced.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T120 | Live sweep of all 21 deployed pages on GitHub Pages: HTTP 200, page-specific content markers, and deployed `data/live/*.json` parity with the committed files (snapshot time, alert counts, flagged count) | done | arena-b447d5a4 | `COORDINATION.md` (this section) | `fetch_page` per page (platform fetch route, 2026-11-27 ~17:46–17:52Z); parity vs `data/live/*.json`; `verify_release.py` PASS on the final merged tree |
+| T121 | Publish: commit → push → PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | in progress | arena-b447d5a4 | `COORDINATION.md` (this section) | `gh pr`, `gh api repos/…/pages(+builds)`, live URL fetch |
+
+### T120 — sweep results (2026-11-27, ~17:46–17:52Z)
+
+**All 21 pages returned HTTP-200 content with their expected markers** through the platform fetch route. Nothing was
+broken; no page needed a fix.
+
+| Page | Result |
+|---|---|
+| `index.html` | OK — snapshot `2026-11-27T17:30:51Z` shown at fetch time, 514 open / 200 settled rows, five topic rows with sourced API links, Culture correctly labelled untraded (F-83) |
+| `categories.html` | OK — table of the five topics (151/17/120/166/60 open · 50/1/50/50/49 settled), auditable exclusion counts (25,218 scanned open / 19,043 in scope / 6,094 excluded …) |
+| `gas.html` | OK — 151 open · 50 settled · $23,271 largest (KXAAAGASM-26NOV30-3.90) |
+| `elections.html` | OK — 17 open · 1 settled · $3 largest; "almost no trading in this topic" notice rendered |
+| `culture.html` | OK — 120 open all $0, no-trading notice rendered, F-38/F-65/F-66/F-97 note present |
+| `crypto.html` | OK — 166 open · $16,436,950 largest |
+| `golf.html` | OK — 60 open · 49 settled · $19,179 largest |
+| `dashboard.html` | OK — snapshot refreshed to `2026-11-27T17:45:51Z` during the sweep (collector commit landed mid-sweep); swings feed shows the ≥ $0.10 chat with traded/thin chips, deep links |
+| `alerts.html` | OK — "swings served: **154** · traded 21 · thin 75 · no trades 0 · candle-sourced 5 · no history 53", both chats render, lifecycle chips shown |
+| `live.html` | OK — LIVE · direct demo API, 515 markets, 34 swings (↑18 ↓16), 0 passing the ROI screen (honest empty state) |
+| `roi.html` | OK — formula, parameters, fee table (21 rows transcribed from the July 2026 schedule), out-of-sample section |
+| `trading.html` | OK — auto-sim, three strategies, ledger empty and labelled PAPER ONLY |
+| `portfolio.html` | OK — real account blank (F-07), executor contract table, paper ledger |
+| `simulation.html` | OK — 174 alerts processed, 61 paper fills, 7 settled (3/4), insufficient-sample labels on every rule |
+| `strategies.html` | OK — categorisation axes + four untested hypotheses + promotion rule |
+| `suggestions.html` | OK — implemented vs proposed split rendered from `data/findings.json` |
+| `questions.html` | OK — 9 questions, 1 blocked-on-human (Q3 credentials) |
+| `verification.html` | OK — 72 claims / 71 verified / 1 unverified (C-20, live values) |
+| `flagged.html` | OK — renders 91 irregularities / 30 high at sweep time (the tree at fetch time predated PR #139) |
+| `sources.html` | OK — full official source list |
+| `executive-summary.html` | OK — 27 Nov 2026 audit + requirement table render |
+
+**Deployed-vs-committed parity (checked by fetching the deployed files):**
+- `data/live/collector_health.json` served by Pages is **byte-identical** to the committed file (`outcome: ok`, snapshot `2026-11-27T17:45:51Z`, run `46012505508`).
+- `data/verified_facts.json` counts agree with the deployed verification page: 72 total / 71 verified / 1 unverified (C-20 only); doc_links 24/24 in the official index.
+- `data/live/markets.json` collected_at `2026-11-27T17:45:51Z` (committed, after PR #138/#139 merges) = the snapshot the deployed dashboard/pipeline pages show.
+- Flagged ledger: committed file holds 92 rows (F-100…F-104 landed via PRs #138/#139 **after** the Pages site was built for the sweep), 30 high severity. The deployed "91" during the sweep was the pre-#139 build; a Pages deploy for #139 was in progress at the end of the sweep, so they converge. Not a defect — noted so the number isn't read as drift.
+
+**Official API spot check (platform fetch route, 2026-11-27 ~17:52Z):** `GET /trade-api/v2/markets/KXAAAGASM-26NOV30-3.90`
+→ `last_price_dollars 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, `volume_24h_fp 0.00`, `status active`,
+rules text names AAA gas prices — **identical** to the committed snapshot row for the gas headline market. `GET /exchange/status`
+→ `trading_active: true` on all four demo shards.
+
+**Final gate:** `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, all validators, all suites
+including the three added by PR #138 — `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js` —
+DOM suites, internal-link check). Two merges of `origin/main` were required during the session (collection commits land
+continuously); nothing of any other session was discarded.
+
+
 ## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
