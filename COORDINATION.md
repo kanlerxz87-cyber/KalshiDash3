@@ -44,7 +44,7 @@ collection. Sandbox egress to Kalshi and to the Actions log blob host is TLS-blo
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
 | R41-1 | Root-cause the five-pass `validate_alerts` failure independently, and fix it if the cause is still present | **done — no code change shipped: main had already fixed it twice** | arena-417935f1 | (none; superseded) | see the overlap record below |
-| R41-2 | Make a failed validator's own output reach `collector_health.json` | **done on main as F-109 by `arena-a8d317a1`; this branch keeps main's implementation** | arena-417935f1 | `scripts/collect_relay.py` (comment only, 5 lines) | main's `test_collect_relay.py` and `test_collect_health.py` PASS |
+| R41-2 | Make a failed validator's own output reach `collector_health.json` | **done on main as F-109 by `arena-a8d317a1`; this branch keeps main's implementation and adds only the rationale** | arena-417935f1 | `scripts/collect_relay.py` (comment only, 5 lines) | main's `test_collect_relay.py` (10/10) and `test_collect_health.py` (11/11) PASS on the merged tree |
 | R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result | in progress | arena-417935f1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh api repos/…/pages(+builds)` |
 
 ### R41 — what this session found, and why it shipped no fix
@@ -96,6 +96,7 @@ contributes no finding.
 |---|---|
 | `python3 scripts/verify_release.py` | **PASS** — 21 pages, every validator and DOM suite, internal links |
 | `python3 scripts/tests/test_collect_relay.py` / `test_collect_health.py` | **PASS** (relay loop 10/10, health suite 11/11) |
+| `git diff origin/main HEAD --stat` on the final tree | `COORDINATION.md` +78, `scripts/collect_relay.py` +5 — nothing else |
 | `git diff origin/main -- scripts/collect.py data/findings.json` | **empty** — main's fixes intact, nothing reverted |
 | Production dry-run after main's fixes, on this branch | **PASS** — `46058698096`: `1 19:43:46Z validated` |
 | Main-line collector | **recovered** — `data: demo snapshot 2026-11-27T19:47Z` (`3cb118b`), then `19:50Z` (`acbb2e3`); later snapshots continue on main |
