@@ -3862,3 +3862,12 @@ Requested by nobody but needed by the standing "every claim carries an official 
 | Files touched | `alerts.html` (one paragraph, static note above the chats) + this section. No `data/live/*`, no script, no test contract. | `git diff --stat` |
 | Gate before commit | `check_site.py` 21 pages OK, `test_pages_dom.js` OK (incl. N2 `100/164` + `100/124`, N3 `120/164`), `audit_rendered_numbers.js` OK (72 claims each with an https source), `verify_release.py` **PASS** | local run, this session |
 | Sources | Get Markets (caching + WebSocket advice), WebSocket Connection (handshake auth), `data/verified_facts.json` C-31 / C-58 | fetched 2026-11-27 |
+
+### 49BA session — merge record (both follow-up PRs closed out)
+
+| Item | Result | Evidence |
+|---|---|---|
+| [PR #182](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/182) | Merged `--merge` (no approval wait) → `main` at **`e4aa4374f3f74110df6d5a9ccc2af3ae404cf330`** (23:27:10Z). `build` pass 1m32s, `deploy` skipped on PR, then Pages `status: built` for `e4aa437`. Content: the 49BA-1 close-out table above. | [run 46082309796](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46082309796); `gh api …/pages/builds/latest` |
+| [PR #183](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/183) | Merged `--merge` → `main` at **`84ff78aac3e4a57871cb6a8136b9956d39bc5f62`** (23:37:42Z). `build` pass 1m48s, `deploy` skipped on PR, Pages `status: built` for `84ff78aa` (23:37:44Z). Content: the 49BA-2 sourcing fix. | [run 46083280851](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46083280851) |
+| Live render after #183 | `alerts.html?audit=49ba-2341` shows the quoted wording with **two separate Get Markets links** for the caching sentence, the *“WebSocket API when you need current state”* advice, the authenticated-handshake reason with the [WebSocket Connection](https://docs.kalshi.com/websockets/websocket-connection) link, F-07 for the missing credentials, and the unchanged counts **135 / 29 / 1** over 165 archived swings. The removed inference (*“polling faster than that cannot add information”*) no longer appears anywhere: `grep -rn "cannot add information" --include=*.html --include=*.js .` returns nothing. | `fetch_page` 23:41Z |
+| Scope discipline | Both PRs touched only `alerts.html` / `COORDINATION.md` / the generated `data/session_claims.json`. No `data/live/*`, no scripts, no test contracts, and other sessions' PRs (#148, #150) untouched. | `git diff --stat` |
