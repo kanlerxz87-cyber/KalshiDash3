@@ -1636,6 +1636,44 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/build_alerts.py"
    ]
+  },
+  {
+   "id": "F-111",
+   "severity": "medium",
+   "item": "Two official Kalshi sources disagree on the fee multiplier of KXBTCY, KXETHY and KXELECTIRAN: the fee-schedule PDF lists multiplier 0, the live GET /series records report fee_multiplier 1",
+   "why": "Live parity audit on 2026-11-27 (session arena-035cd7c0) fetched GET /series for all 35 series behind every published row plus 4 exclusion-reason series. Every one of the 39 records returned fee_multiplier 1, including KXBTCY, KXETHY and KXELECTIRAN. The official fee schedule PDF (kalshi-fee-schedule.pdf, update effective July 7 2026) lists those same three series in its Non-Standard Fees table with Maker Multiplier 0 and Taker Multiplier 0. The project's paper-fee model follows the PDF (shipped disclosure F-84: M = 0 on KXBTCY / KXETHY / KXELECTIRAN), so the two official sources disagree about the fee a simulated trade should pay. Which value governs the effective fee is unverified: Kalshi exposes a Get Series Fee Changes endpoint and event-level fee overrides, which may mean the series field is a base value and the PDF is the effective schedule, or vice versa. Not resolved or changed by this session; both readings are linked for manual review.",
+   "action": "Flagged for manual review. No fee value was changed. If the PDF governs (as F-84 assumes), consider noting the API-field conflict next to the fee disclosures on trading.html / portfolio.html. If the series field governs, the simulation's fee table for those three series is understated and the F-84 disclosure needs revisiting. Either way the resolution should be re-verified against kalshi.com/docs/kalshi-fee-schedule.pdf and GET /series/{ticker} at that time.",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXETHY",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXELECTIRAN",
+    "https://docs.kalshi.com/api-reference/exchange/get-series-fee-changes"
+   ]
+  },
+  {
+   "id": "F-112",
+   "severity": "low",
+   "item": "KXMAXSHARDINGTEST (official title 'shard') is filed by Kalshi under categories ['Crypto'], tags ['BTC'], so the documented scope rule publishes it on the Crypto page although its name suggests an exchange test instrument",
+   "why": "The 2026-11-27 live parity audit read the official series record: GET /series/KXMAXSHARDINGTEST returns categories ['Crypto'], category 'Crypto', tags ['BTC'], title 'shard', frequency one_off, contract terms BTC.pdf and CF Benchmarks BRTI as settlement source. The project's scope rule is 'official categories decide the topic; only Test and Demo categories are never in scope' (E9D9-F1), and this series is not filed under Test or KXDEMOFUTHOURLY-style demo tags, so excluding it would require inferring intent from its name - which the verification policy forbids. It is therefore in scope by the documented rule and appears in the Crypto topic. The ticker contains SHARDINGTEST and the title is 'shard', which points at exchange sharding test plumbing rather than a live event; a human should decide whether to add it to excluded_series_reasons like KXBALLONDOR and KXNATGASD were.",
+   "action": "Flagged for manual review with the official series link. No rows were removed and no classification was changed (never infer). If a reviewer rules it out of scope, the fix is an excluded_series_reasons entry in scripts/collect.py citing the official record, plus the usual regression tests - the same pattern as the KXBALLONDOR exclusion.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXMAXSHARDINGTEST",
+    "https://docs.kalshi.com/api-reference/market/get-series",
+    "https://docs.kalshi.com/getting_started/exchange_sharding"
+   ]
+  },
+  {
+   "id": "F-113",
+   "severity": "low",
+   "item": "Alert-cited markets outside the published size window stay 'not in snapshot' in the lifecycle ledger even after the official API determines them, so some alerted events never get a yes/no outcome counted",
+   "why": "The brief requires tracking alerted events until they resolve yes or no. The alerts page's lifecycle join reports one of: settled YES/NO, result set but not yet paid, closed, open, or 'not in snapshot'. KXPGATOUR-THRC26-BHAR (RSM Classic, alert row with a >= $0.10 swing) is cited by the alert archive but falls outside the size-capped published market rows, so its lifecycle reads 'not in snapshot'. The live official record on 2026-11-27 reports status finalized, result 'no', settlement_ts 2026-11-23T19:58:03.108438Z - the resolution exists and is verifiable, but the site cannot show or count it because it only joins against the published snapshot rows. This is a disclosed boundary (the ledger counts what the snapshot holds), not a data error, but it leaves the 'track until resolved' requirement partially unmet for out-of-window alert rows.",
+   "action": "Flagged for manual review. Suggested fix (not implemented in this session's scope): a per-ticker resolution backfill that, for alert tickers absent from the published rows, reads GET /markets/{ticker} result at archive-build time and stores it on the alert row so the outcomes ledger can count every alerted resolution. Until then the ledger's coverage statement on alerts.html should keep being explicit about which rows it can resolve.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+    "https://docs.kalshi.com/api-reference/market/get-market",
+    "https://docs.kalshi.com/getting_started/market_settlement"
+   ]
   }
 ]
 }

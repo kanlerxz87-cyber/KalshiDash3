@@ -1,0 +1,1030 @@
+{
+ "note": "Verbatim field values observed from live GETs on https://external-api.demo.kalshi.co/trade-api/v2 on 2026-11-27 (session arena-035cd7c0). Each record keeps the exact request URL. Values are transcribed from the official JSON responses exactly as returned; the parity script scripts/audit_live_parity.py re-derives the same comparisons over the network.",
+ "fetched_on": "2026-11-27",
+ "exchange_status": {
+  "url": "https://external-api.demo.kalshi.co/trade-api/v2/exchange/status",
+  "exchange_active": true,
+  "trading_active": true,
+  "shards": 4
+ },
+ "series": [
+  {
+   "ticker": "KXAAAGASM",
+   "categories": [
+    "Economics"
+   ],
+   "tags": [
+    "Oil & Gas",
+    "Oil and energy"
+   ],
+   "title": "US gas price",
+   "fee_multiplier": 1,
+   "frequency": "monthly",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASM"
+  },
+  {
+   "ticker": "KXBNB",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "BNB",
+    "Crypto",
+    "Hourly"
+   ],
+   "title": "BNB",
+   "fee_multiplier": 1,
+   "frequency": "hourly",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBNB"
+  },
+  {
+   "ticker": "KXBNB15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "BNB",
+    "15 min"
+   ],
+   "title": "BNB 15 Minute",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBNB15M"
+  },
+  {
+   "ticker": "KXBTC15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "BTC",
+    "15 min"
+   ],
+   "title": "Bitcoin price up down",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTC15M"
+  },
+  {
+   "ticker": "KXBTCMAXMON",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "Bitcoin",
+    "Crypto"
+   ],
+   "title": "Bitcoin monthly one touch",
+   "fee_multiplier": 1,
+   "frequency": "monthly",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCMAXMON"
+  },
+  {
+   "ticker": "KXBTCY",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "Bitcoin",
+    "Crypto"
+   ],
+   "title": "BTC price range EOY",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBTCY"
+  },
+  {
+   "ticker": "KXCRYPTOLEAD15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "15 min",
+    "Crypto"
+   ],
+   "title": "Coin Race 15 minutes",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXCRYPTOLEAD15M"
+  },
+  {
+   "ticker": "KXDOGE15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "DOGE",
+    "15 min"
+   ],
+   "title": "Dogecoin 15 Minute",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDOGE15M"
+  },
+  {
+   "ticker": "KXDPWORLDTOUR",
+   "categories": [
+    "Sports"
+   ],
+   "tags": [
+    "Golf"
+   ],
+   "title": "DP World Tour Tournament Winner",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDPWORLDTOUR"
+  },
+  {
+   "ticker": "KXDPWT3BALL",
+   "categories": [
+    "Sports"
+   ],
+   "tags": [
+    "Golf"
+   ],
+   "title": "DPWT 3-Ball",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDPWT3BALL"
+  },
+  {
+   "ticker": "KXELECTIRAN",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "International elections",
+    "Iran",
+    "International"
+   ],
+   "title": "Will Iran hold a presidential election?",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXELECTIRAN"
+  },
+  {
+   "ticker": "KXETH15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "ETH",
+    "15 min"
+   ],
+   "title": "ETH 15M price up down",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXETH15M"
+  },
+  {
+   "ticker": "KXETHD",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "Crypto",
+    "Hourly",
+    "Ethereum"
+   ],
+   "title": "Ethereum price Above/below",
+   "fee_multiplier": 1,
+   "frequency": "hourly",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXETHD"
+  },
+  {
+   "ticker": "KXETHY",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "Crypto",
+    "Ethereum"
+   ],
+   "title": "ETH price EOY ",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXETHY"
+  },
+  {
+   "ticker": "KXGOVAK",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "US Elections",
+    "Governor"
+   ],
+   "title": "Alaska governor",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXGOVAK"
+  },
+  {
+   "ticker": "KXGOVCA",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "US Elections",
+    "Governor"
+   ],
+   "title": "California Governor's race",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXGOVCA"
+  },
+  {
+   "ticker": "KXHYPE15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "HYPE",
+    "15 min"
+   ],
+   "title": "Hype 15 min",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXHYPE15M"
+  },
+  {
+   "ticker": "KXMAXSHARDINGTEST",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "BTC"
+   ],
+   "title": "shard",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXMAXSHARDINGTEST"
+  },
+  {
+   "ticker": "KXMAYORLA",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "US Elections",
+    "Other US Elections"
+   ],
+   "title": "Los Angeles Mayor winner?",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXMAYORLA"
+  },
+  {
+   "ticker": "KXNEAR15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "15 min",
+    "NEAR"
+   ],
+   "title": "NEAR 15m",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNEAR15M"
+  },
+  {
+   "ticker": "KXOSCARACTO",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Oscars",
+    "Awards"
+   ],
+   "title": "Oscar for Best Actor",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXOSCARACTO"
+  },
+  {
+   "ticker": "KXOSCARPIC",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Oscars",
+    "Awards"
+   ],
+   "title": "Oscar for Best Picture",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXOSCARPIC"
+  },
+  {
+   "ticker": "KXPGARYDER",
+   "categories": [
+    "Sports"
+   ],
+   "tags": [
+    "Golf"
+   ],
+   "title": "Ryder Cup",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGARYDER"
+  },
+  {
+   "ticker": "KXPGATOUR",
+   "categories": [
+    "Sports"
+   ],
+   "tags": [
+    "Golf"
+   ],
+   "title": "PGA Tour",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPGATOUR"
+  },
+  {
+   "ticker": "KXPRESNOMD",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "2028",
+    "US Elections"
+   ],
+   "title": "Democratic Primary winner",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRESNOMD"
+  },
+  {
+   "ticker": "KXPRESNOMR",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "2028",
+    "US Elections"
+   ],
+   "title": "Republican Primary winner",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRESNOMR"
+  },
+  {
+   "ticker": "KXPRESPERSON",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "2028",
+    "US Elections"
+   ],
+   "title": "Pres person",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRESPERSON"
+  },
+  {
+   "ticker": "KXPRIMARYMOV",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "Primaries"
+   ],
+   "title": "Primary margins of victory",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRIMARYMOV"
+  },
+  {
+   "ticker": "KXRT",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Rotten Tomatoes"
+   ],
+   "title": "Rotten Tomatoes Scores",
+   "fee_multiplier": 1,
+   "frequency": "custom",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXRT"
+  },
+  {
+   "ticker": "KXSOL15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "15 min",
+    "SOL"
+   ],
+   "title": "Solana 15 minutes",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSOL15M"
+  },
+  {
+   "ticker": "KXSUPERBOWLHEADLINE",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Live Music"
+   ],
+   "title": "Who will headline super bowl ",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXSUPERBOWLHEADLINE"
+  },
+  {
+   "ticker": "KXTIME",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Achievements",
+    "People",
+    "Awards"
+   ],
+   "title": "TIME\u2019s Person of the Year",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXTIME"
+  },
+  {
+   "ticker": "KXVOTEPRIMARY",
+   "categories": [
+    "Elections"
+   ],
+   "tags": [
+    "Primaries"
+   ],
+   "title": "Vote percentages in primaries",
+   "fee_multiplier": 1,
+   "frequency": "one_off",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXVOTEPRIMARY"
+  },
+  {
+   "ticker": "KXXRP15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "15 min",
+    "XRP"
+   ],
+   "title": "XRP 15 Minute",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXXRP15M"
+  },
+  {
+   "ticker": "KXZEC15M",
+   "categories": [
+    "Crypto"
+   ],
+   "tags": [
+    "15 min",
+    "ZEC"
+   ],
+   "title": "Zcash 15min",
+   "fee_multiplier": 1,
+   "frequency": "fifteen_min",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXZEC15M"
+  },
+  {
+   "ticker": "KXAAAGASD",
+   "categories": [
+    "Economics"
+   ],
+   "tags": [
+    "Oil & Gas",
+    "Oil and energy",
+    "Econ Daily"
+   ],
+   "title": "US gas price up",
+   "fee_multiplier": 1,
+   "frequency": "daily",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD"
+  },
+  {
+   "ticker": "KXNATGASD",
+   "categories": [
+    "Entertainment"
+   ],
+   "tags": [
+    "Oil & Gas"
+   ],
+   "title": "Natural Gas Daily",
+   "fee_multiplier": 1,
+   "frequency": "daily",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXNATGASD"
+  },
+  {
+   "ticker": "KXBALLONDOR",
+   "categories": [
+    "Sports"
+   ],
+   "tags": [
+    "Soccer"
+   ],
+   "title": "Ballon d'Or",
+   "fee_multiplier": 1,
+   "frequency": "annual",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR"
+  },
+  {
+   "ticker": "KXDEMOFUTHOURLY",
+   "categories": [
+    "Test"
+   ],
+   "tags": [
+    "Demo"
+   ],
+   "title": "Demo hourly event contract futures",
+   "fee_multiplier": 1,
+   "frequency": "hourly",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY"
+  }
+ ],
+ "markets": [
+  {
+   "ticker": "KXETHY-27JAN0100-T4999.99",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.9,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 18263278.14,
+   "open_interest_fp": 1382157.55,
+   "event_ticker": "KXETHY-27JAN0100",
+   "title": "ETH price  on Jan 1, 2027?",
+   "close_time": "2027-01-01T05:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99"
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B57500",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.19,
+   "yes_bid_dollars": 0.19,
+   "yes_ask_dollars": 0.2,
+   "volume_fp": 65057262.79,
+   "open_interest_fp": 13427353.84,
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "close_time": "2027-01-01T05:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B57500"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV271430-30",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.997,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 2166.41,
+   "open_interest_fp": 969.14,
+   "event_ticker": "KXBTC15M-26NOV271430",
+   "title": "BTC price up in next 15 mins?",
+   "close_time": "2026-11-27T19:30:00Z",
+   "settlement_ts": "2026-11-27T19:30:06.227944Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV271430-30"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV271445-45",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.98,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 2036.41,
+   "open_interest_fp": 811.43,
+   "event_ticker": "KXBTC15M-26NOV271445",
+   "title": "BTC price up in next 15 mins?",
+   "close_time": "2026-11-27T19:45:00Z",
+   "settlement_ts": "2026-11-27T19:45:01.228459Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV271445-45"
+  },
+  {
+   "ticker": "KXBTC15M-26NOV271400-00",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.99,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 1653.73,
+   "open_interest_fp": 932.89,
+   "event_ticker": "KXBTC15M-26NOV271400",
+   "title": "BTC price up in next 15 mins?",
+   "close_time": "2026-11-27T19:00:00Z",
+   "settlement_ts": "2026-11-27T19:00:02.196663Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV271400-00"
+  },
+  {
+   "ticker": "KXOSCARPIC-27-YOU",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.24,
+   "yes_bid_dollars": 0.25,
+   "yes_ask_dollars": 0.26,
+   "volume_fp": 1368307.31,
+   "open_interest_fp": 924352.88,
+   "event_ticker": "KXOSCARPIC-27",
+   "title": "Will You Can See Everything win Best Picture at the Oscars?",
+   "close_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If You Can See Everything has won Best Picture",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXOSCARPIC-27-YOU"
+  },
+  {
+   "ticker": "KXOSCARPIC-27-BLA",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.09,
+   "yes_bid_dollars": 0.07,
+   "yes_ask_dollars": 0.08,
+   "volume_fp": 2039447.74,
+   "open_interest_fp": 1397012.61,
+   "event_ticker": "KXOSCARPIC-27",
+   "title": "Will The Black Ball win Best Picture at the Oscars?",
+   "close_time": "2027-12-31T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If The Black Ball has won Best Picture",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXOSCARPIC-27-BLA"
+  },
+  {
+   "ticker": "KXSUPERBOWLHEADLINE-27-HAR",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.05,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 523335.96,
+   "open_interest_fp": 523332.82,
+   "event_ticker": "KXSUPERBOWLHEADLINE-27",
+   "title": "Who will headline the Pro Football Championship Halftime Show?",
+   "close_time": "2026-10-27T03:00:43Z",
+   "settlement_ts": "2026-10-27T03:33:43.186942Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Harry Styles is announced to headline",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSUPERBOWLHEADLINE-27-HAR"
+  },
+  {
+   "ticker": "KXSUPERBOWLHEADLINE-27-BEY",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.33,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 64742.92,
+   "open_interest_fp": 64742.92,
+   "event_ticker": "KXSUPERBOWLHEADLINE-27",
+   "title": "Who will headline the Pro Football Championship Halftime Show?",
+   "close_time": "2026-10-27T03:00:43Z",
+   "settlement_ts": "2026-10-27T03:33:43.193622Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Beyonc\u00e9 is announced to headline",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSUPERBOWLHEADLINE-27-BEY"
+  },
+  {
+   "ticker": "KXSUPERBOWLHEADLINE-27-JAY",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.89,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 15486.3,
+   "open_interest_fp": 15483.16,
+   "event_ticker": "KXSUPERBOWLHEADLINE-27",
+   "title": "Who will headline the Pro Football Championship Halftime Show?",
+   "close_time": "2026-10-27T03:00:43Z",
+   "settlement_ts": "2026-10-27T03:33:43.185724Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If JAY-Z is announced to headline",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSUPERBOWLHEADLINE-27-JAY"
+  },
+  {
+   "ticker": "KXPRESNOMD-28-GPLA",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.99,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 465856531.27,
+   "open_interest_fp": 44108150.17,
+   "event_ticker": "KXPRESNOMD-28",
+   "title": "Will Graham Platner be the nominee for the Presidency for the Democratic party?",
+   "close_time": "2028-11-07T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If Graham Platner wins and accepts the nomination",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-GPLA"
+  },
+  {
+   "ticker": "KXPRESNOMD-28-HBID",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.815,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.815,
+   "volume_fp": 537285226.32,
+   "open_interest_fp": 140234529.05,
+   "event_ticker": "KXPRESNOMD-28",
+   "title": "Will Hunter Biden be the nominee for the Presidency for the Democratic party?",
+   "close_time": "2028-11-07T15:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If Hunter Biden wins and accepts the nomination",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-HBID"
+  },
+  {
+   "ticker": "KXGOVCA-26-MMAH",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.9,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 68919632.99,
+   "open_interest_fp": 8589776.59,
+   "event_ticker": "KXGOVCA-26",
+   "title": "Who will win the governorship in California?",
+   "close_time": "2026-11-04T04:26:15Z",
+   "settlement_ts": "2026-11-04T04:58:49.9578Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Matt Mahan is elected to the governorship",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVCA-26-MMAH"
+  },
+  {
+   "ticker": "KXGOVCA-26-XBEC",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.97,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 19465779.72,
+   "open_interest_fp": 1722375.46,
+   "event_ticker": "KXGOVCA-26",
+   "title": "Who will win the governorship in California?",
+   "close_time": "2026-11-04T04:26:15Z",
+   "settlement_ts": "2026-11-04T04:58:49.9578Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If Xavier Becerra is elected to the governorship",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVCA-26-XBEC"
+  },
+  {
+   "ticker": "KXGOVCA-26-KPOR",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.02,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 67641041.38,
+   "open_interest_fp": 7343769.46,
+   "event_ticker": "KXGOVCA-26",
+   "title": "Who will win the governorship in California?",
+   "close_time": "2026-11-04T04:26:15Z",
+   "settlement_ts": "2026-11-04T04:58:49.9578Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Katie Porter is sworn in as the governor",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVCA-26-KPOR"
+  },
+  {
+   "ticker": "KXAAAGASM-26NOV30-3.90",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.75,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 31027.52,
+   "open_interest_fp": 24988.65,
+   "event_ticker": "KXAAAGASM-26NOV30",
+   "title": "Will average **gas prices** be above $3.90?",
+   "close_time": "2026-11-30T04:59:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $3.90",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90"
+  },
+  {
+   "ticker": "KXAAAGASM-26NOV30-3.80",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.75,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 27330.22,
+   "open_interest_fp": 17463.58,
+   "event_ticker": "KXAAAGASM-26NOV30",
+   "title": "Will average **gas prices** be above $3.80?",
+   "close_time": "2026-11-30T04:59:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $3.80",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.80"
+  },
+  {
+   "ticker": "KXAAAGASM-26OCT31-4.40",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.01,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 2676426.78,
+   "open_interest_fp": 2676406.58,
+   "event_ticker": "KXAAAGASM-26OCT31",
+   "title": "Will average **gas prices** be above $4.40?",
+   "close_time": "2026-10-31T03:59:00Z",
+   "settlement_ts": "2026-10-31T14:10:30.416365Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $4.40",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26OCT31-4.40"
+  },
+  {
+   "ticker": "KXAAAGASM-26OCT31-4.10",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.97,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 12524.68,
+   "open_interest_fp": 12152.59,
+   "event_ticker": "KXAAAGASM-26OCT31",
+   "title": "Will average **gas prices** be above $4.10?",
+   "close_time": "2026-10-31T03:59:00Z",
+   "settlement_ts": "2026-10-31T14:10:30.416365Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $4.10",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26OCT31-4.10"
+  },
+  {
+   "ticker": "KXAAAGASM-26OCT31-4.50",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.05,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 161121.04,
+   "open_interest_fp": 136116.06,
+   "event_ticker": "KXAAAGASM-26OCT31",
+   "title": "Will average **gas prices** be above $4.50?",
+   "close_time": "2026-10-31T03:59:00Z",
+   "settlement_ts": "2026-10-31T14:10:30.416365Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $4.50",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26OCT31-4.50"
+  },
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-HBAR",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.069,
+   "yes_bid_dollars": 0.055,
+   "yes_ask_dollars": 0.069,
+   "volume_fp": 340435.46,
+   "open_interest_fp": 320490.87,
+   "event_ticker": "KXDPWORLDTOUR-BMAPC26",
+   "title": "BMW Australian PGA Championship: Haydn Barron wins",
+   "close_time": "2026-12-13T00:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If Haydn Barron wins the BMW Australian PGA Championship",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-HBAR"
+  },
+  {
+   "ticker": "KXPGATOUR-MAST27-MFIT",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.023,
+   "yes_bid_dollars": 0.021,
+   "yes_ask_dollars": 0.025,
+   "volume_fp": 833849.07,
+   "open_interest_fp": 833821.07,
+   "event_ticker": "KXPGATOUR-MAST27",
+   "title": "Masters Tournament: Matt Fitzpatrick wins",
+   "close_time": "2027-04-25T23:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If Matt Fitzpatrick wins the Masters Tournament",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT"
+  },
+  {
+   "ticker": "KXPGATOUR-FAISG26-WCLA",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "volume_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Farmers Insurance Skins Game: Wyndham Clark wins",
+   "close_time": "2026-11-27T18:35:35Z",
+   "settlement_ts": "2026-11-27T18:39:12.18608Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Wyndham Clark wins the 2026 Farmers Insurance Skins Game",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-WCLA"
+  },
+  {
+   "ticker": "KXPGATOUR-FAISG26-JTHO",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "volume_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Farmers Insurance Skins Game: Justin Thomas wins",
+   "close_time": "2026-11-27T18:35:35Z",
+   "settlement_ts": "2026-11-27T18:39:12.18608Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Justin Thomas wins the 2026 Farmers Insurance Skins Game",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-JTHO"
+  },
+  {
+   "ticker": "KXPGATOUR-FAISG26-JKOI",
+   "status": "finalized",
+   "result": "yes",
+   "last_price_dollars": 0.0,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.0,
+   "volume_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "event_ticker": "KXPGATOUR-FAISG26",
+   "title": "Farmers Insurance Skins Game: Jackson Koivun wins",
+   "close_time": "2026-11-27T18:35:35Z",
+   "settlement_ts": "2026-11-27T18:39:12.18608Z",
+   "settlement_value_dollars": 1.0,
+   "rules_primary_prefix": "If Jackson Koivun wins the 2026 Farmers Insurance Skins Game",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-JKOI"
+  },
+  {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.02,
+   "yes_bid_dollars": 0.01,
+   "yes_ask_dollars": 0.02,
+   "volume_fp": 59537859.15,
+   "open_interest_fp": 6995727.75,
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "close_time": "2027-01-01T05:00:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If the simple average of the sixty seconds of CF Benchmarks",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500"
+  },
+  {
+   "ticker": "KXAAAGASM-26NOV30-3.70",
+   "status": "active",
+   "result": "",
+   "last_price_dollars": 0.75,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 0.75,
+   "volume_fp": 15446.22,
+   "open_interest_fp": 13222.63,
+   "event_ticker": "KXAAAGASM-26NOV30",
+   "title": "Will average **gas prices** be above $3.70?",
+   "close_time": "2026-11-30T04:59:00Z",
+   "settlement_ts": null,
+   "settlement_value_dollars": null,
+   "rules_primary_prefix": "If average regular gas prices for United States are strictly greater than $3.70",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.70"
+  },
+  {
+   "ticker": "KXPGATOUR-THRC26-BHAR",
+   "status": "finalized",
+   "result": "no",
+   "last_price_dollars": 0.75,
+   "yes_bid_dollars": 0.0,
+   "yes_ask_dollars": 1.0,
+   "volume_fp": 153195.26,
+   "open_interest_fp": 119274.49,
+   "event_ticker": "KXPGATOUR-THRC26",
+   "title": "The RSM Classic: Brian Harman wins",
+   "close_time": "2026-11-23T19:54:03Z",
+   "settlement_ts": "2026-11-23T19:58:03.108438Z",
+   "settlement_value_dollars": 0.0,
+   "rules_primary_prefix": "If Brian Harman wins the The RSM Classic",
+   "url": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR"
+  }
+ ],
+ "orderbooks": []
+}
