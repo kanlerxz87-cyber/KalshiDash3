@@ -51,7 +51,7 @@ NEVER_IN_SCOPE = {"Test", "Demo"}  # GET /series categories of the exchange's ow
 
 COMPATIBLE = {
     "gas": {"Economics", "Commodities", "Financials"},
-    "elections": {"Elections", "Politics", "World", "International"},
+    "elections": {"Elections"},
     "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
     "crypto": {"Crypto", "Financials"},
     "golf": {"Sports", "Golf"},

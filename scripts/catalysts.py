@@ -294,7 +294,7 @@ def build() -> dict:
     row_by_ticker = {r.get("ticker"): r for r in rows.values()}
     compatible = {
         "gas": {"Economics", "Commodities", "Financials"},
-        "elections": {"Elections", "Politics", "World", "International"},
+        "elections": {"Elections"},
         "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},

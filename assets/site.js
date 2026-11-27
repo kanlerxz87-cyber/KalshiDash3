@@ -57,10 +57,14 @@ const KD = (() => {
     return !r || QA_RE.test(String((r.title || "") + " " + (r.yes_sub_title || "") + " " + (r.rules_primary || "")));
   }
 
-  function basisBadge(b) {
-    return b === "seed"
-      ? '<span class="badge ok" title="Series ticker appears in the official Kalshi fee schedule">confirmed</span>'
-      : '<span class="badge warn" title="Matched by keyword heuristic only — not confirmed by an official source">keyword</span>';
+  function basisBadge(b, matchedBy) {
+    if (b === "seed") {
+      return '<span class="badge ok" title="Series ticker appears in the official Kalshi fee schedule">confirmed</span>';
+    }
+    if (matchedBy === "official") {
+      return '<span class="badge ok" title="Series matched by Kalshi\'s official GET /series category/tag filter (not in the fee-schedule seed list)">official series</span>';
+    }
+    return '<span class="badge warn" title="Matched by keyword heuristic only — not confirmed by an official source">keyword</span>';
   }
 
   function resultBadge(r) {

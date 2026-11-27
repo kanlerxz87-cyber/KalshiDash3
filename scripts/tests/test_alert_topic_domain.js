@@ -42,7 +42,7 @@ const categories = JSON.parse(fs.readFileSync(path.join(ROOT, "data/categories.j
 const fromSnapshot = (markets.counts || {}).category_compatible_official;
 const compatible = fromSnapshot
   ? Object.fromEntries(Object.entries(fromSnapshot))
-  : { gas: ["Economics", "Commodities", "Financials"], elections: ["Elections", "Politics", "World", "International"],
+  : { gas: ["Economics", "Commodities", "Financials"], elections: ["Elections"],
       culture: ["Entertainment", "Culture", "Pop Culture", "Awards", "Media"], crypto: ["Crypto", "Financials"],
       golf: ["Golf", "Sports"] };
 if (!Object.keys(compatible).length) throw new Error("no topic-compatibility rule available");
