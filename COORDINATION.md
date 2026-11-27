@@ -1088,12 +1088,21 @@ publishes findings on the Flagged page, and closes out gate → PR → `main` �
 
 No other session's lines dropped; zero conflict markers after resolution.
 
+**Close-out (2026-11-27):** [PR #168](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/168) → merged
+(`4104155`, merge commit of `origin/main` at the time of merge, 2026-11-27T20:41:00Z). Gate **PASS** on the
+exact merged tree (all validators + suites, including main's `audit_rendered_numbers.js` and
+`test_staleness_disclosure.js`). GitHub Pages deploy for `4104155` → **built** 2026-11-27T20:41:43Z, and the
+live page was fetched afterwards serving this session's merged content
+(`https://kanlerxz87-cyber.github.io/KalshiDash3/strategies.html` carries the new provenance note; the alert
+dock renders main's `chatCount` wording). Findings published: **F-116..F-120** (flagged ledger 109 rows).
+Recorded by this commit on the branch; it lands on `main` via the follow-up PR below.
+
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
 | T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | **done** — PASS (21 pages, every validator and suite, `check_site.py` OK) | arena-251f5c3d | `COORDINATION.md` (this section) | gate run 2026-11-27 on `fe245d8` + claim commit |
 | T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | **done** — every record matched, see T115 table below | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
 | T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | **done** — two audit passes (render recomputation + source-link/count sweep) found 9 real defects, all fixed and regression-pinned by `test_pages_dom.js` section N; gate **PASS** after the fixes | arena-251f5c3d | `assets/site.js`, `index.html` (via money()), `dashboard.html`, `alerts.html`, `portfolio.html`, `simulation.html`, `trading.html`, `strategies.html`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS 2026-11-27; findings F-116..F-120 in `data/findings.json` |
-| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | in progress — F-116..F-120 appended (flagged ledger now 109 rows), gate **PASS** on the merged tree; PR/merge/Pages pending below | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; Actions API, Pages API, live URL fetch to follow |
+| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | **done** — F-116..F-120 appended (flagged ledger now 109 rows), gate **PASS** on the final merged tree, [PR #168](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/168) merged as `4104155`, Pages deploy built + live | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; PR #168 merged 2026-11-27T20:41:00Z; Pages build `4104155` → `built` 2026-11-27T20:41:43Z; live URL fetch confirmed |
 
 ### T115 — official-source verification, fetched live 2026-11-27
 
