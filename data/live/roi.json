@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T19:39:04Z",
- "runtime_seconds": 82.7,
+ "collected_at": "2026-11-27T20:21:07Z",
+ "runtime_seconds": 90.3,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,24 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 640,
+  "open_in_scope": 866,
   "open_excluded_category_conflict": 19,
   "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
   "near_misses": 0,
-  "unscoreable": 640,
-  "orderbooks": 640,
-  "orderbooks_requested": 640,
+  "unscoreable": 866,
+  "orderbooks": 866,
+  "orderbooks_requested": 866,
   "alerts": 0,
-  "markets_with_momentum": 0,
+  "markets_with_momentum": 35,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 640,
-  "returned": 640,
+  "requested": 866,
+  "returned": 866,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -82,7 +82,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -134,7 +134,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -186,7 +186,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -238,7 +238,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -290,7 +290,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -342,7 +342,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -394,7 +394,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 280.33222222222224,
+   "ttc_hours": 279.63138888888886,
    "momentum": null,
    "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
@@ -447,7 +447,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 17049.332222222223,
+   "ttc_hours": 17048.631388888887,
    "momentum": null,
    "series_ticker": "KXREDISTRICTING",
    "fee_multiplier": {
@@ -484,17 +484,18 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 172,
+  "candles_used": 148,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 4,
-  "baseline_always_yes_hits": 3,
+  "baseline_always_yes_bets": 9,
+  "baseline_always_yes_hits": 4,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 20,
-   "no side passed the replay gates": 4
+   "candle without a price": 15,
+   "no candles in the 2h before close": 34,
+   "no side passed the replay gates": 9
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -503,7 +504,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.75
+  "baseline_always_yes_hit_rate": 0.4444
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
