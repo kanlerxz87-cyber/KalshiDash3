@@ -46,6 +46,8 @@ The dashboard's “dollars traded (est.)” is a project calculation (`volume_fp
 - Cause/news links are leads, not proof of causation; demo markets may not reflect production; GitHub Pages still reports legacy branch publishing, as recorded in the existing Flagged ledger.
 - The Gate and repository validators passed, but this does not certify continuous operation outside the observed snapshot, authenticated account state, profitability, or the reachability of every link after this fetch.
 
+**T115 release close-out:** [PR #132](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/132) merged at `2026-11-27T17:27:37Z` as `a5bf878c968ec66f21e1d687a2a6514a74f678ec`. Its PR build passed (Actions run [46041804422](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46041804422)); the post-merge Pages workflow build and deploy both passed (run [46042005843](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46042005843)). Pages API reports `built` for the merge commit; deployment source remains legacy `main /` as disclosed above. Node.js 20 deprecation notices for pinned `actions/*@v4` appeared as non-failing warnings.
+
 <!-- End session claim -->
 
 ## Session `arena-bc717755` — current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)
