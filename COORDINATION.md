@@ -6,6 +6,19 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467`)
+
+Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). One concurrent PR is open (`#138`, branch `arena/f33fe827-kalshidash3`, touching `assets/engine.js`, `dashboard.html`, `data/findings.json`, `scripts/verify_release.py`, and four new JS test files); this session avoids `assets/engine.js`, `dashboard.html`, and those four test files completely, and will rebase/merge cleanly before opening a PR so no concurrent session's work is overwritten.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| E9D9-1 | Line-by-line audit of `data/live/markets.json`, `roi.json`, `alerts.json`, `catalysts.json`, `simulation.json`, and `verified_facts.json` against live official Kalshi demo API records (`GET /markets/{ticker}`, `GET /series/{ticker}`, `GET /series?category=…&include_volume=true`) and `docs.kalshi.com` | in_progress | arena-e9d94b88 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…`, `https://docs.kalshi.com/llms.txt` |
+| E9D9-2 | Enforce `official_discovery`, `category_conflict`, and `excluded_series_reason` inside `scripts/roi_scan.py` and `scripts/tests/validate_roi.py` so `Test` instruments (`KXDEMOFUTHOURLY-*`) and off-topic keyword matches cannot enter `roi.json` (`near_misses`, `picks`, `unscoreable`, or settled replay) | in_progress | arena-e9d94b88 | `scripts/roi_scan.py`, `scripts/tests/validate_roi.py`, `scripts/tests/test_roi_scan_offline.py` | `GET /series/KXDEMOFUTHOURLY` (`categories: ["Test"]`, `tags: ["Demo"]`); regression tests |
+| E9D9-3 | Tighten Elections vs non-election `Politics` classification (`CATEGORY_COMPATIBLE["elections"]`, `TAG_DOMAIN_TOPIC`) and add bounded `include_volume=true` official-series backfill in `scripts/collect.py` so traded `Elections` (`KXPRESPERSON`, `KXPRESNOMD`, `CONTROLS`) and `Culture` (`KXOSCARPIC`) series outside the 25k newest-first FX window are discovered | in_progress | arena-e9d94b88 | `scripts/collect.py`, `scripts/build_alerts.py`, `scripts/catalysts.py`, `scripts/simulate.py`, `assets/live.js`, `scripts/tests/test_scope.py`, `scripts/tests/test_topic_integrity.py` | `GET /series/KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, `KXPRESPERSON`, `KXOSCARPIC`; `GET /series?category=Elections&include_volume=true` |
+| E9D9-4 | Correct stale G5 disclosure on `suggestions.html` (which contradicted F-84 on `portfolio.html` / `trading.html`), append verified findings (`E9D9-F1`..`E9D9-F3`) to `data/findings.json`, run `verify_release.py`, merge PR to `main`, dispatch `collect.yml` + `desk.yml` on `main`, and verify GitHub Pages deployment | in_progress | arena-e9d94b88 | `suggestions.html`, `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, GitHub Actions + Pages APIs |
+
+<!-- End session E9D9 claim -->
+
 ## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
