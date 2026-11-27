@@ -65,6 +65,12 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 - Inspected newly opened PR #177. Its declared files are only `AUDIT_AEB0CBDC.md` and `COORDINATION.md` (its own session section); it explicitly avoids application, snapshot, and concurrent-session files. No A740 implementation-scope overlap was found.
 - Ran `python3 scripts/verify_release.py` on this latest base: **PASS** (offline validators, Python/DOM tests including the F-113 regressions, source/link checks, rendered-number audit, and all 21 pages). `git diff --check` is clean. Push, PR checks, merge, and post-merge deployed finding-page/Pages verification remain pending.
 
+### A740-2 latest base sync (2026-11-27T22:48Z)
+
+- `origin/main` advanced to `a2bd7d8` when PR #177 merged. Rebased the A740 stack onto that current tip; this rebase completed without conflicts. PR #177's declared scope remains its independent audit report plus its own coordination section; the A740 data, finding, report, and regression are preserved unchanged.
+- The PR #177 description independently reports a live `GET /markets/{ticker}` match and visible `settled NO` for the RSM Classic ticker, consistent with this session's committed observation and lifecycle sidecar.
+- On the rebased `a2bd7d8` tree, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4 tests) and `python3 scripts/verify_release.py` **PASS** (validators, Python/DOM suites, source/link checks, rendered-number audit, and all 21 pages). No PR, merge, or A740 deployment is claimed yet.
+
 ---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
