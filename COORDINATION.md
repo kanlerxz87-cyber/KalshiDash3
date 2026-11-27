@@ -135,7 +135,7 @@ both sides.
 | T122 | Line-by-line re-verification of published market values against the **live official demo API** (`/exchange/status`, `/markets/{ticker}`, `/markets/{ticker}/orderbook`, `/series/{ticker}`) for each topic's headline market and each published resolved row | done | arena-f33fe827 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` |
 | T123 | Independent audit of what all 21 pages **render** against the committed data, recomputing every published number, count and badge from `data/live/*.json`; plus internal/external link inventory | done (F-100, F-102, F-103) | arena-f33fe827 | `COORDINATION.md` (this section) | jsdom harness (not committed) + `scripts/check_site.py` |
 | T124 | Repair any real defect T121–T123 finds, with a regression test that fails before the fix; append any new irregularity to `data/findings.json` with its official source link | done (F-100 fixed; F-101/F-102/F-103 pinned) | arena-f33fe827 | `scripts/…`, `scripts/tests/…`, `data/findings.json` (append only) | mutation-checked regression tests; `scripts/verify_release.py` |
-| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | in progress | arena-f33fe827 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | done (merged as `94d996a`) | arena-f33fe827 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages API, live URL fetch (blocked by egress allowlist — see R-31) |
 
 The rows above were claimed as `unclaimed` in the pushed claim (so the board never showed an owner that had not
 been pushed) and were taken by this session immediately after. **Nothing was edited outside the file scope in the
@@ -259,7 +259,8 @@ probes (duplicate-swing check, evidence arithmetic, topic-domain sweep) recorded
 New files: `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`,
 `scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js` (all four run by the gate).
 Changed: `dashboard.html` (F-100), `assets/engine.js` (export only, F-102), `scripts/verify_release.py` (four new suites),
-`data/findings.json` (F-100…F-103 appended; ledger now 89 irregularities / 28 high).
+`data/findings.json` (F-100…F-103 appended; ledger after the rebase onto `main` reads 91 irregularities / 30 high —
+main's 87 items untouched, only these four IDs appended).
 
 ### Remarks, kept honest
 
@@ -2715,3 +2716,22 @@ Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snaps
 **Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and live execution stay paper), F-14/F-26/F-77 (high-ROI heuristic is disclosed, fee-aware screen honestly reports 0 picks), F-25 (cause links are settlement references, not causality), DEPLOY-1 (Pages served by legacy branch publisher; switching to Actions-only needs repo admin `Settings → Pages → Build and deployment → GitHub Actions`). Official-source verification above covers the load-bearing claims; live market values remain collection outputs (F-20).
 - 2026-11-27: rebased onto `origin/main` (`bd6f467`, four concurrent PRs merged) and resolved three conflicts keeping
   both sides; re-ran the full gate on the merged tree → **PASS**; audits re-verified against the `17:30:51Z` snapshot.
+
+### T125 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #138](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/138)** — "verify: independent line-by-line pass, ask-ladder fix (F-100), and four automated audits (F-100…F-103)", base `main`, head `arena/f33fe827-kalshidash3`, 9 files +1084/−92 | `gh pr create` |
+| Conflict resolution before merge | Branch was `CONFLICTING` against `bd6f467`; rebased, three conflicts merged structurally (both sessions' `COORDINATION.md` sections kept, `assets/engine.js` keeps `quotedBid` **and** `normalizeRow`, `data/findings.json` rebuilt from `origin/main` plus only F-100…F-103 → 91/30, valid JSON, no duplicate IDs) | conflict-resolution table in this section |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** (83 s) on the merged tree: rendered-number audit, both new suites, `test_liquidity_ladder.js`, `check_site.py` 21 pages OK | local run |
+| PR check | `build` **pass** 1m26s (scope tests + offline release gate + Pages artifact); `deploy` correctly skipped on a PR — merge state `MERGEABLE`/`UNSTABLE` only because of that skip | `gh pr checks 138` |
+| Merge | **merged `2026-11-27T17:42:21Z`** as merge commit `94d996adc1e0bafe63f07b8d019a1b4ea8b748a1`, without waiting for approval | `gh pr merge 138 --merge` |
+| Pages deploy | **confirmed** — `Deploy site to GitHub Pages` run **46043922829** `success` (build job 140658301034 completed 17:44:03Z, steps *Verify release* and *Upload pages artifact* both success); `pages build and deployment` run **46043922440** `success`; Pages API `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true` | `gh run view`/`gh run list`; `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` |
+| Live check | **not possible from this sandbox** — no egress to `kanlerxz87-cyber.github.io` (allowlist). The deploy is a straight copy of the merged `main` tree (`pages.yml`: verify release → stage public files → upload artifact), i.e. exactly the tree that passed the gate locally and in CI. Recorded, not glossed over (R-31) | R-31 in this section |
+| Net unique diff | `dashboard.html`, `assets/engine.js`, `scripts/verify_release.py`, `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`, `scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js`, `data/findings.json`, `COORDINATION.md` | `gh pr view 138 --json files` |
+
+**Still open after this PR (not in it, published on `flagged.html` as non-blocking):** book-sanity guard for the
+`KXBTCY-27JAN0100-B97500` "0.97 → 0.01" `last_price` artefact (the 53 `unknown_no_observations` rows whose pre-F-99
+bounds are unrecoverable) — a guard would refuse to publish a swing whose book never crossed; elections coverage stays
+structurally thin (R-32). F-07 (no demo credentials), F-25 (cause links are search leads) and DEPLOY-1 (legacy Pages
+publisher) remain as previously flagged.
