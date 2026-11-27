@@ -120,6 +120,15 @@ Claimed **2026-11-27T22:34Z** on fixed Arena branch `arena/5940f7eb-kalshidash3`
   - `python3 scripts/audit_live_parity.py --compare data/audit/live_observations.json` → **PASS** (39 series, 28 markets exact on immutable/finalized fields).
 - **Flagged irregularities (non-blocking, published on [`flagged.html`](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) — 113 items total):** `F-07` (no demo API credentials supplied — account balance left blank, trading/portfolio explicitly paper-only), `F-14`/`F-26`/`F-77` (experimental high-ROI alert filter vs fee-aware ROI screen with 0 picks), `F-25` (settlement-reference links are not asserted causes), `F-111` (fee-schedule PDF vs `GET /series` `fee_multiplier`), `F-112` (`KXMAXSHARDINGTEST` test-like Crypto series), `DEPLOY-1` (legacy Pages branch publisher alongside Actions workflow).
 
+### 5940-1 close-out — PR, merge, and GitHub Pages deployment
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #175](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/175)** — `5940-1: independent 10-market live-API parity & release verification` | `gh pr view 175` |
+| PR check | `build` **pass** (1m44s); `deploy` skipped on PR as designed | [Actions run 46078735044](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46078735044) |
+| Merge | **Merged `2026-11-27T22:49:32Z`** into `main` as merge commit `b029297311583de2fb7f9dda5bc2923196081443` | [PR #175](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/175) |
+| GitHub Pages deploy | `Deploy site to GitHub Pages` workflow **success** (`build` 1m46s + `deploy` 12s); Pages API `status: built` (`e1c5a04` built `2026-11-27T22:50:55Z` after concurrent collector snapshot `22:50Z`). Legacy publisher race on `b029297` superseded by `e1c5a04` (`DEPLOY-1`). | [Actions run 46078951174](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46078951174) · [Live site](https://kanlerxz87-cyber.github.io/KalshiDash3/) · [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) |
+
 ## Session `arena-9312ad1f` — collector-stall root cause (independent reproduction), cross-session claim ledger, and site-wide source/staleness audit (branch `arena/9312ad1f-kalshidash3`, base `43dd5f1`)
 
 Claimed 2026-11-27 **before any code or data edit**, after reading this board and reproducing the release gate on the
