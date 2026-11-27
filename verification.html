@@ -10,6 +10,8 @@
 <header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
 <main class="wrap">
 
+  <div id="snapshotBanner"></div>
+
   <h1>Verification — line by line</h1>
   <p class="lede">
     Every static claim in this project is a row below, with the official page it was checked against and the date it was
@@ -144,6 +146,10 @@ function render() {
   </div>`;
   try {
     const snap = await KD.json("data/live/markets.json");
+    // R93-3: the "data quality" block below prints counts taken from this snapshot, so the page has
+    // to say how old the snapshot is. It previously printed the timestamp alone and never the age,
+    // which let a stalled collector look current.
+    KD.snapshotBanner(snap);
     const open = snap.open_markets || [], settled = snap.settled_markets || [];
     const seed = open.filter(r => r.category_basis === "seed").length;
     KD.$("#dataQuality").innerHTML =

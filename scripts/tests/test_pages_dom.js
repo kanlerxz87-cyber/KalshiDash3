@@ -123,7 +123,11 @@ function inlineAssets(html) {
 }
 
 async function loadPage(file, mode, opts = {}) {
-  const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
+  let source = fs.readFileSync(path.join(ROOT, file), "utf8");
+  // The dock has its own suite. Load it in the lifecycle fixture too, where we need to
+  // compare it with the full alert chats. It waits for DOMContentLoaded on inline load.
+  if (opts.includeDock) source = source.replace('src="assets/chatdock.js" defer', 'src="assets/chatdock.js"');
+  const html = inlineAssets(source);
   const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, fixtures: opts.fixtures || {}, closed: false };
   const errors = [];
   const dom = new JSDOM(html, {
@@ -627,6 +631,13 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
+    const kd = r.dom.window.eval("KD");
+    check(kd.basisBadge("seed", "seed").includes("confirmed"),
+      "KD.basisBadge must render 'confirmed' for fee-schedule seed series");
+    check(kd.basisBadge("keyword", "official").includes("official series"),
+      "KD.basisBadge must render 'official series' (not 'keyword') when category_matched_by === 'official' (F-106)");
+    check(kd.basisBadge("keyword", "keyword").includes("keyword"),
+      "KD.basisBadge must render 'keyword' when matched by keyword heuristic only");
     // S-02 / F-90 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING
     // WINDOW, not the number the scan found in scope. The page must state the scan total
     // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
@@ -782,6 +793,60 @@ function commonAsserts(label, r) {
     r.close();
   }
 
+  /* --- J2. A collector follow-up outside the rankings reaches the chats and the ledger. --- */
+  {
+    const base = "https://external-api.demo.kalshi.co/trade-api/v2";
+    const prior = "2026-11-27T19:50:00Z", next = "2026-11-27T20:05:00Z";
+    const datedRows = ["DETERMINED", "DEFERRED", "FINAL"].map((suffix, i) => {
+      const ticker = `KXAAAGASM-TEST-${suffix}`;
+      return { ticker, title: suffix, category_id: i === 1 ? "crypto" : "gas", category_basis: "seed",
+        from_time: "2026-11-27T19:35:00Z", to_time: prior, direction: "up", delta: 0.12,
+        from_price: 0.40, to_price: 0.52, volume_24h_fp: 450,
+        market_source: `${base}/markets/${ticker}`, high_roi: true };
+    });
+    const [det, unknown, final] = datedRows;
+    const historical = `${base}/historical/markets/${final.ticker}`;
+    const followed = [
+      { ticker: det.ticker, source: det.market_source, status: "determined", result: "yes", observed_at: prior },
+      { ticker: unknown.ticker, source: unknown.market_source, status: null, result: null, reason: "lookup deferred" },
+      { ticker: final.ticker, source: historical, status: "finalized", result: "no", observed_at: prior },
+    ];
+    const snapshot = { collected_at: prior, settled_markets: [],
+      open_markets: [{ ticker: "KXAAAGASM-TEST-OPEN", category_id: "gas", status: "active", last_price_dollars: 0.42 }],
+      alert_lifecycle: { rows: followed } };
+    const file = "data/live/markets.json";
+    const r = await loadPage("alerts.html", "snapshot", { includeDock: true, fixtures: {
+      [file]: snapshot,
+      "data/live/alerts_archive.json": { alerts: datedRows },
+      "data/live/alerts.json": { all_events: datedRows, high_roi: datedRows },
+    } });
+    commonAsserts("alerts.html (follow-ups)", r);
+    const selector = (ticker) => [...r.doc.querySelectorAll("#outcomes tbody tr")].find(x => x.textContent.includes(ticker));
+    const chips = () => new Map([...r.doc.querySelectorAll("#lifecycleBar .kchip")].map(x => x.textContent.split(": ")));
+    check(chips().get("settled") === "1" && chips().get("result set · not paid") === "1" && chips().get("status unverified") === "1",
+      "distinct follow-ups are counted once, and nonfinal results are not counted as settlements");
+    check(selector(final.ticker)?.querySelector("a")?.getAttribute("href") === historical && selector(final.ticker)?.textContent.includes(prior),
+      "rank-excluded settlement row cites its exact historical source and verification time");
+    check(selector(unknown.ticker)?.querySelector("td:nth-child(5)")?.textContent === "—", "unverified result cell is blank");
+    check(/settled NO/.test(r.doc.querySelector("#kdChatAll")?.textContent || "") && /settled NO/.test(r.doc.querySelector("#kdChatModel")?.textContent || ""),
+      "both dock feeds show the rank-excluded final result");
+    check(/result set · not paid yet/.test(r.doc.querySelector("#feedAll").textContent), "the full chat shows the initial determination");
+
+    r.state.fixtures[file] = { ...snapshot, collected_at: next, alert_lifecycle: { rows: [
+      { ...followed[0], status: "finalized", result: "yes", observed_at: next }, ...followed.slice(1),
+    ] } };
+    await r.dom.window.eval("refreshCollector()");
+    check(chips().get("settled") === "2" && chips().get("result set · not paid") === "0", "later snapshot advances to finalized");
+    check(/settled YES/.test(r.doc.querySelector("#feedAll").textContent) && /settled YES/.test(r.doc.querySelector("#feedModel").textContent),
+      "both full-page feeds update on the first refresh render");
+    r.doc.querySelector('#catTabs [data-c="gas"]').click();
+    check(r.doc.querySelectorAll("#feedAll .chat-msg").length === 2 && r.doc.querySelector("#dropNote").textContent === "",
+      "topic filtering renders two messages without mistaking the hidden topic for an archive-cap drop");
+    check(r.errors.length === 0, "follow-up refresh and filter have no script errors");
+    console.log("  J2 follow-ups  ok  (chat states, exact citations, and finalized refresh)");
+    r.close();
+  }
+
   /* --- K. suggestions.html: handles missing status (G19) and multi-word status (G9) --- */
   {
     const r = await loadPage("suggestions.html", "snapshot");
@@ -793,6 +858,8 @@ function commonAsserts(label, r) {
     const implText = (r.doc.querySelector("#impl") || {}).textContent || "";
     const propText = (r.doc.querySelector("#prop") || {}).textContent || "";
     check(implText.includes("G9"), "suggestions.html must classify G9 (implemented ...) under #impl");
+    check(implText.includes("G5"), "suggestions.html must classify G5 (per-series fees, F-84/E9D9-F3) under #impl");
+    check(!/G5 \(fees\) remains open/.test(r.text), "suggestions.html must not claim G5 remains open for browser-side ledgers");
     check(propText.includes("G19"), "suggestions.html must render G19 safely under #prop");
     check(!r.text.includes("`data/findings.json`"), "suggestions.html must not contain raw markdown backticks");
     console.log(`  K suggestions   ok  (${implRows.length} implemented, ${propRows.length} proposed)`);
@@ -820,7 +887,9 @@ function commonAsserts(label, r) {
     const vText = (r.doc.querySelector("#verifiedCounts") || {}).textContent || "";
     const sText = (r.doc.querySelector('[data-count="suggestions"]') || {}).textContent || "";
     const qText = (r.doc.querySelector('[data-count="questions"]') || {}).textContent || "";
-    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${fd.flagged.length} irregularities`),
+    const release = JSON.parse(fs.readFileSync(path.join(ROOT, "data/release_findings.json"), "utf8"));
+    const flaggedCount = fd.flagged.length + release.flagged.length;
+    check(vText.includes(`${vf.facts.length} claims checked`) && vText.includes(`${flaggedCount} irregularities`),
       `executive-summary.html must render live verified/flagged counts from JSON (got: ${vText})`);
     check(sText.includes(`${fd.suggestions.length}`),
       `executive-summary.html must render live suggestions count (got: ${sText})`);
@@ -835,17 +904,50 @@ function commonAsserts(label, r) {
     const cat = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/catalysts.json"), "utf8"));
     const catLine = (r.doc.querySelector("#catCoverage") || {}).textContent || "";
     const catStatus = (r.doc.querySelector("#catStatus") || {}).textContent || "";
-    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`),
-      `executive-summary.html must render the catalyst coverage from data/live/catalysts.json (got: ${catLine})`);
+    check(catLine.includes(`${cat.counts.reviewed} of ${cat.counts.archive_total}`) && catLine.includes(cat.generated_at),
+      `executive-summary.html must render the catalyst file timestamp and coverage (got: ${catLine})`);
     check(cat.counts.reviewed === cat.counts.archive_total || /partial/.test(catStatus),
       `the catalyst status must say "partial" while any swing is unreviewed (got: ${catStatus})`);
-    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, `
+    // F-104: the requirements table typed "the sample is one settled alert" (true on
+    // 2026-11-22) while the alert chats rendered "no settled alert yet" from the same
+    // committed data. A living page must not type a volatile count: recompute the
+    // settled-alert sample with the SAME narrow join the alert page uses (served feed
+    // tickers -> snapshot row -> finalized with a yes/no result, assets/site.js
+    // lifecycleOf/lifecycleTally) and refuse any typed sample size that disagrees.
+    if (markets) {
+      const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
+      const idx = new Map((markets.alert_lifecycle?.rows || []).map(r => [r.ticker, r]));
+      for (const row of (markets.open_markets || []).concat(markets.settled_markets || [])) {
+        if (row && row.ticker) idx.set(row.ticker, row);   // settled rows win, as on the page
+      }
+      const served = new Set((alertsDoc.all_events || []).map(a => a && a.ticker).filter(Boolean));
+      let settledAlerted = 0;
+      for (const t of served) {
+        const row = idx.get(t);
+        const status = String((row && row.status) || "").toLowerCase();
+        const result = typeof (row && row.result) === "string" ? row.result.toLowerCase() : null;
+        if ((status === "finalized" || status === "settled") && (result === "yes" || result === "no")) settledAlerted += 1;
+      }
+      const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+      const typed = [...bodyText.matchAll(/(\bone|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+settled alert/gi)]
+        .map(m => WORD_NUM[m[1].toLowerCase()] ?? Number(m[1]));
+      for (const n of typed) {
+        check(n === settledAlerted,
+          `executive-summary.html types a settled-alert sample of ${n} but the committed data has ${settledAlerted} `
+          + `(served feed ${served.size} tickers; the alert chats page is the live surface for this count) — F-104`);
+      }
+      check(/bare count/.test(bodyText),
+        "executive-summary.html must keep the D-04 disclosure that the move-vs-outcome figure is a bare count, not a rate");
+      console.log(`  M F-104 guard   ok  (settled-alert sample recomputed: ${settledAlerted} of ${served.size} served tickers; `
+        + `typed sample sizes found: ${typed.length})`);
+    }
+    console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${flaggedCount} flagged, `
       + `${fd.suggestions.length} suggestions, ${fd.questions.length} questions, catalysts `
       + `${cat.counts.reviewed}/${cat.counts.archive_total})`);
     r.close();
   }
 
-  /* --- N. T116 (F-100..F-104): number formatting + cross-surface count honesty ---
+  /* --- N. T116 (F-111..F-115): number formatting + cross-surface count honesty ---
    * money() must group thousands everywhere (the landing table printed "$23271" while
    * gas.html printed "$23,271" for the same market); every badge/chip must lead with the
    * number of rows actually rendered and state the feed total it caps; the dashboard
@@ -862,7 +964,7 @@ function commonAsserts(label, r) {
     };
     const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
 
-    // N1. index dollars cells must render the grouped form of their own number (F-100).
+    // N1. index dollars cells must render the grouped form of their own number (F-111).
     {
       const r = await loadPage("index.html", "snapshot");
       commonAsserts("index.html N", r);
@@ -883,7 +985,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N2. dashboard badges + evidence note denominator (F-101).
+    // N2. dashboard badges + evidence note denominator (F-112).
     {
       const r = await loadPage("dashboard.html", "snapshot");
       commonAsserts("dashboard.html N", r);
@@ -918,7 +1020,7 @@ function commonAsserts(label, r) {
     }
 
     // N3. alerts chips count the rendered bubbles; the evidence bar stays global on every
-    // category tab (F-102, candidate #4).
+    // category tab (F-113, candidate #4).
     {
       const r = await loadPage("alerts.html", "snapshot");
       commonAsserts("alerts.html N", r);
@@ -954,7 +1056,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N4. portfolio KPI cash must use the grouped money format (F-103).
+    // N4. portfolio KPI cash must use the grouped money format (F-114).
     {
       const r = await loadPage("portfolio.html", "snapshot");
       commonAsserts("portfolio.html N", r);
@@ -965,7 +1067,7 @@ function commonAsserts(label, r) {
       r.close();
     }
 
-    // N5. derived results tables must carry a source link or a provenance note (F-104).
+    // N5. derived results tables must carry a source link or a provenance note (F-115).
     {
       const noteHasLink = (tb) => {
         // KD.table() wraps its output in <div class="tw">, so a note may sit beside the

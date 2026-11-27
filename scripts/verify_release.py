@@ -83,12 +83,26 @@ def main() -> int:
     for path in sorted(tests.glob("validate_*.py")) + sorted(tests.glob("test_*.py")):
         if not run(sys.executable, str(path.relative_to(ROOT))):
             failed.append(path.name)
+    # audit_rendered_numbers.js is the independent recomputation: it re-derives every figure the
+    # pages print from data/live/*.json and compares it with what jsdom renders. The other DOM
+    # suites prove the pages RUN; only this one proves the printed numbers match the data.
     for name in ("engine.test.js", "test_engine_node.js", "test_pages_dom.js", "test_chatdock.js",
-                 "test_verification_links.js", "test_fee_multipliers.js", "test_lifecycle.js"):
+                 "test_chat_counts.js",
+                 "test_verification_links.js", "test_fee_multipliers.js", "test_lifecycle.js",
+                 "audit_rendered_numbers.js", "test_liquidity_ladder.js",
+                 "test_alert_topic_domain.js", "test_series_fallback.js",
+                 # R93-3: a page that prints a snapshot number without its age lets a stalled
+                 # collector look live. This suite enumerates every page, from the committed tree.
+                 "test_staleness_disclosure.js"):
         if not run("node", f"scripts/tests/{name}"):
             failed.append(name)
     if not run(sys.executable, "scripts/check_site.py"):
         failed.append("check_site.py")
+    # R93-1: keep data/session_claims.json in step with the board. Informational only — a board
+    # with overlapping claims is a coordination problem to publish, not a reason to refuse to
+    # deploy a site whose own correctness checks pass. `--strict` is for humans before they edit.
+    if not run(sys.executable, "scripts/check_claim_conflicts.py"):
+        failed.append("check_claim_conflicts.py")
 
     if failed:
         print("\nRELEASE REFUSED: " + ", ".join(failed), file=sys.stderr)

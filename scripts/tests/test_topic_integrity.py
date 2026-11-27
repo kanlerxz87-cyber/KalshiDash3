@@ -84,6 +84,16 @@ class ExclusionListTests(unittest.TestCase):
         self.assertEqual(got, ("gas", "seed"),
                          "the retail gasoline series must stay in the gas topic")
 
+    def test_non_election_politics_props_are_refused_by_category_conflict(self):
+        self.assertEqual(self.collect.CATEGORY_COMPATIBLE["elections"], {"Elections"})
+        for st, title in (
+            ("KXAPRPOTUS", "Will the President's approval rating be above 38.5?"),
+            ("KXTRUMPNOMNUM", "How many nominations will Trump send to the Senate before Nov 29, 2026?"),
+            ("KXEOWEEK", "Will the President sign an Executive Order this week?"),
+        ):
+            reason = self.collect.category_conflict("elections", ["Politics"], "keyword", ["Recurring"])
+            self.assertIsNotNone(reason, f"{st} (Politics/Recurring) must be refused by category_conflict")
+
 
 class TagConflictTests(unittest.TestCase):
     @classmethod

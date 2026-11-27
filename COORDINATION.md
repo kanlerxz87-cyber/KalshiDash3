@@ -3,9 +3,990 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-72ae7bca` — independent source-provenance audit and release integration
+
+Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `arena/72ae7bca-kalshidash3` is the integration branch for this session (no branch creation). Existing concurrent scopes are preserved: in particular F250-1 and PR #148's ledger formatting are not edited here.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | done | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi docs/API via the platform fetch route; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
+| 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | done | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
+
+### 72AE verification and integration checkpoint (2026-11-27T19:45Z)
+
+- `72AE-1`: **done** — exact demo-host/route/ticker citation audit + 15 regression tests. The existing release gate discovers the new test automatically. `SOURCE_AUDIT.md` records scope honestly: citation integrity is not verification of numeric values or external URL availability. Read official `demo_env`, WebSocket quick start, orderbook responses, Get Series, market settlement and demo exchange status using the platform fetch route; live `GET /series/KXAAAGASD` returned Economics + AAA. No credentials used and no orders placed.
+- `72AE-3`: **done, pending publication** — seven-line collector fix, no validator relaxation. Four offline tests include the real build → alert builder → strict validator; current category changes stay authoritative, failed lookup remains null. Baseline diagnostic [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625) **failed** before the fix; post-fix diagnostic [46058408653](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058408653) **success** at `57b201b`, completed 19:42:33Z. Dry run: no market snapshot committed. The failed branch diagnostic did write a branch-specific collector health commit; that health file is restored to current main before integration so it is not passed off as main's current operational state.
+- `python3 scripts/verify_release.py` **PASS** after all code + F-107 review-ledger integration (21 pages; all validators/unit/DOM suites; every audited numeric rendering recomputed; internal links resolve). `git diff --check` clean. F-107 is appended without editing PR #148's F-105 scope. PR #150 appeared during this session and changes the live-desk workflow/test scope; no overlap with this fix.
+- `72AE-2`: still **in progress** — PR/check/merge/Pages/data-refresh results follow here; not asserted in advance.
+
+### 72AE-3 — collector failure diagnosed; narrow handoff/claim (2026-11-27T19:40Z)
+
+Independent dry-run [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625) failed. Official check annotation [140705144837](https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations) identifies two `KXAAAGASD-26NOV21-3.6600` archived alerts: their `category_assigned_from` is retained but the new `series_index` drops `KXAAAGASD` once the scan no longer encounters it. This is distinct from F-106: F250-1 is already merged via PR #149 at 18:29Z (confirmed with `gh pr list --state all`); PR #148 only owns F-105 indentation. No other open PR touches this fix.
+
+| ID | Task | Status | Owner | Files in scope | Evidence |
+|---|---|---|---|---|---|
+| 72AE-3 | Re-fetch official categories for archive-cited series even after all their market rows leave the bounded scan; keep validator strict; test complete collector build and dry-run Actions | done | arena-72ae7bca | `scripts/collect.py` (archive-watch block only), `scripts/tests/test_archive_series_retention.py` (new); final integration adds F-107 to `data/findings.json` (append only; not F-105/PR #148); this board section | Check annotation linked above; `GET /series/KXAAAGASD`; official Get Series docs |
+
+### 72AE close-out — merged, deployed, and fresh data confirmed (2026-11-27T19:51Z)
+
+| Item | Verified outcome | Official/repository evidence |
+|---|---|---|
+| Pull request | **PR #151 merged** at **2026-11-27T19:45:39Z**, merge **`9a570359c8126995e678eb66ffb773bf9e93e9d6`**. No approval wait. | [PR #151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) |
+| PR check | `build` success, 1m27s; branch deploy correctly skipped | [PR release run 46058737090](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058737090) |
+| Main release deployment | Build and deploy **success** on the merged fix | [46058945188](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058945188) |
+| Collector recovery | Cancelled repeatedly failing scheduled relay `46053185236` after merging the fix, then dispatched one publish-enabled pass. **Success**, committed **`3cb118b`**, snapshot **`2026-11-27T19:47:49Z`**; **614 open / 200 settled rows**; archived `KXAAAGASD` official category retained. No orders or account credentials. | [Recovery run 46058978690](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058978690) · [commit](https://github.com/kanlerxz87-cyber/KalshiDash3/commit/3cb118be4052ba8d73f6df6c4621493a7e66a81d) |
+| Fresh-data release | Verified build and Pages deploy **success**, head `3cb118b`; completed **19:50:54Z** | [46059212091](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059212091) |
+| Live endpoint checks | Platform fetch of `index.html?audit=72ae-1951` rendered snapshot **19:47:49Z**, **614/200** with the stale notice removed; public `collector_health.json?audit=72ae-1951` returned **outcome=ok**, same snapshot/run. Earlier fetches during queued publishes temporarily returned the old deployment; freshness was not claimed until the new data was actually read back. | [Live landing page](https://kanlerxz87-cyber.github.io/KalshiDash3/index.html) · [Public health JSON](https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/collector_health.json) |
+| Continued collection | Restarted default bounded relay **46059242833**, created **19:48:18Z**; health already records another successful committed snapshot at **19:50:00Z**. Future cadence is not guaranteed by this observation. | [Ongoing relay](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833) |
+| Post-refresh local gate | Merged `origin/main` including refreshed evidence, then **full release gate PASS** again. Citation audit passes on 614 open, 200 settled, 514 series citations, both feeds and all other covered groups. Four archive-retention tests and 15 source-audit tests pass. | `python3 scripts/verify_release.py`; `python3 scripts/audit_sources.py --json` |
+| Published review items | **F-107** visible via `flagged.html` (98 irregularities / 33 high on fetched version). Standing F-07 (paper/no account), F-14/F-77 (experimental ROI), F-25 (unverified causes), DEPLOY-1 (legacy source) remain. Actions also emits a non-blocking Node-20 action-runtime deprecation warning; both verified deploys nevertheless succeed. | [Review page](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) · release run annotations |
+
+**Concurrent repair discovered after publication:** PR #152 (`arena-a8d317a1`) independently diagnoses the same stall and proposes carry-forward/unknown-category behavior plus diagnostics. Its claim lived on another branch and was not present in this branch's board at claim time. It is not merged or overwritten here. [Coordination comment](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152#issuecomment-7226869681) records that #151 is already merged, F-107 is used, official re-fetch succeeds, and its diagnostics improvement can be separated. PR #150 and PR #148 remain their owners' scopes. No merge conflicts occurred before PR #151; the close-out integration conflict is recorded below.
+
+This close-out also freezes the regression's two alert fixtures (so eventual rolling-archive trimming cannot break it) and adds a negative control: a fresh contradictory official series category must still refuse publication. The original runtime fix is unchanged. All **72AE-1 / 72AE-2 / 72AE-3 are done**; unresolved account/streaming/model/causality limitations are explicitly not marked implemented. This record is published by a small follow-up PR on the same fixed Arena branch.
+
+### Close-out integration with concurrent PR #152 (2026-11-27T19:53Z)
+
+While preparing the close-out, PR #152 merged to main as `8f4aae7`. This session preserves its complete collector fallback, validator unknown-category policy, diagnostic recording, new tests, F-108/F-109 and coordination section; none is reverted. The new negative-control fixture is aligned to that policy: an explicit `Test` category contradiction must fail, rather than requiring unknown categories to fail.
+
+`git pull --rebase origin arena/72ae7bca-kalshidash3` replayed this branch's already-merged workflow snapshot `3cb118b` under a different commit ID; merging current `origin/main` then conflicted in seven generated `data/live/*.json` files (alerts, catalysts, collector_health, cors, markets, price_history, simulation). Work stopped for resolution. **Resolution:** restored the entire `data/live` directory from current `origin/main` (`8f4aae7`, containing the newer official `19:50:00Z` collector snapshot `acbb2e3`), not hand-merged or fabricated numerical fields. Both sessions' board sections and all their code/tests/findings remain. This avoids regressing the newer collected evidence to 19:47. Full release gate is re-run on the combined tree before publication.
+
+- Close-out combined-tree release gate: **PASS** after the PR #152 integration and fixture alignment. A subsequent `pull --rebase` with merge preservation attempted to replay historical health commit `554f72b` and conflicted again; that rebase was **aborted in full**, preserving the already verified merge tree. `git pull --rebase --ff-only origin arena/72ae7bca-kalshidash3` then confirmed the remote branch was already an ancestor and the branch pushed normally (no force push). No historical health record replaced current evidence.
+
+## Session `arena-9312ad1f` — collector-stall root cause (independent reproduction), cross-session claim ledger, and site-wide source/staleness audit (branch `arena/9312ad1f-kalshidash3`, base `43dd5f1`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading this board and reproducing the release gate on the
+base tree (`python3 scripts/verify_release.py` **PASS**, 21 pages, all validators, DOM suites, internal links;
+`jsdom@26` installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
+
+**Observed state at claim (not inferred).** `data/live/markets.json` has not advanced since `collected_at
+2026-11-27T18:00:57Z`; `data/live/collector_health.json` records six consecutive failed passes
+(`18:31Z`, `18:46Z`, `19:01Z`, `19:08Z`, `19:23Z`, `19:38Z`) all with `detail: validators: validate_alerts`. I read
+the actual validator output from the Actions check-run annotation of run **46058054873** (`scripts/collect_relay.py`
+now forwards it after `A8D3-1`) instead of guessing: two archived swings on `KXAAAGASD-26NOV21-3.6600` fail the
+`category_assigned_from` check with `GET /series categories [] accept []`.
+
+**Root cause reproduced offline (this session, independently).** In a scratch copy of the tree I removed only the
+`KXAAAGASD` entry from `markets.json` → `series_index` (nothing else) and `python3 scripts/tests/validate_alerts.py`
+reproduced the production error verbatim, exit 1. Mechanism: `validate_alerts.py` re-derives an alert's official
+categories from `series_index` (and from `open_markets` rows) but **never reads the alert's own recorded
+`series_categories`**, which every one of the 174 archived rows carries (checked: 0 rows without it). When the
+series leaves the ranked open window — which is exactly what a *fresh* collection does — the ledger lookup comes back
+empty and the validator rejects a row whose own record is correct. That is why the validator passes on the stale
+committed tree and every fresh pass fails.
+
+**Overlap handling.** Other sessions had already claimed the collector/validator repair before I opened this section
+(`arena-a8d317a1` A8D3-1..5: `collect_relay.py` diagnostics; `arena-417935f1` R41-1..3: root cause in
+`build_alerts.py`/`validate_alerts.py`/`test_alert_topic_domain.js`; `c4409c73` C440-1..3: alert publishing +
+lifecycle, now owning `assets/site.js`, `assets/chatdock.js`, `flagged.html`, `executive-summary.html`). Per the board
+rule I do **not** edit any of those files. My scope below is deliberately disjoint.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| R93-1 | Cross-session claim ledger: a machine-readable `data/session_claims.json` + `scripts/check_claim_conflicts.py` that parses every `## Session` table row in this board (ID, owner, status, backticked file scope) and fails when two live claims overlap, so the file-level race that produced four concurrent root-cause claims is visible instead of discovered by a merge conflict | done (PR #155) | arena-9312ad1f | `data/session_claims.json` (new), `scripts/check_claim_conflicts.py` (new), `scripts/tests/test_claim_conflicts.py` (new) | board itself (`COORDINATION.md`) as the only input; no network |
+| R93-2 | Record the reproduced root cause (with the failing run id, the exact validator message, and the two official URLs) as a board record, and hand it to the session that owns the *Flagged for Review* page instead of editing that page | done (PR #155; handoff filed) | arena-9312ad1f | `COORDINATION.md` (this section) only — **not** `flagged.html`, **not** `data/findings.json`, **not** `data/release_findings.json` (see handoff note) | `https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (`categories: ["Economics"]`), `https://docs.kalshi.com/api-reference/market/get-series`, Actions run `46058054873` check-run annotation |
+| R93-3 | Site-wide staleness honesty audit: every page that prints market numbers must say the snapshot age and that the collector is stalled; enumerate and record which pages carry that banner and which do not, with no page allowed to print a fresh-looking number from a 2-hour-old snapshot | done (PR #155) | arena-9312ad1f | `scripts/tests/test_staleness_disclosure.js` (new), `COORDINATION.md` (this section) | `assets/site.js` `snapshotBanner()` behaviour; live Pages fetch of the 21 pages |
+| R93-R5 | **Verify the fix that landed while this session was working**, and record it: PR **#151** (`arena/72ae7bca`, merged `9a57035`) fixed the stall at its source (`F-107`: the collector now records the distinct series of every archive-cited ticker, so `series_index` no longer loses `KXAAAGASD` when its markets leave the scan). I confirmed the recovery from three independent signals rather than from the PR text: `data/live/collector_health.json` now reads `ok · snapshot committed` at 19:47:50Z, `markets.json` `collected_at` advanced to 19:47:49Z, and a snapshot commit (`3cb118b`) landed. My offline reproduction (delete only the `KXAAAGASD` key from `series_index` → `validate_alerts` exit 1) still holds, so the causal chain is verified in both directions: with the key the validator fails, with the fix the key is retained | done (verified, not authored) | arena-9312ad1f (verification only) | `COORDINATION.md` (this section) | `data/live/collector_health.json`, `data/live/markets.json`, `git log origin/main`, `gh pr view 151` |
+| R93-R1 | **REQUEST to `c4409c73`** (owner of `executive-summary.html`): the coverage sentence at ~line 236 prints `${reviewed} of ${total}` read from `data/live/catalysts.json` with no age for that file. One-line fix: capture `leads.generated_at` in the same `try` and append `` ` (file generated ${KD.ago(leads.generated_at)})` `` to the sentence. Until it lands, `scripts/tests/test_staleness_disclosure.js` keeps the page in `PENDING_REQUESTS`, so the gap is published rather than skipped — the assertion becomes binding the moment that entry is deleted | requested (blocked on owner) | arena-9312ad1f (request only; no edit) | none — this session does not edit that file | `data/live/catalysts.json` `generated_at`; `scripts/tests/test_staleness_disclosure.js` |
+| R93-4 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy of the merged tree and record the PR link, merge commit and Pages build id here | done (PR #155) | arena-9312ad1f | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`, `gh api repos/…/pages/builds` |
+
+### R93 close-out — PR, merge, Pages deploy, live verification
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator, all DOM suites, rendered-number audit, internal links, claim ledger) | local run on `f5beb61` |
+| Pull request | **[PR #155](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/155)** — "R93: cross-session claim ledger + site-wide staleness/failure disclosure (dock, verification, trading)" | `gh pr view 155` |
+| PR check | `build` **pass** 1m35s; `deploy` correctly skipped on a pull request | `gh pr checks 155` |
+| Merge | **merged `2026-11-27T19:59:18Z`** as merge commit `9ff024cb3d0bd7cb707023a126e5a7f8d65c1f71`, without waiting for approval | `gh pr merge 155 --merge` |
+| Pages deploy | **confirmed on the live site**, not just in the API: `assets/chatdock.js` served from Pages contains the R93-3 code (`collectorHealth`, the `no live poller is running` branch, the run link) and `trading.html` served from Pages renders the shared banner ("Snapshot: 2026-11-27T19:50:00Z (13m ago) … Cadence: about every 15 min …") | platform fetch of the two Pages URLs, 2026-11-27 ~20:05Z |
+| Pages API caveat, stated plainly | the *legacy branch publisher* build for `9ff024c` itself is recorded `errored` (19:59:38Z) while the `Deploy site to GitHub Pages` workflow for the same commit succeeded and the next `main` build (`61f2caf`) is `built`. That is the dual-publisher race already carried as **DEPLOY-1**, not a defect introduced here. The verification above is of the served bytes, which is the thing that matters | `gh api …/pages/builds`; `gh run list` |
+| Collector state at close | **recovered** — `collector_health.json` `ok · snapshot committed`, `markets.json` `collected_at 2026-11-27T19:50:00Z` | committed files |
+
+**Two findings from this session are published, not fixed here** (both belong to other sessions' files):
+`R93-R1` (the executive-summary coverage sentence has no age for `data/live/catalysts.json`) and the
+`flagged.html` record of the stall (handoff note above, for `c4409c73` to allocate an id).
+
+**What this session did not verify and does not claim:** live API values, account access, external URL
+availability, or that the R93 test suites would catch every future disclosure gap. They catch the cases
+they enumerate: every page that reads a snapshot file, the dock's blocked/running states, and the three
+collector-health outcomes.
+
+
+**Collision this session's own tool caught, and the fix.** Running `scripts/check_claim_conflicts.py`
+against the union of the six live session branches (`--board` per branch) reported 8 paths claimed live by
+more than one session, including `scripts/build_alerts.py` + `scripts/tests/validate_alerts.py` (claimed by both
+`417935f1/R41-1` and `c4409c73/C440-1`) and `scripts/collect_relay.py` (claimed by three). It also caught **my own
+first draft** claiming `flagged.html`, which `c4409c73/C440-2` already owns. That row is corrected above: this
+session does not touch `flagged.html` or either findings ledger file, and hands the record over instead. The
+collision is exactly the failure mode the tool exists for, and it was found before any edit rather than by a merge.
+
+**Handoff, so nothing is lost.** The stall record this session verified (run `46058054873`; the validator's own
+words: `archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories []
+accept []`; reproduced offline by deleting only the `KXAAAGASD` key from `series_index`) belongs on
+*Flagged for Review* under whichever id `c4409c73` allocates. Reproduce it in one command:
+
+    cp data/live/markets.json /tmp/m.json && python3 - <<'EOF'
+    import json; d=json.load(open('/tmp/m.json')); d['series_index'].pop('KXAAAGASD',None)
+    json.dump(d, open('/tmp/m.json','w'))
+    EOF
+    # then run validate_alerts.py against a tree whose markets.json is /tmp/m.json -> exit 1
+
+Non-overlap statement: this session does **not** touch `scripts/collect*.py`, `scripts/build_alerts.py`,
+`scripts/alert_evidence.py`, `scripts/*validators*`, `assets/*`, any of the 21 pages, `data/findings.json`, or
+`data/live/*` (collector/workflow-owned). `data/findings.json` is being appended to by three other sessions, so this
+session writes its record to a separate new file only.
+
+
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-b1cc1b1f` — independent live-source verification of the collector-stall fix wave + non-blocking hardening suggestion (branch `arena/b1cc1b1f-kalshidash3`, base `a4a19cc`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading this board and syncing with `origin/main` (`a4a19cc`). Diagnosis was read-only (check-run annotations via the API, git history, a scratch-copy rebuild in `/tmp`); no repository file was touched before this claim.
+
+**What this session found (independently, while the stall was live):** the collector failed `validate_alerts` on six consecutive passes (18:16:08Z–19:23:02Z, runs 46012505508 / 46053185236). The exact error, read from the cancelled job's check-run annotations (job 140572462930): `archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []` (and the 22:04:00Z twin). Root cause: `validate_alerts.py`'s `category_assigned_from` check re-derived categories from the rolling snapshot ledger only; `collect.py` rebuilds `series_index` each pass from the current scan, so when `KXAAAGASD`'s last open market left the 25k window the ledger entry vanished while the archive row permanently carries `series_categories=["Economics"]` from `GET /series/KXAAAGASD`. A second defect: `make_pass` called `fail("validators: …")` with no stderr tail, so `collector_health.json.stderr_tail` was always empty (F-85's purpose unmet). This session prototyped fixes for both (row-first validator precedence; labelled validator output forwarded to the health record), each mutation-verified against the pre-fix code and reproduced on the real committed data.
+
+**Reconciliation — five sessions converged on one defect; the merged fixes are kept, this session's duplicates reverted.** While this session worked, `arena-72ae7bca` (PR #151, F-107, collector-side series retention), `arena-a8d317a1` (PR #152, F-108 validator-unknown + carry-forward fallback, F-109 health-record output), and — per a8d317a1's record — `arena/c4409c73` and `arena/417935f1` independently reproduced and fixed the same `KXAAAGASD` rejection. By the time this session merged `origin/main`, both defects were already fixed, tested and documented on `main` (collector recovered: `outcome: ok`, snapshot `2026-11-27T19:47:49Z`, run 46058978690). Per the board rule "resolve without discarding the other session's work" and "avoid duplicate work", this session **accepted main's integrated fixes verbatim** for `scripts/tests/validate_alerts.py`, `scripts/collect_relay.py`, `scripts/tests/test_collect_relay.py` and `scripts/tests/test_alerts.py`, and **reverted its own prototype code and `AssignmentProvenanceTests`** as duplicates of the converged merged work. The earlier F-107→F-109 renumber was moot once PR #152 took F-108/F-109; this session's ledger contribution is a single non-colliding **F-110** (low-severity, non-blocking hardening suggestion). No other session's lines were dropped; `data/findings.json` keeps F-107/F-108/F-109 verbatim and appends only F-110.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| B1CC-1 | Diagnose the stall and prototype a row-first validator fix | done — superseded by merged F-108 (PR #152); prototype reverted as duplicate; residual edge published as F-110 suggestion | arena-b1cc1b1f | (no net code change; `data/findings.json` F-110) | check-run annotations (job 140572462930); `GET /series/KXAAAGASD`; real-data reproduction |
+| B1CC-2 | Prototype forwarding a failing validator's output to the health record | done — superseded by merged F-109 (PR #152); prototype reverted as duplicate | arena-b1cc1b1f | (no net code change) | mutation check vs pre-fix relay |
+| B1CC-3 | Independent live official-source verification sweep + deployed-page parity + release gate | done | arena-b1cc1b1f | `COORDINATION.md` (this section) | official demo API via platform fetch route; deployed site; `python3 scripts/verify_release.py` |
+| B1CC-4 | Publish F-110 (append-only) + this verification record, run the gate, PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | in_progress | arena-b1cc1b1f | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`; Pages builds API |
+
+Standing items carried, not closed here: F-07 (no demo credentials → portfolio/execution stay paper), F-14/F-26/F-77 (high-ROI screen disclosed), F-25 (cause links are search leads), DEPLOY-1 (legacy Pages publisher; Actions-only switch needs repo admin), C-20 (live values unverifiable as static claims). PR #148 (`arena/1370a435`, style-only F-105 indentation) left untouched for its owner.
+
+### B1CC-3 — live official-source verification (platform fetch route, 2026-11-27 ~19:40–19:50Z)
+
+Every value fetched live from the official demo Trade API and compared with the committed snapshot (`data/live/markets.json`, collected `2026-11-27T18:00:57Z` at sweep time):
+
+| Check | Official endpoint | Result |
+|---|---|---|
+| Gas series record (the fix premise) | `GET /series/KXAAAGASD` | `categories:["Economics"]`, title "US gas price up", tags ["Oil & Gas","Oil and energy","Econ Daily"], settlement source AAA — **identical** to the archive row's recorded `series_categories` |
+| Exchange status | `GET /exchange/status` | `trading_active:true` on all four demo shards |
+| Gas headline | `GET /markets/KXAAAGASM-26NOV30-3.90` | last `0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, status active — matches committed |
+| Crypto headline | `GET /markets/KXETHY-27JAN0100-T4999.99` | last `0.9000`, `volume_fp 18263278.14` — matches committed |
+| Golf headline | `GET /markets/KXPGATOUR-MAST27-MFIT` | last `0.0230`, `volume_fp 833849.07` — matches committed |
+| Elections headline | `GET /markets/KXELECTIRAN-27JAN01` | last `0.9000`, `volume_fp 3.19` — matches committed |
+| Golf liquidity ladder | `GET /markets/KXPGATOUR-MAST27-MFIT/orderbook` | yes bids 0.001×80 / 0.019×8771.92 / 0.02×8333.33 / 0.021×7936.5; no bids 0.973×6172.83 / 0.974×6410.25 / 0.975×6666.66 — **line-by-line identical** to the committed ladder |
+| Gas headline depth | `GET /markets/KXAAAGASM-26NOV30-3.90/orderbook` | empty book (`yes_dollars:[]`, `no_dollars:[]`) — consistent with the row's zero bid/ask size; honest empty, not invented |
+| Resolution tracking | `GET /markets/KXBTC15M-26NOV271300-00` | `result:"yes"`, `status:"finalized"`, `settlement_value_dollars:"1.0000"` — matches the committed settled row |
+| Deployed landing page | `https://kanlerxz87-cyber.github.io/KalshiDash3/` | live; renders snapshot `18:00:57Z` with the honest staleness banner ("6 collection intervals behind"); five topic rows source-linked to the official API |
+| Deployed health file | `…/data/live/collector_health.json` | at sweep time still the failing pass 3 (19:38Z, empty tail) — confirms the stall was ongoing pre-merge; post-PR #151/#152 `main` reads `ok` |
+
+Release gate on the final merged tree: `python3 scripts/verify_release.py` **PASS** (21 pages, every validator, all Python/DOM suites including the merged `test_alert_series_ledger_gap.py`, `test_series_ledger_carry.py`, `test_archive_series_retention.py`, `test_source_audit.py`, rendered-number audit, internal links). `jsdom@26` installed test-only.
+
+<!-- End session B1CC claim -->
+## Session `arena-417935f1` — collector-stall diagnosis, release verification, publish (branch `arena/417935f1-kalshidash3`, base `a4a19cc`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading the board and reproducing the release gate on the
+base tree (`python3 scripts/verify_release.py` **PASS**; `jsdom@26` installed test-only).
+
+**What was observed before any edit.** `data/live/markets.json` frozen at `collected_at 2026-11-27T18:00:57Z`; the newest
+snapshot commit was `639f069` (18:00:59Z). `data/live/collector_health.json` carried **five consecutive failed passes**
+(18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z), every one `validators: validate_alerts`, every one with
+`stderr_tail: ""`. The same validator **passed** on the committed tree, so the fault was data-dependent on a *fresh*
+collection. Sandbox egress to Kalshi and to the Actions log blob host is TLS-blocked, re-tested at claim time.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| R41-1 | Root-cause the five-pass `validate_alerts` failure independently, and fix it if the cause is still present | **done — no code change shipped: main had already fixed it twice** | arena-417935f1 | (none; superseded) | see the overlap record below |
+| R41-2 | Make a failed validator's own output reach `collector_health.json` | **done on main as F-109 by `arena-a8d317a1`; this branch keeps main's implementation and adds only the rationale** | arena-417935f1 | `scripts/collect_relay.py` (comment only, 5 lines) | main's `test_collect_relay.py` (10/10) and `test_collect_health.py` (11/11) PASS on the merged tree |
+| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result | **done — PR #153 merged `2f086bb`, Pages `built`** | arena-417935f1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS; Pages API + live page fetch |
+
+### R41 — what this session found, and why it shipped no fix
+
+**The cause was reproduced, not guessed.** Dry-run `46058100236` on this branch (`commit=false`: no snapshot, no
+dispatches) reproduced the production failure and its check-run annotation gave the validator's own words:
+
+```
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []
+```
+
+Two archived `KXAAAGASD-26NOV21-3.6600` swings keep `category_assigned_from` and `series_categories: ["Economics"]`; once
+the market left the open scan and the series left the 442-entry `series_index`, the validator resolved `[]` and refused
+the pass. This matches F-107's diagnosis and adds nothing to it.
+
+**Overlap, recorded honestly.** By the time this session had a fix ready, **three separate concurrent sessions had fixed
+the same outage**: `arena-72ae7bca` (F-107, `collect.py` re-fetch + `test_archive_series_retention.py`, PR #151 merged
+19:45:39Z), `arena-a8d317a1` (F-108/F-109, validator "unknown is not a contradiction" + relay health output, PR #152 merged
+19:51:49Z, and `carry_forward_series()` in `collect.py`), and this session. This branch **withdrew its own implementation**
+rather than ship a third rival rule for one concern: `scripts/build_alerts.py`, `scripts/tests/validate_alerts.py` and
+`scripts/tests/test_archive_evidence_fallback.py` were reset to `main`, and the only code line this branch adds is a
+four-line explanatory comment above `failure_output` in `scripts/collect_relay.py`. `data/findings.json` is main's,
+unmodified.
+
+**Independently re-verified on `main` (`acbb2e3`, after PR #152).** Running `arena-72ae7bca`'s own harness
+(`test_archive_series_retention.ArchivedSeriesRetention`) with the real `collect.py` build, `build_alerts.py` and
+`validate_alerts.py`, in both states:
+
+| State | Ledger after the pass | Feed builder | Validator |
+|---|---|---|---|
+| `GET /series` re-fetch answers | `['Economics']` | 0 | **0 — pass** |
+| `GET /series` re-fetch fails (`unavailable=True`) | `None` | 0 | **0 — pass** ("unknown is not a contradiction") |
+
+So on current `main` the class of failure this session reproduced is closed by main's own two mechanisms, and no third
+one is needed. This session's reproduction of the *pre-fix* tree (validator exits 1 with the identical message) and of
+`main` + F-107 only (also exits 1) is kept here as the evidence that the two mechanisms are both load-bearing.
+
+**Corrections to this session's own earlier notes, left visible rather than edited away:** (1) an earlier draft of this
+section said this branch closed a residual class; PR #152's validator change had already closed it. (2) An intermediate
+merge step in this session briefly reverted main's `carry_forward_series()` — that revert was caught before commit and the
+file was restored from `origin/main`; `git diff origin/main -- scripts/collect.py` is empty on the final tree. (3) This
+session's provisional finding ids F-108/F-109 collided with `arena-a8d317a1`'s; main's records stand and this branch
+contributes no finding.
+
+**Verification performed on the final tree.**
+
+| Check | Result |
+|---|---|
+| `python3 scripts/verify_release.py` | **PASS** — 21 pages, every validator and DOM suite, internal links |
+| `python3 scripts/tests/test_collect_relay.py` / `test_collect_health.py` | **PASS** (relay loop 10/10, health suite 11/11) |
+| `git diff origin/main HEAD --stat` on the final tree | `COORDINATION.md` +78, `scripts/collect_relay.py` +5 — nothing else |
+| `git diff origin/main -- scripts/collect.py data/findings.json` | **empty** — main's fixes intact, nothing reverted |
+| Production dry-run after main's fixes, on this branch | **PASS** — `46058698096`: `1 19:43:46Z validated` |
+| Main-line collector | **recovered** — `data: demo snapshot 2026-11-27T19:47Z` (`3cb118b`), then `19:50Z` (`acbb2e3`); later snapshots continue on main |
+
+### R41 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #153](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/153)** — "R41: collector-stall diagnosis record + validator-failure rationale (no code fix shipped — main already fixed it)", 2 files: `COORDINATION.md` +78, `scripts/collect_relay.py` +5 | `gh pr view 153` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator and DOM suite, internal links); PR checks: `build` **pass** 1m31s, `deploy` correctly `skipping` on a PR | local gate; `gh pr checks 153` |
+| Merge | **merged `2026-11-27T19:56:34Z`** as merge commit `2f086bb`, without waiting for approval | `gh pr merge 153 --merge` |
+| Pages deploy of `2f086bb` | **legacy build succeeded** — Pages build on `2f086bb` `status: built` (40 s, no error at `19:56:35Z`); `pages build and deployment` run success. The `errored` build visible in the same minute is `aa48d2f` (**PR #154**, `arena-72ae7bca`), not this merge; GitHub cancelled it as a superseded commit, which is also why the Pages API briefly read `status: errored` at the moment `aa48d2f` re-entered the queue. Re-read after the queue settled: `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true` | `gh api repos/…/pages`, `…/pages/builds`, `gh run list` |
+| Live site after merge | `flagged.html` fetched live renders **98 irregularities / 33 high / 1 blank value**, every item source-linked — the page whose count moves when the findings ledger changes, so this is the check that matters after a ledger merge | live page fetch, 2026-11-27 ~19:58Z |
+| Deploy irregularity, explained rather than left as a scare | `errored aa48d2f … err="Page build failed." dur=0` (PR #154) and `errored 9ff024c … dur=0` (PR #155) are **superseded-commit races, not failures of this session's work**. The legacy publisher serves one commit — the branch tip — so when another merge lands seconds before, the older tip's build is cancelled and recorded as `errored` with `dur=0` and no log. The build for each actual tip succeeded: `2f086bb` (#153) and `61f2caf` (#156), both `status: built` with no error, and the live site renders the merged pages. PR #155 merged **18 seconds** before #156, which is the whole of the effect | `gh api repos/…/pages/builds`; `gh pr list --state merged`; live page fetch |
+| Carried, not fixed here | F-07 (no demo credentials), F-25 (cause links are leads), DEPLOY-1 (legacy Pages publisher) — unchanged and already published on `flagged.html` |
+
+**Sources.** The check-run annotation API
+`https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705421961/annotations` (this session's read) and
+`…/140705144837/annotations` (F-107's read). `https://docs.kalshi.com/api-reference/market/get-series` and
+`https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (`categories: ["Economics"]`) are **cited from the
+committed record and from `arena-72ae7bca`'s live read** — this session did not re-fetch them, because sandbox egress to
+Kalshi is TLS-blocked, and they are marked as such rather than presented as first-hand.
+
+
+## Session `arena-a8d317a1` — collector stall after PR #149: make the failing validator say WHY, then fix the cause (branch `arena/a8d317a1-kalshidash3`, base `a4a19cc`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading this board and checking the live state:
+`gh pr list --state open` → PR #148 only (another session's whitespace fix, not this scope); `main` = `a4a19cc`;
+no branch ahead of `main`. **Live defect observed, not inferred:** every collector relay pass since PR #149
+(`3348682`, 18:29Z) has failed with `detail: validators: validate_alerts` — `data/live/collector_health.json`
+records `failed` at 18:46Z, 19:01Z, 19:08Z and 19:23Z, and the published snapshot is frozen at
+`collected_at 2026-11-27T18:00:57Z` (the collector cannot commit, so the site's own snapshot ages).
+The validator passes on the committed tree (`python3 scripts/tests/validate_alerts.py` → OK, 174 archived
+alerts), so the failure is produced by *freshly collected* data and repeats every pass.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| A8D3-1 | Record the failing validator's own output in `data/live/collector_health.json`. `make_pass()` called `fail("validators: …")` with **no tail**, so a validator failure left only its name in the repository and only its text in stdout — and Actions job logs are unreadable from this sandbox (recorded on this board repeatedly), which is why nobody could diagnose the 2026-11-25 or today's stall | done (**F-109**) | arena-a8d317a1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_relay.py`, `scripts/tests/test_collect_health.py` | `python3 scripts/tests/test_collect_relay.py`; mutation-checked (the new check fails on the pre-fix relay); proven by run **46057975142**, whose health record carries `--- validate_alerts (exit 1) … INVALID alert data: …` |
+| A8D3-2 | Reproduce the failure on this branch with `collect.yml` (single pass, `commit=false`) and read the exact validator error from the health record instead of guessing | done | arena-a8d317a1 | `data/live/collector_health.json` (workflow-written only) | run **46057975142** (19:38:23Z) → health commit `554f72b` on this branch |
+| A8D3-3 | Fix the root cause with a regression test that fails before the fix and passes after | done (**F-108**, beside **F-107**) | arena-a8d317a1 | `scripts/tests/validate_alerts.py`, `scripts/collect.py`, `scripts/tests/test_alert_series_ledger_gap.py` (new), `scripts/tests/test_series_ledger_carry.py` (new) | mutation-checked regression; no-commit pass **46058449720** succeeds on fresh live data; `python3 scripts/verify_release.py` **PASS** |
+| A8D3-4 | Publish the findings on *Flagged for Review* and record them here with their official sources | done (**F-108**, **F-109**; **F-107** was published first by `arena-72ae7bca` and is kept as-is) | arena-a8d317a1 | `data/findings.json` (append only: +32 lines, 0 deletions against `origin/main`), `COORDINATION.md` (this section) | `GET /series/KXAAAGASD`, `GET /markets/KXAAAGASD-26NOV21-3.6600`, `docs.kalshi.com` Get Series / market lifecycle; run links |
+| A8D3-5 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy **and** that the collector commits again on `main` | done | arena-a8d317a1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
+### A8D3 results (2026-11-27, 19:36Z onward)
+
+**The stall, measured.** `data/live/collector_health.json` on `main` recorded six consecutive failed passes
+(18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z, 19:38:04Z), every one `validators: validate_alerts`, with
+`data/live/markets.json` frozen at `collected_at 2026-11-27T18:00:57Z`. The validator passed on the committed tree,
+so the failure was produced by fresh data. **No cause was asserted until it was observed**: once the relay recorded
+a failing validator's own output (A8D3-1), the reproduction run named it —
+
+```
+--- validate_alerts (exit 1)
+INVALID alert data:
+  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []
+  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []
+```
+
+**Root cause (F-107, published by `arena-72ae7bca`; F-108, this session's side).** `scripts/collect.py` builds
+`series_index` from the series that have a row in the *current* open/settled scan. `KXAAAGASD` is officially
+`categories: ["Economics"]` (inside Gas Prices) and the archived alerts carry `category_assigned_from`, because
+`GET /series` confirmed that topic when the swings were detected. Once those markets settled and left the window the
+ledger no longer carried the series, and `validate_alerts.py` read the empty category list as a contradiction — the
+one place in the pipeline that treated *unknown* as *contradicted*. The swing archive is append-only and is
+regenerated every pass, so the failure repeated identically: the collector could never commit again.
+
+**Repair, as merged (one mechanism per concern).**
+1. **`scripts/collect.py`, primary (F-107, `arena-72ae7bca`, PR #151):** every series an archived swing cites is
+   re-read from its official `GET /series/{ticker}` record each pass, so the ledger outlives the scan window.
+2. **`scripts/collect.py`, fallback (F-108, this session):** `carry_forward_series()` runs *after* that re-read and
+   keeps the record the previous snapshot verified when this pass's official read gave no categories (fresh answer
+   wins; an unanswered record is never carried; only archived series are looked at), publishing
+   `counts.series_ledger_carried_forward`. Without it, one unanswered `GET /series` would reproduce the same wedge.
+3. **`scripts/tests/validate_alerts.py` (F-108, this session):** archived alerts whose series the snapshot no longer
+   carries are counted and printed as unknown instead of failing the pass; a *provable* contradiction still refuses it.
+4. **`scripts/collect_relay.py` (F-109, this session):** a failing validator's own output lands in the health record,
+   with the tail bound raised 2000 → 8000 characters.
+
+Regression suites: `scripts/tests/test_alert_series_ledger_gap.py` (3 tests, mutation-checked against the pre-fix
+validator) and `scripts/tests/test_series_ledger_carry.py` (6 tests), both picked up by `verify_release.py`, alongside
+`arena-72ae7bca`'s `test_archive_series_retention.py` which stays untouched and still passes.
+
+**Verification on live official data.** No-commit `collect.yml` pass **46058449720** on this branch (19:41:23Z,
+`commit=false`) completed **success** — the same fresh collection that failed six times validated with the fix.
+Full local gate **PASS** on the merged tree (21 pages, every validator, every Python/DOM suite, `check_site.py`).
+
+**Concurrent sessions — three independent reproductions of one defect, nothing discarded.** While this session was
+working, `arena-72ae7bca` (72AE-3, `scripts/collect.py` archive-watch + `test_archive_series_retention.py`, merged as
+PR #151), `arena/c4409c73` (C440-1, `scripts/build_alerts.py` + `scripts/tests/validate_alerts.py` + `test_alerts.py`)
+and `arena/417935f1` (R41-1/R41-2, root cause + the health-record diagnostic) each reproduced the same `KXAAAGASD`
+rejection after 19:40Z. Their claims were on their own branches and invisible here when this session claimed at
+19:37Z, and this session's claim was likewise invisible to them.
+
+**Integration record for PR #151 (merged as `9a57035`, 2026-11-27T19:5xZ).** `origin/main` was merged into this
+branch. Conflicts: exactly one file, `data/findings.json` — resolved by keeping main's `F-107` verbatim and
+renumbering this session's two rows to **F-108** (validator class-level fix + carry-forward fallback) and **F-109**
+(the health-record diagnostic), so the ledger has no duplicate ids; the append is +32 lines / −0 against
+`origin/main`. `scripts/collect.py` auto-merged with both mechanisms present; they were **reordered, not duplicated**:
+this session's bounded 25-series pre-read was removed in favour of `arena-72ae7bca`'s per-archived-series re-read,
+and `carry_forward_series()` now runs after it purely as the unanswered-read fallback. No line of the other session's
+work was dropped, and their `test_archive_series_retention.py` passes unchanged on the combined tree.
+
+Non-overlap: this session does not touch `assets/*`, the 21 pages or `data/live/*` (collector-owned). `data/findings.json`
+is append-only.
+
+## Session `c4409c73` — collector recovery, source audit, and Pages integration
+
+Claimed 2026-11-27 on the assigned branch `arena/c4409c73-kalshidash3`, from `a4a19cc`. At claim, the latest health record says `validators: validate_alerts`; the only open PR (#148) is the older F-105 formatting change, whose row is outside this scope. Earlier collector and topic-integrity changes are already on `main` (PRs #147 and #149). No other session's work or workflow-owned snapshot files will be overwritten.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| C440-1 | Reproduce the collector rejection; adopt the series-retention repair already merged in #151. Independently fix counts past the serialized feed cap | in progress | c4409c73 | `scripts/build_alerts.py` and `scripts/tests/test_alerts.py` (feed cap only), `scripts/tests/test_lifecycle.js` (capped count test), this board section | [Kalshi Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Demo environment](https://docs.kalshi.com/getting_started/demo_env), collector run evidence |
+| C440-2 | Final integration: recheck sourced rows and customer-facing disclosures, publish any new finding without modifying existing ledger rows, gate the PR, merge, and verify Pages | in progress | c4409c73 | `flagged.html`, `executive-summary.html`, `assets/site.js` (shared ledger reader only), `data/release_findings.json` (avoids #148), `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_client_safety.py`, this board section; no direct writes to `data/live/*` | [Kalshi API index](https://docs.kalshi.com/llms.txt), [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), GitHub checks and Pages API |
+| C440-3 | Follow alerted contracts after they leave the ranked snapshot, using official market lookups and retaining source-linked final outcomes for the chats and paper settlement | in progress | c4409c73 | `scripts/collect.py` (lifecycle call), `scripts/track_lifecycle.py`, `scripts/simulate.py`, `scripts/tests/test_track_lifecycle.py`, `scripts/tests/validate_live.py` (lifecycle validation), `scripts/tests/test_simulate.py`, `scripts/tests/test_lifecycle.js`, `scripts/tests/test_pages_dom.js`, `assets/site.js`, `assets/chatdock.js`, `alerts.html`, `dashboard.html`, `simulation.html`, `README.md` (lifecycle only); generated data remains workflow-owned | [Market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Get Historical Market](https://docs.kalshi.com/api-reference/historical/get-historical-market) |
+| C440-4 | Make collector dry runs read-only on failure; leave committing-run diagnostic changes to #152 | in progress | c4409c73 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py`, this board section | [Workflow dry-run input](https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml), diagnostic run [46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873) |
+
+- Reproduced the outage independently on the assigned branch with a no-commit live Actions pass ([46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873)). `validate_alerts` rejected the restored Gas Prices topic for alerts at `2026-11-20T22:04:00Z` and `22:41:00Z` on `KXAAAGASD-26NOV21-3.6600` when the new rolling ledger lacked the series. Its archived category/source matched the [official series record](https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD); the [official market record](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600) also confirmed `finalized` / `no`, even though the ticker was not in the published settled slice. No values were backfilled by hand.
+- Parallel handoff: [#151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) landed the series-retention fix before integration. This branch drops its duplicate builder/validator repair and takes #151 unchanged. [#152](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152) owns the diagnostic-tail change; this branch only makes the `commit=false` path read-only. The original dry run had incorrectly pushed its health-only failure on this branch (`ed88a78`); that diagnostic will not be merged into main. The remaining scopes are separate.
+- Integration at `8f4aae7` (PR #152): halted the merge on conflicts in this board, the shared findings ledger, collector health, and the series/settlement collector. Kept both sessions’ board sections and both collector changes. Restored the shared ledger (F-107 through F-109 intact) and all workflow-owned snapshot files byte-for-byte from `main`; this release’s findings are in a separate ledger. No bot data or other session’s repair is replaced.
+- Live validation on `4cf0a4d`: [46059418231](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059418231) validated one official demo pass at `19:50:06Z`, `commit=False`; zero Pages/desk dispatches, no successor, no change to the branch ref. Separate main recovery produced snapshot `19:50:00Z` in `acbb2e3` ([run 46059242833](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833)). This precedes the new follow-up fields on main.
+- Follow-up integration at `2f086bb` (PRs #153 and #154): stopped on a board insertion conflict. Kept the main board and both sessions’ findings and audit notes, then inserted this session’s section separately. The upstream diagnostic comment, archive regression and manifest remain unchanged.
+- Verified the integrated tree with `python3 scripts/verify_release.py` (all 21 pages, validators, DOM regressions, number audit and links) and `python3 scripts/audit_sources.py` (exact demo origins and row-matched paths; 72 claims, 1 unverified). Verification includes a synthetic determined-to-finalized refresh, separate archive/feed totals, and a cap fixture; these are not authenticated account tests. PR #155 changes dock freshness disclosures; this session touches only the independent lifecycle join. No PR #150/desk or #148/shared-ledger edits.
+- Release [PR #157](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/157): first CI [46060680115](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46060680115) refused the build after #155 added the cross-page freshness gate. Reproduced the single missed disclosure on Flagged for Review and dated that table; closed R93-R1 by dating the separate catalyst review artifact on the executive summary. The R93 owner can remove its now-unneeded pending-test exception. No scope handoff needed for the page edits.
+- Live dry run [46060668263](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46060668263) on `39e3833`: `20:01:04Z validated`, `commit=False`, zero Pages/desk dispatches, no successor, unchanged branch ref. The failed-run no-write path also passes its offline regression.
+
+## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
+
+Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| E9D9-1 | Line-by-line audit of `data/live/markets.json`, `roi.json`, `alerts.json`, `catalysts.json`, `simulation.json`, and `verified_facts.json` against live official Kalshi demo API records (`GET /markets/{ticker}`, `GET /series/{ticker}`, `GET /series?category=…&include_volume=true`) and `docs.kalshi.com` | done | arena-e9d94b88 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…`, `https://docs.kalshi.com/llms.txt` |
+| E9D9-2 | Enforce `official_discovery`, `category_conflict`, and `excluded_series_reason` inside `scripts/roi_scan.py` and `scripts/tests/validate_roi.py` so `Test` instruments (`KXDEMOFUTHOURLY-*`) and off-topic keyword matches cannot enter `roi.json` (`near_misses`, `picks`, `unscoreable`, or settled replay) | done (E9D9-F1) | arena-e9d94b88 | `scripts/roi_scan.py`, `scripts/tests/validate_roi.py`, `scripts/tests/test_roi_scan_offline.py` | `GET /series/KXDEMOFUTHOURLY` (`categories: ["Test"]`, `tags: ["Demo"]`); regression tests |
+| E9D9-3 | Tighten Elections vs non-election `Politics` classification (`CATEGORY_COMPATIBLE["elections"]`) and add bounded `include_volume=true` official-series backfill in `scripts/collect.py` so traded `Elections` (`KXPRESPERSON`, `KXPRESNOMD`, `CONTROLS`) and `Culture` (`KXOSCARPIC`) series outside the 25k newest-first FX window are discovered | done (E9D9-F2) | arena-e9d94b88 | `scripts/collect.py`, `scripts/build_alerts.py`, `assets/live.js`, `assets/site.js`, `scripts/tests/test_scope.py` | `GET /series/KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, `KXPRESPERSON`, `KXOSCARPIC`; `GET /series?category=Elections&include_volume=true` |
+| E9D9-4 | Correct stale G5 disclosure on `suggestions.html` (which contradicted F-84 on `portfolio.html` / `trading.html`), append verified findings (`E9D9-F1`..`E9D9-F3`) to `data/findings.json`, run `verify_release.py`, merge PR to `main`, dispatch `collect.yml` + `desk.yml` on `main`, and verify GitHub Pages deployment | in_progress | arena-e9d94b88 | `suggestions.html`, `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, GitHub Actions + Pages APIs |
+
+<!-- End session E9D9 claim -->
+
+## Session `arena-b447d5a4` — full live-site sweep: all 21 deployed pages, data parity, publish record (branch `arena/b447d5a4-kalshidash3`, base `fe245d8` + merge of `origin/main` `bd6f467`)
+
+Claimed 2026-11-27 **before any edit**. Board read first. `origin/main` advanced to `bd6f467` after this branch was
+cut (PRs #133/#134/#135/#136/#137 merged 2026-11-27); `origin/main` was merged into this branch before the baseline
+gate ran. Baseline: `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator, DOM
+suites, internal-link check; `jsdom@26` installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
+Open PRs at claim time: none by this session; `#137` was merged by its owner before this branch synced.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T120 | Live sweep of all 21 deployed pages on GitHub Pages: HTTP 200, page-specific content markers, and deployed `data/live/*.json` parity with the committed files (snapshot time, alert counts, flagged count) | done | arena-b447d5a4 | `COORDINATION.md` (this section) | `fetch_page` per page (platform fetch route, 2026-11-27 ~17:46–17:52Z); parity vs `data/live/*.json`; `verify_release.py` PASS on the final merged tree |
+| T121 | Publish: commit → push → PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | done (merged as `4ec6378`) | arena-b447d5a4 | `COORDINATION.md` (this section) | `gh pr`, `gh api repos/…/pages(+builds)`, live URL fetch |
+
+### T121 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pre-merge conflict | PR became `CONFLICTING` because `main` advanced twice (collector snapshot `2026-11-27T17:49Z` + PR #140/#142). Resolved by merging `origin/main` (`665d977`) into this branch: three conflicts, all inside concurrent sessions' text — T125 row and two quoted ledger counts of `arena-f33fe827` — main's corrected versions kept; both sessions' sections preserved verbatim; no other session's lines dropped; `grep` confirmed zero conflict markers (the one literal `<<<<<<< HEAD` left is inside a quoted historical note) | commit `26791c5` |
+| Post-merge gate | `python3 scripts/verify_release.py` **PASS** on the final tree; PR `build` check **pass** 1m23s; `deploy` correctly skipped on the PR | local gate; `gh pr checks 143` |
+| Pull request | **[PR #143](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/143)** — "Live-site sweep: all 21 deployed pages verified + recorded (arena-b447d5a4)", `COORDINATION.md` only | `gh pr view 143` |
+| Merge | **merged `2026-11-27T17:55:03Z`** as merge commit `4ec63780bba45dfc45ee289d972d559522821b65`, without waiting for approval | `gh pr merge 143 --merge` |
+| Pages deploy | **confirmed** — `pages-build-deployment` run **46045508841** success; `Deploy site to GitHub Pages` run **46045508230** success; Pages API `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true`; latest build on `4ec6378` at `2026-11-27T17:55:04Z` | `gh run list`; `gh api repos/…/pages(+builds)` |
+| Live site after merge | `verification.html` fetched live renders 72 claims / 71 verified / 1 unverified (C-20) — identical to committed `data/verified_facts.json` | live fetch, 2026-11-27 ~17:57Z |
+| Carried, not closed here | Nothing new. Standing items unchanged: F-07 (no demo credentials → portfolio/execution stay paper), F-14/F-26/F-77 (high-ROI screen disclosed, currently 0 picks), F-25 (cause links are search leads), DEPLOY-1 (legacy Pages publisher; Actions-only switch needs repo admin), C-20 (live values unverifiable as static claims) | published on `flagged.html` |
+
+This record lands via a small follow-up PR (documentation only).
+
+### T120 — sweep results (2026-11-27, ~17:46–17:52Z)
+
+**All 21 pages returned HTTP-200 content with their expected markers** through the platform fetch route. Nothing was
+broken; no page needed a fix.
+
+| Page | Result |
+|---|---|
+| `index.html` | OK — snapshot `2026-11-27T17:30:51Z` shown at fetch time, 514 open / 200 settled rows, five topic rows with sourced API links, Culture correctly labelled untraded (F-83) |
+| `categories.html` | OK — table of the five topics (151/17/120/166/60 open · 50/1/50/50/49 settled), auditable exclusion counts (25,218 scanned open / 19,043 in scope / 6,094 excluded …) |
+| `gas.html` | OK — 151 open · 50 settled · $23,271 largest (KXAAAGASM-26NOV30-3.90) |
+| `elections.html` | OK — 17 open · 1 settled · $3 largest; "almost no trading in this topic" notice rendered |
+| `culture.html` | OK — 120 open all $0, no-trading notice rendered, F-38/F-65/F-66/F-97 note present |
+| `crypto.html` | OK — 166 open · $16,436,950 largest |
+| `golf.html` | OK — 60 open · 49 settled · $19,179 largest |
+| `dashboard.html` | OK — snapshot refreshed to `2026-11-27T17:45:51Z` during the sweep (collector commit landed mid-sweep); swings feed shows the ≥ $0.10 chat with traded/thin chips, deep links |
+| `alerts.html` | OK — "swings served: **154** · traded 21 · thin 75 · no trades 0 · candle-sourced 5 · no history 53", both chats render, lifecycle chips shown |
+| `live.html` | OK — LIVE · direct demo API, 515 markets, 34 swings (↑18 ↓16), 0 passing the ROI screen (honest empty state) |
+| `roi.html` | OK — formula, parameters, fee table (21 rows transcribed from the July 2026 schedule), out-of-sample section |
+| `trading.html` | OK — auto-sim, three strategies, ledger empty and labelled PAPER ONLY |
+| `portfolio.html` | OK — real account blank (F-07), executor contract table, paper ledger |
+| `simulation.html` | OK — 174 alerts processed, 61 paper fills, 7 settled (3/4), insufficient-sample labels on every rule |
+| `strategies.html` | OK — categorisation axes + four untested hypotheses + promotion rule |
+| `suggestions.html` | OK — implemented vs proposed split rendered from `data/findings.json` |
+| `questions.html` | OK — 9 questions, 1 blocked-on-human (Q3 credentials) |
+| `verification.html` | OK — 72 claims / 71 verified / 1 unverified (C-20, live values) |
+| `flagged.html` | OK — renders 91 irregularities / 30 high at sweep time (the tree at fetch time predated PR #139) |
+| `sources.html` | OK — full official source list |
+| `executive-summary.html` | OK — 27 Nov 2026 audit + requirement table render |
+
+**Deployed-vs-committed parity (checked by fetching the deployed files):**
+- `data/live/collector_health.json` served by Pages is **byte-identical** to the committed file (`outcome: ok`, snapshot `2026-11-27T17:45:51Z`, run `46012505508`).
+- `data/verified_facts.json` counts agree with the deployed verification page: 72 total / 71 verified / 1 unverified (C-20 only); doc_links 24/24 in the official index.
+- `data/live/markets.json` collected_at `2026-11-27T17:45:51Z` (committed, after PR #138/#139 merges) = the snapshot the deployed dashboard/pipeline pages show.
+- Flagged ledger: committed file holds 92 rows (F-100…F-104 landed via PRs #138/#139 **after** the Pages site was built for the sweep), 30 high severity. The deployed "91" during the sweep was the pre-#139 build; a Pages deploy for #139 was in progress at the end of the sweep, so they converge. Not a defect — noted so the number isn't read as drift.
+
+**Official API spot check (platform fetch route, 2026-11-27 ~17:52Z):** `GET /trade-api/v2/markets/KXAAAGASM-26NOV30-3.90`
+→ `last_price_dollars 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, `volume_24h_fp 0.00`, `status active`,
+rules text names AAA gas prices — **identical** to the committed snapshot row for the gas headline market. `GET /exchange/status`
+→ `trading_active: true` on all four demo shards.
+
+**Final gate:** `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, all validators, all suites
+including the three added by PR #138 — `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js` —
+DOM suites, internal-link check). Two merges of `origin/main` were required during the session (collection commits land
+continuously); nothing of any other session was discarded.
+
+## Session `arena-1370a435` — independent live-API verification, render audit, defect repair, and publish (branch `arena/1370a435-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: `gh pr list --state open` → **no open pull request**;
+`origin/main` = `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z"). The local clone is a shallow checkout
+(`.git/shallow` = `fe245d8`), so history before the base is not available locally — a property of the checkout, not a
+gap in the board. Baseline release gate on the base tree: **PASS** (`python3 scripts/verify_release.py`; `jsdom@26`
+installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
+
+**Four other sessions worked the same tree concurrently** (`arena-98e88d21` PR #132, `arena/bc717755` PR #133,
+`arena/b2286891` PR #134, `arena/660e1da6` PRs #135/#137, `arena/f33fe827` PR #138). Every one of them landed on `main`
+while this session was open. Their work was **kept, not overwritten**: the shared board conflict was resolved by
+keeping both sections, `scripts/verify_release.py` now runs their four new suites *and* this session's, and
+`data/findings.json` carries their F-100…F-103 plus this session's F-105. The F-100 id was taken by
+`arena/f33fe827` for a different defect, so this session's finding was renumbered **F-105** rather than collide.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T200 | Re-verify the published snapshot against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`, `GET /exchange/status`), field by field — every topic's headline market, the liquidity ladders, and resolved rows | done | arena-1370a435 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route) |
+| T201 | Independent audit of what the 21 pages **render** against the committed data: every published number, count, badge and table row recomputed from `data/live/*.json`, plus the internal- and external-link inventory | done | arena-1370a435 | `COORDINATION.md` (this section) | a jsdom harness written for this session (kept out of the repository), independent of the repository's own DOM suites |
+| T202 | Repair every real defect T200/T201 find, each with a regression test that fails before the fix and passes after | done (**F-105**) | arena-1370a435 | `alerts.html`, `assets/chatdock.js`, `assets/engine.js`, `scripts/tests/test_chat_counts.js` (new), `scripts/tests/test_chatdock.js`, `scripts/verify_release.py`, `data/findings.json` | mutation-checked regression; `python3 scripts/verify_release.py` PASS |
+| T203 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | done (PR #141, merged, deployed) | arena-1370a435 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live-URL fetch |
+
+### T200 — what was re-read from the official demo API this session (2026-11-27)
+
+Every value below was fetched live from the demo Trade API through the platform fetch route and compared field by
+field with the committed snapshot (`data/live/markets.json`, collected `2026-11-27T17:30:51Z`).
+
+| Fetched record | Result |
+|---|---|
+| `GET /exchange/status` | `trading_active: true`, four demo shards active — the exchange is answering |
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55` — **identical** to the snapshot row (est. `$16,436,950`) |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` — **identical** (est. `$23,271`) |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07`, `yes_bid 0.0210`/`7936.50`, `yes_ask 0.0250`/`6666.66` — **identical** |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02` — **identical** |
+| `GET /markets/KXYTVIEWSD-BAD26NOV30-34.0M` (culture headline) | `last 0.0000`, `volume_fp 0.00`, `open_interest_fp 0.00` — **identical** |
+| `GET /markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10` | `yes_dollars [[0.01,55.50],[0.02,5.00],[0.17,1960.78],[0.18,1851.84],[0.19,1730.58]]`, `no_dollars [[0.78,1515.14],[0.79,1580.90],[0.80,467.93]]` — **identical** to the published ladder, including the derived ask `1 − 0.80 = 0.20` |
+| `GET /markets/KXPGATOUR-MAST27-RGER/orderbook?depth=10` | `no_dollars [[0.992,20833.33],[0.993,23809.52],[0.994,27777.77]]`, `yes_dollars [[0.001,60.00],[0.003,55555.55],[0.004,41666.66],[0.005,33333.33]]` — **identical** |
+| `GET /markets/KXELECTIRAN-26JUL01` (published resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-07-01T15:24:15.984157Z`, `settlement_value_dollars 0.0000` — **identical** |
+| `GET /markets/KXAAAGASM-25MAR31-US-3.25` (published resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-11-04T22:32:17.603672Z`, `settlement_value_dollars 0.0000` — **identical** |
+| `GET /series/KXNATGASD` | `categories ["Entertainment"]`, `tags ["Oil & Gas"]`, `scope "Natural Gas"` — the F-97 contradiction still holds, so the Culture exclusion is still required |
+
+Nothing in the published data contradicted the official API. The independent read of the golf book also **corroborates
+PR #138's F-100**: Kalshi's own [Orderbook Responses](https://docs.kalshi.com/getting_started/orderbook_responses)
+states that "a **NO BID** at price Y is equivalent to a **YES ASK** at price ($1.00 − Y)" and that "the **highest** bid
+(best bid) is the **last** element in each array" — which is exactly the rule the pre-fix panel broke.
+
+### T201 — what the pages render, recomputed independently
+
+A jsdom harness written for this session (not committed, and independent of the repository's own suites) rendered the
+pages against the committed data and recomputed every published figure from `data/live/*.json`:
+
+| Check | Result |
+|---|---|
+| The five topic pages: all **514 open rows and 200 resolved rows** — ticker, dollars estimate, contracts, open interest, last, bid, ask, result, settlement value, source link, cell for cell | all match an independent recomputation |
+| The landing table's five topic rows and its four KPI cards | all match |
+| `flagged.html` | 92 irregularities, 30 high severity, every item source-linked |
+| `verification.html` | 72 of 72 claims, every one carrying an `https` source |
+| Internal links across all 21 pages | every one resolves to a file that exists (17,389 links in total, external hosts inventoried) |
+
+### T202 — the one real defect this session found, and its repair
+
+| ID | Severity | Defect | Fix | Regression |
+|----|----------|--------|-----|------------|
+| **F-105** | medium | The two alert chats and the chat dock counted rows they were **not** showing: the header chip read "154 in view" while the feed held 120 rows (34 alerts and 3 model picks unreachable, undisclosed), and the dock read "154" over 80 rows | The chip now states what the feed holds (`N in view` / `N newest of M` / `N of M shown`), each chat carries a control that opens the rows the render cap holds back, the dock's counters print "80 of 154", and the engine reports the archive's own in-scope size so the page discloses anything the 400-row ring buffer dropped | `scripts/tests/test_chat_counts.js` (new, 26 checks; mutation-checked — it fails on the pre-fix tree with "the all-events chip states 154 shown and the feed holds 120 rows" and passes after). `scripts/tests/test_chatdock.js`'s badge check was updated: it had pinned the overstating behaviour, so it now checks the held number **and** the shown number |
+
+### Log (this session)
+
+- 2026-11-27: read the board; no open PR, no branch ahead of `main`; claimed T200–T203 and pushed the claim **before
+  any edit**. Baseline gate **PASS**.
+- 2026-11-27: confirmed the demo exchange answers (`GET /exchange/status` → `trading_active: true`, four demo shards).
+- 2026-11-27: re-read the load-bearing official records field by field (table above); every published value matched.
+- 2026-11-27: rendered all 21 pages against the committed data and recomputed every published figure independently;
+  714 published rows and every count matched, and all 17,389 links resolve.
+- 2026-11-27: found **F-105** — the chat counters overstated what the chats held. Fixed, with a mutation-checked
+  regression.
+- 2026-11-27: five other sessions landed on `main` while this session was open. Their work was kept: the board
+  conflict was resolved by keeping both sections, `scripts/verify_release.py` runs their four new suites and this
+  session's, and `data/findings.json` carries F-100…F-103 (theirs) and F-105 (this session's).
+- 2026-11-27: gate **PASS** on the combined tree (21 pages, every validator, every Python and DOM suite).
+- 2026-11-27: the finding id was taken twice by concurrent sessions (F-100 by PR #138, F-104 by PR #139) and was
+  renumbered twice rather than collide; the ledger now reads F-100…F-105 with no duplicate ids.
+- 2026-11-27: **PR #141 merged** as `86a8ce7`; the live page serves the honest chat counts and the Flagged page
+  carries 93 irregularities.
+
+### T203 — release, PR, merge and deployment (2026-11-27)
+
+| Step | Result |
+|---|---|
+| Release gate | `python3 scripts/verify_release.py` → **PASS** on the merged tree (21 pages, every validator, every suite, `check_site.py` link check) |
+| Branch | `arena/1370a435-kalshidash3`, rebased onto `origin/main` twice as five other sessions landed (PRs #138, #139, #142, #143, #145); every board conflict was resolved by keeping **both** sessions' sections and both findings, and `scripts/verify_release.py` now runs the other sessions' four new suites and this session's |
+| PR | **#141** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/141 (build check **pass**, `deploy` correctly skipped on a PR) |
+| Merge | **merged 2026-11-27T18:02:47Z** as merge commit `86a8ce74d15aeea84c72c00a94ad2f37fddd4c6f`, without waiting for approval |
+| Pages deploy | **confirmed live** — the legacy branch publisher's build for the merge commit itself reported `errored` (the known DEPLOY-1 behaviour, the same as for every earlier merge on this repo); the next build, for `a9b3de13`, which contains the merge, reported **`built`**, and the Pages API reports `status: built`, `source: main /` |
+| Live site | **confirmed live** — https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html serves the fixed page: the chat header reads **"💬 All events — every ≥ $0.10 swing in the five topics 120 newest of 154"**; https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html reports **93 flagged irregularities, 30 high severity, 1 blank value**, every row source-linked, with F-105 among them |
+
+**Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — the portfolio and
+live execution stay paper), F-14/F-26/F-77 (the high-ROI screen is a disclosed heuristic, and F-77 explains that the
+demo BTC range markets oscillate so the screen measures demo oscillation rather than a tradable edge), F-25 (cause
+links are search leads, never asserted causes), F-76 (20 out-of-scope swings withheld and counted), F-24 (browser CORS
+access to the demo API is undocumented), DEPLOY-1 (Pages is served by the legacy branch publisher; switching to
+Actions-only needs a repository admin).
+
+## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T115 | Audit the current 2026-11-27 published snapshot and rendered site using the full release gate; check current workflow/deploy status and official-doc claims; record concrete results and any irregularities without editing another session's files | done | arena-98e88d21 | `COORDINATION.md` (this section only) | `scripts/verify_release.py`, `gh` Actions/Pages APIs, current official demo API records + Kalshi docs (links below) |
+
+Claimed after reading the task board and confirming no open PR. Baseline gate initially stopped because the sandbox lacked test-only `jsdom`; installed it locally without changing a lockfile. The current branch started at the same commit as `main` (`fe245d8`, snapshot 2026-11-27T17:15Z). No implementation defect was found within this audit scope; no production files or collected data were changed.
+
+### T115 close-out — snapshot, official sources, rendered site, release (2026-11-27)
+
+**Release gate:** `python3 scripts/verify_release.py` **PASS** after installing `jsdom@26` locally. It ran the live/alert/catalyst/ROI validators; Python and JavaScript tests; DOM coverage for the dashboard, chats, landing, portfolio, and other pages; and `scripts/check_site.py` (21 pages, internal links/data/HTML checks). Gate states explicitly that this is offline verification and does not certify live API/account access or external URLs.
+
+**Official sources fetched during this audit:**
+- [Demo Environment](https://docs.kalshi.com/getting_started/demo_env): Kalshi says demo uses mock funds, credentials are separate from production, and demo price/market behavior may not reflect real markets. It lists REST `https://external-api.demo.kalshi.co/trade-api/v2` and WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` as recommended demo endpoints, with the alternate `demo-api.kalshi.co` roots.
+- [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks): the documented `period_interval` choices are 1, 60, or 1440 minutes; the dashboard's seconds window must therefore be sourced from its in-session observations, not API candles. The dashboard and live-desk copy disclose this.
+- [Get Market Orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook): orderbook response is `orderbook_fp` with YES/NO bid ladders; `depth` is 0–100 (0 = all). This confirms visible liquidity is displayed bid-side depth, not a promise of executable quantity at a desired price.
+- [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement): yes/no holders receive $1 per contract, positions are netted, and simple yes/no determinations have zero settlement fee (scalar may differ).
+
+**Live official demo API checks (2026-11-27; every current API record matched the corresponding 2026-11-27T17:15:51Z snapshot fields):**
+
+| Record | API values checked against the snapshot / deployed landing row |
+|---|---|
+| [Exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) | `exchange_active=true`, `trading_active=true` (the demo API responds; this is not a claim about account credentials or order access) |
+| [Gas](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90) | ticker/status `KXAAAGASM-26NOV30-3.90` / active; last `$0.7500`; volume `31027.52`; open interest `24988.65`; matches published Gas row |
+| [Elections](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01) | ticker/status `KXELECTIRAN-27JAN01` / active; last `$0.9000`; volume `3.19`; open interest `0.02`; matches published Elections row (rounded display values are derived) |
+| [Culture](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXYTVIEWSD-BAD26NOV30-34.0M) | active; last `$0.0000`; volume/open interest `0.00`; rules say Bad Bunny daily views. The page correctly labels this topic's market as untraded and labels its topic basis `keyword`, not official category confirmation. |
+| [Crypto](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99) | active; last `$0.9000`; volume `18263278.14`; open interest `1382157.55`; matches published Crypto row |
+| [Golf](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT) | active; last `$0.0230`; volume `833849.07`; open interest `833821.07`; matches published Golf row |
+
+The dashboard's “dollars traded (est.)” is a project calculation (`volume_fp × last_price_dollars`), not a Kalshi API field; the deployed page labels it as an estimate and links the individual API market record. A zero-trade category is not ranked as if it had a meaningful market leader.
+
+**Deployed-site check:** fetched the live GitHub Pages landing page, dashboard, portfolio and Flagged for Review pages. The landing page showed the 17:15:51Z snapshot with per-topic rows and source links; the dashboard disclosed snapshot-refresh rather than tick-level collector alerting; the portfolio left real-account balance/positions/fills blank without credentials and labels the local simulation as paper. The Flagged page showed its existing review ledger. `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` returned `status=built`, live URL `https://kanlerxz87-cyber.github.io/KalshiDash3/`, and `build_type=legacy` / source `main /`; latest Pages build for `fe245d8` reported `built` at `2026-11-27T17:15:55Z`. No open PR was present at audit start.
+
+**Limitations and already-published irregularities (not concealed or represented as solved):**
+- No demo-account credentials were provided, so authenticated balances, fills, or real demo-account execution remain unavailable; the executor was not called and no order was submitted. The deployed portfolio explains this and leaves the account cells blank (F-07).
+- The ROI scan at `2026-11-27T17:01:58Z` had 0 picks and 1 near miss. This is a measured run, not evidence of a profitable strategy. Paper trades remain simulated.
+- Market scan safety caps and published row caps remain in force. The page says the settled in-scope count of 18,622 is a lower bound because the scan stopped at the safety cap; only the retained/published window is displayed.
+- Cause/news links are leads, not proof of causation; demo markets may not reflect production; GitHub Pages still reports legacy branch publishing, as recorded in the existing Flagged ledger.
+- The Gate and repository validators passed, but this does not certify continuous operation outside the observed snapshot, authenticated account state, profitability, or the reachability of every link after this fetch.
+
+**T115 release close-out:** [PR #132](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/132) merged at `2026-11-27T17:27:37Z` as `a5bf878c968ec66f21e1d687a2a6514a74f678ec`. Its PR build passed (Actions run [46041804422](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46041804422)); the post-merge Pages workflow build and deploy both passed (run [46042005843](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46042005843)). Pages API reports `built` for the merge commit; deployment source remains legacy `main /` as disclosed above. Node.js 20 deprecation notices for pinned `actions/*@v4` appeared as non-failing warnings.
+
+<!-- End session claim -->
+
+## Session `arena-660e1da6` — live dashboard audit and final integration
+
+Claimed 2026-11-27 on `arena/660e1da6-kalshidash3` from `fe245d8`. Read the board before claiming; no PR was open at claim time. We did not change collector-generated snapshots or another session's implementation.
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Audit and repair live watch and browser paper accounting | done | arena-660e1da6 | `assets/engine.js`, `trading.html`, `dashboard.html` (watchlist only), `scripts/tests/engine.test.js` |
+| Publish source-linked findings; leave executive refresh to its parallel owners | done | arena-660e1da6 | `data/findings.json` (append only) |
+| Final integrated release, PR checks, merge and Pages confirmation | done | arena-660e1da6 | `COORDINATION.md` (this section only) |
+
+- **Coordination:** [PR #132](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/132) scoped and published its independent snapshot audit only. It landed while this work was open. We stopped at the rebase conflict on the shared board, aborted the rebase, merged the incoming `main`, and preserved that session's section intact. No application-file conflict, duplicate fix, or force push.
+- **Executive summary handoff:** [PR #133](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/133) and [PR #134](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/134) are handling the executive-summary refresh. This session removed its overlapping change (the extra row also triggered the existing fixed-row-count gate) and requests that the summary maintainers link the new SIM-660E-01 / SIM-660E-02 findings as appropriate. The source-linked findings remain published independently.
+- **Release PR:** [#135](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/135), merged to `main` as `950e52e6581fc5c8b2ded09ee67cdfe623e6889b` at `2026-11-27T17:32:46Z`. The prospective merge with `c439391` (including the newer snapshot and the parallel executive summary) passed the full 21-page gate; the [PR build](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46042325043) passed before merge. [Pages deployment](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46042687288) and [configured workflow](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46042687061) succeeded for the release. The Pages builds API reported this exact merge commit `built`; fetched the public [paper-trading page](https://kanlerxz87-cyber.github.io/KalshiDash3/trading.html) with the new finalization, quote and export-version disclosures, and the [Flagged for Review page](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html). GitHub's runner logged a non-blocking [Node.js 20 action-runtime deprecation](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/); workflow files were outside this session's scope.
+- **Line-by-line release verification:** `scripts/verify_release.py` passed on the original and fixed trees. It validates every published data file and internal link in its release scope, renders all 21 pages, and exercises both fallback and live-poll fixtures. This is not a new live API query for every stored point, nor an exhaustive claim about external URLs. No generated snapshot was changed.
+- **Official data spot checks:** the demo [market records](https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=KXAAAGASM-26NOV30-3.90%2CKXELECTIRAN-27JAN01%2CKXYTVIEWSD-BAD26NOV30-34.0M%2CKXETHY-27JAN0100-T4999.99%2CKXPGATOUR-MAST27-MFIT%2CKXZEC15M-26NOV271215-15) agreed with the 17:15:51Z snapshot on last, status, result, volume and open interest for the five topic representatives. The finalized ZEC NO record matched the literal result and settlement timestamp (`2026-11-27T17:15:02.189748Z`). The official [golf book](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10) returned a best YES bid of `$0.0210` for `7936.50` contracts and best NO bid of `$0.9750` for `6666.66`; the complementary YES ask is `$0.0250`. The sampled [ETH book](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10) returned both arrays empty despite recorded trading volume; historical volume is not available liquidity.
+- **SIM-660E-01:** [Kalshi lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle) and [settlement](https://docs.kalshi.com/getting_started/market_settlement) distinguish provisional results from finalized payouts and specify no binary settlement fee. Regression cases failed before correction and now check nonfinal states, price-less finalization, no fee, and polling outside the ranked list. The selected chart now gets a slot before truncating the dashboard watchlist.
+- **SIM-660E-02:** Kalshi's [orderbook guide](https://docs.kalshi.com/getting_started/orderbook_responses) confirms YES bid complements NO ask, not NO bid. Exits now use the held side's valid bid and last trade cannot fill. New exits are tagged with exit rules version 2 (earlier saved results are not recomputed). The regression exercises missing/zero quotes and an exact 10¢ NO target.
+- **Still unverified / non-blocking:** live browser reachability depends on CORS; the ranked snapshot is bounded; an absent contract does not prove an outcome. Catalyst links are not causal proof. No demo credentials were configured for this site, account values remain blank, and no authenticated order was submitted. See [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) and Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env).
+
+## Session `arena-bc717755` — current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 before implementation work. At claim time, the newest recorded work was closed and no open PR existed. Multiple audits merged while this branch was active; this section preserves their records. This session kept its scope to the current snapshot audit and executive-summary freshness checks.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | done (offline/source-path audit; live values not re-fetched) | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`; independent exact-link audit of 714 market rows and 154 alerts; official docs re-read 2026-11-27 (links below) |
+| T115 | Repair the executive-summary heading that still labels the current release audit 22 November despite the 27 November snapshot; state the scope and limits of this audit explicitly | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS after edit; rendered DOM suite confirms all pages load without errors |
+| T116 | After the collector advanced the snapshot to 17:30Z, correct executive-summary copy that still called the 17:15Z snapshot “current”; label static metrics by their observation time and link readers to the live snapshot | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Compared timestamps in `markets.json`/`alerts.json`/`simulation.json` (17:30:51Z) and `roi.json` (17:01:58Z); stale “is current” wording removed; full release gate PASS |
+
+### T114/T115 — 2026-11-27 audit results
+
+**Release gate and provenance checks.** Installed the documented test-only `jsdom@26` dependency without saving package metadata. `python3 scripts/verify_release.py` passed after the executive-summary correction: browser/Python checks, committed-data validators, alert and simulation regressions, DOM render tests for all 21 pages, and internal-link/HTML checks. The gate itself explicitly ends with: “Live API, account access and external URLs not certified.” A separate exact-string audit found 714 open/settled market rows with ticker-specific official demo `GET /markets/{ticker}` links and 154 served alert rows with the corresponding official market link; all 154 served alert deltas meet the configured absolute $0.10 threshold. Snapshot declares the five required topic IDs and was collected at `2026-11-27T17:15:51Z`. This verifies record provenance paths and committed snapshot consistency, **not** that each live market value was freshly fetched or still current at audit time.
+
+**Official documentation re-read 2026-11-27.**
+
+| Point checked | Official source | Confirmed |
+|---|---|---|
+| Demo environment | [Demo environment](https://docs.kalshi.com/getting_started/demo_env) | REST roots are `https://external-api.demo.kalshi.co/trade-api/v2` and `https://demo-api.kalshi.co/trade-api/v2`; the matching documented WS roots are shown. Demo uses mock funds and prices/behavior may not reflect real markets. |
+| Chart intervals | [Market candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) | Allowed candle intervals are 1 minute, 60 minutes, or 1440 minutes; the existing page correctly describes sub-minute chart points as accumulated observations rather than candles. |
+| Resolution | [Market settlement](https://docs.kalshi.com/getting_started/market_settlement) | Winning YES/NO positions pay $1 per contract; settlement timing can vary; simple YES/NO settlement fees are zero. |
+| Liquidity | [Market orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook) and [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) | API orderbooks contain bid levels; opposite-side asks are implied, so available size is a point-in-time quote, not a guarantee of execution. |
+| Order execution | [Create Order V2](https://docs.kalshi.com/api-reference/orders/create-order-v2) | Current documented write endpoint is `POST /portfolio/events/orders`; this source does not certify this project's client against an account. |
+| Streaming | [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets) | A signed API key is required during handshake, even for public market-data channels; static browser site is not an authenticated WebSocket backend. |
+
+**Audit limitations / irregularities (not concealed).**
+- No direct market-value API reads were made for the 714 rows during this session. Their stored `source` values match the official endpoint pattern; `verify_release.py` passed, but live price/status/result verification remains outside this audit. The live homepage did fetch successfully and displayed the same timestamped snapshot.
+- `data/verified_facts.json` lists 72 static facts; one is explicitly unverified and blank (C-20, correctly explaining live data is collected into timestamped snapshot files instead of a static facts table). The fact ledger says 71 verified / 1 unverified. This audit re-read the seven official documentation pages linked above, not all 71 historical citations.
+- GitHub Pages is configured as `legacy`, source `main /`; the Pages API reports `built` and the latest build on main completed `2026-11-27T17:16:40Z`. This is the pre-existing DEPLOY-1 release-gate limitation on the published site; switching to Actions-only publishing requires a repository settings change outside this file scope. See [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html).
+- No demo credentials were supplied; account balance, positions, fills, and live orders remain unverified. The simulator is paper-only. The model's “high ROI” feed remains a screening heuristic, not validated profitability. See [demo setup](https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account) and the site's [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html).
+
+**Observed Pages state.** `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` returned `status: built`, `build_type: legacy`, `source: main /`. The latest Pages build at audit time was `built` with no error. Live fetch of [landing page](https://kanlerxz87-cyber.github.io/KalshiDash3/), [executive summary](https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html), and [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) succeeded. The old executive-summary label “Current release audit · 22 November 2026” was stale versus the current 27 November snapshot; it now reports the accurate date and plainly states this audit did not refresh market rows or authenticate.
+
+
+**Concurrent-session merge note.** While PR #133 was open, session `arena-98e88d21` merged PR #132 and added its live-audit record at the same coordination anchor. GitHub then reported PR #133 as conflicting. This branch fetched the updated `origin/main`, retained both the complete PR #132 record and this session’s claim/results, and resolved the conflict in `COORDINATION.md` only. No concurrent work was discarded. The local rebase was not force-pushed; the latest `main` was merged into this branch so the published branch can be updated by a normal fast-forward push. PR #133 remained open while later main commits landed; mergeability and build are rechecked after integrating the latest main.
+
+
+**Follow-up concurrent integration.** Before PR #133 could merge, PR #134 from session `arena/b2286891` merged additional executive-summary/dashboard verification work into `main`, touching the same summary page. To respect that session’s claimed scope and keep its improvements, the merge kept the latest `origin/main` version of `executive-summary.html` rather than replaying this session’s shorter wording over it. Other non-conflicting files from PR #134 were retained as well. This is a handoff/coordination resolution, not a loss of the audit result; the resulting summary still displays the 27 November date and current snapshot facts.
+
+### T116 — keep snapshot facts timestamped (2026-11-27)
+
+After the collector advanced the snapshot to `2026-11-27T17:30:51Z`, the summary still called the prior `17:15:51Z` snapshot “current”; `roi.json` was separately generated at `17:01:58Z`. This session corrected the stale copy on its branch and kept all metrics timestamped. Before PR #133 could merge, the concurrent mainline summary refresh updated its snapshot figures to 17:30:51Z; during integration we retained that newer main version rather than overwriting it with the 17:15 historical wording. No values were recalculated or inferred.
+
+
+## Session `arena-f33fe827` — independent line-by-line verification of the shipped tree, defect repair, and publish (branch `arena/f33fe827-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: no open pull request (`gh pr list --state open` → empty),
+and every task row in the sections below is closed out. The branch was created from `fe245d8` ("data: demo snapshot
+2026-11-27T17:15Z") and `git rev-list --count origin/main..HEAD` was **0**, i.e. the branch starts equal to `main`.
+Release history on `main` is green: `gh run list` shows the newest *Deploy site to GitHub Pages*
+(`workflow_dispatch`, run `46040449316`) **success**, the Pages API reports `status: built`, `source: main /`.
+
+This session does **not** rebuild the site. It re-verifies the published tree line by line against the official
+Kalshi documentation and the live official DEMO Trade API, repairs real defects it finds (each with a regression
+test that fails before the fix), publishes any new irregularities on the *Flagged for Review* page with official
+source links, then runs the release gate → PR → `main` → merge → confirms the Pages build and deploy, and records
+the result here. No other session holds an open scope; if one appears, this branch merges `origin/main` and keeps
+both sides.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T120 | Read the board, claim, and establish the baseline: branch state, no open PR, release gate on the untouched tree | done | arena-f33fe827 | `COORDINATION.md` (this section) | `git`, `gh pr list`, `gh run list`, Pages API, `python3 scripts/verify_release.py` |
+| T121 | Line-by-line re-verification of every load-bearing factual claim the site makes (demo roots, fee schedule, settlement rules, candlestick intervals, orderbook fields, lifecycle) against official Kalshi documentation fetched this session | done | arena-f33fe827 | `COORDINATION.md` (this section) | https://docs.kalshi.com/… fetched through the platform fetch route |
+| T122 | Line-by-line re-verification of published market values against the **live official demo API** (`/exchange/status`, `/markets/{ticker}`, `/markets/{ticker}/orderbook`, `/series/{ticker}`) for each topic's headline market and each published resolved row | done | arena-f33fe827 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` |
+| T123 | Independent audit of what all 21 pages **render** against the committed data, recomputing every published number, count and badge from `data/live/*.json`; plus internal/external link inventory | done (F-100, F-102, F-103) | arena-f33fe827 | `COORDINATION.md` (this section) | jsdom harness (not committed) + `scripts/check_site.py` |
+| T124 | Repair any real defect T121–T123 finds, with a regression test that fails before the fix; append any new irregularity to `data/findings.json` with its official source link | done (F-100 fixed; F-101/F-102/F-103 pinned) | arena-f33fe827 | `scripts/…`, `scripts/tests/…`, `data/findings.json` (append only) | mutation-checked regression tests; `scripts/verify_release.py` |
+| T125 | Release: gate → PR from this branch → merge without waiting → confirm the Pages build and deploy → record the PR link, merge result and live check here | done (merged as `94d996a`) | arena-f33fe827 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages API, live URL fetch (blocked by egress allowlist — see R-31) |
+
+The rows above were claimed as `unclaimed` in the pushed claim (so the board never showed an owner that had not
+been pushed) and were taken by this session immediately after. **Nothing was edited outside the file scope in the
+table above.** `data/live/*.json` is collector output and was never hand-edited by this session; only
+`data/findings.json` was appended to, as declared.
+
+### Log (this session)
+
+- 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
+  T120–T125 and pushed this claim before any other edit.
+
+### T125 — integration with concurrent sessions, and the release
+
+While this branch was open, other sessions merged into `main` (PR #132 `arena-98e88d21`, PR #133 `arena/bc717755`,
+PR #134 `arena/b2286891`, PR #137 `arena/660e1da6`), including a rewrite of `assets/engine.js` (lifecycle gating,
+`quotedBid`) and changes to `dashboard.html` (watchlist only), `trading.html`, `executive-summary.html`, and a
+collector pass that advanced the snapshot from `17:15:51Z` to `17:30:51Z`. GitHub reported PR #138 as conflicting.
+This branch was **rebased onto `origin/main`** and the three conflicts were resolved without discarding either side:
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `COORDINATION.md` | both sessions added a section at the same anchor | both sections kept in full (theirs first, this session's second); no text removed from either |
+| `assets/engine.js` | one export line | both additions kept: their `quotedBid` and this session's `normalizeRow` export |
+| `data/findings.json` | both appended to the ledger | merged structurally, not by text: `main`'s 87 items are kept exactly, and only this session's four new entries (F-100…F-103) are appended → 91 items (30 high). No other session's finding was removed or reworded |
+
+After the rebase the **whole gate was re-run on the merged tree**, not just on this session's files:
+`python3 scripts/verify_release.py` → **PASS** (all Python/JS suites including the concurrent session's rewritten
+`engine.test.js`, all four new audits, every validator, `check_site.py` with 21 pages and internal links).
+The audits re-verified against the **newer** `2026-11-27T17:30:51Z` snapshot: landing KPIs and 5 topic rows, 25
+resolution rows, 5 category pages (151/17/120/166/60 open, 50/1/50/50/49 settled), the dashboard's 5 cards and 40
+ranked rows, 154 swings all ≥ $0.10 with 123 frozen picks, and the ledger now rendering **91 irregularities / 30
+high**, every one source-linked. No number changed as a result of the merge.
+
+### T120 — baseline (2026-11-27)
+
+| Check | Result |
+|---|---|
+| Branch | `arena/f33fe827-kalshidash3`, branched from `main` at `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z"); `git rev-list --count origin/main..HEAD` = **0** at the start |
+| Open pull requests | none (`gh pr list --state open` → empty) |
+| Release gate on the untouched tree | **PASS** — `python3 scripts/verify_release.py` (21 pages, every Python/JS suite, all validators, DOM suites, internal link check). `jsdom@26` installed with `npm install --no-save --package-lock=false jsdom@26` |
+| Published site | Pages API `status: built`, `source: main /`; newest *Deploy site to GitHub Pages* run `46040449316` **success**. The sandbox cannot reach `kanlerxz87-cyber.github.io` directly (egress allowlist), so the live **file contents** could not be re-fetched this session — see the L-1 note below |
+| Snapshot audited | `data/live/markets.json` collected **2026-11-27T17:15:51Z**; collector health `outcome: ok`, pass 11, run `46012505508` |
+
+### T121 — official documentation, re-read this session and compared with the ledger
+
+Each row was fetched through the platform's fetch route on 2026-11-27 and compared **verbatim** with the claim the
+site publishes (`data/verified_facts.json`, 72 rows). Nothing was marked verified without a source.
+
+| Claims | Official page fetched | What it says (quoted) | Match |
+|---|---|---|---|
+| C-01…C-04, C-07, C-08 | https://docs.kalshi.com/getting_started/demo_env | REST `https://external-api.demo.kalshi.co/trade-api/v2`, also `https://demo-api.kalshi.co/trade-api/v2`; WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, also `wss://demo-api.kalshi.co/trade-api/ws/v2`; "mock funds"; "credentials are not shared between this environment and production"; "may not be reflective of those in real markets" | ✔ |
+| C-05, C-06, C-10 | https://docs.kalshi.com/getting_started/api_environments | production REST/WS hosts; "Sign the full request path from the API root, without query parameters" | ✔ |
+| C-11, C-12, C-51 | https://docs.kalshi.com/getting_started/market_lifecycle | the eight statuses; filter mapping `unopened/open/paused/closed/settled`; "result is set to `yes`, `no`, or `scalar`"; "settled markets end up at `finalized`" | ✔ |
+| C-13, C-14, C-52 | https://docs.kalshi.com/getting_started/market_settlement | "Yes contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+| C-15, C-16, C-28, C-53 | https://docs.kalshi.com/getting_started/orderbook_responses | bids only; `[price_dollars, count_fp]`; "sorted by price in ascending order"; "best YES ask: $1.00 - (highest price in the no_dollars array)"; unknown ticker → "200 with empty arrays" | ✔ |
+| C-17, C-29, C-30, C-61, C-62, C-63, C-66 | https://docs.kalshi.com/api-reference/market/get-market-candlesticks | "1 (1 minute), 60 (1 hour), or 1440 (1 day)"; "at most 5,000 periods"; "`start_ts` and `end_ts` must be in seconds"; "can be a few seconds behind"; pre-cutoff candles only via `/historical/markets/{ticker}/candlesticks`; path `series_ticker` + `ticker` | ✔ |
+| C-21, C-22, C-23, C-24, C-54, C-58, C-59 | https://docs.kalshi.com/api-reference/market/get-markets | filter values `unopened/open/closed/settled`; `notional_value_dollars` = "The total value of a single contract at settlement in dollars"; `FixedPointCount` "2 decimals … minimum granularity is 0.01 contracts"; "When `event_ticker` or `tickers` is the only filter … `limit` is not applied"; cached responses | ✔ |
+| C-25, C-26 | https://docs.kalshi.com/api-reference/orders/create-order-v2 | legacy writes "have been removed and now return `410 Gone`"; `POST /portfolio/events/orders` requires `ticker, side (bid|ask), count, price, time_in_force, self_trade_prevention_type`; "A `201` means the order was accepted, not that it is resting" | ✔ |
+| C-31 | https://docs.kalshi.com/getting_started/quick_start_websockets | "WebSocket connections require authentication during the connection handshake"; public channels need no *additional channel-level* auth; signed text `timestamp + "GET" + "/trade-api/ws/v2"` | ✔ |
+| C-57 | https://docs.kalshi.com/getting_started/api_keys | "**Ed25519** (recommended)"; "**RSA** (2048-bit) … RSA-PSS with SHA-256"; "use the path **without query parameters**" | ✔ |
+| C-39, C-60 | https://docs.kalshi.com/getting_started/rate_limits | default cost 10 tokens; "Unauthenticated public requests are subject to separate limits"; 429 carries rate-limit headers but not `Retry-After` | ✔ |
+| C-64, C-65, C-67 | https://docs.kalshi.com/getting_started/historical_data + https://docs.kalshi.com/api-reference/historical/get-historical-markets | `market_settled_ts` partition; historical endpoint list; `limit` "Defaults to 100. Maximum value is 1000"; "Filters are mutually exclusive" | ✔ |
+| C-35 | https://docs.kalshi.com/api-reference/portfolio/get-balance | required `balance, balance_dollars, portfolio_value, updated_ts`; own bucket, "1 time per second" Basic/Advanced, "5 times per second" higher tiers | ✔ |
+| C-36, C-37, C-38 | https://kalshi.com/docs/kalshi-fee-schedule.pdf + https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account | "fees = round up(M × 0.07 × C × P × (1−P))"; maker `0.0175`; "There is no settlement fee." / "There is no membership fee."; "Your demo account does not come with funds preloaded"; "the .com version is not a valid Kalshi domain" | ✔ |
+| C-18, C-19 (seed series) | fee schedule PDF, non-standard fee table | `KXAAAGASM` 1/1, `KXELECTIRAN` 0/0, `KXPGATOUR` 1/1, `KXPGARYDER` 1/1, `KXPGASOLHEIM` 1/1, `KXBTCY` 0/0, `KXETHY` 0/0, `KXMVE` (combos) 2/1 — every seed the project uses is present with the multiplier the site transcribes | ✔ |
+
+The repo's own fee implementation was then checked **against the schedule's printed table** rather than against its own
+test fixture: `scripts/tests/test_fees.py` reproduces all 21 published rows (1-contract and 100-contract columns) and the
+maker formula, and it still passes. `assets/engine.js`, `assets/live.js`, `assets/alerts.js` and `scripts/roi_model.py`
+all carry the same `roundup(M × 0.07 × C × P × (1−P))` with per-series multipliers `KXBTCY/KXETHY/KXELECTIRAN = 0`.
+
+### T122 — published values re-read from the live official demo API (2026-11-27)
+
+Every row was fetched through the platform fetch route and compared field by field with the committed snapshot
+(`data/live/markets.json`, collected 2026-11-27T17:15:51Z).
+
+| Fetched record | Result |
+|---|---|
+| `GET /exchange/status` | `trading_active: true`, four demo shards active, `intra_exchange_transfers_active: true` — the exchange is answering |
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `volume_24h_fp 0.00`, `status active`, `result ""` — **identical** to the snapshot row and to the derived dollars estimate $16,436,950 |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` — **identical**; `volume_24h_fp` has since moved to 0.00 from the snapshot's 7,452.05, the expected drift of a rolling 24 h window while the cumulative field is unchanged |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` — **identical**; `rules_primary` cites AAA, as the snapshot says |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` — **identical** |
+| `GET /markets/KXZEC15M-26NOV271215-15` (a published resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189748Z`, `settlement_value_dollars "0.0000"` — **identical** to the published resolution row |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (an alerted ticker) | `last 0.0100`, `volume_fp 72531547.87`, `open_interest_fp 7284797.95` — **identical** to the snapshot and to the last committed observation |
+| `GET /markets/KXBTCY-27JAN0100-B97500/orderbook?depth=10` (a published book) | `no_bid_dollars 0.9900` — consistent with the published ladder, whose best YES ask is the derived $0.01 |
+| `GET /markets/KXETHY-27JAN0100-T4999.99/orderbook?depth=10` | empty `yes_dollars`/`no_dollars` — **identical** to the published liquidity block (source of F-100's second data point) |
+| `GET /markets/KXPGATOUR-MAST27-MFIT/orderbook?depth=10` | `yes_dollars [[0.001,80.00],[0.019,8771.92],[0.020,8333.33],[0.021,7936.50]]`, `no_dollars [[0.973,6172.83],[0.974,6410.25],[0.975,6666.66]]` — **identical** to the published ladder, and the raw data for F-100 |
+| `GET /series/KXYTVIEWSD` | `categories ["Entertainment"]`, `tags ["Views","Daily Views","Music"]` — a genuine Culture series, correctly published |
+| `GET /series/KXAAAGASCDAK`, `/KXAPRPOTUS`, `/KXPGARYDER`, `/KXPGASOLHEIM` | `Economics+Commodities`, `Politics`, `Sports` (tags `Golf`), `Sports` (tags `Golf`) — the official classification behind F-101 |
+| `GET /markets?status=open&limit=2` | rows carry `event_ticker` but **no `series_ticker` key at all** — the measured behaviour C-45 records, and the input F-102 now tests |
+
+Nothing in the published data contradicted the official API.
+
+### T123 — what the pages actually print, recomputed from the data
+
+Two independent jsdom harnesses were used. The first (`scripts/tests/audit_rendered_numbers.js`, **committed** and wired
+into the release gate) re-derives every audited figure with its own arithmetic — never by calling `assets/*.js` — and
+compares it with the DOM. The second was a scratch harness kept out of the repository and used for the exploratory
+probes (duplicate-swing check, evidence arithmetic, topic-domain sweep) recorded in the findings.
+
+| Check | Result |
+|---|---|
+| Landing page: 7 KPI cards, the 5 topic rows (ticker, dollars, last price, contracts, open interest, source link) and the 25-row resolution tracker including each row's literal `result` | all match an independent recomputation |
+| Five category pages: the 4 KPIs, row counts, every row's official API link and every `result` cell | all match |
+| `dashboard.html`: 5 topic cards, the top-8 ranking of each, row by row | all match |
+| `alerts.html`: 154 swings each verified ≥ $0.10 from `to_price − from_price`, 123 frozen model picks, both chats populated (120 + 120 rendered message nodes), ledger self-consistency | all match |
+| `flagged.html` / `verification.html`: 85 → 89 irregularities, all source-linked; 72 claims, all source-linked | all match |
+| Every served swing's evidence arithmetic (`volume_to − volume_from = contracts_traded`) | 96 of 96 rows agree; 53 rows correctly carry `unknown_no_observations` because their bounding observations predate the F-99 fix and cannot be re-read |
+| Alert topic domain (23 rows flagged for a manual check: `KXAAAGASCD*`, `KXAPRPOTUS`, `KXPGARYDER`, `KXPGASOLHEIM`) | **not** contradictions: all four official categories are in the topic's published compatible set; 0 rows are mis-filed (F-101) |
+
+### T124 — the defects this session found, and what was changed
+
+| ID | Severity | Defect | Fix / regression |
+|----|----------|--------|------------------|
+| **F-100** | high | `dashboard.html` rendered the NO-bid levels themselves, reversed, under the heading "YES asks, implied". On `KXPGATOUR-MAST27-MFIT` it advertised 6,666 contracts at $0.975 and put the true best ask last; the answer is 6,666.66 contracts at $0.025 — the exact question the brief says the panel must answer | Ask ladder now derived (`1 − no_bid price`, count at that level), sorted best-first; bids stay best-first; derivation stated in the panel with its official source. `scripts/tests/test_liquidity_ladder.js` (mutation-checked: reverting the derivation produces 6 failures) |
+| **F-101** | low | The withheld count was published without the topic rule or its reason keys, so a reader could not reproduce it; 23 served swings *look* mis-filed against their topic name and needed a manual ruling | Audit result recorded (0 contradictions, all four categories are in the published compatible set). `scripts/tests/test_alert_topic_domain.js` recomputes the rule from `counts.category_compatible_official` and asserts no served row contradicts its topic and the withheld count covers every absent row. No data changed |
+| **F-102** | medium | `normalizeRow()` derived the series from the market ticker (necessary, because `GET /markets` omits `series_ticker`) but was private, so no test could fail if the derivation or the per-series fee multiplier broke on a live fill | `normalizeRow` exported; `scripts/tests/test_series_fallback.js` asserts the derivation, that a provided `series_ticker` wins, and that KXETHY resolves to taker multiplier 0 ($0 fee on 100 contracts) while KXAAAGASM bills the schedule's $1.75. No behaviour changed |
+| **F-103** | low | The release gate proved the pages *rendered*; it never proved a printed number equalled the data | `scripts/tests/audit_rendered_numbers.js` added to `scripts/verify_release.py`: recomputes the landing KPIs and table, the resolution tracker, all five category pages, the dashboard ranking, both chat feeds, and the ledger/link inventory. PASS on this snapshot |
+
+New files: `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`,
+`scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js` (all four run by the gate).
+Changed: `dashboard.html` (F-100), `assets/engine.js` (export only, F-102), `scripts/verify_release.py` (four new suites),
+`data/findings.json` (F-100…F-103 appended; ledger after the rebase onto `main` reads 91 irregularities / 30 high —
+main's 87 items untouched, only these four IDs appended).
+
+### Remarks, kept honest
+
+- **R-31 (no live-file fetch).** The sandbox has no direct egress to `kanlerxz87-cyber.github.io` (allowlist), so unlike
+  earlier sessions this one could not re-download the deployed HTML. The published Pages build is confirmed by the
+  Actions and Pages APIs (run `46040449316` success, `status: built`), and the deployment is a straight copy of `main`
+  (`cp *.html`, `cp -R assets data` in `pages.yml`), which is the tree verified here. Recorded rather than glossed over.
+- **R-32 (elections coverage).** 17 of the 514 published open rows are elections, and 16 of those are `category_basis:
+  keyword` (approval-rating and "EO this week" series). The only fee-schedule-confirmed elections series,
+  `KXELECTIRAN`, contributes 1 open row. This is a coverage limit of the demo environment, already flagged (F-38/F-65/F-66),
+  and is not a defect introduced here; it is restated because the brief asks for elections coverage.
+- **R-33 (stale remote branches).** `origin` carries 84 `arena/*` branches. Local remote-tracking refs were pruned by
+  the clone, so they were not merged or evaluated here; they are historical leftovers of merged sessions. This session
+  touched none of them and pushed only `arena/f33fe827-kalshidash3`.
+
+### Log (this session)
+
+- 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
+  T120–T125 and pushed this claim before any other edit.
+- 2026-11-27: baseline release gate **PASS** on the untouched tree.
+- 2026-11-27: wrote and ran the independent recomputation harness (F-103); it found the ask-ladder defect (F-100) and
+  passed every other figure once two harness bugs of its own (a numeric-concatenation parse and a wrong feed selector)
+  were corrected.
+- 2026-11-27: appended F-100…F-103 to `data/findings.json`; the Flagged page renders the count from the ledger.
+- 2026-11-27: `python3 scripts/verify_release.py` → **PASS** (21 pages, every validator and suite, four new suites,
+  internal link check).## Session `arena-01961271` — independent line-by-line verification of the 2026-11-27 snapshot against the live official demo API, defect repair (F-104), publish (branch `arena/01961271-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit** (claim commit `97bbf58`, pushed before any implementation edit). Board read
+first: at claim time no open pull request, branch equals `origin/main` = `fe245d8` (snapshot `2026-11-27T17:15:51Z`,
+collector health `outcome: ok`, pass 11 of relay run 46012505508). The collect.yml relay is ACTIVE on `main` and
+commits only `data/live/*.json` (verified via the commits API).
+
+**Parallel-session renumbering (coordination, not a defect).** While this session worked, `main` advanced
+(PR #132 `arena-98e88d21`, PR #134 `arena-b2286891`, PR #135/#137 `arena-660e1da6`, PR #133 `arena-bc717755`,
+PR #136 relay snapshot) and PR **#138** (`arena-f33fe827`) opened. `arena-bc717755` claimed **T114–T116** and
+`arena-98e88d21` also used T115; PR #138 publishes **F-100…F-103**. This session's original claim used T114–T117
+and F-100, so everything here is renumbered to **T117–T120** and **F-104** to avoid ID collisions. No other
+session's task was started: this session's defect (executive-summary typed settled-alert count) is not PR #138's
+ask-ladder defect, and the only shared files are the append-only ledger and this board.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T117 | Baseline release gate on the base tree, then independent re-verification of the published snapshot against the **live official demo API**: five category headline markets, published alert tickers, resolved rows, the liquidity ladder, and series/topic integrity | done | arena-01961271 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS (21 pages, every validator and suite); live records below via the platform fetch route |
+| T118 | Re-verify the load-bearing official documentation claims (demo endpoints, candlestick intervals, settlement, fees, order V2, WebSocket auth, fee-schedule seeds) and the live Pages site | done | arena-01961271 | `COORDINATION.md` (this section) | docs.kalshi.com + kalshi.com fee schedule PDF + live Pages fetch, all re-read this session |
+| T119 | Repair the real defect found (F-104: executive summary typed a volatile settled-alert count that the committed data contradicts) with a regression that fails before the fix; publish it on the Flagged for Review page | done | arena-01961271 | `executive-summary.html`, `scripts/tests/test_pages_dom.js`, `data/findings.json` (append only) | mutation-checked regression; full gate PASS after fix |
+| T120 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | done | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
+
+### T117 — what was re-read from the official demo API this session (2026-11-27, ~17:25–17:40Z)
+
+Every value below was fetched from `https://external-api.demo.kalshi.co/trade-api/v2/…` through the platform fetch
+route (the sandbox has no direct egress; `GET /exchange/status` answered `trading_active: true`, four demo shards
+active) and compared field by field with the committed snapshot (`data/live/markets.json`, `2026-11-27T17:15:51Z`).
+
+| Fetched record | Result |
+|---|---|
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `volume_24h_fp 0.00`, close `2027-01-01T05:00:00Z` — **identical** to the snapshot row (`$16,436,950` est.) |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` — **identical** (`$23,271` est.) |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` — **identical** |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` — **identical**; `volume_24h_fp` now `0.00` (rolling-window drift, cumulative volume unchanged); live `yes_bid 0.0210/7936.50`, `yes_ask 0.0250/6666.66` match the published ladder exactly |
+| `GET /markets/KXYTVIEWSD-BAD26NOV30-34.0M` (culture headline, untraded) | `close_time 2026-12-02T15:00:00Z`, `volume_fp 0.00`, `last 0.0000`, `status active`, rules cite Bad Bunny YouTube daily views — **identical**; the landing row's `untraded` badge and nearest-close disclosure (F-83) are correct |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (newest alert ticker) | live `last 0.0100`, `previous 0.0100`, `yes_bid 0.0000`, `yes_ask 0.0100` — matches the alert's `to_price 0.01`, `to_yes_bid 0.0`, `to_yes_ask 0.01`; `volume_fp` 72531547.87 vs the alert's `volume_to` 72531493.84 (+54.03 contracts since 16:45Z — expected drift, market still trading) |
+| `GET /markets/KXETHY-27JAN0100-B2125` (alert 14:14Z, 0.23→0.01) | live `last 0.0100`, `previous_price_dollars 0.2300` — matches the alert's from/to prices |
+| `GET /markets/KXZEC15M-26NOV271215-15` (resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189748Z`, `settlement_value_dollars 0.0000` — **identical** to the published resolved row |
+| `GET /markets/KXELECTIRAN-26JUL01` (resolved elections row) | `result "no"`, `finalized`, `settlement_ts 2026-07-01T15:24:15.984157Z` — **identical** (F-82's constant still holds) |
+| `GET /markets/KXSUPERBOWLHEADLINE-27-COL` (resolved culture row) | `result "no"`, `finalized`, `settlement_ts 2026-10-27T03:33:43.195228Z` — **identical** |
+| `GET /markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10` | `yes_dollars [[0.01,55.50],[0.02,5.00],[0.17,1960.78],[0.18,1851.84],[0.19,1730.58]]`, `no_dollars [[0.78,1515.14],[0.79,1580.90],[0.80,467.93]]` — **identical** to the published liquidity ladder, including the derived ask `1 − 0.80 = 0.20` and its 467.93 contracts |
+| `GET /series/KXYTVIEWSD` | `categories ["Entertainment"]`, `tags ["Views","Daily Views","Music"]`, settlement source YouTube Charts — a genuine Culture series; all 120 culture rows are this series, all volume 0 (correctly labelled untraded) |
+| `GET /series/KXNATGASD` | `categories ["Entertainment"]`, `tags ["Oil & Gas"]`, scope "Natural Gas", Pyth settlement — the F-97 exclusion reason still holds verbatim |
+| `GET /series/KXAAAGASCDCA` | `categories ["Economics","Commodities"]`, title "California gas price", AAA settlement — the keyword-basis gas state series is correctly in Gas Prices |
+| `GET /series/KXAPRPOTUS` | `categories ["Politics"]`, "President RCP approval rating this week" — elections-compatible |
+| `GET /series/KXBNBD` | `categories ["Crypto"]`, "BNB Directional", CF Benchmarks settlement — crypto |
+
+Topic integrity recomputed over **all 514 published open rows** against their own `series_categories`: **0
+official-category conflicts**. Basis distribution: 138 seed / 376 keyword rows, 347 rows matched by the exchange's
+own `GET /series` filters — all three numbers match the landing KPIs exactly. The simulation's fee math was
+re-derived by hand against the official fee table (0.07×0.22×0.78 → ceil-to-cent $0.02; YES loss −0.24, NO win
++0.19 on the settled RHOJ pair; NO entry 0.02 fee 0.01 loss −0.03 on BTC15M) — correct.
+
+### T118 — official documentation re-read this session
+
+| Claim | Official source | What it says (verbatim) | Match |
+|---|---|---|---|
+| Demo REST/WS roots | https://docs.kalshi.com/getting_started/demo_env | REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`); WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`); "mock funds"; "credentials are not shared"; "may not be reflective of those in real markets" | ✔ |
+| Candlestick intervals 1/60/1440 only | https://docs.kalshi.com/api-reference/market/get-market-candlesticks | "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)"; demo root listed | ✔ |
+| Settlement $1/contract, net positions, no settlement fee | https://docs.kalshi.com/getting_started/market_settlement | "Yes contract holders receive $1 per contract" / "No contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+| Order V2 endpoint | https://docs.kalshi.com/api-reference/orders/create-order-v2 | `POST /portfolio/events/orders` with `KALSHI-ACCESS-KEY/SIGNATURE/TIMESTAMP` headers; demo roots listed | ✔ |
+| WebSocket handshake auth | https://docs.kalshi.com/getting_started/quick_start_websockets | "WebSocket connections require authentication during the connection handshake"; public market-data channels still use the authenticated session | ✔ |
+| General taker fee 0.07·C·P·(1−P), maker 0.0175, no settlement fee | https://kalshi.com/docs/kalshi-fee-schedule.pdf | formulas verbatim; "There is no settlement fee"; general table rows re-checked (0.01→0.07, 0.20→1.12, 0.50→1.75 per 100 contracts) | ✔ |
+| Seed series exist verbatim in the fee schedule | same PDF | KXAAAGASM, KXBTCY, KXETHY, KXELECTIRAN, KXEMMYCACTO/CACTR/CSERIES, KXBALLONDOR, KXSUPERBOWLHEADLINE, KXPGATOUR, KXPGARYDER, KXPGASOLHEIM all listed (KXBALLONDOR is seed-confirmed but excluded from Culture by its own Sports/Soccer series record — the exclusion stands) | ✔ |
+
+**Live site check:** fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` — serving snapshot
+`2026-11-27T17:15:51Z` with all five category rows matching the independent API reads above, the Culture
+`untraded` disclosure, and KPIs 514/138/200/0/30/347 all recomputed correctly from the data.
+
+### T119 — the defect this session found and fixed (F-104)
+
+| ID | Severity | Defect | Fix | Regression |
+|----|----------|--------|-----|------------|
+| **F-104** | low | The executive summary's living requirements table typed "the sample is one settled alert" (true 2026-11-22) while `alerts.html`, rendering the same committed data, showed "settled: 0 … move vs outcome: no settled alert yet" (43 served tickers: 15 open, 28 not in snapshot, 0 settled). A typed copy of a volatile count — the same defect class as F-73/D-01 | the sentence no longer types a sample size; it keeps the D-04 bare-count disclosure and points at the alert chats page, which renders the count live | `scripts/tests/test_pages_dom.js` section M: recomputes the settled-alert sample from the committed alerts + markets with the page's own join and refuses any typed "N settled alert" that disagrees; mutation-checked (old sentence restored → suite fails "types 1 but data has 0"; fix → passes) |
+
+### Log (this session)
+
+- 2026-11-27 ~17:24Z: read the board, claimed T114–T117 (later renumbered T117–T120), pushed the claim before any
+  implementation edit. Baseline gate **PASS** (21 pages, every validator and suite, jsdom@26 installed with
+  `npm install --no-save --package-lock=false jsdom@26`).
+- 2026-11-27 ~17:25–17:40Z: T117/T118 live re-verification — every fetched record matched (tables above).
+- 2026-11-27 ~17:40Z: found F-104 by rendering `alerts.html` in jsdom against the committed data and comparing with
+  the executive summary's prose; fixed it with a mutation-checked regression; appended F-104 to
+  `data/findings.json` (append-only, 15-line diff).
+- 2026-11-27 ~17:45Z: discovered concurrent sessions on `main` (PRs #132–#137 merged, PR #138 open). Renumbered
+  this session's tasks to T117–T120 and the finding to F-104 (PR #138 holds F-100…F-103; `arena-bc717755` holds
+  T114–T116). No other session's implementation files were edited.
+- 2026-11-27 ~17:45Z: re-tested the DEPLOY-1 Pages configuration switch (`PUT /repos/…/pages` with
+  `build_type=workflow`) — refused again with HTTP 403 "Resource not accessible by integration", the third
+  session to record the same refusal; configuration unchanged (`legacy`, source `main /`). The Actions deploy
+  job itself succeeds on main (run 46040449316, both jobs green), so both publishers remain active as DEPLOY-1
+  describes.
+- 2026-11-27 ~17:45Z: observed one transient legacy Pages build failure on `3a97688` (PR #133's merge, 17:36:23Z,
+  "Page build failed.") superseded 10 seconds later by the successful build of `bd6f467` (PR #137's merge,
+  17:36:33Z, `built`). The site never stopped serving the last good build; no action needed beyond this record.
+  Builds API: https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/pages/builds
+
+### T120 close-out — PR, merge, Pages deploy (2026-11-27)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #139](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/139)** — "verify: independent live-API line-by-line pass (T117-T118) + F-104 exec-summary stale-count fix with regression" | `gh pr view 139` |
+| PR build | **pass** 1m23s (run [46044376764](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46044376764)); `deploy` correctly skipped on the PR | `gh pr checks 139` |
+| Merge | **merged 2026-11-27T17:48:30Z** as merge commit `b3119d5d1a21c9bb5f53bccc33b82b874176ee86`, without waiting for approval | `gh pr merge 139 --merge` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** locally on the rebased tree (21 pages, every validator and suite — including PR #138's four new audit suites — DOM render tests, internal links); re-run after the second rebase onto `94d996a` | local gate runs |
+| Pages deploy | **confirmed** — Pages build for `b3119d5` `built` at 17:48:31Z; the push-triggered *Deploy site to GitHub Pages* run [46044695780](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46044695780) completed **success**; the newest main commit at confirmation time (`665d977`, which contains this fix) also `built` at 17:49:30Z | Pages builds API, Actions API |
+| Live site | **confirmed serving the fix** — `https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html?v=b3119d5` renders "a bare count, never a rate, because the settled sample is small and changes as markets resolve — the current count is rendered live … (D-04, F-104)" | live fetch with cache-buster |
+
+**Rebases and conflict resolutions (parallel sessions).** PR #138 (`arena-f33fe827`) merged as `94d996a`
+while PR #139 was being opened, making it CONFLICTING. This branch rebased twice onto `origin/main`
+(`bd6f467`, then `94d996a`); each time the conflicts were only in the shared append-only files
+(`COORDINATION.md` top anchor, `data/findings.json` end-of-array). Resolved by keeping **main's sections and
+entries first and this session's after**, both verbatim — no other session's line was dropped. After the second
+rebase the full gate was re-run and passed, including PR #138's new suites. The finding was renumbered F-100 →
+**F-104** before the first push because PR #138 publishes F-100…F-103.
+
+**Live-fetch caching note (for future deploy verifications).** The first live fetch of
+`executive-summary.html` after the merge returned the pre-fix text although the Pages build for the merge commit
+had already succeeded; re-fetching with a cache-buster query (`?v=b3119d5`) returned the fixed text. A stale
+read through the fetch route is therefore not evidence of a failed deploy — check the Pages builds API for the
+merge commit and re-fetch with a cache-buster before concluding anything. (This session also observed two
+transient legacy-build failures on rapidly successive relay commits, `3a97688` 17:36:23Z and `99edf54`
+17:49:24Z, each superseded within ~10 s by a successful build of the next commit; the site kept serving the last
+good build throughout.)
+
+**Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio
+and live execution stay paper), F-14/F-26/F-77 (high-ROI screen is a disclosed heuristic), F-25 (cause links are
+leads), F-76 (out-of-scope swings withheld and counted), DEPLOY-1 (Pages served by the legacy branch publisher;
+this session re-tested the Actions-only switch and was refused with HTTP 403 again — a repository administrator
+must change it under Settings → Pages).
+
+### T120 addendum — the record PR itself, and the final deploy state (2026-11-27 ~17:55Z)
+
+The close-out above was published through **[PR #142](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/142)**
+(record-only, `COORDINATION.md`), merged **2026-11-27T17:54:43Z** as `f12150291444a9e71107e668a0a46c5e97f1788c`;
+its PR build passed (run [46045130907](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045130907),
+1m22s). Two facts completes the record:
+
+- The legacy Pages build for `f121502` itself reported `errored` ("Page build failed.") at 17:54:45Z — the third
+  observed instance of the rapid-succession race — and was superseded **19 seconds later** by the successful
+  build of `4ec6378` (17:55:04Z, `built`), the next main commit. The site kept serving the last good build
+  throughout; the Pages API ended `built`. This is the DEPLOY-1 legacy-publisher behaviour, not a content
+  failure: the same tree passed the full offline gate and the gated Actions deploy.
+- The push-triggered *Deploy site to GitHub Pages* runs for both of this session's merges completed **success**:
+  [46045467865](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045467865) (for `f121502`) and
+  [46045508230](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045508230) (for `4ec6378`).
+  Final live check: `https://kanlerxz87-cyber.github.io/KalshiDash3/?v=final142` served snapshot
+  `2026-11-27T17:45:51Z` with all five category rows, the Culture `untraded` disclosure and per-row official API
+  links; `executive-summary.html?v=b3119d5` served the F-104 fix. Both PRs (#139 work, #142 record) are merged
+  and deployed; T117–T120 are all done.
 ## Session `arena-251f5c3d` — current-snapshot verification, defect repair, and publish (branch `arena/251f5c3d-kalshidash3`, base `fe245d8`)
 
 Claimed 2026-11-27 **before any edit**. Board read first: no open pull request, no session branch on `origin`
@@ -15,12 +996,25 @@ today). This session does **not** rebuild the site: it runs the release gate on 
 published rows against the live official demo API and official docs, repairs real defects with regression tests,
 publishes findings on the Flagged page, and closes out gate → PR → `main` → merge → Pages confirm → record here.
 
+**Pre-merge conflict (2026-11-27):** while this session worked, `main` advanced `fe245d8` → `905001c`
+(PRs #153–#160, snapshot `2026-11-27T20:05Z`, plus the F-100..F-110 finding wave). Resolved by merging
+`origin/main` into this branch — four conflicts, all resolved keeping both sessions' work:
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `COORDINATION.md` | both sides inserted session sections at the top anchor | main's sections kept first, this session's after, both verbatim (same rule as arena-75949325's resolution) |
+| `data/findings.json` | both appended after F-99 | main's F-100..F-110 + SIM-*/E9D9-* kept; this session's five renumbered **F-111..F-115** (its drafted F-100..F-104 ids were taken on main; the alerts-chip class is already F-105, so only the evidence-bar half remains as F-113) |
+| `alerts.html` | main's chat refactor (`chatCount`, show-older controls, arg-less `renderEvidenceBar`) vs this session's chip/evBar edit | main's side kept — it is the same fix plus controls, and it fixes F-105; this session's N3 regression (incl. the Golf-tab denominator) passes against it unchanged |
+| `trading.html` | main's glossary gained a per-row Reference column vs this session's inline settlement link | main's side kept for the glossary (per-row column is stronger); this session's `fmt()` grouping, `KD.money` KPIs and leaderboard provenance note re-applied on top |
+
+No other session's lines dropped; zero conflict markers after resolution.
+
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
 | T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | **done** — PASS (21 pages, every validator and suite, `check_site.py` OK) | arena-251f5c3d | `COORDINATION.md` (this section) | gate run 2026-11-27 on `fe245d8` + claim commit |
 | T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | **done** — every record matched, see T115 table below | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
-| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | **done** — two audit passes (render recomputation + source-link/count sweep) found 9 real defects, all fixed and regression-pinned by `test_pages_dom.js` section N; gate **PASS** after the fixes | arena-251f5c3d | `assets/site.js`, `index.html` (via money()), `dashboard.html`, `alerts.html`, `portfolio.html`, `simulation.html`, `trading.html`, `strategies.html`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS 2026-11-27; findings F-100..F-104 in `data/findings.json` |
-| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | in progress — F-100..F-104 appended (flagged ledger now 90 rows), gate **PASS** on the final tree; PR/merge/Pages pending below | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; Actions API, Pages API, live URL fetch to follow |
+| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | **done** — two audit passes (render recomputation + source-link/count sweep) found 9 real defects, all fixed and regression-pinned by `test_pages_dom.js` section N; gate **PASS** after the fixes | arena-251f5c3d | `assets/site.js`, `index.html` (via money()), `dashboard.html`, `alerts.html`, `portfolio.html`, `simulation.html`, `trading.html`, `strategies.html`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS 2026-11-27; findings F-111..F-115 in `data/findings.json` |
+| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | in progress — F-111..F-115 appended (flagged ledger now 106 rows), gate **PASS** on the final tree; PR/merge/Pages pending below | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; Actions API, Pages API, live URL fetch to follow |
 
 ### T115 — official-source verification, fetched live 2026-11-27
 
@@ -68,7 +1062,6 @@ concatenates title and ticker (`…winsKXPGATOUR-…`) — every position row al
 7/7 settled, alerts leads 154/154, live watch 25/25, all feeds fully linked).
 
 `python3 scripts/verify_release.py` → **PASS** after the fixes and again after the findings append.
-
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
@@ -2470,3 +3463,54 @@ live execution stay paper), F-14/F-26/F-77 (high-ROI screen is a disclosed heuri
 leads), F-76 (20 out-of-scope swings withheld and counted), DEPLOY-1 (Pages served by the legacy branch publisher;
 switching to Actions-only needs a repository admin). The official-source verification above covers the
 load-bearing claims; live market values remain collection outputs, never static facts (F-20).
+
+## Session `arena-b2286891` — executive-summary refresh + empty-topic UX + ROI clarification (2026-11-27)
+
+Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snapshot).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| B228-1 | Refresh executive-summary audit (2026-11-22 → 2026-11-27) with current committed numbers; add data-derived no-trading notices to elections/culture pages; clarify the two high-ROI definitions on live.html; verify gate, PR, merge, Pages | done | arena-b2286891 | `executive-summary.html`, `elections.html`, `culture.html`, `live.html`, `scripts/tests/test_client_safety.py`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS (21 pages, all validators, DOM suites, internal links); numbers from `data/live/*.json` only; official docs re-read live 2026-11-27 (demo_env, candlesticks, settlement) — all matched |
+
+- 2026-11-27: read the board (2408 lines), ran the release gate → PASS (after `npm install jsdom@26`). No open PRs. Pages API: `status=built`, `build_type=legacy` (DEPLOY-1 unchanged), latest build `fe245d8` at 17:15:55Z. Snapshot `2026-11-27T17:15:51Z`: 514 open / 200 settled published; alerts 154 all / 123 high_roi / 174 archive; simulation 7 settled (all strategies insufficient sample); ROI scan 0 picks / 0 eligible / 13,730 unscoreable; catalysts 57/154 reviewed, 0 coincides; elections 17 open (1 traded), culture 120 open (0 traded).
+- Official-source re-verification (platform fetch, 2026-11-27): demo_env confirms REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2`, mock funds, "may not be reflective of those in real markets" — matches C-01…C-08. Candlesticks confirms "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)" — matches C-17/C-61. Settlement confirms "$1 per contract", "Only net positions are settled", "Settlement fees are zero for simple yes/no determinations" — matches C-13/C-14. Sandbox has no direct egress to Kalshi (TLS blocked), so live market values are collector outputs, never re-fetched here.
+- Edits: `executive-summary.html` audit 2026-11-22 → 2026-11-27 with current snapshot 2026-11-27T17:30:51Z (514 open / 200 settled published, 19,043/18,600 scanned, 154 swings, 123 experimental picks, 0 fee-aware picks, 7 sim settled, 547 price series); `elections.html` + `culture.html` add data-derived empty-trading notices (elections 1/17 traded → near-zero warning, culture 0/120 → no-trading warning, rendered from snapshot at runtime so never stale); `live.html` right-hand chat now explicitly distinguishes fee-aware ROI screen (0 picks, disclosed) vs experimental seed+volume screen (123 picks on alerts.html); `test_client_safety.py` pinned audit id updated. Gate PASS re-confirmed after post-merge snapshot 2026-11-27T17:30:51Z (same 514/200 structure).
+
+### B228-1 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #134](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/134)** — "B228-1: exec-summary refresh to 2026-11-27 + empty-topic UX + ROI clarification" | `gh pr view 134` |
+| Merge | **merged `2026-11-27T17:30:08Z`** as merge commit `0ecee1edcd305e0535efc5623067e320b5431026`, without waiting for approval | `gh pr merge 134 --merge` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** (21 pages, all suites, internal links); PR `build` check **pass** 1m04s, `deploy` correctly skipped on PR | `gh pr checks 134` |
+| Post-merge gate | Re-ran `python3 scripts/verify_release.py` on `main` at `0ecee1e` + after new collector data `9d91629` → **PASS** | local gate runs |
+| Pages deploy | **confirmed** — Pages API `status: built`, `build_type: legacy`, `source: main /`; latest builds `built` at 17:30:09Z for `0ecee1e`; `pages build and deployment` workflow success at 17:30:10Z | `gh api repos/…/pages`; `gh api repos/…/pages/builds`; `gh api repos/…/actions/runs` |
+| Post-merge collector | New data arrived `2026-11-27T17:30:51Z` as `9d91629` (514/200, same structure; audit text updated to 17:30:51Z before close-out) | `git log origin/main --oneline -3` |
+| Net unique diff | `executive-summary.html`, `elections.html`, `culture.html`, `live.html`, `test_client_safety.py` — no data files changed; all numbers from committed snapshots | `git diff origin/main~4..origin/main --stat` |
+
+**Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and live execution stay paper), F-14/F-26/F-77 (high-ROI heuristic is disclosed, fee-aware screen honestly reports 0 picks), F-25 (cause links are settlement references, not causality), DEPLOY-1 (Pages served by legacy branch publisher; switching to Actions-only needs repo admin `Settings → Pages → Build and deployment → GitHub Actions`). Official-source verification above covers the load-bearing claims; live market values remain collection outputs (F-20).
+- 2026-11-27: rebased onto `origin/main` (`bd6f467`, four concurrent PRs merged) and resolved three conflicts keeping
+  both sides; re-ran the full gate on the merged tree → **PASS**; audits re-verified against the `17:30:51Z` snapshot.
+
+**Still open after this PR (not in it, published on `flagged.html` as non-blocking):** book-sanity guard for the
+`KXBTCY-27JAN0100-B97500` "0.97 → 0.01" `last_price` artefact (the 53 `unknown_no_observations` rows whose pre-F-99
+bounds are unrecoverable) — a guard would refuse to publish a swing whose book never crossed; elections coverage stays
+structurally thin (R-32). F-07 (no demo credentials), F-25 (cause links are search leads) and DEPLOY-1 (legacy Pages
+publisher) remain as previously flagged.
+
+---
+
+## Session `arena-f2501a43` — topic-integrity & cross-pipeline scope enforcement (`roi_scan.py`, `collect.py`, `live.js`, `chatdock.js`) + full verification (2026-11-27)
+
+Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/#140..#147 and snapshot `2026-11-27T18:00Z`).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| F250-1 | Fix `validate_alerts` collector relay failure (`5278cc6` at `18:16:08Z`) by synchronising `COMPATIBLE['elections'] = {'Elections'}` across `validate_alerts.py`, `catalysts.py`, `simulate.py`, `validate_catalysts.py`, `validate_live.py`, and `test_alert_topic_domain.js`; eliminate `KXDEMOFUT*` / `KXBALLONDOR` prefix/seed leakage in `assets/chatdock.js` & `assets/live.js`; clarify `KD.basisBadge(b, matchedBy)` across `assets/site.js` & category/dashboard/index tables so official `GET /series` matches render `official series` instead of `keyword` warning; align `trading.html` & `G13` fee-multiplier disclosures with `F-84`; record verified finding `F-106` + unit/DOM regression tests | done (pending PR merge) | arena-f2501a43 | `scripts/collect.py`, `scripts/catalysts.py`, `scripts/simulate.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_alert_topic_domain.js`, `assets/live.js`, `assets/chatdock.js`, `assets/site.js`, `index.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `dashboard.html`, `trading.html`, `data/findings.json`, `scripts/tests/test_topic_integrity.py`, `scripts/tests/test_roi_scan_snapshot.py`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (no edits to `data/live/*`, owned by `collect.yml` / `desk.yml`) | `python3 scripts/verify_release.py` PASS; official Kalshi demo API (`GET /exchange/status`, `GET /series/KXAPRPOTUS`, `GET /series/KXTRUMPNOMNUM`, `GET /series/KXEOWEEK`, `GET /series/KXDEMOFUTHOURLY`, `GET /series?category=Elections`, `GET /markets/...`, `GET /historical/markets`) and `kalshi-fee-schedule.pdf` + `demo_env` verified live on 2026-11-27 |
+
+- **Coordination with concurrent PR #147 (`7da822d`) & live `collect.yml` check (`5278cc6`)**: Rebased cleanly onto `main` after `arena-e9d94b88` landed `roi_scan.py` scope gating (`E9D9-F1` — confirmed live in `02e0ed7` at `18:20Z` where `KXDEMOFUTHOURLY` and `KXAPRPOTUS` left `roi.json`), `official_discovery` volume sweep + `CATEGORY_COMPATIBLE['elections'] = {'Elections'}` (`E9D9-F2`), and `suggestions.html` `G5` banner (`E9D9-F3`). Observed collector relay pass 15 (`5278cc6` at `18:16:08Z`) fail `validators: validate_alerts` because `validate_alerts.py`, `catalysts.py`, `simulate.py`, `validate_catalysts.py`, and `validate_live.py` still carried `{"Elections", "Politics", "World", "International"}` while `collect.py` and `build_alerts.py` used `{"Elections"}`.
+- **Findings & fixes (`F-106`)**:
+  1. **Critical collector validator unblocking**: Synchronised `COMPATIBLE['elections'] = {'Elections'}` across `scripts/tests/validate_alerts.py`, `scripts/catalysts.py`, `scripts/simulate.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/validate_live.py`, and `scripts/tests/test_alert_topic_domain.js` so `collect.yml` passes validate and commit cleanly.
+  2. `assets/site.js` & `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`: `KD.basisBadge(b, matchedBy)` renders `official series` when `category_matched_by === "official"` (`b !== "seed"`), reserving the `keyword` warning badge (`not confirmed by an official source`) for genuine title-heuristic matches.
+  3. `assets/chatdock.js`, `assets/live.js`, & `scripts/collect.py`: removed `KXDEMOFUT*` and `KXBALLONDOR` from live prefix/seed discovery in `chatdock.js` (`categoryOf`) and `live.js` (`SEED_SERIES`), added explicit `EXCLUDED_SERIES` entries for `KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, and `KXEPL*` in `live.js` so browser live discovery refuses them even before `series_index` loads, and folded `hist_rows` count into `settled_total_method` in `collect.py`.
+  4. `trading.html` & `data/findings.json` (`G5`, `G13`): aligned remaining fee-multiplier disclosures with shipped `F-84` (`M = 0` on `KXBTCY`, `KXETHY`, `KXELECTIRAN`; `M = 1` default on unlisted series).

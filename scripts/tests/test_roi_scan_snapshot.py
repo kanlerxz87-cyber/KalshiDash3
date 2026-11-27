@@ -55,6 +55,10 @@ def offline_get(path, params=None, retries=3):
         return {"markets": rows, "cursor": ""}, url
     if path == "/series":
         return {"series": []}, url
+    if path.startswith("/series/") and not path.endswith("/candlesticks"):
+        st = path.split("/series/", 1)[1].upper()
+        srec = (doc.get("series_index") or {}).get(st)
+        return {"series": {"ticker": st, **(srec or {})} if srec else {}}, url
     if path == "/historical/cutoff":
         # The snapshot does not hold this endpoint, and inventing a cutoff would be exactly the
         # fabrication the site forbids. RuntimeError is the path build() takes when the API is

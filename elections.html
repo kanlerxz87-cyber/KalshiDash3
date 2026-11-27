@@ -20,6 +20,8 @@
 
   <div id="snapshotBanner"></div>
 
+  <div id="elexNotice"></div>
+
   <div class="grid">
     <div class="card"><div class="kpi" id="kOpen">—</div><small class="mut">open markets in scope</small></div>
     <div class="card"><div class="kpi" id="kSettled">—</div><small class="mut">settled markets captured</small></div>
@@ -81,6 +83,17 @@ KD.nav("elections");
   KD.$("#kResolved").textContent = resolved.length;
   const maxD = open.reduce((a, r) => Math.max(a, r.dollars_traded_estimate || 0), 0);
   KD.$("#kDollars").textContent = maxD ? "$" + Math.round(maxD).toLocaleString() : "—";
+  try {
+    const traded = open.filter(r => (r.volume_fp || 0) > 0).length;
+    const note = document.getElementById("elexNotice");
+    if (note && open.length) {
+      if (traded === 0) {
+        note.innerHTML = '<div class="notice warn"><b>No trading in this topic in the current snapshot.</b> All ' + open.length + ' open Elections markets show $0 traded — the demo exchange has no volume here right now. The table below is still the official snapshot; the ranking is meaningless until trading resumes. Snapshot <code>' + KD.esc(snap.collected_at || "") + '</code>.</div>';
+      } else if (traded <= 2) {
+        note.innerHTML = '<div class="notice warn"><b>Almost no trading in this topic.</b> Only ' + traded + ' of ' + open.length + ' open Elections markets have traded in the current snapshot (largest $' + Math.round(maxD).toLocaleString() + ' est.). The ranking is real but near-zero until volume returns. Snapshot <code>' + KD.esc(snap.collected_at || "") + '</code>.</div>';
+      }
+    }
+  } catch (e) {}
 
   KD.$("#open").innerHTML = KD.table([
     { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
@@ -96,7 +109,7 @@ KD.nav("elections");
     vol: KD.num(r.volume_fp), oi: KD.num(r.open_interest_fp),
     last: KD.cents(r.last_price_dollars), bid: KD.cents(r.yes_bid_dollars), ask: KD.cents(r.yes_ask_dollars),
     close: r.close_time ? KD.esc(r.close_time.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
-    status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis),
+    status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis, r.category_matched_by),
     src: KD.srcLink(r.source, "API"),
   })), { empty: "No open elections markets are in the current snapshot. That is a real result, not an error: the collector reports only what the API returned." });
 

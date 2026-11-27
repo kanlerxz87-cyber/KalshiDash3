@@ -21,13 +21,15 @@
 <header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
 <main class="wrap">
 
+  <div id="snapshotBanner"></div>
+
   <h1>Auto-sim trading engine <span class="autosim-tag">AUTO-SIM · PAPER ONLY</span></h1>
   <p class="lede">
     Automated simulated trades that test strategies against live demo-API prices. The engine runs by itself:
     it watches the same ≥$0.10 swing alerts as the <a href="alerts.html">alert chats</a>, opens and closes
-    paper positions, settles them from the API's literal <code>result</code> field, and categorises every trade
-    by strategy, topic and price band. It places <b>no real orders</b> — demo order placement needs API keys
-    that do not exist yet (<a href="flagged.html">F-07, F-27</a>). The ledger lives in this browser
+    paper positions, settles them only when the API confirms finalization and a binary result, and categorises every trade
+    by strategy, topic and price band. It places <b>no real orders</b> — demo order placement requires credentials that
+    have not been configured for this site (<a href="flagged.html">F-07, F-27</a>). The ledger lives in this browser
     (<code>localStorage</code>) and can be exported.
   </p>
 
@@ -35,13 +37,15 @@
     <b>What "simulated" means here, precisely.</b> Entry fills are simulated at the best quoted ask for the side
     bought (YES ask, or the NO ask derived from the YES bid per the documented reciprocal order-book relationship —
     <a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Order Book Responses</a>).
-    Exits fill at the YES bid when quoted, otherwise the last traded price; exits that would need an unquoted price are
-    not taken. Fees are modelled at the documented general taker rate <code>ceil(M×0.07×C×P×(1−P))</code>
-    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>); per-series
-    fee multipliers differ, so net P&amp;L is an estimate. Settlement pays $1 per winning contract because the official
+    Exits require the bid for the side held on an active market; a NO bid can be derived from the YES ask.
+    The last traded price is not an exit quote. A provisional result does not pay out
+    (<a href="https://docs.kalshi.com/getting_started/market_lifecycle">Market Lifecycle</a>). Fees are modelled at the documented general taker rate <code>ceil(M×0.07×C×P×(1−P))</code>
+    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>), applying the schedule's transcribed per-series multipliers (such as <code>KXBTCY</code>, <code>KXETHY</code>, and <code>KXELECTIRAN</code> at <code>M = 0</code>; <a href="flagged.html">F-84</a>) and defaulting unlisted series to <code>M = 1</code>, so net P&amp;L remains a paper estimate. Settlement pays $1 per winning contract because the official
     docs state YES outcomes pay YES holders and NO outcomes pay NO holders, with zero settlement fees for simple yes/no
     (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
-    Markets whose result is <code>scalar</code> are left open and flagged rather than guessed.
+    Markets whose result is <code>scalar</code> are not settled by this simulator. If the API does not return a holding,
+    its outcome is not inferred. Saved trades are not recalculated: new exits carry <code>exit_rules_version: 2</code>
+    in the export so they can be separated from earlier simulations.
   </div>
 
   <div class="controls">
@@ -89,17 +93,16 @@
 
   <h2>What these numbers can and cannot tell you</h2>
   <div class="tw"><table>
-    <thead><tr><th>Metric</th><th>Meaning</th><th>Limit you must know</th></tr></thead>
+    <thead><tr><th>Metric</th><th>Meaning</th><th>Limit you must know</th><th>Reference</th></tr></thead>
     <tbody>
       <tr><td>Realised net P&amp;L</td><td>Sum of closed-trade net P&amp;L, fees included.</td>
-          <td>Paper fills assume the quote was available to trade at the shown size; real fills can be partial.</td></tr>
+          <td>Paper fills assume the quote was available to trade at the shown size; real fills can be partial.</td><td><a href="https://docs.kalshi.com/getting_started/orderbook_responses">Kalshi orderbook</a></td></tr>
       <tr><td>Equity</td><td>Paper cash + open stake at entry prices.</td>
-          <td>Open stake is not marked-to-market in the headline number; unrealised estimates are per-position below.</td></tr>
+          <td>Open stake is not marked-to-market in the headline number; unrealised estimates are per-position below.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js">Simulator calculation</a></td></tr>
       <tr><td>Win rate</td><td>Closed trades with net P&amp;L &gt; 0 ÷ closed.</td>
-          <td>Meaningless before positions resolve or hit exits; strategies stay open until then by design.</td></tr>
-      <tr><td>Settlement P&amp;L</td><td>Positions held to resolution pay $1 per winning contract
-          (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">market settlement</a>).</td>
-          <td>Only simple yes/no results settle this way; scalar results are left open (flagged F-28).</td></tr>
+          <td>Meaningless before positions resolve or hit exits; strategies stay open until then by design.</td><td><a href="https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js">Simulator calculation</a></td></tr>
+      <tr><td>Settlement P&amp;L</td><td>Positions held to resolution pay $1 per winning contract.</td>
+          <td>Only simple yes/no results settle this way; scalar results are left open (flagged F-28).</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement">Kalshi settlement</a></td></tr>
     </tbody>
   </table></div>
 
@@ -121,7 +124,7 @@ function fmt(v, d = 2) {
   if (v === null || v === undefined || Number.isNaN(v)) return '<span class="na">—</span>';
   const n = Number(v);
   const [i, f] = Math.abs(n).toFixed(d).split(".");
-  // T116 (F-100): group thousands to match KD.money everywhere else on the site.
+  // T116 (F-111): group thousands to match KD.money everywhere else on the site.
   return (n < 0 ? "-" : "") + i.replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (f ? "." + f : "");
 }
 function roi(st) { return st.stake > 0 ? st.net / st.stake : null; }
@@ -201,14 +204,8 @@ function markSide(dir) { return dir === 1 ? '<span class="badge ok">YES</span>' 
 function positionsTable() {
   const rows = AT.state.positions.map((p) => {
     const m = KDL.markets.get(p.ticker) || {};
-    const yesBid = KDL.num(m.yes_bid_dollars);
-    let unreal = null, markBasis = "unquoted";
-    if (yesBid !== null) {
-      const exitYes = yesBid;
-      const entryYes = p.dir === 1 ? p.entry_price : 1 - p.entry_price;
-      unreal = p.dir === 1 ? (exitYes - entryYes) * p.count : (entryYes - exitYes) * p.count;
-      markBasis = "yes_bid";
-    }
+    const bid = KDL.quotedBid(m, p.dir);
+    const unreal = bid ? (bid.price - p.entry_price) * p.count : null;
     return {
       when: new Date(p.ts).toLocaleTimeString(),
       ticker: `<span class="mono">${KD.esc(p.ticker)}</span> <a class="small" target="_blank" rel="noopener" href="https://external-api.demo.kalshi.co/trade-api/v2/markets?tickers=${encodeURIComponent(p.ticker)}">api</a>`,
@@ -217,7 +214,7 @@ function positionsTable() {
       cat: KD.CAT_LABEL[p.category_id] || "—",
       count: KD.num(p.count), entry: `${KD.cents(p.entry_price)} <span class="small mut">(${KD.esc(p.entry_basis)})</span>`,
       trigger: `<span class="small mut">${KD.esc(p.trigger || "")}</span>`,
-      unreal: unreal === null ? '<span class="na">—</span>' : `<span class="${unreal >= 0 ? "pos" : "neg"}">${fmt(unreal)}</span> <span class="small mut">${markBasis}</span>`,
+      unreal: unreal === null ? '<span class="na">—</span>' : `<span class="${unreal >= 0 ? "pos" : "neg"}">${fmt(unreal)}</span> <span class="small mut">${bid.basis} · before fees</span>`,
       age: KD.ago(new Date(p.ts).toISOString())
     };
   });
@@ -337,6 +334,8 @@ async function boot() {
   KDL.onRows(() => { renderAll(); });
   // Snapshot + collector history so the engine has a market universe without live REST…
   const snap = await KDL.loadSnapshot();
+  // R93-3: the ledger below prices positions from this snapshot, so the page says how old it is.
+  KD.snapshotBanner(snap);
   KDL.ingest((snap?.open_markets || []).concat(snap?.settled_markets || []), "collector", { silent: true });
   // …then go live if the browser can reach the demo API.
   const ok = await KDL.probe();

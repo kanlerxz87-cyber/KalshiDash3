@@ -52,6 +52,7 @@ const KDCHAT = (() => {
   const MAX_ROWS = 80;
   const FEED_CAP = 2000;
   const REPO = "kanlerxz87-cyber/KalshiDash3";
+  const GH = "https://github.com/" + REPO;
 
   const CAT_LABEL = {
     gas: "Gas Prices",
@@ -103,6 +104,7 @@ const KDCHAT = (() => {
     mounted: false,
     filter: "",
     health: null,
+    collectorHealth: null,    // data/live/collector_health.json: did the last collector pass commit?
   };
 
   const key = (a) => `${a.ticker}@${a.t}`;
@@ -150,6 +152,12 @@ const KDCHAT = (() => {
   /* ------------------------- history flow ------------------------- */
   async function loadHistory() {
     if (S.histLoaded) return;
+    // R93-3: the collector's own pass record. Read here because the dock is mounted on every page,
+    // so this one fetch puts "the pipeline last failed" in front of a reader wherever they are.
+    try {
+      const rh = await fetch("data/live/collector_health.json", { cache: "no-store" });
+      if (rh.ok) S.collectorHealth = await rh.json();
+    } catch { S.collectorHealth = null; }
     let doc = null;
     try {
       const r = await fetch("data/live/alerts_archive.json", { cache: "no-store" });
@@ -213,6 +221,9 @@ const KDCHAT = (() => {
           S.basis.set(r.ticker, r.category_basis || null);
           S.life.set(r.ticker, r);                                                // status/result for the lifecycle chip
         }
+      }
+      for (const r of d.alert_lifecycle?.rows || []) {
+        if (r?.ticker && !S.life.has(r.ticker)) S.life.set(r.ticker, r);
       }
       for (const r of rows) {
         const t = Date.parse(d.collected_at || "");
@@ -279,20 +290,23 @@ const KDCHAT = (() => {
 
   function lifeBit(a) {
     if (typeof KD === "undefined" || !KD.lifecycleChip) return "";
-    const life = a.life || (a.ticker ? lifeOf(a.ticker) : null);
+    const life = a.ticker ? lifeOf(a.ticker) : a.life;
     return life ? KD.lifecycleChip(life) : "";
   }
 
   // GET /markets carries no category field, so a raw market record can only be
   // placed in one of the five requested topics by its series prefix. Anything
   // else is "other" and is never shown in the topic-filtered view.
+  // F-76 / F-96 / F-106: never include KXDEMOFUT* (official category Test) or
+  // KXBALLONDOR (official category Sports, tags Soccer) in live discovery.
   function categoryOf(ticker) {
     const t = String(ticker || "").toUpperCase();
+    if (t.startsWith("KXDEMOFUT") || t.startsWith("KXBALLONDOR")) return "other";
     if (t.startsWith("KXAAAGAS")) return "gas";
-    if (t.startsWith("KXBTC") || t.startsWith("KXETH") || t.startsWith("KXSOL") || t.startsWith("KXDEMOFUT")) return "crypto";
-    if (t.startsWith("KXPGATOUR") || t.startsWith("KXGOLF")) return "golf";
+    if (t.startsWith("KXBTC") || t.startsWith("KXETH") || t.startsWith("KXSOL")) return "crypto";
+    if (t.startsWith("KXPGATOUR") || t.startsWith("KXPGARYDER") || t.startsWith("KXPGASOLHEIM") || t.startsWith("KXGOLF")) return "golf";
     if (t.startsWith("KXELECT") || t.startsWith("KXPRES") || t.startsWith("KXSEN")) return "elections";
-    if (t.startsWith("KXGRAMMY") || t.startsWith("KXOSCAR") || t.startsWith("KXBALLONDOR") || t.startsWith("KXEMMY")) return "culture";
+    if (t.startsWith("KXGRAMMY") || t.startsWith("KXOSCAR") || t.startsWith("KXEMMY") || t.startsWith("KXSUPERBOWLHEADLINE")) return "culture";
     return "other";
   }
 
@@ -462,9 +476,37 @@ const KDCHAT = (() => {
     const snapLine = document.getElementById("kdSnapLine");
     if (snapLine && S.snapshotAt) {
       const age = Date.now() - Date.parse(S.snapshotAt);
+      // R93-3 (2026-11-27): this line used to read "... — the live poller below is still current"
+      // whenever the snapshot was older than 45 minutes. That is only true while the poller is
+      // actually running, and the poller is exactly what fails when the demo API is not readable
+      // from the browser (CORS). On 2026-11-27 the collector had not committed since 18:00:57Z and
+      // the dock still told the reader the chats were current. The claim is now conditional, and
+      // the age is always printed so the reader can judge it either way.
       snapLine.innerHTML =
         `Committed snapshot <code>${esc(S.snapshotAt)}</code> (${esc(ago(Date.parse(S.snapshotAt)))})` +
-        (age > 45 * 60000 ? ' · <b class="warn">stale</b> — the live poller below is still current' : "");
+        (age > 45 * 60000
+          ? ' · <b class="warn">stale</b>' +
+            (S.liveOn ? " — the live poller is current; these history rows are not"
+                      : " — no live poller is running, so every row here is as old as that snapshot")
+          : "");
+    }
+    // R93-3: the committed health record says whether the most recent collector pass committed or
+    // failed (scripts/collect_relay.py writes it on every pass). Without this the reader had to
+    // open GitHub Actions to learn that the whole pipeline was down. Absent file = no claim.
+    const healthNote = document.getElementById("kdHealthNote");
+    if (healthNote) {
+      const h = S.collectorHealth;
+      if (!h) {
+        healthNote.innerHTML = "";
+      } else if (h.outcome === "failed") {
+        healthNote.innerHTML =
+          ` · <b class="warn">last collector pass failed</b> <span class="mut">` +
+          `(${esc(h.detail || "no detail recorded")}, ${esc(ago(Date.parse(h.generated_at)))})</span> · ` +
+          `<a href="${esc(GH)}/actions/runs/${esc(h.run && h.run.run_id || "")}" target="_blank" rel="noopener">the run</a>`;
+      } else if (h.outcome === "ok") {
+        healthNote.innerHTML =
+          ` · <span class="mut">last collector pass committed (${esc(ago(Date.parse(h.generated_at)))})</span>`;
+      }
     }
   }
 
@@ -494,8 +536,10 @@ const KDCHAT = (() => {
     const inCat = (a) => !cat || a.category === cat;
     const box = document.getElementById("kdChatAll");
     const mbox = document.getElementById("kdChatModel");
+    let shownAll = 0, shownModel = 0;
     if (box) {
       const rows = all.filter(inCat).slice(-MAX_ROWS);
+      shownAll = rows.length;
       box.innerHTML = rows.length
         ? rows.map(rowHTML).join("")
         : '<div class="cd-empty">No ≥ $0.10 swing yet. Alerts appear as soon as two readings differ by $0.10 or more.</div>';
@@ -503,16 +547,22 @@ const KDCHAT = (() => {
     }
     if (mbox) {
       const rows = model.filter(inCat).slice(-MAX_ROWS);
+      shownModel = rows.length;
       mbox.innerHTML = rows.length
         ? rows.map(rowHTML).join("")
         : '<div class="cd-empty">No swing has passed the experimental screen yet (a fee-schedule seed series with positive reported 24-hour volume — not an ROI prediction).</div>';
       if (nearBottom(mbox)) mbox.scrollTop = mbox.scrollHeight;
     }
-    // Counts are the rows HELD (the whole qualifying set); each list shows its newest MAX_ROWS.
+    // F-105 (2026-11-27): the counter used to print the whole held set while the list showed only
+    // its newest MAX_ROWS, so the dock claimed 154 alerts while holding 80 of them. The counter
+    // now states what the list holds; the full record is on the alerts page, which says the same
+    // thing and opens the rest.
+    const heldAll = all.filter(inCat).length;
+    const heldModel = model.filter(inCat).length;
     const cAll = document.getElementById("kdCountAll");
-    if (cAll) cAll.textContent = String(all.length);
+    if (cAll) cAll.textContent = dockCount(shownAll, heldAll);
     const cModel = document.getElementById("kdCountModel");
-    if (cModel) cModel.textContent = String(model.length);
+    if (cModel) cModel.textContent = dockCount(shownModel, heldModel);
     const badge = document.getElementById("kdChip");
     if (badge) {
       badge.className = "kd-chip " + (S.liveOn ? "live" : S.blocked ? "warn" : "");
@@ -533,6 +583,14 @@ const KDCHAT = (() => {
 
   function nearBottom(el) {
     return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  }
+
+  // F-105: a counter must describe the list next to it. "154" over a list of 80 rows was a
+  // count the reader could not check; "80 of 154" is one they can, and it names the limit.
+  function dockCount(shown, held) {
+    if (!held) return "0";
+    if (shown >= held) return String(held);
+    return `${shown} of ${held}`;
   }
 
   function shell() {
@@ -558,6 +616,7 @@ const KDCHAT = (() => {
       <button class="kd-btn" id="kdToggle">Pause live</button>
       <a class="kd-more" href="alerts.html">full alert page →</a>
       <span class="kd-snapline small" id="kdSnapLine"></span>
+      <span class="kd-healthnote small" id="kdHealthNote"></span>
       <span id="kdHealth"></span>
     </header>
     <div class="kd-grid">

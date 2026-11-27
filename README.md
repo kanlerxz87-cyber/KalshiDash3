@@ -21,7 +21,7 @@ left blank and listed on the *Flagged for Review* page.
 | `executive-summary.html` | Requirement-by-requirement status, the four facts a decision-maker needs |
 | `categories.html` + `gas / elections / culture / crypto / golf.html` | One page per topic, nothing mixed across topics |
 | `dashboard.html` | Price chart (X = time, Y = contract price): official candles at 1/60/1440 minutes plus the collector's observations, a pointer readout of the exact plotted price/time/period volume, archived ≥ $0.10 swings marked and deep-linkable, liquidity ladder, resolution tracker, optional in-browser live polling |
-| `alerts.html` | Two scrolling alert chats — every ≥ $0.10 swing in either direction, plus the model-picks feed (one frozen screen, identical on every page: `data/alert_rules.json` → `high_roi`). Each alert carries its market's lifecycle — settled YES/NO, result set but not yet paid, closed, open, or not in snapshot — and an outcomes ledger counts how the alerted events resolved |
+| `alerts.html` | Two scrolling alert chats: observed swings ≥ $0.10 in either direction and an experimental model-watch feed (`data/alert_rules.json` → `high_roi`). Follow-up records supply exact market links, observed times and finalized results even after a contract leaves the ranked lists. Unavailable results stay blank. |
 | `live.html` | In-browser live desk: polls the public demo API directly, swings ≥ 10¢ ranked by modelled ROI after fees |
 | `roi.html` | The high-ROI model definition, its parameters and its out-of-sample measurement |
 | `trading.html` | Auto-sim engine: automated paper trades on three disclosed strategies, settled from the API's literal `result`, with performance by strategy / topic / price band / exit reason |
@@ -47,7 +47,8 @@ data/live/            collected snapshots (written by scripts/collect.py)
 scripts/collect.py    credential-free demo data collector (includes official-candle backfill for lost alert history)
 scripts/watchdog.py   bounded freshness decision: stale-only, no overlap, hourly cap (topic-fair resolution history,
                       alert-aware price-history retention, official-candle backfill)
-scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and data/live/alerts.json; rules in data/alert_rules.json
+scripts/build_alerts.py   builds the persistent ≥ $0.10 swing archive data/live/alerts_archive.json and capped feeds in data/live/alerts.json; rules in data/alert_rules.json
+scripts/track_lifecycle.py   collects exact, dated settlement follow-ups for archived alerts and open paper positions; publishes alert_lifecycle in markets.json, outside the rankings
 scripts/simulate.py       paper-only simulator: fixed rules in data/strategies.json applied to the alert archive; writes data/live/simulation.json (no orders, no account)
 scripts/tests/test_simulate.py  fee-table, settlement and signal tests for the simulator (synthetic fixtures)
 scripts/kalshi_client.py  demo trade executor (env-var credentials only)
@@ -61,6 +62,7 @@ scripts/tests/test_topic_integrity.py  offline: a published row may not contradi
 scripts/tests/test_price_history_retention.py  offline: the retention window may not delete the observations an alert cites (F-99)
 scripts/tests/test_pages_dom.js  jsdom render tests, including the chart (candle request shape, no fake 0c) and the alert→chart deep link
 scripts/tests/test_lifecycle.js  lifecycle join (resolved YES/NO vs determined vs not-in-snapshot) and the single model-pick rule shared by engine, page and dock
+scripts/tests/test_chat_counts.js  offline: every chat counter states exactly what its list holds — the header may never claim more rows than the feed renders (F-105)
 .github/workflows/collect.yml   scheduled collection
 .github/workflows/pages.yml     deploy to Pages (same files the branch publisher serves)
 ```
@@ -167,6 +169,7 @@ See the [current executive audit](https://kanlerxz87-cyber.github.io/KalshiDash3
 - WebSocket streaming requires an API key at the handshake, so a static site cannot stream ticks.
 - Portfolio performance and the auto-sim engine are labelled paper simulations until demo credentials exist.
   Kalshi states a demo account "does not come with funds preloaded" and must be created by a person.
+- For alerted tickers and open paper positions, `markets.json.alert_lifecycle.rows` adds dated follow-ups without changing the market rankings. Ranked records take precedence. The collector verifies at most 16 extra market requests per pass and rotates least-recently attempted tickers; it tries [historical market data](https://docs.kalshi.com/api-reference/historical/get-historical-market) only after a live 404. It retains verified terminal results, leaves failed or deferred lookups blank, and counts only [finalized](https://docs.kalshi.com/getting_started/market_lifecycle) results as settlements. This tracks markets, not a user's positions on Kalshi.
 - Paper results need a stored bid and ask at the alert time. New archive entries now carry `to_yes_bid` /
   `to_yes_ask` (request R-2, implemented 2026-11-20); entries written before that still have no quote and
   stay unfilled, as do quotes whose spread exceeds the 0.10 cap (Flagged F-19, F-23).

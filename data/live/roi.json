@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T17:01:58Z",
- "runtime_seconds": 108.7,
+ "collected_at": "2026-11-27T19:39:04Z",
+ "runtime_seconds": 82.7,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,22 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 13731,
+  "open_in_scope": 640,
+  "open_excluded_category_conflict": 19,
+  "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 1,
-  "unscoreable": 13730,
-  "orderbooks": 13731,
-  "orderbooks_requested": 13731,
+  "near_misses": 0,
+  "unscoreable": 640,
+  "orderbooks": 640,
+  "orderbooks_requested": 640,
   "alerts": 0,
-  "markets_with_momentum": 120,
+  "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 13731,
-  "returned": 13731,
+  "requested": 640,
+  "returned": 640,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -57,69 +59,10 @@
   "trades_created_ts": "2026-09-28T00:00:00Z"
  },
  "picks": [],
- "near_misses": [
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV27H18-UP",
-   "eligible": false,
-   "fails": [
-    "spread 99.0c > 10c cap",
-    "depth 10 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "NO entry 99.0c above 95c ceiling",
-    "net ROI -68.43% not above 0% floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.68725,
-   "mid": 0.505,
-   "micro": 1.0,
-   "last": 0.55,
-   "bid": 0.01,
-   "ask": 1.0,
-   "spread": 0.99,
-   "depth": 10.0,
-   "vol24": 0.0,
-   "ttc_hours": 0.9672222222222222,
-   "momentum": null,
-   "series_ticker": "KXDEMOFUTHOURLY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.99,
-    "fee_unit": 0.0006930000000000006,
-    "cost": 0.990693,
-    "ev": -0.6779430000000001,
-    "roi": -0.684311890767372
-   },
-   "score": -0.684311890767372,
-   "dollars_traded_estimate": 137.5,
-   "title": "Demo BTC at or above 59876.36 USD",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-27T18:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H18",
-   "status": "active",
-   "result": null,
-   "volume_fp": 250.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 50.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 10.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.01,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H18-UP"
-  }
- ],
+ "near_misses": [],
  "unscoreable": [
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.6",
+   "ticker": "KXMXCPIYOY-26DEC09-T4.3",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -139,9 +82,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -150,11 +93,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be above 38.5 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.3%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -167,10 +111,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.6"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.3"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.4",
+   "ticker": "KXMXCPIYOY-26DEC09-T4.2",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -190,9 +134,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -201,11 +145,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 38.3 and 38.5 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.2%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -218,10 +163,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.4"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.2"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-38.1",
+   "ticker": "KXMXCPIYOY-26DEC09-T4.1",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -241,9 +186,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -252,11 +197,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 38.0 and 38.2 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.1%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -269,10 +215,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.1"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.1"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.8",
+   "ticker": "KXMXCPIYOY-26DEC09-T4.0",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -292,9 +238,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -303,11 +249,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.7 and 37.9 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.0%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -320,10 +267,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.8"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.0"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.5",
+   "ticker": "KXMXCPIYOY-26DEC09-T3.9",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -343,9 +290,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -354,11 +301,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.4 and 37.6 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.9%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -371,10 +319,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.5"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.9"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-37.2",
+   "ticker": "KXMXCPIYOY-26DEC09-T3.8",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -394,9 +342,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -405,11 +353,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 37.1 and 37.3 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.8%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -422,10 +371,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.2"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.8"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-36.9",
+   "ticker": "KXMXCPIYOY-26DEC09-T3.7",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -445,9 +394,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 280.33222222222224,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXMXCPIYOY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -456,11 +405,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be between 36.8 and 37.0 according to RealClearPolitics?",
-   "category_id": "elections",
+   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.7%?",
+   "category_id": "culture",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [],
+   "close_time": "2026-12-09T11:59:00Z",
+   "event_ticker": "KXMXCPIYOY-26DEC09",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -473,15 +423,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.9"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.7"
   },
   {
-   "ticker": "KXAPRPOTUS-26DEC04-36.7",
+   "ticker": "KXREDISTRICTING-28-MS",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 710 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -496,9 +447,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 166.96722222222223,
+   "ttc_hours": 17049.332222222223,
    "momentum": null,
-   "series_ticker": "KXAPRPOTUS",
+   "series_ticker": "KXREDISTRICTING",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -507,11 +458,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will the President's approval rating be below 36.8 according to RealClearPolitics?",
+   "title": "What states will redistrict before the 2028 Congressional elections?",
    "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T16:00:00Z",
-   "event_ticker": "KXAPRPOTUS-26DEC04",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-11-07T04:59:00Z",
+   "event_ticker": "KXREDISTRICTING-28",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -524,24 +478,23 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.7"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXREDISTRICTING-28-MS"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 114,
+  "candles_used": 172,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 3,
-  "baseline_always_yes_hits": 1,
+  "baseline_always_yes_bets": 4,
+  "baseline_always_yes_hits": 3,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 21,
-   "no side passed the replay gates": 3,
-   "no candles in the 2h before close": 1
+   "candle without a price": 20,
+   "no side passed the replay gates": 4
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -550,7 +503,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.3333
+  "baseline_always_yes_hit_rate": 0.75
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",

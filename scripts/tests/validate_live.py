@@ -14,6 +14,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
@@ -47,12 +48,12 @@ def check(cond: bool, msg: str) -> None:
         errors.append(msg)
 
 
-def check_by_category(tag: str, row: dict) -> None:
+def check_by_category(tag: str, row: dict, pre_narrowing_elections: bool = False) -> None:
     # Kept independent of scripts/collect.py on purpose: the validator must be able to refuse a
     # snapshot produced by a broken collector, so it re-states the rule rather than importing it.
     compatible = {
         "gas": {"Economics", "Commodities", "Financials"},
-        "elections": {"Elections", "Politics", "World", "International"},
+        "elections": {"Elections", "Politics", "World", "International"} if pre_narrowing_elections else {"Elections"},
         "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},
@@ -66,6 +67,42 @@ def check_by_category(tag: str, row: dict) -> None:
     errors.append(
         f"{tag} published under {cat} but its official series categories are {official} (F-65)"
     )
+
+
+def matches_lifecycle_source(source: object, ticker: str) -> bool:
+    bases = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
+    return isinstance(source, str) and isinstance(ticker, str) and bool(ticker) and source in {
+        f"{base}{prefix}/markets/{quote(ticker, safe='')}" for base in bases for prefix in ("", "/historical")
+    }
+
+
+def check_alert_lifecycle(doc: dict) -> None:
+    # Older snapshots predate the separate lifecycle rows. The live collector always emits them.
+    followups = doc.get("alert_lifecycle")
+    if followups is None:
+        return
+    check(followups.get("schema") == 1, "alert_lifecycle schema must be 1")
+    lookups = followups.get("lookup_requests")
+    check(type(lookups) is int and 0 <= lookups <= 16, "alert_lifecycle lookup budget exceeded")
+    rows = followups.get("rows")
+    check(isinstance(rows, list), "alert_lifecycle.rows must be a list")
+    seen = set()
+    valid_states = {"initialized", "active", "inactive", "closed", "determined", "disputed", "amended", "finalized"}
+    for row in rows or []:
+        ticker = row.get("ticker") or ""
+        tag = f"alert_lifecycle:{ticker}"
+        check(bool(ticker) and ticker not in seen, f"{tag} empty/duplicate ticker")
+        seen.add(ticker)
+        check(matches_lifecycle_source(row.get("source"), ticker), f"{tag} wrong official source")
+        status = row.get("status")
+        check(row.get("result") in ALLOWED_RESULTS, f"{tag} unknown result")
+        if status is None:
+            check(bool(row.get("reason")) and all(row.get(k) is None for k in (
+                "observed_at", "result", "settlement_ts", "settlement_value_dollars"
+            )), f"{tag} an unverified lookup needs a reason and blank values")
+        else:
+            check(status in valid_states and not row.get("reason") and bool(row.get("observed_at")),
+                  f"{tag} status must be documented and dated")
 
 
 def check_simulation() -> None:
@@ -114,7 +151,11 @@ def check_simulation() -> None:
                 pos.get("alert_key") in archive_keys if archive_keys else False,
                 f"{tag} alert_key is not in data/live/alerts_archive.json",
             )
+            if pos.get("settlement_source") is not None:
+                check(matches_lifecycle_source(pos["settlement_source"], pos.get("ticker") or ""),
+                      f"{tag} settlement source must identify the exact official demo market")
             if pos.get("status") == "settled":
+                check(pos.get("settled_result") in ("yes", "no"), f"{tag} missing binary settlement result")
                 payoff = 1.0 if pos.get("settled_result") == pos.get("side") else 0.0
                 expect = round(payoff - entry - float(pos["entry_fee"]), 4)
                 check(
@@ -147,6 +188,7 @@ def main() -> int:
     except ValueError:
         errors.append(f"collected_at not ISO-8601 Z: {ts!r}")
 
+    pre_narrowing = "Politics" in (((doc.get("counts") or {}).get("category_compatible_official") or {}).get("elections") or [])
     for bucket in ("open_markets", "settled_markets"):
         rows = doc.get(bucket)
         check(isinstance(rows, list), f"{bucket} must be a list")
@@ -162,7 +204,7 @@ def main() -> int:
             if "series_categories" in r:
                 cats = r.get("series_categories")
                 check(isinstance(cats, list), f"{tag} series_categories must be a list")
-                check_by_category(tag, r)
+                check_by_category(tag, r, pre_narrowing_elections=pre_narrowing)
             # A market whose series is in the fee-schedule seed list must never be
             # demoted to "keyword": that would understate what is confirmed.
             seed_series = SEED_SERIES
@@ -224,6 +266,7 @@ def main() -> int:
         check(bool(cdoc.get("checked_at")), "cors.json checked_at missing")
         check(str(cdoc.get("origin_tested", "")).startswith("https://"), "cors.json origin_tested must be https")
         check("access_control_allow_origin" in cdoc, "cors.json must record allow-origin (or null) — never assume it")
+    check_alert_lifecycle(doc)
     check_simulation()
 
     if errors:

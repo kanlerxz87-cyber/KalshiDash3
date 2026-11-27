@@ -191,7 +191,7 @@ KD.nav("");
       price: r ? KD.cents(r.last_price_dollars) : '<span class="na">—</span>',
       vol: r ? KD.num(r.volume_fp) : '<span class="na">—</span>',
       oi: r ? KD.num(r.open_interest_fp) : '<span class="na">—</span>',
-      basis: r ? KD.basisBadge(r.category_basis) : '<span class="na">—</span>',
+      basis: r ? KD.basisBadge(r.category_basis, r.category_matched_by) : '<span class="na">—</span>',
       src: r ? KD.srcLink(r.source, "API") : '<span class="na">—</span>',
     };
   });
@@ -208,8 +208,9 @@ KD.nav("");
      <a href="questions.html">Q1</a> for why <code>notional_value_dollars</code> is the wrong field for this.
      “Confirmed” means the series ticker appears in the
      <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">official fee schedule</a>;
+     “official series” means Kalshi's own <code>GET /series</code> category/tag filter returned the series;
      “keyword” is a heuristic match and is <a href="flagged.html">flagged</a>.
-     A keyword top can be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`
+     A non-seed top can still be a QA/test market under a matched series — check the market's rules text before treating it as a real event (<a href="flagged.html">F-38</a>).</p>`
    // F-83: name the topics where no market has traded, so "$0" is never read as a ranking result.
    + (Object.keys(untraded).length
       ? `<p class="small mut"><b>Untraded topics in this snapshot:</b> ` +

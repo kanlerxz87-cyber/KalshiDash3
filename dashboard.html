@@ -30,7 +30,7 @@
       </section>
       <section class="card alert-card" aria-labelledby="modelAlertsTitle">
         <div class="alert-heading"><h3 id="modelAlertsTitle">Model watch · experimental screen</h3><span id="modelAlertCount" class="badge warn">0</span></div>
-        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, frozen at detection, ordered by that volume — the same one rule the alert page and the chat dock use (D-02). It has no demonstrated profitability. Each alert also carries the event's lifecycle: <b>settled YES/NO</b> once Kalshi's own <code>result</code> field is final, <b>still open</b>, or <b>not in snapshot</b> (the snapshot is a ranked window, not the exchange — D-03).</p>
+        <p class="small mut">Not an ROI prediction. This unvalidated research shortlist only includes fee-schedule seed-series alerts with positive reported 24-hour volume, frozen at detection, ordered by that volume — the same one rule the alert page and the chat dock use (D-02). It has no demonstrated profitability. Each alert also shows the contract’s lifecycle. The collector follows alerted tickers after they leave the rankings, and shows <b>settled YES/NO</b> only when the <a href="https://docs.kalshi.com/getting_started/market_lifecycle">official market record</a> is finalized.</p>
         <div id="modelAlerts" class="alert-feed" role="log" aria-live="polite" aria-label="Experimental screened price swing alerts"></div>
       </section>
     </div>
@@ -283,7 +283,7 @@ function renderTables() {
         atAsk: ob.contracts_at_best_yes_ask === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_ask),
         atBid: ob.contracts_at_best_yes_bid === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_bid),
         status: KD.statusBadge(r.status),
-        basis: KD.basisBadge(r0.category_basis),
+        basis: KD.basisBadge(r0.category_basis, r0.category_matched_by),
       };
     });
     return `<div class="card"><h3>${KD.CAT_LABEL[id]} <span class="small mut">${rows.length} of ${(byCat[id] || []).length} open in scope</span></h3>` +
@@ -312,7 +312,7 @@ function renderResolved() {
       settle: KD.money(r.settlement_value_dollars, 4),
       last: KD.cents(r.last_price_dollars),
       vol: KD.num(r.volume_fp),
-      basis: KD.basisBadge(r.category_basis),
+      basis: KD.basisBadge(r.category_basis, r.category_matched_by),
     }));
   KD.$("#resolved").innerHTML = KD.table([
     { key: "time", label: "Settled (UTC)" }, { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
@@ -520,7 +520,7 @@ function drawChart() {
   }
 
   meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
-    `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis)} · ` +
+    `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis, row.category_matched_by)} · ` +
     `status ${KD.statusBadge(row.status)} · result ${KD.resultBadge(row.result)} · ` +
     `last ${KD.cents(row.last_price_dollars)} · ${KD.num(row.volume_fp)} contracts traded · ` +
     `open interest ${KD.num(row.open_interest_fp)}` +
@@ -749,8 +749,20 @@ function drawLiq() {
     return;
   }
   if (ob.error) { head.innerHTML = `<span class="badge bad">order book unavailable</span> ${KD.esc(ob.error)}`; host.innerHTML = ""; return; }
-  const maxC = Math.max(1, ...ob.yes_bids.map(x => x.contracts), ...ob.no_bids.map(x => x.contracts));
-  const ladder = (rows, side) => rows.slice().reverse().slice(0, 10).map(r =>
+  // Defect F-100. Kalshi returns BIDS ONLY, and the docs give the mapping
+  // (https://docs.kalshi.com/getting_started/orderbook_responses):
+  //   best YES ask = $1.00 - (highest price in no_dollars), and the contracts available at
+  //   that ask are the count at that same no_dollars level.
+  // The panel used to print the no_bid level itself under the heading "YES asks, implied",
+  // reversed, so a reader asking "how many contracts can I buy YES for, at what price" was
+  // shown the complement of the answer (e.g. 468 contracts at $0.80 instead of 467.93 at
+  // $0.20). The asks are now derived and ordered best (cheapest) first; the bids stay
+  // best (highest) first. Both counts are the API's own.
+  const asks = (ob.no_bids || []).map(r => ({ price: Math.round((1 - r.price) * 10000) / 10000, contracts: r.contracts }))
+    .sort((a, b) => a.price - b.price);
+  const bids = (ob.yes_bids || []).slice().reverse();
+  const maxC = Math.max(1, ...bids.map(x => x.contracts), ...asks.map(x => x.contracts));
+  const ladder = (rows, side) => rows.slice(0, 10).map(r =>
     `<div class="row"><span>$${r.price.toFixed(4)}</span>
      <span class="bar ${side === "ask" ? "ask" : ""}"><i style="width:${(r.contracts / maxC * 100).toFixed(1)}%"></i></span>
      <span class="r">${KD.num(r.contracts)}</span></div>`).join("") || '<p class="empty">No resting orders on this side.</p>';
@@ -760,8 +772,11 @@ function drawLiq() {
     visible depth ${KD.num(ob.visible_contracts_total)} contracts ·
     <a href="${KD.esc(ob.source)}" target="_blank" rel="noopener">query</a>`;
   host.innerHTML =
-    `<div><h3>YES bids — contracts a seller can hit</h3><div class="book">${ladder(ob.yes_bids, "bid")}</div></div>` +
-    `<div><h3>YES asks, implied — contracts a buyer can lift</h3><div class="book">${ladder(ob.no_bids, "ask")}</div></div>`;
+    `<div><h3>YES bids — contracts a seller can hit (best bid first)</h3><div class="book">${ladder(bids, "bid")}</div></div>` +
+    `<div><h3>YES asks, implied — contracts a buyer can lift (best ask first)</h3><div class="book">${ladder(asks, "ask")}</div></div>`
+    + `<p class="small mut">Kalshi publishes bids only. Each ask price here is <code>$1 − no_bid price</code> and each count is the
+       contracts resting at that NO bid, which is the number of YES contracts a buyer can lift at that ask
+       (<a href="https://docs.kalshi.com/getting_started/orderbook_responses" target="_blank" rel="noopener">Orderbook Responses</a>).</p>`;
 }
 
 let loading = false;
@@ -861,8 +876,8 @@ function liveWatchlist() {
   const rows = (state.snap?.open_markets || [])
     .filter(r => r.last_price_dollars !== null)
     .sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.dollars_traded_estimate || 0) - (a.dollars_traded_estimate || 0));
-  const set = new Set(rows.slice(0, 60).map(r => r.ticker));
-  if (state.sel) set.add(state.sel);
+  const set = new Set(state.sel ? [state.sel] : []);
+  for (const r of rows) set.add(r.ticker);
   KDL.setWatch([...set]);
 }
 
