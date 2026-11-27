@@ -17,7 +17,21 @@ Open PRs at claim time: none by this session; `#137` was merged by its owner bef
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
 | T120 | Live sweep of all 21 deployed pages on GitHub Pages: HTTP 200, page-specific content markers, and deployed `data/live/*.json` parity with the committed files (snapshot time, alert counts, flagged count) | done | arena-b447d5a4 | `COORDINATION.md` (this section) | `fetch_page` per page (platform fetch route, 2026-11-27 ~17:46–17:52Z); parity vs `data/live/*.json`; `verify_release.py` PASS on the final merged tree |
-| T121 | Publish: commit → push → PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | in progress | arena-b447d5a4 | `COORDINATION.md` (this section) | `gh pr`, `gh api repos/…/pages(+builds)`, live URL fetch |
+| T121 | Publish: commit → push → PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | done (merged as `4ec6378`) | arena-b447d5a4 | `COORDINATION.md` (this section) | `gh pr`, `gh api repos/…/pages(+builds)`, live URL fetch |
+
+### T121 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pre-merge conflict | PR became `CONFLICTING` because `main` advanced twice (collector snapshot `2026-11-27T17:49Z` + PR #140/#142). Resolved by merging `origin/main` (`665d977`) into this branch: three conflicts, all inside concurrent sessions' text — T125 row and two quoted ledger counts of `arena-f33fe827` — main's corrected versions kept; both sessions' sections preserved verbatim; no other session's lines dropped; `grep` confirmed zero conflict markers (the one literal `<<<<<<< HEAD` left is inside a quoted historical note) | commit `26791c5` |
+| Post-merge gate | `python3 scripts/verify_release.py` **PASS** on the final tree; PR `build` check **pass** 1m23s; `deploy` correctly skipped on the PR | local gate; `gh pr checks 143` |
+| Pull request | **[PR #143](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/143)** — "Live-site sweep: all 21 deployed pages verified + recorded (arena-b447d5a4)", `COORDINATION.md` only | `gh pr view 143` |
+| Merge | **merged `2026-11-27T17:55:03Z`** as merge commit `4ec63780bba45dfc45ee289d972d559522821b65`, without waiting for approval | `gh pr merge 143 --merge` |
+| Pages deploy | **confirmed** — `pages-build-deployment` run **46045508841** success; `Deploy site to GitHub Pages` run **46045508230** success; Pages API `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true`; latest build on `4ec6378` at `2026-11-27T17:55:04Z` | `gh run list`; `gh api repos/…/pages(+builds)` |
+| Live site after merge | `verification.html` fetched live renders 72 claims / 71 verified / 1 unverified (C-20) — identical to committed `data/verified_facts.json` | live fetch, 2026-11-27 ~17:57Z |
+| Carried, not closed here | Nothing new. Standing items unchanged: F-07 (no demo credentials → portfolio/execution stay paper), F-14/F-26/F-77 (high-ROI screen disclosed, currently 0 picks), F-25 (cause links are search leads), DEPLOY-1 (legacy Pages publisher; Actions-only switch needs repo admin), C-20 (live values unverifiable as static claims) | published on `flagged.html` |
+
+This record lands via a small follow-up PR (documentation only).
 
 ### T120 — sweep results (2026-11-27, ~17:46–17:52Z)
 
