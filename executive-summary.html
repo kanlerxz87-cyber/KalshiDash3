@@ -15,7 +15,7 @@
      confirmable is on <a href="flagged.html">Flagged for Review</a> rather than softened into an estimate.</p>
 
   <section id="audit-2026-11-22" aria-labelledby="auditTitle">
-    <h2 id="auditTitle">Current release audit · 22 November 2026</h2>
+    <h2 id="auditTitle">Current release audit · 27 November 2026</h2>
     <div class="notice warn"><b>Useful for research, not a verified trading edge.</b>
       The dashboard and offline tests run without credentials. Account balances, authenticated execution,
       uninterrupted tick streaming and profitable ROI are not verified by this release.
@@ -52,6 +52,14 @@
             No claim of profitability or exhaustive coverage of all exchange markets is made.</td>
           <td><a href="https://docs.kalshi.com/getting_started/demo_env">Official demo-price warning</a> ·
             <a href="roi.html">Model assumptions and evidence</a> · <a href="simulation.html">Paper ledger</a></td></tr>
+        <tr><td>Browser paper-trading verification</td>
+          <td><b>Corrected settlement timing and exit prices.</b> The simulator now waits for a finalized binary result,
+            charges no exit fee at settlement, and uses the bid for the held side for a price exit. If a quote or outcome
+            is unconfirmed it does not fill or pay out. Earlier saved trades are not recalculated.</td>
+          <td><a href="https://docs.kalshi.com/getting_started/market_lifecycle">Lifecycle</a> ·
+            <a href="https://docs.kalshi.com/getting_started/market_settlement">Settlement</a> ·
+            <a href="https://docs.kalshi.com/getting_started/orderbook_responses">Bid/ask relationship</a> ·
+            <a href="trading.html">Browser simulator</a> · <a href="flagged.html">Findings</a></td></tr>
         <tr><td>News and jump annotations</td>
           <td><b>Research leads, not confirmed causes.</b> A market record supplies settlement rules and source fields,
             not proof that a linked story caused a price move. Unconfirmed causal explanations must remain unverified.</td>
