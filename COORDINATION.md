@@ -476,6 +476,26 @@ leads), F-76 (out-of-scope swings withheld and counted), DEPLOY-1 (Pages served 
 this session re-tested the Actions-only switch and was refused with HTTP 403 again — a repository administrator
 must change it under Settings → Pages).
 
+### T120 addendum — the record PR itself, and the final deploy state (2026-11-27 ~17:55Z)
+
+The close-out above was published through **[PR #142](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/142)**
+(record-only, `COORDINATION.md`), merged **2026-11-27T17:54:43Z** as `f12150291444a9e71107e668a0a46c5e97f1788c`;
+its PR build passed (run [46045130907](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045130907),
+1m22s). Two facts completes the record:
+
+- The legacy Pages build for `f121502` itself reported `errored` ("Page build failed.") at 17:54:45Z — the third
+  observed instance of the rapid-succession race — and was superseded **19 seconds later** by the successful
+  build of `4ec6378` (17:55:04Z, `built`), the next main commit. The site kept serving the last good build
+  throughout; the Pages API ended `built`. This is the DEPLOY-1 legacy-publisher behaviour, not a content
+  failure: the same tree passed the full offline gate and the gated Actions deploy.
+- The push-triggered *Deploy site to GitHub Pages* runs for both of this session's merges completed **success**:
+  [46045467865](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045467865) (for `f121502`) and
+  [46045508230](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46045508230) (for `4ec6378`).
+  Final live check: `https://kanlerxz87-cyber.github.io/KalshiDash3/?v=final142` served snapshot
+  `2026-11-27T17:45:51Z` with all five category rows, the Culture `untraded` disclosure and per-row official API
+  links; `executive-summary.html?v=b3119d5` served the F-104 fix. Both PRs (#139 work, #142 record) are merged
+  and deployed; T117–T120 are all done.
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
