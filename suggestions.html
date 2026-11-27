@@ -29,14 +29,16 @@
   <h2>Proposed — awaiting your decision</h2>
   <div id="prop"></div>
 
-  <h2>The decision that unlocks the most</h2>
-  <div class="notice warn">
-    <b>G5 (fees) remains open for the browser-side ledgers.</b> <a href="roi.html">ROI model</a> and
-    <a href="simulation.html">Paper trading</a> apply the transcribed per-series multipliers from the fee schedule,
-    while the browser-side <a href="trading.html">Auto-sim</a> and <a href="portfolio.html">Portfolio</a> ledgers
-    still model the general taker rate (<code>M = 1</code>) without per-series overrides. At a 50¢ entry the general
-    taker fee is about 2¢ per contract — roughly 4% of the stake — so a strategy that looks break-even gross is a loser
-    net. Source:
+  <h2>Fee schedule parity across server and browser ledgers</h2>
+  <div class="notice ok">
+    <b>G5 (fee-adjusted P&amp;L with per-series multipliers) is implemented across all paper surfaces (F-84).</b>
+    <a href="roi.html">ROI model</a>, <a href="simulation.html">Paper trading</a>,
+    <a href="trading.html">Auto-sim</a>, and <a href="portfolio.html">Portfolio</a> all apply the official quadratic
+    taker formula <code>ceil(M &times; 0.07 &times; C &times; P &times; (1 &minus; P))</code> with the transcribed
+    <code>M = 0</code> Non-Standard Fees series (<code>KXBTCY</code>, <code>KXETHY</code>, <code>KXELECTIRAN</code>)
+    and default <code>M = 1</code>, verified by <code>scripts/tests/test_fee_multipliers.js</code> and
+    <code>scripts/tests/test_fees.py</code>. Real demo-account execution remains gated on demo API credentials
+    (<a href="flagged.html">F-07</a>). Source:
     <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Kalshi fee schedule</a>.
   </div>
 

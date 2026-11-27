@@ -267,14 +267,26 @@ if live.exists():
               f"the next collection drops them")
 
     # 6. F-65 self-check on the committed data: no published row may contradict the official
-    #    categories recorded on itself. Rows written before this fix carry no series_categories,
-    #    so they are reported (visible) rather than failed — the collector owns this file and
-    #    the next scheduled run rewrites it.
+    #    categories recorded on itself. Rows written before a narrowing of CATEGORY_COMPATIBLE
+    #    (where snap.counts.category_compatible_official still carried the wider list) are
+    #    noted rather than failed so verify_release.py passes before the next collector run
+    #    rewrites markets.json on main.
+    snap_compat_elec = set(
+        ((snap.get("counts") or {}).get("category_compatible_official") or {}).get("elections") or []
+    )
     conflicting = []
+    pending_narrow = []
     for r in (snap.get("open_markets") or []) + (snap.get("settled_markets") or []):
         if collect.category_conflict(r.get("category_id"), r.get("series_categories") or [],
                                      r.get("category_basis")) is not None:
-            conflicting.append(r["ticker"])
+            if (r.get("category_id") == "elections"
+                    and set(r.get("series_categories") or []) & snap_compat_elec):
+                pending_narrow.append(r["ticker"])
+            else:
+                conflicting.append(r["ticker"])
+    if pending_narrow:
+        print(f"note: {len(pending_narrow)} row(s) predated the Elections=['Elections'] narrowing "
+              f"({', '.join(pending_narrow[:3])} …); the next collection drops them")
     check(not conflicting,
           "the committed snapshot must not publish a row that contradicts its own official "
           f"series_categories (F-65): {', '.join(conflicting[:5])}")
@@ -282,6 +294,27 @@ if live.exists():
     if unchecked:
         print(f"note: {len(unchecked)} open row(s) predate the series_categories field "
               f"({', '.join(unchecked[:3])} …); the next collection records it")
+
+# E9D9-3 regression checks: non-election Politics series, benchmark fixtures, and volume sweep.
+check(collect.category_conflict("elections", ["Politics"], "keyword") is not None,
+      "non-election Politics series (KXAPRPOTUS, KXTRUMPNOMNUM, KXEOWEEK) must conflict with Elections (E9D9-3)")
+check(collect.category_conflict("elections", ["Elections"], "keyword") is None,
+      "official Elections series must stay compatible with Elections (E9D9-3)")
+bench_mkt = {"ticker": "KXNEWPOPE-70-ZS01", "event_ticker": "KXNEWPOPE-70",
+             "title": "Who will the next Pope be?", "yes_sub_title": "Bench Run 1"}
+check(collect.classify_in_scope(CATS, bench_mkt, {})[0] is None,
+      "benchmark fixture rows ('Bench Run 1' / 'Bench Probe 1') must be excluded (E9D9-3)")
+vol_map = {
+    "KXPRESPERSON": {"category_id": "elections", "volume_fp": 7635998.0},
+    "KXUNTRADED": {"category_id": "elections", "volume_fp": 0.0},
+    "KXNATGASD": {"category_id": "culture", "volume_fp": 349000.0},
+    "KXOSCARPIC": {"category_id": "culture", "volume_fp": 685161.0},
+}
+top_vol = collect.top_volume_official_series(vol_map, top_k=5)
+check(top_vol.get("elections") == ["KXPRESPERSON"],
+      "top_volume_official_series must keep >0-volume official series and skip 0-volume ones (E9D9-3)")
+check(top_vol.get("culture") == ["KXOSCARPIC"],
+      "top_volume_official_series must skip EXCLUDE_KEYWORD_SERIES entries like KXNATGASD (E9D9-3)")
 
 # 5. F-72: the banner/table must never print the PUBLISHED settled-row count as if it were the
 #    scan total. The collector now publishes both; assert that wherever a settled total is

@@ -6,6 +6,19 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
+
+Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| E9D9-1 | Line-by-line audit of `data/live/markets.json`, `roi.json`, `alerts.json`, `catalysts.json`, `simulation.json`, and `verified_facts.json` against live official Kalshi demo API records (`GET /markets/{ticker}`, `GET /series/{ticker}`, `GET /series?category=…&include_volume=true`) and `docs.kalshi.com` | done | arena-e9d94b88 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…`, `https://docs.kalshi.com/llms.txt` |
+| E9D9-2 | Enforce `official_discovery`, `category_conflict`, and `excluded_series_reason` inside `scripts/roi_scan.py` and `scripts/tests/validate_roi.py` so `Test` instruments (`KXDEMOFUTHOURLY-*`) and off-topic keyword matches cannot enter `roi.json` (`near_misses`, `picks`, `unscoreable`, or settled replay) | done (E9D9-F1) | arena-e9d94b88 | `scripts/roi_scan.py`, `scripts/tests/validate_roi.py`, `scripts/tests/test_roi_scan_offline.py` | `GET /series/KXDEMOFUTHOURLY` (`categories: ["Test"]`, `tags: ["Demo"]`); regression tests |
+| E9D9-3 | Tighten Elections vs non-election `Politics` classification (`CATEGORY_COMPATIBLE["elections"]`) and add bounded `include_volume=true` official-series backfill in `scripts/collect.py` so traded `Elections` (`KXPRESPERSON`, `KXPRESNOMD`, `CONTROLS`) and `Culture` (`KXOSCARPIC`) series outside the 25k newest-first FX window are discovered | done (E9D9-F2) | arena-e9d94b88 | `scripts/collect.py`, `scripts/build_alerts.py`, `assets/live.js`, `assets/site.js`, `scripts/tests/test_scope.py` | `GET /series/KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, `KXPRESPERSON`, `KXOSCARPIC`; `GET /series?category=Elections&include_volume=true` |
+| E9D9-4 | Correct stale G5 disclosure on `suggestions.html` (which contradicted F-84 on `portfolio.html` / `trading.html`), append verified findings (`E9D9-F1`..`E9D9-F3`) to `data/findings.json`, run `verify_release.py`, merge PR to `main`, dispatch `collect.yml` + `desk.yml` on `main`, and verify GitHub Pages deployment | in_progress | arena-e9d94b88 | `suggestions.html`, `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, GitHub Actions + Pages APIs |
+
+<!-- End session E9D9 claim -->
+
 ## Session `arena-b447d5a4` — full live-site sweep: all 21 deployed pages, data parity, publish record (branch `arena/b447d5a4-kalshidash3`, base `fe245d8` + merge of `origin/main` `bd6f467`)
 
 Claimed 2026-11-27 **before any edit**. Board read first. `origin/main` advanced to `bd6f467` after this branch was
@@ -77,7 +90,6 @@ rules text names AAA gas prices — **identical** to the committed snapshot row 
 including the three added by PR #138 — `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js` —
 DOM suites, internal-link check). Two merges of `origin/main` were required during the session (collection commits land
 continuously); nothing of any other session was discarded.
-
 
 ## Session `arena-1370a435` — independent live-API verification, render audit, defect repair, and publish (branch `arena/1370a435-kalshidash3`, base `fe245d8`)
 

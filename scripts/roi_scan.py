@@ -347,29 +347,63 @@ def build(validate_n: int, out_path: Path) -> dict:
     open_ms, open_trunc = paged_markets({"status": "open", "mve_filter": "exclude"}, cap=20000)
     print(f"  open markets: {len(open_ms)}" + (" (safety cap reached)" if open_trunc else ""))
 
-    series_idx = COLLECT.fetch_series_index()
-    rows, seen_combo = [], 0
+    series_idx = COLLECT.fetch_series_index(getter=get)
+    official_map, _ = COLLECT.official_discovery(cats, series_index=series_idx, getter=get)
+    ledger: dict[str, dict] = {}
+
+    def record_series(ticker: str) -> None:
+        t = (ticker or "").upper()
+        if not t or t in ledger:
+            return
+        rec = series_idx.get(t)
+        if rec is None:
+            try:
+                d, _ = get(f"/series/{t}")
+                rec = d.get("series") or {}
+            except (RuntimeError, AssertionError) as e:
+                print(f"  ! series {t}: {e}", file=sys.stderr)
+                rec = None
+        cats_official = COLLECT.official_categories(rec)
+        ledger[t] = {
+            "categories": cats_official if cats_official else None,
+            "title": (rec or {}).get("title"),
+            "tags": (rec or {}).get("tags"),
+        }
+
+    rows, seen_combo, seen_conflict, seen_excluded = [], 0, 0, 0
     # NOTE: `category_id`/`category_basis` are NOT API fields — GET /markets has no topic
     # field. They are this project's classification, attached to the market object here so
     # the model's require_seed_category gate reads exactly what the page reads (the browser
     # mirror attaches the same two keys in scoreAll()).
+    # E9D9-2: run COLLECT.classify_in_scope so Test/Demo instruments (KXDEMOFUTHOURLY),
+    # natural-gas futures (KXNATGASD/KXNATGAS15M), QA/Bench fixtures, and category/tag
+    # conflicts (e.g. non-election Politics series) are excluded identically to collect.py.
     for m in open_ms:
-        if COLLECT.is_multivariate(m):
+        st = COLLECT.series_of(m)
+        cid, basis, matched_by, official_cats, rej, _ = COLLECT.classify_in_scope(
+            cats, m, series_idx, official_map=official_map,
+            record_series_fn=record_series, ledger=ledger,
+        )
+        if rej == "multivariate":
             seen_combo += 1
             continue
-        st = COLLECT.series_of(m)
-        s = series_idx.get(st, {})
-        cid, basis = COLLECT.classify(cats, st, s.get("title"),
-                                      " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
-                                      m.get("title") or m.get("yes_sub_title"))
+        if rej == "conflict":
+            seen_conflict += 1
+            continue
+        if rej in ("off_topic_or_qa", "excluded_series"):
+            seen_excluded += 1
+            continue
         if not cid:
             continue
         if str(m.get("status") or "").lower() in ("finalized", "determined", "closed", "settled"):
             continue
         m["category_id"] = cid
         m["category_basis"] = basis
-        rows.append({"m": m, "cid": cid, "basis": basis, "series": st})
-    print(f"  in scope: {len(rows)} open markets in the five categories ({seen_combo} combos skipped by the local guard)")
+        m["category_matched_by"] = matched_by
+        m["series_categories"] = official_cats
+        rows.append({"m": m, "cid": cid, "basis": basis, "series": st, "official_cats": official_cats})
+    print(f"  in scope: {len(rows)} open markets in the five categories "
+          f"({seen_combo} combos, {seen_conflict} category conflicts, {seen_excluded} off-topic/QA skipped)")
 
     # 2. ranking input: dollars traded estimate, labelled as an estimate
     for r in rows:
@@ -402,7 +436,8 @@ def build(validate_n: int, out_path: Path) -> dict:
             scoring_errors.append({"ticker": m.get("ticker"), "error": f"{type(e).__name__}: {e}"})
             continue
         sc.update({"title": m.get("title") or m.get("yes_sub_title") or "", "category_id": r["cid"],
-                   "category_basis": r["basis"], "close_time": m.get("close_time"),
+                   "category_basis": r["basis"], "series_categories": r.get("official_cats") or [],
+                   "close_time": m.get("close_time"),
                    "event_ticker": m.get("event_ticker"), "status": m.get("status"),
                    "result": m.get("result") or None,
                    "volume_fp": RM.num(m.get("volume_fp")), "volume_24h_fp": RM.num(m.get("volume_24h_fp")),
@@ -452,8 +487,11 @@ def build(validate_n: int, out_path: Path) -> dict:
     # 6. out-of-sample validation on markets that have already settled
     settled, settled_trunc = paged_markets({"status": "settled"}, cap=20000)
     settled.sort(key=lambda m: m.get("settlement_ts") or m.get("close_time") or "", reverse=True)
-    validation = replay_settled(model, [m for m in settled if _maybe_in_scope(cats, series_idx, m)], validate_n) \
-        if validate_n else {"skipped": {"--validate": "0"}}
+    validation = replay_settled(
+        model,
+        [m for m in settled if _maybe_in_scope(cats, series_idx, m, official_map, record_series, ledger)],
+        validate_n,
+    ) if validate_n else {"skipped": {"--validate": "0"}}
     print(f"  validation: {validation.get('markets_tested', 0)} markets, {validation.get('signals', 0)} signals, hit rate {validation.get('hit_rate')}")
 
     cutoff = None
@@ -493,6 +531,8 @@ def build(validate_n: int, out_path: Path) -> dict:
         "counts": {
             "open_scanned": len(open_ms),
             "open_in_scope": len(rows),
+            "open_excluded_category_conflict": seen_conflict,
+            "open_excluded_off_topic_or_qa": seen_excluded,
             "eligible": len(eligible),
             "picks": len(picks),
             "near_misses": len(near_misses),
@@ -531,12 +571,11 @@ def build(validate_n: int, out_path: Path) -> dict:
     return payload
 
 
-def _maybe_in_scope(cats, series_idx, m) -> bool:
-    st = COLLECT.series_of(m)
-    s = series_idx.get(st, {})
-    cid, _ = COLLECT.classify(cats, st, s.get("title"),
-                              " ".join(s.get("categories") or []) if s.get("categories") else s.get("category"),
-                              m.get("title") or m.get("yes_sub_title"))
+def _maybe_in_scope(cats, series_idx, m, official_map=None, record_series_fn=None, ledger=None) -> bool:
+    cid, _, _, _, _, _ = COLLECT.classify_in_scope(
+        cats, m, series_idx, official_map=official_map,
+        record_series_fn=record_series_fn, ledger=ledger,
+    )
     return bool(cid)
 
 

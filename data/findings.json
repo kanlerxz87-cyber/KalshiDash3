@@ -161,18 +161,18 @@
     "https://docs.kalshi.com/api-reference/market/get-market-orderbook"
    ]
   },
-  {
-   "id": "G5",
-   "suggestion": "Model fees before trusting any P&L number.",
-   "why_it_helps_decisions": "Near 50 cents the taker fee is about 2 cents per contract, i.e. about 4% of a 50c stake. A strategy that looks break-even gross is a loser net.",
-   "effort": "Medium",
-   "risk": "Fee multipliers vary per series; a naive flat model misstates cost for 0/0 series.",
-   "success_metric": "Fee-adjusted P&L shown alongside gross, with the series fee_multiplier displayed.",
-   "status": "proposed",
-   "sources": [
-    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
-   ]
-  },
+    {
+      "id": "G5",
+      "suggestion": "Model fees before trusting any P&L number.",
+      "why_it_helps_decisions": "Near 50 cents the taker fee is about 2 cents per contract, i.e. about 4% of a 50c stake. A strategy that looks break-even gross is a loser net.",
+      "effort": "Medium",
+      "risk": "Fee multipliers vary per series; a naive flat model misstates cost for 0/0 series.",
+      "success_metric": "Fee-adjusted P&L shown alongside gross, with the series fee_multiplier displayed.",
+      "status": "implemented (server + browser paper ledgers apply official per-series multipliers; F-84)",
+      "sources": [
+        "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+      ]
+    },
   {
    "id": "G6",
    "suggestion": "Log which chart window and which snapshot you looked at when you place each trade.",
@@ -1507,7 +1507,8 @@
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
       "https://docs.kalshi.com/getting_started/market_lifecycle"
     ]
-  },{
+  },
+  {
    "id": "F-105",
    "severity": "medium",
    "item": "The two alert chats and the chat dock counted rows they were not showing: the header said \"154 in view\" while the feed held 120",
@@ -1521,6 +1522,44 @@
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
       "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
+  },
+  {
+    "id": "E9D9-F1",
+    "severity": "high",
+    "item": "Live-desk ROI scanner (roi_scan.py) bypassed the collector's official-category, Test-instrument, and QA exclusions, publishing KXDEMOFUTHOURLY in near_misses",
+    "why": "scripts/roi_scan.py called COLLECT.classify(...) directly instead of running the collector's official_discovery + category_conflict + EXCLUDE_KEYWORD_SERIES + EXCLUDE_TITLE_RE gates. On the committed 2026-11-27T17:01:58Z scan (data/live/roi.json), the sole entry in near_misses was KXDEMOFUTHOURLY-26NOV27H18-UP ('Demo BTC at or above 59876.36 USD'), whose official series record GET /series/KXDEMOFUTHOURLY carries categories ['Test'] and tags ['Demo'], while unscoreable included non-election Politics series (KXAPRPOTUS-*) and open_in_scope was inflated to 13,731.",
+    "action": "FIXED: extracted COLLECT.classify_in_scope() in scripts/collect.py and wired both scripts/collect.py and scripts/roi_scan.py (open scan + settled validation replay) plus assets/live.js through the same category_conflict, Test/Demo, QA/benchmark, and excluded-series checks. scripts/tests/validate_roi.py now refuses any pick, near_miss, or unscoreable row that violates those rules, and scripts/tests/test_roi_scan_offline.py pins negative regression cases for KXDEMOFUTHOURLY, KXAPRPOTUS, and KXNATGASD.",
+    "sources": [
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+      "https://docs.kalshi.com/api-reference/market/get-series-list",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/roi_scan.py",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_roi.py"
+    ]
+  },
+  {
+    "id": "E9D9-F2",
+    "severity": "medium",
+    "item": "Elections admitted non-election Politics prop series while high-volume official Elections and Culture series sat behind the 25,000-row newest-first scan cap",
+    "why": "Two linked classification/discovery gaps were verified against live demo endpoints on 2026-11-27: (1) CATEGORY_COMPATIBLE['elections'] included 'Politics', letting 16 non-election governance prop contracts (KXAPRPOTUS presidential approval, KXTRUMPNOMNUM cabinet nomination counts, KXEOWEEK executive-order counts — all categories ['Politics']) account for 16 of the 17 open Elections rows; (2) GET /markets?status=open returns newest-first and hits SAFETY_SCAN_CAP (25,000) inside 15-minute FX/crypto contracts before reaching older multi-year series, even though GET /series?category=Elections&include_volume=true and ?category=Entertainment&include_volume=true report active traded markets on KXPRESPERSON (vol 7.64M), KXPRESNOMD (5.58M), CONTROLS (2.82M), and KXOSCARPIC (685K). Separately, KXNEWPOPE-70 carries benchmark test contracts ('Bench Run 1..8', 'Bench Probe 1').",
+    "action": "FIXED: narrowed CATEGORY_COMPATIBLE['elections'] to {'Elections'} across collect.py, build_alerts.py, and assets/live.js; added include_volume=true to official_discovery() and a bounded top-volume official-series market backfill (top 12 traded official series per topic) in scripts/collect.py; extended EXCLUDE_TITLE_RE and KD.isQaRow to drop 'Bench Run'/'Bench Probe' benchmark fixtures and added KXNATGASMON to EXCLUDE_KEYWORD_SERIES; removed duplicate dict keys in collect.py counts.",
+    "sources": [
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAPRPOTUS",
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXPRESPERSON",
+      "https://external-api.demo.kalshi.co/trade-api/v2/series/KXOSCARPIC",
+      "https://docs.kalshi.com/api-reference/market/get-series-list"
+    ]
+  },
+  {
+    "id": "E9D9-F3",
+    "severity": "low",
+    "item": "suggestions.html still stated browser paper ledgers used flat M = 1 fees, contradicting F-84",
+    "why": "F-84 updated assets/alerts.js, assets/engine.js, portfolio.html, and trading.html to apply the transcribed fee-schedule multipliers (M = 0 on KXBTCY, KXETHY, KXELECTIRAN; default M = 1), verified by scripts/tests/test_fee_multipliers.js, but the static callout at the bottom of suggestions.html still claimed trading.html and portfolio.html used flat M = 1 without per-series overrides.",
+    "action": "FIXED: updated the callout on suggestions.html (and G5's status in data/findings.json) so it accurately states that all server and browser paper ledgers share per-series fee-multiplier parity while real demo execution remains gated on demo API credentials (F-07).",
+    "sources": [
+      "https://kalshi.com/docs/kalshi-fee-schedule.pdf",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/suggestions.html",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_fee_multipliers.js"
+    ]
   }
  ]
 }
