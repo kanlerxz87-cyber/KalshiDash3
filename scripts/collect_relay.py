@@ -501,6 +501,7 @@ def make_pass(plan: Plan):
                 annotate("error", f"pass {n}: {name} FAILED (exit {p.returncode})", (p.stdout + p.stderr)[-3000:])
                 return fail(f"{name} (exit {p.returncode})", p.stdout + p.stderr)
         failed = []
+        tails = []
         for name, path in VALIDATORS:
             if not (ROOT / path).exists():
                 annotate("warning", f"pass {n}: validator {path} is missing; skipped")
@@ -509,13 +510,22 @@ def make_pass(plan: Plan):
                 p = sh(["python3", path], timeout=600)
             except subprocess.TimeoutExpired:
                 failed.append(name)
+                tails.append(f"[{name}] timed out after 600s")
                 continue
             if p.returncode != 0:
                 failed.append(name)
+                tails.append(f"[{name}] exit {p.returncode}\n{(p.stdout + p.stderr)[-1500:]}")
                 annotate("error", f"pass {n}: {name} FAILED", (p.stdout + p.stderr)[-3000:])
         if failed:
             discard_changes()
-            return fail("validators: " + ", ".join(failed))
+            # F-108: the health record must carry the failing validators' OWN last lines, not just
+            # their names. Before this, fail() was called with no tail, so every
+            # collector_health.json written for a validator failure had stderr_tail "" — six
+            # consecutive stalled passes (2026-11-27 18:16Z..19:23Z) could not say WHY from the
+            # repository alone, defeating F-85's stated purpose ("carries the failing step's own
+            # last lines"). record_health keeps the last 2000 chars; each failing validator is
+            # labelled so a reader can tell which lines belong to which check.
+            return fail("validators: " + ", ".join(failed), "\n".join(tails))
         if not plan.commit:
             discard_changes()
             return "validated", f"dry run on {head}; nothing committed"

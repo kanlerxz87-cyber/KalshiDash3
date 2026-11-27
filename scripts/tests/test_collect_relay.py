@@ -12,6 +12,7 @@ Run: python3 scripts/tests/test_collect_relay.py
 from __future__ import annotations
 
 import importlib.util
+import json
 import re
 import sys
 import tempfile
@@ -275,12 +276,16 @@ def main() -> int:
     calls: list[str] = []
 
     class Done:
-        def __init__(self, rc=0):
-            self.returncode, self.stdout, self.stderr = rc, "", ""
+        def __init__(self, rc=0, stderr=""):
+            self.returncode, self.stdout, self.stderr = rc, "", stderr
 
     def fake_sh(args, timeout=600, check=False):
         calls.append(" ".join(args[1:2]) if args[0] == "python3" else " ".join(args[:2]))
-        return Done(1 if fail_on and args[0] == "python3" and args[1] == fail_on else 0)
+        rc = 1 if fail_on and args[0] == "python3" and args[1] == fail_on else 0
+        # A failing validator prints its reason to stderr; the relay must forward those lines
+        # into the health record (F-108), so the stub emits a distinctive, recognisable tail.
+        return Done(rc, stderr=(f"INVALID data from {args[1]}: assigned topic 'gas' but categories [] accept []"
+                                if rc else ""))
 
     saved = (R.sh, R.sync_to_remote, R.probe_api, R.commit_and_push, R.discard_changes, R.annotate)
     notes: list[str] = []
@@ -308,6 +313,14 @@ def main() -> int:
         out = R.make_pass(R.make_plan("main"))(3)
         check(out[0] == "failed" and "commit_and_push" not in calls and "discard" in calls,
               f"a failing validator discards the pass ({out[1]})")
+        # F-108: the health record must name the failing validator AND carry its own last lines.
+        health = json.loads((R.HEALTH_ROOT / R.HEALTH_PATH).read_text())
+        check(health.get("outcome") == "failed" and "validate_live" in (health.get("detail") or ""),
+              f"the health record names the failing validator ({health.get('detail')!r})")
+        check("categories [] accept []" in (health.get("stderr_tail") or ""),
+              "the health record carries the failing validator's OWN stderr tail, not an empty string (F-108)")
+        check("[validate_live]" in (health.get("stderr_tail") or ""),
+              "the tail is labelled with which validator produced it")
         calls.clear(); fail_on = None
         out = R.make_pass(R.make_plan("main", commit_in="false"))(4)
         check(out[0] == "validated" and "commit_and_push" not in calls, "a dry-run pass validates and commits nothing")
