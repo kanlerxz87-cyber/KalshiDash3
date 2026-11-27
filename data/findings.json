@@ -1574,6 +1574,52 @@
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py"
    ]
+  },
+  {
+   "id": "F-107",
+   "severity": "high",
+   "item": "Collector dropped official series evidence for archived alerts once their entire series left the bounded market scan",
+   "why": "On 2026-11-27, collector health reported repeated validate_alerts failures while the published market snapshot remained at 18:00:57Z. Independent dry-run 46058016625 reproduced the failure: two archived KXAAAGASD-26NOV21-3.6600 alerts retained category_assigned_from but the new snapshot no longer included KXAAAGASD in series_index, so the strict validator could not reproduce that assignment. The official GET /series/KXAAAGASD record was re-read in this session and returned categories ['Economics'], title 'US gas price up', and AAA as a settlement source. This was not the elections compatibility-table drift described in F-106.",
+   "action": "Fixed scripts/collect.py to record the distinct series of every archive-cited ticker as well as scanned markets, using the existing official series lookup and deduplication. No category is inferred and no validator is relaxed. Added an end-to-end offline regression that runs the collector build, alert builder and validator with the gas series absent from both current market buckets; additional tests cover one request per series, reuse of an official bulk answer, current category changes and unavailable API answers remaining null. Live collection recovery is tracked in COORDINATION.md; a passing offline suite alone does not establish freshness.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058016625",
+    "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://docs.kalshi.com/api-reference/market/get-series",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_archive_series_retention.py"
+   ]
+  },
+  {
+   "id": "F-108",
+   "severity": "medium",
+   "item": "validate_alerts treated an archived alert's series leaving series_index as a contradiction - the only place in the pipeline that read 'unknown' as 'contradicted' - and nothing kept a verified record when the exchange stopped answering for an archived series",
+   "why": "Same stall as F-107, seen from the validator's side. Measured on main: data/live/collector_health.json recorded six consecutive failed passes (18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z, 19:38:04Z), every one 'validators: validate_alerts', while data/live/markets.json stayed at collected_at 2026-11-27T18:00:57Z. Once the relay began recording a failing validator's own output (F-109), the reproduction run 46057975142 named it: 'archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []' and the same market at 22:04:00Z. The series is officially ['Economics'] (GET /series/KXAAAGASD) and the archived alerts carry category_assigned_from, so their topic was confirmed from the official record; the ledger had simply stopped carrying the series once its markets left the scan. The rule that failed the pass was the only one in the pipeline that turned missing evidence into a contradiction: scripts/build_alerts.py publishes a row whose official categories are unknown ('no official categories recorded: unknown is not a contradiction'). F-107 repairs the coverage gap by re-reading each archived series' official record every pass; that leaves a second exposure, because a pass in which GET /series/{ticker} does not answer stores no categories for that series and the strict rule would wedge the collector again.",
+   "action": "Two layers, both pinned. (1) scripts/tests/validate_alerts.py: an archived alert whose series is absent from series_index is counted and printed ('unknown is not a contradiction; N archived alert(s) cite a series the current snapshot no longer carries') instead of failing the pass; a PROVABLE contradiction (series present with categories the topic cannot contain) still refuses the pass. Regression: scripts/tests/test_alert_series_ledger_gap.py, mutation-checked - it fails on the pre-fix validator with the production error text and passes after. (2) scripts/collect.py: carry_forward_series() runs after F-107's per-series re-read and keeps the record the previous snapshot verified when this pass's official read gave no categories (a fresh answer always wins, an unanswered record is never carried, only archived series are looked at), publishing counts.series_ledger_carried_forward so the ledger is never silently stale. Regression: scripts/tests/test_series_ledger_carry.py. Integration: F-107 (PR #151) was merged first and is the primary repair; this row records the validator's class-level fix plus its fallback, not a second mechanism. Verified on live official data by no-commit collect.yml pass 46058449720 (2026-11-27T19:41Z, success on the fresh collection that had failed six times) and by python3 scripts/verify_release.py PASS on the merged tree.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058449720",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_alert_series_ledger_gap.py"
+   ]
+  },
+  {
+   "id": "F-109",
+   "severity": "medium",
+   "item": "data/live/collector_health.json never carried a failing validator's own output: every validator failure recorded only the validator's name, with stderr_tail empty, so six consecutive collector stalls could not be diagnosed from the repository",
+   "why": "scripts/collect_relay.py called fail('validators: ' + names) with no tail, unlike the pre-check and pipeline failures, which do pass their output, so a validator's report existed only in the job's stdout. Actions job logs are served from a host this project's sandboxes cannot reach (recorded on this board on 2026-11-22 and again for the 2026-11-25 stall of the same validator), and a wedged run's output dies with the run. Measured on main: the health records for 18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z and 19:23:02Z all read detail 'validators: validate_alerts' with stderr_tail empty, so the stall that F-107 and F-108 record carried no diagnosis in the repository.",
+   "action": "FIXED: make_pass() collects each failing validator's own output (name, exit code, stdout and stderr; a timeout is recorded as such) and passes it to record_health(), and HEALTH_TAIL_LIMIT was raised from 2000 to 8000 characters so a validator's header and error list survive truncation instead of only the tail. Regression: scripts/tests/test_collect_relay.py asserts that a failing validator's record names it AND carries its error text (mutation-checked: the check fails on the pre-fix relay with 'the health record carries the validator's own error text, not just its name'), and scripts/tests/test_collect_health.py pins the new bound. Proven in production shape: run 46057975142 recorded '--- validate_alerts (exit 1) ... INVALID alert data: archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []', the message that identified the defect.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_collect_relay.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://docs.github.com/en/actions/how-tos/monitor-workflows/view-workflow-run-history",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json"
+   ]
   }
  ]
 }

@@ -152,7 +152,10 @@ class HealthRecordTests(unittest.TestCase):
         self.assertEqual(doc["pass"], 3)
         self.assertEqual(doc["outcome"], "failed")
         self.assertEqual(doc["detail"], "collect timeout")
-        self.assertLessEqual(len(doc["stderr_tail"]), 2000)
+        # A8D3-1: the bound is a named constant; it must be large enough for a validator's
+        # own report (header + up to 40 errors), not just one crash traceback.
+        self.assertLessEqual(len(doc["stderr_tail"]), self.mod.HEALTH_TAIL_LIMIT)
+        self.assertGreaterEqual(self.mod.HEALTH_TAIL_LIMIT, 4000)
         self.assertIn("COLLECT_FAILED", doc["stderr_tail"])
         self.assertIn("run", doc)
         self.assertIn("generated_at", doc)
