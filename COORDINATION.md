@@ -3,6 +3,15 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-72ae7bca` — independent source-provenance audit and release integration
+
+Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `arena/72ae7bca-kalshidash3` is the integration branch for this session (no branch creation). Existing concurrent scopes are preserved: in particular F250-1 and PR #148's ledger formatting are not edited here.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | in progress | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi OpenAPI/docs via available official GitHub sources; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
+| 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | in progress | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
+
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
