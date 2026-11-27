@@ -52,6 +52,7 @@ const KDCHAT = (() => {
   const MAX_ROWS = 80;
   const FEED_CAP = 2000;
   const REPO = "kanlerxz87-cyber/KalshiDash3";
+  const GH = "https://github.com/" + REPO;
 
   const CAT_LABEL = {
     gas: "Gas Prices",
@@ -103,6 +104,7 @@ const KDCHAT = (() => {
     mounted: false,
     filter: "",
     health: null,
+    collectorHealth: null,    // data/live/collector_health.json: did the last collector pass commit?
   };
 
   const key = (a) => `${a.ticker}@${a.t}`;
@@ -150,6 +152,12 @@ const KDCHAT = (() => {
   /* ------------------------- history flow ------------------------- */
   async function loadHistory() {
     if (S.histLoaded) return;
+    // R93-3: the collector's own pass record. Read here because the dock is mounted on every page,
+    // so this one fetch puts "the pipeline last failed" in front of a reader wherever they are.
+    try {
+      const rh = await fetch("data/live/collector_health.json", { cache: "no-store" });
+      if (rh.ok) S.collectorHealth = await rh.json();
+    } catch { S.collectorHealth = null; }
     let doc = null;
     try {
       const r = await fetch("data/live/alerts_archive.json", { cache: "no-store" });
@@ -465,9 +473,37 @@ const KDCHAT = (() => {
     const snapLine = document.getElementById("kdSnapLine");
     if (snapLine && S.snapshotAt) {
       const age = Date.now() - Date.parse(S.snapshotAt);
+      // R93-3 (2026-11-27): this line used to read "... — the live poller below is still current"
+      // whenever the snapshot was older than 45 minutes. That is only true while the poller is
+      // actually running, and the poller is exactly what fails when the demo API is not readable
+      // from the browser (CORS). On 2026-11-27 the collector had not committed since 18:00:57Z and
+      // the dock still told the reader the chats were current. The claim is now conditional, and
+      // the age is always printed so the reader can judge it either way.
       snapLine.innerHTML =
         `Committed snapshot <code>${esc(S.snapshotAt)}</code> (${esc(ago(Date.parse(S.snapshotAt)))})` +
-        (age > 45 * 60000 ? ' · <b class="warn">stale</b> — the live poller below is still current' : "");
+        (age > 45 * 60000
+          ? ' · <b class="warn">stale</b>' +
+            (S.liveOn ? " — the live poller is current; these history rows are not"
+                      : " — no live poller is running, so every row here is as old as that snapshot")
+          : "");
+    }
+    // R93-3: the committed health record says whether the most recent collector pass committed or
+    // failed (scripts/collect_relay.py writes it on every pass). Without this the reader had to
+    // open GitHub Actions to learn that the whole pipeline was down. Absent file = no claim.
+    const healthNote = document.getElementById("kdHealthNote");
+    if (healthNote) {
+      const h = S.collectorHealth;
+      if (!h) {
+        healthNote.innerHTML = "";
+      } else if (h.outcome === "failed") {
+        healthNote.innerHTML =
+          ` · <b class="warn">last collector pass failed</b> <span class="mut">` +
+          `(${esc(h.detail || "no detail recorded")}, ${esc(ago(Date.parse(h.generated_at)))})</span> · ` +
+          `<a href="${esc(GH)}/actions/runs/${esc(h.run && h.run.run_id || "")}" target="_blank" rel="noopener">the run</a>`;
+      } else if (h.outcome === "ok") {
+        healthNote.innerHTML =
+          ` · <span class="mut">last collector pass committed (${esc(ago(Date.parse(h.generated_at)))})</span>`;
+      }
     }
   }
 
@@ -577,6 +613,7 @@ const KDCHAT = (() => {
       <button class="kd-btn" id="kdToggle">Pause live</button>
       <a class="kd-more" href="alerts.html">full alert page →</a>
       <span class="kd-snapline small" id="kdSnapLine"></span>
+      <span class="kd-healthnote small" id="kdHealthNote"></span>
       <span id="kdHealth"></span>
     </header>
     <div class="kd-grid">

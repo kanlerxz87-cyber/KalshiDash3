@@ -21,6 +21,8 @@
 <header class="top"><div class="wrap"><nav id="nav"></nav></div></header>
 <main class="wrap">
 
+  <div id="snapshotBanner"></div>
+
   <h1>Auto-sim trading engine <span class="autosim-tag">AUTO-SIM · PAPER ONLY</span></h1>
   <p class="lede">
     Automated simulated trades that test strategies against live demo-API prices. The engine runs by itself:
@@ -322,6 +324,8 @@ async function boot() {
   KDL.onRows(() => { renderAll(); });
   // Snapshot + collector history so the engine has a market universe without live REST…
   const snap = await KDL.loadSnapshot();
+  // R93-3: the ledger below prices positions from this snapshot, so the page says how old it is.
+  KD.snapshotBanner(snap);
   KDL.ingest((snap?.open_markets || []).concat(snap?.settled_markets || []), "collector", { silent: true });
   // …then go live if the browser can reach the demo API.
   const ok = await KDL.probe();

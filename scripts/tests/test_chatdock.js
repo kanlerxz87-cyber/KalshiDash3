@@ -32,7 +32,7 @@ const bad = (m) => { failures++; console.log("  FAIL " + m); };
 const check = (c, m) => (c ? ok(m) : bad(m));
 
 /* ---------------------------------------------------------------- harness */
-function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
+function makeEnv({ apiMode, archive, snapshot, ticks, pollMs, health }) {
   const state = { calls: [], polled: 0 };
   const fnum = (v) => { const n = Number(v); return Number.isNaN(n) ? null : n; };
 
@@ -41,6 +41,10 @@ function makeEnv({ apiMode, archive, snapshot, ticks, pollMs }) {
     const send = (body, status = 200) => ({ ok: status >= 200 && status < 300, status, json: async () => body });
     if (/^data\/live\/alerts_archive\.json/.test(u)) return send(archive);
     if (/^data\/live\/markets\.json/.test(u)) return send(snapshot);
+    // R93-3: the collector's own pass record. Omitting it must behave exactly as before.
+    if (/^data\/live\/collector_health\.json/.test(u)) {
+      return health ? send(health) : send({}, 404);
+    }
     if (/api\.github\.com/.test(u)) return send({ workflow_runs: [] });
     if (/external-api\.demo\.kalshi\.co/.test(u)) {
       if (apiMode === "blocked") { const e = new TypeError("Failed to fetch"); e.name = "TypeError"; throw e; }
@@ -248,6 +252,53 @@ function counts(w) {
   const healthSrc = SRC.slice(SRC.indexOf("freshness / run health"));
   check(/observedMinutes/.test(healthSrc) && /gap > observed \* 2/.test(healthSrc),
         "the throttling warning compares the scheduled gap against measured spacing (F-40 signal kept)");
+
+  /* ------------------------------------ R93-3: staleness + collector-failure disclosure */
+  console.log("\nR93-3 — a blocked poller must not be called 'current', and a failed pass must be visible");
+  const old = new Date(Date.now() - 3 * 3600 * 1000).toISOString().replace(/\.\d+Z$/, "Z");
+  const staleSnap = { ...SNAPSHOT, collected_at: old };
+
+  // (a) blocked poller + a stale snapshot: the old wording claimed the poller was "still current".
+  const envA = makeEnv({ apiMode: "blocked", archive: ARCHIVE, snapshot: staleSnap, ticks: [] });
+  await sleep(150); open(envA.w); await sleep(100);
+  const snapLine = envA.w.document.getElementById("kdSnapLine").textContent;
+  check(!/still current/.test(snapLine),
+    `the dock does not claim a blocked poller is current ("${snapLine.slice(-70)}")`);
+  check(/no live poller is running/.test(snapLine),
+    "it says every row is as old as the snapshot instead");
+  check(/stale/.test(snapLine), "it still labels the snapshot stale");
+
+  // (b) the same stale snapshot with the poller running: the history rows are the stale part.
+  const envB = makeEnv({ apiMode: "live", archive: ARCHIVE, snapshot: staleSnap,
+    ticks: [[["KXBTCY-27JAN0100-B47500", 0.5]]], pollMs: 400 });
+  await sleep(900); open(envB.w); await sleep(400);
+  const snapLineB = envB.w.document.getElementById("kdSnapLine").textContent;
+  check(/live poller is current/.test(snapLineB) && /history rows\s+are not/.test(snapLineB),
+    `with the poller running it says the poller is current and history is not ("${snapLineB.slice(-80)}")`);
+
+  // (c) a FAILED last pass is named on the page, with the run linked, no GitHub visit required.
+  const failedHealth = {
+    schema: 1, generated_at: new Date(Date.now() - 10 * 60000).toISOString().replace(/\.\d+Z$/, "Z"),
+    pass: 2, outcome: "failed", detail: "validators: validate_alerts", stderr_tail: "",
+    run: { workflow: "collect.yml", run_id: "46058054873", attempt: "1", sha: "abc" },
+  };
+  const envC = makeEnv({ apiMode: "blocked", archive: ARCHIVE, snapshot: SNAPSHOT, ticks: [], health: failedHealth });
+  await sleep(150); open(envC.w); await sleep(120);
+  const note = envC.w.document.getElementById("kdHealthNote").textContent;
+  check(/last collector pass failed/.test(note), `a failed pass is named ("${note.slice(0, 60)}…")`);
+  check(/validate_alerts/.test(note), "the failing step is named, not just 'something failed'");
+  const links = [...envC.w.document.querySelectorAll("#kdHealthNote a")].map((a) => a.href);
+  check(links.some((h) => h.includes("/actions/runs/46058054873")), "the failing run is linked");
+
+  // (d) a healthy pass says so, and an absent record says nothing at all.
+  const okHealth = { ...failedHealth, outcome: "ok", detail: "snapshot committed" };
+  const envD = makeEnv({ apiMode: "blocked", archive: ARCHIVE, snapshot: SNAPSHOT, ticks: [], health: okHealth });
+  await sleep(150); open(envD.w); await sleep(120);
+  const noteD = envD.w.document.getElementById("kdHealthNote").textContent;
+  check(/last collector pass committed/.test(noteD) && !/failed/.test(noteD),
+    `a committed pass is reported as such ("${noteD.slice(0, 50)}…")`);
+  const noteE = env3.w.document.getElementById("kdHealthNote").textContent;
+  check(noteE === "", "no health record means no claim either way");
 
   console.log("");
   teardown();
