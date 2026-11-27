@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "flagged": [
+    {
+      "id": "C440-LIFECYCLE",
+      "severity": "high",
+      "item": "A ranked window can omit an already settled contract",
+      "why": "The published market snapshot omitted KXAAAGASD-26NOV21-3.6600 although the official per-ticker record reported finalized / no. A snapshot-only join left its archived alerts without a result and could leave a paper position open.",
+      "action": "The collector follows alerted contracts and outstanding paper positions by ticker. It can use the historical partition after a live 404 and retains sourced final results. Failed or deferred lookups leave the status and result blank; the alert ledger labels them unverified.",
+      "sources": [
+        "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+        "https://docs.kalshi.com/getting_started/market_lifecycle",
+        "https://docs.kalshi.com/api-reference/historical/get-historical-market"
+      ]
+    },
+    {
+      "id": "C440-FEED-WINDOW",
+      "severity": "medium",
+      "item": "Alert feed counts could exceed the number of published rows",
+      "why": "With 302 in-scope swings and 301 model-watch matches in a regression fixture, both JSON feeds contained 300 rows but their counts still reported the larger totals. The validation mismatch would block a collector pass at that size.",
+      "action": "Each feed now reports the number of rows it actually publishes. The archive and archive-wide evidence totals remain separate; no swing is dropped from the archive by the feed cap.",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-market",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_alerts.py"
+      ]
+    },
+    {
+      "id": "C440-SUMMARY",
+      "severity": "medium",
+      "item": "The executive summary used old counts as if they were current",
+      "why": "The summary still called the 17:30 UTC snapshot current after the collector and the separate ROI scanner had produced newer files. The ROI scan and market snapshot also have different timestamps and coverage.",
+      "action": "The summary reads each timestamp and count from its own published artifact. It labels the experimental alert filter separately from the fee-aware ROI scan. Missing metrics stay blank and are identified as unverified.",
+      "sources": [
+        "https://docs.kalshi.com/api-reference/market/get-markets",
+        "https://docs.kalshi.com/getting_started/demo_env",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/audit_rendered_numbers.js"
+      ]
+    },
+    {
+      "id": "C440-DRY-RUN",
+      "severity": "medium",
+      "item": "A failed no-commit collector run wrote a health record",
+      "why": "The credential-free diagnostic run was dispatched with commit=false, but its validation failure still created a branch commit. The error annotation was sufficient for diagnosis.",
+      "action": "Dry runs now leave Git unchanged even when a validator fails. Scheduled publishing runs still record health; the diagnostic commit was not included in the integration diff.",
+      "sources": [
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873",
+        "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml"
+      ]
+    }
+  ]
+}

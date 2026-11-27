@@ -15,12 +15,11 @@
      confirmable is on <a href="flagged.html">Flagged for Review</a> rather than softened into an estimate.</p>
 
   <section id="audit-2026-11-27" aria-labelledby="auditTitle">
-    <h2 id="auditTitle">Current release audit · 27 November 2026</h2>
+    <h2 id="auditTitle">Release audit</h2>
     <div class="notice warn"><b>Useful for research, not a verified trading edge.</b>
       The dashboard and offline tests run without credentials. Account balances, authenticated execution,
       uninterrupted tick streaming and profitable ROI are not verified by this release.
-      Existing historical verification records below are not a claim that every external value was re-fetched today.
-      Snapshot <code>2026-11-27T17:30:51Z</code>: 514 open / 200 settled published (scan totals 19,043 open / 18,600 settled in scope; both truncated at the 25,000-row safety cap); 154 swings ≥$0.10 (123 high-ROI experimental screen, 174 in archive); simulation 7 settled positions across S1–S4 (all insufficient sample); ROI screen 0 picks / 0 eligible — every open market fails a gate after fees.</div>
+      The timestamps below belong to separate published artifacts. The latest stored snapshot is not necessarily live.</div>
     <div class="tw"><table>
       <thead><tr><th>Decision area</th><th>Current finding</th><th>Official reference / review evidence</th></tr></thead>
       <tbody>
@@ -45,14 +44,17 @@
           <td><b>Polling with timestamped snapshot fallback, not guaranteed tick streaming.</b>
             Browser reachability and snapshot age must be checked on the page. WebSocket handshakes require
             authentication, including public market-data channels. A time-axis unit does not create missing observations.
-            Latest snapshot <code>2026-11-27T17:30:51Z</code> is current; 547 price-history series accumulated.</td>
+            <div id="auditSnapshot" class="small mut">Snapshot timestamp and counts unverified.</div>
+            <div id="auditAlerts" class="small mut">Alert totals unverified.</div></td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets">Authenticated WebSocket guide</a> ·
             <a href="dashboard.html">Dashboard and freshness state</a></td></tr>
         <tr><td>High-ROI shortlist and simulated returns</td>
           <td><b>Experimental, not a proven edge.</b> The two chats and paper ledgers are available for strategy research.
             Demo prices may differ from real markets; simulation output is not actual account performance.
             No claim of profitability or exhaustive coverage of all exchange markets is made.
-            As of the <code>2026-11-27T17:30:51Z</code> snapshot the fee-aware ROI screen finds <b>0 picks</b> (all 13,730 in-scope markets fail a gate after fees); the experimental seed+24h-volume screen that powers the alert chats' second feed finds 123 of 154 swings. Both are disclosed separately.</td>
+            The fee-aware ROI scan is separate from the alert chat’s experimental seed-series and 24-hour-volume filter.
+            <div id="auditRoi" class="small mut">Fee-aware screen results unverified.</div>
+            <div id="auditSimulation" class="small mut">Paper positions unverified.</div></td>
           <td><a href="https://docs.kalshi.com/getting_started/demo_env">Official demo-price warning</a> ·
             <a href="roi.html">Model assumptions and evidence</a> · <a href="simulation.html">Paper ledger</a></td></tr>
         <tr><td>News and jump annotations</td>
@@ -82,7 +84,7 @@
           <td>Ranked by a labelled estimate, because Kalshi has no “dollars traded” field (<a href="questions.html">Q1</a>). Only five categories shown by construction.</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Market fields</a></td></tr>
       <tr><td>Track events until resolved, showing how they resolved (yes or no)</td>
           <td><span class="badge ok">done</span></td><td>Resolution tracker on the dashboard, plus every alert bubble and the outcome ledger on <a href="alerts.html">Alert chats</a></td>
-          <td>The literal API result is shown; a market can resolve to <code>scalar</code>, which is displayed as such rather than forced to yes/no. Every alert now carries its market's lifecycle (settled YES/NO, result set but not yet paid, closed without a result, still open, or not in the committed snapshot) from the official <code>status</code>/<code>result</code> fields, so a swing is followed after the fact as well as at the moment it fires. A market that has rotated out of the ranked snapshot reads <b>not in snapshot</b> — never "unresolved" (<a href="flagged.html">D-03</a>), and the move-agrees-with-outcome count is shown as a bare count, never a rate, because the settled sample is small and changes as markets resolve — the current count is rendered live from the committed snapshot on the <a href="alerts.html">alert chats</a> page (<a href="flagged.html">D-04</a>, <a href="flagged.html">F-104</a>).</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement</a> · <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Lifecycle</a></td></tr>
+          <td>The collector follows alerted contracts beyond the ranked window using current or historical per-ticker records. It preserves finalized results, shows scalar outcomes separately, and flags unavailable records without inferring an outcome. A result set before finalization is not counted as settled. The chats show move-vs-outcome agreement as a bare count, not a hit rate.</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement</a> · <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Lifecycle</a> · <a href="https://docs.kalshi.com/api-reference/historical/get-historical-market">Historical lookup</a></td></tr>
       <tr><td>Track portfolio performance on the demo account</td>
           <td><span class="badge bad">blocked</span></td><td><a href="portfolio.html">Portfolio</a></td>
           <td>No demo credentials were supplied; account existence is unknown. Account values are left blank rather than invented (<a href="flagged.html">F-07</a>).</td><td><a href="https://docs.kalshi.com/getting_started/api_keys" target="_blank" rel="noopener">Authentication</a></td></tr>
@@ -90,7 +92,7 @@
           <td><span class="badge ok">done</span></td><td><a href="strategies.html">Strategies</a></td>
           <td>Categorisation is live; performance is measurable once trades exist. All four strategies are marked untested.</td><td><a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Settlement basis</a></td></tr>
       <tr><td>Execute trades and track their performance</td>
-          <td><span class="badge warn">ready, unexercised</span></td><td><a href="portfolio.html">Portfolio</a></td>
+          <td><span class="badge warn">client present · unverified</span></td><td><a href="portfolio.html">Portfolio</a></td>
           <td>Executor targets the current V2 endpoint and is unexercised because no keys were supplied. The old endpoint it used to target is gone (<a href="flagged.html">F-01</a>).</td><td><a href="https://docs.kalshi.com/api-reference/orders/create-order-v2" target="_blank" rel="noopener">Order contract</a></td></tr>
       <tr><td>Automate simulated trades to test different strategies (S1–S4 replay)</td>
           <td><span class="badge ok">done</span></td><td><a href="portfolio.html">Portfolio §4</a></td>
@@ -100,7 +102,7 @@
           <td>X is time, Y is the contract price. Each window plots two series and says which is which: the exchange's own candles at 1 minute (<i>Minutes</i>), 1 hour (<i>Hours</i>) or 1 day (<i>Days</i>) from <a href="https://docs.kalshi.com/api-reference/market/get-market-candlesticks" target="_blank" rel="noopener">GET /series/…/candlesticks</a>, and the collector's own observations (one per run) on top. Archived ≥ $0.10 swings are drawn as dashed markers, and every alert in the chat deep-links to its chart. Seconds resolution cannot be requested from Kalshi — candles exist only at 1/60/1440 minutes (<a href="verification.html">C-61</a>, <a href="verification.html">C-62</a>) — so the <i>Seconds</i> window is the accumulated-observation window and the page says so rather than inventing ticks (<a href="flagged.html">F-06</a>, <a href="flagged.html">F-68</a>). The dashboard also polls the demo API from the browser when CORS allows (<a href="flagged.html">F-24</a>).</td><td><a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Price fields</a></td></tr>
       <tr><td>Live alerting on swings ≥ $0.10 in either direction, as a simplified scrolling chat viewable in real time</td>
           <td><span class="badge ok">done</span></td><td><a href="alerts.html">Alert chats</a></td>
-          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Both chats show the same counts on every page, because the pick screen is one frozen rule (the archive's <code>high_roi</code> flag) rather than three page-specific ones — before 2026-11-22 the same 61 swings produced 49 / 47 / 46 picks on the dashboard, the alert page and the dock (<a href="flagged.html">D-02</a>). Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between committed observations, so a snapshot-only alert's resolution is one collector pass (about 15 minutes while the relay runs — and each page prints the cadence it measures from the committed observations rather than this sentence asserting one) (<a href="flagged.html">F-24</a>, <a href="flagged.html">F-73</a>).</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Streaming requirements</a></td></tr>
+          <td>Two chats: <b>all events</b> and a <b>model picks</b> (high-ROI screen) feed. Both chats use one selection rule (the archive's frozen <code>high_roi</code> flag); the number shown can differ by view limit, topic filter or live observations — before 2026-11-22 the same 61 swings produced 49 / 47 / 46 picks on the dashboard, the alert page and the dock (<a href="flagged.html">D-02</a>). Browser polling gives second-scale detection; without CORS the collector layer still catches ≥ $0.10 moves between committed observations, so a snapshot-only alert's resolution is one collector pass (about 15 minutes while the relay runs — and each page prints the cadence it measures from the committed observations rather than this sentence asserting one) (<a href="flagged.html">F-24</a>, <a href="flagged.html">F-73</a>).</td><td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets" target="_blank" rel="noopener">Streaming requirements</a></td></tr>
       <tr><td>Live charts include events and website links that may have caused a sharp jump</td>
           <td><span class="badge warn" id="catStatus">partial — coverage rendered below</span></td><td>Alert bubbles + chart markers on the dashboard</td>
           <td>No API returns a cause→move mapping, so a cause is never asserted (<a href="flagged.html">F-25</a>).
@@ -126,7 +128,7 @@
           <td><span data-count="questions">Questions</span>, one of which cannot be closed by an agent.</td><td><a href="https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account" target="_blank" rel="noopener">Account prerequisites</a></td></tr>
       <tr><td>Verified throughout, with source links and no hallucinated values</td>
           <td><span class="badge ok">done</span></td><td><a href="verification.html">Verification</a></td>
-          <td><span id="verifiedCounts"><span data-count="claims">claims</span> checked against an official page; <span data-count="unverified">1</span> deliberately left blank. <span data-count="flagged">irregularities</span> found and listed across all sessions, each with its source; the ones closed in the final integration are marked fixed in their entry.</span> (<a href="verification.html">claims</a> · <a href="flagged.html">flagged</a>)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo scope</a></td></tr>
+          <td><span id="verifiedCounts">Verification and review counts are not yet loaded.</span> (<a href="verification.html">claims</a> · <a href="flagged.html">flagged</a>)</td><td><a href="https://docs.kalshi.com/getting_started/demo_env" target="_blank" rel="noopener">Demo scope</a></td></tr>
       <tr><td>Live GitHub Pages site with a landing page and category subpages</td>
           <td><span class="badge ok">done</span></td><td>This site</td>
           <td>Five parallel sessions had produced overlapping sites; one canonical tree now exists (<a href="flagged.html">F-05</a>).</td><td><a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages" target="_blank" rel="noopener">Pages hosting</a></td></tr>
@@ -163,7 +165,7 @@
          schedule's per-series multiplier M on every paper fill (M = 0 for <code>KXBTCY</code>/<code>KXETHY</code>/<code>KXELECTIRAN</code>, otherwise the default 1), so its
          P&amp;L is net of the published rate rather than of a flat one (<a href="flagged.html">F-84</a>).
          <a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">Source</a></p></div>
-    <div class="card"><h3>One step needs you</h3>
+    <div class="card"><h3>Account access unverified</h3>
       <p>No demo credentials were supplied, so account existence and performance are unverified. Account setup and
          secure key provisioning are prerequisites; a secured backend and end-to-end reconciliation are also required.
          Until tested, the browser trades only in labelled simulation.
@@ -192,6 +194,33 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 <script src="assets/site.js"></script>
 <script>
 KD.nav("executive-summary.html");
+
+// Each source has its own collection time and coverage. Leave the unverified fallback when
+// the relevant file or a required field is absent; zero is valid only when the artifact says so.
+async function auditMetric(id, file, describe) {
+  try {
+    const line = describe(await KD.json(`data/live/${file}.json`));
+    if (line) KD.$(`#${id}`).textContent = line;
+  } catch { /* keep the unverified label */ }
+}
+auditMetric("auditSnapshot", "markets", d => {
+  if (!d?.collected_at || !Array.isArray(d.open_markets) || !Array.isArray(d.settled_markets)) return;
+  return `Snapshot ${d.collected_at}: ${KD.num(d.open_markets.length)} open and ${KD.num(d.settled_markets.length)} settled rows published.`;
+});
+auditMetric("auditAlerts", "alerts", d => {
+  if (!d?.generated_at || !Array.isArray(d.all_events) || !Array.isArray(d.high_roi)) return;
+  return `Alert feeds ${d.generated_at}: ${KD.num(d.all_events.length)} all-event rows and ${KD.num(d.high_roi.length)} experimental model-watch rows.`;
+});
+auditMetric("auditRoi", "roi", d => {
+  if (!d?.collected_at || !Array.isArray(d.picks) || !Number.isInteger(d.counts?.open_in_scope)) return;
+  return `Fee-aware scan ${d.collected_at}: ${KD.num(d.picks.length)} picks; ${KD.num(d.counts.open_in_scope)} open markets in scope.`;
+});
+auditMetric("auditSimulation", "simulation", d => {
+  if (!d?.generated_at || !Array.isArray(d.open_positions) || !Array.isArray(d.settled_positions)) return;
+  const settled = d.settled_positions.filter(p => p.status === "settled" || p.status === "settled_scalar");
+  return `Paper ledger ${d.generated_at}: ${KD.num(d.open_positions.length)} open and ${KD.num(settled.length)} retained settled positions.`;
+});
+
 // R-5: the counts on this row were typed by hand and went stale (they said "50 irregularities" when the
 // ledger held more). Render them from the committed files instead, and fall back to a link, never a number.
 (async () => {
@@ -204,7 +233,7 @@ KD.nav("executive-summary.html");
   };
   try {
     const [findings, facts] = await Promise.all([
-      KD.json("data/findings.json"), KD.json("data/verified_facts.json"),
+      KD.findings(), KD.json("data/verified_facts.json"),
     ]);
     const claims = (facts.facts || []).length;
     const blanks = (facts.facts || []).filter((x) => !x.verified).length;

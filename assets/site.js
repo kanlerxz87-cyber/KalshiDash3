@@ -110,6 +110,12 @@ const KD = (() => {
   const RESULT_BEARING = new Set(["determined", "disputed", "amended"]);
   const TERMINAL_STATUS = new Set(["finalized", "settled", "determined", "disputed", "amended", "closed", "expired"]);
 
+  async function findings() {
+    const base = await json("data/findings.json");
+    const release = await json("data/release_findings.json").catch(() => null);
+    return { ...base, flagged: [...(release?.flagged || []), ...(base.flagged || [])] };
+  }
+
   function marketIndex(doc) {
     const m = new Map();
     for (const r of (doc?.alert_lifecycle?.rows || [])) if (r?.ticker) m.set(r.ticker, r);
@@ -371,5 +377,5 @@ const KD = (() => {
   }
 
   return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, cadence,
-    marketIndex, lifecycleOf, lifecycleChip, lifecycleAttach, lifecycleTally, LIFECYCLE_SPEC, LIFECYCLE_TIP };
+    findings, marketIndex, lifecycleOf, lifecycleChip, lifecycleAttach, lifecycleTally, LIFECYCLE_SPEC, LIFECYCLE_TIP };
 })();

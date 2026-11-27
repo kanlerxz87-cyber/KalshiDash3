@@ -1315,9 +1315,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # the next pass follows it via the archive even if it has dropped from both slices.
     def previous_doc(name):
         try:
-            return json.loads((LIVE / name).read_text())
+            doc = json.loads((LIVE / name).read_text())
         except (OSError, json.JSONDecodeError):
             return {}
+        return doc if isinstance(doc, dict) else {}
 
     from track_lifecycle import track
 

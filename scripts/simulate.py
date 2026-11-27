@@ -142,11 +142,13 @@ def main() -> int:
 
     open_rows = {r["ticker"]: r for r in (markets.get("open_markets") or []) if r.get("ticker")}
     followed = (markets.get("alert_lifecycle") or {}).get("rows") or []
-    settled_rows = {r["ticker"]: r for r in followed
-                    if r.get("ticker") and r.get("status") == "finalized"
-                    and r.get("result") in ("yes", "no", "scalar")}
-    settled_rows.update({r["ticker"]: r for r in (markets.get("settled_markets") or [])
-                         if r.get("ticker") and r.get("result") in ("yes", "no", "scalar")})
+    # Match the browser join: a current ranked record supersedes a follow-up for the same
+    # ticker. A determined or otherwise nonfinal record cannot close a paper position.
+    lifecycle_rows = {r["ticker"]: r for r in followed if r.get("ticker")}
+    lifecycle_rows.update(open_rows)
+    lifecycle_rows.update({r["ticker"]: r for r in markets.get("settled_markets") or [] if r.get("ticker")})
+    settled_rows = {ticker: r for ticker, r in lifecycle_rows.items()
+                    if r.get("status") == "finalized" and r.get("result") in ("yes", "no", "scalar")}
     base = markets.get("base_url") or "https://external-api.demo.kalshi.co/trade-api/v2"
 
     strategies = strat["strategies"]

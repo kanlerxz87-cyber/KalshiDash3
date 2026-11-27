@@ -47,6 +47,9 @@
 
   <h2>Unverified values currently visible on the site</h2>
   <div id="blank"></div>
+  <h2>Tracked contracts with unverified status</h2>
+  <p class="small mut">A missing result is left blank. The linked official market page may have changed since the last lookup.</p>
+  <div id="followupFlags"></div>
 
 </main>
 <footer><div class="wrap">
@@ -61,14 +64,12 @@ KalshiDash3 · all market values from the Kalshi <b>demo</b> environment (mock f
 KD.nav("flagged.html");
 (async () => {
   let f, facts;
-  try { f = await KD.json("data/findings.json"); } catch { KD.$("#flags").innerHTML = KD.empty("data/findings.json missing."); return; }
-  try { facts = (await KD.json("data/verified_facts.json")).facts || []; } catch { facts = []; }
-
-  const sev = id => f.flagged.find(x => x.id === id)?.severity;
+  try { f = await KD.findings(); } catch { KD.$("#flags").innerHTML = KD.empty("Findings ledger could not be loaded."); return; }
+  try { facts = (await KD.json("data/verified_facts.json")).facts || []; } catch { facts = null; }
   KD.$("#summary").innerHTML = `<div class="grid">
     <div class="card"><div class="kpi">${f.flagged.length}<small>flagged irregularities</small></div></div>
     <div class="card"><div class="kpi">${f.flagged.filter(x => x.severity === "high").length}<small>high severity — correctness or provenance</small></div></div>
-    <div class="card"><div class="kpi">${facts.filter(x => !x.verified).length}<small>blank values, not guessed</small></div></div>
+    <div class="card"><div class="kpi">${facts ? facts.filter(x => !x.verified).length : "—"}<small>unverified reference values</small></div></div>
   </div>`;
 
   KD.$("#flags").innerHTML = KD.table([
@@ -84,14 +85,27 @@ KD.nav("flagged.html");
     src: (x.sources || []).map(u => KD.srcLink(u, "source")).join(" "),
   })));
 
-  const blanks = facts.filter(x => !x.verified);
+  const blanks = (facts || []).filter(x => !x.verified);
   KD.$("#blank").innerHTML = KD.table([
     { key: "id", label: "ID" }, { key: "claim", label: "Claim" }, { key: "why", label: "Why it is blank" }, { key: "src", label: "Source" },
   ], blanks.map(x => ({
     id: `<b>${KD.esc(x.id)}</b>`, claim: KD.esc(x.claim),
     why: KD.esc(x.flag || x.note || "Not confirmable from an official source."),
     src: KD.srcLink(x.source, "source"),
-  })), { empty: "Nothing blank." });
+  })), { empty: facts ? "No unverified reference values." : "Reference ledger unavailable; verification not confirmed." });
+
+  const followups = KD.$("#followupFlags");
+  try {
+    const snapshot = await KD.json("data/live/markets.json");
+    if (!Array.isArray(snapshot?.alert_lifecycle?.rows)) throw new Error("no lifecycle data");
+    followups.innerHTML = KD.table([
+      { key: "ticker", label: "Contract" }, { key: "why", label: "Why unverified" },
+      { key: "when", label: "Last attempt (UTC)" }, { key: "source", label: "Official market record" },
+    ], snapshot.alert_lifecycle.rows.filter(x => !x.status).map(x => ({
+      ticker: KD.esc(x.ticker), why: KD.esc(x.reason), when: KD.esc(x.attempted_at || ""),
+      source: KD.srcLink(x.source, "Kalshi demo API"),
+    })), { empty: "No unverified lookups in this collector snapshot." });
+  } catch { followups.innerHTML = KD.empty("No collector follow-up data available; outcome coverage is unverified."); }
 })();
 </script>
 </body></html>

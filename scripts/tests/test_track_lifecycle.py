@@ -73,6 +73,15 @@ class LifecycleTests(unittest.TestCase):
         self.assertIsNone(row["settlement_value_dollars"])
         self.assertEqual(row["source"], BASE + PATH)
 
+    def test_another_markets_source_is_invalid_even_with_the_right_response(self):
+        wrong_source = BASE + PATH + "-X"
+        self.get.return_value = {"market": MARKET}, wrong_source
+        doc = self.run_track()
+        self.assertIsNone(doc["rows"][0]["result"])
+        doc["rows"][0]["source"] = wrong_source
+        validate_live.check_alert_lifecycle({"alert_lifecycle": doc})
+        self.assertIn("wrong official source", validate_live.errors[0])
+
     def test_outage_keeps_unknown_values_and_does_not_burst(self):
         second = dict(TARGET, ticker=TICKER + "-X")
         self.get.side_effect = RuntimeError("HTTP 429")

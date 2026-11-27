@@ -27,7 +27,10 @@ catch (e) {
 const readJSON = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), "utf8"));
 const markets = readJSON("data/live/markets.json");
 const alerts = readJSON("data/live/alerts.json");
-const findings = readJSON("data/findings.json");
+const findings = [
+  ...readJSON("data/findings.json").flagged,
+  ...readJSON("data/release_findings.json").flagged,
+];
 const facts = readJSON("data/verified_facts.json");
 
 const CTX2D = new Proxy({}, {
@@ -311,10 +314,14 @@ const numFromText = (s) => Number(String(s).replace(/[^0-9.\-]/g, ""));
     check(belowThreshold === 0, `${belowThreshold} served swing(s) move less than $0.10 — below the published threshold`);
     check(badDelta === 0, `${badDelta} served swing(s) have a delta that does not equal to_price - from_price`);
     check(roi.every((a) => a.high_roi === true), "every row in the model chat must carry the frozen high_roi flag");
-    const allTxt = r.text;
-    for (const [label, value] of [["swings served", served.length], ["model picks", roi.length]]) {
-      check(new RegExp(String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ",")).test(allTxt) || allTxt.includes(String(value)),
-        `alerts.html must state "${label}" as ${value}`);
+    const evidence = alerts.counts.evidence;
+    const archiveScope = alerts.counts.archive_total - alerts.counts.withheld_out_of_scope - alerts.counts.withheld_category_conflict;
+    const evidenceChips = new Map([...r.doc.querySelectorAll("#evBar .kchip")].map(x => x.textContent.split(": ")));
+    check(Number(evidenceChips.get("swings in scope (archive)")) === archiveScope,
+      "alerts.html must label the evidence denominator as the in-scope archive, not the rendered feeds");
+    for (const [label, key] of [["traded", "traded_ge_floor"], ["thin", "traded_below_floor"], ["no trades", "quote_only"],
+      ["volume n/a", "counter_reset"], ["candle-sourced", "candle_unquantified"], ["no history", "unknown_no_observations"]]) {
+      check(Number(evidenceChips.get(label)) === evidence[key], `alerts.html evidence count ${label} must come from counts.evidence`);
     }
     const msgs = r.doc.querySelectorAll("#feedAll .chat-msg").length;
     // The two chats the brief asks for must both exist and both be populated from the data.
@@ -327,19 +334,41 @@ const numFromText = (s) => Number(String(s).replace(/[^0-9.\-]/g, ""));
     r.close();
   }
 
+  /* ================= executive-summary.html: independent artifact times and denominators ================= */
+  {
+    const r = await loadPage("executive-summary.html");
+    const roi = readJSON("data/live/roi.json"), simulation = readJSON("data/live/simulation.json");
+    const settled = simulation.settled_positions.filter(p => ["settled", "settled_scalar"].includes(p.status));
+    const expected = {
+      auditSnapshot: [markets.collected_at, `${num0(OPEN.length)} open`, `${num0(SETTLED.length)} settled`],
+      auditAlerts: [alerts.generated_at, `${num0(alerts.all_events.length)} all-event`, `${num0(alerts.high_roi.length)} experimental`],
+      auditRoi: [roi.collected_at, `${num0(roi.picks.length)} picks`, `${num0(roi.counts.open_in_scope)} open markets in scope`],
+      auditSimulation: [simulation.generated_at, `${num0(simulation.open_positions.length)} open`, `${num0(settled.length)} retained settled`],
+    };
+    for (const [id, pieces] of Object.entries(expected)) {
+      const text = r.doc.getElementById(id)?.textContent || "";
+      check(pieces.every(piece => piece && text.includes(piece)), `executive-summary.html #${id} disagrees with its dated artifact: ${text}`);
+    }
+    console.log("  executive summary ok  (independent snapshot, alert, scan and paper-ledger counts)");
+    r.close();
+  }
+
   /* ================= flagged.html: the ledger renders whole ================= */
   {
     const r = await loadPage("flagged.html", { waitMs: 1200 });
     check(r.errors.length === 0, `flagged.html: uncaught error ${r.errors.slice(0, 2).join(" | ")}`);
-    const high = findings.flagged.filter((f) => f.severity === "high").length;
-    check(r.text.includes(String(findings.flagged.length)),
-      `flagged.html must publish all ${findings.flagged.length} irregularities; the count is not on the page`);
-    check(r.text.includes(String(high)), `flagged.html must publish the ${high} high-severity count`);
-    // Every flagged item must carry at least one source link (the brief's verification rule).
-    for (const f of findings.flagged) {
-      check(Array.isArray(f.sources) && f.sources.length > 0, `flagged item ${f.id} has no source link`);
+    const high = findings.filter((f) => f.severity === "high").length;
+    const kpis = [...r.doc.querySelectorAll("#summary .kpi")].map(x => parseInt(x.textContent, 10));
+    check(kpis[0] === findings.length, `flagged.html must publish all ${findings.length} irregularities`);
+    check(kpis[1] === high, `flagged.html must publish the ${high} high-severity count`);
+    const rows = new Map([...r.doc.querySelectorAll("#flags tbody tr")].map(row => [row.cells[0].textContent, row]));
+    check(rows.size === findings.length, "every finding has one unique rendered row");
+    for (const f of findings) {
+      const links = [...(rows.get(f.id)?.querySelectorAll("a") || [])].map(a => a.getAttribute("href"));
+      check(f.sources?.length > 0 && f.sources.every(s => s.startsWith("https://") && links.includes(s)),
+        `flagged item ${f.id} must render all its external sources`);
     }
-    console.log(`  flagged.html      ok  (${findings.flagged.length} irregularities, ${high} high, every item source-linked)`);
+    console.log(`  flagged.html      ok  (${findings.length} irregularities, ${high} high, every item source-linked)`);
     r.close();
   }
 

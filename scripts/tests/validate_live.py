@@ -69,6 +69,13 @@ def check_by_category(tag: str, row: dict, pre_narrowing_elections: bool = False
     )
 
 
+def matches_lifecycle_source(source: object, ticker: str) -> bool:
+    bases = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
+    return isinstance(source, str) and isinstance(ticker, str) and bool(ticker) and source in {
+        f"{base}{prefix}/markets/{quote(ticker, safe='')}" for base in bases for prefix in ("", "/historical")
+    }
+
+
 def check_alert_lifecycle(doc: dict) -> None:
     # Older snapshots predate the separate lifecycle rows. The live collector always emits them.
     followups = doc.get("alert_lifecycle")
@@ -81,14 +88,12 @@ def check_alert_lifecycle(doc: dict) -> None:
     check(isinstance(rows, list), "alert_lifecycle.rows must be a list")
     seen = set()
     valid_states = {"initialized", "active", "inactive", "closed", "determined", "disputed", "amended", "finalized"}
-    bases = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
     for row in rows or []:
         ticker = row.get("ticker") or ""
         tag = f"alert_lifecycle:{ticker}"
         check(bool(ticker) and ticker not in seen, f"{tag} empty/duplicate ticker")
         seen.add(ticker)
-        check(row.get("source") in {f"{base}{prefix}/markets/{quote(ticker, safe='')}"
-                                   for base in bases for prefix in ("", "/historical")}, f"{tag} wrong official source")
+        check(matches_lifecycle_source(row.get("source"), ticker), f"{tag} wrong official source")
         status = row.get("status")
         check(row.get("result") in ALLOWED_RESULTS, f"{tag} unknown result")
         if status is None:
@@ -146,7 +151,11 @@ def check_simulation() -> None:
                 pos.get("alert_key") in archive_keys if archive_keys else False,
                 f"{tag} alert_key is not in data/live/alerts_archive.json",
             )
+            if pos.get("settlement_source") is not None:
+                check(matches_lifecycle_source(pos["settlement_source"], pos.get("ticker") or ""),
+                      f"{tag} settlement source must identify the exact official demo market")
             if pos.get("status") == "settled":
+                check(pos.get("settled_result") in ("yes", "no"), f"{tag} missing binary settlement result")
                 payoff = 1.0 if pos.get("settled_result") == pos.get("side") else 0.0
                 expect = round(payoff - entry - float(pos["entry_fee"]), 4)
                 check(

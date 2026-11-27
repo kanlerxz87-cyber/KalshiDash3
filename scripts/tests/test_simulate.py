@@ -95,7 +95,7 @@ class SimulateTest(unittest.TestCase):
         (self.dir / "price_history.json").write_text(json.dumps({"schema": 1, "series": history}))
         (self.dir / "markets.json").write_text(json.dumps({
             "collected_at": T_NEXT, "base_url": "https://example.invalid/v2",
-            "open_markets": list(open_rows), "settled_markets": list(settled_rows),
+            "open_markets": list(open_rows), "settled_markets": [{"status": "finalized", **r} for r in settled_rows],
             "alert_lifecycle": {"rows": list(tracked_rows)}}))
 
     def _alert(self, direction="up", high_roi=True, ticker="KXAAAGASM-X-1", **extra):
@@ -149,6 +149,13 @@ class SimulateTest(unittest.TestCase):
         doc = self._run()
         closed = next(p for p in doc["settled_positions"] if p["strategy"] == "S1")
         self.assertEqual((closed["outcome"], closed["settled_result"], closed["settlement_source"]), ("loss", "no", source))
+
+    def test_ranked_status_takes_precedence_over_followup_for_paper(self):
+        ticker = "KXAAAGASM-X-1"
+        self._write([self._alert(ticker=ticker)], {ticker: self._obs(0.49, 0.50)},
+                    settled_rows=[{"ticker": ticker, "status": "determined", "result": "yes"}],
+                    tracked_rows=[{"ticker": ticker, "status": "finalized", "result": "no"}])
+        self.assertEqual(self._strat(self._run(), "S1")["settled"], 0)
 
     def test_fade_buys_no_at_one_minus_bid(self):
         # NO costs 1 - yes_bid. With bid 0.49 that is 0.51.
