@@ -213,7 +213,7 @@ def main() -> int:
             entry_categories[_t] = [str(c) for c in _a["series_categories"]]
 
     def _official(ticker: str) -> list:
-        """Official GET /series categories, resolved exactly as scripts/build_alerts.py does (F-107).
+        """Official GET /series categories, resolved exactly as scripts/build_alerts.py does (F-109).
 
         Order: snapshot row -> snapshot `series_index` -> the archive ENTRY's own recorded
         `series_categories`. The third source is what makes this check reproducible after the

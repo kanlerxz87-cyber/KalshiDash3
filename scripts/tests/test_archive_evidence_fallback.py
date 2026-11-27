@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""F-107 — the feed builder and the alert validator must resolve a market's official
+"""F-109 — the feed builder and the alert validator must resolve a market's official
 categories from the SAME sources, and that resolution must survive a market leaving the
 open scan.
 
@@ -27,7 +27,7 @@ What is pinned here (offline; no network, no writes outside a temp dir)
      so the fallback cannot be used to smuggle an off-topic row back into the feeds.
   5. The specific production row resolves to a category that accepts its assigned topic.
 
-Run: python3 scripts/tests/test_scope_source_parity.py     (exit 0 pass, 1 fail)
+Run: python3 scripts/tests/test_archive_evidence_fallback.py     (exit 0 pass, 1 fail)
 """
 from __future__ import annotations
 
@@ -80,7 +80,7 @@ def test_builder_reads_the_archive_record() -> None:
     src = function_source(BUILDER, "official_for")
     check(bool(src), "build_alerts.py must define official_for()")
     check("series_categories" in src,
-          "builder official_for() must consult the archive entry's recorded series_categories (F-107)")
+          "builder official_for() must consult the archive entry's recorded series_categories (F-109)")
     check("archive_recorded" in src or "recorded_cache" in src,
           "builder official_for() must fall back to the recorded per-ticker categories")
     # Order matters: the exchange's CURRENT record first, the detection-time record last.
@@ -95,7 +95,7 @@ def test_validator_reads_the_archive_record() -> None:
     src = function_source(VALIDATOR, "_official")
     check(bool(src), "validate_alerts.py must define _official()")
     check("entry_categories" in src,
-          "validator _official() must fall back to the archive entry's recorded categories (F-107)")
+          "validator _official() must fall back to the archive entry's recorded categories (F-109)")
     row_at = src.find("row_by_ticker")
     ledger_at = src.find("ledger.get")
     recorded_at = src.find("entry_categories.get")
@@ -143,10 +143,54 @@ def test_production_row_now_resolves() -> None:
               f"{PRODUCTION_TICKER} entries must keep the 'gas' topic they were assigned")
 
 
+def test_failed_series_refetch_cannot_reopen_the_outage() -> None:
+    """F-107's fix re-fetches GET /series for archive-cited series; this pins its failure path.
+
+    scripts/collect.py resolves archive-cited series through its own `record_series()`, which
+    records `categories: None` when the fetch raises (pinned by that fix's
+    `test_failed_official_lookup_stays_unknown_never_inferred`). One transient error on
+    /series/<archive-only series> then puts the ledger back in the state that gated five
+    collection passes, while the archive still holds the topic the exchange's record justified.
+    This runs arena-72ae7bca's own harness — the real collector build, feed builder and validator
+    — with `unavailable=True`, and requires the pass to succeed.
+    """
+    try:
+        sys.path.insert(0, str(ROOT / "scripts"))
+        sys.path.insert(0, str(ROOT / "scripts" / "tests"))
+        import collect  # noqa: F401  (imported by the harness)
+        import build_alerts  # noqa: F401
+        import test_archive_series_retention as harness
+    except ImportError as exc:  # the fix this protects was reverted out of the tree
+        check(False, f"the F-107 retention harness is missing, so this case cannot be run: {exc}")
+        return
+    from contextlib import redirect_stdout
+    from unittest.mock import patch
+    import io
+
+    case = harness.ArchivedSeriesRetention()
+    with tempfile.TemporaryDirectory(prefix="kalshi-f109-") as temp:
+        root = Path(temp)
+        payload, _calls = case.build(root, unavailable=True)
+        check(payload["series_index"]["KXAAAGASD"]["categories"] is None,
+              "precondition: a failed re-fetch leaves the ledger's categories null")
+        live = root / "data" / "live"
+        with patch.object(build_alerts, "ROOT", root), patch.object(build_alerts, "LIVE", live), \
+                patch.object(sys, "argv", ["build_alerts.py"]), redirect_stdout(io.StringIO()):
+            built = build_alerts.main()
+        check(built == 0, "the feed builder must still publish the archive's own record")
+        validator = harness.validator_module()
+        validator.LIVE = live
+        validator.RULES = root / "data" / "alert_rules.json"
+        with redirect_stdout(io.StringIO()):
+            rc = validator.main()
+        check(rc == 0, "validator refused after a failed GET /series re-fetch (F-109): "
+                       + " | ".join(validator.errors[:3]))
+
+
 def test_end_to_end_repair_and_validate() -> None:
     """The real scripts, on a scratch copy, with the production condition forced.
 
-    This is F-107's actual failure mode: remove the series from the open scan AND from the
+    This is F-109's actual failure mode: remove the series from the open scan AND from the
     ledger, leaving only the archive's own record, then require BOTH the feed builder and the
     validator to succeed. Before the fix the validator refused this tree; after it, both pass.
     """
@@ -169,7 +213,7 @@ def test_end_to_end_repair_and_validate() -> None:
         validated = subprocess.run([sys.executable, "scripts/tests/validate_alerts.py"], cwd=scratch,
                                    capture_output=True, text=True)
         check(validated.returncode == 0,
-              "validator refused the aged-out tree (F-107 regression): " + validated.stderr[-600:])
+              "validator refused the aged-out tree (F-109 regression): " + validated.stderr[-600:])
         check("categories [] accept []" not in validated.stderr,
               "the 'categories [] accept []' contradiction must not reappear")
 
@@ -188,12 +232,13 @@ def main() -> int:
                  test_the_two_files_agree_on_the_order,
                  test_the_fallback_cannot_readmit_an_off_topic_swing,
                  test_production_row_now_resolves,
+                 test_failed_series_refetch_cannot_reopen_the_outage,
                  test_end_to_end_repair_and_validate):
         before = len(failures)
         test()
         print(("  ok   " if len(failures) == before else "  FAIL ") + test.__name__)
     if failures:
-        print("\nFAIL: scope-source parity (F-107)")
+        print("\nFAIL: scope-source parity (F-109)")
         for f in failures:
             print("  - " + f)
         return 1
