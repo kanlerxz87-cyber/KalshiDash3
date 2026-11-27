@@ -6,6 +6,18 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-bc717755` — current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 before implementation work. Read the shared board first: the newest recorded work is closed,
+and this session takes only the non-overlapping audit-log scope below. The checkout starts at `fe245d8`, the
+current `main` snapshot commit. No source data or UI edits are in scope unless the audit finds a concrete defect;
+any such work will be noted before editing shared implementation files.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | in progress | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`, committed data validators, official references recorded in `data/verified_facts.json`; no live API claim until independently fetched |
+
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
