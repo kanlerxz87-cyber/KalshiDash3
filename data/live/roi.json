@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T06:00:59Z",
- "runtime_seconds": 42.6,
+ "collected_at": "2026-11-27T12:30:55Z",
+ "runtime_seconds": 182.8,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,13 +29,13 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 550,
+  "open_in_scope": 19285,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 2,
-  "unscoreable": 548,
-  "orderbooks": 550,
-  "orderbooks_requested": 550,
+  "near_misses": 1,
+  "unscoreable": 19284,
+  "orderbooks": 19285,
+  "orderbooks_requested": 19285,
   "alerts": 0,
   "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
@@ -43,160 +43,42 @@
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 550,
-  "returned": 550,
+  "requested": 19285,
+  "returned": 19285,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
   "docs": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks"
  },
  "historical_cutoff": {
-  "market_positions_last_updated_ts": "2026-09-27T00:00:00Z",
-  "market_settled_ts": "2026-09-27T00:00:00Z",
-  "orders_updated_ts": "2026-11-12T00:00:00Z",
-  "trades_created_ts": "2026-09-27T00:00:00Z"
+  "market_positions_last_updated_ts": "2026-09-28T00:00:00Z",
+  "market_settled_ts": "2026-09-28T00:00:00Z",
+  "orders_updated_ts": "2026-11-13T00:00:00Z",
+  "trades_created_ts": "2026-09-28T00:00:00Z"
  },
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXBTC15M-26NOV270115-15",
+   "ticker": "KXDEMOFUTHOURLY-26NOV27H13-UP",
    "eligible": false,
    "fails": [
-    "24h volume 2.0 < 100 contracts",
-    "net ROI -3.05% not above 0% floor",
-    "closes in 14 min < 15 min floor",
+    "spread 98.0c > 10c cap",
+    "depth 12 < 50 contracts at the touch",
+    "YES entry 99.0c above 95c ceiling",
+    "net ROI -36.11% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [],
-   "q": 0.508,
-   "mid": 0.515,
-   "micro": 0.515,
-   "last": 0.48,
-   "bid": 0.51,
-   "ask": 0.52,
-   "spread": 0.010000000000000009,
-   "depth": 100.0,
-   "vol24": 2.0,
-   "ttc_hours": 0.2336111111111111,
-   "momentum": null,
-   "series_ticker": "KXBTC15M",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.49,
-    "fee_unit": 0.017493,
-    "cost": 0.507493,
-    "ev": -0.015492999999999979,
-    "roi": -0.0305284999004912
-   },
-   "score": -0.0305284999004912,
-   "dollars_traded_estimate": 56.64,
-   "title": "BTC price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-27T06:15:00Z",
-   "event_ticker": "KXBTC15M-26NOV270115",
-   "status": "active",
-   "result": null,
-   "volume_fp": 118.0,
-   "volume_24h_fp": 2.0,
-   "open_interest_fp": 99.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 50.0,
-    "depth_at_ask": 50.0,
-    "bid_price": 0.54,
-    "ask_price": 0.55
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV270115-15"
-  },
-  {
-   "ticker": "KXXRP15M-26NOV270115-15",
-   "eligible": false,
-   "fails": [
-    "spread 50.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "net ROI -22.71% not above 0% floor",
-    "closes in 14 min < 15 min floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.6,
-   "mid": 0.75,
-   "micro": 0.75,
-   "last": 0.0,
-   "bid": 0.5,
-   "ask": 1.0,
-   "spread": 0.5,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 0.2336111111111111,
-   "momentum": null,
-   "series_ticker": "KXXRP15M",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.5,
-    "fee_unit": 0.0175,
-    "cost": 0.5175,
-    "ev": -0.11749999999999994,
-    "roi": -0.22705314009661826
-   },
-   "score": -0.22705314009661826,
-   "dollars_traded_estimate": 0.0,
-   "title": "XRP price up in next 15 mins?",
-   "category_id": "crypto",
-   "category_basis": "keyword",
-   "close_time": "2026-11-27T06:15:00Z",
-   "event_ticker": "KXXRP15M-26NOV270115",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV270115-15"
-  }
- ],
- "unscoreable": [
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV27H07-UP",
-   "eligible": false,
-   "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.53,
+   "q": 0.6329166666666666,
    "mid": 0.5,
-   "micro": 0.5,
-   "last": 0.65,
-   "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 0.9836111111111111,
+   "micro": 0.9083333333333333,
+   "last": 0.45,
+   "bid": 0.01,
+   "ask": 0.99,
+   "spread": 0.98,
+   "depth": 12.0,
+   "vol24": 4490.0,
+   "ttc_hours": 0.4847222222222222,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -204,54 +86,61 @@
     "maker": 0,
     "listed": false
    },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 78.0,
-   "title": "Demo BTC at or above 61694.35 USD",
+   "entry": {
+    "side": "YES",
+    "entry": 0.99,
+    "fee_unit": 0.0006930000000000006,
+    "cost": 0.990693,
+    "ev": -0.3577763333333335,
+    "roi": -0.361137439482598
+   },
+   "score": -0.361137439482598,
+   "dollars_traded_estimate": 2070.0,
+   "title": "Demo BTC at or above 61574.15 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-27T07:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H07",
+   "close_time": "2026-11-27T13:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H13",
    "status": "active",
    "result": null,
-   "volume_fp": 120.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 50.0,
+   "volume_fp": 4600.0,
+   "volume_24h_fp": 4490.0,
+   "open_interest_fp": 30.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
+    "depth_at_bid": 11.0,
+    "depth_at_ask": 1.0,
+    "bid_price": 0.01,
+    "ask_price": 0.99
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H07-UP"
-  },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H13-UP"
+  }
+ ],
+ "unscoreable": [
   {
-   "ticker": "KXDOGE15M-26NOV270115-15",
+   "ticker": "KXBNB-26NOV2801-T744.99",
    "eligible": false,
    "fails": [
-    "spread 100.0c > 10c cap",
-    "depth 1 < 50 contracts at the touch",
+    "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
-    "closes in 14 min < 15 min floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
     "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
    ],
-   "q": 0.655,
-   "mid": 0.5,
-   "micro": 1.0,
-   "last": 0.4,
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
    "bid": 0.0,
-   "ask": 1.0,
-   "spread": 1.0,
-   "depth": 1.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 0.2336111111111111,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXDOGE15M",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -259,28 +148,28 @@
    },
    "entry": null,
    "score": null,
-   "dollars_traded_estimate": 0.4,
-   "title": "DOGE price up in next 15 mins?",
+   "dollars_traded_estimate": 0.0,
+   "title": "BNB price on Nov 28, 2026?",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-27T06:15:00Z",
-   "event_ticker": "KXDOGE15M-26NOV270115",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
-   "volume_fp": 1.0,
+   "volume_fp": 0.0,
    "volume_24h_fp": 0.0,
-   "open_interest_fp": 1.0,
+   "open_interest_fp": 0.0,
    "catalysts": [],
    "book": {
-    "depth_at_bid": 1.0,
+    "depth_at_bid": 0.0,
     "depth_at_ask": 0.0,
-    "bid_price": 0.45,
+    "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV270115-15"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-T744.99"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T98P000",
+   "ticker": "KXBNB-26NOV2801-T380",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -300,9 +189,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -311,11 +200,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $98.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -328,10 +217,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T98P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-T380"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T96P000",
+   "ticker": "KXBNB-26NOV2801-B742",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -351,9 +240,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -362,11 +251,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $96.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -379,10 +268,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T96P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B742"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T94P000",
+   "ticker": "KXBNB-26NOV2801-B737",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -402,9 +291,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -413,11 +302,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $94.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -430,10 +319,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T94P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B737"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T92P000",
+   "ticker": "KXBNB-26NOV2801-B732",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -453,9 +342,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -464,11 +353,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $92.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -481,10 +370,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T92P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B732"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T90P000",
+   "ticker": "KXBNB-26NOV2801-B727",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -504,9 +393,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -515,11 +404,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $90.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -532,10 +421,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T90P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B727"
   },
   {
-   "ticker": "KXTTFW-04DEC261659-T88P000",
+   "ticker": "KXBNB-26NOV2801-B722",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -555,9 +444,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 183.98333333333332,
+   "ttc_hours": 17.48472222222222,
    "momentum": null,
-   "series_ticker": "KXTTFW",
+   "series_ticker": "KXBNB",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -566,11 +455,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Dutch TTF gas above $88.000 on Dec 4 at 4:59:59 PM EST?",
-   "category_id": "gas",
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-12-04T21:59:59Z",
-   "event_ticker": "KXTTFW-04DEC261659",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -583,23 +472,75 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTTFW-04DEC261659-T88P000"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B722"
+  },
+  {
+   "ticker": "KXBNB-26NOV2801-B717",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 17.48472222222222,
+   "momentum": null,
+   "series_ticker": "KXBNB",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "BNB price on Nov 28, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "close_time": "2026-11-28T06:00:00Z",
+   "event_ticker": "KXBNB-26NOV2801",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B717"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 136,
+  "candles_used": 160,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 2,
+  "baseline_always_yes_bets": 3,
   "baseline_always_yes_hits": 2,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 22,
-   "no side passed the replay gates": 2
+   "no candles in the 2h before close": 23,
+   "candle without a price": 21,
+   "no side passed the replay gates": 3
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -608,7 +549,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 1.0
+  "baseline_always_yes_hit_rate": 0.6667
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
