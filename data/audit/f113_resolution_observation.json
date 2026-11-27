@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "verified_date_utc": "2026-11-27",
+  "method": "Official Kalshi demo Trade API response fetched through the platform page-fetch route; selected fields transcribed verbatim from the response market object. The exact fetch time was not retained by the tool.",
+  "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR",
+  "documentation_sources": [
+    "https://docs.kalshi.com/api-reference/market/get-market",
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://docs.kalshi.com/getting_started/market_settlement"
+  ],
+  "market": {
+    "ticker": "KXPGATOUR-THRC26-BHAR",
+    "event_ticker": "KXPGATOUR-THRC26",
+    "title": "The RSM Classic: Brian Harman wins",
+    "close_time": "2026-11-23T19:54:03Z",
+    "status": "finalized",
+    "result": "no",
+    "settlement_ts": "2026-11-23T19:58:03.108438Z",
+    "settlement_value_dollars": "0.0000"
+  },
+  "note": "This is an outcome observation, not a current quote or a claim about market-cause attribution."
+}

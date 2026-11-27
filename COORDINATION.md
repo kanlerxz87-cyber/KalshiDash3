@@ -32,6 +32,51 @@ Claimed 2026-11-27 before implementation after reading this task board and confi
 
 **Post-merge sync note (2026-11-27):** after correcting the audit's smooth-scroll count, `git pull --rebase origin arena/699eb329-kalshidash3` attempted to replay main's already-merged PR history and conflicted in `COORDINATION.md`. The rebase was aborted; no other session's work was discarded. Current `main` already contains all those merged board sections and this session's audit; the remaining report correction is a descendant of the current branch tip and will be pushed as a normal fast-forward, not a force push.
 
+## Session `arena-740b3003` — close the stale lifecycle finding against the current official record
+
+Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshidash3`, based on `ba847e8` (`main`, demo snapshot `2026-11-27T22:20:02Z`). Read the shared board, checked open PRs, and inspected the current committed lifecycle record before editing implementation/data.
+
+**Observed before edits:** F-113 still said its named golf alert `KXPGATOUR-THRC26-BHAR` was “not in snapshot.” The current `data/live/markets.json` already contains an `alert_lifecycle` row for that ticker with `status: finalized`, `result: no`, settlement timestamp `2026-11-23T19:58:03.108438Z`, and the exact official market URL; the corresponding alert is still in the archive/feed. A fresh read of the official demo `GET /markets/{ticker}` at the URL below returned those same fields. Thus the implementation had landed, but the review ledger had not been updated after the collector published the evidence.
+
+**Stale-scope handoff (per the board’s >60-minute rule):** open PR #148’s only commit is the F-105 formatting-only change (`f5c5e7f`, committed 18:11:28Z; PR last updated 18:11:33Z), more than four hours before this claim. This session takes over only `data/findings.json` for F-113. I compared the stale patch with the current base: the brace seam is already normalized, and every finding’s keys use the same valid three-space indentation for this one-space-indented JSON; the PR’s four-space rendering would make F-105 inconsistent. No F-105 edit is needed, and the stale PR will be closed as superseded after this follow-up is integrated. The machine-ledger still marks E9D9-4 live although its PR #147 merged at 18:10:42Z; the older `dba435ee` T47 claim is backed by PR #64 merged 2026-11-21T20:41Z. Those board rows are historical/stale; no code from those scopes is being changed. Open PR #150 is a disjoint desk-workflow change; its workflow file and code are untouched. This record is the handoff note; it does not rewrite another session’s section.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| A740-1 | Reconcile F-113 with the now-published lifecycle record, add the official-observation fixture and regression, and append a post-audit closure note; verify but do not reformat F-105 because current main is already consistent | done | arena-740b3003 | `data/findings.json` (F-113 action only), `data/audit/f113_resolution_observation.json` (new), `data/audit/REPORT.md` (follow-up section only), `scripts/tests/test_f113_resolution.py` (new), `COORDINATION.md` (this section), `data/session_claims.json` (generated) | [Official demo market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Market Lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), committed `data/live/markets.json` / alert archive |
+| A740-2 | Run the complete release gate; open a PR from this fixed branch, merge without waiting, and verify the deployed finding page and Pages build | in progress | arena-740b3003 | `COORDINATION.md` (this section only) | `python3 scripts/verify_release.py`, GitHub PR/check/Pages APIs, deployed `flagged.html` |
+
+### A740-1 verification checkpoint (2026-11-27T22:39Z)
+
+- Re-read official demo `GET /markets/KXPGATOUR-THRC26-BHAR` and the official Get Market / Market Lifecycle / Market Settlement docs. Exact official result: `status=finalized`, `result=no`, `settlement_ts=2026-11-23T19:58:03.108438Z`, `settlement_value_dollars=0.0000`. The stored `data/live/markets.json` sidecar has the same outcome and a source matching the ticker; the alert remains in the archive and is outside the ranked slices.
+- Added the date-labelled observation fixture and a regression with 4 checks (archive/source, official observation, exact lifecycle outcome, and honest F-113 wording). The finding action and audit report now say the named gap is closed while retaining the one-collector-pass caveat for newly detected alerts; unknown/deferred/out-of-scope results remain unverified.
+- `python3 scripts/tests/test_f113_resolution.py` **PASS** (4 tests); `python3 scripts/audit_sources.py --json` **PASS** (0 citation errors); `python3 scripts/tests/validate_live.py` **PASS** (614 open / 200 settled / 20 orderbooks); `python3 scripts/tests/validate_alerts.py` **PASS** (184 archived rows); `python3 scripts/check_site.py` **PASS** (21 pages); full `python3 scripts/verify_release.py` **PASS** (all validators, unit/DOM suites, rendered-number audit, freshness checks and links). `git diff --check` clean.
+- Verified that PR #148's F-105 formatting hunk is stale and its proposed four-space member indent is not the repository's current three-space JSON convention; the current base already has the normalized object seam. No F-105 data was changed. A740-1 is **done**; A740-2 remains in progress pending this branch's PR/merge/deploy evidence.
+
+### A740-2 rebase and pre-publication checkpoint (2026-11-27T22:43Z)
+
+- `origin/main` advanced to `8684b3d` while this branch was being prepared (from the earlier `5919a8a` base). Rebased the A740 commits onto `8684b3d` before publication. The only rebase conflict was `COORDINATION.md` at the insertion point: retained the upstream `arena-699eb329` accessibility audit section and the A740 section; the A740 changes/data applied intact. No application or data conflict was present.
+- Re-ran `python3 scripts/verify_release.py` on the rebased tree: **PASS**. This includes offline validators, tests, source/link checks, rendered-number audit and the 21-page site check. The validated live snapshot is the newer `2026-11-27T22:35:01Z` collection. `git diff --check` is clean.
+- GitHub reports Pages currently **built** for main commit `8684b3d`; this is baseline deployment status, not evidence for the still-unmerged A740 change. PR #148 remains **OPEN** (confirmed with `gh pr view 148`); leave it untouched until A740 is integrated, then close it as superseded. Other current open PRs are #150, #175 and #176, outside A740's code scope.
+- A740 branch PR/check/merge and the post-merge `flagged.html` + Pages build remain pending; no deployment is claimed for this change yet.
+
+### A740-2 latest-main sync (2026-11-27T22:46Z)
+
+- `origin/main` advanced again to `3f085cd` through PR #176 after the previous checkpoint. Rebased the three A740 commits onto that tip. The rebase had one `COORDINATION.md` conflict where the upstream post-merge sync note and the A740 section shared an insertion point; kept both sections. The data/test commits remained intact, and no application or market snapshot was altered by this rebase.
+- Inspected newly opened PR #177. Its declared files are only `AUDIT_AEB0CBDC.md` and `COORDINATION.md` (its own session section); it explicitly avoids application, snapshot, and concurrent-session files. No A740 implementation-scope overlap was found.
+- Ran `python3 scripts/verify_release.py` on this latest base: **PASS** (offline validators, Python/DOM tests including the F-113 regressions, source/link checks, rendered-number audit, and all 21 pages). `git diff --check` is clean. Push, PR checks, merge, and post-merge deployed finding-page/Pages verification remain pending.
+
+### A740-2 latest base sync (2026-11-27T22:48Z)
+
+- `origin/main` advanced to `a2bd7d8` when PR #177 merged. Rebased the A740 stack onto that current tip; this rebase completed without conflicts. PR #177's declared scope remains its independent audit report plus its own coordination section; the A740 data, finding, report, and regression are preserved unchanged.
+- The PR #177 description independently reports a live `GET /markets/{ticker}` match and visible `settled NO` for the RSM Classic ticker, consistent with this session's committed observation and lifecycle sidecar.
+- On the rebased `a2bd7d8` tree, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4 tests) and `python3 scripts/verify_release.py` **PASS** (validators, Python/DOM suites, source/link checks, rendered-number audit, and all 21 pages). No PR, merge, or A740 deployment is claimed yet.
+
+### A740-2 collector refresh and base sync (2026-11-27T22:50Z)
+
+- `origin/main` advanced to `e1c5a04` through PR #175 and its `2026-11-27T22:50:03Z` live-data collection. Rebased A740 onto this latest tip without conflicts. The refreshed `data/live/markets.json` still contains the out-of-window `KXPGATOUR-THRC26-BHAR` sidecar with exact source, `status=finalized`, `result=no`, `settlement_ts=2026-11-23T19:58:03.108438Z`, settlement value `0.0000`, and prior row observation time `2026-11-27T20:35:02Z`.
+- After rebase, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4), `validate_live.py` **PASS** (614 open / 200 settled / 20 orderbooks), `validate_alerts.py` **PASS** (184 archived alerts), and `check_site.py` **PASS** (21 pages). `python3 scripts/verify_release.py` on `e1c5a04` also **PASS**: offline validators, Python/DOM suites, source/link checks, rendered-number audit and all 21 pages. Push, PR checks, merge, and post-merge deployment verification remain pending.
+
+---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
 
