@@ -6,6 +6,15 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `c4409c73` — collector recovery, source audit, and Pages integration
+
+Claimed 2026-11-27 on the assigned branch `arena/c4409c73-kalshidash3`, from `a4a19cc`. At claim, the latest health record says `validators: validate_alerts`; the only open PR (#148) is the older F-105 formatting change, whose row is outside this scope. Earlier collector and topic-integrity changes are already on `main` (PRs #147 and #149). No other session's work or workflow-owned snapshot files will be overwritten.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| C440-1 | Reproduce the current collector rejection and repair the alert-publishing invariant at its source with regression tests | in progress | c4409c73 | `scripts/build_alerts.py`, `scripts/alert_evidence.py`, `scripts/tests/test_alerts.py`, `scripts/tests/validate_alerts.py`, session section of `COORDINATION.md` | [Kalshi Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Demo environment](https://docs.kalshi.com/getting_started/demo_env), collector run evidence |
+| C440-2 | Final integration: recheck sourced rows and customer-facing disclosures, publish any new finding without modifying existing ledger rows, gate the PR, merge, and verify Pages | in progress | c4409c73 | `flagged.html`, `data/release_findings.json` (only if needed; avoids #148), this board section; no writes to `data/live/*` | [Kalshi API index](https://docs.kalshi.com/llms.txt), [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), GitHub checks and Pages API |
+
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
 Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
