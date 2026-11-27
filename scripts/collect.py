@@ -53,7 +53,6 @@ HISTORICAL_BACKFILL_PER_SEED = HISTORICAL_PER_SEED
 HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 OFFICIAL_VOLUME_SWEEP_TOP_K = 12  # top traded official series per topic queried directly (E9D9-3)
-CITED_SERIES_READ_LIMIT = 25  # archived series read fresh per pass when the scan no longer covers them (A8D3)
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
 # keyword fallback only — a series that is explicitly a seed can never be excluded, because
@@ -1097,29 +1096,6 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
 
     for t in sorted({series_of(m) for st2 in ("open", "settled") for m in raw[st2]}):
         record_series(t)
-    # A8D3: every series an archived swing cites keeps a verified record, even after its markets
-    # leave the scan window. A bounded number of series the ledger has never seen are read fresh
-    # (one GET /series/{ticker} each, the same documented endpoint record_series uses); the rest
-    # keep the record the previous snapshot already verified.
-    previous_ledger: dict = {}
-    cited_series: set = set()
-    try:
-        previous_ledger = json.loads((LIVE / "markets.json").read_text()).get("series_index") or {}
-    except (OSError, json.JSONDecodeError, AttributeError):
-        previous_ledger = {}
-    try:
-        archived = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
-        cited_series = {(str(a.get("ticker") or "").upper().split("-")[0])
-                        for a in archived if a.get("ticker")}
-    except (OSError, json.JSONDecodeError, AttributeError):
-        cited_series = set()
-    unseen_cited = sorted(t for t in cited_series if t and t not in ledger)
-    for t in unseen_cited[:CITED_SERIES_READ_LIMIT]:
-        record_series(t)
-    carried_forward = carry_forward_series(ledger, previous_ledger, cited_series)
-    if unseen_cited or carried_forward:
-        print(f"  series ledger: {len(unseen_cited[:CITED_SERIES_READ_LIMIT])} archived series read fresh, "
-              f"{carried_forward} kept from the previous snapshot (no longer in the current scan)")
     no_answer = sorted(t for t, v in ledger.items() if not v["categories"])
     print(f"  series ledger: {len(ledger)} series, {len(no_answer)} without an official categories answer")
 
@@ -1266,6 +1242,31 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         watch |= archived_tickers
     except (OSError, json.JSONDecodeError, AttributeError):
         pass  # first run: no archive yet, so open rows alone define the watch set
+    # F-107: the category ledger must outlive the scan window just like the chart
+    # history. Archived swings can retain a topic assigned from GET /series after
+    # their entire series leaves raw[open/settled]. Re-fetch that official record;
+    # never infer a category from the ticker or relax the downstream validator.
+    # record_series deduplicates against the scan ledger (one call per series).
+    for st in sorted({series_of({"ticker": t}) for t in archived_tickers}):
+        record_series(st)
+    # A8D3 (one mechanism for one concern, kept from two sessions that found the same gap): the
+    # loop above re-reads the official record for every series an archived swing cites, which is
+    # the primary repair of F-107. This is its fallback for the pass where the exchange does not
+    # answer for one of those series: `record_series` then stores no categories, and the archived
+    # alert's verified topic would lose its backing - which is exactly the stall this pair of
+    # fixes exists for. A fresh answer always wins; this only fills a series the previous snapshot
+    # verified and the current one did not, and the count is published so the ledger is never
+    # silently stale.
+    previous_ledger: dict = {}
+    try:
+        previous_ledger = json.loads((LIVE / "markets.json").read_text()).get("series_index") or {}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        previous_ledger = {}
+    cited_series = {series_of({"ticker": t}) for t in archived_tickers}
+    carried_forward = carry_forward_series(ledger, previous_ledger, cited_series)
+    if carried_forward:
+        print(f"  series ledger: {carried_forward} archived series kept their previous snapshot's "
+              f"verified record (the exchange gave no categories for them this pass)")
     hist = {k: v for k, v in hist.items() if k in watch}
     # Restore what an earlier, prunier run already deleted: archive-cited tickers with no
     # observations left at all are rebuilt from their own official candles (see the docstring).
