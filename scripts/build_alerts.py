@@ -62,6 +62,7 @@ CATEGORY_COMPATIBLE = {
 # markets is not an event in gas, elections, culture, crypto or golf, so it is withheld
 # from the chats while staying in the archive.
 NEVER_IN_SCOPE = {"Test", "Demo"}
+DEMO_BASES = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
 
 
 def series_of_ticker(ticker: str) -> str:
@@ -72,6 +73,21 @@ def series_of_ticker(ticker: str) -> str:
     """
     t = (ticker or "").upper()
     return t.split("-")[0] if "-" in t else t
+
+
+def archived_series_categories(a: dict) -> list[str]:
+    """Return recorded categories only when they cite this series on the demo API."""
+    series = series_of_ticker(a.get("ticker") or "")
+    if a.get("series_categories_source") not in {f"{base}/series/{series}" for base in DEMO_BASES}:
+        return []
+    return [str(c) for c in (a.get("series_categories") or [])]
+
+
+def alert_categories(a: dict, row: dict, ledger: dict) -> list[str]:
+    """Prefer current official metadata; a rolling scan can omit an archived ticker."""
+    series = row.get("series_ticker") or series_of_ticker(a.get("ticker") or "")
+    categories = row.get("series_categories") or (ledger.get(series) or {}).get("categories")
+    return [str(c) for c in categories] if categories else archived_series_categories(a)
 
 
 def load(path: Path):
@@ -162,20 +178,20 @@ def main() -> int:
     #
     # Merging two collector branches brought archive entries whose rows predate `series_categories`
     # (12 of the demo Test series among them), so those alerts carried no official categories. The
-    # snapshot's series_index now answers for them, and leaving the field null would make the
-    # withholding rule silently allow exactly the rows it exists to remove. A category this project
-    # has since verified from GET /series is therefore written onto the entry; an entry whose series
-    # is not in the ledger is left null (unknown is not a contradiction).
+    # snapshot's series_index now answers for them. Record the source with the categories while
+    # it is available; don't replace previously sourced metadata with a later classification.
     series_ledger = markets.get("series_index") or {}
     repaired = 0
     for a in archive["alerts"]:
-        if "series_categories" in a and a["series_categories"]:
+        if archived_series_categories(a):
             continue
-        entry = series_ledger.get(series_of_ticker(a.get("ticker") or "")) or {}
-        cats = entry.get("categories")
-        if cats:
-            a["series_categories"] = [str(c) for c in cats]
-            a["series_categories_source"] = entry.get("source")
+        series = series_of_ticker(a.get("ticker") or "")
+        entry = series_ledger.get(series) or {}
+        cats = [str(c) for c in (entry.get("categories") or [])]
+        source = entry.get("source")
+        if cats and source in {f"{base}/series/{series}" for base in DEMO_BASES}:
+            a["series_categories"] = cats
+            a["series_categories_source"] = source
             repaired += 1
     if repaired:
         print(f"archive: recorded official series_categories on {repaired} entr(y/ies) from series_index")
@@ -228,14 +244,10 @@ def main() -> int:
     for a in archive["alerts"]:
         if a.get("category_id"):
             continue
-        cats = [str(c) for c in (a.get("series_categories") or [])]
-        if not cats:
-            entry = series_ledger.get(series_of_ticker(a.get("ticker") or "")) or {}
-            cats = [str(c) for c in (entry.get("categories") or [])]
-            if cats:
-                a["series_categories"] = cats
-                a["series_categories_source"] = entry.get("source")
-        topics = sorted(t for t, comp in CATEGORY_COMPATIBLE.items() if set(cats) & comp)
+        cats = set(archived_series_categories(a))
+        if cats & NEVER_IN_SCOPE:
+            continue
+        topics = sorted(t for t, comp in CATEGORY_COMPATIBLE.items() if cats & comp)
         if len(topics) == 1:
             a["category_id"] = topics[0]
             a["category_basis"] = "official-series"
@@ -255,24 +267,13 @@ def main() -> int:
     # F-65: an archived alert stays in the archive (history is never rewritten), but it must
     # not be served when the exchange's own series record says its series is not in that topic.
     #
-    # The first version of this check only looked at snapshot rows, which was backwards: the
-    # collector DROPS a conflicting row, so a row-membership test would have kept precisely the
-    # alerts that were supposed to disappear. The collector now publishes `series_index` — the
-    # official GET /series categories per series ticker — and that ledger is the authority here.
-    # A series with no ledger entry, or with null categories, is unknown and is served.
-    ledger = markets.get("series_index") or {}
+    # The ledger can reject a row even if it is not ranked, but is itself refreshed from a
+    # bounded scan. When neither current source has categories, use the alert's own sourced copy.
     conflicts: dict[str, dict] = {}
     out_of_scope: dict[str, int] = {}
 
-    def official_for(ticker: str) -> list[str]:
-        row = by_ticker.get(ticker)
-        if row and row.get("series_categories"):
-            return [str(c) for c in row["series_categories"]]
-        entry = ledger.get((row or {}).get("series_ticker") or series_of_ticker(ticker)) or {}
-        return [str(c) for c in (entry.get("categories") or [])]
-
     def publishable(a) -> bool:
-        cats = official_for(a.get("ticker") or "")
+        cats = alert_categories(a, by_ticker.get(a.get("ticker")) or {}, series_ledger)
         cat = a.get("category_id")
         # 1. The exchange's own record files the series under a test/demo category.
         never = sorted({c for c in cats if c in NEVER_IN_SCOPE})
@@ -280,13 +281,12 @@ def main() -> int:
             key = "series filed under " + ", ".join(never)
             out_of_scope[key] = out_of_scope.get(key, 0) + 1
             return False
-        # 2. No topic could be confirmed for this swing. The five topics are the scope of
-        #    this project, so an unclassified swing is withheld and counted, not guessed.
-        if not cat:
-            key = "no topic could be confirmed from GET /series"
+        # 2. An unclassified or unsupported topic cannot appear in the five-topic feeds.
+        if cat not in CATEGORY_COMPATIBLE:
+            key = "no supported topic recorded"
             out_of_scope[key] = out_of_scope.get(key, 0) + 1
             return False
-        compatible = CATEGORY_COMPATIBLE.get(cat, set())
+        compatible = CATEGORY_COMPATIBLE[cat]
         # 3. No official categories recorded: unknown is not a contradiction.
         if not cats:
             return True
@@ -308,9 +308,10 @@ def main() -> int:
               file=sys.stderr)
         return 1
 
-    def newest_first(rows):
-        return rows[:MAX_ALERTS_PER_FEED]
-
+    # Each feed has its own newest-first window; a model-watch entry can be older than the
+    # all-events window. Counts describe the serialized windows, not the untrimmed archive.
+    all_window = all_feed[:MAX_ALERTS_PER_FEED]
+    roi_window = roi_feed[:MAX_ALERTS_PER_FEED]
     out = {
         "schema": 1,
         "generated_at": now,
@@ -319,8 +320,8 @@ def main() -> int:
         "rules_status": rules.get("status"),
         "high_roi_rule": roi,
         "counts": {
-            "all_events": len(all_feed),
-            "high_roi": len(roi_feed),
+            "all_events": len(all_window),
+            "high_roi": len(roi_window),
             "archive_total": len(archive["alerts"]),
             "new_this_run": new_count,
             # F-65: archived, but withheld from the feeds because the snapshot's own row for the
@@ -334,8 +335,8 @@ def main() -> int:
             "withheld_out_of_scope": scope_count,
             "withheld_out_of_scope_reasons": dict(sorted(out_of_scope.items())),
         },
-        "all_events": newest_first(all_feed),
-        "high_roi": newest_first(roi_feed),
+        "all_events": all_window,
+        "high_roi": roi_window,
         "disclaimers": [
             "Prices are last-traded prices from the Kalshi DEMO environment (mock funds).",
             "Each alert is a change between two consecutive collector observations, not a continuous tick stream.",
@@ -344,8 +345,8 @@ def main() -> int:
             "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
             "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
             "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
-            "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten.",
-            "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",
+            "Each feed contains its own newest 300 qualifying rows. The row counts describe these windows; evidence counts describe the full in-scope archive.",
+            "An archived alert is withheld when official series categories contradict its topic. Current metadata takes precedence; a sourced archive record is used if the rolling snapshot has no categories for that series.",
             "Scope: the chats cover the five topics only. An archived swing whose series GET /series files under Test/Demo, or for which no single topic can be confirmed, is withheld and counted (counts.withheld_out_of_scope) rather than shown under the wrong topic.",
         ],
     }

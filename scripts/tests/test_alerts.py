@@ -9,7 +9,7 @@ Rule under test (mirrors scripts/build_alerts.py and data/alert_rules.json):
   * an alert is a consecutive pair of last-traded-price observations for one
     market whose absolute change is >= $0.10, in either direction;
   * cause_link is null on every alert (no official cause source is collected);
-  * the high_roi feed is a subset of the all_events feed;
+  * both feeds are newest-first windows into the eligible archive;
   * high_roi is frozen at detection time and is verified against the inputs stored with
     each alert, never against a later snapshot (HighRoiFreezeTests).
 
@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
 sys.path.insert(0, str(ROOT / "scripts"))
 import build_alerts  # noqa: E402
+import validate_alerts  # noqa: E402
 EPS = 1e-9
 
 
@@ -130,10 +131,12 @@ class FeedTests(unittest.TestCase):
             print(f"note: {archive_only} archive-only alert(s) whose market has left the "
                   "snapshot — allowed by design (T12), counted by validate_alerts.py")
 
-    def test_high_roi_is_subset_of_all_events(self):
-        all_keys = {(a["ticker"], a["to_time"]) for a in self.feed["all_events"]}
+    def test_high_roi_is_subset_of_archive(self):
+        # The model's newest 300 qualifying alerts may predate the all-events window.
+        archive = json.loads((LIVE / "alerts_archive.json").read_text())["alerts"]
+        keys = {(a["ticker"], a["from_time"], a["to_time"]) for a in archive if a["high_roi"]}
         for a in self.feed["high_roi"]:
-            self.assertIn((a["ticker"], a["to_time"]), all_keys)
+            self.assertIn((a["ticker"], a["from_time"], a["to_time"]), keys)
 
     def test_disclaimers_present(self):
         self.assertTrue(self.feed.get("disclaimers"))
@@ -234,6 +237,92 @@ class CategoryIntegrityTests(unittest.TestCase):
         self.assertEqual(len(feed["all_events"]), 1,
                          "a null categories answer is unknown and must not withhold an alert")
         self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
+
+
+class RollingArchiveTests(unittest.TestCase):
+    """Run the builder and independent validator against the same changing scan."""
+
+    BASE = "https://external-api.demo.kalshi.co/trade-api/v2"
+    TICKER = "KXAAAGASD-26NOV21-3.6600"
+    SERIES = "KXAAAGASD"
+    SERIES_URL = f"{BASE}/series/{SERIES}"
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.live = Path(tmp.name)
+        self.snapshot = {"base_url": self.BASE, "open_markets": [], "series_index": {}}
+        self.history = {"series": {}}
+        self.a = {
+            "ticker": self.TICKER, "category_id": "gas", "category_basis": "official-series",
+            "category_assigned_from": "GET /series categories (series_categories)",
+            "series_categories": ["Economics"], "series_categories_source": self.SERIES_URL,
+            "from_time": "2026-11-20T22:03:00Z", "to_time": "2026-11-20T22:04:00Z",
+            "from_price": 0.20, "to_price": 0.40, "delta": 0.20, "direction": "up",
+            "market_source": f"{self.BASE}/markets/{self.TICKER}",
+            "cause_link": None, "cause_status": "unverified", "high_roi": False,
+        }
+
+    def build(self, rows):
+        (self.live / "markets.json").write_text(json.dumps(self.snapshot))
+        (self.live / "price_history.json").write_text(json.dumps(self.history))
+        (self.live / "alerts_archive.json").write_text(json.dumps({"schema": 1, "alerts": rows}))
+        with mock.patch.object(build_alerts, "LIVE", self.live), \
+             mock.patch.object(sys, "argv", ["build_alerts.py"]):
+            self.assertEqual(build_alerts.main(), 0)
+        return json.loads((self.live / "alerts.json").read_text())
+
+    def validate(self):
+        with mock.patch.object(validate_alerts, "LIVE", self.live):
+            return validate_alerts.main()
+
+    def test_sourced_assignment_survives_a_missing_series(self):
+        self.assertEqual(self.build([self.a])["counts"]["all_events"], 1)
+        self.assertEqual(self.validate(), 0)
+
+    def test_current_conflict_is_withheld_without_rewriting_assignment(self):
+        self.snapshot["series_index"][self.SERIES] = {"categories": ["Sports"], "source": self.SERIES_URL}
+        feed = self.build([self.a])
+        self.assertEqual(feed["all_events"], [])
+        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
+        stored = json.loads((self.live / "alerts_archive.json").read_text())["alerts"][0]
+        self.assertEqual(stored["series_categories"], ["Economics"])
+        self.assertEqual(self.validate(), 0)
+
+    def test_assignment_requires_the_official_series_url_for_this_ticker(self):
+        self.a["series_categories_source"] = f"{self.BASE}/series/KXBTCY"
+        self.build([self.a])
+        with mock.patch("sys.stderr"):
+            self.assertEqual(self.validate(), 1)
+        self.assertTrue(any("sourced GET /series" in e for e in validate_alerts.errors))
+
+    def test_archived_test_category_stays_withheld_without_current_ledger(self):
+        ticker = "KXDEMOFUTHOURLY-26NOV21H16-UP"
+        self.a.update(ticker=ticker, category_id="crypto", category_basis="keyword",
+                      category_assigned_from=None, series_categories=["Test"],
+                      series_categories_source=f"{self.BASE}/series/KXDEMOFUTHOURLY",
+                      market_source=f"{self.BASE}/markets/{ticker}")
+        feed = self.build([self.a])
+        self.assertEqual(feed["counts"]["withheld_out_of_scope"], 1)
+        self.assertFalse(feed["all_events"] or feed["high_roi"])
+        self.assertEqual(self.validate(), 0)
+
+    def test_feed_counts_match_independently_capped_windows(self):
+        from datetime import datetime, timedelta, timezone
+
+        start = datetime(2026, 11, 20, tzinfo=timezone.utc)
+        rows = [dict(self.a, from_time=(start + timedelta(minutes=i)).isoformat().replace("+00:00", "Z"),
+                     to_time=(start + timedelta(minutes=i + 1)).isoformat().replace("+00:00", "Z"),
+                     category_assigned_from=None, category_basis="seed" if i < 301 else "keyword",
+                     high_roi=i < 301, volume_24h_fp=10.0) for i in range(302)]
+        feed = self.build(rows)
+        self.assertEqual(len(feed["all_events"]), 300)
+        self.assertEqual(len(feed["high_roi"]), 300)
+        self.assertEqual(feed["counts"]["all_events"], 300)
+        self.assertEqual(feed["counts"]["high_roi"], 300)
+        self.assertEqual(feed["counts"]["archive_total"], 302)
+        self.assertEqual(feed["high_roi"][-1]["to_time"], rows[1]["to_time"])
+        self.assertEqual(self.validate(), 0)
 
 
 class HighRoiFreezeTests(unittest.TestCase):

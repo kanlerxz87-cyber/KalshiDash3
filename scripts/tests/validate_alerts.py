@@ -48,6 +48,7 @@ RULES = ROOT / "data" / "alert_rules.json"
 # GET /series for each topic; see data/categories.json and
 # https://docs.kalshi.com/api-reference/market/get-series-list
 NEVER_IN_SCOPE = {"Test", "Demo"}  # GET /series categories of the exchange's own test instruments
+DEMO_BASES = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
 
 COMPATIBLE = {
     "gas": {"Economics", "Commodities", "Financials"},
@@ -88,6 +89,8 @@ def iso_z(v: str) -> bool:
 
 def main() -> int:
     global archive_only, candle_only
+    errors.clear()
+    archive_only = candle_only = 0
     alerts_doc = load(LIVE / "alerts.json")
     archive_doc = load(LIVE / "alerts_archive.json")
     rules = load(RULES)
@@ -128,7 +131,10 @@ def main() -> int:
             check(("up" if d > 0 else "down") == a.get("direction"), f"{tag} direction contradicts delta sign")
         check(iso_z(a.get("from_time")) and iso_z(a.get("to_time")), f"{tag} timestamps not ISO-8601 Z")
         check(str(a.get("from_time", "")) < str(a.get("to_time", "")), f"{tag} from_time must precede to_time")
-        check(str(a.get("market_source", "")).startswith("https://"), f"{tag} market_source must be https")
+        check(a.get("market_source") in {
+            f"{base}{prefix}/markets/{a.get('ticker')}"
+            for base in DEMO_BASES for prefix in ("", "/historical")
+        }, f"{tag} market_source must be the official demo endpoint for this ticker")
         check(a.get("cause_link") is None, f"{tag} cause_link must stay null (no official cause source — F-25)")
         check("unverified" in str(a.get("cause_status", "")), f"{tag} cause_status must state unverified")
         check(isinstance(a.get("high_roi"), bool), f"{tag} high_roi must be a boolean")
@@ -205,23 +211,29 @@ def main() -> int:
     ledger = state.get("series_index") or {}
     row_by_ticker = {r.get("ticker"): r for r in (state.get("open_markets") or [])}
 
-    def _official(ticker: str) -> list:
+    def _recorded(a: dict) -> list:
+        series = (a.get("ticker") or "").upper().partition("-")[0]
+        if a.get("series_categories_source") in {f"{base}/series/{series}" for base in DEMO_BASES}:
+            return [str(c) for c in (a.get("series_categories") or [])]
+        return []
+
+    def _official(a: dict) -> list:
+        ticker = a.get("ticker") or ""
         row = row_by_ticker.get(ticker) or {}
-        if row.get("series_categories"):
-            return [str(c) for c in row["series_categories"]]
-        series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
-        return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
+        series = row.get("series_ticker") or ticker.upper().partition("-")[0]
+        cats = row.get("series_categories") or (ledger.get(series) or {}).get("categories")
+        return [str(c) for c in cats] if cats else _recorded(a)
 
     def _served(a: dict) -> bool:
-        cats = _official(a.get("ticker") or "")
+        cats = _official(a)
         # Scope: an exchange-test series is never an event in the five topics; an alert with
         # no confirmed topic is withheld rather than shown under a guessed one.
         if any(c in NEVER_IN_SCOPE for c in cats):
             return False
         cat = a.get("category_id")
-        if not cat:
+        if cat not in COMPATIBLE:
             return False
-        compatible = COMPATIBLE.get(cat, set())
+        compatible = COMPATIBLE[cat]
         # No official categories recorded: unknown is not a contradiction (same as the builder).
         if not cats:
             return True
@@ -234,16 +246,16 @@ def main() -> int:
           f"counts.withheld_category_conflict + counts.withheld_out_of_scope must be {withheld_expected} when "
           f"reproduced from series_index, got {counts.get('withheld_category_conflict')!r} + "
           f"{counts.get('withheld_out_of_scope')!r} (F-65, F-76)")
-    # A topic restored from GET /series (category_assigned_from) must be the ONLY topic that
-    # accepts that series; an ambiguous or contradicted assignment fails the build.
+    # Validate a historical assignment against the sourced categories used to make it, not
+    # the current (possibly pruned) scan. A newer contradiction is withheld by _served above.
     for a in archive:
         if not a.get("category_assigned_from"):
             continue
-        cats = _official(a.get("ticker") or "")
+        cats = _recorded(a)
         topics = sorted(t for t, comp in COMPATIBLE.items() if set(cats) & comp)
-        check(topics == [a.get("category_id")],
+        check(topics == [a.get("category_id")] and not (NEVER_IN_SCOPE & set(cats)),
               f"archive:{a.get('ticker')}@{a.get('to_time')} assigned topic {a.get('category_id')!r} "
-              f"but GET /series categories {cats!r} accept {topics!r}")
+              f"but its sourced GET /series categories {cats!r} accept {topics!r}")
     expected_all = served[:MAX]
     check(alerts_doc.get("all_events") == expected_all, "alerts.json all_events does not reproduce from the archive (order/membership/300 cap)")
     expected_roi = [a for a in served if a.get("high_roi")][:MAX]
