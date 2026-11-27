@@ -153,6 +153,8 @@ function renderAlerts() {
         evidenceState: (a.evidence && a.evidence.state) || null,
         contractsTraded: a.evidence ? a.evidence.contracts_traded : null,
         gaveBackHalf: Boolean((a.evidence_reversion || {}).gave_back_half),
+        // 49BA-1: printed end price vs the two-sided quote recorded in the same read.
+        quote: (a.evidence && a.evidence.quote) || null,
       });
     }
   } else {
@@ -196,12 +198,17 @@ function renderAlerts() {
     candle_unquantified: ["candle-sourced", "dim", "Bounded by a candle-backfill read; candlestick volume is per period, not cumulative, so the count is unknowable"],
     unknown_no_observations: ["no history", "dim", "The two observations that bound this swing are not in the committed history"],
   };
+  // 49BA-1 percentage/cents formatter for the quote chip (values are dollars in 0..1).
+  const pct = (v) => (v === null || v === undefined || !Number.isFinite(Number(v)) ? "—" : (Number(v) * 100).toFixed(1) + "\u00a2");
   const evidenceChip = (a) => {
     const spec = a.evidenceState ? EVIDENCE_LABEL[a.evidenceState] : null;
     if (!spec) return "";
     const n = a.contractsTraded;
     const count = (n === null || n === undefined) ? "" : ` · ${Number(n).toLocaleString()} contracts`;
     return `<span class="badge ${spec[1]}" title="${KD.esc(spec[2])}">${spec[0]}${count}</span>`
+      + (a.quote && a.quote.state === "outside_quote"
+        ? ` <span class="badge warn" title="The last-traded price ${pct(a.quote.to_last_price)} is outside the two-sided quote recorded in the same read (yes_bid ${pct(a.quote.to_yes_bid)} / yes_ask ${pct(a.quote.to_yes_ask)}, spread ${pct(a.quote.spread_dollars)}). The move was not available at that quote; the row does not claim why the two differ.">print ≠ book · ${pct(a.quote.outside_by_dollars)} outside</span>`
+        : "")
       + (a.gaveBackHalf ? ` <span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "");
   };
   const renderFeed = (items, emptyText) => items.length ? items.map(a => {
@@ -246,11 +253,19 @@ function renderAlerts() {
       + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase), ${ev.candle_unquantified || 0} are bounded by a candle-backfill read (candlestick volume is per period) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
       + `The floor is a project rule, not a Kalshi field (F-79).`
     : "";
+  // 49BA-1: the printed end price against the two-sided quote recorded in the SAME read. Both are
+  // fields of one Get Markets response, so this is a comparison, not an estimate.
+  const qc = state.alerts?.counts?.quote_check;
+  const quoteNote = (qc && Number.isFinite(qc.rows))
+    ? ` Quote check: of the ${qc.rows} swings served, ${qc.inside_quote || 0} ended inside the two-sided quote recorded at the same read, `
+      + `${qc.outside_quote || 0} printed outside it (the last-traded price was not available at that quote, chipped "print ≠ book") `
+      + `and ${qc.unknown_quote || 0} carry no usable quote. The last traded price and the quote are different fields; this row-level fact does not re-score the model screen (F-121).`
+    : "";
   KD.$("#alertFreshness").textContent = (feedGen
     ? `Alerts render from the canonical archive feed (data/live/alerts.json, generated ${feedGen}); each row links its official market record. Swings stay listed after their market leaves the open scan. The collector refreshes the snapshot on a scheduled cadence (last snapshot ${fetched || "n/a"} UTC); this page checks for a newer committed file once per minute.`
     : fetched
       ? `Alert scan uses consecutive snapshots through ${fetched} UTC (archive feed unavailable — recomputed from retained history). The collector runs on a scheduled cadence; this page checks for a newer committed snapshot once per minute. Older alerts may fall outside the retained chart history.`
-      : "Alert feeds are empty until a sourced snapshot is available.") + evNote;
+      : "Alert feeds are empty until a sourced snapshot is available.") + evNote + quoteNote;
 }
 
 function renderTables() {

@@ -390,6 +390,13 @@ window.KDL = (() => {
     const evBit = ev
       ? `<span class="badge ${ev.c}" title="${esc(ev.tip)}">${esc(ev.t)}${a.contracts_traded !== null && a.contracts_traded !== undefined ? " · " + num(a.contracts_traded) + " contracts" : ""}</span>`
       : "";
+    // 49BA-1: last_price_dollars is a print, yes_bid_dollars/yes_ask_dollars are the quote of the
+    // same read. When the print sits outside that band the row says so, because the move was not
+    // available at the recorded quote — the case a trader must not read as an executable swing.
+    const q = a.evidence_quote;
+    const quoteBit = q && q.state === "outside_quote"
+      ? `<span class="badge warn" title="The last-traded price ${cents(q.to_last_price)} lies outside the two-sided quote recorded in the same read (yes_bid ${cents(q.to_yes_bid)} / yes_ask ${cents(q.to_yes_ask)}, spread ${cents(q.spread_dollars)}), so the move was not available at that quote. The row does not claim why the two differ.">print ≠ book · ${cents(q.outside_by_dollars)} outside</span>`
+      : "";
     const rev = a.evidence_reversion;
     const revBit = rev && rev.gave_back_half === true
       ? `<span class="badge dim" title="A later observation returned to at least half the move">gave back ≥½</span>` : "";
@@ -411,6 +418,7 @@ window.KDL = (() => {
         <span class="mono chat-ticker">${esc(a.ticker)}</span>
         ${modelBit}
         ${evBit}
+        ${quoteBit}
         ${revBit}
         ${lifeBit}
         <span class="badge dim">${esc(cat)}</span>
@@ -544,6 +552,10 @@ window.KDL = (() => {
     full.evidence_reversion = a.evidence_reversion || null;
     full.evidence_state = (a.evidence && a.evidence.state) || null;
     full.contracts_traded = a.evidence ? a.evidence.contracts_traded : null;
+    // 49BA-1: the printed end price compared with the two-sided quote recorded in the same read.
+    // inside_quote / outside_quote / unknown_quote; absent on rows that predate the check.
+    full.evidence_quote = (a.evidence && a.evidence.quote) || null;
+    full.quote_state = full.evidence_quote ? full.evidence_quote.state : null;
     if (a.evidence && a.evidence.why) full.note = `${full.note} Evidence: ${a.evidence.why}.`;
     return full;
   }

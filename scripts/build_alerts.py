@@ -206,6 +206,11 @@ def main() -> int:
             "volume_to": current.get("volume_to"),
             "policy_floor_contracts": current["policy_floor_contracts"],
             "policy_floor_is_a_kalshi_field": False,
+            # 49BA-1: the printed end price compared with the two-sided quote of the SAME read.
+            # Both sides are recorded fields of one Get Markets response, so this block is
+            # deterministic and is rebuilt for archive rows too (it cannot change: the row's
+            # prices and quotes are frozen). See scripts/alert_evidence.py.
+            "quote": current.get("quote"),
             "why": current["why"],
             "sources": current["sources"],
             "decided_at": (prior.get("decided_at") if prior.get("state") == current["state"]
@@ -332,6 +337,10 @@ def main() -> int:
             # quoted price that changed with no trade at all. Always published, so the ratio
             # cannot quietly get worse for a reader who never opens a row.
             "evidence": alert_evidence.summarize(all_feed),
+            # 49BA-1: how many of the served swings recorded an end price OUTSIDE the two-sided
+            # quote of the same read. Published next to the evidence counts so a reader who never
+            # opens a row still sees how many prints were not executable at the recorded quote.
+            "quote_check": alert_evidence.summarize_quote(all_feed),
             "withheld_out_of_scope": scope_count,
             "withheld_out_of_scope_reasons": dict(sorted(out_of_scope.items())),
         },
@@ -344,6 +353,7 @@ def main() -> int:
             "cause_link is null on every alert: no official cause source has been collected, so none is shown.",
             "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
             "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
+            "Quote check (evidence.quote): the printed end price (last_price_dollars) is compared with the two-sided quote recorded in the same read (yes_bid_dollars / yes_ask_dollars of one Get Markets response). inside_quote means the print sits within the quote, outside_quote means it does not (outside_by_dollars states by how much) and unknown_quote means no usable quote was recorded. It does not claim why the two differ and it does not re-score high_roi.",
             "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
             "Each feed contains its own newest 300 qualifying rows. Feed counts describe those windows; evidence counts describe the full in-scope archive.",
             "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",

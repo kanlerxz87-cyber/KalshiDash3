@@ -1015,7 +1015,29 @@ function commonAsserts(label, r) {
             `dashboard evidence note denominator ${stated} must equal counts.all_events ${alertsDoc.counts.all_events}`);
         }
       }
-      console.log(`  N2 dashboard      ok  (badges "${allB.shown}/${allB.total}" + "${modelB.shown}/${modelB.total}", evidence denominator)`);
+      // 49BA-1: the dashboard's freshness note must state the published quote check, and when the
+      // whole served feed is on screen the per-row "print ≠ book" chip must appear exactly for the
+      // rows whose printed end price sits outside the recorded quote.
+      const qcDash = alertsDoc.counts.quote_check;
+      if (qcDash && Number.isFinite(qcDash.rows)) {
+        check(/Quote check: of the (\d+) swings served/.test(fresh),
+          "dashboard must publish the quote-check note when counts.quote_check exists (49BA-1)");
+        const stated = Number((fresh.match(/Quote check: of the (\d+) swings served/) || [])[1]);
+        check(stated === qcDash.rows,
+          `dashboard quote note must state ${qcDash.rows} served swings (got ${stated})`);
+        // Exact, not a bound: the dashboard renders the newest `dashN` swings, so the chip must
+        // appear on exactly the outside-quote rows inside that rendered slice.
+        {
+          const byTimeDesc = (alertsDoc.all_events || []).slice()
+            .sort((a, b) => Date.parse(b.to_time) - Date.parse(a.to_time));
+          const wantChips = byTimeDesc.slice(0, dashN)
+            .filter(a => (((a.evidence || {}).quote) || {}).state === "outside_quote").length;
+          const chips = (r.doc.querySelector("#allAlerts").innerHTML.match(/print ≠ book/g) || []).length;
+          check(chips === wantChips,
+            `dashboard must chip exactly the ${wantChips} outside-quote rows it renders, rendered ${chips} (49BA-1)`);
+        }
+      }
+      console.log(`  N2 dashboard      ok  (badges "${allB.shown}/${allB.total}" + "${modelB.shown}/${modelB.total}", evidence denominator${qcDash && Number.isFinite(qcDash.rows) ? ", quote check" : ""})`);
       r.close();
     }
 
@@ -1026,6 +1048,7 @@ function commonAsserts(label, r) {
       commonAsserts("alerts.html N", r);
       const allB = chipNums((r.doc.querySelector("#allCount") || {}).textContent || "");
       const modelB = chipNums((r.doc.querySelector("#modelCount") || {}).textContent || "");
+      const qc = alertsDoc.counts.quote_check;
       const feedN = r.doc.querySelectorAll("#feedAll .chat-msg").length;
       const modelN = r.doc.querySelectorAll("#feedModel .chat-msg").length;
       check(feedN > 0, "alerts.html: the all-events chat must render rows from the committed feed");
@@ -1035,6 +1058,23 @@ function commonAsserts(label, r) {
         `alerts #modelCount leading ${modelB.shown} must equal rendered bubbles ${modelN}`);
       check(allB.total === alertsDoc.counts.all_events || allB.shown === alertsDoc.counts.all_events,
         `alerts #allCount must relate to counts.all_events ${alertsDoc.counts.all_events} (got shown=${allB.shown} total=${allB.total})`);
+      // 49BA-1: the evidence bar states the published quote counts, and every rendered row whose
+      // printed end price sits outside the recorded quote carries the chip. Measured on the
+      // "all events" view, before any category tab re-renders the chat with a subset.
+      if (qc && Number.isFinite(qc.rows)) {
+        const bar0 = (r.doc.querySelector("#evBar") || {}).textContent || "";
+        const barN = (bar0.replace(/\s+/g, " ").match(/print ≠ book: (\d+)/) || [])[1];
+        check(Number(barN) === (qc.outside_quote || 0),
+          `alerts evidence bar must state ${qc.outside_quote || 0} outside-quote rows (got "${bar0.slice(0, 220)}")`);
+        // Exact over the rendered slice: the chat shows the newest `feedN` rows of the served feed.
+        const byTimeAsc = (alertsDoc.all_events || []).slice()
+          .sort((a, b) => Date.parse(a.to_time) - Date.parse(b.to_time));
+        const wantChips = byTimeAsc.slice(-feedN)
+          .filter(a => (((a.evidence || {}).quote) || {}).state === "outside_quote").length;
+        const chips = (r.doc.querySelector("#feedAll").innerHTML.match(/print ≠ book/g) || []).length;
+        check(chips === wantChips,
+          `alerts chat must chip exactly the ${wantChips} outside-quote rows it renders, rendered ${chips} (49BA-1)`);
+      }
       // The bar's first chip is the denominator (label as of the F-105 chat refactor:
       // "swings in scope (archive)"); it is computed from the global evidence parts, so it
       // must equal counts.all_events on every category tab (F-118).
@@ -1060,7 +1100,7 @@ function commonAsserts(label, r) {
           check(ev2 === alertsDoc.counts.all_events,
             `golf tab: evidence bar denominator must stay the global total ${alertsDoc.counts.all_events} (got ${ev2})`);
         }
-        console.log(`  N3 alerts         ok  (chips "${allB.shown}/${allB.total}", golf tab "${golfB.shown}/${golfB.total}", evidence bar global)`);
+        console.log(`  N3 alerts         ok  (chips "${allB.shown}/${allB.total}", golf tab "${golfB.shown}/${golfB.total}", evidence bar global${qc && Number.isFinite(qc.rows) ? ", quote chips" : ""})`);
       }
       r.close();
     }

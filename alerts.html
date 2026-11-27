@@ -104,6 +104,16 @@
     in the committed history). The floor is a <b>project rule, not a Kalshi field</b> — Kalshi publishes no per-move
     significance field — and every alert shows the exact contract count so you can apply your own. Full method:
     <code>scripts/alert_evidence.py</code>; <a href="flagged.html">F-79, F-80, F-81</a>.
+    <br>
+    <b>Was the move even in the book?</b> The rule watches <code>last_price_dollars</code>, the last traded price, while
+    <code>yes_bid_dollars</code> / <code>yes_ask_dollars</code> are the two-sided quote read in the same
+    <a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>
+    response (documented as cached, so the quote can lag the exchange by seconds). Each alert therefore also compares its
+    printed end price with that quote: <span class="badge warn">print ≠ book</span> means the price printed
+    <i>outside</i> the recorded bid/ask band, so the move was not available at the quote a reader could have traded, and the
+    chip states by how much. Rows that carry no usable quote are counted as <b>quote unknown</b> and nothing is inferred.
+    This is a per-row comparison of two official fields, not a re-scoring of the model screen
+    (<a href="flagged.html">F-121</a>; the demo oscillation itself is F-77).
   </p>
 
   <div class="chats">
@@ -401,6 +411,17 @@ function renderEvidenceBar() {
     + chip("candle-sourced", c.candle_unquantified || 0, "")
     + chip("no history", c.unknown_no_observations || 0, "")
     + `<span class="kchip">traded floor: ${c.floor_contracts ?? "—"} contracts (project rule, not a Kalshi field)</span>`;
+  // 49BA-1: printed end price vs the two-sided quote of the SAME read. Published counts describe
+  // the served feeds (scripts/alert_evidence.py summarize_quote); when the committed feed predates
+  // the check the page says so instead of showing zeroes that look like a clean result.
+  const q = (state.feedCounts || {}).quote_check;
+  if (q && Number.isFinite(q.rows)) {
+    box.innerHTML += `<span class="kchip" title="last_price_dollars (the printed price) compared with yes_bid_dollars/yes_ask_dollars of the same Get Markets read">print inside quote: <b>${q.inside_quote || 0}</b></span>`
+      + `<span class="kchip" style="color:#ffd88a" title="The last-traded price of the interval lies outside the two-sided quote recorded at the same read, so the move was not available at that quote">print ≠ book: <b>${q.outside_quote || 0}</b></span>`
+      + `<span class="kchip" title="No usable two-sided quote was recorded with the read (legacy rows); nothing is inferred">quote unknown: <b>${q.unknown_quote || 0}</b></span>`;
+  } else {
+    box.innerHTML += `<span class="kchip">quote check: <b>not published in this feed</b></span>`;
+  }
 }
 
 // Join the collector's ranked records and per-ticker follow-ups. Only a finalized result

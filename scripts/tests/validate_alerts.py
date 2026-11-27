@@ -61,6 +61,8 @@ errors: list[str] = []
 archive_only = 0
 candle_only = 0
 ev_counts: dict = {}
+quote_rows = 0      # archived rows carrying evidence.quote (49BA-1)
+quote_outside = 0   # ...of which the printed end price sat outside the recorded quote
 
 
 def check(cond: bool, msg: str) -> None:
@@ -78,6 +80,14 @@ def load(path: Path):
         return None
 
 
+def qnum(v):
+    """float or None, for the quote check's own recomputation (49BA-1)."""
+    try:
+        return None if v is None or v == "" else float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 def iso_z(v: str) -> bool:
     try:
         datetime.strptime(str(v), "%Y-%m-%dT%H:%M:%SZ")
@@ -87,7 +97,7 @@ def iso_z(v: str) -> bool:
 
 
 def main() -> int:
-    global archive_only, candle_only
+    global archive_only, candle_only, quote_rows, quote_outside
     alerts_doc = load(LIVE / "alerts.json")
     archive_doc = load(LIVE / "alerts_archive.json")
     rules = load(RULES)
@@ -142,6 +152,8 @@ def main() -> int:
                  "counter_reset", "candle_unquantified", "unknown_no_observations")
     ev_counts.clear()
     ev_counts.update({s: 0 for s in ev_states})
+    quote_rows = 0
+    quote_outside = 0
     floor = float((rules.get("evidence") or {}).get("floor_contracts", 100.0))
     for a in archive or []:
         tag = f"archive:{a.get('ticker')}@{a.get('to_time')}"
@@ -156,6 +168,50 @@ def main() -> int:
         check(ev.get("policy_floor_is_a_kalshi_field") is False,
               f"{tag} evidence must disclose that the floor is a project rule, not a Kalshi field")
         check(isinstance(ev.get("why"), str) and ev.get("why"), f"{tag} evidence.why must explain the state")
+        # 49BA-1: the quote check is recomputed here from the row's OWN recorded fields, with a
+        # deliberately separate implementation, and must match. A print outside the two-sided
+        # quote of the same read has to be labelled outside_quote with the distance recorded --
+        # that is the one case a trader must not read as an executable move.
+        q = ev.get("quote")
+        if isinstance(q, dict):
+            quote_rows += 1
+            q_price = qnum(a.get("to_price"))
+            q_bid = qnum(a.get("to_yes_bid"))
+            q_ask = qnum(a.get("to_yes_ask"))
+            if q_price is not None and q_bid is not None and q_ask is not None \
+                    and -1e-9 <= q_bid <= q_ask + 1e-9 <= 1.0 + 1e-9:
+                inside = q_bid - 1e-9 <= q_price <= q_ask + 1e-9
+                want = "inside_quote" if inside else "outside_quote"
+                check(q.get("state") == want,
+                      f"{tag} quote.state {q.get('state')!r} contradicts the recorded fields "
+                      f"(last {q_price}, bid {q_bid}, ask {q_ask} => {want})")
+                if inside:
+                    check(q.get("outside_by_dollars") in (0, 0.0, None),
+                          f"{tag} inside_quote must not record a distance, got "
+                          f"{q.get('outside_by_dollars')!r}")
+                else:
+                    want_by = round(max(q_bid - q_price, q_price - q_ask, 0.0), 4)
+                    check(q.get("outside_by_dollars") == want_by,
+                          f"{tag} outside_by_dollars {q.get('outside_by_dollars')!r} != "
+                          f"recomputed {want_by}")
+                    quote_outside += 1
+                check(q.get("spread_dollars") == round(q_ask - q_bid, 4),
+                      f"{tag} quote.spread_dollars does not recompute from the recorded quote")
+            else:
+                check(q.get("state") == "unknown_quote",
+                      f"{tag} has no usable recorded quote, so quote.state must be "
+                      f"unknown_quote (got {q.get('state')!r})")
+                check(q.get("outside_by_dollars") is None,
+                      f"{tag} unknown_quote must not record a distance")
+            # A quote must never be invented: whatever the block says it used, the numbers must
+            # equal the row's own recorded fields. The fallback to the bounding observation is
+            # named in quote_source and may only differ for rows that carry no quote at all.
+            if a.get("to_yes_bid") is not None and a.get("to_yes_ask") is not None:
+                check(q.get("to_yes_bid") == qnum(a.get("to_yes_bid"))
+                      and q.get("to_yes_ask") == qnum(a.get("to_yes_ask")),
+                      f"{tag} quote bid/ask differ from the row's recorded to_yes_bid/to_yes_ask")
+                check("alert.to_yes_bid" in str(q.get("quote_source", "")),
+                      f"{tag} quote used a fallback source although the row carries a quote")
         obs = sorted(((ev_series.get(a.get("ticker")) or {}).get("observations") or []),
                      key=lambda o: o.get("t") or "")
         by_t = {o.get("t"): o for o in obs}
@@ -197,6 +253,14 @@ def main() -> int:
     # ---- feeds reproduce from the archive ----
     # F-65: build_alerts.py withholds an alert whose series the exchange files outside the topic
     # (the ledger is data/live/markets.json -> series_index). The rule is reproduced here from
+    # 49BA-1: a feed either carries the quote block on every row (build_alerts writes it for the
+    # whole archive) or predates it. A partial block is refused rather than tolerated, so the
+    # check cannot decay into an exemption: as soon as one row has it, every row must.
+    if quote_rows:
+        check(quote_rows == len(archive or []),
+              f"evidence.quote is present on {quote_rows} of {len(archive or [])} archived rows; "
+              f"a feed that carries the quote check must carry it on every row (49BA-1)")
+
     # the same ledger so the validator can refuse a feed that silently keeps such a row, and
     # refuse one that drops a legitimate row. Same failure mode as before: a rule that only the
     # writer knows about is a rule nobody can audit.
@@ -297,6 +361,37 @@ def main() -> int:
         check(sum(ev_counts.values()) == len(archive),
               f"recomputed evidence states must partition the {len(archive)} archived rows, "
               f"got {sum(ev_counts.values())}")
+    # 49BA-1: the published quote counts describe the SERVED rows and must equal a recomputation
+    # over exactly those rows (an absent block on a served row counts as unknown_quote).
+    #
+    # A feed built before this check exists carries neither the per-row block (refused above as
+    # soon as ONE row has it) nor this count block. That state is named in the output instead of
+    # failing the build, because the committed snapshot on main is written by the collector, not
+    # by the branch that adds the check; scripts/tests/test_quote_check_build.py is what proves the
+    # BUILDER always writes it, so a regression that stops writing it fails a test immediately.
+    qc_pub = (alerts_doc.get("counts") or {}).get("quote_check")
+    if quote_rows == 0 and qc_pub is None:
+        print("note: this feed predates the per-row quote check (49BA-1); no quote block is "
+              "present and none is expected until the next collector pass writes one")
+    else:
+        check(isinstance(qc_pub, dict), "alerts.json counts.quote_check missing (49BA-1)")
+    if isinstance(qc_pub, dict):
+        served_keys_q = {(a.get("ticker"), a.get("from_time"), a.get("to_time")) for a in served}
+        qc_want = {"inside_quote": 0, "outside_quote": 0, "unknown_quote": 0}
+        for a in archive or []:
+            if (a.get("ticker"), a.get("from_time"), a.get("to_time")) not in served_keys_q:
+                continue
+            st = (((a.get("evidence") or {}).get("quote")) or {}).get("state")
+            qc_want[st if st in qc_want else "unknown_quote"] += 1
+        for st in ("inside_quote", "outside_quote", "unknown_quote"):
+            check(st in qc_pub, f"counts.quote_check must always publish {st}")
+            check(qc_pub.get(st) == qc_want[st],
+                  f"counts.quote_check.{st} {qc_pub.get(st)!r} != recomputed {qc_want[st]} "
+                  f"over the served rows (49BA-1)")
+        check(qc_pub.get("rows") == len(served),
+              f"counts.quote_check.rows {qc_pub.get('rows')!r} != the {len(served)} served rows")
+        check(qc_pub.get("outside_quote", 0) <= qc_pub.get("rows", 0) >= qc_pub.get("inside_quote", 0),
+              "counts.quote_check states cannot exceed the number of served rows")
     check(iso_z(alerts_doc.get("generated_at")), "alerts.json generated_at not ISO-8601 Z")
 
     # ---- high_roi screen reproduces from the rules against the ROW ITSELF ----
@@ -396,6 +491,9 @@ def finish(total: int, fresh: int) -> int:
             print(f"  - {e}", file=sys.stderr)
         return 1
     ev_note = ""
+    if quote_rows:
+        print(f"quote check (49BA-1): {quote_rows} rows recomputed, {quote_outside} printed "
+              f"outside the recorded quote")
     if ev_counts:
         ev_note = (f"evidence: {ev_counts['traded_ge_floor']} traded >= floor, "
                    f"{ev_counts['traded_below_floor']} thin, {ev_counts['quote_only']} quote-only, "

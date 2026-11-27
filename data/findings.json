@@ -1737,6 +1737,20 @@
     "https://docs.kalshi.com/getting_started/orderbook_responses",
     "https://docs.kalshi.com/getting_started/market_settlement"
    ]
+  },
+  {
+   "id": "F-121",
+   "severity": "high",
+   "item": "Every swing alert presented its printed end price as the move, never comparing it with the two-sided quote recorded in the same read — so 29 of 164 served swings (28 of 124 model picks) showed a “move” that was not available at the quote",
+   "why": "The rule watches last_price_dollars, which Kalshi documents as the last traded price, while yes_bid_dollars / yes_ask_dollars are the resting quote of the same Get Markets response (https://docs.kalshi.com/api-reference/market/get-markets). scripts/alert_evidence.py classified whether contracts traded (traded_ge_floor / traded_below_floor / quote_only / counter_reset / candle_unquantified / unknown_no_observations) but never whether the recorded end price sat inside the recorded quote, and no page compared the two fields. Measured by this session on the committed snapshot collected 2026-11-27T22:20:02Z: of the 164 served swings, 134 ended inside the recorded quote, 29 outside it and 1 carried no usable quote; 28 of the 124 experiments-screen picks are in the outside set, and the 8 rows archived before the quotes were carried (pre-R-2) have none at all. The clearest case is KXBTCY-27JAN0100-B97500, recorded in the archive as 0.01 → 0.97 (a 96c “up move”) with to_yes_bid 0.00 / to_yes_ask 0.01 at the same read: nothing was available to trade at 97c at that quote, yet the row read exactly like an executable swing and carried the model-pick flag. The class was named in aggregate by F-77 (demo BTC range markets oscillate and dominate the model feed, disclosed as a paragraph with a suggested spread gate), but no row carried the fact, so a reader looking at one bubble could not tell an executable move from a print outside the book.",
+   "action": "Fixed as a per-row, additive disclosure; the frozen high_roi flag is deliberately untouched (F-26 / F-77 keep that as the owner's decision). scripts/alert_evidence.py gains quote_check(): it compares to_price with to_yes_bid / to_yes_ask of the same read and returns inside_quote, outside_quote (with outside_by_dollars and the spread) or unknown_quote when no usable quote was recorded — never a guess, and it states that it does not claim why the two fields differ. scripts/build_alerts.py writes the block on every archived row (deterministic, because both sides are frozen fields) and publishes counts.quote_check over the served rows. assets/engine.js renders a “print ≠ book · N¢ outside” chip in every chat bubble (alerts.html, live.html and the dock), dashboard.html renders the same chip plus a “Quote check” sentence in its freshness note, and alerts.html renders the three counts in its evidence bar and explains the chip in its method text. scripts/tests/validate_alerts.py recomputes the block from each row's own fields with an independent implementation and refuses a contradictory label, a partial block and a wrong published count; scripts/tests/test_quote_check_build.py (9 cases) runs the real builder against a scratch fixture and proves the positive path plus those three negative controls. scripts/tests/test_evidence.py gains 8 quote-check cases and scripts/tests/test_pages_dom.js N2/N3 assert the rendered chips equal exactly the outside-quote rows in the rendered slice. Full release gate PASS on the committed data and on a tree rebuilt with the new blocks.",
+   "sources": [
+    "https://docs.kalshi.com/api-reference/market/get-markets",
+    "https://docs.kalshi.com/getting_started/orderbook_responses",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B97500",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/alert_evidence.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_quote_check_build.py"
+   ]
   }
  ]
 }
