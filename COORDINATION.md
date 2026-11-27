@@ -6,12 +6,51 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T115 | Audit the current 2026-11-27 published snapshot and rendered site using the full release gate; check current workflow/deploy status and official-doc claims; record concrete results and any irregularities without editing another session's files | done | arena-98e88d21 | `COORDINATION.md` (this section only) | `scripts/verify_release.py`, `gh` Actions/Pages APIs, current official demo API records + Kalshi docs (links below) |
+
+Claimed after reading the task board and confirming no open PR. Baseline gate initially stopped because the sandbox lacked test-only `jsdom`; installed it locally without changing a lockfile. The current branch started at the same commit as `main` (`fe245d8`, snapshot 2026-11-27T17:15Z). No implementation defect was found within this audit scope; no production files or collected data were changed.
+
+### T115 close-out — snapshot, official sources, rendered site, release (2026-11-27)
+
+**Release gate:** `python3 scripts/verify_release.py` **PASS** after installing `jsdom@26` locally. It ran the live/alert/catalyst/ROI validators; Python and JavaScript tests; DOM coverage for the dashboard, chats, landing, portfolio, and other pages; and `scripts/check_site.py` (21 pages, internal links/data/HTML checks). Gate states explicitly that this is offline verification and does not certify live API/account access or external URLs.
+
+**Official sources fetched during this audit:**
+- [Demo Environment](https://docs.kalshi.com/getting_started/demo_env): Kalshi says demo uses mock funds, credentials are separate from production, and demo price/market behavior may not reflect real markets. It lists REST `https://external-api.demo.kalshi.co/trade-api/v2` and WebSocket `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` as recommended demo endpoints, with the alternate `demo-api.kalshi.co` roots.
+- [Get Market Candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks): the documented `period_interval` choices are 1, 60, or 1440 minutes; the dashboard's seconds window must therefore be sourced from its in-session observations, not API candles. The dashboard and live-desk copy disclose this.
+- [Get Market Orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook): orderbook response is `orderbook_fp` with YES/NO bid ladders; `depth` is 0–100 (0 = all). This confirms visible liquidity is displayed bid-side depth, not a promise of executable quantity at a desired price.
+- [Market Settlement](https://docs.kalshi.com/getting_started/market_settlement): yes/no holders receive $1 per contract, positions are netted, and simple yes/no determinations have zero settlement fee (scalar may differ).
+
+**Live official demo API checks (2026-11-27; every current API record matched the corresponding 2026-11-27T17:15:51Z snapshot fields):**
+
+| Record | API values checked against the snapshot / deployed landing row |
+|---|---|
+| [Exchange status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status) | `exchange_active=true`, `trading_active=true` (the demo API responds; this is not a claim about account credentials or order access) |
+| [Gas](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90) | ticker/status `KXAAAGASM-26NOV30-3.90` / active; last `$0.7500`; volume `31027.52`; open interest `24988.65`; matches published Gas row |
+| [Elections](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXELECTIRAN-27JAN01) | ticker/status `KXELECTIRAN-27JAN01` / active; last `$0.9000`; volume `3.19`; open interest `0.02`; matches published Elections row (rounded display values are derived) |
+| [Culture](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXYTVIEWSD-BAD26NOV30-34.0M) | active; last `$0.0000`; volume/open interest `0.00`; rules say Bad Bunny daily views. The page correctly labels this topic's market as untraded and labels its topic basis `keyword`, not official category confirmation. |
+| [Crypto](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99) | active; last `$0.9000`; volume `18263278.14`; open interest `1382157.55`; matches published Crypto row |
+| [Golf](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-MAST27-MFIT) | active; last `$0.0230`; volume `833849.07`; open interest `833821.07`; matches published Golf row |
+
+The dashboard's “dollars traded (est.)” is a project calculation (`volume_fp × last_price_dollars`), not a Kalshi API field; the deployed page labels it as an estimate and links the individual API market record. A zero-trade category is not ranked as if it had a meaningful market leader.
+
+**Deployed-site check:** fetched the live GitHub Pages landing page, dashboard, portfolio and Flagged for Review pages. The landing page showed the 17:15:51Z snapshot with per-topic rows and source links; the dashboard disclosed snapshot-refresh rather than tick-level collector alerting; the portfolio left real-account balance/positions/fills blank without credentials and labels the local simulation as paper. The Flagged page showed its existing review ledger. `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` returned `status=built`, live URL `https://kanlerxz87-cyber.github.io/KalshiDash3/`, and `build_type=legacy` / source `main /`; latest Pages build for `fe245d8` reported `built` at `2026-11-27T17:15:55Z`. No open PR was present at audit start.
+
+**Limitations and already-published irregularities (not concealed or represented as solved):**
+- No demo-account credentials were provided, so authenticated balances, fills, or real demo-account execution remain unavailable; the executor was not called and no order was submitted. The deployed portfolio explains this and leaves the account cells blank (F-07).
+- The ROI scan at `2026-11-27T17:01:58Z` had 0 picks and 1 near miss. This is a measured run, not evidence of a profitable strategy. Paper trades remain simulated.
+- Market scan safety caps and published row caps remain in force. The page says the settled in-scope count of 18,622 is a lower bound because the scan stopped at the safety cap; only the retained/published window is displayed.
+- Cause/news links are leads, not proof of causation; demo markets may not reflect production; GitHub Pages still reports legacy branch publishing, as recorded in the existing Flagged ledger.
+- The Gate and repository validators passed, but this does not certify continuous operation outside the observed snapshot, authenticated account state, profitability, or the reachability of every link after this fetch.
+
+<!-- End session claim -->
+
 ## Session `arena-bc717755` — current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)
 
-Claimed 2026-11-27 before implementation work. Read the shared board first: the newest recorded work is closed,
-and this session takes only the non-overlapping audit-log scope below. The checkout starts at `fe245d8`, the
-current `main` snapshot commit. No source data or UI edits are in scope unless the audit finds a concrete defect;
-any such work will be noted before editing shared implementation files.
+Claimed 2026-11-27 before implementation work. At claim time, the newest recorded work was closed and no open PR existed. A separate audit was subsequently merged while this branch was active; this merge preserves that session’s record. This session keeps its scope to the current snapshot audit and the executive-summary date/caveat correction.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
@@ -40,6 +79,9 @@ any such work will be noted before editing shared implementation files.
 - No demo credentials were supplied; account balance, positions, fills, and live orders remain unverified. The simulator is paper-only. The model's “high ROI” feed remains a screening heuristic, not validated profitability. See [demo setup](https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account) and the site's [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html).
 
 **Observed Pages state.** `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` returned `status: built`, `build_type: legacy`, `source: main /`. The latest Pages build at audit time was `built` with no error. Live fetch of [landing page](https://kanlerxz87-cyber.github.io/KalshiDash3/), [executive summary](https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html), and [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) succeeded. The old executive-summary label “Current release audit · 22 November 2026” was stale versus the current 27 November snapshot; it now reports the accurate date and plainly states this audit did not refresh market rows or authenticate.
+
+
+**Concurrent-session merge note.** While PR #133 was open, session `arena-98e88d21` merged PR #132 and added its live-audit record at the same coordination anchor. GitHub then reported PR #133 as conflicting. This branch fetched the updated `origin/main`, retained both the complete PR #132 record and this session’s claim/results, and resolved the conflict in `COORDINATION.md` only. No concurrent work was discarded. The local rebase was not force-pushed; the latest `main` was merged into this branch so the published branch can be updated by a normal fast-forward push. PR #133 remains open pending refreshed mergeability/check status.
 
 
 
