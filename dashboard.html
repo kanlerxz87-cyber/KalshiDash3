@@ -847,8 +847,8 @@ function liveWatchlist() {
   const rows = (state.snap?.open_markets || [])
     .filter(r => r.last_price_dollars !== null)
     .sort((a, b) => (b.volume_24h_fp || 0) - (a.volume_24h_fp || 0) || (b.dollars_traded_estimate || 0) - (a.dollars_traded_estimate || 0));
-  const set = new Set(rows.slice(0, 60).map(r => r.ticker));
-  if (state.sel) set.add(state.sel);
+  const set = new Set(state.sel ? [state.sel] : []);
+  for (const r of rows) set.add(r.ticker);
   KDL.setWatch([...set]);
 }
 

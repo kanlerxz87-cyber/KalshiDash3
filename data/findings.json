@@ -1417,6 +1417,30 @@
       "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
       "https://docs.kalshi.com/api-reference/market/get-markets"
     ]
+  },
+  {
+    "id": "SIM-660E-01",
+    "severity": "high",
+    "item": "The browser paper simulator stopped polling before settlement and could record a provisional result as a payout",
+    "why": "Kalshi distinguishes closed, determined, disputed, amended and finalized; only finalization confirms payment. The prior poll loop dropped closed and determined records, while the portfolio could book a result before finalization. It also charged a simulated taker fee on a binary payout and treated an explicit null price as zero.",
+    "action": "The poll loop continues to query watched markets before finalization and includes open paper holdings even after they leave the ranked list. A lifecycle record need not contain a price, and only a finalized binary result closes a position with zero exit fee. An absent record still does not establish an outcome. Independently verified a finalized NO sample against the official demo API. Regression tests cover the lifecycle states and distinguish a missing price from zero.",
+    "sources": [
+      "https://docs.kalshi.com/getting_started/market_lifecycle",
+      "https://docs.kalshi.com/getting_started/market_settlement",
+      "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV271215-15"
+    ]
+  },
+  {
+    "id": "SIM-660E-02",
+    "severity": "high",
+    "item": "NO-side paper exits and unrealized marks could use the wrong side of the spread",
+    "why": "One minus the YES bid is a NO ask, not a NO bid. The previous simulator also accepted the last trade as an exit quote. Either can overstate a simulated strategy’s performance without any executable exit quote.",
+    "action": "The browser simulator now takes price exits only on active markets, at the held side’s bid, with the documented complement of the YES ask as the NO bid fallback. Blank and non-tradable quotes do not produce marks or fills. Existing saved trades are not recalculated; new exits are tagged exit_rules_version=2 in the export. Quotes are not proof of fill size or actual fills.",
+    "sources": [
+      "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "https://docs.kalshi.com/api-reference/market/get-market",
+      "https://docs.kalshi.com/getting_started/market_lifecycle"
+    ]
   }
  ]
 }
