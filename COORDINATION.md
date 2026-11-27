@@ -45,9 +45,74 @@ data-dependent on a *fresh* collection, not on the committed snapshot.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| R41-1 | Root-cause the five-pass `validate_alerts` collector failure and fix it at the source | in_progress | arena-417935f1 | `scripts/build_alerts.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_alert_topic_domain.js` (only the files the cause requires) | fresh-collection replay + validator output; official `GET /series` categories |
-| R41-2 | Make a failed validator's own output land in `data/live/collector_health.json` and in the check-run annotation instead of an empty `stderr_tail` (F-108) | in_progress | arena-417935f1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py` | `gh api …/check-runs/{id}/annotations` (empty on all five failing runs) |
-| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result here | unclaimed | — | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py`; `gh api repos/…/pages(+builds)` |
+| R41-1 | Root-cause the five-pass `validate_alerts` collector failure and fix it at the source | done — **F-109**; the ordinary trigger was fixed concurrently as **F-107** (PR #151), this session closed the class | arena-417935f1 | `scripts/build_alerts.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_archive_evidence_fallback.py` (new) | validator's own output; controlled reproduction against `main` + F-107 |
+| R41-2 | Make a failed validator's own output land in `data/live/collector_health.json` instead of an empty `stderr_tail` (**F-108**) | done | arena-417935f1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py` | pre-fix dry-run `46058100236` recorded `stderr_tail: ""`; mutation test |
+| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result here | in_progress | arena-417935f1 | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py` **PASS**; `gh api repos/…/pages(+builds)` |
+
+### R41 verification record (2026-11-27, 19:34Z–20:15Z)
+
+**What was observed, in order, before any edit.** `data/live/markets.json` frozen at `collected_at 2026-11-27T18:00:57Z`
+(newest snapshot commit `639f069`, 18:00:59Z). `data/live/collector_health.json` carried **five consecutive failed
+passes** — 18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z — every one `validators: validate_alerts`, every one
+with `stderr_tail: ""`. PR #149 merged 18:29:47Z, between the last good snapshot and the first failure. The same
+validator **passed** on the committed tree, so the fault was data-dependent on a *fresh* collection.
+
+**How the cause was obtained rather than guessed.** Sandbox egress to Kalshi and to the Actions log blob host is TLS-blocked
+(re-tested at claim time), so the validator's message was pulled from the check-run annotation that the relay writes when a
+run ends: dry-run `46058100236` on this branch (`commit=false`, so it commits no snapshot and dispatches nothing) reproduced
+the failure and its annotation read:
+
+```
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []
+```
+
+**Root cause (F-109), and its overlap with a concurrent fix.** `validate_alerts.py` refuses an entry whose stored
+`category_assigned_from` topic cannot be reproduced from official categories. Both KXAAAGASD entries carry
+`series_categories: ["Economics"]` and `series_categories_source: …/series/KXAAAGASD`. The market had left the open scan
+and the series had left the 442-entry `series_index`, so the validator resolved `[]` → `topics == [] != ['gas']`. The
+builder read *fewer* sources than the validator, so it served the same row the validator refused.
+
+`arena-72ae7bca` fixed the ordinary trigger independently (commit `57b201b`, PR #151, merged 19:45:39Z) by re-fetching
+`GET /series` for every archive-cited series — **F-107**. This session's branch was rebased onto that fix rather than
+shipping a second, competing rule. What F-107 does not cover is its own failure path: `record_series()` writes
+`categories: null` when that fetch raises, and that fix's `test_failed_official_lookup_stays_unknown_never_inferred`
+asserts exactly that outcome. Reproduced here on `main` + F-107 using that fix's own harness with `unavailable=True`,
+then the real builder and validator: **the validator exits 1 with the identical message**. That is the residual this
+session closes — resolution from the record the archive already holds, not from a live call that may fail.
+
+**Fixes.** `build_alerts.official_for()` and `validate_alerts._official()` now resolve from the same three sources in the
+same order — snapshot row → `series_index` → the archive entry's recorded categories — so the two files cannot disagree
+again. The later binding of the ledger in `build_alerts.py` is renamed `series_index` so the shadowing that produced the
+original mismatch cannot recur. The fallback supplies categories only: `publishable()` still withholds a contradiction,
+and an entry with no recorded categories stays unknown. **F-108:** the validator branch of `collect_relay.py` now passes
+each failing validator's own stdout+stderr (and a stated reason on timeout) to `record_health`.
+
+**Verification performed.**
+
+| Check | Result |
+|---|---|
+| Controlled reproduction, pre-fix `build_alerts.py` + pre-fix validator, series aged out of scan and ledger | **fails** with the production message (exit 1) |
+| Same tree with the fix | **passes** (`validate_alerts` exit 0, feeds reproduce from the archive) |
+| Same tree, `main` + F-107 but *without* this session's fallback, failed `/series` re-fetch | **fails**, exit 1, identical message |
+| `scripts/tests/test_archive_evidence_fallback.py` (7 checks, new) | **PASS**; mutation against `main`'s validator kills it |
+| `scripts/tests/test_collect_health.py` incl. new F-108 case | **PASS**; mutation against the previous relay kills it |
+| `arena-72ae7bca`'s `test_archive_series_retention.py` on the merged tree | **PASS** (4/4) |
+| Production CI, same dry-run that failed at 19:39Z | **PASS** — run `46058698096`: `1 19:43:46Z validated` |
+| Main-line collector after both fixes | **recovered** — `data: demo snapshot 2026-11-27T19:47Z` (`3cb118b`), `collector_health.json` `outcome: ok` |
+| `python3 scripts/verify_release.py` on the merged tree | **PASS** — 21 pages, every validator and DOM suite, 100 irregularities / 34 high rendered |
+
+**Sources used (official).** `https://docs.kalshi.com/api-reference/market/get-series`,
+`https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (categories `["Economics"]`, which is why the `gas`
+topic was assigned; re-read by `arena-72ae7bca`, not by this session — sandbox egress is blocked, and this session did not
+re-verify it), and the check-run annotation API
+`https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations`.
+`GET /series` **was not** re-fetched from this sandbox; the category value is quoted from the committed archive record and
+from `arena-72ae7bca`'s live read, and is flagged as such rather than presented as this session's observation.
+
+**Irregularities carried, not fixed here:** F-108's live post-fix behaviour was not observed on a *failing* run (the
+post-fix dry-run passed everything), so that fix is pinned by mutation test only and is recorded that way on
+`flagged.html`. F-07 (no demo credentials), F-25 (cause links are leads), DEPLOY-1 (legacy Pages publisher) unchanged.
 
 <!-- End session arena-417935f1 claim -->
 
