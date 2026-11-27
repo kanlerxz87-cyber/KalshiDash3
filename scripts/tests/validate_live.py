@@ -14,6 +14,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 LIVE = ROOT / "data" / "live"
@@ -66,6 +67,37 @@ def check_by_category(tag: str, row: dict, pre_narrowing_elections: bool = False
     errors.append(
         f"{tag} published under {cat} but its official series categories are {official} (F-65)"
     )
+
+
+def check_alert_lifecycle(doc: dict) -> None:
+    # Older snapshots predate the separate lifecycle rows. The live collector always emits them.
+    followups = doc.get("alert_lifecycle")
+    if followups is None:
+        return
+    check(followups.get("schema") == 1, "alert_lifecycle schema must be 1")
+    lookups = followups.get("lookup_requests")
+    check(type(lookups) is int and 0 <= lookups <= 16, "alert_lifecycle lookup budget exceeded")
+    rows = followups.get("rows")
+    check(isinstance(rows, list), "alert_lifecycle.rows must be a list")
+    seen = set()
+    valid_states = {"initialized", "active", "inactive", "closed", "determined", "disputed", "amended", "finalized"}
+    bases = ("https://external-api.demo.kalshi.co/trade-api/v2", "https://demo-api.kalshi.co/trade-api/v2")
+    for row in rows or []:
+        ticker = row.get("ticker") or ""
+        tag = f"alert_lifecycle:{ticker}"
+        check(bool(ticker) and ticker not in seen, f"{tag} empty/duplicate ticker")
+        seen.add(ticker)
+        check(row.get("source") in {f"{base}{prefix}/markets/{quote(ticker, safe='')}"
+                                   for base in bases for prefix in ("", "/historical")}, f"{tag} wrong official source")
+        status = row.get("status")
+        check(row.get("result") in ALLOWED_RESULTS, f"{tag} unknown result")
+        if status is None:
+            check(bool(row.get("reason")) and all(row.get(k) is None for k in (
+                "observed_at", "result", "settlement_ts", "settlement_value_dollars"
+            )), f"{tag} an unverified lookup needs a reason and blank values")
+        else:
+            check(status in valid_states and not row.get("reason") and bool(row.get("observed_at")),
+                  f"{tag} status must be documented and dated")
 
 
 def check_simulation() -> None:
@@ -225,6 +257,7 @@ def main() -> int:
         check(bool(cdoc.get("checked_at")), "cors.json checked_at missing")
         check(str(cdoc.get("origin_tested", "")).startswith("https://"), "cors.json origin_tested must be https")
         check("access_control_allow_origin" in cdoc, "cors.json must record allow-origin (or null) — never assume it")
+    check_alert_lifecycle(doc)
     check_simulation()
 
     if errors:

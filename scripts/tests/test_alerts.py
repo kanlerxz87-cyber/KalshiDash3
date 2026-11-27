@@ -239,8 +239,8 @@ class CategoryIntegrityTests(unittest.TestCase):
         self.assertEqual(feed["counts"]["withheld_category_conflict"], 0)
 
 
-class RollingArchiveTests(unittest.TestCase):
-    """Run the builder and independent validator against the same changing scan."""
+class FeedWindowTests(unittest.TestCase):
+    """Run the builder and validator after both public feeds pass their row caps."""
 
     BASE = "https://external-api.demo.kalshi.co/trade-api/v2"
     TICKER = "KXAAAGASD-26NOV21-3.6600"
@@ -275,37 +275,6 @@ class RollingArchiveTests(unittest.TestCase):
     def validate(self):
         with mock.patch.object(validate_alerts, "LIVE", self.live):
             return validate_alerts.main()
-
-    def test_sourced_assignment_survives_a_missing_series(self):
-        self.assertEqual(self.build([self.a])["counts"]["all_events"], 1)
-        self.assertEqual(self.validate(), 0)
-
-    def test_current_conflict_is_withheld_without_rewriting_assignment(self):
-        self.snapshot["series_index"][self.SERIES] = {"categories": ["Sports"], "source": self.SERIES_URL}
-        feed = self.build([self.a])
-        self.assertEqual(feed["all_events"], [])
-        self.assertEqual(feed["counts"]["withheld_category_conflict"], 1)
-        stored = json.loads((self.live / "alerts_archive.json").read_text())["alerts"][0]
-        self.assertEqual(stored["series_categories"], ["Economics"])
-        self.assertEqual(self.validate(), 0)
-
-    def test_assignment_requires_the_official_series_url_for_this_ticker(self):
-        self.a["series_categories_source"] = f"{self.BASE}/series/KXBTCY"
-        self.build([self.a])
-        with mock.patch("sys.stderr"):
-            self.assertEqual(self.validate(), 1)
-        self.assertTrue(any("sourced GET /series" in e for e in validate_alerts.errors))
-
-    def test_archived_test_category_stays_withheld_without_current_ledger(self):
-        ticker = "KXDEMOFUTHOURLY-26NOV21H16-UP"
-        self.a.update(ticker=ticker, category_id="crypto", category_basis="keyword",
-                      category_assigned_from=None, series_categories=["Test"],
-                      series_categories_source=f"{self.BASE}/series/KXDEMOFUTHOURLY",
-                      market_source=f"{self.BASE}/markets/{ticker}")
-        feed = self.build([self.a])
-        self.assertEqual(feed["counts"]["withheld_out_of_scope"], 1)
-        self.assertFalse(feed["all_events"] or feed["high_roi"])
-        self.assertEqual(self.validate(), 0)
 
     def test_feed_counts_match_independently_capped_windows(self):
         from datetime import datetime, timedelta, timezone

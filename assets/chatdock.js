@@ -214,6 +214,9 @@ const KDCHAT = (() => {
           S.life.set(r.ticker, r);                                                // status/result for the lifecycle chip
         }
       }
+      for (const r of d.alert_lifecycle?.rows || []) {
+        if (r?.ticker && !S.life.has(r.ticker)) S.life.set(r.ticker, r);
+      }
       for (const r of rows) {
         const t = Date.parse(d.collected_at || "");
         if (Number.isNaN(t)) continue;
@@ -279,7 +282,7 @@ const KDCHAT = (() => {
 
   function lifeBit(a) {
     if (typeof KD === "undefined" || !KD.lifecycleChip) return "";
-    const life = a.life || (a.ticker ? lifeOf(a.ticker) : null);
+    const life = a.ticker ? lifeOf(a.ticker) : a.life;
     return life ? KD.lifecycleChip(life) : "";
   }
 

@@ -466,9 +466,10 @@ def write_health_ok(pass_no: int, ref: str | None = None) -> str:
 def make_pass(plan: Plan):
     def do_pass(n: int) -> tuple[str, str]:
         def fail(detail: str, tail: str = "") -> tuple[str, str]:
-            # Every non-committing pass leaves a reason in the repository, not only in stdout.
-            outcome = record_health(n, detail, tail, plan.ref)
-            print(f"  health record: {outcome}")
+            # Only publishing passes may write to Git; a dry run must be read-only even on failure.
+            if plan.commit:
+                outcome = record_health(n, detail, tail, plan.ref)
+                print(f"  health record: {outcome}")
             return "failed", detail
 
         try:

@@ -90,12 +90,13 @@ class SimulateTest(unittest.TestCase):
         simulate.LIVE, simulate.OUT, simulate.STRAT_PATH = self.saved
         self._tmp.cleanup()
 
-    def _write(self, alerts, history, open_rows=(), settled_rows=()):
+    def _write(self, alerts, history, open_rows=(), settled_rows=(), tracked_rows=()):
         (self.dir / "alerts_archive.json").write_text(json.dumps({"schema": 1, "alerts": alerts}))
         (self.dir / "price_history.json").write_text(json.dumps({"schema": 1, "series": history}))
         (self.dir / "markets.json").write_text(json.dumps({
             "collected_at": T_NEXT, "base_url": "https://example.invalid/v2",
-            "open_markets": list(open_rows), "settled_markets": list(settled_rows)}))
+            "open_markets": list(open_rows), "settled_markets": list(settled_rows),
+            "alert_lifecycle": {"rows": list(tracked_rows)}}))
 
     def _alert(self, direction="up", high_roi=True, ticker="KXAAAGASM-X-1", **extra):
         a = {"ticker": ticker, "event_ticker": "E", "title": "x", "category_id": "gas",
@@ -136,6 +137,18 @@ class SimulateTest(unittest.TestCase):
         self.assertEqual(self._strat(doc, "S1")["losses"], 1)
         closed = [p for p in doc["settled_positions"] if p["strategy"] == "S1"][0]
         self.assertAlmostEqual(closed["realized_net"], -0.52)
+
+    def test_lifecycle_outside_ranked_window_only_settles_on_final_status(self):
+        ticker = "KXAAAGASM-X-1"
+        source = f"https://external-api.demo.kalshi.co/trade-api/v2/historical/markets/{ticker}"
+        self._write([self._alert(ticker=ticker)], {ticker: self._obs(0.49, 0.50)}, tracked_rows=[
+            {"ticker": ticker, "status": "determined", "result": "no", "source": source}])
+        self.assertEqual(self._strat(self._run(), "S1")["settled"], 0)
+        self._write([self._alert(ticker=ticker)], {ticker: self._obs(0.49, 0.50)}, tracked_rows=[
+            {"ticker": ticker, "status": "finalized", "result": "no", "source": source, "settlement_ts": T_NEXT}])
+        doc = self._run()
+        closed = next(p for p in doc["settled_positions"] if p["strategy"] == "S1")
+        self.assertEqual((closed["outcome"], closed["settled_result"], closed["settlement_source"]), ("loss", "no", source))
 
     def test_fade_buys_no_at_one_minus_bid(self):
         # NO costs 1 - yes_bid. With bid 0.49 that is 0.51.
