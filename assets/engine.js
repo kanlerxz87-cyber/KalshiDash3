@@ -838,6 +838,10 @@ window.KDL = (() => {
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
     esc, num, cents, money, quotedBid, takerFee, seriesTakerMult, SERIES_TAKER_MULT, seriesOf, bandOf,
+    // Exposed for scripts/tests/test_series_fallback.js: GET /markets omits series_ticker on the
+    // demo environment (C-45), so normalizeRow derives it from the ticker and keeps a provided
+    // value untouched. Keeping it reachable means the derivation is testable, not just asserted.
+    normalizeRow,
     markets: S.markets
   };
 })();
