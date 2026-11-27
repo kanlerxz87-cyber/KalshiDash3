@@ -59,6 +59,12 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 - GitHub reports Pages currently **built** for main commit `8684b3d`; this is baseline deployment status, not evidence for the still-unmerged A740 change. PR #148 remains **OPEN** (confirmed with `gh pr view 148`); leave it untouched until A740 is integrated, then close it as superseded. Other current open PRs are #150, #175 and #176, outside A740's code scope.
 - A740 branch PR/check/merge and the post-merge `flagged.html` + Pages build remain pending; no deployment is claimed for this change yet.
 
+### A740-2 latest-main sync (2026-11-27T22:46Z)
+
+- `origin/main` advanced again to `3f085cd` through PR #176 after the previous checkpoint. Rebased the three A740 commits onto that tip. The rebase had one `COORDINATION.md` conflict where the upstream post-merge sync note and the A740 section shared an insertion point; kept both sections. The data/test commits remained intact, and no application or market snapshot was altered by this rebase.
+- Inspected newly opened PR #177. Its declared files are only `AUDIT_AEB0CBDC.md` and `COORDINATION.md` (its own session section); it explicitly avoids application, snapshot, and concurrent-session files. No A740 implementation-scope overlap was found.
+- Ran `python3 scripts/verify_release.py` on this latest base: **PASS** (offline validators, Python/DOM tests including the F-113 regressions, source/link checks, rendered-number audit, and all 21 pages). `git diff --check` is clean. Push, PR checks, merge, and post-merge deployed finding-page/Pages verification remain pending.
+
 ---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
