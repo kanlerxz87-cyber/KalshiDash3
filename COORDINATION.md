@@ -3640,3 +3640,12 @@ Branch `arena/5082c6af-kalshidash3`, branched from `ba847e80` (`main`, snapshot 
 - Official sources re-read live: [demo_env](https://docs.kalshi.com/getting_started/demo_env) confirms REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds, "may not be reflective of those in real markets" — matches C-01…C-08. Live `GET /exchange/status` returned `exchange_active:true, trading_active:true`.
 - Live site: [collector_health.json](https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/collector_health.json) `outcome=ok`, snapshot `2026-11-27T22:20:02Z` (8 min old at check). Pages API `status: built` for `ba847e8`; `Deploy site to GitHub Pages` + `pages build and deployment` both success at 22:20:06Z.
 - Standing flagged items (non-blocking, on `flagged.html`): F-07 (no demo credentials — portfolio/execution stay paper), F-14/F-77 (experimental high-ROI heuristic; fee-aware screen reports 0 picks), F-25 (cause links are settlement references, not causality), DEPLOY-1 (legacy Pages publisher).
+
+### 4150-1 publication close-out — PR merged and Pages confirmed
+
+| Item | Verified result |
+|---|---|
+| Pull request | [PR #170](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/170) merged to `main` at `2026-11-27T22:30:46Z`, merge commit `5919a8ac45685905ca9c18dc618d84e6fc6a044f`. |
+| PR release gate | Build succeeded in [run 46076891538](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46076891538); deploy was correctly skipped for the PR. Non-blocking Node.js 20 action-runtime deprecation warning was emitted. |
+| Main release gate and deploy | Post-merge [run 46077090121](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077090121) completed **success**: build 1m41s and Pages deploy 10s. Pages build API reported merge commit `5919a8a` as `built` at `22:31:20Z`; Pages endpoint reports public site `https://kanlerxz87-cyber.github.io/KalshiDash3/`, HTTPS enforced. A subsequent Pages build for a newer collector data commit was observed in `building` state; that later build is not represented as complete by this record. |
+| Net change | Audit documentation only; site implementation and committed market data were unchanged by this task. |
