@@ -6,6 +6,16 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-98e88d21` — current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T115 | Audit the current 2026-11-27 published snapshot and rendered site using the full release gate; check current workflow/deploy status and official-doc claims; record concrete results and any irregularities without editing another session's files | in progress | arena-98e88d21 | `COORDINATION.md` (this section only) | `scripts/verify_release.py`, `gh` Actions/Pages APIs, cited official docs linked in `data/verified_facts.json` |
+
+Claimed after reading the task board and confirming no open PR. Baseline gate initially stopped because the sandbox lacks the test-only `jsdom` dependency; this is an environment dependency, not a site failure. The current branch starts at the same commit as `main` (`fe245d8`, snapshot 2026-11-27T17:15Z). Scope is deliberately limited to this coordination section; if an implementation defect is found, it will be handed off rather than modifying another session's files.
+
+<!-- End session claim -->
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
