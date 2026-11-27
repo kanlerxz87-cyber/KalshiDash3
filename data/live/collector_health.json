@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T19:38:23Z",
- "pass": 1,
+ "generated_at": "2026-11-27T19:38:04Z",
+ "pass": 3,
  "outcome": "failed",
  "detail": "validators: validate_alerts",
- "stderr_tail": "--- validate_alerts (exit 1)\nnote: 10 archived alert(s) whose screen result differs in the CURRENT snapshot \u2014 expected and allowed: high_roi is frozen at detection time (volume_24h_fp changes between collections); the flag is verified against each entry's own stored inputs.\nINVALID alert data:\n  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []\n  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []\n",
+ "stderr_tail": "",
  "run": {
   "workflow": "collect.yml",
-  "run_id": "46057975142",
+  "run_id": "46053185236",
   "attempt": "1",
-  "sha": "0d872096a99ef32736b7d35f849a82e8cf479344"
+  "sha": "7d50e214762cb1d4b023133b157b4b1c285f632e"
  },
  "note": "Written by scripts/collect_relay.py when a pass does not commit. Read by humans; the site's staleness banner is what readers see. Never contains credentials."
 }
