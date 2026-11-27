@@ -51,6 +51,8 @@ While preparing the close-out, PR #152 merged to main as `8f4aae7`. This session
 
 `git pull --rebase origin arena/72ae7bca-kalshidash3` replayed this branch's already-merged workflow snapshot `3cb118b` under a different commit ID; merging current `origin/main` then conflicted in seven generated `data/live/*.json` files (alerts, catalysts, collector_health, cors, markets, price_history, simulation). Work stopped for resolution. **Resolution:** restored the entire `data/live` directory from current `origin/main` (`8f4aae7`, containing the newer official `19:50:00Z` collector snapshot `acbb2e3`), not hand-merged or fabricated numerical fields. Both sessions' board sections and all their code/tests/findings remain. This avoids regressing the newer collected evidence to 19:47. Full release gate is re-run on the combined tree before publication.
 
+- Close-out combined-tree release gate: **PASS** after the PR #152 integration and fixture alignment. A subsequent `pull --rebase` with merge preservation attempted to replay historical health commit `554f72b` and conflicted again; that rebase was **aborted in full**, preserving the already verified merge tree. `git pull --rebase --ff-only origin arena/72ae7bca-kalshidash3` then confirmed the remote branch was already an ancestor and the branch pushed normally (no force push). No historical health record replaced current evidence.
+
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
