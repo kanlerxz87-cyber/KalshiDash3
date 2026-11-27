@@ -35,8 +35,6 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-from track_lifecycle import track
-
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 LIVE = DATA / "live"
@@ -1321,8 +1319,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         except (OSError, json.JSONDecodeError):
             return {}
 
+    from track_lifecycle import track
+
+    tracked_topics = {c["id"] for c in cats["categories"]}
+    paper = previous_doc("simulation.json").get("open_positions") or []
     payload["alert_lifecycle"] = track(
-        payload, archive, previous_doc("simulation.json").get("open_positions") or [],
+        payload, [a for a in archive if a.get("category_id") in tracked_topics],
+        [p for p in paper if p.get("category_id") in tracked_topics],
         previous_doc("markets.json").get("alert_lifecycle") or {}, get, utcnow,
     )
     followups = payload["alert_lifecycle"]
