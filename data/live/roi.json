@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T22:36:22Z",
- "runtime_seconds": 79.2,
+ "collected_at": "2026-11-27T23:21:15Z",
+ "runtime_seconds": 110.1,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -39,7 +39,7 @@
   "orderbooks": 592,
   "orderbooks_requested": 592,
   "alerts": 0,
-  "markets_with_momentum": 0,
+  "markets_with_momentum": 42,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
@@ -82,8 +82,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.643888888888889,
-   "momentum": null,
+   "ttc_hours": 5.895833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -136,8 +136,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.643888888888889,
-   "momentum": null,
+   "ttc_hours": 5.895833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -190,8 +190,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.643888888888889,
-   "momentum": null,
+   "ttc_hours": 5.895833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -244,8 +244,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.643888888888889,
-   "momentum": null,
+   "ttc_hours": 5.895833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -298,8 +298,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.643888888888889,
-   "momentum": null,
+   "ttc_hours": 5.895833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -352,8 +352,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.893888888888889,
-   "momentum": null,
+   "ttc_hours": 6.145833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -406,8 +406,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.893888888888889,
-   "momentum": null,
+   "ttc_hours": 6.145833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -460,8 +460,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.893888888888889,
-   "momentum": null,
+   "ttc_hours": 6.145833333333333,
+   "momentum": 0.0,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -497,17 +497,18 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 117,
+  "candles_used": 143,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 1,
-  "baseline_always_yes_hits": 0,
+  "baseline_always_yes_bets": 10,
+  "baseline_always_yes_hits": 6,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 23,
-   "no side passed the replay gates": 1
+   "no candles in the 2h before close": 38,
+   "candle without a price": 14,
+   "no side passed the replay gates": 10
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -516,7 +517,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.0
+  "baseline_always_yes_hit_rate": 0.6
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
