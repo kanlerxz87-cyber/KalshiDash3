@@ -237,30 +237,23 @@ def main() -> int:
     # A topic restored from GET /series (category_assigned_from) must be the ONLY topic that
     # accepts that series; an ambiguous or contradicted assignment fails the build.
     #
-    # The assignment is verified against the SAME official reading it was made from: the row's
-    # own recorded series_categories first (build_alerts.py records them, with their source URL,
-    # at assignment time), and the current snapshot only as a fallback for legacy rows that carry
-    # none. Re-deriving from the snapshot alone made this check clock-dependent (F-109):
-    # collect.py rebuilds series_index every pass from the series present in that pass's scan, so
-    # when KXAAAGASD's last open market left the 25k newest-first window on 2026-11-27 the ledger
-    # entry disappeared and six consecutive collector passes (18:16Z..19:23Z, runs 46012505508 /
-    # 46053185236) failed on a Nov-20 gas alert whose row still carries ["Economics"] from
-    # GET /series/KXAAAGASD. The collector-side retention fix (F-107 / PR #151, arena-72ae7bca)
-    # re-fetches archive-cited series so they stay in the ledger; this validator-side change is the
-    # complementary defense in depth, because record_series still stores categories=null when that
-    # re-fetch fails transiently, which would otherwise re-trip the snapshot-only check. Same
-    # precedence as the high_roi screen below (F-39): the row's stored inputs are authoritative; the
-    # snapshot rolls. No official reading anywhere = unknown, not a contradiction (the builder never
-    # assigns a topic from an empty categories list). A series Kalshi later reclassifies is still
-    # corrected live: the feed-serving check below reads the current snapshot and withholds the row
-    # from both chats.
+    # A8D3: an UNKNOWN series is not a contradiction. The ledger only covers series that have a
+    # row in the CURRENT snapshot window, so a resolved event's series drops out of it as its
+    # market leaves the scan - while the archived alert keeps the topic GET /series confirmed
+    # when it was written. Treating that gap as a contradiction stopped the collector committing
+    # at all: measured 2026-11-27T18:29Z..19:38Z, every relay pass failed with
+    # "archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series
+    # categories [] accept []" (KXAAAGASD's rows had aged out of the ledger) and the published
+    # snapshot stayed frozen at 18:00:57Z. `build_alerts.py` already applies exactly this rule to
+    # a row with no categories ("unknown is not a contradiction"), so the validator now states it
+    # too, counts the rows it applies to, and still refuses a PROVABLE contradiction.
+    unverifiable_series = 0
     for a in archive:
         if not a.get("category_assigned_from"):
             continue
-        cats = [str(c) for c in (a.get("series_categories") or [])]
+        cats = _official(a.get("ticker") or "")
         if not cats:
-            cats = _official(a.get("ticker") or "")
-        if not cats:
+            unverifiable_series += 1
             continue
         topics = sorted(t for t, comp in COMPATIBLE.items() if set(cats) & comp)
         check(topics == [a.get("category_id")],
@@ -389,6 +382,10 @@ def main() -> int:
         check(not missing,
               f"{len(missing)} re-derivable swing(s) missing from the archive, e.g. {[k[0] + '@' + k[2] for k in missing[:3]]}")
 
+    if unverifiable_series:
+        print(f"note: {unverifiable_series} archived alert(s) cite a series the current snapshot no "
+              f"longer carries in series_index; the topic stored with them came from GET /series "
+              f"and is kept, not re-contradicted (unknown is not a contradiction)")
     return finish(len(archive or []), fresh)
 
 

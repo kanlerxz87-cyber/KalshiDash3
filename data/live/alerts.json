@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T19:47:49Z",
- "snapshot_collected_at": "2026-11-27T19:47:49Z",
+ "generated_at": "2026-11-27T19:50:01Z",
+ "snapshot_collected_at": "2026-11-27T19:50:00Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -1646,7 +1646,7 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.42,
+    "min_distance_from_from_price": 0.43,
     "gave_back_half": false,
     "still_open": false
    }
@@ -9215,7 +9215,7 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.42,
+    "min_distance_from_from_price": 0.43,
     "gave_back_half": false,
     "still_open": false
    }

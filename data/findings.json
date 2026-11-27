@@ -1590,34 +1590,51 @@
    ]
   },
   {
-   "id": "F-109",
-   "severity": "high",
-   "item": "Validator-side hardening complementing F-107 / PR #151: validate_alerts.py's category_assigned_from check re-derived a restored alert's topic from the rolling snapshot ledger only, so it failed whenever the ledger lacked the series (the collector stall, 2026-11-27 18:16Z-19:38Z)",
-   "why": "Concurrent with session arena-72ae7bca (PR #151, merged 2026-11-27T19:45:39Z), which fixed the collector side by re-fetching GET /series for archive-cited series so they stay in the ledger (their F-107). This is the validator side of the same defect, kept as defense in depth: scripts/collect.py record_series stores categories=null when GET /series fails transiently, so even with PR #151's retention a ledger entry can exist with null categories; _official() then returns [] and the pre-fix check failed on a Nov-20 gas alert whose row permanently carries series_categories=['Economics'] from GET /series/KXAAAGASD (verified live 2026-11-27: categories ['Economics']). build_alerts.py assigns a restored topic row-first; the validator must check the same way (the F-39 precedent: stored inputs are authoritative, the snapshot rolls). Read from the cancelled job's check-run annotations (job 140572462930): 'archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []'.",
-   "action": "Fixed in scripts/tests/validate_alerts.py: the category_assigned_from check reads the archive row's own series_categories first (the official reading the assignment was made from, recorded with its source URL), falling back to the current snapshot only for legacy rows that carry none; no official reading anywhere is unknown, not a contradiction. This is not a relaxation: a row whose own official categories contradict its topic, or accept more than one topic, still fails (mutation-checked). A series Kalshi later reclassifies is still withheld from both chats by the live feed-serving check. Regression: AssignmentProvenanceTests in scripts/tests/test_alerts.py (6 tests), mutation-verified to reproduce the exact CI error against the pre-fix validator and pass after; also reproduced on the real committed data by removing KXAAAGASD from series_index and open_markets (old validator exit 1 with the identical two errors, fixed validator exit 0). Merged origin/main (PR #151) keeping both fixes; this finding renumbered F-107 -> F-109 to avoid the ID collision with PR #151's F-107. python3 scripts/verify_release.py PASS.",
-   "status": "fixed 2026-11-27 (arena-b1cc1b1f; complements PR #151 / F-107)",
+   "id": "F-108",
+   "severity": "medium",
+   "item": "validate_alerts treated an archived alert's series leaving series_index as a contradiction - the only place in the pipeline that read 'unknown' as 'contradicted' - and nothing kept a verified record when the exchange stopped answering for an archived series",
+   "why": "Same stall as F-107, seen from the validator's side. Measured on main: data/live/collector_health.json recorded six consecutive failed passes (18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z, 19:38:04Z), every one 'validators: validate_alerts', while data/live/markets.json stayed at collected_at 2026-11-27T18:00:57Z. Once the relay began recording a failing validator's own output (F-109), the reproduction run 46057975142 named it: 'archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []' and the same market at 22:04:00Z. The series is officially ['Economics'] (GET /series/KXAAAGASD) and the archived alerts carry category_assigned_from, so their topic was confirmed from the official record; the ledger had simply stopped carrying the series once its markets left the scan. The rule that failed the pass was the only one in the pipeline that turned missing evidence into a contradiction: scripts/build_alerts.py publishes a row whose official categories are unknown ('no official categories recorded: unknown is not a contradiction'). F-107 repairs the coverage gap by re-reading each archived series' official record every pass; that leaves a second exposure, because a pass in which GET /series/{ticker} does not answer stores no categories for that series and the strict rule would wedge the collector again.",
+   "action": "Two layers, both pinned. (1) scripts/tests/validate_alerts.py: an archived alert whose series is absent from series_index is counted and printed ('unknown is not a contradiction; N archived alert(s) cite a series the current snapshot no longer carries') instead of failing the pass; a PROVABLE contradiction (series present with categories the topic cannot contain) still refuses the pass. Regression: scripts/tests/test_alert_series_ledger_gap.py, mutation-checked - it fails on the pre-fix validator with the production error text and passes after. (2) scripts/collect.py: carry_forward_series() runs after F-107's per-series re-read and keeps the record the previous snapshot verified when this pass's official read gave no categories (a fresh answer always wins, an unanswered record is never carried, only archived series are looked at), publishing counts.series_ledger_carried_forward so the ledger is never silently stale. Regression: scripts/tests/test_series_ledger_carry.py. Integration: F-107 (PR #151) was merged first and is the primary repair; this row records the validator's class-level fix plus its fallback, not a second mechanism. Verified on live official data by no-commit collect.yml pass 46058449720 (2026-11-27T19:41Z, success on the fresh collection that had failed six times) and by python3 scripts/verify_release.py PASS on the merged tree.",
    "sources": [
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
     "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
     "https://docs.kalshi.com/api-reference/market/get-series-list",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46012505508",
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058449720",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_alerts.py"
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_alert_series_ledger_gap.py"
    ]
   },
   {
-   "id": "F-108",
+   "id": "F-109",
    "severity": "medium",
-   "item": "collector_health.json.stderr_tail was always empty for validator failures, so a stalled collector could not say WHY from the repository alone (F-85's stated purpose unmet)",
-   "why": "scripts/collect_relay.py make_pass called fail('validators: ...') with no tail, so record_health wrote stderr_tail '' on every validator failure. Six consecutive failing passes (2026-11-27 18:16Z-19:38Z) each committed a health record naming validate_alerts but carrying no error text; the reason existed only in the Actions job's ::error annotations, which are served from blob storage unreachable from some environments (the F-85 note itself says the health file exists precisely because job logs are not always reachable). Diagnosing this stall required reading the cancelled job's check-run annotations through the API.",
-   "action": "Fixed in scripts/collect_relay.py: each failing validator's last ~1500 characters of stdout+stderr are now labelled ([name] exit N) and forwarded to fail(); record_health keeps the last 2000. A validator timeout is also labelled. Regression added to scripts/tests/test_collect_relay.py (stubbed make_pass): asserts the health record names the failing validator AND carries its own labelled stderr tail; mutation-verified to fail against the pre-fix relay (empty stderr_tail) and pass after. python3 scripts/verify_release.py PASS.",
-   "status": "fixed 2026-11-27 (arena-b1cc1b1f)",
+   "item": "data/live/collector_health.json never carried a failing validator's own output: every validator failure recorded only the validator's name, with stderr_tail empty, so six consecutive collector stalls could not be diagnosed from the repository",
+   "why": "scripts/collect_relay.py called fail('validators: ' + names) with no tail, unlike the pre-check and pipeline failures, which do pass their output, so a validator's report existed only in the job's stdout. Actions job logs are served from a host this project's sandboxes cannot reach (recorded on this board on 2026-11-22 and again for the 2026-11-25 stall of the same validator), and a wedged run's output dies with the run. Measured on main: the health records for 18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z and 19:23:02Z all read detail 'validators: validate_alerts' with stderr_tail empty, so the stall that F-107 and F-108 record carried no diagnosis in the repository.",
+   "action": "FIXED: make_pass() collects each failing validator's own output (name, exit code, stdout and stderr; a timeout is recorded as such) and passes it to record_health(), and HEALTH_TAIL_LIMIT was raised from 2000 to 8000 characters so a validator's header and error list survive truncation instead of only the tail. Regression: scripts/tests/test_collect_relay.py asserts that a failing validator's record names it AND carries its error text (mutation-checked: the check fails on the pre-fix relay with 'the health record carries the validator's own error text, not just its name'), and scripts/tests/test_collect_health.py pins the new bound. Proven in production shape: run 46057975142 recorded '--- validate_alerts (exit 1) ... INVALID alert data: archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []', the message that identified the defect.",
    "sources": [
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_collect_relay.py",
-    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46053185236"
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://docs.github.com/en/actions/how-tos/monitor-workflows/view-workflow-run-history",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json"
+   ]
+  },
+  {
+   "id": "F-110",
+   "severity": "low",
+   "item": "Non-blocking hardening suggestion: validate_alerts.py's category_assigned_from check skips verification entirely when the series is absent from series_index (counted as unverifiable); verifying against the archive row's own recorded series_categories first would still catch a contradicted or ambiguous assignment in that case",
+   "why": "Independently reproduced and verified by session arena-b1cc1b1f while the stall was live. The integrated fixes (F-107 / PR #151 collector-side retention; F-108 / PR #152 validator treats unknown as unknown) unblock the collector and are correct: an absent series is unknown, not a contradiction. One residual edge remains: when collect.py record_series stores categories=null because GET /series failed transiently (PR #151's own test_failed_official_lookup_stays_unknown_never_inferred pins that null case), the ledger entry exists but is empty, so the assignment is skipped rather than checked. build_alerts.py assigns a restored topic from the row's OWN series_categories first (recorded with their source URL at assignment time); those official readings are permanent. A row-first check (row series_categories, then snapshot fallback, then unknown) would still refuse a provable contradiction in that edge while never failing on a genuine unknown. This is a suggestion, not a defect: the current behavior is safe and the collector is healthy.",
+   "action": "No code change made by this session (the merged F-108 fix is kept verbatim; this session's earlier row-first prototype was reverted as a duplicate of the converged merged work). Proposed as a future hardening: read a.get('series_categories') before _official() in the category_assigned_from loop, keep the unverifiable_series counter for rows with no reading anywhere, and keep refusing ambiguous/contradicted assignments. Verified premise live 2026-11-27: GET /series/KXAAAGASD returns categories ['Economics'], identical to the archive rows' recorded series_categories. Full release gate PASS on the merged tree.",
+   "status": "open (suggestion; owner decision needed)",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/build_alerts.py"
    ]
   }
 ]

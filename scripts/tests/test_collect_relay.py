@@ -276,16 +276,15 @@ def main() -> int:
     calls: list[str] = []
 
     class Done:
-        def __init__(self, rc=0, stderr=""):
-            self.returncode, self.stdout, self.stderr = rc, "", stderr
+        def __init__(self, rc=0, stdout="", stderr=""):
+            self.returncode, self.stdout, self.stderr = rc, stdout, stderr
 
     def fake_sh(args, timeout=600, check=False):
         calls.append(" ".join(args[1:2]) if args[0] == "python3" else " ".join(args[:2]))
-        rc = 1 if fail_on and args[0] == "python3" and args[1] == fail_on else 0
-        # A failing validator prints its reason to stderr; the relay must forward those lines
-        # into the health record (F-108), so the stub emits a distinctive, recognisable tail.
-        return Done(rc, stderr=(f"INVALID data from {args[1]}: assigned topic 'gas' but categories [] accept []"
-                                if rc else ""))
+        if fail_on and args[0] == "python3" and args[1] == fail_on:
+            # The validator's own report, exactly as a real one prints it (validate_alerts.py).
+            return Done(1, "", "INVALID alert data:\n  - archive:KXTEST-1@2026-11-27T18:00:00Z from_time must precede to_time\n")
+        return Done(0)
 
     saved = (R.sh, R.sync_to_remote, R.probe_api, R.commit_and_push, R.discard_changes, R.annotate)
     notes: list[str] = []
@@ -313,14 +312,14 @@ def main() -> int:
         out = R.make_pass(R.make_plan("main"))(3)
         check(out[0] == "failed" and "commit_and_push" not in calls and "discard" in calls,
               f"a failing validator discards the pass ({out[1]})")
-        # F-108: the health record must name the failing validator AND carry its own last lines.
+        # A8D3-1: the validator's own text must reach the committed health record. Before the fix
+        # the record said only "validators: validate_live" and the report lived and died in stdout.
         health = json.loads((R.HEALTH_ROOT / R.HEALTH_PATH).read_text())
-        check(health.get("outcome") == "failed" and "validate_live" in (health.get("detail") or ""),
+        check(health.get("detail") == "validators: validate_live",
               f"the health record names the failing validator ({health.get('detail')!r})")
-        check("categories [] accept []" in (health.get("stderr_tail") or ""),
-              "the health record carries the failing validator's OWN stderr tail, not an empty string (F-108)")
-        check("[validate_live]" in (health.get("stderr_tail") or ""),
-              "the tail is labelled with which validator produced it")
+        check("INVALID alert data" in (health.get("stderr_tail") or "")
+              and "from_time must precede to_time" in health["stderr_tail"],
+              "the health record carries the validator's own error text, not just its name")
         calls.clear(); fail_on = None
         out = R.make_pass(R.make_plan("main", commit_in="false"))(4)
         check(out[0] == "validated" and "commit_and_push" not in calls, "a dry-run pass validates and commits nothing")
