@@ -166,9 +166,6 @@ def main() -> int:
     # withholding rule silently allow exactly the rows it exists to remove. A category this project
     # has since verified from GET /series is therefore written onto the entry; an entry whose series
     # is not in the ledger is left null (unknown is not a contradiction).
-    #: The official series categories recorded ON each archive entry (F-65). Read by the
-    #: topic-assignment repair below and by the withholding test further down; a variable of
-    #: its own so a later block cannot shadow it again. See the F-109 note at `official_for`.
     series_ledger = markets.get("series_index") or {}
     repaired = 0
     for a in archive["alerts"]:
@@ -263,65 +260,16 @@ def main() -> int:
     # alerts that were supposed to disappear. The collector now publishes `series_index` — the
     # official GET /series categories per series ticker — and that ledger is the authority here.
     # A series with no ledger entry, or with null categories, is unknown and is served.
-    #: F-109: the official GET /series ledger this pass wrote. Named apart from `series_ledger`
-    #: above on purpose: before this fix the two were the same name, the later binding shadowed
-    #: the earlier one, and `official_for` therefore could not consult the categories recorded on
-    #: the entry itself. See the note in `official_for`.
-    series_index = markets.get("series_index") or {}
+    ledger = markets.get("series_index") or {}
     conflicts: dict[str, dict] = {}
     out_of_scope: dict[str, int] = {}
 
     def official_for(ticker: str) -> list[str]:
-        """The exchange's own categories for this market's series, or [] when not known here.
-
-        Resolution order (first non-empty wins; empty means unknown, never a guess):
-          1. the snapshot row's recorded `series_categories`;
-          2. the snapshot's `series_index` ledger;
-          3. the categories recorded on the archive ENTRY itself (F-109).
-
-        Why step 3 exists, stated as the defect it is: a swing whose market has since left the
-        open scan (settled, expired, trimmed) has no row and — once the series drops out of the
-        ledger — no ledger entry either. But the entry's categories were copied from GET /series
-        when the alert was detected, and `category_assigned_from` says the TOPIC was derived from
-        exactly those categories. Reading only steps 1-2 made the served set flip from "served" to
-        "withheld (no topic could be confirmed)" as soon as the market aged out, while
-        `category_id` stayed set — and `scripts/tests/validate_alerts.py`, which has always read
-        the entry's own record, then refused the feed: the collector's five consecutive failed
-        passes at 18:31Z/18:46Z/19:01Z/19:08Z/19:23Z on 2026-11-27, with the validator's words
-        "KXAAAGASD-26NOV21-3.6600 … assigned topic 'gas' but GET /series categories [] accept []".
-        Not extrapolation: the same series is filed ['Economics'] by GET /series and 'Economics' is
-        in CATEGORY_COMPATIBLE['gas'], which is why the topic was assigned.
-
-        F-107 fixed the ordinary form of this in scripts/collect.py: the collector now re-fetches
-        GET /series for every archive-cited series, so the ledger usually answers at step 2. What
-        remains, and is why this step is still needed, is the collector's own failure path — its
-        `record_series()` records `categories: None` when that fetch raises (its
-        `test_failed_official_lookup_stays_unknown_never_inferred` asserts exactly that). A single
-        rate-limited or 5xx reply on /series/<archive-only series> would then put steps 1-2 back in
-        the state that gated five passes in a row. Step 3 is the record this project already
-        collected, so the feed does not depend on one successful network call.
-        """
         row = by_ticker.get(ticker)
         if row and row.get("series_categories"):
             return [str(c) for c in row["series_categories"]]
-        entry = series_index.get((row or {}).get("series_ticker") or series_of_ticker(ticker)) or {}
-        cats = [str(c) for c in (entry.get("categories") or [])]
-        if cats:
-            return cats
-        recorded = archive_recorded(ticker)
-        return [str(c) for c in recorded]
-
-    #: ticker -> the `series_categories` an archive entry for that ticker recorded. Built once:
-    #: several entries can share a ticker and they agree (the value is copied from the same
-    #: GET /series record; a first-write-wins map cannot invent a category).
-    recorded_cache: dict[str, list[str]] = {}
-    for _a in archive["alerts"]:
-        _t = _a.get("ticker")
-        if _t and _t not in recorded_cache and _a.get("series_categories"):
-            recorded_cache[_t] = [str(c) for c in _a["series_categories"]]
-
-    def archive_recorded(ticker: str) -> list[str]:
-        return recorded_cache.get(ticker or "", [])
+        entry = ledger.get((row or {}).get("series_ticker") or series_of_ticker(ticker)) or {}
+        return [str(c) for c in (entry.get("categories") or [])]
 
     def publishable(a) -> bool:
         cats = official_for(a.get("ticker") or "")

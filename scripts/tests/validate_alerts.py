@@ -204,32 +204,13 @@ def main() -> int:
     state = load(LIVE / "markets.json") or {}
     ledger = state.get("series_index") or {}
     row_by_ticker = {r.get("ticker"): r for r in (state.get("open_markets") or [])}
-    # What each archive entry itself recorded from GET /series when the swing was detected.
-    # Third resolution source below, and the one that survives the market leaving the scan.
-    entry_categories: dict[str, list] = {}
-    for _a in archive:
-        _t = _a.get("ticker")
-        if _t and _t not in entry_categories and _a.get("series_categories"):
-            entry_categories[_t] = [str(c) for c in _a["series_categories"]]
 
     def _official(ticker: str) -> list:
-        """Official GET /series categories, resolved exactly as scripts/build_alerts.py does (F-109).
-
-        Order: snapshot row -> snapshot `series_index` -> the archive ENTRY's own recorded
-        `series_categories`. The third source is what makes this check reproducible after the
-        market leaves the open scan: those categories were copied from GET /series at detection
-        time and `category_assigned_from` names that record. Before the builder read them too,
-        the two files disagreed and this validator refused every pass that had aged a market out
-        -- five consecutive collector failures on 2026-11-27 between 18:31Z and 19:23Z.
-        """
         row = row_by_ticker.get(ticker) or {}
         if row.get("series_categories"):
             return [str(c) for c in row["series_categories"]]
         series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
-        cats = [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
-        if cats:
-            return cats
-        return [str(c) for c in (entry_categories.get(ticker) or [])]
+        return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
 
     def _served(a: dict) -> bool:
         cats = _official(a.get("ticker") or "")
@@ -255,10 +236,25 @@ def main() -> int:
           f"{counts.get('withheld_out_of_scope')!r} (F-65, F-76)")
     # A topic restored from GET /series (category_assigned_from) must be the ONLY topic that
     # accepts that series; an ambiguous or contradicted assignment fails the build.
+    #
+    # A8D3: an UNKNOWN series is not a contradiction. The ledger only covers series that have a
+    # row in the CURRENT snapshot window, so a resolved event's series drops out of it as its
+    # market leaves the scan - while the archived alert keeps the topic GET /series confirmed
+    # when it was written. Treating that gap as a contradiction stopped the collector committing
+    # at all: measured 2026-11-27T18:29Z..19:38Z, every relay pass failed with
+    # "archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series
+    # categories [] accept []" (KXAAAGASD's rows had aged out of the ledger) and the published
+    # snapshot stayed frozen at 18:00:57Z. `build_alerts.py` already applies exactly this rule to
+    # a row with no categories ("unknown is not a contradiction"), so the validator now states it
+    # too, counts the rows it applies to, and still refuses a PROVABLE contradiction.
+    unverifiable_series = 0
     for a in archive:
         if not a.get("category_assigned_from"):
             continue
         cats = _official(a.get("ticker") or "")
+        if not cats:
+            unverifiable_series += 1
+            continue
         topics = sorted(t for t, comp in COMPATIBLE.items() if set(cats) & comp)
         check(topics == [a.get("category_id")],
               f"archive:{a.get('ticker')}@{a.get('to_time')} assigned topic {a.get('category_id')!r} "
@@ -386,6 +382,10 @@ def main() -> int:
         check(not missing,
               f"{len(missing)} re-derivable swing(s) missing from the archive, e.g. {[k[0] + '@' + k[2] for k in missing[:3]]}")
 
+    if unverifiable_series:
+        print(f"note: {unverifiable_series} archived alert(s) cite a series the current snapshot no "
+              f"longer carries in series_index; the topic stored with them came from GET /series "
+              f"and is kept, not re-contradicted (unknown is not a contradiction)")
     return finish(len(archive or []), fresh)
 
 

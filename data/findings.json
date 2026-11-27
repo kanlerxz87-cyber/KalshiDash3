@@ -1589,31 +1589,37 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_archive_series_retention.py"
    ]
   },
-{
- "id": "F-108",
- "severity": "medium",
- "item": "A failed collection pass recorded that a validator failed, but never recorded what the validator said",
- "why": "data/live/collector_health.json records the reason a pass did not commit. Its five entries for 2026-11-27 18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z and 19:23:02Z all read detail \"validators: validate_alerts\" with stderr_tail \"\". In scripts/collect_relay.py the validator branch annotated the run with the validator's output but returned fail(\"validators: \" + names) with no tail, so a tail-less record is what reached the repository. The reason therefore existed only in job stdout, which this project has already recorded as unreachable from some environments (F-85, F-87), and the outage could only be diagnosed by re-running a dry-run to regenerate it. Timed-out validators recorded no reason at all.",
- "action": "The validator branch now accumulates each failing validator's stdout+stderr (and a stated reason when one times out) and passes it to record_health, bounded to 2000 characters in the health file and 3000 in the run annotation. Pinned offline by test_a_validator_failure_carries_the_validators_own_output in scripts/tests/test_collect_health.py, which fails on the previous code. Verified live in one direction only: the pre-fix dry-run 46058100236 recorded stderr_tail \"\", while the post-fix dry-run 46058698096 passed every validator and so produced no failure record to inspect. The post-fix claim rests on the mutation test, not on an observed post-fix failure.",
- "sources": [
-  "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058100236",
-  "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705421961/annotations",
-  "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py"
- ]
-},
-{
- "id": "F-109",
- "severity": "high",
- "item": "The alert scope rule could not read the official series categories the archive itself had recorded, so one transient /series error reopened the collector outage",
- "why": "Two rules resolve a market's official GET /series categories, and they read different sources: scripts/build_alerts.py read the snapshot row then data/live/markets.json series_index, while scripts/tests/validate_alerts.py also read the archive entry's own recorded series_categories. F-107 made the collector re-fetch GET /series for every archive-cited series, which keeps the ledger populated in the ordinary case. It does not cover the collector's own failure path: record_series() writes categories null when that fetch raises, and that fix's test_failed_official_lookup_stays_unknown_never_inferred asserts exactly that outcome. In that state the builder reports no official categories and serves the swing while validator rule 4 still refuses it. Reproduced here on main plus F-107, using that fix's own harness with the series unavailable and then the real builder and validator: the validator exits 1 with the identical message that gated five passes in a row. The fix removed the ordinary trigger, not the class of trigger.",
- "action": "The builder's official_for() and the validator's _official() now resolve from the same three sources in the same order - snapshot row, series_index, then the categories the archive entry recorded from GET /series at detection time - so the rule no longer depends on one successful network call. The fallback supplies categories only: publishable() still withholds a swing whose recorded categories contradict its topic, and an entry with no recorded categories stays unknown (withheld and counted), never inferred. The later binding of the ledger in build_alerts.py is renamed series_index so the shadowing that caused the original mismatch cannot recur. Pinned by scripts/tests/test_archive_evidence_fallback.py, seven checks including the failed-re-fetch case, mutation-verified against main's validator.",
- "sources": [
-  "https://docs.kalshi.com/api-reference/market/get-series",
-  "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
-  "https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705144837/annotations",
-  "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_archive_series_retention.py",
-  "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_archive_evidence_fallback.py"
- ]
-}
+  {
+   "id": "F-108",
+   "severity": "medium",
+   "item": "validate_alerts treated an archived alert's series leaving series_index as a contradiction - the only place in the pipeline that read 'unknown' as 'contradicted' - and nothing kept a verified record when the exchange stopped answering for an archived series",
+   "why": "Same stall as F-107, seen from the validator's side. Measured on main: data/live/collector_health.json recorded six consecutive failed passes (18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z, 19:38:04Z), every one 'validators: validate_alerts', while data/live/markets.json stayed at collected_at 2026-11-27T18:00:57Z. Once the relay began recording a failing validator's own output (F-109), the reproduction run 46057975142 named it: 'archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []' and the same market at 22:04:00Z. The series is officially ['Economics'] (GET /series/KXAAAGASD) and the archived alerts carry category_assigned_from, so their topic was confirmed from the official record; the ledger had simply stopped carrying the series once its markets left the scan. The rule that failed the pass was the only one in the pipeline that turned missing evidence into a contradiction: scripts/build_alerts.py publishes a row whose official categories are unknown ('no official categories recorded: unknown is not a contradiction'). F-107 repairs the coverage gap by re-reading each archived series' official record every pass; that leaves a second exposure, because a pass in which GET /series/{ticker} does not answer stores no categories for that series and the strict rule would wedge the collector again.",
+   "action": "Two layers, both pinned. (1) scripts/tests/validate_alerts.py: an archived alert whose series is absent from series_index is counted and printed ('unknown is not a contradiction; N archived alert(s) cite a series the current snapshot no longer carries') instead of failing the pass; a PROVABLE contradiction (series present with categories the topic cannot contain) still refuses the pass. Regression: scripts/tests/test_alert_series_ledger_gap.py, mutation-checked - it fails on the pre-fix validator with the production error text and passes after. (2) scripts/collect.py: carry_forward_series() runs after F-107's per-series re-read and keeps the record the previous snapshot verified when this pass's official read gave no categories (a fresh answer always wins, an unanswered record is never carried, only archived series are looked at), publishing counts.series_ledger_carried_forward so the ledger is never silently stale. Regression: scripts/tests/test_series_ledger_carry.py. Integration: F-107 (PR #151) was merged first and is the primary repair; this row records the validator's class-level fix plus its fallback, not a second mechanism. Verified on live official data by no-commit collect.yml pass 46058449720 (2026-11-27T19:41Z, success on the fresh collection that had failed six times) and by python3 scripts/verify_release.py PASS on the merged tree.",
+   "sources": [
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://docs.kalshi.com/getting_started/market_lifecycle",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058449720",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_alert_series_ledger_gap.py"
+   ]
+  },
+  {
+   "id": "F-109",
+   "severity": "medium",
+   "item": "data/live/collector_health.json never carried a failing validator's own output: every validator failure recorded only the validator's name, with stderr_tail empty, so six consecutive collector stalls could not be diagnosed from the repository",
+   "why": "scripts/collect_relay.py called fail('validators: ' + names) with no tail, unlike the pre-check and pipeline failures, which do pass their output, so a validator's report existed only in the job's stdout. Actions job logs are served from a host this project's sandboxes cannot reach (recorded on this board on 2026-11-22 and again for the 2026-11-25 stall of the same validator), and a wedged run's output dies with the run. Measured on main: the health records for 18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z and 19:23:02Z all read detail 'validators: validate_alerts' with stderr_tail empty, so the stall that F-107 and F-108 record carried no diagnosis in the repository.",
+   "action": "FIXED: make_pass() collects each failing validator's own output (name, exit code, stdout and stderr; a timeout is recorded as such) and passes it to record_health(), and HEALTH_TAIL_LIMIT was raised from 2000 to 8000 characters so a validator's header and error list survive truncation instead of only the tail. Regression: scripts/tests/test_collect_relay.py asserts that a failing validator's record names it AND carries its error text (mutation-checked: the check fails on the pre-fix relay with 'the health record carries the validator's own error text, not just its name'), and scripts/tests/test_collect_health.py pins the new bound. Proven in production shape: run 46057975142 recorded '--- validate_alerts (exit 1) ... INVALID alert data: archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic gas but GET /series categories [] accept []', the message that identified the defect.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/collect_relay.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_collect_relay.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46057975142",
+    "https://docs.github.com/en/actions/how-tos/monitor-workflows/view-workflow-run-history",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json"
+   ]
+  }
  ]
 }

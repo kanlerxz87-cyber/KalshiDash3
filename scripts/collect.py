@@ -397,6 +397,37 @@ def fetch_series_index(getter=None):
         return {}
 
 
+def carry_forward_series(ledger: dict, previous: dict, cited) -> int:
+    """Keep a VERIFIED series record for a series the current scan no longer covers (A8D3).
+
+    Why this exists: the ledger below is built from rows in the CURRENT open/settled window, so a
+    resolved event's series leaves it as its markets age out of the scan - while the archived
+    >= $0.10 swings still cite that series and `scripts/tests/validate_alerts.py` re-checks their
+    topic against this ledger. On 2026-11-27 that gap stopped the collector committing at all:
+    every relay pass from 18:29Z to 19:38Z failed with "archive:KXAAAGASD-26NOV21-3.6600@...:
+    assigned topic 'gas' but GET /series categories [] accept []" and the published snapshot
+    stayed frozen at 18:00:57Z.
+
+    A FRESH answer always wins: this fills only a series the previous snapshot recorded categories
+    for and the current snapshot does not. Nothing is inferred - the carried record is exactly the
+    one `GET /series` already returned, with the same source URL - and the count is published in
+    `counts.series_ledger_carried_forward` so a reader can see the ledger is partly carried.
+    """
+    carried = 0
+    for t in sorted({str(x or "").upper() for x in cited}):
+        if not t:
+            continue
+        current = ledger.get(t) or {}
+        if current.get("categories"):
+            continue
+        prior = previous.get(t) or {}
+        if not prior.get("categories"):
+            continue
+        ledger[t] = dict(prior)
+        carried += 1
+    return carried
+
+
 def official_discovery(cats, series_index: dict | None = None, getter=None) -> tuple[dict[str, dict], list[dict]]:
     """Series the EXCHANGE itself files under each topic, via the documented filters.
 
@@ -1218,6 +1249,24 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # record_series deduplicates against the scan ledger (one call per series).
     for st in sorted({series_of({"ticker": t}) for t in archived_tickers}):
         record_series(st)
+    # A8D3 (one mechanism for one concern, kept from two sessions that found the same gap): the
+    # loop above re-reads the official record for every series an archived swing cites, which is
+    # the primary repair of F-107. This is its fallback for the pass where the exchange does not
+    # answer for one of those series: `record_series` then stores no categories, and the archived
+    # alert's verified topic would lose its backing - which is exactly the stall this pair of
+    # fixes exists for. A fresh answer always wins; this only fills a series the previous snapshot
+    # verified and the current one did not, and the count is published so the ledger is never
+    # silently stale.
+    previous_ledger: dict = {}
+    try:
+        previous_ledger = json.loads((LIVE / "markets.json").read_text()).get("series_index") or {}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        previous_ledger = {}
+    cited_series = {series_of({"ticker": t}) for t in archived_tickers}
+    carried_forward = carry_forward_series(ledger, previous_ledger, cited_series)
+    if carried_forward:
+        print(f"  series ledger: {carried_forward} archived series kept their previous snapshot's "
+              f"verified record (the exchange gave no categories for them this pass)")
     hist = {k: v for k, v in hist.items() if k in watch}
     # Restore what an earlier, prunier run already deleted: archive-cited tickers with no
     # observations left at all are rebuilt from their own official candles (see the docstring).
@@ -1273,6 +1322,9 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "category_never_in_scope_official": sorted(CATEGORY_NEVER_IN_SCOPE),
             "excluded_series_reasons": dict(EXCLUDE_KEYWORD_SERIES),
             "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
+            # A8D3: verified series records kept from the previous snapshot because the current
+            # scan no longer covers them (their events resolved and left the window).
+            "series_ledger_carried_forward": carried_forward,
             # Scan completeness, published: what the ranking below could see at all.
             "open_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("open")),
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
