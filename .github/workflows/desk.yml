@@ -44,6 +44,10 @@ jobs:
         with:
           python-version: "3.11"
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Model tests (fee table, browser/CI parity, engine behaviour)
         run: |
           python3 scripts/tests/test_fees.py
@@ -55,15 +59,11 @@ jobs:
           # being written (127 of 387 open demo markets carry a $0.00 ask).
           python3 scripts/tests/test_roi_scan_snapshot.py
 
+      - name: Install test-only DOM dependency
+        run: npm install --no-save --package-lock=false jsdom@26
+
       - name: Page render smoke test (jsdom, no network)
-        run: |
-          set -euo pipefail
-          if npm install --no-save --silent --no-audit --no-fund jsdom >/dev/null 2>&1; then
-            node scripts/tests/test_pages_dom.js
-          else
-            echo "::warning::jsdom could not be installed on this runner; the DOM render test was skipped."
-            node scripts/tests/test_engine_node.js   # still exercises the engine without a DOM
-          fi
+        run: node scripts/tests/test_pages_dom.js
 
       - name: Probe the official demo REST root
         run: |
