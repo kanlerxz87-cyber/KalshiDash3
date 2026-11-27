@@ -101,9 +101,10 @@ class ArchivedSeriesRetention(unittest.TestCase):
             validator.RULES = root / "data/alert_rules.json"
             with redirect_stdout(io.StringIO()):
                 self.assertEqual(validator.main(), 0, "\n".join(validator.errors))
-            # Negative control: removing the retained entry reproduces the old
-            # failure. A relaxed validator would incorrectly pass this case.
-            payload["series_index"].pop("KXAAAGASD")
+            # Negative control: an authoritative contradiction still refuses
+            # publication. PR #152 now treats a genuinely missing answer as
+            # unknown, so do not undo that concurrent policy in this regression.
+            payload["series_index"]["KXAAAGASD"]["categories"] = ["Test"]
             (live / "markets.json").write_text(json.dumps(payload))
             validator = validator_module()
             validator.LIVE = live

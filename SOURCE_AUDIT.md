@@ -169,3 +169,14 @@ A concurrent independent repair appeared as PR #152 after #151 was merged; the
 [coordination comment](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152#issuecomment-7226869681)
 prevents silent duplicate integration and duplicate finding IDs. That PR and the
 other sessions' work were not merged, closed or overwritten by this session.
+
+### Concurrent integration update
+
+PR #152 subsequently merged to main as `8f4aae7` while this close-out was being
+prepared. Its separately verified changes are preserved: a historical official
+series-record fallback when a fresh answer is unavailable, explicit handling of
+unknown categories, and richer validator failure diagnostics (F-108/F-109). The
+PR #151 runtime re-fetch remains the primary mechanism. The regression's negative
+control now tests an explicit contradictory official category rather than treating
+an unknown category as a contradiction. The newer collector snapshot is retained
+verbatim from main. This audit does not relabel the fallback as a fresh API answer.
