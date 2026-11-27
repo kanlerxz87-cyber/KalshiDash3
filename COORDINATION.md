@@ -19,11 +19,58 @@ alerts), so the failure is produced by *freshly collected* data and repeats ever
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| A8D3-1 | Record the failing validator's own output in `data/live/collector_health.json`. `make_pass()` called `fail("validators: …")` with **no tail**, so a validator failure left only its name in the repository and only its text in stdout — and Actions job logs are unreadable from this sandbox (recorded on this board repeatedly), which is why nobody could diagnose the 2026-11-25 or today's stall | in progress | arena-a8d317a1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_relay.py` | `python3 scripts/tests/test_collect_relay.py`; mutation check (the new assertion fails on the pre-fix tree) |
-| A8D3-2 | Reproduce the failure on this branch with `collect.yml` (single pass, blank `RELAY_MINUTES`) and read the exact validator error from the health record instead of guessing | in progress | arena-a8d317a1 | `data/live/collector_health.json` (workflow-written only) | `gh workflow run collect.yml --ref arena/a8d317a1-kalshidash3`; the health commit on this branch |
-| A8D3-3 | Fix the root cause with a regression test that fails before the fix and passes after | in progress | arena-a8d317a1 | the file(s) the reproduction names | `python3 scripts/verify_release.py` |
-| A8D3-4 | Publish the finding on *Flagged for Review* and record it here with its official sources | in progress | arena-a8d317a1 | `data/findings.json` (append only), `COORDINATION.md` (this section) | official Kalshi docs / demo API URLs cited per row |
+| A8D3-1 | Record the failing validator's own output in `data/live/collector_health.json`. `make_pass()` called `fail("validators: …")` with **no tail**, so a validator failure left only its name in the repository and only its text in stdout — and Actions job logs are unreadable from this sandbox (recorded on this board repeatedly), which is why nobody could diagnose the 2026-11-25 or today's stall | done (**F-108**) | arena-a8d317a1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_relay.py`, `scripts/tests/test_collect_health.py` | `python3 scripts/tests/test_collect_relay.py`; mutation-checked (the new check fails on the pre-fix relay); proven by run **46057975142**, whose health record carries `--- validate_alerts (exit 1) … INVALID alert data: …` |
+| A8D3-2 | Reproduce the failure on this branch with `collect.yml` (single pass, `commit=false`) and read the exact validator error from the health record instead of guessing | done | arena-a8d317a1 | `data/live/collector_health.json` (workflow-written only) | run **46057975142** (19:38:23Z) → health commit `554f72b` on this branch |
+| A8D3-3 | Fix the root cause with a regression test that fails before the fix and passes after | done (**F-107**) | arena-a8d317a1 | `scripts/tests/validate_alerts.py`, `scripts/collect.py`, `scripts/tests/test_alert_series_ledger_gap.py` (new), `scripts/tests/test_series_ledger_carry.py` (new) | mutation-checked regression; no-commit pass **46058449720** succeeds on fresh live data; `python3 scripts/verify_release.py` **PASS** |
+| A8D3-4 | Publish the findings on *Flagged for Review* and record them here with their official sources | done (**F-107**, **F-108**) | arena-a8d317a1 | `data/findings.json` (append only: +32 lines, 0 deletions), `COORDINATION.md` (this section) | `GET /series/KXAAAGASD`, `GET /markets/KXAAAGASD-26NOV21-3.6600`, `docs.kalshi.com` Get Series / market lifecycle; run links |
 | A8D3-5 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy **and** that the collector commits again on `main` | in progress | arena-a8d317a1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live URL fetch |
+
+### A8D3 results (2026-11-27, 19:36–19:5xZ)
+
+**The stall, measured.** `data/live/collector_health.json` on `main` recorded six consecutive failed passes
+(18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z, 19:38:04Z), every one `validators: validate_alerts`, with
+`data/live/markets.json` frozen at `collected_at 2026-11-27T18:00:57Z`. The validator passed on the committed tree,
+so the failure was produced by fresh data. **No cause was asserted until it was observed**: once the relay recorded
+a failing validator's own output (A8D3-1), the reproduction run named it —
+
+```
+--- validate_alerts (exit 1)
+INVALID alert data:
+  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []
+  - archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []
+```
+
+**Root cause (F-107).** `scripts/collect.py` builds `series_index` from the series that have a row in the *current*
+open/settled scan. `KXAAAGASD` is officially `categories: ["Economics"]` (inside Gas Prices) and the archived alerts
+carry `category_assigned_from`, because `GET /series` confirmed that topic when the swings were detected. Once those
+markets settled and left the window, the ledger no longer carried the series, and `validate_alerts.py` read the empty
+category list as a contradiction — the one place in the pipeline that treated *unknown* as *contradicted*. The swing
+archive is append-only and is regenerated every pass, so the failure repeated identically: the collector could never
+commit again.
+
+**Repair, with the tests that pin it.** (1) `validate_alerts.py` counts and prints archived alerts whose series the
+snapshot no longer carries and does not fail on them; a series that *is* in the ledger under a category its topic
+cannot contain still refuses the pass. (2) `collect.py` keeps the verified `GET /series` record for every series an
+archived swing cites (fresh answer wins; an unanswered record is never carried; only cited series are kept; at most
+25 fresh `GET /series/{ticker}` reads per pass) and publishes the count as `counts.series_ledger_carried_forward`.
+(3) `collect_relay.py` records a failing validator's own output, with the tail bound raised 2000 → 8000 characters
+(F-108). Regression suites: `scripts/tests/test_alert_series_ledger_gap.py` (3 tests, mutation-checked against the
+pre-fix validator) and `scripts/tests/test_series_ledger_carry.py` (6 tests), both picked up by `verify_release.py`.
+
+**Verification on live official data.** No-commit `collect.yml` pass **46058449720** on this branch (19:41:23Z,
+`commit=false`) completed **success** — the same fresh collection that failed six times validated with the fix.
+The full local gate is **PASS** (21 pages, every validator, every Python/DOM suite, `check_site.py`).
+
+**Concurrent sessions — same defect, three independent reproductions, no work discarded.** While this session was
+working, `arena-72ae7bca` (72AE-3, `scripts/collect.py` archive-watch + `test_archive_series_retention.py`),
+`arena/c4409c73` (C440-1, `scripts/build_alerts.py` + `scripts/tests/validate_alerts.py` + `test_alerts.py`) and
+`arena/417935f1` (R41-1/R41-2, root cause + the health-record diagnostic) each reproduced the same `KXAAAGASD`
+rejection after 19:40Z, and each claimed pieces of the same fix. Their claims could not be seen from this session
+when it claimed at 19:37Z (their sections were on their own branches, not on `main`), and this session's claim was
+likewise not visible to them. Nothing of theirs is edited or reverted here. The overlaps are logged so the next
+integration session can keep one implementation per concern rather than two: **F-107** (root cause + repair) and
+**F-108** (validator diagnostics) are the ids this session published; if another session publishes the same ids first,
+the later merge must renumber rather than duplicate, exactly as F-100/F-104/F-105 were renumbered on this board.
 
 Non-overlap: this session does not touch `assets/*`, the 21 pages, `data/live/*` (collector-owned) or another
 session's ledger rows. `data/findings.json` is append-only (next free id taken at write time).
