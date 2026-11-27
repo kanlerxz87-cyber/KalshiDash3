@@ -58,7 +58,7 @@ Claimed 2026-11-27 before implementation work. At claim time, the newest recorde
 |---|---|---|---|---|---|
 | T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | done (offline/source-path audit; live values not re-fetched) | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`; independent exact-link audit of 714 market rows and 154 alerts; official docs re-read 2026-11-27 (links below) |
 | T115 | Repair the executive-summary heading that still labels the current release audit 22 November despite the 27 November snapshot; state the scope and limits of this audit explicitly | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS after edit; rendered DOM suite confirms all pages load without errors |
-| T116 | After the collector advanced the snapshot to 17:30Z, correct executive-summary copy that still called the 17:15Z snapshot “current”; label static metrics by their observation time and link readers to the live snapshot | in progress | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Compare executive-summary timestamps to `data/live/markets.json`, `alerts.json`, `simulation.json` and `roi.json`; full release gate |
+| T116 | After the collector advanced the snapshot to 17:30Z, correct executive-summary copy that still called the 17:15Z snapshot “current”; label static metrics by their observation time and link readers to the live snapshot | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Compared timestamps in `markets.json`/`alerts.json`/`simulation.json` (17:30:51Z) and `roi.json` (17:01:58Z); stale “is current” wording removed; full release gate PASS |
 
 ### T114/T115 — 2026-11-27 audit results
 
@@ -88,6 +88,10 @@ Claimed 2026-11-27 before implementation work. At claim time, the newest recorde
 
 
 **Follow-up concurrent integration.** Before PR #133 could merge, PR #134 from session `arena/b2286891` merged additional executive-summary/dashboard verification work into `main`, touching the same summary page. To respect that session’s claimed scope and keep its improvements, the merge kept the latest `origin/main` version of `executive-summary.html` rather than replaying this session’s shorter wording over it. Other non-conflicting files from PR #134 were retained as well. This is a handoff/coordination resolution, not a loss of the audit result; the resulting summary still displays the 27 November date and current snapshot facts.
+
+### T116 — keep snapshot facts timestamped (2026-11-27)
+
+The new main snapshot at `2026-11-27T17:30:51Z` had superseded `17:15:51Z`, while `executive-summary.html` still called the older snapshot “current.” `roi.json` was generated separately at `17:01:58Z`. Updated the executive summary to name the 17:15 figures as a **dated audit snapshot**, link current counts to the landing page, remove “is current,” and state the ROI scan time separately from the 17:30 alert-chat model screen. The saved values remain explicitly time-scoped; no values were recalculated or inferred.
 
 
 
