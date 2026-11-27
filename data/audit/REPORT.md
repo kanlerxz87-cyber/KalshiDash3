@@ -1,6 +1,6 @@
 # Live parity audit — session `arena-035cd7c0` (2026-11-27)
 
-Scope: 035-1 / 035-2 / 035-3 in `COORDINATION.md`. This file is the evidence record for
+Scope: A035-1 / A035-2 / A035-3 in `COORDINATION.md`. This file is the evidence record for
 the line-by-line verification of the committed demo snapshot against the **official
 Kalshi demo Trade API** and the **official Kalshi documentation index**. Nothing here is
 inferred: every compared field either equals what the official source returned, or it is
