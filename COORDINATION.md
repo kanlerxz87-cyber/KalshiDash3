@@ -3053,21 +3053,25 @@ Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snaps
 - 2026-11-27: rebased onto `origin/main` (`bd6f467`, four concurrent PRs merged) and resolved three conflicts keeping
   both sides; re-ran the full gate on the merged tree → **PASS**; audits re-verified against the `17:30:51Z` snapshot.
 
-### T125 close-out — PR, merge, Pages deploy
-
-| Item | Result | Evidence |
-|---|---|---|
-| Pull request | **[PR #138](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/138)** — "verify: independent line-by-line pass, ask-ladder fix (F-100), and four automated audits (F-100…F-103)", base `main`, head `arena/f33fe827-kalshidash3`, 9 files +1084/−92 | `gh pr create` |
-| Conflict resolution before merge | Branch was `CONFLICTING` against `bd6f467`; rebased, three conflicts merged structurally (both sessions' `COORDINATION.md` sections kept, `assets/engine.js` keeps `quotedBid` **and** `normalizeRow`, `data/findings.json` rebuilt from `origin/main` plus only F-100…F-103 → 91/30, valid JSON, no duplicate IDs) | conflict-resolution table in this section |
-| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** (83 s) on the merged tree: rendered-number audit, both new suites, `test_liquidity_ladder.js`, `check_site.py` 21 pages OK | local run |
-| PR check | `build` **pass** 1m26s (scope tests + offline release gate + Pages artifact); `deploy` correctly skipped on a PR — merge state `MERGEABLE`/`UNSTABLE` only because of that skip | `gh pr checks 138` |
-| Merge | **merged `2026-11-27T17:42:21Z`** as merge commit `94d996adc1e0bafe63f07b8d019a1b4ea8b748a1`, without waiting for approval | `gh pr merge 138 --merge` |
-| Pages deploy | **confirmed** — `Deploy site to GitHub Pages` run **46043922829** `success` (build job 140658301034 completed 17:44:03Z, steps *Verify release* and *Upload pages artifact* both success); `pages build and deployment` run **46043922440** `success`; Pages API `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true` | `gh run view`/`gh run list`; `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` |
-| Live check | **not possible from this sandbox** — no egress to `kanlerxz87-cyber.github.io` (allowlist). The deploy is a straight copy of the merged `main` tree (`pages.yml`: verify release → stage public files → upload artifact), i.e. exactly the tree that passed the gate locally and in CI. Recorded, not glossed over (R-31) | R-31 in this section |
-| Net unique diff | `dashboard.html`, `assets/engine.js`, `scripts/verify_release.py`, `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_liquidity_ladder.js`, `scripts/tests/test_alert_topic_domain.js`, `scripts/tests/test_series_fallback.js`, `data/findings.json`, `COORDINATION.md` | `gh pr view 138 --json files` |
-
 **Still open after this PR (not in it, published on `flagged.html` as non-blocking):** book-sanity guard for the
 `KXBTCY-27JAN0100-B97500` "0.97 → 0.01" `last_price` artefact (the 53 `unknown_no_observations` rows whose pre-F-99
 bounds are unrecoverable) — a guard would refuse to publish a swing whose book never crossed; elections coverage stays
 structurally thin (R-32). F-07 (no demo credentials), F-25 (cause links are search leads) and DEPLOY-1 (legacy Pages
 publisher) remain as previously flagged.
+
+---
+
+## Session `arena-f2501a43` — topic-integrity & cross-pipeline scope enforcement (`roi_scan.py`, `collect.py`, `live.js`, `chatdock.js`) + full verification (2026-11-27)
+
+Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/#140..#147 and snapshot `2026-11-27T18:00Z`).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| F250-1 | Fix `validate_alerts` collector relay failure (`5278cc6` at `18:16:08Z`) by synchronising `COMPATIBLE['elections'] = {'Elections'}` across `validate_alerts.py`, `catalysts.py`, `simulate.py`, `validate_catalysts.py`, `validate_live.py`, and `test_alert_topic_domain.js`; eliminate `KXDEMOFUT*` / `KXBALLONDOR` prefix/seed leakage in `assets/chatdock.js` & `assets/live.js`; clarify `KD.basisBadge(b, matchedBy)` across `assets/site.js` & category/dashboard/index tables so official `GET /series` matches render `official series` instead of `keyword` warning; align `trading.html` & `G13` fee-multiplier disclosures with `F-84`; record verified finding `F-106` + unit/DOM regression tests | done (pending PR merge) | arena-f2501a43 | `scripts/collect.py`, `scripts/catalysts.py`, `scripts/simulate.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/validate_live.py`, `scripts/tests/test_alert_topic_domain.js`, `assets/live.js`, `assets/chatdock.js`, `assets/site.js`, `index.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`, `dashboard.html`, `trading.html`, `data/findings.json`, `scripts/tests/test_topic_integrity.py`, `scripts/tests/test_roi_scan_snapshot.py`, `scripts/tests/test_pages_dom.js`, `COORDINATION.md` (no edits to `data/live/*`, owned by `collect.yml` / `desk.yml`) | `python3 scripts/verify_release.py` PASS; official Kalshi demo API (`GET /exchange/status`, `GET /series/KXAPRPOTUS`, `GET /series/KXTRUMPNOMNUM`, `GET /series/KXEOWEEK`, `GET /series/KXDEMOFUTHOURLY`, `GET /series?category=Elections`, `GET /markets/...`, `GET /historical/markets`) and `kalshi-fee-schedule.pdf` + `demo_env` verified live on 2026-11-27 |
+
+- **Coordination with concurrent PR #147 (`7da822d`) & live `collect.yml` check (`5278cc6`)**: Rebased cleanly onto `main` after `arena-e9d94b88` landed `roi_scan.py` scope gating (`E9D9-F1` — confirmed live in `02e0ed7` at `18:20Z` where `KXDEMOFUTHOURLY` and `KXAPRPOTUS` left `roi.json`), `official_discovery` volume sweep + `CATEGORY_COMPATIBLE['elections'] = {'Elections'}` (`E9D9-F2`), and `suggestions.html` `G5` banner (`E9D9-F3`). Observed collector relay pass 15 (`5278cc6` at `18:16:08Z`) fail `validators: validate_alerts` because `validate_alerts.py`, `catalysts.py`, `simulate.py`, `validate_catalysts.py`, and `validate_live.py` still carried `{"Elections", "Politics", "World", "International"}` while `collect.py` and `build_alerts.py` used `{"Elections"}`.
+- **Findings & fixes (`F-106`)**:
+  1. **Critical collector validator unblocking**: Synchronised `COMPATIBLE['elections'] = {'Elections'}` across `scripts/tests/validate_alerts.py`, `scripts/catalysts.py`, `scripts/simulate.py`, `scripts/tests/validate_catalysts.py`, `scripts/tests/validate_live.py`, and `scripts/tests/test_alert_topic_domain.js` so `collect.yml` passes validate and commit cleanly.
+  2. `assets/site.js` & `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`: `KD.basisBadge(b, matchedBy)` renders `official series` when `category_matched_by === "official"` (`b !== "seed"`), reserving the `keyword` warning badge (`not confirmed by an official source`) for genuine title-heuristic matches.
+  3. `assets/chatdock.js`, `assets/live.js`, & `scripts/collect.py`: removed `KXDEMOFUT*` and `KXBALLONDOR` from live prefix/seed discovery in `chatdock.js` (`categoryOf`) and `live.js` (`SEED_SERIES`), added explicit `EXCLUDED_SERIES` entries for `KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, and `KXEPL*` in `live.js` so browser live discovery refuses them even before `series_index` loads, and folded `hist_rows` count into `settled_total_method` in `collect.py`.
+  4. `trading.html` & `data/findings.json` (`G5`, `G13`): aligned remaining fee-multiplier disclosures with shipped `F-84` (`M = 0` on `KXBTCY`, `KXETHY`, `KXELECTIRAN`; `M = 1` default on unlisted series).

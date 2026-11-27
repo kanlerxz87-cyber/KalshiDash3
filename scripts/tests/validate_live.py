@@ -47,12 +47,12 @@ def check(cond: bool, msg: str) -> None:
         errors.append(msg)
 
 
-def check_by_category(tag: str, row: dict) -> None:
+def check_by_category(tag: str, row: dict, pre_narrowing_elections: bool = False) -> None:
     # Kept independent of scripts/collect.py on purpose: the validator must be able to refuse a
     # snapshot produced by a broken collector, so it re-states the rule rather than importing it.
     compatible = {
         "gas": {"Economics", "Commodities", "Financials"},
-        "elections": {"Elections", "Politics", "World", "International"},
+        "elections": {"Elections", "Politics", "World", "International"} if pre_narrowing_elections else {"Elections"},
         "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},
@@ -147,6 +147,7 @@ def main() -> int:
     except ValueError:
         errors.append(f"collected_at not ISO-8601 Z: {ts!r}")
 
+    pre_narrowing = "Politics" in (((doc.get("counts") or {}).get("category_compatible_official") or {}).get("elections") or [])
     for bucket in ("open_markets", "settled_markets"):
         rows = doc.get(bucket)
         check(isinstance(rows, list), f"{bucket} must be a list")
@@ -162,7 +163,7 @@ def main() -> int:
             if "series_categories" in r:
                 cats = r.get("series_categories")
                 check(isinstance(cats, list), f"{tag} series_categories must be a list")
-                check_by_category(tag, r)
+                check_by_category(tag, r, pre_narrowing_elections=pre_narrowing)
             # A market whose series is in the fee-schedule seed list must never be
             # demoted to "keyword": that would understate what is confirmed.
             seed_series = SEED_SERIES

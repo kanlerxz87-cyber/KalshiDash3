@@ -269,7 +269,7 @@ function renderTables() {
         atAsk: ob.contracts_at_best_yes_ask === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_ask),
         atBid: ob.contracts_at_best_yes_bid === undefined ? '<span class="na">—</span>' : KD.num(ob.contracts_at_best_yes_bid),
         status: KD.statusBadge(r.status),
-        basis: KD.basisBadge(r0.category_basis),
+        basis: KD.basisBadge(r0.category_basis, r0.category_matched_by),
       };
     });
     return `<div class="card"><h3>${KD.CAT_LABEL[id]} <span class="small mut">${rows.length} of ${(byCat[id] || []).length} open in scope</span></h3>` +
@@ -298,7 +298,7 @@ function renderResolved() {
       settle: KD.money(r.settlement_value_dollars, 4),
       last: KD.cents(r.last_price_dollars),
       vol: KD.num(r.volume_fp),
-      basis: KD.basisBadge(r.category_basis),
+      basis: KD.basisBadge(r.category_basis, r.category_matched_by),
     }));
   KD.$("#resolved").innerHTML = KD.table([
     { key: "time", label: "Settled (UTC)" }, { key: "ticker", label: "Ticker" }, { key: "title", label: "Market" },
@@ -506,7 +506,7 @@ function drawChart() {
   }
 
   meta.innerHTML = `<b>${KD.esc(row.title)}</b> · <code>${KD.esc(row.ticker)}</code> · ` +
-    `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis)} · ` +
+    `category ${KD.CAT_LABEL[row.category_id] || "—"} ${KD.basisBadge(row.category_basis, row.category_matched_by)} · ` +
     `status ${KD.statusBadge(row.status)} · result ${KD.resultBadge(row.result)} · ` +
     `last ${KD.cents(row.last_price_dollars)} · ${KD.num(row.volume_fp)} contracts traded · ` +
     `open interest ${KD.num(row.open_interest_fp)}` +

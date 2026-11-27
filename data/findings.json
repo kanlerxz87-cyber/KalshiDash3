@@ -161,18 +161,18 @@
     "https://docs.kalshi.com/api-reference/market/get-market-orderbook"
    ]
   },
-    {
-      "id": "G5",
-      "suggestion": "Model fees before trusting any P&L number.",
-      "why_it_helps_decisions": "Near 50 cents the taker fee is about 2 cents per contract, i.e. about 4% of a 50c stake. A strategy that looks break-even gross is a loser net.",
-      "effort": "Medium",
-      "risk": "Fee multipliers vary per series; a naive flat model misstates cost for 0/0 series.",
-      "success_metric": "Fee-adjusted P&L shown alongside gross, with the series fee_multiplier displayed.",
-      "status": "implemented (server + browser paper ledgers apply official per-series multipliers; F-84)",
-      "sources": [
-        "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
-      ]
-    },
+  {
+   "id": "G5",
+   "suggestion": "Model fees before trusting any P&L number.",
+   "why_it_helps_decisions": "Near 50 cents the taker fee is about 2 cents per contract, i.e. about 4% of a 50c stake. A strategy that looks break-even gross is a loser net.",
+   "effort": "Medium",
+   "risk": "Fee multipliers vary per series; unlisted new series fall back to the documented default M = 1 until confirmed.",
+   "success_metric": "Fee-adjusted P&L shown alongside gross, with the series fee_multiplier displayed.",
+   "status": "implemented (server + browser paper ledgers apply official per-series multipliers; F-84)",
+   "sources": [
+    "https://kalshi.com/docs/kalshi-fee-schedule.pdf"
+   ]
+  },
   {
    "id": "G6",
    "suggestion": "Log which chart window and which snapshot you looked at when you place each trade.",
@@ -265,7 +265,7 @@
    "suggestion": "SHIPPED: auto-sim engine that opens/closes paper trades on 3 disclosed strategies and categorises performance by strategy, topic and price band.",
    "why_it_helps_decisions": "The brief asks for automated simulated trades to test strategies and categorise results. trading.html runs the loop automatically: entries on qualifying swings, exits at +/- $0.10 or settlement, and per-strategy/topic/band/exit-reason tables.",
    "effort": "Done",
-   "risk": "Paper fills at quoted sizes may overstate real fills; fee multipliers per series are not modelled (G5).",
+   "risk": "Paper fills at quoted sizes may overstate real fills; transcribed fee multipliers per series are applied (F-84), while unlisted new series default to M = 1.",
    "success_metric": "Strategy leaderboard with resolved trades and net-of-fees ROI per strategy.",
    "status": "shipped",
    "sources": [
@@ -1560,6 +1560,20 @@
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/suggestions.html",
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_fee_multipliers.js"
     ]
+  },
+  {
+   "id": "F-106",
+   "severity": "high",
+   "item": "Collector relay pass failed validate_alerts because COMPATIBLE['elections'] drifted across validate_alerts.py / catalysts.py / simulate.py / validate_live.py after PR #147; category tables also mislabelled official GET /series matches as 'keyword', and chatdock.js / live.js still seeded or prefix-matched KXDEMOFUT* and KXBALLONDOR",
+   "why": "Three consistency defects were verified on 2026-11-27: (1) After PR #147 narrowed CATEGORY_COMPATIBLE['elections'] to {'Elections'} in scripts/collect.py and scripts/build_alerts.py, collector relay pass 15 at 2026-11-27T18:16:08Z (commit 5278cc6, data/live/collector_health.json) failed 'validators: validate_alerts' and aborted its snapshot commit because scripts/tests/validate_alerts.py (along with scripts/catalysts.py, scripts/simulate.py, scripts/tests/validate_catalysts.py, and scripts/tests/validate_live.py) still carried the old {'Elections', 'Politics', 'World', 'International'} table, causing build_alerts.py and validate_alerts.py to disagree on which archived elections swings are in scope. (2) In scripts/collect.py, rows discovered via Kalshi's documented GET /series?category=... or GET /series?tags=... filters record category_matched_by = 'official' while keeping category_basis = 'keyword' whenever the series is not one of the 13 tickers in kalshi-fee-schedule.pdf; because KD.basisBadge(r.category_basis) ignored r.category_matched_by, index.html, dashboard.html, and all five category pages rendered a warning badge reading 'keyword' ('Matched by keyword heuristic only — not confirmed by an official source') on rows from Kalshi's own category/tag endpoint. (3) In assets/chatdock.js, categoryOf(ticker) still mapped KXDEMOFUT* to 'crypto' and KXBALLONDOR to 'culture' during browser live discovery, and SEED_SERIES in assets/live.js still listed 'KXBALLONDOR' even though GET /series/KXDEMOFUTHOURLY is categories ['Test'] and GET /series/KXBALLONDOR is categories ['Sports'], tags ['Soccer'] (F-76, F-96).",
+   "action": "Fixed across all surfaces: (1) Synchronised COMPATIBLE['elections'] = {'Elections'} across scripts/tests/validate_alerts.py, scripts/catalysts.py, scripts/simulate.py, scripts/tests/validate_catalysts.py, scripts/tests/validate_live.py, and scripts/tests/test_alert_topic_domain.js so collector passes validate cleanly. (2) Updated KD.basisBadge(basis, matchedBy) in assets/site.js and callers in index.html, dashboard.html, gas.html, elections.html, culture.html, crypto.html, and golf.html to render 'official series' when category_matched_by === 'official' and category_basis !== 'seed'. (3) Removed KXDEMOFUT* and KXBALLONDOR from live prefix/seed discovery in assets/chatdock.js and assets/live.js, added explicit EXCLUDED_SERIES entries in assets/live.js, folded historical_backfill_rows into settled_in_scope_total_method in scripts/collect.py, and updated trading.html + G13 in data/findings.json to match F-84.",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXDEMOFUTHOURLY",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXBALLONDOR",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py"
+   ]
   }
  ]
 }

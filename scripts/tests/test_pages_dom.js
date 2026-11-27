@@ -627,6 +627,13 @@ function commonAsserts(label, r) {
   if (markets && markets.counts && markets.counts.settled_in_scope) {
     const r = await loadPage("index.html", "snapshot");
     commonAsserts("index.html", r);
+    const kd = r.dom.window.eval("KD");
+    check(kd.basisBadge("seed", "seed").includes("confirmed"),
+      "KD.basisBadge must render 'confirmed' for fee-schedule seed series");
+    check(kd.basisBadge("keyword", "official").includes("official series"),
+      "KD.basisBadge must render 'official series' (not 'keyword') when category_matched_by === 'official' (F-106)");
+    check(kd.basisBadge("keyword", "keyword").includes("keyword"),
+      "KD.basisBadge must render 'keyword' when matched by keyword heuristic only");
     // S-02 / F-90 (2026-11-22): counts.settled_in_scope is the 1,600-row RETAINED PAGING
     // WINDOW, not the number the scan found in scope. The page must state the scan total
     // (counts.settled_in_scope_total, 6,927 in the shipped snapshot), name the published rows,
@@ -793,6 +800,8 @@ function commonAsserts(label, r) {
     const implText = (r.doc.querySelector("#impl") || {}).textContent || "";
     const propText = (r.doc.querySelector("#prop") || {}).textContent || "";
     check(implText.includes("G9"), "suggestions.html must classify G9 (implemented ...) under #impl");
+    check(implText.includes("G5"), "suggestions.html must classify G5 (per-series fees, F-84/E9D9-F3) under #impl");
+    check(!/G5 \(fees\) remains open/.test(r.text), "suggestions.html must not claim G5 remains open for browser-side ledgers");
     check(propText.includes("G19"), "suggestions.html must render G19 safely under #prop");
     check(!r.text.includes("`data/findings.json`"), "suggestions.html must not contain raw markdown backticks");
     console.log(`  K suggestions   ok  (${implRows.length} implemented, ${propRows.length} proposed)`);

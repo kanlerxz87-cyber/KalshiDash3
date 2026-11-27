@@ -582,8 +582,13 @@ const KDLIVE = (() => {
     }
 
     const SEED_SERIES = new Set(["KXAAAGASM", "KXELECTIRAN", "KXEMMYCACTO", "KXEMMYCACTR", "KXEMMYCSERIES",
-      "KXBALLONDOR", "KXSUPERBOWLHEADLINE", "KXBTCMAX150", "KXBTCY", "KXETHY", "KXPGATOUR", "KXPGARYDER", "KXPGASOLHEIM"]);
-    const EXCLUDED_SERIES = new Set(["KXBALLONDOR", "KXGOLFTENNISMAJORS", "KXNATGAS15M", "KXNATGASD", "KXNATGASMON", "KXDEMOFUTHOURLY"]);
+      "KXSUPERBOWLHEADLINE", "KXBTCMAX150", "KXBTCY", "KXETHY", "KXPGATOUR", "KXPGARYDER", "KXPGASOLHEIM"]);
+    const EXCLUDED_SERIES = new Set([
+      "KXBALLONDOR", "KXGOLFTENNISMAJORS",
+      "KXNATGAS15M", "KXNATGASD", "KXNATGASMON",
+      "KXAPRPOTUS", "KXTRUMPNOMNUM", "KXEOWEEK",
+      "KXDEMOFUTHOURLY", "KXEPLFIRSTGOAL", "KXEPLAST", "KXEPLSOA",
+    ]);
     const QA_TITLE_RE = /demo portfolio test|portfolio cash out|\bqa\s*\d|\bbench\s+(?:run|probe)\s*\d*\b/i;
     const COMPATIBLE_CATS = {
       gas: new Set(["Economics", "Commodities", "Financials"]),
@@ -595,18 +600,18 @@ const KDLIVE = (() => {
     const KW = {
       gas: ["gas", "gasoline", "diesel"],
       elections: ["election", "president", "senate", "congress", "mayor", "governor", "nominee"],
-      culture: ["emmy", "oscar", "grammy", "album", "movie", "box office", "ballon", "headline", "celebrity"],
+      culture: ["emmy", "oscar", "grammy", "album", "movie", "box office", "headline", "celebrity"],
       crypto: ["bitcoin", "btc", "ethereum", "eth", "crypto", "solana", "doge"],
       golf: ["golf", "pga", "ryder cup", "solheim", "masters", "open championship"],
     };
     function classifyTicker(ticker, m) {
-      // Word-boundary matching + scope exclusions matching scripts/collect.py (T101, F-97, E9D9-2/3).
-      const st = String(ticker).split("-")[0].toUpperCase();
-      if (EXCLUDED_SERIES.has(st)) return null;
-      const rawTitle = `${m.title || ""} ${m.yes_sub_title || ""} ${m.subtitle || ""} ${m.rules_primary || ""}`;
+      // Word-boundary matching + scope exclusions matching scripts/collect.py (T101, F-97, E9D9-2/3, F-106).
+      const st = String(ticker || "").split("-")[0].toUpperCase();
+      if (EXCLUDED_SERIES.has(st) || st.startsWith("KXDEMOFUT")) return null;
+      const rawTitle = `${(m && m.title) || ""} ${(m && m.yes_sub_title) || ""} ${(m && m.subtitle) || ""} ${(m && m.rules_primary) || ""}`;
       if (QA_TITLE_RE.test(rawTitle)) return null;
       const seriesRec = (S.seriesIndex && S.seriesIndex[st]) || null;
-      const officialCats = (m.series_categories || (seriesRec && seriesRec.categories) || []).map(String).filter(Boolean);
+      const officialCats = ((m && m.series_categories) || (seriesRec && seriesRec.categories) || []).map(String).filter(Boolean);
       if (officialCats.includes("Test") || officialCats.includes("Demo")) return null;
       const bySeed = {
         KXAAAGASM: "gas", KXELECTIRAN: "elections",

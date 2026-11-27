@@ -1161,8 +1161,10 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # differently and a third left it out; the string lives here, next to the value it describes.
     settled_scan_truncated = bool(raw.get("_truncated", {}).get("settled"))
     settled_total_method = (
-        "exact count of every settled row the paged scan returned inside the five topics, "
-        "measured before the per-topic publish selection and before the size window"
+        "exact count of every settled row the paged scan returned inside the five topics"
+        + (f" (including {len(hist_rows)} row(s) from GET /historical/markets for seeded series)"
+           if hist_rows else "")
+        + ", measured before the per-topic publish selection and before the size window"
         + ("; the scan stopped at the safety cap, so this is a lower bound"
            if settled_scan_truncated else "; the scan was not truncated, so this is exact")
         + f" (safety_scan_cap {SAFETY_SCAN_CAP}, kept window {SETTLED_KEEP}, "

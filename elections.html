@@ -109,7 +109,7 @@ KD.nav("elections");
     vol: KD.num(r.volume_fp), oi: KD.num(r.open_interest_fp),
     last: KD.cents(r.last_price_dollars), bid: KD.cents(r.yes_bid_dollars), ask: KD.cents(r.yes_ask_dollars),
     close: r.close_time ? KD.esc(r.close_time.replace("T", " ").replace("Z", "")) : '<span class="na">—</span>',
-    status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis),
+    status: KD.statusBadge(r.status), basis: KD.basisBadge(r.category_basis, r.category_matched_by),
     src: KD.srcLink(r.source, "API"),
   })), { empty: "No open elections markets are in the current snapshot. That is a real result, not an error: the collector reports only what the API returned." });
 

@@ -38,8 +38,7 @@
     Exits require the bid for the side held on an active market; a NO bid can be derived from the YES ask.
     The last traded price is not an exit quote. A provisional result does not pay out
     (<a href="https://docs.kalshi.com/getting_started/market_lifecycle">Market Lifecycle</a>). Fees are modelled at the documented general taker rate <code>ceil(M×0.07×C×P×(1−P))</code>
-    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>); per-series
-    fee multipliers differ, so net P&amp;L is an estimate. Settlement pays $1 per winning contract because the official
+    (<a href="https://kalshi.com/docs/kalshi-fee-schedule.pdf" target="_blank" rel="noopener">fee schedule</a>), applying the schedule's transcribed per-series multipliers (such as <code>KXBTCY</code>, <code>KXETHY</code>, and <code>KXELECTIRAN</code> at <code>M = 0</code>; <a href="flagged.html">F-84</a>) and defaulting unlisted series to <code>M = 1</code>, so net P&amp;L remains a paper estimate. Settlement pays $1 per winning contract because the official
     docs state YES outcomes pay YES holders and NO outcomes pay NO holders, with zero settlement fees for simple yes/no
     (<a href="https://docs.kalshi.com/getting_started/market_settlement" target="_blank" rel="noopener">Market Settlement</a>).
     Markets whose result is <code>scalar</code> are not settled by this simulator. If the API does not return a holding,

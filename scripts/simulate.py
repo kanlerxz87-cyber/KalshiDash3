@@ -160,7 +160,7 @@ def main() -> int:
     _ledger = markets.get("series_index") or {}
     _compatible = {
         "gas": {"Economics", "Commodities", "Financials"},
-        "elections": {"Elections", "Politics", "World", "International"},
+        "elections": {"Elections"},
         "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},

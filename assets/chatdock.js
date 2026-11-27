@@ -286,13 +286,16 @@ const KDCHAT = (() => {
   // GET /markets carries no category field, so a raw market record can only be
   // placed in one of the five requested topics by its series prefix. Anything
   // else is "other" and is never shown in the topic-filtered view.
+  // F-76 / F-96 / F-106: never include KXDEMOFUT* (official category Test) or
+  // KXBALLONDOR (official category Sports, tags Soccer) in live discovery.
   function categoryOf(ticker) {
     const t = String(ticker || "").toUpperCase();
+    if (t.startsWith("KXDEMOFUT") || t.startsWith("KXBALLONDOR")) return "other";
     if (t.startsWith("KXAAAGAS")) return "gas";
-    if (t.startsWith("KXBTC") || t.startsWith("KXETH") || t.startsWith("KXSOL") || t.startsWith("KXDEMOFUT")) return "crypto";
-    if (t.startsWith("KXPGATOUR") || t.startsWith("KXGOLF")) return "golf";
+    if (t.startsWith("KXBTC") || t.startsWith("KXETH") || t.startsWith("KXSOL")) return "crypto";
+    if (t.startsWith("KXPGATOUR") || t.startsWith("KXPGARYDER") || t.startsWith("KXPGASOLHEIM") || t.startsWith("KXGOLF")) return "golf";
     if (t.startsWith("KXELECT") || t.startsWith("KXPRES") || t.startsWith("KXSEN")) return "elections";
-    if (t.startsWith("KXGRAMMY") || t.startsWith("KXOSCAR") || t.startsWith("KXBALLONDOR") || t.startsWith("KXEMMY")) return "culture";
+    if (t.startsWith("KXGRAMMY") || t.startsWith("KXOSCAR") || t.startsWith("KXEMMY") || t.startsWith("KXSUPERBOWLHEADLINE")) return "culture";
     return "other";
   }
 

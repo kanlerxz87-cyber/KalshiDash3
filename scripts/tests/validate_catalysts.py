@@ -74,7 +74,7 @@ def main() -> int:
                      for r in (markets.get(b) or [])}
     compatible = {
         "gas": {"Economics", "Commodities", "Financials"},
-        "elections": {"Elections", "Politics", "World", "International"},
+        "elections": {"Elections"},
         "culture": {"Entertainment", "Culture", "Pop Culture", "Awards", "Media"},
         "crypto": {"Crypto", "Financials"},
         "golf": {"Sports", "Golf"},
