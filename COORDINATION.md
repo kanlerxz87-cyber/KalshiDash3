@@ -71,6 +71,11 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 - The PR #177 description independently reports a live `GET /markets/{ticker}` match and visible `settled NO` for the RSM Classic ticker, consistent with this session's committed observation and lifecycle sidecar.
 - On the rebased `a2bd7d8` tree, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4 tests) and `python3 scripts/verify_release.py` **PASS** (validators, Python/DOM suites, source/link checks, rendered-number audit, and all 21 pages). No PR, merge, or A740 deployment is claimed yet.
 
+### A740-2 collector refresh and base sync (2026-11-27T22:50Z)
+
+- `origin/main` advanced to `e1c5a04` through PR #175 and its `2026-11-27T22:50:03Z` live-data collection. Rebased A740 onto this latest tip without conflicts. The refreshed `data/live/markets.json` still contains the out-of-window `KXPGATOUR-THRC26-BHAR` sidecar with exact source, `status=finalized`, `result=no`, `settlement_ts=2026-11-23T19:58:03.108438Z`, settlement value `0.0000`, and prior row observation time `2026-11-27T20:35:02Z`.
+- After rebase, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4), `validate_live.py` **PASS** (614 open / 200 settled / 20 orderbooks), `validate_alerts.py` **PASS** (184 archived alerts), and `check_site.py` **PASS** (21 pages). `python3 scripts/verify_release.py` on `e1c5a04` also **PASS**: offline validators, Python/DOM suites, source/link checks, rendered-number audit and all 21 pages. Push, PR checks, merge, and post-merge deployment verification remain pending.
+
 ---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
