@@ -19,6 +19,17 @@ Claimed 2026-11-27 before implementation after reading this task board and confi
 - **Findings recorded, not silently changed:** `UX_AUDIT.md` logs UX-1 (chart canvas text alternative), UX-2 (programmatic selected/current state for filters and navigation), and UX-3 (comprehensive reduced-motion and user control/batched live announcements). The report explicitly says this is not a WCAG conformance assessment and lists untested assistive technology, contrast, focus-order, reflow and browser behavior.
 - **No external or market-data claims:** this task's evidence is the checked-in HTML/CSS/JS and local automated inspection only. Existing release source/audit reports remain the authority for Kalshi facts.
 
+### 699E publication close-out — PR, merge and Pages
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | [PR #172](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/172) — static-site accessibility/interaction audit | `gh pr view 172` |
+| PR check | `build` passed (1m37s); `deploy` skipped on PR | Actions run [46077249199](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077249199) |
+| Merge | Merged 2026-11-27T22:34:15Z as `3595a4f27116ab777ccebe9a666646de687910ae` | [PR #172](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/172) |
+| Pages deploy | `Deploy site to GitHub Pages` run [46077453076](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077453076) succeeded on the merge commit; Pages API reported `status: built`. A later build for `32fa7a3` is also `built`. | Actions run; `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` and `/pages/builds` |
+| Published audit | [`UX_AUDIT.md`](https://raw.githubusercontent.com/kanlerxz87-cyber/KalshiDash3/main/UX_AUDIT.md) is on main; contains the scoped findings and explicit limits. | Cache-visible fetch of the main-branch file |
+| Irregularity | CI reports a non-blocking Node.js 20 action-runtime deprecation annotation; it did not fail the build or deploy. | Actions run [46077249199](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077249199) |
+
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
 
