@@ -3,6 +3,15 @@
 > Sessions: `arena-5761b399` (branch `arena/5761b399-kalshidash3`, merged to main via PR #1) and `session-1c0d1fc0` (branch `arena/1c0d1fc0-kalshidash3`, PR #2). Both branched from `49ba7bce3112e9e0b4c7534af961e1d0ef8d19ff`.
 > Rule: claim before work, commit+push claim immediately, non-overlapping scopes, small frequent commits, `git pull --rebase` before push. Stale claim (>60 min, no commits) may be taken over with handoff note.
 
+## Session `arena-699eb329` — independent repo/requirement audit and release verification
+
+Claimed 2026-11-27 before implementation after reading this task board and confirming the working tree is clean. This session will independently run the repository release gate, inspect the requirement-to-feature coverage and source-provenance boundaries, and publish a concise audit with links and any limitations. It will not modify application/runtime files or snapshot data; no code or deployment changes are planned unless the audit exposes a clearly unowned defect (which will be handed off rather than editing another session's scope).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 699E-1 | Review current site and automation against the user brief; rerun release checks; record verified capabilities, source links, unverified items and irregularities | in progress | arena-699eb329 | `COORDINATION.md` (this section only), `SESSION_AUDIT.md` (new) | `python3 scripts/verify_release.py`, `python3 scripts/audit_sources.py`; official links referenced by `data/verified_facts.json` and `SOURCE_AUDIT.md` |
+
+
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
 
 Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `arena/72ae7bca-kalshidash3` is the integration branch for this session (no branch creation). Existing concurrent scopes are preserved: in particular F250-1 and PR #148's ledger formatting are not edited here.
