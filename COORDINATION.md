@@ -153,7 +153,7 @@ Claimed 2026-11-27 **before any code or data edit**, after reading this board an
 | B1CC-1 | Diagnose the stall and prototype a row-first validator fix | done — superseded by merged F-108 (PR #152); prototype reverted as duplicate; residual edge published as F-110 suggestion | arena-b1cc1b1f | (no net code change; `data/findings.json` F-110) | check-run annotations (job 140572462930); `GET /series/KXAAAGASD`; real-data reproduction |
 | B1CC-2 | Prototype forwarding a failing validator's output to the health record | done — superseded by merged F-109 (PR #152); prototype reverted as duplicate | arena-b1cc1b1f | (no net code change) | mutation check vs pre-fix relay |
 | B1CC-3 | Independent live official-source verification sweep + deployed-page parity + release gate | done | arena-b1cc1b1f | `COORDINATION.md` (this section) | official demo API via platform fetch route; deployed site; `python3 scripts/verify_release.py` |
-| B1CC-4 | Publish F-110 (append-only) + this verification record, run the gate, PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | in_progress | arena-b1cc1b1f | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`; Pages builds API |
+| B1CC-4 | Publish F-110 (append-only) + this verification record, run the gate, PR → `main` → merge without waiting → confirm Pages deploy → record PR link + result here | done (PR #159 merged, deployed) | arena-b1cc1b1f | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`; Pages builds API |
 
 Standing items carried, not closed here: F-07 (no demo credentials → portfolio/execution stay paper), F-14/F-26/F-77 (high-ROI screen disclosed), F-25 (cause links are search leads), DEPLOY-1 (legacy Pages publisher; Actions-only switch needs repo admin), C-20 (live values unverifiable as static claims). PR #148 (`arena/1370a435`, style-only F-105 indentation) left untouched for its owner.
 
@@ -176,6 +176,20 @@ Every value fetched live from the official demo Trade API and compared with the 
 | Deployed health file | `…/data/live/collector_health.json` | at sweep time still the failing pass 3 (19:38Z, empty tail) — confirms the stall was ongoing pre-merge; post-PR #151/#152 `main` reads `ok` |
 
 Release gate on the final merged tree: `python3 scripts/verify_release.py` **PASS** (21 pages, every validator, all Python/DOM suites including the merged `test_alert_series_ledger_gap.py`, `test_series_ledger_carry.py`, `test_archive_series_retention.py`, `test_source_audit.py`, rendered-number audit, internal links). `jsdom@26` installed test-only.
+
+### B1CC-4 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #159](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/159)** — "verify(collector): independent live-source verification of the stall-fix wave + F-110 hardening suggestion (arena-b1cc1b1f)"; net diff vs `main` = `COORDINATION.md` (+38) and `data/findings.json` (F-110 append, +18/−1) only | `gh pr view 159` |
+| Pre-merge gate | PR `build` check **pass** (1m33s, then re-pass on the final sync); `deploy` correctly skipped on the PR | `gh pr checks 159` |
+| Merge | **merged 2026-11-27T20:08:54Z** as merge commit `905001c`, without waiting for approval | `gh pr merge 159 --merge` |
+| Pages deploy | **confirmed** — `Deploy site to GitHub Pages` run **46061609981** success; legacy `pages build and deployment` run **46061609701** success; Pages API `status: built`, latest build on `905001c` at `2026-11-27T20:08:56Z` (37 s) | `gh run list`; `gh api repos/…/pages(+builds)` |
+| Live site after merge | deployed `data/findings.json` serves **F-110** (101 irregularities; confirmed via cache-busted fetch — a stale CDN edge briefly served the pre-merge 100-row file, the documented legacy-build convergence delay, not a defect) | live fetch `…/data/findings.json?v=pr159` |
+| Collector health | recovered and committing on `main` (snapshot `2026-11-27T20:05Z`, `70f5eb4`); the stall this session diagnosed is closed by the merged F-107/F-108/F-109 wave | `data/live/collector_health.json`, `git log origin/main` |
+| Carried, not closed here | F-110 (low, suggestion — owner decision); standing F-07 / F-14 / F-25 / F-26 / F-77 / DEPLOY-1 / C-20 unchanged | published on `flagged.html` |
+
+This close-out record lands via a small follow-up PR (documentation only).
 
 <!-- End session B1CC claim -->
 ## Session `arena-417935f1` — collector-stall diagnosis, release verification, publish (branch `arena/417935f1-kalshidash3`, base `a4a19cc`)
