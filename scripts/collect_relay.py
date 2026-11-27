@@ -354,6 +354,11 @@ def commit_and_push(ref: str) -> tuple[str, str]:
 
 
 HEALTH_PATH = "data/live/collector_health.json"
+#: How much of a failing step's own output the health record keeps. 2000 was enough for one
+#: pipeline crash but not for a validator report: validate_alerts.py prints a header plus up to
+#: 40 errors, so a tail-only capture of that size dropped the header and the first errors — the
+#: ones that name the defect. 8000 keeps the whole report for the failures this file exists for.
+HEALTH_TAIL_LIMIT = 8000
 #: Repo root the health file is written under. Overridable so the relay's own tests, which
 #: deliberately exercise failing passes, cannot drop a real-looking record into the working
 #: tree. Production leaves it None, which means "use ROOT".
@@ -380,7 +385,7 @@ def record_health(pass_no: int, detail: str, tail: str = "", ref: str | None = N
         "pass": pass_no,
         "outcome": "failed",
         "detail": detail,
-        "stderr_tail": (tail or "")[-2000:],
+        "stderr_tail": (tail or "")[-HEALTH_TAIL_LIMIT:],
         "run": {
             "workflow": "collect.yml",
             "run_id": os.environ.get("GITHUB_RUN_ID"),
@@ -502,6 +507,7 @@ def make_pass(plan: Plan):
                 annotate("error", f"pass {n}: {name} FAILED (exit {p.returncode})", (p.stdout + p.stderr)[-3000:])
                 return fail(f"{name} (exit {p.returncode})", p.stdout + p.stderr)
         failed = []
+        failure_output: list[str] = []
         for name, path in VALIDATORS:
             if not (ROOT / path).exists():
                 annotate("warning", f"pass {n}: validator {path} is missing; skipped")
@@ -510,13 +516,20 @@ def make_pass(plan: Plan):
                 p = sh(["python3", path], timeout=600)
             except subprocess.TimeoutExpired:
                 failed.append(name)
+                failure_output.append(f"--- {name} timed out after 600s")
                 continue
             if p.returncode != 0:
                 failed.append(name)
+                # The validator's own words are the diagnosis (F-85's open edge): without this the
+                # health record said only "validators: validate_alerts" while the report that names
+                # the offending row existed only in the job log, which is unreadable from every
+                # environment that had to diagnose the 2026-11-25 and 2026-11-27 stalls.
+                failure_output.append(f"--- {name} (exit {p.returncode})\n{p.stdout}{p.stderr}")
                 annotate("error", f"pass {n}: {name} FAILED", (p.stdout + p.stderr)[-3000:])
         if failed:
             discard_changes()
-            return fail("validators: " + ", ".join(failed))
+            return fail("validators: " + ", ".join(failed),
+                        "\n".join(failure_output) or "validator failed without output")
         if not plan.commit:
             discard_changes()
             return "validated", f"dry run on {head}; nothing committed"
