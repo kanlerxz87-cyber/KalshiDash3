@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T16:16:54Z",
- "runtime_seconds": 175.7,
+ "collected_at": "2026-11-27T17:01:58Z",
+ "runtime_seconds": 108.7,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,22 +29,22 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 17154,
+  "open_in_scope": 13731,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 4,
-  "unscoreable": 17150,
-  "orderbooks": 17154,
-  "orderbooks_requested": 17154,
+  "near_misses": 1,
+  "unscoreable": 13730,
+  "orderbooks": 13731,
+  "orderbooks_requested": 13731,
   "alerts": 0,
-  "markets_with_momentum": 240,
+  "markets_with_momentum": 120,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 17154,
-  "returned": 17154,
+  "requested": 13731,
+  "returned": 13731,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -59,81 +59,27 @@
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXAAAGASD-26NOV28-3.5200",
+   "ticker": "KXDEMOFUTHOURLY-26NOV27H18-UP",
    "eligible": false,
    "fails": [
-    "spread 15.0c > 10c cap",
+    "spread 99.0c > 10c cap",
+    "depth 10 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
+    "NO entry 99.0c above 95c ceiling",
+    "net ROI -68.43% not above 0% floor",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [],
-   "q": 0.76625,
-   "mid": 0.925,
+   "q": 0.68725,
+   "mid": 0.505,
    "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.85,
-   "ask": 1.0,
-   "spread": 0.15000000000000002,
-   "depth": 174.0,
-   "vol24": 0.0,
-   "ttc_hours": 12.701666666666666,
-   "momentum": null,
-   "series_ticker": "KXAAAGASD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.15000000000000002,
-    "fee_unit": 0.008925000000000002,
-    "cost": 0.15892500000000004,
-    "ev": 0.07482499999999997,
-    "roi": 0.4708195689790779
-   },
-   "score": 0.4708195689790779,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will average **gas prices** be above $3.5200?",
-   "category_id": "gas",
-   "category_basis": "keyword",
-   "close_time": "2026-11-28T04:59:00Z",
-   "event_ticker": "KXAAAGASD-26NOV28",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 174.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.85,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV28-3.5200"
-  },
-  {
-   "ticker": "KXDEMOFUTHOURLY-26NOV27H17-UP",
-   "eligible": false,
-   "fails": [
-    "spread 98.0c > 10c cap",
-    "depth 12 < 50 contracts at the touch",
-    "YES entry 99.0c above 95c ceiling",
-    "net ROI -32.08% not above 0% floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.6729166666666666,
-   "mid": 0.5,
-   "micro": 0.9083333333333333,
-   "last": 0.65,
+   "last": 0.55,
    "bid": 0.01,
-   "ask": 0.99,
-   "spread": 0.98,
-   "depth": 12.0,
-   "vol24": 2250.0,
-   "ttc_hours": 0.7183333333333334,
+   "ask": 1.0,
+   "spread": 0.99,
+   "depth": 10.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.9672222222222222,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -142,152 +88,38 @@
     "listed": false
    },
    "entry": {
-    "side": "YES",
+    "side": "NO",
     "entry": 0.99,
     "fee_unit": 0.0006930000000000006,
     "cost": 0.990693,
-    "ev": -0.31777633333333344,
-    "roi": -0.32076166212270946
+    "ev": -0.6779430000000001,
+    "roi": -0.684311890767372
    },
-   "score": -0.32076166212270946,
-   "dollars_traded_estimate": 1573.0,
-   "title": "Demo BTC at or above 60054.98 USD",
+   "score": -0.684311890767372,
+   "dollars_traded_estimate": 137.5,
+   "title": "Demo BTC at or above 59876.36 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-27T17:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H17",
+   "close_time": "2026-11-27T18:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H18",
    "status": "active",
    "result": null,
-   "volume_fp": 2420.0,
-   "volume_24h_fp": 2250.0,
-   "open_interest_fp": 120.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 11.0,
-    "depth_at_ask": 1.0,
-    "bid_price": 0.01,
-    "ask_price": 0.99
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H17-UP"
-  },
-  {
-   "ticker": "KXAAAGASD-26NOV28-3.5250",
-   "eligible": false,
-   "fails": [
-    "spread 52.0c > 10c cap",
-    "depth 10 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "net ROI -41.02% not above 0% floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.683,
-   "mid": 0.74,
-   "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.48,
-   "ask": 1.0,
-   "spread": 0.52,
-   "depth": 10.0,
-   "vol24": 0.0,
-   "ttc_hours": 12.701666666666666,
-   "momentum": null,
-   "series_ticker": "KXAAAGASD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.52,
-    "fee_unit": 0.017472,
-    "cost": 0.5374720000000001,
-    "ev": -0.2204720000000001,
-    "roi": -0.4102018337699454
-   },
-   "score": -0.4102018337699454,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will average **gas prices** be above $3.5250?",
-   "category_id": "gas",
-   "category_basis": "keyword",
-   "close_time": "2026-11-28T04:59:00Z",
-   "event_ticker": "KXAAAGASD-26NOV28",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
+   "volume_fp": 250.0,
    "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
+   "open_interest_fp": 50.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 10.0,
     "depth_at_ask": 0.0,
-    "bid_price": 0.48,
+    "bid_price": 0.01,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV28-3.5250"
-  },
-  {
-   "ticker": "KXAAAGASD-26NOV28-3.5300",
-   "eligible": false,
-   "fails": [
-    "spread 85.0c > 10c cap",
-    "depth 31 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "net ROI -54.45% not above 0% floor",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [],
-   "q": 0.6087499999999999,
-   "mid": 0.575,
-   "micro": 1.0,
-   "last": 0.0,
-   "bid": 0.15,
-   "ask": 1.0,
-   "spread": 0.85,
-   "depth": 31.0,
-   "vol24": 0.0,
-   "ttc_hours": 12.701666666666666,
-   "momentum": null,
-   "series_ticker": "KXAAAGASD",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": {
-    "side": "NO",
-    "entry": 0.85,
-    "fee_unit": 0.008925000000000002,
-    "cost": 0.8589249999999999,
-    "ev": -0.46767499999999984,
-    "roi": -0.5444887504729748
-   },
-   "score": -0.5444887504729748,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will average **gas prices** be above $3.5300?",
-   "category_id": "gas",
-   "category_basis": "keyword",
-   "close_time": "2026-11-28T04:59:00Z",
-   "event_ticker": "KXAAAGASD-26NOV28",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 31.0,
-    "depth_at_ask": 0.0,
-    "bid_price": 0.15,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV28-3.5300"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H18-UP"
   }
  ],
  "unscoreable": [
   {
-   "ticker": "KXBNB-26NOV2801-T744.99",
+   "ticker": "KXAPRPOTUS-26DEC04-38.6",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -307,9 +139,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -318,11 +150,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be above 38.5 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -335,10 +167,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-T744.99"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.6"
   },
   {
-   "ticker": "KXBNB-26NOV2801-T380",
+   "ticker": "KXAPRPOTUS-26DEC04-38.4",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -358,9 +190,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -369,11 +201,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 38.3 and 38.5 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -386,10 +218,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-T380"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.4"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B742",
+   "ticker": "KXAPRPOTUS-26DEC04-38.1",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -409,9 +241,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -420,11 +252,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 38.0 and 38.2 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -437,10 +269,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B742"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-38.1"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B737",
+   "ticker": "KXAPRPOTUS-26DEC04-37.8",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -460,9 +292,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -471,11 +303,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 37.7 and 37.9 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -488,10 +320,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B737"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.8"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B732",
+   "ticker": "KXAPRPOTUS-26DEC04-37.5",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -511,9 +343,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -522,11 +354,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 37.4 and 37.6 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -539,10 +371,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B732"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.5"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B727",
+   "ticker": "KXAPRPOTUS-26DEC04-37.2",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -562,9 +394,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -573,11 +405,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 37.1 and 37.3 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -590,10 +422,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B727"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-37.2"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B722",
+   "ticker": "KXAPRPOTUS-26DEC04-36.9",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -613,9 +445,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -624,11 +456,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be between 36.8 and 37.0 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -641,10 +473,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B722"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.9"
   },
   {
-   "ticker": "KXBNB-26NOV2801-B717",
+   "ticker": "KXAPRPOTUS-26DEC04-36.7",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -664,9 +496,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13.718333333333334,
-   "momentum": 0.0,
-   "series_ticker": "KXBNB",
+   "ttc_hours": 166.96722222222223,
+   "momentum": null,
+   "series_ticker": "KXAPRPOTUS",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -675,11 +507,11 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "BNB price on Nov 28, 2026?",
-   "category_id": "crypto",
+   "title": "Will the President's approval rating be below 36.8 according to RealClearPolitics?",
+   "category_id": "elections",
    "category_basis": "keyword",
-   "close_time": "2026-11-28T06:00:00Z",
-   "event_ticker": "KXBNB-26NOV2801",
+   "close_time": "2026-12-04T16:00:00Z",
+   "event_ticker": "KXAPRPOTUS-26DEC04",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -692,24 +524,24 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBNB-26NOV2801-B717"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAPRPOTUS-26DEC04-36.7"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 159,
+  "candles_used": 114,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 5,
+  "baseline_always_yes_bets": 3,
   "baseline_always_yes_hits": 1,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 19,
-   "no candles in the 2h before close": 31,
-   "no side passed the replay gates": 5
+   "candle without a price": 21,
+   "no side passed the replay gates": 3,
+   "no candles in the 2h before close": 1
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -718,7 +550,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.2
+  "baseline_always_yes_hit_rate": 0.3333
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
