@@ -190,6 +190,28 @@ class HealthRecordTests(unittest.TestCase):
         self.assertNotIn('return "failed", "git sync"', body)
         self.assertNotIn('return "failed", name', body)
 
+    def test_a_validator_failure_carries_the_validators_own_output(self):
+        """F-108: five recorded failures on 2026-11-27 said only 'validators: validate_alerts'.
+
+        `stderr_tail` was empty on every one of them because the validator branch called
+        fail("validators: …") with no tail. The validator's message is the only thing that says
+        WHICH row contradicted WHICH rule, so the branch must collect each failing validator's
+        stdout+stderr and hand it to record_health.
+        """
+        source = (ROOT / "scripts" / "collect_relay.py").read_text()
+        body = source.split("def do_pass(n: int)", 1)[1]
+        self.assertIn("tails", body, "the validator branch must accumulate the failing output")
+        self.assertIn('"\\n".join(tails)', body,
+                      "the accumulated validator output must be passed as the health-record tail")
+        self.assertNotIn('return fail("validators: " + ", ".join(failed))', body,
+                         "the tail-less validator failure return must be gone (F-108)")
+        # A validator that times out has no output; it must still leave a reason rather than a blank.
+        self.assertIn("timed out after 600s", body,
+                      "a timed-out validator must record a reason too")
+        # The tail must be bounded: record_health keeps 2000 characters, and the annotation is
+        # capped at 3000 per call, so a huge diff cannot turn a diagnostic into a second failure.
+        self.assertIn("[-3000:]", body)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

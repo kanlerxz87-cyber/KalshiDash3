@@ -467,6 +467,8 @@ def make_pass(plan: Plan):
     def do_pass(n: int) -> tuple[str, str]:
         def fail(detail: str, tail: str = "") -> tuple[str, str]:
             # Every non-committing pass leaves a reason in the repository, not only in stdout.
+            # A validator failure now passes its output as `tail`, so the health file carries the
+            # validator's own message (F-108).
             outcome = record_health(n, detail, tail, plan.ref)
             print(f"  health record: {outcome}")
             return "failed", detail
@@ -501,6 +503,11 @@ def make_pass(plan: Plan):
                 annotate("error", f"pass {n}: {name} FAILED (exit {p.returncode})", (p.stdout + p.stderr)[-3000:])
                 return fail(f"{name} (exit {p.returncode})", p.stdout + p.stderr)
         failed = []
+        # F-108: a validator's own words must survive the pass. record_health() was called with no
+        # tail here, so every one of the five recorded failures on 2026-11-27 (18:31Z-19:23Z) said
+        # only "validators: validate_alerts" with `stderr_tail: ""` — the reason was in stdout,
+        # which is served from a blob host this project cannot always reach, and dies with the run.
+        tails: list[str] = []
         for name, path in VALIDATORS:
             if not (ROOT / path).exists():
                 annotate("warning", f"pass {n}: validator {path} is missing; skipped")
@@ -509,13 +516,15 @@ def make_pass(plan: Plan):
                 p = sh(["python3", path], timeout=600)
             except subprocess.TimeoutExpired:
                 failed.append(name)
+                tails.append(f"[{name}] timed out after 600s")
                 continue
             if p.returncode != 0:
                 failed.append(name)
                 annotate("error", f"pass {n}: {name} FAILED", (p.stdout + p.stderr)[-3000:])
+                tails.append(f"[{name}] exit {p.returncode}\n{p.stdout}\n{p.stderr}")
         if failed:
             discard_changes()
-            return fail("validators: " + ", ".join(failed))
+            return fail("validators: " + ", ".join(failed), "\n".join(tails))
         if not plan.commit:
             discard_changes()
             return "validated", f"dry run on {head}; nothing committed"

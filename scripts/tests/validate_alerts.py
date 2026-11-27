@@ -204,13 +204,32 @@ def main() -> int:
     state = load(LIVE / "markets.json") or {}
     ledger = state.get("series_index") or {}
     row_by_ticker = {r.get("ticker"): r for r in (state.get("open_markets") or [])}
+    # What each archive entry itself recorded from GET /series when the swing was detected.
+    # Third resolution source below, and the one that survives the market leaving the scan.
+    entry_categories: dict[str, list] = {}
+    for _a in archive:
+        _t = _a.get("ticker")
+        if _t and _t not in entry_categories and _a.get("series_categories"):
+            entry_categories[_t] = [str(c) for c in _a["series_categories"]]
 
     def _official(ticker: str) -> list:
+        """Official GET /series categories, resolved exactly as scripts/build_alerts.py does (F-107).
+
+        Order: snapshot row -> snapshot `series_index` -> the archive ENTRY's own recorded
+        `series_categories`. The third source is what makes this check reproducible after the
+        market leaves the open scan: those categories were copied from GET /series at detection
+        time and `category_assigned_from` names that record. Before the builder read them too,
+        the two files disagreed and this validator refused every pass that had aged a market out
+        -- five consecutive collector failures on 2026-11-27 between 18:31Z and 19:23Z.
+        """
         row = row_by_ticker.get(ticker) or {}
         if row.get("series_categories"):
             return [str(c) for c in row["series_categories"]]
         series = row.get("series_ticker") or (ticker or "").upper().split("-")[0]
-        return [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
+        cats = [str(c) for c in ((ledger.get(series) or {}).get("categories") or [])]
+        if cats:
+            return cats
+        return [str(c) for c in (entry_categories.get(ticker) or [])]
 
     def _served(a: dict) -> bool:
         cats = _official(a.get("ticker") or "")
