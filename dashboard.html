@@ -176,8 +176,13 @@ function renderAlerts() {
     }
   }
   alerts.sort((a, b) => Date.parse(b.time) - Date.parse(a.time));
+  // T116 (F-101): the badge used to say "100 shown" while the feed actually serves 154 (all)
+  // / 123 (screen) swings — the slice cap hid the real total. State both numbers.
+  const totalAll = alerts.length;
   const all = alerts.slice(0, 100);
-  const screen = alerts.filter(a => a.screened)
+  const screened = alerts.filter(a => a.screened);
+  const totalScreen = screened.length;
+  const screen = screened
     .sort((a, b) => Number(b.market.volume_24h_fp) - Number(a.market.volume_24h_fp) || Date.parse(b.time) - Date.parse(a.time))
     .slice(0, 100);
   // T66. "no trades" is the case a trader must not mistake for a market move: the reported last
@@ -221,13 +226,22 @@ function renderAlerts() {
       KD.$("#chartCard")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
     }));
   }
-  KD.$("#allAlertCount").textContent = `${all.length} shown`;
-  KD.$("#modelAlertCount").textContent = `${screen.length} shown`;
+  KD.$("#allAlertCount").textContent = all.length >= totalAll ? `${totalAll} shown` : `${all.length} of ${totalAll} shown`;
+  KD.$("#modelAlertCount").textContent = screen.length >= totalScreen ? `${totalScreen} shown` : `${screen.length} of ${totalScreen} shown`;
   const fetched = state.snap?.collected_at;
   const feedGen = state.alerts?.generated_at;
   const ev = state.alerts?.counts?.evidence;
+  // The evidence parts are computed over the WHOLE served feed (alert_evidence.py), so the
+  // denominator must be the served total too — it used to reuse `all.length`, the 100-row
+  // render cap, and the sentence read "Of the 100 swings served" while its parts summed 154.
+  const servedTotal = (state.alerts?.counts && Number.isFinite(state.alerts.counts.all_events))
+    ? state.alerts.counts.all_events
+    : ev
+      ? (ev.traded_ge_floor || 0) + (ev.traded_below_floor || 0) + (ev.quote_only || 0)
+        + (ev.counter_reset || 0) + (ev.candle_unquantified || 0) + (ev.unknown_no_observations || 0)
+      : all.length;
   const evNote = ev
-    ? ` Of the ${all.length} swings served: ${ev.traded_ge_floor || 0} traded at or above the ${ev.floor_contracts} -contract floor, `
+    ? ` Of the ${servedTotal} swings served: ${ev.traded_ge_floor || 0} traded at or above the ${ev.floor_contracts} -contract floor, `
       + `${ev.traded_below_floor || 0} traded below it, ${ev.quote_only || 0} had ZERO contracts traded in the interval, `
       + `${ev.counter_reset || 0} have an unknowable count (volume field did not increase), ${ev.candle_unquantified || 0} are bounded by a candle-backfill read (candlestick volume is per period) and ${ev.unknown_no_observations || 0} are no longer in the committed history. `
       + `The floor is a project rule, not a Kalshi field (F-79).`

@@ -1066,6 +1066,81 @@ its PR build passed (run [46045130907](https://github.com/kanlerxz87-cyber/Kalsh
   `2026-11-27T17:45:51Z` with all five category rows, the Culture `untraded` disclosure and per-row official API
   links; `executive-summary.html?v=b3119d5` served the F-104 fix. Both PRs (#139 work, #142 record) are merged
   and deployed; T117–T120 are all done.
+## Session `arena-251f5c3d` — current-snapshot verification, defect repair, and publish (branch `arena/251f5c3d-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: no open pull request, no session branch on `origin`
+besides this one, and every prior session section below records a completed close-out (latest merged PR #131,
+2026-11-25). `origin/main` = `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z", the collector's own commit from
+today). This session does **not** rebuild the site: it runs the release gate on the current tree, re-verifies the
+published rows against the live official demo API and official docs, repairs real defects with regression tests,
+publishes findings on the Flagged page, and closes out gate → PR → `main` → merge → Pages confirm → record here.
+
+**Pre-merge conflict (2026-11-27):** while this session worked, `main` advanced `fe245d8` → `905001c`
+(PRs #153–#160, snapshot `2026-11-27T20:05Z`, plus the F-100..F-110 finding wave). Resolved by merging
+`origin/main` into this branch — four conflicts, all resolved keeping both sessions' work:
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `COORDINATION.md` | both sides inserted session sections at the top anchor | main's sections kept first, this session's after, both verbatim (same rule as arena-75949325's resolution) |
+| `data/findings.json` | both appended after F-99 | main's F-100..F-110 + SIM-*/E9D9-* kept; this session's five renumbered **F-116..F-120** (drafted F-100..F-104, then F-111..F-115 — each wave's ids were taken on main by concurrent sessions; the alerts-chip class is already F-105, so only the evidence-bar half remains, as F-118) |
+| `alerts.html` | main's chat refactor (`chatCount`, show-older controls, arg-less `renderEvidenceBar`) vs this session's chip/evBar edit | main's side kept — it is the same fix plus controls, and it fixes F-105; this session's N3 regression (incl. the Golf-tab denominator) passes against it unchanged |
+| `trading.html` | main's glossary gained a per-row Reference column vs this session's inline settlement link | main's side kept for the glossary (per-row column is stronger); this session's `fmt()` grouping, `KD.money` KPIs and leaderboard provenance note re-applied on top |
+
+No other session's lines dropped; zero conflict markers after resolution.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | **done** — PASS (21 pages, every validator and suite, `check_site.py` OK) | arena-251f5c3d | `COORDINATION.md` (this section) | gate run 2026-11-27 on `fe245d8` + claim commit |
+| T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | **done** — every record matched, see T115 table below | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
+| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | **done** — two audit passes (render recomputation + source-link/count sweep) found 9 real defects, all fixed and regression-pinned by `test_pages_dom.js` section N; gate **PASS** after the fixes | arena-251f5c3d | `assets/site.js`, `index.html` (via money()), `dashboard.html`, `alerts.html`, `portfolio.html`, `simulation.html`, `trading.html`, `strategies.html`, `scripts/tests/test_pages_dom.js` | `python3 scripts/verify_release.py` PASS 2026-11-27; findings F-116..F-120 in `data/findings.json` |
+| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | in progress — F-116..F-120 appended (flagged ledger now 109 rows), gate **PASS** on the merged tree; PR/merge/Pages pending below | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS 2026-11-27; Actions API, Pages API, live URL fetch to follow |
+
+### T115 — official-source verification, fetched live 2026-11-27
+
+The sandbox has no direct egress to Kalshi; records below were read through the platform fetch route (same method
+as sessions arena-a490dfa2 / arena-75949325). Snapshot under test: `data/live/markets.json`,
+`collected_at 2026-11-27T17:15:51Z`.
+
+| Record fetched | Snapshot value | Official value (fetched 2026-11-27) | Match |
+|---|---|---|---|
+| `GET /exchange/status` | collector's own health implies trading | `exchange_active: true`, `trading_active: true`, four demo shards active | ✔ |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65`, `close_time 2026-11-30T04:59:00Z`, `status active` | identical, `previous_price_dollars 0.7500` | ✔ |
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `close_time 2027-01-01T05:00:00Z` | identical | ✔ |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` | identical | ✔ |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` | identical | ✔ |
+| `GET /markets/KXYTVIEWSD-BAD26NOV30-34.0M` (culture headline - untraded) | `last 0.0000`, `volume_fp 0.00`, `open_interest_fp 0.00`, `status active` | identical (market created 2026-11-27T16:06Z, about an hour before the snapshot) | ✔ |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (newest published alert's ticker) | alert `0.97 -> 0.01` at `2026-11-27T16:45:51Z`; market `status active` | `status active`, `last_price_dollars 0.0100` (equals the alert's `to_price`), `volume_fp 72531547.87` | ✔ |
+| `GET /markets/KXDOGE15M-26NOV271215-15` (newest published resolved row) | `result yes`, `settlement_ts 2026-11-27T17:15:02.189654Z`, `settlement_value_dollars 1.0000` | `result "yes"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189654Z` (identical to the microsecond), `settlement_value_dollars "1.0000"` | ✔ |
+| [docs.kalshi.com/getting_started/demo_env](https://docs.kalshi.com/getting_started/demo_env) | C-01..C-04 roots, C-07/C-08 mock funds | verbatim: REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`); WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`); "mock funds"; "credentials are not shared"; "may not be reflective of those in real markets" | ✔ |
+| [docs.kalshi.com/api-reference/market/get-market-candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) | C-17/C-29/C-61: intervals 1/60/1440 only | verbatim: "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)"; demo roots listed among base URLs | ✔ |
+| [docs.kalshi.com/getting_started/market_settlement](https://docs.kalshi.com/getting_started/market_settlement) | C-13/C-14: $1 per contract, net positions, zero settlement fee for yes/no | verbatim: "Yes contract holders receive $1 per contract"; "No contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+
+Nothing published in the snapshot contradicted the official records.
+
+### T116 — audit passes, defects found, fixes, regression tests
+
+Two jsdom audit harnesses rendered every page against the committed JSON and recomputed what the
+pages claim (harnesses kept out of the repo, run from the checkout):
+
+| # | Defect found | Where | Fix | Regression |
+|---|---|---|---|---|
+| 1 | `money()` printed dollars without thousands separators: index showed `$23271` while gas.html showed `$23,271` for the same market (crypto `$16436950`, golf `$19179`) | `assets/site.js` `money()` | group thousands; negatives render `−$x`; `$0` unchanged (F-83 contract) | `test_pages_dom.js` N1 |
+| 2 | Dashboard badges read `100 shown` while the feed serves 154 (all) / 123 (model) swings | `dashboard.html` | badges read `N of M shown` (N = rendered, M = json total) | N2 |
+| 3 | Evidence note said "Of the 100 swings served" while its own parts summed to 154 (21+75+0+0+5+53) | `dashboard.html` | denominator = `counts.all_events` (parts-sum fallback) | N2 |
+| 4 | alerts chips claimed `154 in view` over a chat rendering the newest 120 bubbles | `alerts.html` `render()` | chips count the rendered bubbles; `X of Y shown` when capped/filtered | N3 |
+| 5 | Evidence bar's `swings served` used the category-filtered length against global evidence parts (golf tab: 7 vs parts summing 154) | `alerts.html` `renderEvidenceBar` | denominator = `KDL.feedAlerts().length` (global on every tab) | N3 (golf tab) |
+| 6 | portfolio mixed raw `"$"+toFixed(2)` with `KD.money` for the same quantities | `portfolio.html` | all ledger cash/P&L/fee displays go through `KD.money` | N4 (`pCash` = `$10,000.00`) |
+| 7 | A missing unrealised/fee value rendered `−$0.00` (inferred) instead of blank | `portfolio.html` open/closed/by-strategy rows | `KD.money(null)` → em-dash (blank, never inferred) | N4 + N2 pattern |
+| 8 | Derived results tables (simulation by-strategy/topic/trade-type, trading leaderboard, strategy candidates) had no source link | `simulation.html`, `trading.html`, `strategies.html` | provenance notes linking `data/live/simulation.json` / `alerts_archive.json` / `strategies.json`; official references linked in-row (fee schedule, Order Book Responses, Market Settlement, `GET /portfolio/fills` → [docs.kalshi.com/api-reference/portfolio/get-fills](https://docs.kalshi.com/api-reference/portfolio/get-fills), fetched 2026-11-27) | N5 |
+| 9 | trading.html's own `fmt()` and KPI cards used ungrouped raw dollars | `trading.html` | `fmt()` groups thousands; KPIs use `KD.money` | N5 + N4 pattern |
+
+Not defects (audit false positives, corrected in the harness): the stratTable has no `filled`
+column (`fillTable` holds it); a leading `\bKX` identity test fails when `textContent`
+concatenates title and ticker (`…winsKXPGATOUR-…`) — every position row already carried its
+`srclink`. Source-link sweep after the fixes: **no unlinked rows anywhere** (simulation 54/54 open,
+7/7 settled, alerts leads 154/154, live watch 25/25, all feeds fully linked).
+
+`python3 scripts/verify_release.py` → **PASS** after the fixes and again after the findings append.
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 

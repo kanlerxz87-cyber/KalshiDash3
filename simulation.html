@@ -167,7 +167,10 @@ function render(sim, rules) {
       concl: esc(s.conclusion),
     })),
     { empty: "No strategies defined." }
-  );
+  ) + `<p class="small mut">Every count on this page is derived from
+    <a href="data/live/simulation.json">data/live/simulation.json</a> — the committed run over
+    <a href="data/live/alerts_archive.json">alerts_archive.json</a> signals. Position rows link
+    their own market record; fee and settlement basis are in Rules below.</p>`;
 
   const catRows = [];
   for (const s of strat) {
@@ -189,7 +192,10 @@ function render(sim, rules) {
     ],
     catRows,
     { empty: "No paper fills in any topic yet." }
-  ) + `<p class="small mut">Topic labels come from the category classifier: seed series (listed in the fee schedule) or keyword match. Keyword-only series are unverified (Flagged F-21).</p>`;
+  ) + `<p class="small mut">Topic labels come from the category classifier: seed series (listed in the
+    <a href="${FEE_DOC}">fee schedule</a>) or keyword match. Keyword-only series are unverified
+    (<a href="flagged.html">Flagged F-21</a>). Derived from
+    <a href="data/live/simulation.json">data/live/simulation.json</a>.</p>`;
 
   $("#ttTable").innerHTML = KD.table(
     [
@@ -202,7 +208,9 @@ function render(sim, rules) {
       wl: `${KD.num(t.wins)} / ${KD.num(t.losses)}`, net: signedMoney(t.realized_net),
     })),
     { empty: "No paper fills yet, so no trade types to show." }
-  );
+  ) + `<p class="small mut">Derived from
+    <a href="data/live/simulation.json">data/live/simulation.json</a> (signals:
+    <a href="data/live/alerts_archive.json">alerts_archive.json</a>).</p>`;
 
   const posRow = (p, extra) => ({
     id: esc(p.id), strat: esc(p.strategy), title: esc(p.title || p.ticker),

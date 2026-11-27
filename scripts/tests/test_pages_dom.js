@@ -946,6 +946,160 @@ function commonAsserts(label, r) {
       + `${cat.counts.reviewed}/${cat.counts.archive_total})`);
     r.close();
   }
+
+  /* --- N. T116 (F-116..F-120): number formatting + cross-surface count honesty ---
+   * money() must group thousands everywhere (the landing table printed "$23271" while
+   * gas.html printed "$23,271" for the same market); every badge/chip must lead with the
+   * number of rows actually rendered and state the feed total it caps; the dashboard
+   * evidence note's denominator must equal the sum of its own parts; and derived results
+   * tables must carry a source link or a provenance note. Found by this session's audit
+   * passes (arena-251f5c3d). */
+  {
+    const group2 = (n) => "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const chipNums = (t) => {
+      const shown = /([\d,]+)/.exec(t);
+      const of = /of\s*([\d,]+)/.exec(t);
+      const n = (x) => (x ? Number(x[1].replace(/,/g, "")) : null);
+      return { shown: n(shown), total: of ? n(of) : n(shown) };
+    };
+    const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
+
+    // N1. index dollars cells must render the grouped form of their own number (F-116).
+    {
+      const r = await loadPage("index.html", "snapshot");
+      commonAsserts("index.html N", r);
+      const today = r.doc.querySelector("#today");
+      const cells = [...(today ? today.querySelectorAll("tbody tr") : [])]
+        .map(tr => [...tr.querySelectorAll("td")].map(td => td.textContent.trim()))
+        .map(tds => tds.find(t => /^\$[\d,]+/.test(t)))
+        .filter(Boolean);
+      check(cells.length >= 3, `index.html: expected dollar cells in #today (got ${cells.length})`);
+      for (const cell of cells) {
+        const m = /^\$([\d,]+)/.exec(cell);
+        const v = Number(m[1].replace(/,/g, ""));
+        const expected = "$" + v.toLocaleString("en-US", { maximumFractionDigits: 0 });
+        check(cell.startsWith(expected),
+          `index.html: dollars cell "${cell}" must group thousands like the category KPIs (expected "${expected}")`);
+      }
+      console.log(`  N1 money format  ok  (${cells.length} index dollar cells grouped)`);
+      r.close();
+    }
+
+    // N2. dashboard badges + evidence note denominator (F-117).
+    {
+      const r = await loadPage("dashboard.html", "snapshot");
+      commonAsserts("dashboard.html N", r);
+      const allB = chipNums((r.doc.querySelector("#allAlertCount") || {}).textContent || "");
+      const modelB = chipNums((r.doc.querySelector("#modelAlertCount") || {}).textContent || "");
+      const dashN = r.doc.querySelectorAll("#allAlerts .alert-item").length;
+      const dashM = r.doc.querySelectorAll("#modelAlerts .alert-item").length;
+      check(allB.total === alertsDoc.counts.all_events,
+        `dashboard #allAlertCount must state the feed total ${alertsDoc.counts.all_events} (got "${allB.total}")`);
+      check(modelB.total === alertsDoc.counts.high_roi,
+        `dashboard #modelAlertCount must state the screen total ${alertsDoc.counts.high_roi} (got "${modelB.total}")`);
+      check(allB.shown === dashN,
+        `dashboard #allAlertCount leading number ${allB.shown} must equal rendered rows ${dashN}`);
+      check(modelB.shown === dashM,
+        `dashboard #modelAlertCount leading number ${modelB.shown} must equal rendered rows ${dashM}`);
+      const fresh = (r.doc.querySelector("#alertFreshness") || {}).textContent || "";
+      if (alertsDoc.counts.evidence) {
+        const m = fresh.match(/Of the (\d+) swings served:([\s\S]*?)The floor is a project rule/);
+        check(!!m, "dashboard must publish the evidence note when counts.evidence exists");
+        if (m) {
+          const stated = Number(m[1]);
+          const parts = [...m[2].matchAll(/(\d+) (?:traded|had|have|are)/g)].map(x => Number(x[1]));
+          const sum = parts.reduce((a, b) => a + b, 0);
+          check(sum === stated,
+            `dashboard evidence note says "Of the ${stated}" but its parts sum to ${sum}`);
+          check(stated === alertsDoc.counts.all_events,
+            `dashboard evidence note denominator ${stated} must equal counts.all_events ${alertsDoc.counts.all_events}`);
+        }
+      }
+      console.log(`  N2 dashboard      ok  (badges "${allB.shown}/${allB.total}" + "${modelB.shown}/${modelB.total}", evidence denominator)`);
+      r.close();
+    }
+
+    // N3. alerts chips count the rendered bubbles; the evidence bar stays global on every
+    // category tab (F-118, candidate #4).
+    {
+      const r = await loadPage("alerts.html", "snapshot");
+      commonAsserts("alerts.html N", r);
+      const allB = chipNums((r.doc.querySelector("#allCount") || {}).textContent || "");
+      const modelB = chipNums((r.doc.querySelector("#modelCount") || {}).textContent || "");
+      const feedN = r.doc.querySelectorAll("#feedAll .chat-msg").length;
+      const modelN = r.doc.querySelectorAll("#feedModel .chat-msg").length;
+      check(feedN > 0, "alerts.html: the all-events chat must render rows from the committed feed");
+      check(allB.shown === feedN,
+        `alerts #allCount leading ${allB.shown} must equal rendered bubbles ${feedN}`);
+      check(modelB.shown === modelN,
+        `alerts #modelCount leading ${modelB.shown} must equal rendered bubbles ${modelN}`);
+      check(allB.total === alertsDoc.counts.all_events || allB.shown === alertsDoc.counts.all_events,
+        `alerts #allCount must relate to counts.all_events ${alertsDoc.counts.all_events} (got shown=${allB.shown} total=${allB.total})`);
+      // The bar's first chip is the denominator (label as of the F-105 chat refactor:
+      // "swings in scope (archive)"); it is computed from the global evidence parts, so it
+      // must equal counts.all_events on every category tab (F-118).
+      const evDenom = (t) => { const m = /(\d[\d,]*)/.exec(t); return m ? Number(m[1].replace(/,/g, "")) : null; };
+      if (alertsDoc.counts.evidence) {
+        const ev1 = evDenom((r.doc.querySelector("#evBar") || {}).textContent || "");
+        check(ev1 === alertsDoc.counts.all_events,
+          `alerts evidence bar denominator must be the global feed total ${alertsDoc.counts.all_events} (got ${ev1})`);
+      }
+      const golfBtn = [...r.doc.querySelectorAll("#catTabs .tabbtn")].find(b => b.dataset.c === "golf");
+      check(!!golfBtn, "alerts.html: #catTabs category buttons must exist");
+      if (golfBtn) {
+        golfBtn.dispatchEvent(new r.dom.window.Event("click", { bubbles: true }));
+        const golfB = chipNums((r.doc.querySelector("#allCount") || {}).textContent || "");
+        const golfN = r.doc.querySelectorAll("#feedAll .chat-msg").length;
+        const golfJson = (alertsDoc.all_events || []).filter(a => a.category_id === "golf").length;
+        check(golfB.shown === golfN,
+          `golf tab: #allCount leading ${golfB.shown} must equal rendered bubbles ${golfN}`);
+        check(golfB.total === golfJson,
+          `golf tab: #allCount must state the golf total ${golfJson} (got ${golfB.total})`);
+        if (alertsDoc.counts.evidence) {
+          const ev2 = evDenom((r.doc.querySelector("#evBar") || {}).textContent || "");
+          check(ev2 === alertsDoc.counts.all_events,
+            `golf tab: evidence bar denominator must stay the global total ${alertsDoc.counts.all_events} (got ${ev2})`);
+        }
+        console.log(`  N3 alerts         ok  (chips "${allB.shown}/${allB.total}", golf tab "${golfB.shown}/${golfB.total}", evidence bar global)`);
+      }
+      r.close();
+    }
+
+    // N4. portfolio KPI cash must use the grouped money format (F-119).
+    {
+      const r = await loadPage("portfolio.html", "snapshot");
+      commonAsserts("portfolio.html N", r);
+      const cash = ((r.doc.querySelector("#pCash") || {}).textContent || "").trim();
+      check(cash === group2(10000),
+        `portfolio #pCash must render the grouped default ${group2(10000)} (got "${cash}")`);
+      console.log(`  N4 portfolio      ok  (pCash "${cash}")`);
+      r.close();
+    }
+
+    // N5. derived results tables must carry a source link or a provenance note (F-120).
+    {
+      const noteHasLink = (tb) => {
+        // KD.table() wraps its output in <div class="tw">, so a note may sit beside the
+        // table (static HTML) or beside that wrapper (KD.table(...) + " + note").
+        for (const s of [tb.nextElementSibling, tb.parentElement && tb.parentElement.nextElementSibling]) {
+          if (s && s.tagName === "P" && s.querySelector("a[href]")) return true;
+        }
+        return false;
+      };
+      for (const page of ["simulation.html", "strategies.html", "trading.html"]) {
+        const r = await loadPage(page, "snapshot");
+        commonAsserts(page + " N", r);
+        const tables = [...r.doc.querySelectorAll("table")].filter(tb => tb.querySelectorAll("tbody tr").length > 0);
+        check(tables.length > 0, `${page} must render at least one non-empty table`);
+        const unsourced = tables.filter(tb => !tb.querySelector("a[href]") && !noteHasLink(tb));
+        check(unsourced.length === 0,
+          `${page}: ${unsourced.length} table(s) have no link in the table or a provenance note — first head: `
+          + (unsourced[0] ? [...unsourced[0].querySelectorAll("thead th")].map(t => t.textContent).join("|") : ""));
+        r.close();
+      }
+      console.log("  N5 provenance     ok  (simulation/strategies/trading tables link a source or carry a note)");
+    }
+  }
   if (problems.length) {
     console.error("\nPAGE RENDER PROBLEMS:");
     for (const p of problems) console.error("  -", p);
