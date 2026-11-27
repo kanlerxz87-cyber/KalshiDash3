@@ -285,22 +285,102 @@ Changed: `dashboard.html` (F-100), `assets/engine.js` (export only, F-102), `scr
   were corrected.
 - 2026-11-27: appended F-100…F-103 to `data/findings.json`; the Flagged page renders the count from the ledger.
 - 2026-11-27: `python3 scripts/verify_release.py` → **PASS** (21 pages, every validator and suite, four new suites,
-  internal link check).## Session `arena-01961271` — independent line-by-line verification of the 2026-11-27 snapshot against the live official demo API, defect repair, publish (branch `arena/01961271-kalshidash3`, base `fe245d8`)
+  internal link check).## Session `arena-01961271` — independent line-by-line verification of the 2026-11-27 snapshot against the live official demo API, defect repair (F-104), publish (branch `arena/01961271-kalshidash3`, base `fe245d8`)
 
-Claimed 2026-11-27 **before any edit**. Board read first: no open pull request (`gh pr list --state open` → empty),
-branch equals `origin/main` = `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z", snapshot `2026-11-27T17:15:51Z`,
+Claimed 2026-11-27 **before any edit** (claim commit `97bbf58`, pushed before any implementation edit). Board read
+first: at claim time no open pull request, branch equals `origin/main` = `fe245d8` (snapshot `2026-11-27T17:15:51Z`,
 collector health `outcome: ok`, pass 11 of relay run 46012505508). The collect.yml relay is ACTIVE on `main` and
-commits only `data/live/*.json` (verified via the commits API), so this section and any repair files below do not
-overlap its scope. This session does not rebuild the site: it re-verifies the published tree line by line against
-the official Kalshi demo API and documentation through the platform fetch route (the sandbox has no direct egress;
-`GET /exchange/status` answered `trading_active: true` at claim time), repairs real defects it finds, and publishes.
+commits only `data/live/*.json` (verified via the commits API).
+
+**Parallel-session renumbering (coordination, not a defect).** While this session worked, `main` advanced
+(PR #132 `arena-98e88d21`, PR #134 `arena-b2286891`, PR #135/#137 `arena-660e1da6`, PR #133 `arena-bc717755`,
+PR #136 relay snapshot) and PR **#138** (`arena-f33fe827`) opened. `arena-bc717755` claimed **T114–T116** and
+`arena-98e88d21` also used T115; PR #138 publishes **F-100…F-103**. This session's original claim used T114–T117
+and F-100, so everything here is renumbered to **T117–T120** and **F-104** to avoid ID collisions. No other
+session's task was started: this session's defect (executive-summary typed settled-alert count) is not PR #138's
+ask-ladder defect, and the only shared files are the append-only ledger and this board.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
-| T114 | Baseline release gate on the base tree, then independent re-verification of the published snapshot against the **live official demo API**: five category headline markets, published alert tickers, resolved rows, the liquidity ladder, and series/topic integrity | in progress | arena-01961271 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `https://external-api.demo.kalshi.co/trade-api/v2/…` via the platform fetch route |
-| T115 | Re-verify the load-bearing official documentation claims (demo endpoints, candlestick intervals, settlement, fees, order V2, WebSocket auth) and the live Pages site | in progress | arena-01961271 | `COORDINATION.md` (this section) | docs.kalshi.com + kalshi.com fee schedule + live Pages fetch |
-| T116 | Repair any real defect found by T114/T115 with a regression test that fails before the fix; publish new findings on the Flagged for Review page | unclaimed | arena-01961271 | repair files named when found; `data/findings.json` (append only) | mutation-checked regressions; release gate |
-| T117 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | unclaimed | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
+| T117 | Baseline release gate on the base tree, then independent re-verification of the published snapshot against the **live official demo API**: five category headline markets, published alert tickers, resolved rows, the liquidity ladder, and series/topic integrity | done | arena-01961271 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS (21 pages, every validator and suite); live records below via the platform fetch route |
+| T118 | Re-verify the load-bearing official documentation claims (demo endpoints, candlestick intervals, settlement, fees, order V2, WebSocket auth, fee-schedule seeds) and the live Pages site | done | arena-01961271 | `COORDINATION.md` (this section) | docs.kalshi.com + kalshi.com fee schedule PDF + live Pages fetch, all re-read this session |
+| T119 | Repair the real defect found (F-104: executive summary typed a volatile settled-alert count that the committed data contradicts) with a regression that fails before the fix; publish it on the Flagged for Review page | done | arena-01961271 | `executive-summary.html`, `scripts/tests/test_pages_dom.js`, `data/findings.json` (append only) | mutation-checked regression; full gate PASS after fix |
+| T120 | Release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, record the PR link and merge result here | in progress | arena-01961271 | `COORDINATION.md` (this section) | Actions API, Pages builds API, live URL fetch |
+
+### T117 — what was re-read from the official demo API this session (2026-11-27, ~17:25–17:40Z)
+
+Every value below was fetched from `https://external-api.demo.kalshi.co/trade-api/v2/…` through the platform fetch
+route (the sandbox has no direct egress; `GET /exchange/status` answered `trading_active: true`, four demo shards
+active) and compared field by field with the committed snapshot (`data/live/markets.json`, `2026-11-27T17:15:51Z`).
+
+| Fetched record | Result |
+|---|---|
+| `GET /markets/KXETHY-27JAN0100-T4999.99` (crypto headline) | `last 0.9000`, `volume_fp 18263278.14`, `open_interest_fp 1382157.55`, `volume_24h_fp 0.00`, close `2027-01-01T05:00:00Z` — **identical** to the snapshot row (`$16,436,950` est.) |
+| `GET /markets/KXAAAGASM-26NOV30-3.90` (gas headline) | `last 0.7500`, `volume_fp 31027.52`, `open_interest_fp 24988.65` — **identical** (`$23,271` est.) |
+| `GET /markets/KXELECTIRAN-27JAN01` (elections headline) | `last 0.9000`, `volume_fp 3.19`, `open_interest_fp 0.02`, `status active` — **identical** |
+| `GET /markets/KXPGATOUR-MAST27-MFIT` (golf headline) | `last 0.0230`, `volume_fp 833849.07`, `open_interest_fp 833821.07` — **identical**; `volume_24h_fp` now `0.00` (rolling-window drift, cumulative volume unchanged); live `yes_bid 0.0210/7936.50`, `yes_ask 0.0250/6666.66` match the published ladder exactly |
+| `GET /markets/KXYTVIEWSD-BAD26NOV30-34.0M` (culture headline, untraded) | `close_time 2026-12-02T15:00:00Z`, `volume_fp 0.00`, `last 0.0000`, `status active`, rules cite Bad Bunny YouTube daily views — **identical**; the landing row's `untraded` badge and nearest-close disclosure (F-83) are correct |
+| `GET /markets/KXBTCY-27JAN0100-B97500` (newest alert ticker) | live `last 0.0100`, `previous 0.0100`, `yes_bid 0.0000`, `yes_ask 0.0100` — matches the alert's `to_price 0.01`, `to_yes_bid 0.0`, `to_yes_ask 0.01`; `volume_fp` 72531547.87 vs the alert's `volume_to` 72531493.84 (+54.03 contracts since 16:45Z — expected drift, market still trading) |
+| `GET /markets/KXETHY-27JAN0100-B2125` (alert 14:14Z, 0.23→0.01) | live `last 0.0100`, `previous_price_dollars 0.2300` — matches the alert's from/to prices |
+| `GET /markets/KXZEC15M-26NOV271215-15` (resolved row) | `result "no"`, `status finalized`, `settlement_ts 2026-11-27T17:15:02.189748Z`, `settlement_value_dollars 0.0000` — **identical** to the published resolved row |
+| `GET /markets/KXELECTIRAN-26JUL01` (resolved elections row) | `result "no"`, `finalized`, `settlement_ts 2026-07-01T15:24:15.984157Z` — **identical** (F-82's constant still holds) |
+| `GET /markets/KXSUPERBOWLHEADLINE-27-COL` (resolved culture row) | `result "no"`, `finalized`, `settlement_ts 2026-10-27T03:33:43.195228Z` — **identical** |
+| `GET /markets/KXBTCY-27JAN0100-B57500/orderbook?depth=10` | `yes_dollars [[0.01,55.50],[0.02,5.00],[0.17,1960.78],[0.18,1851.84],[0.19,1730.58]]`, `no_dollars [[0.78,1515.14],[0.79,1580.90],[0.80,467.93]]` — **identical** to the published liquidity ladder, including the derived ask `1 − 0.80 = 0.20` and its 467.93 contracts |
+| `GET /series/KXYTVIEWSD` | `categories ["Entertainment"]`, `tags ["Views","Daily Views","Music"]`, settlement source YouTube Charts — a genuine Culture series; all 120 culture rows are this series, all volume 0 (correctly labelled untraded) |
+| `GET /series/KXNATGASD` | `categories ["Entertainment"]`, `tags ["Oil & Gas"]`, scope "Natural Gas", Pyth settlement — the F-97 exclusion reason still holds verbatim |
+| `GET /series/KXAAAGASCDCA` | `categories ["Economics","Commodities"]`, title "California gas price", AAA settlement — the keyword-basis gas state series is correctly in Gas Prices |
+| `GET /series/KXAPRPOTUS` | `categories ["Politics"]`, "President RCP approval rating this week" — elections-compatible |
+| `GET /series/KXBNBD` | `categories ["Crypto"]`, "BNB Directional", CF Benchmarks settlement — crypto |
+
+Topic integrity recomputed over **all 514 published open rows** against their own `series_categories`: **0
+official-category conflicts**. Basis distribution: 138 seed / 376 keyword rows, 347 rows matched by the exchange's
+own `GET /series` filters — all three numbers match the landing KPIs exactly. The simulation's fee math was
+re-derived by hand against the official fee table (0.07×0.22×0.78 → ceil-to-cent $0.02; YES loss −0.24, NO win
++0.19 on the settled RHOJ pair; NO entry 0.02 fee 0.01 loss −0.03 on BTC15M) — correct.
+
+### T118 — official documentation re-read this session
+
+| Claim | Official source | What it says (verbatim) | Match |
+|---|---|---|---|
+| Demo REST/WS roots | https://docs.kalshi.com/getting_started/demo_env | REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`); WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`); "mock funds"; "credentials are not shared"; "may not be reflective of those in real markets" | ✔ |
+| Candlestick intervals 1/60/1440 only | https://docs.kalshi.com/api-reference/market/get-market-candlesticks | "Valid values are 1 (1 minute), 60 (1 hour), or 1440 (1 day)"; demo root listed | ✔ |
+| Settlement $1/contract, net positions, no settlement fee | https://docs.kalshi.com/getting_started/market_settlement | "Yes contract holders receive $1 per contract" / "No contract holders receive $1 per contract"; "Only net positions are settled"; "Settlement fees are zero for simple yes/no determinations" | ✔ |
+| Order V2 endpoint | https://docs.kalshi.com/api-reference/orders/create-order-v2 | `POST /portfolio/events/orders` with `KALSHI-ACCESS-KEY/SIGNATURE/TIMESTAMP` headers; demo roots listed | ✔ |
+| WebSocket handshake auth | https://docs.kalshi.com/getting_started/quick_start_websockets | "WebSocket connections require authentication during the connection handshake"; public market-data channels still use the authenticated session | ✔ |
+| General taker fee 0.07·C·P·(1−P), maker 0.0175, no settlement fee | https://kalshi.com/docs/kalshi-fee-schedule.pdf | formulas verbatim; "There is no settlement fee"; general table rows re-checked (0.01→0.07, 0.20→1.12, 0.50→1.75 per 100 contracts) | ✔ |
+| Seed series exist verbatim in the fee schedule | same PDF | KXAAAGASM, KXBTCY, KXETHY, KXELECTIRAN, KXEMMYCACTO/CACTR/CSERIES, KXBALLONDOR, KXSUPERBOWLHEADLINE, KXPGATOUR, KXPGARYDER, KXPGASOLHEIM all listed (KXBALLONDOR is seed-confirmed but excluded from Culture by its own Sports/Soccer series record — the exclusion stands) | ✔ |
+
+**Live site check:** fetched `https://kanlerxz87-cyber.github.io/KalshiDash3/` — serving snapshot
+`2026-11-27T17:15:51Z` with all five category rows matching the independent API reads above, the Culture
+`untraded` disclosure, and KPIs 514/138/200/0/30/347 all recomputed correctly from the data.
+
+### T119 — the defect this session found and fixed (F-104)
+
+| ID | Severity | Defect | Fix | Regression |
+|----|----------|--------|-----|------------|
+| **F-104** | low | The executive summary's living requirements table typed "the sample is one settled alert" (true 2026-11-22) while `alerts.html`, rendering the same committed data, showed "settled: 0 … move vs outcome: no settled alert yet" (43 served tickers: 15 open, 28 not in snapshot, 0 settled). A typed copy of a volatile count — the same defect class as F-73/D-01 | the sentence no longer types a sample size; it keeps the D-04 bare-count disclosure and points at the alert chats page, which renders the count live | `scripts/tests/test_pages_dom.js` section M: recomputes the settled-alert sample from the committed alerts + markets with the page's own join and refuses any typed "N settled alert" that disagrees; mutation-checked (old sentence restored → suite fails "types 1 but data has 0"; fix → passes) |
+
+### Log (this session)
+
+- 2026-11-27 ~17:24Z: read the board, claimed T114–T117 (later renumbered T117–T120), pushed the claim before any
+  implementation edit. Baseline gate **PASS** (21 pages, every validator and suite, jsdom@26 installed with
+  `npm install --no-save --package-lock=false jsdom@26`).
+- 2026-11-27 ~17:25–17:40Z: T117/T118 live re-verification — every fetched record matched (tables above).
+- 2026-11-27 ~17:40Z: found F-104 by rendering `alerts.html` in jsdom against the committed data and comparing with
+  the executive summary's prose; fixed it with a mutation-checked regression; appended F-104 to
+  `data/findings.json` (append-only, 15-line diff).
+- 2026-11-27 ~17:45Z: discovered concurrent sessions on `main` (PRs #132–#137 merged, PR #138 open). Renumbered
+  this session's tasks to T117–T120 and the finding to F-104 (PR #138 holds F-100…F-103; `arena-bc717755` holds
+  T114–T116). No other session's implementation files were edited.
+- 2026-11-27 ~17:45Z: re-tested the DEPLOY-1 Pages configuration switch (`PUT /repos/…/pages` with
+  `build_type=workflow`) — refused again with HTTP 403 "Resource not accessible by integration", the third
+  session to record the same refusal; configuration unchanged (`legacy`, source `main /`). The Actions deploy
+  job itself succeeds on main (run 46040449316, both jobs green), so both publishers remain active as DEPLOY-1
+  describes.
+- 2026-11-27 ~17:45Z: observed one transient legacy Pages build failure on `3a97688` (PR #133's merge, 17:36:23Z,
+  "Page build failed.") superseded 10 seconds later by the successful build of `bd6f467` (PR #137's merge,
+  17:36:33Z, `built`). The site never stopped serving the last good build; no action needed beyond this record.
+  Builds API: https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/pages/builds
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
