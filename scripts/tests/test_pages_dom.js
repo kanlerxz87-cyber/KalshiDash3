@@ -839,6 +839,39 @@ function commonAsserts(label, r) {
       `executive-summary.html must render the catalyst coverage from data/live/catalysts.json (got: ${catLine})`);
     check(cat.counts.reviewed === cat.counts.archive_total || /partial/.test(catStatus),
       `the catalyst status must say "partial" while any swing is unreviewed (got: ${catStatus})`);
+    // F-104: the requirements table typed "the sample is one settled alert" (true on
+    // 2026-11-22) while the alert chats rendered "no settled alert yet" from the same
+    // committed data. A living page must not type a volatile count: recompute the
+    // settled-alert sample with the SAME narrow join the alert page uses (served feed
+    // tickers -> snapshot row -> finalized with a yes/no result, assets/site.js
+    // lifecycleOf/lifecycleTally) and refuse any typed sample size that disagrees.
+    if (markets) {
+      const alertsDoc = JSON.parse(fs.readFileSync(path.join(ROOT, "data/live/alerts.json"), "utf8"));
+      const idx = new Map();
+      for (const row of (markets.open_markets || []).concat(markets.settled_markets || [])) {
+        if (row && row.ticker) idx.set(row.ticker, row);   // settled rows win, as on the page
+      }
+      const served = new Set((alertsDoc.all_events || []).map(a => a && a.ticker).filter(Boolean));
+      let settledAlerted = 0;
+      for (const t of served) {
+        const row = idx.get(t);
+        const status = String((row && row.status) || "").toLowerCase();
+        const result = typeof (row && row.result) === "string" ? row.result.toLowerCase() : null;
+        if ((status === "finalized" || status === "settled") && (result === "yes" || result === "no")) settledAlerted += 1;
+      }
+      const WORD_NUM = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+      const typed = [...bodyText.matchAll(/(\bone|two|three|four|five|six|seven|eight|nine|ten|\d+)\s+settled alert/gi)]
+        .map(m => WORD_NUM[m[1].toLowerCase()] ?? Number(m[1]));
+      for (const n of typed) {
+        check(n === settledAlerted,
+          `executive-summary.html types a settled-alert sample of ${n} but the committed data has ${settledAlerted} `
+          + `(served feed ${served.size} tickers; the alert chats page is the live surface for this count) — F-104`);
+      }
+      check(/bare count/.test(bodyText),
+        "executive-summary.html must keep the D-04 disclosure that the move-vs-outcome figure is a bare count, not a rate");
+      console.log(`  M F-104 guard   ok  (settled-alert sample recomputed: ${settledAlerted} of ${served.size} served tickers; `
+        + `typed sample sizes found: ${typed.length})`);
+    }
     console.log(`  M exec summary  ok  (${vf.facts.length} facts, ${fd.flagged.length} flagged, `
       + `${fd.suggestions.length} suggestions, ${fd.questions.length} questions, catalysts `
       + `${cat.counts.reviewed}/${cat.counts.archive_total})`);
