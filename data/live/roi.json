@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T20:21:07Z",
- "runtime_seconds": 90.3,
+ "collected_at": "2026-11-27T21:06:09Z",
+ "runtime_seconds": 90.0,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,24 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 866,
-  "open_excluded_category_conflict": 19,
+  "open_in_scope": 129,
+  "open_excluded_category_conflict": 6,
   "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
   "near_misses": 0,
-  "unscoreable": 866,
-  "orderbooks": 866,
-  "orderbooks_requested": 866,
+  "unscoreable": 129,
+  "orderbooks": 129,
+  "orderbooks_requested": 129,
   "alerts": 0,
-  "markets_with_momentum": 35,
+  "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 866,
-  "returned": 866,
+  "requested": 129,
+  "returned": 129,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -62,12 +62,13 @@
  "near_misses": [],
  "unscoreable": [
   {
-   "ticker": "KXMXCPIYOY-26DEC09-T4.3",
+   "ticker": "KXDOMINICAPARLI-26DEC16-UWP",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 384 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -82,9 +83,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
+   "ttc_hours": 9209.8975,
    "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
+   "series_ticker": "KXDOMINICAPARLI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -93,12 +94,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.3%?",
-   "category_id": "culture",
+   "title": "Will the United Workers Party (UWP) win the 2026 Dominica general election?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
+   "close_time": "2027-12-16T15:00:00Z",
+   "event_ticker": "KXDOMINICAPARLI-26DEC16",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -111,15 +112,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.3"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOMINICAPARLI-26DEC16-UWP"
   },
   {
-   "ticker": "KXMXCPIYOY-26DEC09-T4.2",
+   "ticker": "KXDOMINICAPARLI-26DEC16-DLP",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 384 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -134,9 +136,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
+   "ttc_hours": 9209.8975,
    "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
+   "series_ticker": "KXDOMINICAPARLI",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -145,12 +147,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.2%?",
-   "category_id": "culture",
+   "title": "Will the Dominica Labour Party (DLP) win the 2026 Dominica general election?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
+   "close_time": "2027-12-16T15:00:00Z",
+   "event_ticker": "KXDOMINICAPARLI-26DEC16",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -163,15 +165,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.2"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOMINICAPARLI-26DEC16-DLP"
   },
   {
-   "ticker": "KXMXCPIYOY-26DEC09-T4.1",
+   "ticker": "KXTAOYUANMAYOR-26NOV28-HHUA",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 366 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -186,9 +189,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
+   "ttc_hours": 8777.8975,
    "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
+   "series_ticker": "KXTAOYUANMAYOR",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -197,12 +200,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.1%?",
-   "category_id": "culture",
+   "title": "Will Huang Shih-chieh win the 2026 Taoyuan mayoral election?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
+   "close_time": "2027-11-28T15:00:00Z",
+   "event_ticker": "KXTAOYUANMAYOR-26NOV28",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -215,15 +218,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.1"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTAOYUANMAYOR-26NOV28-HHUA"
   },
   {
-   "ticker": "KXMXCPIYOY-26DEC09-T4.0",
+   "ticker": "KXTAOYUANMAYOR-26NOV28-CCHA",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 366 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -238,9 +242,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
+   "ttc_hours": 8777.8975,
    "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
+   "series_ticker": "KXTAOYUANMAYOR",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -249,12 +253,12 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 4.0%?",
-   "category_id": "culture",
+   "title": "Will Chang San-cheng win the 2026 Taoyuan mayoral election?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
+   "close_time": "2027-11-28T15:00:00Z",
+   "event_ticker": "KXTAOYUANMAYOR-26NOV28",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -267,15 +271,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T4.0"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXTAOYUANMAYOR-26NOV28-CCHA"
   },
   {
-   "ticker": "KXMXCPIYOY-26DEC09-T3.9",
+   "ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN-5",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 453 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -290,9 +295,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
+   "ttc_hours": 10865.8975,
    "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
+   "series_ticker": "KXVOTEPRIMARY",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -301,171 +306,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.9%?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.9"
-  },
-  {
-   "ticker": "KXMXCPIYOY-26DEC09-T3.8",
-   "eligible": false,
-   "fails": [
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.01,
-   "mid": 0.0,
-   "micro": 0.0,
-   "last": 0.0,
-   "bid": 0.0,
-   "ask": 0.0,
-   "spread": 0.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
-   "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.8%?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.8"
-  },
-  {
-   "ticker": "KXMXCPIYOY-26DEC09-T3.7",
-   "eligible": false,
-   "fails": [
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.01,
-   "mid": 0.0,
-   "micro": 0.0,
-   "last": 0.0,
-   "bid": 0.0,
-   "ask": 0.0,
-   "spread": 0.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 279.63138888888886,
-   "momentum": null,
-   "series_ticker": "KXMXCPIYOY",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.0,
-   "title": "Will Mexico\u2019s full-month annual headline inflation rate for November 2026 be above 3.7%?",
-   "category_id": "culture",
-   "category_basis": "keyword",
-   "series_categories": [],
-   "close_time": "2026-12-09T11:59:00Z",
-   "event_ticker": "KXMXCPIYOY-26DEC09",
-   "status": "active",
-   "result": null,
-   "volume_fp": 0.0,
-   "volume_24h_fp": 0.0,
-   "open_interest_fp": 0.0,
-   "catalysts": [],
-   "book": {
-    "depth_at_bid": 0.0,
-    "depth_at_ask": 0.0,
-    "bid_price": null,
-    "ask_price": null
-   },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXMXCPIYOY-26DEC09-T3.7"
-  },
-  {
-   "ticker": "KXREDISTRICTING-28-MS",
-   "eligible": false,
-   "fails": [
-    "depth 0 < 50 contracts at the touch",
-    "24h volume 0.0 < 100 contracts",
-    "no buyable side",
-    "closes in 710 d > 90 d horizon",
-    "topic not confirmed by the fee schedule (keyword match only)"
-   ],
-   "reasons": [
-    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
-   ],
-   "q": 0.01,
-   "mid": 0.0,
-   "micro": 0.0,
-   "last": 0.0,
-   "bid": 0.0,
-   "ask": 0.0,
-   "spread": 0.0,
-   "depth": 0,
-   "vol24": 0.0,
-   "ttc_hours": 17048.631388888887,
-   "momentum": null,
-   "series_ticker": "KXREDISTRICTING",
-   "fee_multiplier": {
-    "taker": 1,
-    "maker": 0,
-    "listed": false
-   },
-   "entry": null,
-   "score": null,
-   "dollars_traded_estimate": 0.0,
-   "title": "What states will redistrict before the 2028 Congressional elections?",
+   "title": "Will Susana Mendoza receive at least 5% of the popular vote in the first round of the 2027 Chicago mayoral election?",
    "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [
     "Elections"
    ],
-   "close_time": "2028-11-07T04:59:00Z",
-   "event_ticker": "KXREDISTRICTING-28",
+   "close_time": "2028-02-23T15:00:00Z",
+   "event_ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -478,13 +326,178 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXREDISTRICTING-28-MS"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVOTEPRIMARY-CHIMAYOR1R27SMEN-5"
+  },
+  {
+   "ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN-30",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "closes in 453 d > 90 d horizon",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 10865.8975,
+   "momentum": null,
+   "series_ticker": "KXVOTEPRIMARY",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Will Susana Mendoza receive at least 30% of the popular vote in the first round of the 2027 Chicago mayoral election?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-02-23T15:00:00Z",
+   "event_ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVOTEPRIMARY-CHIMAYOR1R27SMEN-30"
+  },
+  {
+   "ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN-25",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "closes in 453 d > 90 d horizon",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 10865.8975,
+   "momentum": null,
+   "series_ticker": "KXVOTEPRIMARY",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Will Susana Mendoza receive at least 25% of the popular vote in the first round of the 2027 Chicago mayoral election?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-02-23T15:00:00Z",
+   "event_ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVOTEPRIMARY-CHIMAYOR1R27SMEN-25"
+  },
+  {
+   "ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN-20",
+   "eligible": false,
+   "fails": [
+    "depth 0 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "no buyable side",
+    "closes in 453 d > 90 d horizon",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [
+    "quoted at a degenerate 0.00/1.00 level: no price to buy, so no entry is priced"
+   ],
+   "q": 0.01,
+   "mid": 0.0,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.0,
+   "spread": 0.0,
+   "depth": 0,
+   "vol24": 0.0,
+   "ttc_hours": 10865.8975,
+   "momentum": null,
+   "series_ticker": "KXVOTEPRIMARY",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": null,
+   "score": null,
+   "dollars_traded_estimate": 0.0,
+   "title": "Will Susana Mendoza receive at least 20% of the popular vote in the first round of the 2027 Chicago mayoral election?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "close_time": "2028-02-23T15:00:00Z",
+   "event_ticker": "KXVOTEPRIMARY-CHIMAYOR1R27SMEN",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 0.0,
+    "bid_price": null,
+    "ask_price": null
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXVOTEPRIMARY-CHIMAYOR1R27SMEN-20"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 148,
+  "candles_used": 118,
   "signals": 0,
   "hits": 0,
   "misses": 0,
@@ -494,7 +507,7 @@
   "by_category": {},
   "skipped": {
    "candle without a price": 15,
-   "no candles in the 2h before close": 34,
+   "no candles in the 2h before close": 35,
    "no side passed the replay gates": 9
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
