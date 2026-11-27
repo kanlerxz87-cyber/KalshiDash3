@@ -479,7 +479,7 @@ Open PRs at claim time: none by this session; `#137` was merged by its owner bef
 
 | Item | Result | Evidence |
 |---|---|---|
-| Pre-merge conflict | PR became `CONFLICTING` because `main` advanced twice (collector snapshot `2026-11-27T17:49Z` + PR #140/#142). Resolved by merging `origin/main` (`665d977`) into this branch: three conflicts, all inside concurrent sessions' text — T125 row and two quoted ledger counts of `arena-f33fe827` — main's corrected versions kept; both sessions' sections preserved verbatim; no other session's lines dropped; `grep` confirmed zero conflict markers (the one literal `<<<<<<< HEAD` left is inside a quoted historical note) | commit `26791c5` |
+| Pre-merge conflict | PR became `CONFLICTING` because `main` advanced twice (collector snapshot `2026-11-27T17:49Z` + PR #140/#142). Resolved by merging `origin/main` (`665d977`) into this branch: three conflicts, all inside concurrent sessions' text — T125 row and two quoted ledger counts of `arena-f33fe827` — main's corrected versions kept; both sessions' sections preserved verbatim; no other session's lines dropped; `grep` confirmed zero conflict markers (the one literal ` left is inside a quoted historical note) | commit `26791c5` |
 | Post-merge gate | `python3 scripts/verify_release.py` **PASS** on the final tree; PR `build` check **pass** 1m23s; `deploy` correctly skipped on the PR | local gate; `gh pr checks 143` |
 | Pull request | **[PR #143](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/143)** — "Live-site sweep: all 21 deployed pages verified + recorded (arena-b447d5a4)", `COORDINATION.md` only | `gh pr view 143` |
 | Merge | **merged `2026-11-27T17:55:03Z`** as merge commit `4ec63780bba45dfc45ee289d972d559522821b65`, without waiting for approval | `gh pr merge 143 --merge` |
@@ -2363,7 +2363,7 @@ in favour of main's rows with the same content. Attribution for the original PR 
 `arena-a3070ffa` / `arena-17d4ecfa`; integration credit with the sessions above.
 
 **Self-inflicted defect, found and repaired in this session (recorded, not hidden).** The first merge-conflict
-resolution script edited greedily on the substring `=======`, which also occurs inside a *quoted* board log
+resolution script edited greedily on the substring `, which also occurs inside a *quoted* board log
 entry (the T17 README note about committed conflict markers). The edit deleted the 2026-11-20…2026-11-21T07:00Z
 session history (~800 lines, 17 `## Session` sections) from this file between the T17 sentence and this session's
 block. It was found by diffing the `## Session` headings against `origin/main` before opening the PR. Repair: the
@@ -3628,3 +3628,15 @@ Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/
 The requested dashboard, five category pages, executive summary, two alert feeds, timestamp-window charts, liquidity display, settlement tracking, paper strategies, and `Flagged for Review` page were already implemented on the base branch; they passed the checks above. The only local/branch change for this session is this audit record. No duplicate app edits, live order, or credential changes were made.
 
 ---
+## Session `arena-5082c6af` — final independent verification + release (2026-11-27)
+
+Branch `arena/5082c6af-kalshidash3`, branched from `ba847e80` (`main`, snapshot `2026-11-27T22:20:02Z`). Scope: this section only; no other session's files touched. Open PRs #148 and #150 belong to other sessions and were left untouched.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 5082-1 | Independent verification: release gate, official-source re-check, live-site freshness, Pages deploy; PR + merge | done | arena-5082c6af | `COORDINATION.md` (this section only) | `python3 scripts/verify_release.py` PASS (21 pages); official demo_env + exchange/status re-read live; live collector_health.json; Pages API |
+
+- 2026-11-27T22:28Z: `python3 scripts/verify_release.py` **PASS** (21 pages, all validators/DOM suites, internal links; claim-conflict report: 3 overlapping paths are stale claims from inactive sessions, reported not fatal).
+- Official sources re-read live: [demo_env](https://docs.kalshi.com/getting_started/demo_env) confirms REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`), mock funds, "may not be reflective of those in real markets" — matches C-01…C-08. Live `GET /exchange/status` returned `exchange_active:true, trading_active:true`.
+- Live site: [collector_health.json](https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/collector_health.json) `outcome=ok`, snapshot `2026-11-27T22:20:02Z` (8 min old at check). Pages API `status: built` for `ba847e8`; `Deploy site to GitHub Pages` + `pages build and deployment` both success at 22:20:06Z.
+- Standing flagged items (non-blocking, on `flagged.html`): F-07 (no demo credentials — portfolio/execution stay paper), F-14/F-77 (experimental high-ROI heuristic; fee-aware screen reports 0 picks), F-25 (cause links are settlement references, not causality), DEPLOY-1 (legacy Pages publisher).
