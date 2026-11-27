@@ -12,7 +12,7 @@ Claimed 2026-11-27 on `arena/660e1da6-kalshidash3` from `fe245d8`. Read the boar
 
 | Task | Status | Owner | File scope |
 |---|---|---|---|
-| Verify existing demo dashboard, audit live price/lifecycle handling, repair evidenced defects and cover with regression tests | in progress | arena-660e1da6 | `assets/engine.js`, `assets/live.js`, `scripts/tests/test_lifecycle.js`, `scripts/tests/test_engine_node.js` |
+| Verify existing demo dashboard, audit live price/lifecycle handling, repair evidenced defects and cover with regression tests | in progress | arena-660e1da6 | `assets/engine.js`, `trading.html`, `dashboard.html` (watchlist only), `scripts/tests/engine.test.js` |
 | Final integration: publish audit/flags, run release gate, PR and confirm Pages | in progress | arena-660e1da6 | `COORDINATION.md` (this section), `data/findings.json`, `executive-summary.html` |
 
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
