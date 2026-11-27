@@ -6,6 +6,27 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-417935f1` — collector-stall root cause (F-107), validator diagnostics (F-108), release verification + publish (branch `arena/417935f1-kalshidash3`, base `a4a19cc`)
+
+Claimed 2026-11-27 **before any code or data edit**, after reading the board and reproducing the release gate on the
+base tree (`python3 scripts/verify_release.py` **PASS**, 21 pages, every validator and DOM suite; `jsdom@26` installed
+test-only with `npm install --no-save --package-lock=false jsdom@26`).
+
+**Observed state at claim (not inferred):** `data/live/markets.json` is frozen at `collected_at
+2026-11-27T18:00:57Z`; `data/live/collector_health.json` records **five consecutive failed passes**
+(`18:31:08Z`, `18:46:08Z`, `19:01:08Z`, `19:08:02Z`, `19:23:02Z`), every one of them `validators: validate_alerts`,
+every one with an **empty `stderr_tail`**. The newest successful snapshot commit is `639f069` at `18:00:59Z`; PR #149
+(`3348682`) merged at `18:29:47Z`. The same validator **passes** on the committed tree here, so the failure is
+data-dependent on a *fresh* collection, not on the committed snapshot.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| R41-1 | Root-cause the five-pass `validate_alerts` collector failure and fix it at the source | in_progress | arena-417935f1 | `scripts/build_alerts.py`, `scripts/tests/validate_alerts.py`, `scripts/tests/test_alert_topic_domain.js` (only the files the cause requires) | fresh-collection replay + validator output; official `GET /series` categories |
+| R41-2 | Make a failed validator's own output land in `data/live/collector_health.json` and in the check-run annotation instead of an empty `stderr_tail` (F-108) | in_progress | arena-417935f1 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py` | `gh api …/check-runs/{id}/annotations` (empty on all five failing runs) |
+| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result here | unclaimed | — | `COORDINATION.md` (this section), `data/findings.json` (append only) | `python3 scripts/verify_release.py`; `gh api repos/…/pages(+builds)` |
+
+<!-- End session arena-417935f1 claim -->
+
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
 Claimed 2026-11-27 **before any code or data edit** after reading `COORDINATION.md` and syncing with `origin/main` (`bd6f467`, snapshot `2026-11-27T17:30:51Z`). Merged concurrent sessions (`PR #138`..`#143` -> `4ec6378`) cleanly before opening PR so every concurrent audit, test suite (`audit_rendered_numbers.js`, `test_alert_topic_domain.js`, `test_liquidity_ladder.js`, `test_series_fallback.js`), and finding (`F-100`..`F-104`) is preserved intact.
