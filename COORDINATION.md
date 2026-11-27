@@ -32,6 +32,20 @@ Claimed 2026-11-27 before implementation after reading this task board and confi
 
 **Post-merge sync note (2026-11-27):** after correcting the audit's smooth-scroll count, `git pull --rebase origin arena/699eb329-kalshidash3` attempted to replay main's already-merged PR history and conflicted in `COORDINATION.md`. The rebase was aborted; no other session's work was discarded. Current `main` already contains all those merged board sections and this session's audit; the remaining report correction is a descendant of the current branch tip and will be pushed as a normal fast-forward, not a force push.
 
+## Session `arena-740b3003` — close the stale lifecycle finding against the current official record
+
+Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshidash3`, based on `ba847e8` (`main`, demo snapshot `2026-11-27T22:20:02Z`). Read the shared board, checked open PRs, and inspected the current committed lifecycle record before editing implementation/data.
+
+**Observed before edits:** F-113 still said its named golf alert `KXPGATOUR-THRC26-BHAR` was “not in snapshot.” The current `data/live/markets.json` already contains an `alert_lifecycle` row for that ticker with `status: finalized`, `result: no`, settlement timestamp `2026-11-23T19:58:03.108438Z`, and the exact official market URL; the corresponding alert is still in the archive/feed. A fresh read of the official demo `GET /markets/{ticker}` at the URL below returned those same fields. Thus the implementation had landed, but the review ledger had not been updated after the collector published the evidence.
+
+**Stale-scope handoff (per the board’s >60-minute rule):** open PR #148’s only commit is the F-105 indentation-only change (`f5c5e7f`, committed 18:11:28Z; PR last updated 18:11:33Z), more than four hours before this claim. This session takes over only `data/findings.json`, will preserve that formatting patch, and will change only F-113’s action text besides the F-105 formatting. The machine-ledger still marks E9D9-4 live although its PR #147 merged at 18:10:42Z; the older `dba435ee` T47 claim is backed by PR #64 merged 2026-11-21T20:41Z. Those board rows are historical/stale; no code from those scopes is being changed. Open PR #150 is a disjoint desk-workflow change; its workflow file and code are untouched. This record is the handoff note; it does not rewrite another session’s section.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| A740-1 | Reconcile F-113 with the now-published lifecycle record, preserve the stale F-105 formatting patch, and add a regression for the exact archived golf resolution | in progress | arena-740b3003 | `data/findings.json` (F-113 action; F-105 formatting handoff only), `scripts/tests/test_f113_resolution.py` (new), `COORDINATION.md` (this section), `data/session_claims.json` (generated) | [Official demo market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Market Lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), committed `data/live/markets.json` / alert archive |
+| A740-2 | Run the complete release gate; open a PR from this fixed branch, merge without waiting, and verify the deployed finding page and Pages build | in progress | arena-740b3003 | `COORDINATION.md` (this section only) | `python3 scripts/verify_release.py`, GitHub PR/check/Pages APIs, deployed `flagged.html` |
+
+---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
 

@@ -1,19 +1,51 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T20:40:16Z",
+ "generated_at": "2026-11-27T22:31:11Z",
  "source": "/home/user/KalshiDash3/COORDINATION.md",
  "note": "Claim ledger parsed from the shared board. A claim is live when its status is not recorded as done. A conflict is one path claimed live by two or more sessions. The board records no commit times, so this report does NOT decide staleness: a claim from a session that stopped hours ago looks the same as one from a minute ago. Cross-check a session's branch before taking a claim over.",
  "sessions": [
   {
+   "session": "740b3003",
+   "heading": "Session `arena-740b3003` \u2014 close the stale lifecycle finding against the current official record",
+   "heading_line": 6,
+   "claims": [
+    {
+     "task": "A740-1",
+     "status": "in progress",
+     "status_normalised": "in progress",
+     "live": true,
+     "owner": "arena-740b3003",
+     "files": [
+      "COORDINATION.md",
+      "data/findings.json",
+      "data/session_claims.json",
+      "scripts/tests/test_f113_resolution.py"
+     ],
+     "line": 16
+    },
+    {
+     "task": "A740-2",
+     "status": "in progress",
+     "status_normalised": "in progress",
+     "live": true,
+     "owner": "arena-740b3003",
+     "files": [
+      "COORDINATION.md"
+     ],
+     "line": 17
+    }
+   ]
+  },
+  {
    "session": "72ae7bca",
    "heading": "Session `arena-72ae7bca` \u2014 independent source-provenance audit and release integration",
-   "heading_line": 6,
+   "heading_line": 21,
    "claims": []
   },
   {
    "session": "9312ad1f",
    "heading": "Session `arena-9312ad1f` \u2014 collector-stall root cause (independent reproduction), cross-session claim ledger, and site-wide source/staleness audit (branch `arena/9312ad1f-kalshidash3`, base `43dd5f1`)",
-   "heading_line": 56,
+   "heading_line": 71,
    "claims": [
     {
      "task": "R93-1",
@@ -26,7 +58,7 @@
       "scripts/check_claim_conflicts.py",
       "scripts/tests/test_claim_conflicts.py"
      ],
-     "line": 86
+     "line": 101
     },
     {
      "task": "R93-2",
@@ -37,7 +69,7 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 87
+     "line": 102
     },
     {
      "task": "R93-3",
@@ -49,7 +81,7 @@
       "COORDINATION.md",
       "scripts/tests/test_staleness_disclosure.js"
      ],
-     "line": 88
+     "line": 103
     },
     {
      "task": "R93-R5",
@@ -60,7 +92,7 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 89
+     "line": 104
     },
     {
      "task": "R93-R1",
@@ -69,7 +101,7 @@
      "live": false,
      "owner": "arena-9312ad1f (request only; no edit)",
      "files": [],
-     "line": 90
+     "line": 105
     },
     {
      "task": "R93-4",
@@ -80,14 +112,14 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 91
+     "line": 106
     }
    ]
   },
   {
    "session": "035cd7c0",
    "heading": "Session `arena-035cd7c0` \u2014 live official-API parity audit + official-source verification sweep (branch `arena/035cd7c0-kalshidash3`, base `a4a19cc` = `main` 2026-11-27T19:23:02Z, rebased onto `3cb118b` after re-reading this board)",
-   "heading_line": 156,
+   "heading_line": 171,
    "claims": [
     {
      "task": "A035-1",
@@ -99,7 +131,7 @@
       "data/audit/",
       "scripts/audit_live_parity.py"
      ],
-     "line": 162
+     "line": 177
     },
     {
      "task": "A035-2",
@@ -110,7 +142,7 @@
      "files": [
       "data/audit/"
      ],
-     "line": 163
+     "line": 178
     },
     {
      "task": "A035-3",
@@ -123,14 +155,14 @@
       "README.md",
       "data/findings.json"
      ],
-     "line": 164
+     "line": 179
     }
    ]
   },
   {
    "session": "b1cc1b1f",
    "heading": "Session `arena-b1cc1b1f` \u2014 independent live-source verification of the collector-stall fix wave + non-blocking hardening suggestion (branch `arena/b1cc1b1f-kalshidash3`, base `a4a19cc`)",
-   "heading_line": 191,
+   "heading_line": 206,
    "claims": [
     {
      "task": "B1CC-1",
@@ -141,7 +173,7 @@
      "files": [
       "data/findings.json"
      ],
-     "line": 201
+     "line": 216
     },
     {
      "task": "B1CC-2",
@@ -150,7 +182,7 @@
      "live": false,
      "owner": "arena-b1cc1b1f",
      "files": [],
-     "line": 202
+     "line": 217
     },
     {
      "task": "B1CC-3",
@@ -161,7 +193,7 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 203
+     "line": 218
     },
     {
      "task": "B1CC-4",
@@ -173,14 +205,14 @@
       "COORDINATION.md",
       "data/findings.json"
      ],
-     "line": 204
+     "line": 219
     }
    ]
   },
   {
    "session": "417935f1",
    "heading": "Session `arena-417935f1` \u2014 collector-stall diagnosis, release verification, publish (branch `arena/417935f1-kalshidash3`, base `a4a19cc`)",
-   "heading_line": 243,
+   "heading_line": 258,
    "claims": [
     {
      "task": "R41-1",
@@ -189,7 +221,7 @@
      "live": false,
      "owner": "arena-417935f1",
      "files": [],
-     "line": 256
+     "line": 271
     },
     {
      "task": "R41-2",
@@ -200,7 +232,7 @@
      "files": [
       "scripts/collect_relay.py"
      ],
-     "line": 257
+     "line": 272
     },
     {
      "task": "R41-3",
@@ -211,14 +243,14 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 258
+     "line": 273
     }
    ]
   },
   {
    "session": "a8d317a1",
    "heading": "Session `arena-a8d317a1` \u2014 collector stall after PR #149: make the failing validator say WHY, then fix the cause (branch `arena/a8d317a1-kalshidash3`, base `a4a19cc`)",
-   "heading_line": 334,
+   "heading_line": 349,
    "claims": [
     {
      "task": "A8D3-1",
@@ -231,7 +263,7 @@
       "scripts/tests/test_collect_health.py",
       "scripts/tests/test_collect_relay.py"
      ],
-     "line": 347
+     "line": 362
     },
     {
      "task": "A8D3-2",
@@ -242,7 +274,7 @@
      "files": [
       "data/live/collector_health.json"
      ],
-     "line": 348
+     "line": 363
     },
     {
      "task": "A8D3-3",
@@ -256,7 +288,7 @@
       "scripts/tests/test_series_ledger_carry.py",
       "scripts/tests/validate_alerts.py"
      ],
-     "line": 349
+     "line": 364
     },
     {
      "task": "A8D3-4",
@@ -268,7 +300,7 @@
       "COORDINATION.md",
       "data/findings.json"
      ],
-     "line": 350
+     "line": 365
     },
     {
      "task": "A8D3-5",
@@ -279,14 +311,14 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 351
+     "line": 366
     }
    ]
   },
   {
    "session": "c4409c73",
    "heading": "Session `c4409c73` \u2014 collector recovery, source audit, and Pages integration",
-   "heading_line": 432,
+   "heading_line": 447,
    "claims": [
     {
      "task": "C440-1",
@@ -299,7 +331,7 @@
       "scripts/tests/test_alerts.py",
       "scripts/tests/test_lifecycle.js"
      ],
-     "line": 438
+     "line": 453
     },
     {
      "task": "C440-2",
@@ -313,7 +345,7 @@
       "executive-summary.html",
       "flagged.html"
      ],
-     "line": 439
+     "line": 454
     },
     {
      "task": "C440-3",
@@ -337,7 +369,7 @@
       "scripts/track_lifecycle.py",
       "simulation.html"
      ],
-     "line": 440
+     "line": 455
     },
     {
      "task": "C440-4",
@@ -349,14 +381,14 @@
       "scripts/collect_relay.py",
       "scripts/tests/test_collect_health.py"
      ],
-     "line": 441
+     "line": 456
     }
    ]
   },
   {
    "session": "e9d94b88",
    "heading": "Session `arena-e9d94b88` \u2014 live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)",
-   "heading_line": 452,
+   "heading_line": 467,
    "claims": [
     {
      "task": "E9D9-1",
@@ -367,7 +399,7 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 458
+     "line": 473
     },
     {
      "task": "E9D9-2",
@@ -380,7 +412,7 @@
       "scripts/tests/test_roi_scan_offline.py",
       "scripts/tests/validate_roi.py"
      ],
-     "line": 459
+     "line": 474
     },
     {
      "task": "E9D9-3",
@@ -395,7 +427,7 @@
       "scripts/collect.py",
       "scripts/tests/test_scope.py"
      ],
-     "line": 460
+     "line": 475
     },
     {
      "task": "E9D9-4",
@@ -408,20 +440,20 @@
       "data/findings.json",
       "suggestions.html"
      ],
-     "line": 461
+     "line": 476
     }
    ]
   },
   {
    "session": "b447d5a4",
    "heading": "Session `arena-b447d5a4` \u2014 full live-site sweep: all 21 deployed pages, data parity, publish record (branch `arena/b447d5a4-kalshidash3`, base `fe245d8` + merge of `origin/main` `bd6f467`)",
-   "heading_line": 465,
+   "heading_line": 480,
    "claims": []
   },
   {
    "session": "1370a435",
    "heading": "Session `arena-1370a435` \u2014 independent live-API verification, render audit, defect repair, and publish (branch `arena/1370a435-kalshidash3`, base `fe245d8`)",
-   "heading_line": 537,
+   "heading_line": 552,
    "claims": [
     {
      "task": "F-105",
@@ -433,32 +465,32 @@
       "scripts/tests/test_chat_counts.js",
       "scripts/tests/test_chatdock.js"
      ],
-     "line": 600
+     "line": 615
     }
    ]
   },
   {
    "session": "98e88d21",
    "heading": "Session `arena-98e88d21` \u2014 current snapshot release and source audit (branch `arena/98e88d21-kalshidash3`)",
-   "heading_line": 639,
+   "heading_line": 654,
    "claims": []
   },
   {
    "session": "660e1da6",
    "heading": "Session `arena-660e1da6` \u2014 live dashboard audit and final integration",
-   "heading_line": 683,
+   "heading_line": 698,
    "claims": []
   },
   {
    "session": "bc717755",
    "heading": "Session `arena-bc717755` \u2014 current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)",
-   "heading_line": 702,
+   "heading_line": 717,
    "claims": []
   },
   {
    "session": "f33fe827",
    "heading": "Session `arena-f33fe827` \u2014 independent line-by-line verification of the shipped tree, defect repair, and publish (branch `arena/f33fe827-kalshidash3`, base `fe245d8`)",
-   "heading_line": 746,
+   "heading_line": 761,
    "claims": [
     {
      "task": "F-104",
@@ -469,20 +501,20 @@
      "files": [
       "scripts/tests/test_pages_dom.js"
      ],
-     "line": 992
+     "line": 1007
     }
    ]
   },
   {
    "session": "251f5c3d",
    "heading": "Session `arena-251f5c3d` \u2014 current-snapshot verification, defect repair, and publish (branch `arena/251f5c3d-kalshidash3`, base `fe245d8`)",
-   "heading_line": 1069,
+   "heading_line": 1084,
    "claims": []
   },
   {
    "session": "a490dfa2",
    "heading": "Session `arena-a490dfa2` \u2014 independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)",
-   "heading_line": 1145,
+   "heading_line": 1169,
    "claims": [
     {
      "task": "F-97",
@@ -493,7 +525,7 @@
      "files": [
       "scripts/tests/test_topic_integrity.py"
      ],
-     "line": 1202
+     "line": 1226
     },
     {
      "task": "F-98",
@@ -504,7 +536,7 @@
      "files": [
       "scripts/tests/test_collect_health.py"
      ],
-     "line": 1203
+     "line": 1227
     },
     {
      "task": "F-99",
@@ -515,20 +547,20 @@
      "files": [
       "scripts/tests/test_price_history_retention.py"
      ],
-     "line": 1204
+     "line": 1228
     }
    ]
   },
   {
    "session": "0b0ca3c1",
    "heading": "Session `arena-0b0ca3c1` \u2014 restore the Pages release gate on `main` (branch `arena/0b0ca3c1-kalshidash3`, base `68827bd`)",
-   "heading_line": 1238,
+   "heading_line": 1262,
    "claims": []
   },
   {
    "session": "1aaa3a61",
    "heading": "Session `arena-1aaa3a61` \u2014 current-snapshot release-gate repair",
-   "heading_line": 1313,
+   "heading_line": 1337,
    "claims": [
     {
      "task": "CSG-1",
@@ -541,14 +573,14 @@
       "scripts/tests/test_chatdock.js",
       "scripts/tests/test_pages_dom.js"
      ],
-     "line": 1317
+     "line": 1341
     }
    ]
   },
   {
    "session": "748b2c0e",
    "heading": "Session `arena-748b2c0e` \u2014 snapshot regression follow-up (2026-11-25)",
-   "heading_line": 1330,
+   "heading_line": 1354,
    "claims": [
     {
      "task": "N25-1",
@@ -560,7 +592,7 @@
       "COORDINATION.md",
       "scripts/tests/test_pages_dom.js"
      ],
-     "line": 1336
+     "line": 1360
     },
     {
      "task": "N25-2",
@@ -572,14 +604,14 @@
       "COORDINATION.md",
       "scripts/tests/test_pages_dom.js"
      ],
-     "line": 1337
+     "line": 1361
     }
    ]
   },
   {
    "session": "56aa1e57",
    "heading": "Session `arena-56aa1e57` \u2014 release-gate repair and Pages deployment confirmation (branch `arena/56aa1e57-kalshidash3`)",
-   "heading_line": 1355,
+   "heading_line": 1379,
    "claims": [
     {
      "task": "LGR-1",
@@ -591,7 +623,7 @@
       "scripts/tests/test_chatdock.js",
       "scripts/tests/test_pages_dom.js"
      ],
-     "line": 1359
+     "line": 1383
     },
     {
      "task": "LGR-2",
@@ -602,26 +634,26 @@
      "files": [
       "COORDINATION.md"
      ],
-     "line": 1360
+     "line": 1384
     }
    ]
   },
   {
    "session": "71d4866f",
    "heading": "Session `arena-71d4866f` \u2014 alert-scope regression coverage and current release audit",
-   "heading_line": 1370,
+   "heading_line": 1394,
    "claims": []
   },
   {
    "session": "0553d7e9",
    "heading": "Session `arena-0553d7e9` \u2014 test-integrity repair, scope-count labelling, source-link hygiene (branch `arena/0553d7e9-kalshidash3`)",
-   "heading_line": 1391,
+   "heading_line": 1415,
    "claims": []
   },
   {
    "session": "5c8e3f0a",
    "heading": "Session `arena-5c8e3f0a` \u2014 demo safety and current release audit",
-   "heading_line": 1442,
+   "heading_line": 1466,
    "claims": [
     {
      "task": "S5C-1",
@@ -633,7 +665,7 @@
       "scripts/kalshi_client.py",
       "scripts/tests/test_client_safety.py"
      ],
-     "line": 1448
+     "line": 1472
     },
     {
      "task": "S5C-2",
@@ -647,74 +679,74 @@
       "data/findings.json",
       "executive-summary.html"
      ],
-     "line": 1449
+     "line": 1473
     }
    ]
   },
   {
    "session": "e05bd5ff",
    "heading": "Session `arena-e05bd5ff` \u2014 final integration session",
-   "heading_line": 1515,
+   "heading_line": 1539,
    "claims": []
   },
   {
    "session": "a2fca5db",
    "heading": "Session `arena-a2fca5db` \u2014 live alert chats, auto-sim trading engine, in-browser live mode",
-   "heading_line": 1624,
+   "heading_line": 1648,
    "claims": []
   },
   {
    "session": "e5adea9d",
    "heading": "Session `arena-e5adea9d` \u2014 paper-trading simulator, verification, integration (branch `arena/e5adea9d-kalshidash3`)",
-   "heading_line": 1689,
+   "heading_line": 1713,
    "claims": []
   },
   {
    "session": "0a479d8c",
    "heading": "Session `arena-0a479d8c` \u2014 review + chart jump markers + alert-feed tests (branch `arena/0a479d8c-kalshidash3`)",
-   "heading_line": 1751,
+   "heading_line": 1775,
    "claims": []
   },
   {
    "session": "f068786c",
    "heading": "Session `arena-f068786c` \u2014 final integration of the alert/automation wave (branch `arena/f068786c-kalshidash3`)",
-   "heading_line": 1822,
+   "heading_line": 1846,
    "claims": []
   },
   {
    "session": "d022c8de",
    "heading": "Session `arena-d022c8de` \u2014 browser-live layer + fee-aware ROI model with out-of-sample validation",
-   "heading_line": 1881,
+   "heading_line": 1905,
    "claims": []
   },
   {
    "session": "d879c640",
    "heading": "Session `arena-d879c640` \u2014 final integration (branch `arena/d879c640-kalshidash3`)",
-   "heading_line": 1950,
+   "heading_line": 1974,
    "claims": []
   },
   {
    "session": "20d7ddf7",
    "heading": "Session `arena-20d7ddf7` \u2014 category-integrity fix driven by official series records (branch `arena/20d7ddf7-kalshidash3`)",
-   "heading_line": 2044,
+   "heading_line": 2068,
    "claims": []
   },
   {
    "session": "6a6e8f22",
    "heading": "Session `arena-6a6e8f22` \u2014 topic-fair resolution history + honest chart intervals + deploy-source fix (branch `arena/6a6e8f22-kalshidash3`)",
-   "heading_line": 2066,
+   "heading_line": 2090,
    "claims": []
   },
   {
    "session": "dc62f2bb",
    "heading": "Session `arena-dc62f2bb` \u2014 integration takeover + close-out (branch `arena/dc62f2bb-kalshidash3`)",
-   "heading_line": 2109,
+   "heading_line": 2133,
    "claims": []
   },
   {
    "session": "dba435ee",
    "heading": "Session `arena-dba435ee` \u2014 line-by-line verification + freshness refresh + integration close-out (branch `arena/dba435ee-kalshidash3`)",
-   "heading_line": 2167,
+   "heading_line": 2191,
    "claims": [
     {
      "task": "R-2",
@@ -725,7 +757,7 @@
      "files": [
       "data/findings.json"
      ],
-     "line": 2235
+     "line": 2259
     },
     {
      "task": "R-3",
@@ -734,7 +766,7 @@
      "live": true,
      "owner": "F-06 \u2192 keep, add F-61/F-62, F-14 \u2192 F-24",
      "files": [],
-     "line": 2236
+     "line": 2260
     },
     {
      "task": "R-4",
@@ -746,7 +778,7 @@
       "data/findings.json",
       "trading.html"
      ],
-     "line": 2237
+     "line": 2261
     },
     {
      "task": "R-5",
@@ -758,7 +790,7 @@
       "data/findings.json",
       "data/verified_facts.json"
      ],
-     "line": 2238
+     "line": 2262
     },
     {
      "task": "R-6",
@@ -769,26 +801,26 @@
      "files": [
       "data/findings.json"
      ],
-     "line": 2239
+     "line": 2263
     }
    ]
   },
   {
    "session": "e1647955",
    "heading": "Session `arena-e1647955` \u2014 official-source catalyst review for newest swings + live-chart observation bugfix + chatdock chart links & sources hygiene (branch `arena/e1647955-kalshidash3`)",
-   "heading_line": 2253,
+   "heading_line": 2277,
    "claims": []
   },
   {
    "session": "d60d648c",
    "heading": "Session `arena-d60d648c` \u2014 parallel takeover of stale PRs #55/#56; reconciliation and record (branch `arena/d60d648c-kalshidash3`)",
-   "heading_line": 2337,
+   "heading_line": 2361,
    "claims": []
   },
   {
    "session": "b25b0914",
    "heading": "Session `arena-b25b0914` \u2014 collector freshness: replace the no-op watchdog with a bounded relay (branch `arena/b25b0914-kalshidash3`)",
-   "heading_line": 2421,
+   "heading_line": 2445,
    "claims": [
     {
      "task": "R-B1",
@@ -797,7 +829,7 @@
      "live": true,
      "owner": "Still on `main` `5d8f8a3`: the health line hard-codes `cronExpression: \"*/20 * * * *\"` / `expectedMinutes: 20`. `collect.yml` has declared `7,27,47` + `13,43` since PR #54, and after T55 the cadence on `main` is the relay's 15-minute grid.",
      "files": [],
-     "line": 2477
+     "line": 2501
     },
     {
      "task": "R-B2",
@@ -809,7 +841,7 @@
       "collect.py",
       "test_scope.py"
      ],
-     "line": 2478
+     "line": 2502
     },
     {
      "task": "R-B3",
@@ -818,7 +850,7 @@
      "live": true,
      "owner": "F-67's title \"a workflow cannot rescue its own cadence\" is right about a post-commit self-dispatch, but T55 keeps the cadence from inside one long run and hands over with a documented `workflow_dispatch`.",
      "files": [],
-     "line": 2479
+     "line": 2503
     },
     {
      "task": "R-B4",
@@ -827,7 +859,7 @@
      "live": true,
      "owner": "Live probes 2026-11-21 between 20:22Z and 20:32Z: `GET /markets/KXELECTIRAN-26JUL01` still returns 200 for a market settled 2026-07-01, before `GET /historical/cutoff` `market_settled_ts 2026-09-22T00:00:00Z`; the docs say such markets \"will not appear\".",
      "files": [],
-     "line": 2480
+     "line": 2504
     },
     {
      "task": "R-B6",
@@ -838,7 +870,7 @@
      "files": [
       "pages.yml"
      ],
-     "line": 2481
+     "line": 2505
     },
     {
      "task": "R-B7",
@@ -847,7 +879,7 @@
      "live": true,
      "owner": "It dispatches with `gh workflow run collect.yml --ref main --event workflow_dispatch`, and `gh workflow run` has **no `--event` flag**: [cli/cli `run.go` L138\u2013141](https://github.com/cli/cli/blob/trunk/pkg/cmd/workflow/run/run.go#L138-L141) defines only `--ref`, `--field`, `--raw-field` and `--json` (latest release v2.105.0, 2026-11-18). Local gh 2.23.0 rejects it with \"unknown flag: --event\". Every alarm dispatch would therefore take the \"dispatch failed\" branch.",
      "files": [],
-     "line": 2482
+     "line": 2506
     },
     {
      "task": "R-B8",
@@ -856,92 +888,92 @@
      "live": true,
      "owner": "They describe a \"20-minute\" collector cadence. `collect.yml` has declared `7,27,47` + `13,43` since PR #54, and after T55 `main` collects on a 15-minute grid.",
      "files": [],
-     "line": 2483
+     "line": 2507
     }
    ]
   },
   {
    "session": "2a7c58f1",
    "heading": "Session `arena-2a7c58f1` \u2014 fix flagged F-73/F-74 + final integration (branch `arena/2a7c58f1-kalshidash3`)",
-   "heading_line": 2543,
+   "heading_line": 2567,
    "claims": []
   },
   {
    "session": "10466065",
    "heading": "Session `arena-10466065` \u2014 swing-alert evidence gate: traded vs quote-only (branch `arena/10466065-kalshidash3`)",
-   "heading_line": 2558,
+   "heading_line": 2582,
    "claims": []
   },
   {
    "session": "42e3b260",
    "heading": "Session `arena-42e3b260` \u2014 final integration, five-topic alert scope, verification ledger hygiene (branch `arena/42e3b260-kalshidash3`)",
-   "heading_line": 2646,
+   "heading_line": 2670,
    "claims": []
   },
   {
    "session": "c09bf8f4",
    "heading": "Session `arena-c09bf8f4` \u2014 verification pass, board-cadence fixes, close-out (branch `arena/c09bf8f4-kalshidash3`)",
-   "heading_line": 2711,
+   "heading_line": 2735,
    "claims": []
   },
   {
    "session": "220b524c",
    "heading": "Session `arena-220b524c` \u2014 verification pass (T57\u2013T61)",
-   "heading_line": 2762,
+   "heading_line": 2786,
    "claims": []
   },
   {
    "session": "981efed5",
    "heading": "Session `arena-981efed5` \u2014 defect fixes, R-B4 resolution & full 21-page DOM verification (branch `arena/981efed5-kalshidash3`)",
-   "heading_line": 2860,
+   "heading_line": 2884,
    "claims": []
   },
   {
    "session": "86046b80",
    "heading": "Session `arena-86046b80` \u2014 catalyst reviews, catalysts.py scope alignment, R-2..R-4 / R-B4 (branch `arena/86046b80-kalshidash3`)",
-   "heading_line": 2880,
+   "heading_line": 2904,
    "claims": []
   },
   {
    "session": "ae1f84b0",
    "heading": "Session `arena-ae1f84b0` \u2014 audit of the shipped tree at 2026-11-22T08:0xZ (branch `arena/ae1f84b0-kalshidash3`)",
-   "heading_line": 2914,
+   "heading_line": 2938,
    "claims": []
   },
   {
    "session": "eed90ce4",
    "heading": "Session `arena-eed90ce4` \u2014 full-brief verification + refresh (branch `arena/eed90ce4-kalshidash3`)",
-   "heading_line": 2983,
+   "heading_line": 3007,
    "claims": []
   },
   {
    "session": "a070c747",
    "heading": "Session `arena-a070c747` \u2014 pick-rule unification, alert\u2192resolution tracking, verification of the live site",
-   "heading_line": 3066,
+   "heading_line": 3090,
    "claims": []
   },
   {
    "session": "38b89a30",
    "heading": "Session `arena-38b89a30` \u2014 closeout audit, open-request fix, live deploy verification (branch `arena/38b89a30-kalshidash3`)",
-   "heading_line": 3198,
+   "heading_line": 3222,
    "claims": []
   },
   {
    "session": "d34a9f0d",
    "heading": "Session `arena-d34a9f0d` \u2014 independent verification pass, landing-page count defects, dead test assertions, catalyst coverage (branch `arena/d34a9f0d-kalshidash3`)",
-   "heading_line": 3241,
+   "heading_line": 3265,
    "claims": []
   },
   {
    "session": "75949325",
    "heading": "Session `arena-75949325` \u2014 final integration: release-gate repair, official-source verification, publish (branch `arena/75949325-kalshidash3`)",
-   "heading_line": 3459,
+   "heading_line": 3483,
    "claims": []
   },
   {
    "session": "b2286891",
    "heading": "Session `arena-b2286891` \u2014 executive-summary refresh + empty-topic UX + ROI clarification (2026-11-27)",
-   "heading_line": 3546,
+   "heading_line": 3570,
    "claims": [
     {
      "task": "B228-1",
@@ -957,14 +989,14 @@
       "live.html",
       "scripts/tests/test_client_safety.py"
      ],
-     "line": 3552
+     "line": 3576
     }
    ]
   },
   {
    "session": "f2501a43",
    "heading": "Session `arena-f2501a43` \u2014 topic-integrity & cross-pipeline scope enforcement (`roi_scan.py`, `collect.py`, `live.js`, `chatdock.js`) + full verification (2026-11-27)",
-   "heading_line": 3582,
+   "heading_line": 3606,
    "claims": [
     {
      "task": "F250-1",
@@ -1000,56 +1032,90 @@
       "scripts/tests/validate_live.py",
       "trading.html"
      ],
-     "line": 3588
+     "line": 3612
     }
    ]
   }
  ],
  "counts": {
-  "sessions": 52,
-  "claims": 55,
-  "live_claims": 20,
-  "paths_claimed_live": 30,
-  "conflicting_paths": 3,
-  "conflicting_sessions": 5
+  "sessions": 53,
+  "claims": 57,
+  "live_claims": 22,
+  "paths_claimed_live": 32,
+  "conflicting_paths": 4,
+  "conflicting_sessions": 6
  },
  "conflicts": [
   {
+   "path": "COORDINATION.md",
+   "sessions": [
+    "740b3003",
+    "e9d94b88"
+   ],
+   "claims": [
+    {
+     "session": "740b3003",
+     "task": "A740-1",
+     "status": "in progress",
+     "line": 16
+    },
+    {
+     "session": "740b3003",
+     "task": "A740-2",
+     "status": "in progress",
+     "line": 17
+    },
+    {
+     "session": "e9d94b88",
+     "task": "E9D9-4",
+     "status": "in_progress",
+     "line": 476
+    }
+   ]
+  },
+  {
    "path": "data/findings.json",
    "sessions": [
+    "740b3003",
     "dba435ee",
     "e9d94b88"
    ],
    "claims": [
     {
+     "session": "740b3003",
+     "task": "A740-1",
+     "status": "in progress",
+     "line": 16
+    },
+    {
      "session": "e9d94b88",
      "task": "E9D9-4",
      "status": "in_progress",
-     "line": 461
+     "line": 476
     },
     {
      "session": "dba435ee",
      "task": "R-2",
      "status": "\u00a71 row \"Live alerting \u2026 (F-14)\" cites F-14 (the high-ROI-model gap) for the browser-polling/CORS point. The CORS finding is **F-24**.",
-     "line": 2235
+     "line": 2259
     },
     {
      "session": "dba435ee",
      "task": "R-4",
      "status": "\"Automate simulated trades (S1\u2013S4 replay)\" row says \"the alerts-page auto-sim (G13)\", but `alerts.html` contains no simulator \u2014 the auto-sim is `trading.html` (G13's own text says so).",
-     "line": 2237
+     "line": 2261
     },
     {
      "session": "dba435ee",
      "task": "R-5",
      "status": "\u00a71 \"Verified throughout\" cell hard-codes \"59 claims checked; 1 deliberately blank\" and \"Thirty-eight irregularities\". The fact table is now **68 claims, 67 verified, 1 blank**; `data/findings.json` holds **43** flagged irregularities.",
-     "line": 2238
+     "line": 2262
     },
     {
      "session": "dba435ee",
      "task": "R-6",
      "status": "\u00a71 says \"the arena-f068786c integration added F-29\"; F-29 is present, but the same cell cites \"F-05\" for the five-sessions-one-tree finding \u2014 check that id still points at the canonical-tree finding after the F-6x additions.",
-     "line": 2239
+     "line": 2263
     }
    ]
   },
@@ -1064,13 +1130,13 @@
      "session": "c4409c73",
      "task": "C440-4",
      "status": "in progress",
-     "line": 441
+     "line": 456
     },
     {
      "session": "a490dfa2",
      "task": "F-98",
      "status": "the collector's health file was written only on failure, so it still read `outcome: failed \u00b7 12:01:52Z` while the collector was publishing healthy snapshots",
-     "line": 1203
+     "line": 1227
     }
    ]
   },
@@ -1085,13 +1151,13 @@
      "session": "c4409c73",
      "task": "C440-3",
      "status": "in progress",
-     "line": 440
+     "line": 455
     },
     {
      "session": "f33fe827",
      "task": "F-104",
      "status": "The executive summary's living requirements table typed \"the sample is one settled alert\" (true 2026-11-22) while `alerts.html`, rendering the same committed data, showed \"settled: 0 \u2026 move vs outcome: no settled alert yet\" (43 served tickers: 15 open, 28 not in snapshot, 0 settled). A typed copy of a volatile count \u2014 the same defect class as F-73/D-01",
-     "line": 992
+     "line": 1007
     }
    ]
   }
