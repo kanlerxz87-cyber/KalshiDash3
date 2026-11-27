@@ -2,6 +2,300 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXPRESNOMR-28-BK",
+   "event_ticker": "KXPRESNOMR-28",
+   "title": "Will Brian Kemp be the nominee for the Presidency for the Republican party?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.97,
+   "to_price": 0.02,
+   "delta": -0.95,
+   "direction": "down",
+   "volume_24h_fp": 8700.07,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-BK",
+   "to_yes_bid": 0.017,
+   "to_yes_ask": 0.02,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 33.48,
+    "est_dollars": 0.67,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 32636358.96,
+    "volume_to": 32636392.44,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "33.48 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXPRESNOMD-28-HBID",
+   "event_ticker": "KXPRESNOMD-28",
+   "title": "Will Hunter Biden be the nominee for the Presidency for the Democratic party?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.815,
+   "to_price": 0.005,
+   "delta": -0.81,
+   "direction": "down",
+   "volume_24h_fp": 9113.16,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-HBID",
+   "to_yes_bid": 0.003,
+   "to_yes_ask": 0.005,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 136.14,
+    "est_dollars": 0.68,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 537285408.29,
+    "volume_to": 537285544.43,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "136.14 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXPRESNOMR-28-RDS",
+   "event_ticker": "KXPRESNOMR-28",
+   "title": "Will Ron DeSantis be the nominee for the Presidency for the Republican party?",
+   "category_id": "elections",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Elections"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.96,
+   "to_price": 0.16,
+   "delta": -0.8,
+   "direction": "down",
+   "volume_24h_fp": 9231.8,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMR-28-RDS",
+   "to_yes_bid": 0.15,
+   "to_yes_ask": 0.16,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 25.47,
+    "est_dollars": 4.08,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 17684936.5,
+    "volume_to": 17684961.97,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "25.47 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXRT-HEX-60",
+   "event_ticker": "KXRT-HEX",
+   "title": "Hexed Rotten Tomatoes score?",
+   "category_id": "culture",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Entertainment"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.58,
+   "to_price": 0.91,
+   "delta": 0.33,
+   "direction": "up",
+   "volume_24h_fp": 0.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXRT-HEX-60",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 2.0,
+    "est_dollars": 1.82,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 2374.7,
+    "volume_to": 2376.7,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-NVON",
+   "event_ticker": "KXDPWORLDTOUR-BMAPC26",
+   "title": "BMW Australian PGA Championship: Nicolai von Dellingshausen wins",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.093,
+   "to_price": 0.28,
+   "delta": 0.187,
+   "direction": "up",
+   "volume_24h_fp": 7374.61,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-NVON",
+   "to_yes_bid": 0.26,
+   "to_yes_ask": 0.28,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 8047.99,
+    "est_dollars": 2253.44,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 17069.01,
+    "volume_to": 25117.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "8047.99 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-TMCK",
+   "event_ticker": "KXDPWORLDTOUR-BMAPC26",
+   "title": "BMW Australian PGA Championship: Tom McKibbin wins",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:19:59Z",
+   "to_time": "2026-11-27T20:35:00Z",
+   "from_price": 0.065,
+   "to_price": 0.25,
+   "delta": 0.185,
+   "direction": "up",
+   "volume_24h_fp": 20229.27,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-TMCK",
+   "to_yes_bid": 0.23,
+   "to_yes_ask": 0.25,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:35:03Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 2120.17,
+    "est_dollars": 530.04,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 40734.37,
+    "volume_to": 42854.54,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2120.17 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:35:03Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXETHD-26NOV2717-T1659.99",
    "event_ticker": "KXETHD-26NOV2717",
    "title": "Ethereum price at Nov 27, 2026 at 5pm EST?",
@@ -44,10 +338,10 @@
     "decided_at": "2026-11-27T20:20:04Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.22,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -2985,7 +3279,7 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.95,
+    "min_distance_from_from_price": 0.97,
     "gave_back_half": false,
     "still_open": false
    }
