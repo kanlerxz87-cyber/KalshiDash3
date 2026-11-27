@@ -52,6 +52,13 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 - `python3 scripts/tests/test_f113_resolution.py` **PASS** (4 tests); `python3 scripts/audit_sources.py --json` **PASS** (0 citation errors); `python3 scripts/tests/validate_live.py` **PASS** (614 open / 200 settled / 20 orderbooks); `python3 scripts/tests/validate_alerts.py` **PASS** (184 archived rows); `python3 scripts/check_site.py` **PASS** (21 pages); full `python3 scripts/verify_release.py` **PASS** (all validators, unit/DOM suites, rendered-number audit, freshness checks and links). `git diff --check` clean.
 - Verified that PR #148's F-105 formatting hunk is stale and its proposed four-space member indent is not the repository's current three-space JSON convention; the current base already has the normalized object seam. No F-105 data was changed. A740-1 is **done**; A740-2 remains in progress pending this branch's PR/merge/deploy evidence.
 
+### A740-2 rebase and pre-publication checkpoint (2026-11-27T22:43Z)
+
+- `origin/main` advanced to `8684b3d` while this branch was being prepared (from the earlier `5919a8a` base). Rebased the A740 commits onto `8684b3d` before publication. The only rebase conflict was `COORDINATION.md` at the insertion point: retained the upstream `arena-699eb329` accessibility audit section and the A740 section; the A740 changes/data applied intact. No application or data conflict was present.
+- Re-ran `python3 scripts/verify_release.py` on the rebased tree: **PASS**. This includes offline validators, tests, source/link checks, rendered-number audit and the 21-page site check. The validated live snapshot is the newer `2026-11-27T22:35:01Z` collection. `git diff --check` is clean.
+- GitHub reports Pages currently **built** for main commit `8684b3d`; this is baseline deployment status, not evidence for the still-unmerged A740 change. PR #148 remains **OPEN** (confirmed with `gh pr view 148`); leave it untouched until A740 is integrated, then close it as superseded. Other current open PRs are #150, #175 and #176, outside A740's code scope.
+- A740 branch PR/check/merge and the post-merge `flagged.html` + Pages build remain pending; no deployment is claimed for this change yet.
+
 ---
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
