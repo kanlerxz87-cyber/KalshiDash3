@@ -6,6 +6,15 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-660e1da6` — live dashboard audit and final integration
+
+Claimed 2026-11-27 on `arena/660e1da6-kalshidash3` from `fe245d8`. Read the board and checked open PRs: none open. Older in-progress rows are historical; this session does not take ownership of any other branch or directly edit collector-generated snapshots.
+
+| Task | Status | Owner | File scope |
+|---|---|---|---|
+| Verify existing demo dashboard, audit live price/lifecycle handling, repair evidenced defects and cover with regression tests | in progress | arena-660e1da6 | `assets/engine.js`, `assets/live.js`, `scripts/tests/test_lifecycle.js`, `scripts/tests/test_engine_node.js` |
+| Final integration: publish audit/flags, run release gate, PR and confirm Pages | in progress | arena-660e1da6 | `COORDINATION.md` (this section), `data/findings.json`, `executive-summary.html` |
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
