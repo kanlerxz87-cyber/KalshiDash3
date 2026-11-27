@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-27T20:05:00Z",
- "snapshot_collected_at": "2026-11-27T20:04:59Z",
+ "generated_at": "2026-11-27T20:20:04Z",
+ "snapshot_collected_at": "2026-11-27T20:20:00Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,15 +11,15 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 154,
+  "all_events": 155,
   "high_roi": 123,
-  "archive_total": 174,
-  "new_this_run": 0,
+  "archive_total": 175,
+  "new_this_run": 1,
   "withheld_category_conflict": 0,
   "withheld_reasons": {},
   "evidence": {
    "traded_ge_floor": 21,
-   "traded_below_floor": 75,
+   "traded_below_floor": 76,
    "quote_only": 0,
    "counter_reset": 0,
    "candle_unquantified": 5,
@@ -34,6 +34,55 @@
   }
  },
  "all_events": [
+  {
+   "ticker": "KXETHD-26NOV2717-T1659.99",
+   "event_ticker": "KXETHD-26NOV2717",
+   "title": "Ethereum price at Nov 27, 2026 at 5pm EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-27T20:04:59Z",
+   "to_time": "2026-11-27T20:19:59Z",
+   "from_price": 0.88,
+   "to_price": 0.66,
+   "delta": -0.22,
+   "direction": "down",
+   "volume_24h_fp": 170.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2717-T1659.99",
+   "to_yes_bid": 0.66,
+   "to_yes_ask": 1.0,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-27T20:20:04Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 2.0,
+    "est_dollars": 1.32,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 254.0,
+    "volume_to": 256.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "why": "2 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env"
+    },
+    "decided_at": "2026-11-27T20:20:04Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -13648,7 +13697,7 @@
   "high_roi is the dashboard's experimental 'Model watch' screen (seed series with positive volume_24h). It is not an owner-approved ROI model.",
   "Evidence: each alert's evidence.state says whether contracts actually traded between the two observations (traded_ge_floor / traded_below_floor), whether the reported last price changed with NO trade at all in the interval (quote_only), or whether the cumulative volume field did not increase so the interval's contract count is unknowable (counter_reset). The floor is a project rule, not a Kalshi field (scripts/alert_evidence.py).",
   "est_dollars on an alert is contracts traded in the interval multiplied by the later price. It is computed here, not a Kalshi field, and it is an estimate because contracts trade at different prices inside one interval.",
-  "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic. The archive itself is never rewritten.",
+  "Each feed contains its own newest 300 qualifying rows. Feed counts describe those windows; evidence counts describe the full in-scope archive.",
   "Category integrity: an archived alert is withheld from both feeds (counts.withheld_category_conflict) when the market's own snapshot row records official series categories that exclude it from that topic.",
   "Scope: the chats cover the five topics only. An archived swing whose series GET /series files under Test/Demo, or for which no single topic can be confirmed, is withheld and counted (counts.withheld_out_of_scope) rather than shown under the wrong topic."
  ]
