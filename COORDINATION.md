@@ -3603,7 +3603,6 @@ Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/
   3. `assets/chatdock.js`, `assets/live.js`, & `scripts/collect.py`: removed `KXDEMOFUT*` and `KXBALLONDOR` from live prefix/seed discovery in `chatdock.js` (`categoryOf`) and `live.js` (`SEED_SERIES`), added explicit `EXCLUDED_SERIES` entries for `KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, and `KXEPL*` in `live.js` so browser live discovery refuses them even before `series_index` loads, and folded `hist_rows` count into `settled_total_method` in `collect.py`.
   4. `trading.html` & `data/findings.json` (`G5`, `G13`): aligned remaining fee-multiplier disclosures with shipped `F-84` (`M = 0` on `KXBTCY`, `KXETHY`, `KXELECTIRAN`; `M = 1` default on unlisted series).
 
-<<<<<<< HEAD
 ---
 
 ## Session `arena-4150b50e` — fresh baseline release/source audit (branch `arena/4150b50e-kalshidash3`)
@@ -3629,7 +3628,6 @@ Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/
 The requested dashboard, five category pages, executive summary, two alert feeds, timestamp-window charts, liquidity display, settlement tracking, paper strategies, and `Flagged for Review` page were already implemented on the base branch; they passed the checks above. The only local/branch change for this session is this audit record. No duplicate app edits, live order, or credential changes were made.
 
 ---
-=======
 ## Session `arena-5082c6af` — final independent verification + release (2026-11-27)
 
 Branch `arena/5082c6af-kalshidash3`, branched from `ba847e80` (`main`, snapshot `2026-11-27T22:20:02Z`). Scope: this section only; no other session's files touched. Open PRs #148 and #150 belong to other sessions and were left untouched.
