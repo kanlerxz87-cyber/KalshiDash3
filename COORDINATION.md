@@ -69,6 +69,51 @@ Claimed 2026-11-27 on `arena/660e1da6-kalshidash3` from `fe245d8`. Read the boar
 - **SIM-660E-02:** Kalshi's [orderbook guide](https://docs.kalshi.com/getting_started/orderbook_responses) confirms YES bid complements NO ask, not NO bid. Exits now use the held side's valid bid and last trade cannot fill. New exits are tagged with exit rules version 2 (earlier saved results are not recomputed). The regression exercises missing/zero quotes and an exact 10¢ NO target.
 - **Still unverified / non-blocking:** live browser reachability depends on CORS; the ranked snapshot is bounded; an absent contract does not prove an outcome. Catalyst links are not causal proof. No demo credentials were configured for this site, account values remain blank, and no authenticated order was submitted. See [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) and Kalshi's [demo documentation](https://docs.kalshi.com/getting_started/demo_env).
 
+## Session `arena-bc717755` — current snapshot release and source audit (branch `arena/bc717755-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 before implementation work. At claim time, the newest recorded work was closed and no open PR existed. Multiple audits merged while this branch was active; this section preserves their records. This session kept its scope to the current snapshot audit and executive-summary freshness checks.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| T114 | Run the repository release gate against the 2026-11-27 snapshot; audit data provenance, user-facing disclosures, internal links and the five-topic/alert/simulation safety boundaries; document results and irregularities | done (offline/source-path audit; live values not re-fetched) | arena-bc717755 | `COORDINATION.md` (this section) | `scripts/verify_release.py`; independent exact-link audit of 714 market rows and 154 alerts; official docs re-read 2026-11-27 (links below) |
+| T115 | Repair the executive-summary heading that still labels the current release audit 22 November despite the 27 November snapshot; state the scope and limits of this audit explicitly | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | `scripts/verify_release.py` PASS after edit; rendered DOM suite confirms all pages load without errors |
+| T116 | After the collector advanced the snapshot to 17:30Z, correct executive-summary copy that still called the 17:15Z snapshot “current”; label static metrics by their observation time and link readers to the live snapshot | done | arena-bc717755 | `executive-summary.html`, `COORDINATION.md` (this section) | Compared timestamps in `markets.json`/`alerts.json`/`simulation.json` (17:30:51Z) and `roi.json` (17:01:58Z); stale “is current” wording removed; full release gate PASS |
+
+### T114/T115 — 2026-11-27 audit results
+
+**Release gate and provenance checks.** Installed the documented test-only `jsdom@26` dependency without saving package metadata. `python3 scripts/verify_release.py` passed after the executive-summary correction: browser/Python checks, committed-data validators, alert and simulation regressions, DOM render tests for all 21 pages, and internal-link/HTML checks. The gate itself explicitly ends with: “Live API, account access and external URLs not certified.” A separate exact-string audit found 714 open/settled market rows with ticker-specific official demo `GET /markets/{ticker}` links and 154 served alert rows with the corresponding official market link; all 154 served alert deltas meet the configured absolute $0.10 threshold. Snapshot declares the five required topic IDs and was collected at `2026-11-27T17:15:51Z`. This verifies record provenance paths and committed snapshot consistency, **not** that each live market value was freshly fetched or still current at audit time.
+
+**Official documentation re-read 2026-11-27.**
+
+| Point checked | Official source | Confirmed |
+|---|---|---|
+| Demo environment | [Demo environment](https://docs.kalshi.com/getting_started/demo_env) | REST roots are `https://external-api.demo.kalshi.co/trade-api/v2` and `https://demo-api.kalshi.co/trade-api/v2`; the matching documented WS roots are shown. Demo uses mock funds and prices/behavior may not reflect real markets. |
+| Chart intervals | [Market candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks) | Allowed candle intervals are 1 minute, 60 minutes, or 1440 minutes; the existing page correctly describes sub-minute chart points as accumulated observations rather than candles. |
+| Resolution | [Market settlement](https://docs.kalshi.com/getting_started/market_settlement) | Winning YES/NO positions pay $1 per contract; settlement timing can vary; simple YES/NO settlement fees are zero. |
+| Liquidity | [Market orderbook](https://docs.kalshi.com/api-reference/market/get-market-orderbook) and [orderbook responses](https://docs.kalshi.com/getting_started/orderbook_responses) | API orderbooks contain bid levels; opposite-side asks are implied, so available size is a point-in-time quote, not a guarantee of execution. |
+| Order execution | [Create Order V2](https://docs.kalshi.com/api-reference/orders/create-order-v2) | Current documented write endpoint is `POST /portfolio/events/orders`; this source does not certify this project's client against an account. |
+| Streaming | [WebSocket quick start](https://docs.kalshi.com/getting_started/quick_start_websockets) | A signed API key is required during handshake, even for public market-data channels; static browser site is not an authenticated WebSocket backend. |
+
+**Audit limitations / irregularities (not concealed).**
+- No direct market-value API reads were made for the 714 rows during this session. Their stored `source` values match the official endpoint pattern; `verify_release.py` passed, but live price/status/result verification remains outside this audit. The live homepage did fetch successfully and displayed the same timestamped snapshot.
+- `data/verified_facts.json` lists 72 static facts; one is explicitly unverified and blank (C-20, correctly explaining live data is collected into timestamped snapshot files instead of a static facts table). The fact ledger says 71 verified / 1 unverified. This audit re-read the seven official documentation pages linked above, not all 71 historical citations.
+- GitHub Pages is configured as `legacy`, source `main /`; the Pages API reports `built` and the latest build on main completed `2026-11-27T17:16:40Z`. This is the pre-existing DEPLOY-1 release-gate limitation on the published site; switching to Actions-only publishing requires a repository settings change outside this file scope. See [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html).
+- No demo credentials were supplied; account balance, positions, fills, and live orders remain unverified. The simulator is paper-only. The model's “high ROI” feed remains a screening heuristic, not validated profitability. See [demo setup](https://help.kalshi.com/en/articles/13823775-creating-and-using-a-demo-account) and the site's [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html).
+
+**Observed Pages state.** `gh api repos/kanlerxz87-cyber/KalshiDash3/pages` returned `status: built`, `build_type: legacy`, `source: main /`. The latest Pages build at audit time was `built` with no error. Live fetch of [landing page](https://kanlerxz87-cyber.github.io/KalshiDash3/), [executive summary](https://kanlerxz87-cyber.github.io/KalshiDash3/executive-summary.html), and [Flagged for Review](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) succeeded. The old executive-summary label “Current release audit · 22 November 2026” was stale versus the current 27 November snapshot; it now reports the accurate date and plainly states this audit did not refresh market rows or authenticate.
+
+
+**Concurrent-session merge note.** While PR #133 was open, session `arena-98e88d21` merged PR #132 and added its live-audit record at the same coordination anchor. GitHub then reported PR #133 as conflicting. This branch fetched the updated `origin/main`, retained both the complete PR #132 record and this session’s claim/results, and resolved the conflict in `COORDINATION.md` only. No concurrent work was discarded. The local rebase was not force-pushed; the latest `main` was merged into this branch so the published branch can be updated by a normal fast-forward push. PR #133 remained open while later main commits landed; mergeability and build are rechecked after integrating the latest main.
+
+
+**Follow-up concurrent integration.** Before PR #133 could merge, PR #134 from session `arena/b2286891` merged additional executive-summary/dashboard verification work into `main`, touching the same summary page. To respect that session’s claimed scope and keep its improvements, the merge kept the latest `origin/main` version of `executive-summary.html` rather than replaying this session’s shorter wording over it. Other non-conflicting files from PR #134 were retained as well. This is a handoff/coordination resolution, not a loss of the audit result; the resulting summary still displays the 27 November date and current snapshot facts.
+
+### T116 — keep snapshot facts timestamped (2026-11-27)
+
+After the collector advanced the snapshot to `2026-11-27T17:30:51Z`, the summary still called the prior `17:15:51Z` snapshot “current”; `roi.json` was separately generated at `17:01:58Z`. This session corrected the stale copy on its branch and kept all metrics timestamped. Before PR #133 could merge, the concurrent mainline summary refresh updated its snapshot figures to 17:30:51Z; during integration we retained that newer main version rather than overwriting it with the 17:15 historical wording. No values were recalculated or inferred.
+
+
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
