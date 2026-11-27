@@ -15,13 +15,12 @@
      confirmable is on <a href="flagged.html">Flagged for Review</a> rather than softened into an estimate.</p>
 
   <section id="audit-2026-11-27" aria-labelledby="auditTitle">
-    <h2 id="auditTitle">Release audit · 27 November 2026</h2>
+    <h2 id="auditTitle">Current release audit · 27 November 2026</h2>
     <div class="notice warn"><b>Useful for research, not a verified trading edge.</b>
       The dashboard and offline tests run without credentials. Account balances, authenticated execution,
       uninterrupted tick streaming and profitable ROI are not verified by this release.
       Existing historical verification records below are not a claim that every external value was re-fetched today.
-      The figures below are a dated audit snapshot, not a live readout; use the <a href="index.html">dashboard</a> for the newest collection timestamp and counts.
-      Snapshot <code>2026-11-27T17:15:51Z</code>: 514 open / 200 settled published (scan totals 19,043 open / 18,622 settled in scope; both truncated at the 25,000-row safety cap); 154 swings ≥$0.10 (123 experimental seed-and-volume screen, 174 in archive); 7 settled paper positions across S1–S4 (insufficient sample). The separate ROI scan at <code>2026-11-27T17:01:58Z</code> had 0 picks / 0 eligible; it is not the alert-chat screen.</div>
+      Snapshot <code>2026-11-27T17:30:51Z</code>: 514 open / 200 settled published (scan totals 19,043 open / 18,600 settled in scope; both truncated at the 25,000-row safety cap); 154 swings ≥$0.10 (123 high-ROI experimental screen, 174 in archive); simulation 7 settled positions across S1–S4 (all insufficient sample); ROI screen 0 picks / 0 eligible — every open market fails a gate after fees.</div>
     <div class="tw"><table>
       <thead><tr><th>Decision area</th><th>Current finding</th><th>Official reference / review evidence</th></tr></thead>
       <tbody>
@@ -46,14 +45,14 @@
           <td><b>Polling with timestamped snapshot fallback, not guaranteed tick streaming.</b>
             Browser reachability and snapshot age must be checked on the page. WebSocket handshakes require
             authentication, including public market-data channels. A time-axis unit does not create missing observations.
-            The audit snapshot collected at <code>2026-11-27T17:15:51Z</code> is historical; the dashboard shows the newest collection time and whether browser polling is available.</td>
+            Latest snapshot <code>2026-11-27T17:30:51Z</code> is current; 547 price-history series accumulated.</td>
           <td><a href="https://docs.kalshi.com/getting_started/quick_start_websockets">Authenticated WebSocket guide</a> ·
             <a href="dashboard.html">Dashboard and freshness state</a></td></tr>
         <tr><td>High-ROI shortlist and simulated returns</td>
           <td><b>Experimental, not a proven edge.</b> The two chats and paper ledgers are available for strategy research.
             Demo prices may differ from real markets; simulation output is not actual account performance.
             No claim of profitability or exhaustive coverage of all exchange markets is made.
-            The fee-aware ROI scan collected at <code>2026-11-27T17:01:58Z</code> found <b>0 picks</b> (0 eligible; 13,730 unscoreable); the experimental seed+24h-volume screen shown in the alert chats is a separate measure (123 of 154 swings in the 17:30Z alert snapshot). Neither is a validated profitability result.</td>
+            As of the <code>2026-11-27T17:30:51Z</code> snapshot the fee-aware ROI screen finds <b>0 picks</b> (all 13,730 in-scope markets fail a gate after fees); the experimental seed+24h-volume screen that powers the alert chats' second feed finds 123 of 154 swings. Both are disclosed separately.</td>
           <td><a href="https://docs.kalshi.com/getting_started/demo_env">Official demo-price warning</a> ·
             <a href="roi.html">Model assumptions and evidence</a> · <a href="simulation.html">Paper ledger</a></td></tr>
         <tr><td>News and jump annotations</td>

@@ -59,7 +59,30 @@ window.KDL = (() => {
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g,
     (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  function num(v) { const n = Number(v); return Number.isFinite(n) ? n : null; }
+  function num(v) {
+    if (typeof v !== "number" && (typeof v !== "string" || !v.trim())) return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  const statusOf = (row) => String(row?.status || "").toLowerCase();
+  const isActive = (row) => ["active", "open"].includes(statusOf(row)) && !row.result;
+  const isFinal = (row) => ["finalized", "settled"].includes(statusOf(row));
+
+  // YES ask complements NO bid, not YES bid. A 0 bid or 1 ask is not
+  // a tradable quote. See Kalshi's Orderbook Responses guide.
+  function quotedBid(row, dir) {
+    if (!isActive(row)) return null;
+    const side = dir === 1 ? "yes" : "no";
+    let price = num(row[`${side}_bid_dollars`]);
+    let basis = `${side}_bid`;
+    if (dir === -1 && price === null) {
+      const ask = num(row.yes_ask_dollars);
+      if (ask !== null) price = Math.round((1 - ask) * 10000) / 10000;
+      basis = "derived_from_yes_ask";
+    }
+    return price > 0 && price < 1 ? {price, basis} : null;
+  }
 
   function cents(v) { return v === null || v === undefined ? "—" : (v * 100).toFixed(1) + "¢"; }
 
@@ -186,9 +209,14 @@ window.KDL = (() => {
     const fired = [];
     for (const raw of rows) {
       const row = normalizeRow(raw);
-      if (!row.ticker || row.last_price_dollars === null) continue;
+      if (!row.ticker) continue;
       const prev = S.prevPrices.get(row.ticker);
       S.markets.set(row.ticker, Object.assign({}, S.markets.get(row.ticker) || {}, row, { _at: Date.now(), _origin: origin }));
+      // Lifecycle records may have no last price; update them without fabricating a tick.
+      if (!isActive(row) || row.last_price_dollars === null) {
+        S.prevPrices.delete(row.ticker);
+        continue;
+      }
       if (prev && !opts.silent) {
         const delta = row.last_price_dollars - prev.price;
         if (Math.abs(delta) >= ALERT_THRESHOLD - 1e-9) {
@@ -416,10 +444,10 @@ window.KDL = (() => {
   async function tick() {
     if (!S.running || S.paused || S.corsOk !== true) return;
     if (Date.now() < S.backoffUntil) return;
-    const tickers = S.watch.filter((t) => {
-      const m = S.markets.get(t);
-      return !m || !["finalized", "determined", "closed", "settled"].includes(String(m.status || "").toLowerCase());
-    });
+    const holdings = AT.cfg.enabled ? AT.state.positions.map((p) => p.ticker) : [];
+    // A position may rotate out of the ranked list, and a closed/determined market
+    // has not yet paid out. Finalization is the only terminal status.
+    const tickers = [...new Set([...holdings, ...S.watch])].filter((t) => !isFinal(S.markets.get(t)));
     if (!tickers.length) { S.lastTickAt = Date.now(); notifyStatus(); return; }
     try {
       // tickers as the ONLY filter -> every matching market in one response,
@@ -613,16 +641,17 @@ window.KDL = (() => {
     // Fill basis: prefer the quoted side ask; never invent one.
     enter(row, dir, sid, opts = {}) {
       if (!this.cfg.enabled || !this.cfg.strategies[sid]) return null;
-      if (row.result) return null; // already determined
+      if (!isActive(row)) return null;
       const yesAsk = num(row.yes_ask_dollars), yesBid = num(row.yes_bid_dollars);
-      const noAsk = num(row.no_ask_dollars) !== null ? num(row.no_ask_dollars) : (yesBid !== null ? Math.round((1 - yesBid) * 10000) / 10000 : null);
+      const directNoAsk = num(row.no_ask_dollars);
+      const noAsk = directNoAsk ?? (yesBid !== null ? Math.round((1 - yesBid) * 10000) / 10000 : null);
       let fill, basis;
       if (dir === 1) {
         if (yesAsk === null || yesAsk <= 0 || yesAsk >= 1) return null;
         fill = yesAsk; basis = "yes_ask";
       } else {
         if (noAsk === null || noAsk <= 0 || noAsk >= 1) return null;
-        fill = noAsk; basis = "no_ask";
+        fill = noAsk; basis = directNoAsk !== null ? "no_ask" : "derived_from_yes_bid";
       }
       const st = STRATS[sid];
       const count = opts.size || st.size;
@@ -658,7 +687,7 @@ window.KDL = (() => {
     close(pos, exitPrice, basis, reason) {
       const idx = this.state.positions.indexOf(pos);
       if (idx < 0) return null;
-      const feeOut = takerFee(pos.count, Math.max(0.0001, Math.min(0.9999, exitPrice)), seriesTakerMult(pos.ticker));
+      const feeOut = basis === "settlement" ? 0 : takerFee(pos.count, exitPrice, seriesTakerMult(pos.ticker));
       // Economic P&L in the traded side's price terms: (exit - entry) x count.
       // For settlements exitPrice IS the per-contract payout ($1 winner / $0
       // loser), so a losing settled position books gross = -entry x count —
@@ -671,6 +700,7 @@ window.KDL = (() => {
       const rec = {
         ...pos, exit_ts: Date.now(), exit_price: Math.round(exitPrice * 10000) / 10000,
         exit_basis: basis, exit_reason: reason || "manual", fee_exit: feeOut || 0,
+        exit_rules_version: 2,
         pnl_gross: Math.round(gross * 100) / 100, pnl_net: Math.round(net * 100) / 100,
         status: "closed"
       };
@@ -693,39 +723,27 @@ window.KDL = (() => {
       for (const pos of this.state.positions.slice()) {
         const r = byTicker.get(pos.ticker);
         if (!r) continue;
-        const st = r.status ? String(r.status).toLowerCase() : "";
-        const done = st === "finalized" || st === "determined" || (r.result === "yes" || r.result === "no");
-        if (done) {
+        if (isFinal(r)) {
           if (r.result === "yes" || r.result === "no") {
             pos.settle_result = r.result;
-            const payout = (pos.dir === 1 ? (r.result === "yes" ? 1 : 0) : (r.result === "no" ? 1 : 0));
+            const payout = (pos.dir === 1 ? r.result === "yes" : r.result === "no") ? 1 : 0;
             this.close(pos, payout, "settlement", "settlement");
           }
-          // result=scalar or empty on a done market: left open, flagged on the page.
+          // Result=scalar or empty: left open, flagged on the page.
           continue;
         }
-        // price exits use the YES price space; convert for NO positions
-        const yesBid = r.yes_bid_dollars, yesLast = r.last_price_dollars;
-        const exitYes = yesBid !== null ? yesBid : yesLast;   // exits fill at the bid when known
-        if (exitYes === null) continue;
-        const yesSpaceEntry = pos.dir === 1 ? pos.entry_price : Math.round((1 - pos.entry_price) * 10000) / 10000;
-        const move = exitYes - yesSpaceEntry;
+        const bid = quotedBid(r, pos.dir);
+        if (!bid) continue;
+        const move = bid.price - pos.entry_price;
         const tp = pos.strategy === "longshot" ? 0.05 : 0.10;
-        const sl = 0.10;
-        if (pos.dir === 1) {
-          if (move >= tp) this.close(pos, pos.entry_price + tp, pos.strategy === "longshot" ? "target" : "target", "take_profit");
-          else if (move <= -sl) this.close(pos, exitYes, exitYes === yesBid ? "yes_bid" : "last", "stop_loss");
-        } else {
-          // NO position: profit when YES price falls
-          if (move <= -tp) this.close(pos, pos.entry_price + tp, "derived", "take_profit");
-          else if (move >= sl) this.close(pos, Math.max(0.0001, 1 - exitYes), exitYes === yesBid ? "derived_from_yes_bid" : "derived_from_last", "stop_loss");
-        }
+        if (move >= tp - 1e-9) this.close(pos, bid.price, bid.basis, "take_profit");
+        else if (move <= -0.10 + 1e-9) this.close(pos, bid.price, bid.basis, "stop_loss");
       }
 
       // 2) entries — driven by recent alerts (momentum, reversion) or statics (longshot)
       const recent = feedAlerts().filter((a) => a.origin === "live" && Date.now() - a.ts < 90e3);
       for (const a of recent.slice(-12).reverse()) {
-        const r = byTicker.get(a.ticker) || S.markets.get(a.ticker);
+        const r = byTicker.get(a.ticker);
         if (!r) continue;
         if (a.dir === "up" && (num(r.volume_24h_fp) || 0) >= 200) {
           if (this.strategyOpen("momentum") < STRATS.momentum.maxOpen && !this.inCooldown(a.ticker, "momentum")) {
@@ -819,7 +837,7 @@ window.KDL = (() => {
     onAlert: (cb) => (S.onAlert.add(cb), () => S.onAlert.delete(cb)),
     onStatus: (cb) => (S.onStatus.add(cb), () => S.onStatus.delete(cb)),
     state: S,
-    esc, num, cents, money, takerFee, seriesTakerMult, SERIES_TAKER_MULT, seriesOf, bandOf,
+    esc, num, cents, money, quotedBid, takerFee, seriesTakerMult, SERIES_TAKER_MULT, seriesOf, bandOf,
     markets: S.markets
   };
 })();
