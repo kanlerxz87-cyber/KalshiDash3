@@ -3677,3 +3677,12 @@ Branch `arena/5082c6af-kalshidash3`, branched from `ba847e80` (`main`, snapshot 
 | PR release gate | Build succeeded in [run 46076891538](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46076891538); deploy was correctly skipped for the PR. Non-blocking Node.js 20 action-runtime deprecation warning was emitted. |
 | Main release gate and deploy | Post-merge [run 46077090121](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46077090121) completed **success**: build 1m41s and Pages deploy 10s. Pages build API reported merge commit `5919a8a` as `built` at `22:31:20Z`; Pages endpoint reports public site `https://kanlerxz87-cyber.github.io/KalshiDash3/`, HTTPS enforced. A subsequent Pages build for a newer collector data commit was observed in `building` state; that later build is not represented as complete by this record. |
 | Net change | Audit documentation only; site implementation and committed market data were unchanged by this task. |
+
+---
+## Session `arena-aeb0cbdc` — independent live-API value verification, lifecycle follow-up audit, and release close-out (branch `arena/aeb0cbdc-kalshidash3`)
+
+Claimed 2026-11-27T22:34Z before editing any repository file, after reading `COORDINATION.md`, checking active PRs (`gh pr list --state all`), and running `python3 scripts/verify_release.py` (**PASS**). Concurrent PRs (`#148`, `#150`, `#172`) belong to other sessions and are not touched here. Scope is strictly `COORDINATION.md` (this section only) and `AUDIT_AEB0CBDC.md` (new file) so there is zero file-scope overlap with any other session or workflow (`collect.yml` / `desk.yml`).
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| AEB0-1 | Independent line-by-line verification of live demo API records (all 5 topic headlines, orderbook depth ladder, out-of-window lifecycle resolutions `KXPGATOUR-THRC26-BHAR` & `KXAAAGASD-26NOV21-3.6600`), official Kalshi documentation + fee schedule PDF, full 21-page DOM/link/source audit, PR + merge + GitHub Pages deploy confirmation | in progress | arena-aeb0cbdc | `COORDINATION.md` (this section only), `AUDIT_AEB0CBDC.md` (new) | Official Kalshi docs/API via platform fetch route; `scripts/verify_release.py`; `scripts/audit_sources.py`; `scripts/audit_live_parity.py`; live GitHub Pages + Actions APIs |
