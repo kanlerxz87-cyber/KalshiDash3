@@ -35,6 +35,23 @@ What this module does, and does not, claim
   It does NOT claim a cause, a motive, conviction, or that a quoted price is tradable. The word
   "cause" is refused here for the same reason scripts/catalysts.py refuses it (F-15, F-25).
 
+The quote check (49BA-1) — is the printed price even inside the book?
+  `evidence.state` above says whether a trade happened. It does not say whether the recorded
+  end price was *executable*: last_price_dollars is a print, while yes_bid_dollars and
+  yes_ask_dollars are the two-sided quote read at the same instant from the same Get Markets
+  response (https://docs.kalshi.com/api-reference/market/get-markets). The order book behind
+  that quote is documented as "a point-in-time read"
+  (https://docs.kalshi.com/getting_started/orderbook_responses), so a print can sit outside the
+  quote recorded beside it — on either side — with no trade available at that quote.
+
+  `evidence.quote` publishes that comparison per row:
+    inside_quote    to_price is within [to_yes_bid, to_yes_ask] of the same read
+    outside_quote   it is not; `outside_by_dollars` says by how much
+    unknown_quote   no usable two-sided quote was recorded with the read (legacy rows) --
+                    nothing is inferred
+  It is a comparison of two recorded official fields, nothing more. It does not claim why the
+  print sits outside the quote, and it does not re-score the frozen `high_roi` flag.
+
 States (exhaustive, and each one is falsifiable from the snapshot)
   traded_ge_floor      contracts_traded >= policy floor; a trade printed in the interval
   traded_below_floor   contracts_traded > 0 but below the floor
@@ -67,12 +84,16 @@ SOURCES = {
     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+    # The quote fields (yes_bid_dollars / yes_ask_dollars) are documented on Get Markets; the
+    # bid-only structure of the order book behind them is documented on Order Book Responses.
+    "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
 }
 
 DEFAULT_FLOOR = 100.0
 REVERSION_WINDOW = 3          # observations looked at after the swing
 HALF_MOVE = 0.5               # "gave back at least half the move" threshold
 EPS = 1e-9
+QUOTE_EPS = 1e-9              # float tolerance for "inside the quote"
 
 
 def _num(v):
@@ -126,6 +147,71 @@ def reversion(alert: dict, by_time: dict, sorted_times: list) -> dict:
     return out
 
 
+def quote_check(alert: dict, observation=None) -> dict:
+    """Compare the swing's printed end price with the two-sided quote of the SAME read.
+
+    Both sides come from one Get Markets response, so this is a comparison of two recorded
+    official fields, not an estimate: `to_price` was last_price_dollars and
+    `to_yes_bid`/`to_yes_ask` were yes_bid_dollars/yes_ask_dollars at that instant. The alert
+    row's own fields are preferred (they are frozen with the row); when a legacy row carries
+    no quote, the observation that bounds it is consulted, and the provenance used is named.
+
+    Returns one of three states and never a guess:
+      inside_quote   to_yes_bid <= to_price <= to_yes_ask
+      outside_quote  to_price lies outside that band; `outside_by_dollars` is the distance
+      unknown_quote  no usable two-sided quote (missing, non-numeric, or bid > ask / out of 0..1)
+    """
+    price = _num(alert.get("to_price"))
+    bid = _num(alert.get("to_yes_bid"))
+    ask = _num(alert.get("to_yes_ask"))
+    source = "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)"
+    if (bid is None or ask is None) and isinstance(observation, dict):
+        ob, oa = _num(observation.get("yes_bid")), _num(observation.get("yes_ask"))
+        if ob is not None and oa is not None:
+            bid, ask = ob, oa
+            source = "price_history observation at to_time (GET /markets)"
+    base = {
+        "to_last_price": _round(price),
+        "to_yes_bid": _round(bid),
+        "to_yes_ask": _round(ask),
+        "quote_source": source,
+        "sources": {"quote": SOURCES["quote"], "fields": SOURCES["fields"]},
+    }
+    usable = (
+        price is not None and bid is not None and ask is not None
+        and -EPS <= bid <= ask + EPS <= 1.0 + EPS
+    )
+    if not usable:
+        base.update({
+            "state": "unknown_quote",
+            "spread_dollars": None,
+            "outside_by_dollars": None,
+            "why": "no usable two-sided quote (yes_bid_dollars / yes_ask_dollars) was recorded "
+                   "with this read, so whether the printed price sat inside the quote cannot "
+                   "be checked and is left unknown",
+        })
+        return base
+    if bid - QUOTE_EPS <= price <= ask + QUOTE_EPS:
+        state, outside_by = "inside_quote", 0.0
+        why = (f"the printed price {price:.2f} is inside the quote recorded at the same read "
+               f"(yes_bid {bid:.2f} / yes_ask {ask:.2f})")
+    else:
+        state = "outside_quote"
+        outside_by = max(bid - price, price - ask, 0.0)
+        side = "above the recorded yes_ask" if price > ask else "below the recorded yes_bid"
+        why = (f"the printed price {price:.2f} is {side} ({ask:.2f} / {bid:.2f} bid) — the "
+               f"last-traded price of the interval is {outside_by:.2f} outside the two-sided "
+               f"quote recorded in the same read, so it is not a price a reader could have "
+               f"traded at that quote; this does not claim why the two differ")
+    base.update({
+        "state": state,
+        "spread_dollars": _round(ask - bid),
+        "outside_by_dollars": _round(outside_by),
+        "why": why,
+    })
+    return base
+
+
 def evaluate(alert: dict, observations, floor: float = DEFAULT_FLOOR) -> dict:
     """Evaluate one archived swing against the committed observations of its market."""
     by_time = index_observations(observations)
@@ -136,6 +222,9 @@ def evaluate(alert: dict, observations, floor: float = DEFAULT_FLOOR) -> dict:
         "policy_floor_is_a_kalshi_field": False,
         "sources": dict(SOURCES),
     }
+    # 49BA-1: the quote comparison travels with every state, including the ones that cannot
+    # quantify the interval, because it needs only the fields recorded with the read.
+    base["quote"] = quote_check(alert, by_time.get(to_t))
     rev = reversion(alert, by_time, times)
     base["reversion"] = rev
 
@@ -233,4 +322,22 @@ def summarize(evaluated) -> dict:
     counts["gave_back_half_within_3"] = gave_back
     counts["held_false"] = held
     counts["floor_contracts"] = float(DEFAULT_FLOOR)
+    return counts
+
+
+QUOTE_STATES = ("inside_quote", "outside_quote", "unknown_quote")
+
+
+def summarize_quote(rows) -> dict:
+    """Counts for the quote check (49BA-1). Every state always present; no derived ratio.
+
+    Read from `evidence.quote.state` on each row. A row without the block (written before this
+    check existed) counts as unknown_quote rather than being assumed inside the quote.
+    """
+    counts = {s: 0 for s in QUOTE_STATES}
+    for a in rows or []:
+        q = ((a or {}).get("evidence") or {}).get("quote") or {}
+        st = q.get("state")
+        counts[st if st in counts else "unknown_quote"] += 1
+    counts["rows"] = len(rows or [])
     return counts

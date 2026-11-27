@@ -168,6 +168,86 @@ def test_every_state_is_reachable_and_summarized():
     check(s["floor_contracts"] == E.DEFAULT_FLOOR, "summary must state the floor")
 
 
+# ---------------------------------------------------------------- 49BA-1: quote check
+# last_price_dollars is a print; yes_bid_dollars / yes_ask_dollars are the two-sided quote of
+# the SAME Get Markets read. A print outside that band was not executable at the recorded
+# quote, and the alert must say so instead of presenting the print as a tradable move.
+
+def quoted(frm, to, bid, ask):
+    a = alert(T0, T1, frm, to)
+    a["to_yes_bid"], a["to_yes_ask"] = bid, ask
+    return a
+
+
+def test_quote_inside_is_labelled_inside():
+    a = quoted(0.40, 0.52, 0.51, 0.53)
+    q = E.evaluate(a, [obs(T0, 0.40, 100.0), obs(T1, 0.52, 200.0)])["quote"]
+    check(q["state"] == "inside_quote", f"inside_quote expected, got {q['state']}")
+    check(q["outside_by_dollars"] == 0.0, f"an inside print has no distance, got {q['outside_by_dollars']}")
+    check(q["spread_dollars"] == 0.02, f"spread 0.02 expected, got {q['spread_dollars']}")
+
+
+def test_print_above_the_ask_is_outside_the_quote():
+    # The committed KXBTCY-27JAN0100-B97500 rows: a 0.01 -> 0.97 print recorded against a
+    # yes_bid 0.00 / yes_ask 0.01 quote. The 96c "move" was never available at the quote.
+    a = quoted(0.01, 0.97, 0.00, 0.01)
+    ev = E.evaluate(a, [obs(T0, 0.01, 72562103.0), obs(T1, 0.97, 72562103.0)])
+    q = ev["quote"]
+    check(q["state"] == "outside_quote", f"outside_quote expected, got {q['state']}")
+    check(q["outside_by_dollars"] == 0.96, f"distance 0.96 expected, got {q['outside_by_dollars']}")
+    check(q["spread_dollars"] == 0.01, f"spread 0.01 expected, got {q['spread_dollars']}")
+    check(ev["state"] == "quote_only", "the state block must stay independent of the quote check")
+    check("not a price a reader could have traded" in q["why"], f"the why must say it plainly: {q['why']}")
+
+
+def test_print_below_the_bid_is_outside_the_quote():
+    a = quoted(0.30, 0.12, 0.20, 0.40)
+    q = E.evaluate(a, [obs(T0, 0.30, 10.0), obs(T1, 0.12, 30.0)])["quote"]
+    check(q["state"] == "outside_quote", f"outside_quote expected, got {q['state']}")
+    check(q["outside_by_dollars"] == 0.08, f"distance 0.08 expected, got {q['outside_by_dollars']}")
+
+
+def test_missing_quote_is_unknown_not_inside():
+    a = alert(T0, T1, 0.30, 0.45)          # legacy row: no to_yes_bid / to_yes_ask
+    q = E.evaluate(a, [obs(T0, 0.30, 10.0), obs(T1, 0.45, 30.0)])["quote"]
+    check(q["state"] == "unknown_quote", f"unknown_quote expected, got {q['state']}")
+    check(q["outside_by_dollars"] is None, "an unknown quote must not carry a distance")
+    check("unknown" in q["why"], f"the why must say it is unknown: {q['why']}")
+
+
+def test_inverted_or_out_of_range_quote_is_unknown():
+    for bid, ask in ((0.60, 0.40), (0.10, 1.20), (-0.10, 0.50)):
+        a = quoted(0.30, 0.45, bid, ask)
+        q = E.evaluate(a, [obs(T0, 0.30, 10.0), obs(T1, 0.45, 30.0)])["quote"]
+        check(q["state"] == "unknown_quote",
+              f"bid {bid} / ask {ask} is not a usable quote, got {q['state']}")
+
+
+def test_quote_falls_back_to_the_bounding_observation_and_names_it():
+    a = alert(T0, T1, 0.30, 0.90)          # legacy row, but the observation carries the quote
+    ev = E.evaluate(a, [obs(T0, 0.30, 10.0, bid=0.30, ask=0.35), obs(T1, 0.90, 30.0, bid=0.34, ask=0.36)])
+    q = ev["quote"]
+    check(q["state"] == "outside_quote", f"outside_quote expected from the observation, got {q['state']}")
+    check(q["to_yes_bid"] == 0.34 and q["to_yes_ask"] == 0.36, f"observation quote expected, got {q}")
+    check("observation" in q["quote_source"], f"the fallback source must be named: {q['quote_source']}")
+
+
+def test_quote_summary_counts_every_row_and_never_assumes_inside():
+    rows = [
+        {"evidence": E.evaluate(quoted(0.40, 0.52, 0.51, 0.53), [])},
+        {"evidence": E.evaluate(quoted(0.01, 0.97, 0.00, 0.01), [])},
+        {"evidence": E.evaluate(alert(T0, T1, 0.30, 0.45), [])},          # no quote at all
+        {"evidence": {"state": "traded_ge_floor"}},                       # pre-49BA-1 row
+    ]
+    s = E.summarize_quote(rows)
+    check(s["inside_quote"] == 1, f"one inside expected, got {s['inside_quote']}")
+    check(s["outside_quote"] == 1, f"one outside expected, got {s['outside_quote']}")
+    check(s["unknown_quote"] == 2, f"two unknown expected (no block, no quote), got {s['unknown_quote']}")
+    check(s["rows"] == 4, f"rows 4 expected, got {s['rows']}")
+    check(sum(s[k] for k in ("inside_quote", "outside_quote", "unknown_quote")) == s["rows"],
+          "the three quote states must partition the rows")
+
+
 def test_never_emits_a_cause():
     banned = ("cause", "caused", "because of", "trigger")
     for a in (alert(T0, T1, 0.5, 0.7), alert(T0, T1, 0.99, 0.02)):
