@@ -507,6 +507,11 @@ def make_pass(plan: Plan):
                 annotate("error", f"pass {n}: {name} FAILED (exit {p.returncode})", (p.stdout + p.stderr)[-3000:])
                 return fail(f"{name} (exit {p.returncode})", p.stdout + p.stderr)
         failed = []
+        # F-108: a validator's own words must survive the pass. Before this, a validator failure
+        # called fail("validators: …") with no tail, so every record of the 2026-11-27 stall
+        # (18:31Z-19:23Z) read detail "validators: validate_alerts" with stderr_tail "" — and the
+        # reason existed only in job stdout, which is served from a blob host this project cannot
+        # always reach and which dies with the run.
         failure_output: list[str] = []
         for name, path in VALIDATORS:
             if not (ROOT / path).exists():

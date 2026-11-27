@@ -144,3 +144,39 @@ backend with reconnect/gap recovery; account/order reconciliation and risk limit
 walk-forward model validation; and timestamped official catalyst evidence clearly
 separated from causal hypotheses. Those are recommendations, not claims of work
 completed in this session.
+
+## Publication and live-recovery outcome
+
+- [PR #151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) merged at
+  **2026-11-27T19:45:39Z**, commit `9a57035`, after its release check passed.
+- [Main collector recovery](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058978690)
+  succeeded and committed snapshot **2026-11-27T19:47:49Z** (`3cb118b`):
+  **614 open / 200 settled published rows**. The official archived gas-series
+  citation is present; the strict validator passed.
+- [Fresh-data Pages release](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059212091)
+  built and deployed successfully, completed **19:50:54Z**. A subsequent live
+  fetch of `index.html` displayed that snapshot and those row counts; the public
+  health JSON reported `outcome: ok`, not the earlier failed state.
+- The full offline release gate passed again against that refreshed main tree.
+  The source audit passed against its 614 open, 200 settled and 514 series records
+  plus the covered alert, ROI, simulation and catalyst rows. The earlier table
+  deliberately remains a labelled **pre-fix** audit, not a current-price table.
+- The [default collector relay](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833)
+  was restarted and recorded another successful snapshot at **19:50:00Z**.
+  This verifies recovery, not an indefinite uptime or future-cadence guarantee.
+
+A concurrent independent repair appeared as PR #152 after #151 was merged; the
+[coordination comment](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152#issuecomment-7226869681)
+prevents silent duplicate integration and duplicate finding IDs. That PR and the
+other sessions' work were not merged, closed or overwritten by this session.
+
+### Concurrent integration update
+
+PR #152 subsequently merged to main as `8f4aae7` while this close-out was being
+prepared. Its separately verified changes are preserved: a historical official
+series-record fallback when a fresh answer is unavailable, explicit handling of
+unknown categories, and richer validator failure diagnostics (F-108/F-109). The
+PR #151 runtime re-fetch remains the primary mechanism. The regression's negative
+control now tests an explicit contradictory official category rather than treating
+an unknown category as a contradiction. The newer collector snapshot is retained
+verbatim from main. This audit does not relabel the fallback as a fresh API answer.

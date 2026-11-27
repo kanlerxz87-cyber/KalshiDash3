@@ -9,8 +9,8 @@ Claimed 2026-11-27T19:36Z before implementation. Current fixed Arena branch `are
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | in progress | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi OpenAPI/docs via available official GitHub sources; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
-| 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | in progress | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
+| 72AE-1 | Independent audit of existing published dashboard, source provenance and requirement coverage; add deterministic public-source validation with regression tests if missing; run full release gate | done | arena-72ae7bca | `scripts/audit_sources.py` (new), `scripts/tests/test_source_audit.py` (new), `COORDINATION.md` (this section only), `SOURCE_AUDIT.md` (new) | Official Kalshi docs/API via the platform fetch route; committed JSON; live Actions/Pages APIs. No changes to another session's files or generated snapshots. |
+| 72AE-2 | Integrate only this claimed scope, PR to main, merge after passing checks, verify Pages deployment and record actual limitations | done | arena-72ae7bca | Same scope | `gh pr`, Actions + Pages APIs; source links in audit report |
 
 ### 72AE verification and integration checkpoint (2026-11-27T19:45Z)
 
@@ -25,26 +25,115 @@ Independent dry-run [46058016625](https://github.com/kanlerxz87-cyber/KalshiDash
 
 | ID | Task | Status | Owner | Files in scope | Evidence |
 |---|---|---|---|---|---|
-| 72AE-3 | Re-fetch official categories for archive-cited series even after all their market rows leave the bounded scan; keep validator strict; test complete collector build and dry-run Actions | in progress | arena-72ae7bca | `scripts/collect.py` (archive-watch block only), `scripts/tests/test_archive_series_retention.py` (new); final integration adds F-107 to `data/findings.json` (append only; not F-105/PR #148); this board section | Check annotation linked above; `GET /series/KXAAAGASD`; official Get Series docs |
+| 72AE-3 | Re-fetch official categories for archive-cited series even after all their market rows leave the bounded scan; keep validator strict; test complete collector build and dry-run Actions | done | arena-72ae7bca | `scripts/collect.py` (archive-watch block only), `scripts/tests/test_archive_series_retention.py` (new); final integration adds F-107 to `data/findings.json` (append only; not F-105/PR #148); this board section | Check annotation linked above; `GET /series/KXAAAGASD`; official Get Series docs |
+
+### 72AE close-out — merged, deployed, and fresh data confirmed (2026-11-27T19:51Z)
+
+| Item | Verified outcome | Official/repository evidence |
+|---|---|---|
+| Pull request | **PR #151 merged** at **2026-11-27T19:45:39Z**, merge **`9a570359c8126995e678eb66ffb773bf9e93e9d6`**. No approval wait. | [PR #151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) |
+| PR check | `build` success, 1m27s; branch deploy correctly skipped | [PR release run 46058737090](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058737090) |
+| Main release deployment | Build and deploy **success** on the merged fix | [46058945188](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058945188) |
+| Collector recovery | Cancelled repeatedly failing scheduled relay `46053185236` after merging the fix, then dispatched one publish-enabled pass. **Success**, committed **`3cb118b`**, snapshot **`2026-11-27T19:47:49Z`**; **614 open / 200 settled rows**; archived `KXAAAGASD` official category retained. No orders or account credentials. | [Recovery run 46058978690](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058978690) · [commit](https://github.com/kanlerxz87-cyber/KalshiDash3/commit/3cb118be4052ba8d73f6df6c4621493a7e66a81d) |
+| Fresh-data release | Verified build and Pages deploy **success**, head `3cb118b`; completed **19:50:54Z** | [46059212091](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059212091) |
+| Live endpoint checks | Platform fetch of `index.html?audit=72ae-1951` rendered snapshot **19:47:49Z**, **614/200** with the stale notice removed; public `collector_health.json?audit=72ae-1951` returned **outcome=ok**, same snapshot/run. Earlier fetches during queued publishes temporarily returned the old deployment; freshness was not claimed until the new data was actually read back. | [Live landing page](https://kanlerxz87-cyber.github.io/KalshiDash3/index.html) · [Public health JSON](https://kanlerxz87-cyber.github.io/KalshiDash3/data/live/collector_health.json) |
+| Continued collection | Restarted default bounded relay **46059242833**, created **19:48:18Z**; health already records another successful committed snapshot at **19:50:00Z**. Future cadence is not guaranteed by this observation. | [Ongoing relay](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833) |
+| Post-refresh local gate | Merged `origin/main` including refreshed evidence, then **full release gate PASS** again. Citation audit passes on 614 open, 200 settled, 514 series citations, both feeds and all other covered groups. Four archive-retention tests and 15 source-audit tests pass. | `python3 scripts/verify_release.py`; `python3 scripts/audit_sources.py --json` |
+| Published review items | **F-107** visible via `flagged.html` (98 irregularities / 33 high on fetched version). Standing F-07 (paper/no account), F-14/F-77 (experimental ROI), F-25 (unverified causes), DEPLOY-1 (legacy source) remain. Actions also emits a non-blocking Node-20 action-runtime deprecation warning; both verified deploys nevertheless succeed. | [Review page](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) · release run annotations |
+
+**Concurrent repair discovered after publication:** PR #152 (`arena-a8d317a1`) independently diagnoses the same stall and proposes carry-forward/unknown-category behavior plus diagnostics. Its claim lived on another branch and was not present in this branch's board at claim time. It is not merged or overwritten here. [Coordination comment](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152#issuecomment-7226869681) records that #151 is already merged, F-107 is used, official re-fetch succeeds, and its diagnostics improvement can be separated. PR #150 and PR #148 remain their owners' scopes. No merge conflicts occurred before PR #151; the close-out integration conflict is recorded below.
+
+This close-out also freezes the regression's two alert fixtures (so eventual rolling-archive trimming cannot break it) and adds a negative control: a fresh contradictory official series category must still refuse publication. The original runtime fix is unchanged. All **72AE-1 / 72AE-2 / 72AE-3 are done**; unresolved account/streaming/model/causality limitations are explicitly not marked implemented. This record is published by a small follow-up PR on the same fixed Arena branch.
+
+### Close-out integration with concurrent PR #152 (2026-11-27T19:53Z)
+
+While preparing the close-out, PR #152 merged to main as `8f4aae7`. This session preserves its complete collector fallback, validator unknown-category policy, diagnostic recording, new tests, F-108/F-109 and coordination section; none is reverted. The new negative-control fixture is aligned to that policy: an explicit `Test` category contradiction must fail, rather than requiring unknown categories to fail.
+
+`git pull --rebase origin arena/72ae7bca-kalshidash3` replayed this branch's already-merged workflow snapshot `3cb118b` under a different commit ID; merging current `origin/main` then conflicted in seven generated `data/live/*.json` files (alerts, catalysts, collector_health, cors, markets, price_history, simulation). Work stopped for resolution. **Resolution:** restored the entire `data/live` directory from current `origin/main` (`8f4aae7`, containing the newer official `19:50:00Z` collector snapshot `acbb2e3`), not hand-merged or fabricated numerical fields. Both sessions' board sections and all their code/tests/findings remain. This avoids regressing the newer collected evidence to 19:47. Full release gate is re-run on the combined tree before publication.
+
+- Close-out combined-tree release gate: **PASS** after the PR #152 integration and fixture alignment. A subsequent `pull --rebase` with merge preservation attempted to replay historical health commit `554f72b` and conflicted again; that rebase was **aborted in full**, preserving the already verified merge tree. `git pull --rebase --ff-only origin arena/72ae7bca-kalshidash3` then confirmed the remote branch was already an ancestor and the branch pushed normally (no force push). No historical health record replaced current evidence.
 
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
-## Session `c4409c73` — collector recovery, source audit, and Pages integration
+## Session `arena-417935f1` — collector-stall diagnosis, release verification, publish (branch `arena/417935f1-kalshidash3`, base `a4a19cc`)
 
-Claimed 2026-11-27 on the assigned branch `arena/c4409c73-kalshidash3`, from `a4a19cc`. At claim, the latest health record says `validators: validate_alerts`; the only open PR (#148) is the older F-105 formatting change, whose row is outside this scope. Earlier collector and topic-integrity changes are already on `main` (PRs #147 and #149). No other session's work or workflow-owned snapshot files will be overwritten.
+Claimed 2026-11-27 **before any code or data edit**, after reading the board and reproducing the release gate on the
+base tree (`python3 scripts/verify_release.py` **PASS**; `jsdom@26` installed test-only).
+
+**What was observed before any edit.** `data/live/markets.json` frozen at `collected_at 2026-11-27T18:00:57Z`; the newest
+snapshot commit was `639f069` (18:00:59Z). `data/live/collector_health.json` carried **five consecutive failed passes**
+(18:31:08Z, 18:46:08Z, 19:01:08Z, 19:08:02Z, 19:23:02Z), every one `validators: validate_alerts`, every one with
+`stderr_tail: ""`. The same validator **passed** on the committed tree, so the fault was data-dependent on a *fresh*
+collection. Sandbox egress to Kalshi and to the Actions log blob host is TLS-blocked, re-tested at claim time.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| C440-1 | Reproduce the collector rejection; adopt the series-retention repair already merged in #151. Independently fix counts past the serialized feed cap | in progress | c4409c73 | `scripts/build_alerts.py` and `scripts/tests/test_alerts.py` (feed cap only), `scripts/tests/test_lifecycle.js` (capped count test), this board section | [Kalshi Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Demo environment](https://docs.kalshi.com/getting_started/demo_env), collector run evidence |
-| C440-2 | Final integration: recheck sourced rows and customer-facing disclosures, publish any new finding without modifying existing ledger rows, gate the PR, merge, and verify Pages | in progress | c4409c73 | `flagged.html`, `executive-summary.html`, `assets/site.js` (shared ledger reader only), `data/release_findings.json` (avoids #148), `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_client_safety.py`, this board section; no direct writes to `data/live/*` | [Kalshi API index](https://docs.kalshi.com/llms.txt), [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), GitHub checks and Pages API |
-| C440-3 | Follow alerted contracts after they leave the ranked snapshot, using official market lookups and retaining source-linked final outcomes for the chats and paper settlement | in progress | c4409c73 | `scripts/collect.py` (lifecycle call), `scripts/track_lifecycle.py`, `scripts/simulate.py`, `scripts/tests/test_track_lifecycle.py`, `scripts/tests/validate_live.py` (lifecycle validation), `scripts/tests/test_simulate.py`, `scripts/tests/test_lifecycle.js`, `scripts/tests/test_pages_dom.js`, `assets/site.js`, `assets/chatdock.js`, `alerts.html`, `dashboard.html`, `simulation.html`, `README.md` (lifecycle only); generated data remains workflow-owned | [Market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Get Historical Market](https://docs.kalshi.com/api-reference/historical/get-historical-market) |
-| C440-4 | Make collector dry runs read-only on failure; leave committing-run diagnostic changes to #152 | in progress | c4409c73 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py`, this board section | [Workflow dry-run input](https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml), diagnostic run [46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873) |
+| R41-1 | Root-cause the five-pass `validate_alerts` failure independently, and fix it if the cause is still present | **done — no code change shipped: main had already fixed it twice** | arena-417935f1 | (none; superseded) | see the overlap record below |
+| R41-2 | Make a failed validator's own output reach `collector_health.json` | **done on main as F-109 by `arena-a8d317a1`; this branch keeps main's implementation and adds only the rationale** | arena-417935f1 | `scripts/collect_relay.py` (comment only, 5 lines) | main's `test_collect_relay.py` (10/10) and `test_collect_health.py` (11/11) PASS on the merged tree |
+| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result | in progress | arena-417935f1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh api repos/…/pages(+builds)` |
 
-- Reproduced the outage independently on the assigned branch with a no-commit live Actions pass ([46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873)). `validate_alerts` rejected the restored Gas Prices topic for alerts at `2026-11-20T22:04:00Z` and `22:41:00Z` on `KXAAAGASD-26NOV21-3.6600` when the new rolling ledger lacked the series. Its archived category/source matched the [official series record](https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD); the [official market record](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600) also confirmed `finalized` / `no`, even though the ticker was not in the published settled slice. No values were backfilled by hand.
-- Parallel handoff: [#151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) landed the series-retention fix before integration. This branch drops its duplicate builder/validator repair and takes #151 unchanged. [#152](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152) owns the diagnostic-tail change; this branch only makes the `commit=false` path read-only. The original dry run had incorrectly pushed its health-only failure on this branch (`ed88a78`); that diagnostic will not be merged into main. The remaining scopes are separate.
-- Integration at `8f4aae7` (PR #152): halted the merge on conflicts in this board, the shared findings ledger, collector health, and the series/settlement collector. Kept both sessions’ board sections and both collector changes. Restored the shared ledger (F-107 through F-109 intact) and all workflow-owned snapshot files byte-for-byte from `main`; this release’s findings are in a separate ledger. No bot data or other session’s repair is replaced.
-- Live validation on `4cf0a4d`: [46059418231](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059418231) validated one official demo pass at `19:50:06Z`, `commit=False`; zero Pages/desk dispatches, no successor, no change to the branch ref. Separate main recovery produced snapshot `19:50:00Z` in `acbb2e3` ([run 46059242833](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833)). This precedes the new follow-up fields on main.
+### R41 — what this session found, and why it shipped no fix
+
+**The cause was reproduced, not guessed.** Dry-run `46058100236` on this branch (`commit=false`: no snapshot, no
+dispatches) reproduced the production failure and its check-run annotation gave the validator's own words:
+
+```
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories [] accept []
+archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:04:00Z assigned topic 'gas' but GET /series categories [] accept []
+```
+
+Two archived `KXAAAGASD-26NOV21-3.6600` swings keep `category_assigned_from` and `series_categories: ["Economics"]`; once
+the market left the open scan and the series left the 442-entry `series_index`, the validator resolved `[]` and refused
+the pass. This matches F-107's diagnosis and adds nothing to it.
+
+**Overlap, recorded honestly.** By the time this session had a fix ready, **three separate concurrent sessions had fixed
+the same outage**: `arena-72ae7bca` (F-107, `collect.py` re-fetch + `test_archive_series_retention.py`, PR #151 merged
+19:45:39Z), `arena-a8d317a1` (F-108/F-109, validator "unknown is not a contradiction" + relay health output, PR #152 merged
+19:51:49Z, and `carry_forward_series()` in `collect.py`), and this session. This branch **withdrew its own implementation**
+rather than ship a third rival rule for one concern: `scripts/build_alerts.py`, `scripts/tests/validate_alerts.py` and
+`scripts/tests/test_archive_evidence_fallback.py` were reset to `main`, and the only code line this branch adds is a
+four-line explanatory comment above `failure_output` in `scripts/collect_relay.py`. `data/findings.json` is main's,
+unmodified.
+
+**Independently re-verified on `main` (`acbb2e3`, after PR #152).** Running `arena-72ae7bca`'s own harness
+(`test_archive_series_retention.ArchivedSeriesRetention`) with the real `collect.py` build, `build_alerts.py` and
+`validate_alerts.py`, in both states:
+
+| State | Ledger after the pass | Feed builder | Validator |
+|---|---|---|---|
+| `GET /series` re-fetch answers | `['Economics']` | 0 | **0 — pass** |
+| `GET /series` re-fetch fails (`unavailable=True`) | `None` | 0 | **0 — pass** ("unknown is not a contradiction") |
+
+So on current `main` the class of failure this session reproduced is closed by main's own two mechanisms, and no third
+one is needed. This session's reproduction of the *pre-fix* tree (validator exits 1 with the identical message) and of
+`main` + F-107 only (also exits 1) is kept here as the evidence that the two mechanisms are both load-bearing.
+
+**Corrections to this session's own earlier notes, left visible rather than edited away:** (1) an earlier draft of this
+section said this branch closed a residual class; PR #152's validator change had already closed it. (2) An intermediate
+merge step in this session briefly reverted main's `carry_forward_series()` — that revert was caught before commit and the
+file was restored from `origin/main`; `git diff origin/main -- scripts/collect.py` is empty on the final tree. (3) This
+session's provisional finding ids F-108/F-109 collided with `arena-a8d317a1`'s; main's records stand and this branch
+contributes no finding.
+
+**Verification performed on the final tree.**
+
+| Check | Result |
+|---|---|
+| `python3 scripts/verify_release.py` | **PASS** — 21 pages, every validator and DOM suite, internal links |
+| `python3 scripts/tests/test_collect_relay.py` / `test_collect_health.py` | **PASS** (relay loop 10/10, health suite 11/11) |
+| `git diff origin/main HEAD --stat` on the final tree | `COORDINATION.md` +78, `scripts/collect_relay.py` +5 — nothing else |
+| `git diff origin/main -- scripts/collect.py data/findings.json` | **empty** — main's fixes intact, nothing reverted |
+| Production dry-run after main's fixes, on this branch | **PASS** — `46058698096`: `1 19:43:46Z validated` |
+| Main-line collector | **recovered** — `data: demo snapshot 2026-11-27T19:47Z` (`3cb118b`), then `19:50Z` (`acbb2e3`); later snapshots continue on main |
+
+**Sources.** The check-run annotation API
+`https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705421961/annotations` (this session's read) and
+`…/140705144837/annotations` (F-107's read). `https://docs.kalshi.com/api-reference/market/get-series` and
+`https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (`categories: ["Economics"]`) are **cited from the
+committed record and from `arena-72ae7bca`'s live read** — this session did not re-fetch them, because sandbox egress to
+Kalshi is TLS-blocked, and they are marked as such rather than presented as first-hand.
+
 
 ## Session `arena-a8d317a1` — collector stall after PR #149: make the failing validator say WHY, then fix the cause (branch `arena/a8d317a1-kalshidash3`, base `a4a19cc`)
 
@@ -126,6 +215,23 @@ work was dropped, and their `test_archive_series_retention.py` passes unchanged 
 
 Non-overlap: this session does not touch `assets/*`, the 21 pages or `data/live/*` (collector-owned). `data/findings.json`
 is append-only.
+
+## Session `c4409c73` — collector recovery, source audit, and Pages integration
+
+Claimed 2026-11-27 on the assigned branch `arena/c4409c73-kalshidash3`, from `a4a19cc`. At claim, the latest health record says `validators: validate_alerts`; the only open PR (#148) is the older F-105 formatting change, whose row is outside this scope. Earlier collector and topic-integrity changes are already on `main` (PRs #147 and #149). No other session's work or workflow-owned snapshot files will be overwritten.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| C440-1 | Reproduce the collector rejection; adopt the series-retention repair already merged in #151. Independently fix counts past the serialized feed cap | in progress | c4409c73 | `scripts/build_alerts.py` and `scripts/tests/test_alerts.py` (feed cap only), `scripts/tests/test_lifecycle.js` (capped count test), this board section | [Kalshi Get Markets](https://docs.kalshi.com/api-reference/market/get-markets), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Demo environment](https://docs.kalshi.com/getting_started/demo_env), collector run evidence |
+| C440-2 | Final integration: recheck sourced rows and customer-facing disclosures, publish any new finding without modifying existing ledger rows, gate the PR, merge, and verify Pages | in progress | c4409c73 | `flagged.html`, `executive-summary.html`, `assets/site.js` (shared ledger reader only), `data/release_findings.json` (avoids #148), `scripts/tests/audit_rendered_numbers.js`, `scripts/tests/test_client_safety.py`, this board section; no direct writes to `data/live/*` | [Kalshi API index](https://docs.kalshi.com/llms.txt), [Get Balance](https://docs.kalshi.com/api-reference/portfolio/get-balance), GitHub checks and Pages API |
+| C440-3 | Follow alerted contracts after they leave the ranked snapshot, using official market lookups and retaining source-linked final outcomes for the chats and paper settlement | in progress | c4409c73 | `scripts/collect.py` (lifecycle call), `scripts/track_lifecycle.py`, `scripts/simulate.py`, `scripts/tests/test_track_lifecycle.py`, `scripts/tests/validate_live.py` (lifecycle validation), `scripts/tests/test_simulate.py`, `scripts/tests/test_lifecycle.js`, `scripts/tests/test_pages_dom.js`, `assets/site.js`, `assets/chatdock.js`, `alerts.html`, `dashboard.html`, `simulation.html`, `README.md` (lifecycle only); generated data remains workflow-owned | [Market lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Get Historical Market](https://docs.kalshi.com/api-reference/historical/get-historical-market) |
+| C440-4 | Make collector dry runs read-only on failure; leave committing-run diagnostic changes to #152 | in progress | c4409c73 | `scripts/collect_relay.py`, `scripts/tests/test_collect_health.py`, this board section | [Workflow dry-run input](https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/.github/workflows/collect.yml), diagnostic run [46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873) |
+
+- Reproduced the outage independently on the assigned branch with a no-commit live Actions pass ([46058054873](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46058054873)). `validate_alerts` rejected the restored Gas Prices topic for alerts at `2026-11-20T22:04:00Z` and `22:41:00Z` on `KXAAAGASD-26NOV21-3.6600` when the new rolling ledger lacked the series. Its archived category/source matched the [official series record](https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD); the [official market record](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASD-26NOV21-3.6600) also confirmed `finalized` / `no`, even though the ticker was not in the published settled slice. No values were backfilled by hand.
+- Parallel handoff: [#151](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151) landed the series-retention fix before integration. This branch drops its duplicate builder/validator repair and takes #151 unchanged. [#152](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152) owns the diagnostic-tail change; this branch only makes the `commit=false` path read-only. The original dry run had incorrectly pushed its health-only failure on this branch (`ed88a78`); that diagnostic will not be merged into main. The remaining scopes are separate.
+- Integration at `8f4aae7` (PR #152): halted the merge on conflicts in this board, the shared findings ledger, collector health, and the series/settlement collector. Kept both sessions’ board sections and both collector changes. Restored the shared ledger (F-107 through F-109 intact) and all workflow-owned snapshot files byte-for-byte from `main`; this release’s findings are in a separate ledger. No bot data or other session’s repair is replaced.
+- Live validation on `4cf0a4d`: [46059418231](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059418231) validated one official demo pass at `19:50:06Z`, `commit=False`; zero Pages/desk dispatches, no successor, no change to the branch ref. Separate main recovery produced snapshot `19:50:00Z` in `acbb2e3` ([run 46059242833](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46059242833)). This precedes the new follow-up fields on main.
+- Follow-up integration at `2f086bb` (PRs #153 and #154): stopped on a board insertion conflict. Kept the main board and both sessions’ findings and audit notes, then inserted this session’s section separately. The upstream diagnostic comment, archive regression and manifest remain unchanged.
 
 ## Session `arena-e9d94b88` — live-desk scope gate, Elections/Culture volume discovery, and official-source audit (branch `arena/e9d94b88-kalshidash3`, base `bd6f467` + merge of `origin/main` `4ec6378`)
 
