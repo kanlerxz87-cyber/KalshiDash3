@@ -160,6 +160,28 @@ table above.** `data/live/*.json` is collector output and was never hand-edited 
 - 2026-11-27: read the board; confirmed no open PR and the branch equal to `origin/main` (`fe245d8`); claimed
   T120–T125 and pushed this claim before any other edit.
 
+### T125 — integration with concurrent sessions, and the release
+
+While this branch was open, other sessions merged into `main` (PR #132 `arena-98e88d21`, PR #133 `arena/bc717755`,
+PR #134 `arena/b2286891`, PR #137 `arena/660e1da6`), including a rewrite of `assets/engine.js` (lifecycle gating,
+`quotedBid`) and changes to `dashboard.html` (watchlist only), `trading.html`, `executive-summary.html`, and a
+collector pass that advanced the snapshot from `17:15:51Z` to `17:30:51Z`. GitHub reported PR #138 as conflicting.
+This branch was **rebased onto `origin/main`** and the three conflicts were resolved without discarding either side:
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `COORDINATION.md` | both sessions added a section at the same anchor | both sections kept in full (theirs first, this session's second); no text removed from either |
+| `assets/engine.js` | one export line | both additions kept: their `quotedBid` and this session's `normalizeRow` export |
+| `data/findings.json` | both appended to the ledger | merged structurally, not by text: `main`'s 87 items are kept exactly, and only this session's four new entries (F-100…F-103) are appended → 91 items (30 high). No other session's finding was removed or reworded |
+
+After the rebase the **whole gate was re-run on the merged tree**, not just on this session's files:
+`python3 scripts/verify_release.py` → **PASS** (all Python/JS suites including the concurrent session's rewritten
+`engine.test.js`, all four new audits, every validator, `check_site.py` with 21 pages and internal links).
+The audits re-verified against the **newer** `2026-11-27T17:30:51Z` snapshot: landing KPIs and 5 topic rows, 25
+resolution rows, 5 category pages (151/17/120/166/60 open, 50/1/50/50/49 settled), the dashboard's 5 cards and 40
+ranked rows, 154 swings all ≥ $0.10 with 123 frozen picks, and the ledger now rendering **91 irregularities / 30
+high**, every one source-linked. No number changed as a result of the merge.
+
 ### T120 — baseline (2026-11-27)
 
 | Check | Result |
@@ -2704,3 +2726,5 @@ Branch `arena/b2286891-kalshidash3`, based on `fe245d8` (2026-11-27T17:15Z snaps
 | Net unique diff | `executive-summary.html`, `elections.html`, `culture.html`, `live.html`, `test_client_safety.py` — no data files changed; all numbers from committed snapshots | `git diff origin/main~4..origin/main --stat` |
 
 **Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — portfolio and live execution stay paper), F-14/F-26/F-77 (high-ROI heuristic is disclosed, fee-aware screen honestly reports 0 picks), F-25 (cause links are settlement references, not causality), DEPLOY-1 (Pages served by legacy branch publisher; switching to Actions-only needs repo admin `Settings → Pages → Build and deployment → GitHub Actions`). Official-source verification above covers the load-bearing claims; live market values remain collection outputs (F-20).
+- 2026-11-27: rebased onto `origin/main` (`bd6f467`, four concurrent PRs merged) and resolved three conflicts keeping
+  both sides; re-ran the full gate on the merged tree → **PASS**; audits re-verified against the `17:30:51Z` snapshot.
