@@ -43,7 +43,7 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
 | A740-1 | Reconcile F-113 with the now-published lifecycle record, add the official-observation fixture and regression, and append a post-audit closure note; verify but do not reformat F-105 because current main is already consistent | done | arena-740b3003 | `data/findings.json` (F-113 action only), `data/audit/f113_resolution_observation.json` (new), `data/audit/REPORT.md` (follow-up section only), `scripts/tests/test_f113_resolution.py` (new), `COORDINATION.md` (this section), `data/session_claims.json` (generated) | [Official demo market](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-THRC26-BHAR), [Get Market](https://docs.kalshi.com/api-reference/market/get-market), [Market Lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), committed `data/live/markets.json` / alert archive |
-| A740-2 | Run the complete release gate; open a PR from this fixed branch, merge without waiting, and verify the deployed finding page and Pages build | in progress | arena-740b3003 | `COORDINATION.md` (this section only) | `python3 scripts/verify_release.py`, GitHub PR/check/Pages APIs, deployed `flagged.html` |
+| A740-2 | Run the release gate; open and merge this fixed-branch PR; verify the deployed F-113 finding and Pages build; close superseded PR #148 | done | arena-740b3003 | `COORDINATION.md` (this section only) | [PR #179](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/179), [build run 46079286360](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46079286360), [Pages deploy 46079502064](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46079502064), deployed [flagged.html](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) |
 
 ### A740-1 verification checkpoint (2026-11-27T22:39Z)
 
@@ -75,6 +75,21 @@ Claimed **2026-11-27T22:31Z** on the fixed Arena branch `arena/740b3003-kalshida
 
 - `origin/main` advanced to `e1c5a04` through PR #175 and its `2026-11-27T22:50:03Z` live-data collection. Rebased A740 onto this latest tip without conflicts. The refreshed `data/live/markets.json` still contains the out-of-window `KXPGATOUR-THRC26-BHAR` sidecar with exact source, `status=finalized`, `result=no`, `settlement_ts=2026-11-23T19:58:03.108438Z`, settlement value `0.0000`, and prior row observation time `2026-11-27T20:35:02Z`.
 - After rebase, `python3 scripts/tests/test_f113_resolution.py` **PASS** (4), `validate_live.py` **PASS** (614 open / 200 settled / 20 orderbooks), `validate_alerts.py` **PASS** (184 archived alerts), and `check_site.py` **PASS** (21 pages). `python3 scripts/verify_release.py` on `e1c5a04` also **PASS**: offline validators, Python/DOM suites, source/link checks, rendered-number audit and all 21 pages. Push, PR checks, merge, and post-merge deployment verification remain pending.
+
+### A740-2 close-out — PR, merge, Pages and deployed finding (2026-11-27T22:59Z)
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | [PR #179](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/179) merged at **2026-11-27T22:55:19Z** as `5efff4b55a3883955b4c5c4e7ad4b955d0d7de6b`. | `gh pr view 179` |
+| PR check | `build` passed in 1m35s; `deploy` was skipped on the pull-request event. | [Actions run 46079286360](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46079286360) |
+| Main deployment | Push-triggered `Deploy site to GitHub Pages` workflow completed **success** at 22:58:43Z; build job passed in 1m42s and deploy job in 9s. Pages API reports `status: built` for merge commit `5efff4b`. | [Actions run 46079502064](https://github.com/kanlerxz87-cyber/KalshiDash3/actions/runs/46079502064); Pages API |
+| Deployed finding | Fetched the published [`flagged.html`](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) after deployment. Its F-113 row says the named RSM Classic gap is resolved, displays the exact official market source, retains the later-pass/unknown-data caveat, and the page labels its collector snapshot `2026-11-27T22:50:03Z`. | Public Pages fetch; rendered F-113 row |
+| Superseded formatting PR | [PR #148](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/148) closed without merge at **2026-11-27T22:55:25Z**. F-105 was not changed. | `gh pr view 148` |
+| Publishing limitation | The successful current build is verified, but Pages API still reports `build_type: legacy`; this does not establish exclusive Actions-only publishing (existing DEPLOY-1). A superseded build for `20ada1a` errored during closely spaced main builds; the current merge-commit build for `5efff4b` succeeded and is the API's latest state. | Pages configuration/builds API; successful run above |
+| Post-closeout release gate | `python3 scripts/verify_release.py` was rerun on the post-merge `5efff4b` working tree after the A740 status/claim-ledger closure; **PASS**. | Local release-gate run, completed 2026-11-27T23:02Z |
+| Scope limits | Release gate is offline. This close-out does not claim authenticated account access, private-account verification, actual orders/trades, or live API availability beyond the cited observations. | `python3 scripts/verify_release.py`; source notes above |
+
+A740-1 and A740-2 are **done**. No future alert is claimed to resolve in the same pass: the regression and finding retain the documented follow-up/unknown-data boundary.
 
 ---
 
