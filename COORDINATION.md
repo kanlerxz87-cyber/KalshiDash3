@@ -83,6 +83,43 @@ While preparing the close-out, PR #152 merged to main as `8f4aae7`. This session
 
 - Close-out combined-tree release gate: **PASS** after the PR #152 integration and fixture alignment. A subsequent `pull --rebase` with merge preservation attempted to replay historical health commit `554f72b` and conflicted again; that rebase was **aborted in full**, preserving the already verified merge tree. `git pull --rebase --ff-only origin arena/72ae7bca-kalshidash3` then confirmed the remote branch was already an ancestor and the branch pushed normally (no force push). No historical health record replaced current evidence.
 
+## Session `arena-5940f7eb` — independent live-API value parity + end-to-end release verification (branch `arena/5940f7eb-kalshidash3`)
+
+Claimed **2026-11-27T22:34Z** on fixed Arena branch `arena/5940f7eb-kalshidash3` (rebased onto `main`, latest snapshot `2026-11-27T22:35:01Z` + live-desk scan `2026-11-27T22:37Z`). Read `COORDINATION.md` and checked open PRs before any edits. Rebase conflicts with concurrent `COORDINATION.md` updates (`arena-699eb329` PRs #172/#174/#176) were resolved without discarding any session's lines, placing this section at a clean interior anchor. Non-overlapping scope: `COORDINATION.md` (this section only); no application, workflow, or data files owned by other sessions (PRs #148, #150, #177, `arena-740b3003`) are touched.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|---|---|---|---|---|---|
+| 5940-1 | Independent line-by-line verification of official Kalshi docs, live demo API top open + settled rows across all 5 categories (`gas`, `elections`, `culture`, `crypto`, `golf`), full offline release gate (`verify_release.py`), citation audit (`audit_sources.py`), PR + merge + GitHub Pages deploy confirmation | done | arena-5940f7eb | `COORDINATION.md` (this section only) | [demo_env](https://docs.kalshi.com/getting_started/demo_env), [quick_start_websockets](https://docs.kalshi.com/getting_started/quick_start_websockets), [orderbook_responses](https://docs.kalshi.com/getting_started/orderbook_responses), [get-market-candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks), [market_lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle), [market_settlement](https://docs.kalshi.com/getting_started/market_settlement), [create-order-v2](https://docs.kalshi.com/api-reference/orders/create-order-v2), live `GET /exchange/status` & 10 live `GET /markets/{ticker}` reads |
+
+### 5940-1 verification log (2026-11-27T22:36Z)
+
+- **Official Kalshi documentation & exchange status re-verified verbatim via platform fetch:**
+  - [demo_env](https://docs.kalshi.com/getting_started/demo_env): REST `https://external-api.demo.kalshi.co/trade-api/v2` (also `https://demo-api.kalshi.co/trade-api/v2`), WS `wss://external-api-ws.demo.kalshi.co/trade-api/ws/v2` (also `wss://demo-api.kalshi.co/trade-api/ws/v2`); mock funds, credentials separate from production, demo prices/behavior may not reflect real markets.
+  - [exchange/status](https://external-api.demo.kalshi.co/trade-api/v2/exchange/status): `exchange_active: true`, `trading_active: true` across shards 0..3.
+  - [quick_start_websockets](https://docs.kalshi.com/getting_started/quick_start_websockets): authenticated handshake required (`KALSHI-ACCESS-KEY`, `KALSHI-ACCESS-SIGNATURE`, `KALSHI-ACCESS-TIMESTAMP`) even for public channels (`ticker`, `trade`, `market_lifecycle_v2`, `multivariate_market_lifecycle`).
+  - [orderbook_responses](https://docs.kalshi.com/getting_started/orderbook_responses): `orderbook_fp` returns `yes_dollars` and `no_dollars` bid arrays (`[price_dollars, count_fp]`, ascending); implied YES ask = `$1.00 - NO bid`.
+  - [get-market-candlesticks](https://docs.kalshi.com/api-reference/market/get-market-candlesticks): `period_interval` valid values `1`, `60`, `1440` minutes only (seconds resolution accumulated via collector/browser observations).
+  - [market_lifecycle](https://docs.kalshi.com/getting_started/market_lifecycle) & [market_settlement](https://docs.kalshi.com/getting_started/market_settlement): terminal REST settlement state is `finalized` with `result` (`yes`/`no`/`scalar`) and `settlement_ts`; $1/contract payout on net positions, zero settlement fee on simple YES/NO determinations.
+  - [create-order-v2](https://docs.kalshi.com/api-reference/orders/create-order-v2): `POST /portfolio/events/orders` with V2 fixed-point fields (`side`: `bid`/`ask`, `count`, `price`).
+- **Live demo API field-by-field spot verification (10 markets across all 5 categories):**
+  - *Open top-dollar leaders (5/5 exact on immutable fields, status `active`, `result: ""`, and quotes/volumes consistent with live trading):*
+    - Gas: [`KXAAAGASM-26NOV30-3.90`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-26NOV30-3.90) (`last_price_dollars: "0.7500"`, `volume_fp: "31027.52"`, `open_interest_fp: "24988.65"`)
+    - Elections: [`KXPRESNOMD-28-GPLA`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPRESNOMD-28-GPLA) (`last_price_dollars: "0.9900"`, `volume_fp: "465856531.27"`, `open_interest_fp: "44108150.17"`)
+    - Culture: [`KXOSCARPIC-27-YOU`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXOSCARPIC-27-YOU) (`last_price_dollars: "0.2400"`, `volume_fp: "1368307.31"`, `open_interest_fp: "924352.88"`)
+    - Crypto: [`KXETHY-27JAN0100-T4999.99`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHY-27JAN0100-T4999.99) (`last_price_dollars: "0.9000"`, `volume_fp: "18263278.14"`, `open_interest_fp: "1382157.55"`)
+    - Golf: [`KXDPWORLDTOUR-BMAPC26-HBAR`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-HBAR) (`last_price_dollars: "0.0690"`, `open_interest_fp: "320490.87"`, live `volume_fp` advanced `341498 -> 341584.67 -> 341602.63` across passes)
+  - *Settled/resolved rows (5/5 exact match on `status: "finalized"`, `result`, `settlement_ts`, `settlement_value_dollars`):*
+    - Gas: [`KXAAAGASM-25MAR31-US-3.25`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXAAAGASM-25MAR31-US-3.25) (`result: "no"`, `settlement_ts: "2026-11-04T22:32:17.603672Z"`)
+    - Elections: [`KXGOVCA-26-MMAH`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXGOVCA-26-MMAH) (`result: "no"`, `settlement_ts: "2026-11-04T04:58:49.9578Z"`)
+    - Culture: [`KXSUPERBOWLHEADLINE-27-COL`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXSUPERBOWLHEADLINE-27-COL) (`result: "no"`, `settlement_ts: "2026-10-27T03:33:43.195228Z"`)
+    - Crypto: [`KXZEC15M-26NOV271715-15`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXZEC15M-26NOV271715-15) (`result: "no"`, `settlement_ts: "2026-11-27T22:15:06.225616Z"`)
+    - Golf: [`KXPGATOUR-FAISG26-WCLA`](https://external-api.demo.kalshi.co/trade-api/v2/markets/KXPGATOUR-FAISG26-WCLA) (`result: "no"`, `settlement_ts: "2026-11-27T18:39:12.18608Z"`)
+- **Automated release gate & audits (`2026-11-27T22:35:01Z` snapshot):**
+  - `python3 scripts/verify_release.py` → **PASS** (21 HTML pages, JS/MJS syntax checks, `validate_alerts`, `validate_catalysts`, `validate_live`, `validate_roi`, all Python unit suites, all jsdom DOM & rendered-number suites, internal link check).
+  - `python3 scripts/audit_sources.py --json` → **PASS** (`errors: []`; 614 open, 200 settled, 592 series_index, 20 liquidity, 164 all_events alerts, 124 high_roi alerts, 184 archived alerts, 48 open + 21 settled simulated positions, 72 verified facts, 1 deliberately blank unverified fact `C-20`).
+  - `python3 scripts/audit_live_parity.py --compare data/audit/live_observations.json` → **PASS** (39 series, 28 markets exact on immutable/finalized fields).
+- **Flagged irregularities (non-blocking, published on [`flagged.html`](https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html) — 113 items total):** `F-07` (no demo API credentials supplied — account balance left blank, trading/portfolio explicitly paper-only), `F-14`/`F-26`/`F-77` (experimental high-ROI alert filter vs fee-aware ROI screen with 0 picks), `F-25` (settlement-reference links are not asserted causes), `F-111` (fee-schedule PDF vs `GET /series` `fee_multiplier`), `F-112` (`KXMAXSHARDINGTEST` test-like Crypto series), `DEPLOY-1` (legacy Pages branch publisher alongside Actions workflow).
+
 ## Session `arena-9312ad1f` — collector-stall root cause (independent reproduction), cross-session claim ledger, and site-wide source/staleness audit (branch `arena/9312ad1f-kalshidash3`, base `43dd5f1`)
 
 Claimed 2026-11-27 **before any code or data edit**, after reading this board and reproducing the release gate on the
