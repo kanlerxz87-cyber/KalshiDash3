@@ -99,7 +99,7 @@ keeping both sections, `scripts/verify_release.py` now runs their four new suite
 | T200 | Re-verify the published snapshot against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`, `GET /exchange/status`), field by field — every topic's headline market, the liquidity ladders, and resolved rows | done | arena-1370a435 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route) |
 | T201 | Independent audit of what the 21 pages **render** against the committed data: every published number, count, badge and table row recomputed from `data/live/*.json`, plus the internal- and external-link inventory | done | arena-1370a435 | `COORDINATION.md` (this section) | a jsdom harness written for this session (kept out of the repository), independent of the repository's own DOM suites |
 | T202 | Repair every real defect T200/T201 find, each with a regression test that fails before the fix and passes after | done (**F-105**) | arena-1370a435 | `alerts.html`, `assets/chatdock.js`, `assets/engine.js`, `scripts/tests/test_chat_counts.js` (new), `scripts/tests/test_chatdock.js`, `scripts/verify_release.py`, `data/findings.json` | mutation-checked regression; `python3 scripts/verify_release.py` PASS |
-| T203 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | done (PR #139, merged, deployed) | arena-1370a435 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live-URL fetch |
+| T203 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | done (PR #141, merged, deployed) | arena-1370a435 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live-URL fetch |
 
 ### T200 — what was re-read from the official demo API this session (2026-11-27)
 
@@ -158,17 +158,21 @@ pages against the committed data and recomputed every published figure from `dat
   conflict was resolved by keeping both sections, `scripts/verify_release.py` runs their four new suites and this
   session's, and `data/findings.json` carries F-100…F-103 (theirs) and F-105 (this session's).
 - 2026-11-27: gate **PASS** on the combined tree (21 pages, every validator, every Python and DOM suite).
+- 2026-11-27: the finding id was taken twice by concurrent sessions (F-100 by PR #138, F-104 by PR #139) and was
+  renumbered twice rather than collide; the ledger now reads F-100…F-105 with no duplicate ids.
+- 2026-11-27: **PR #141 merged** as `86a8ce7`; the live page serves the honest chat counts and the Flagged page
+  carries 93 irregularities.
 
 ### T203 — release, PR, merge and deployment (2026-11-27)
 
 | Step | Result |
 |---|---|
 | Release gate | `python3 scripts/verify_release.py` → **PASS** on the merged tree (21 pages, every validator, every suite, `check_site.py` link check) |
-| Branch | `arena/1370a435-kalshidash3`, rebased onto `origin/main` (94d996a, PR #138) before the push |
-| PR | **#139** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/139 |
-| Merge | **merged** to `main` without waiting for approval; merge commit recorded in the PR |
-| Pages deploy | **confirmed** — Pages API `status: built`, `source: main /`; a build for the merge commit reported `built` |
-| Live site | **confirmed live** — https://kanlerxz87-cyber.github.io/KalshiDash3/ serves the current snapshot with all five topic rows, the two chats showing "120 newest of 154" / "120 newest of 123", and the Flagged page carrying 92 irregularities with their source links |
+| Branch | `arena/1370a435-kalshidash3`, rebased onto `origin/main` twice as five other sessions landed (PRs #138, #139, #142, #143, #145); every board conflict was resolved by keeping **both** sessions' sections and both findings, and `scripts/verify_release.py` now runs the other sessions' four new suites and this session's |
+| PR | **#141** — https://github.com/kanlerxz87-cyber/KalshiDash3/pull/141 (build check **pass**, `deploy` correctly skipped on a PR) |
+| Merge | **merged 2026-11-27T18:02:47Z** as merge commit `86a8ce74d15aeea84c72c00a94ad2f37fddd4c6f`, without waiting for approval |
+| Pages deploy | **confirmed live** — the legacy branch publisher's build for the merge commit itself reported `errored` (the known DEPLOY-1 behaviour, the same as for every earlier merge on this repo); the next build, for `a9b3de13`, which contains the merge, reported **`built`**, and the Pages API reports `status: built`, `source: main /` |
+| Live site | **confirmed live** — https://kanlerxz87-cyber.github.io/KalshiDash3/alerts.html serves the fixed page: the chat header reads **"💬 All events — every ≥ $0.10 swing in the five topics 120 newest of 154"**; https://kanlerxz87-cyber.github.io/KalshiDash3/flagged.html reports **93 flagged irregularities, 30 high severity, 1 blank value**, every row source-linked, with F-105 among them |
 
 **Carried, not fixed here (published on `flagged.html`, non-blocking):** F-07 (no demo credentials — the portfolio and
 live execution stay paper), F-14/F-26/F-77 (the high-ROI screen is a disclosed heuristic, and F-77 explains that the
