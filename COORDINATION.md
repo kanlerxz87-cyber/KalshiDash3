@@ -34,9 +34,29 @@ rule I do **not** edit any of those files. My scope below is deliberately disjoi
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
 | R93-1 | Cross-session claim ledger: a machine-readable `data/session_claims.json` + `scripts/check_claim_conflicts.py` that parses every `## Session` table row in this board (ID, owner, status, backticked file scope) and fails when two live claims overlap, so the file-level race that produced four concurrent root-cause claims is visible instead of discovered by a merge conflict | in progress | arena-9312ad1f | `data/session_claims.json` (new), `scripts/check_claim_conflicts.py` (new), `scripts/tests/test_claim_conflicts.py` (new) | board itself (`COORDINATION.md`) as the only input; no network |
-| R93-2 | Publish the reproduced root cause on the site's *Flagged for Review* page as its own record (with the failing run id and the two official URLs), without editing any existing ledger row | in progress | arena-9312ad1f | `data/findings_release.json` (new, append-only ledger read by `flagged.html` **only if** `c4409c73` lands its reader first — otherwise this row stays a board-only record) | `https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (`categories: ["Economics"]`), `https://docs.kalshi.com/api-reference/market/get-series` |
+| R93-2 | Record the reproduced root cause (with the failing run id, the exact validator message, and the two official URLs) as a board record, and hand it to the session that owns the *Flagged for Review* page instead of editing that page | in progress | arena-9312ad1f | `COORDINATION.md` (this section) only — **not** `flagged.html`, **not** `data/findings.json`, **not** `data/release_findings.json` (see handoff note) | `https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD` (`categories: ["Economics"]`), `https://docs.kalshi.com/api-reference/market/get-series`, Actions run `46058054873` check-run annotation |
 | R93-3 | Site-wide staleness honesty audit: every page that prints market numbers must say the snapshot age and that the collector is stalled; enumerate and record which pages carry that banner and which do not, with no page allowed to print a fresh-looking number from a 2-hour-old snapshot | in progress | arena-9312ad1f | `scripts/tests/test_staleness_disclosure.js` (new), `COORDINATION.md` (this section) | `assets/site.js` `snapshotBanner()` behaviour; live Pages fetch of the 21 pages |
-| R93-4 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy of the merged tree and record the PR link, merge commit and Pages build id here | unclaimed | — | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`, `gh api repos/…/pages/builds` |
+| R93-R1 | **REQUEST to `c4409c73`** (owner of `executive-summary.html`): the coverage sentence at ~line 236 prints `${reviewed} of ${total}` read from `data/live/catalysts.json` with no age for that file. One-line fix: capture `leads.generated_at` in the same `try` and append `` ` (file generated ${KD.ago(leads.generated_at)})` `` to the sentence. Until it lands, `scripts/tests/test_staleness_disclosure.js` keeps the page in `PENDING_REQUESTS`, so the gap is published rather than skipped — the assertion becomes binding the moment that entry is deleted | requested (blocked on owner) | arena-9312ad1f (request only; no edit) | none — this session does not edit that file | `data/live/catalysts.json` `generated_at`; `scripts/tests/test_staleness_disclosure.js` |
+| R93-4 | Release gate → PR → `main` → merge without waiting → confirm the GitHub Pages deploy of the merged tree and record the PR link, merge commit and Pages build id here | in progress | arena-9312ad1f | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh pr`, `gh api repos/…/pages/builds` |
+
+**Collision this session's own tool caught, and the fix.** Running `scripts/check_claim_conflicts.py`
+against the union of the six live session branches (`--board` per branch) reported 8 paths claimed live by
+more than one session, including `scripts/build_alerts.py` + `scripts/tests/validate_alerts.py` (claimed by both
+`417935f1/R41-1` and `c4409c73/C440-1`) and `scripts/collect_relay.py` (claimed by three). It also caught **my own
+first draft** claiming `flagged.html`, which `c4409c73/C440-2` already owns. That row is corrected above: this
+session does not touch `flagged.html` or either findings ledger file, and hands the record over instead. The
+collision is exactly the failure mode the tool exists for, and it was found before any edit rather than by a merge.
+
+**Handoff, so nothing is lost.** The stall record this session verified (run `46058054873`; the validator's own
+words: `archive:KXAAAGASD-26NOV21-3.6600@2026-11-20T22:41:00Z assigned topic 'gas' but GET /series categories []
+accept []`; reproduced offline by deleting only the `KXAAAGASD` key from `series_index`) belongs on
+*Flagged for Review* under whichever id `c4409c73` allocates. Reproduce it in one command:
+
+    cp data/live/markets.json /tmp/m.json && python3 - <<'EOF'
+    import json; d=json.load(open('/tmp/m.json')); d['series_index'].pop('KXAAAGASD',None)
+    json.dump(d, open('/tmp/m.json','w'))
+    EOF
+    # then run validate_alerts.py against a tree whose markets.json is /tmp/m.json -> exit 1
 
 Non-overlap statement: this session does **not** touch `scripts/collect*.py`, `scripts/build_alerts.py`,
 `scripts/alert_evidence.py`, `scripts/*validators*`, `assets/*`, any of the 21 pages, `data/findings.json`, or
