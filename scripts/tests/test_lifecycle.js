@@ -89,15 +89,31 @@ console.log("A — one market row maps to exactly one lifecycle state");
 }
 
 /* ---------------------------------------------------------------- B. index */
-console.log("\nB — the alert index is built from both snapshot buckets, settled last");
+console.log("\nB — the alert index fills gaps via follow-up without modifying either ranked bucket");
 {
-  const idx = KD.marketIndex({
+  const dated = "2026-11-27T19:50:00Z";
+  const source = "https://external-api.demo.kalshi.co/trade-api/v2/historical/markets/FOLLOWED";
+  const doc = {
+    collected_at: dated,
     open_markets: [{ ticker: "A", status: "active" }, { ticker: "B", status: "active" }],
     settled_markets: [{ ticker: "C", status: "finalized", result: "yes" }, { ticker: "B", status: "finalized", result: "no" }],
-  });
-  check(idx.size === 3, "three distinct tickers indexed");
-  check(idx.has("C") && idx.get("C").result === "yes", "settled market found");
+    alert_lifecycle: { rows: [
+      { ticker: "A", status: "finalized", result: "yes" },
+      { ticker: "FOLLOWED", status: "finalized", result: "no", source, observed_at: dated },
+      { ticker: "UNVERIFIED", status: null, result: null, reason: "lookup deferred" },
+    ] },
+  };
+  const before = JSON.stringify(doc);
+  const idx = KD.marketIndex(doc);
+  check(idx.size === 5 && JSON.stringify(doc) === before, "three ranked and two followed tickers; ranks are unchanged");
   check(idx.get("B").status === "finalized", "a ticker in both buckets resolves to the settled row");
+  check(KD.lifecycleOf(idx.get("A")).state === "open", "a ranked record takes precedence over a follow-up");
+  const life = KD.lifecycleOf(idx.get("FOLLOWED"));
+  check(life.state === "settled" && life.result === "no" && life.source === source && life.observed_at === dated,
+    "a finalized follow-up retains the exact source and verification time");
+  const pending = KD.lifecycleOf(idx.get("UNVERIFIED"));
+  check(pending.state === "unverified" && pending.result === null && /lookup deferred/.test(KD.lifecycleChip(pending)),
+    "a deferred read is explicitly unverified and has no result");
   check(KD.marketIndex(null).size === 0, "a missing snapshot yields an empty index, not a throw");
 }
 

@@ -123,15 +123,12 @@
   <section class="card" id="resolutionCard" aria-labelledby="resolutionTitle">
     <h3 id="resolutionTitle">Tracked to resolution — how the events behind these alerts settled</h3>
     <p class="small mut">
-      Every alert is followed after the swing it reported. The join uses only the collector's committed
-      snapshot: the market's own <code>status</code> and <code>result</code> fields
-      (<a href="https://docs.kalshi.com/api-reference/market/get-markets" target="_blank" rel="noopener">Get Markets</a>,
-      lifecycle and payout order per
-      <a href="https://docs.kalshi.com/getting_started/market_lifecycle" target="_blank" rel="noopener">Market Lifecycle</a>).
-      <b>Result set · not paid yet</b> is not an outcome: Kalshi populates <code>result</code> when a market is
-      determined and pays positions when it is finalized, so it is counted separately.
-      A ticker that is absent from the snapshot reads <b>not in snapshot</b> — the committed snapshot is a ranked
-      window, not the whole exchange, so absence is never reported as "unresolved" (D-03).
+      The collector follows alerted contracts even after they leave the rankings. It uses Kalshi’s
+      <a href="https://docs.kalshi.com/api-reference/market/get-market">current</a> and
+      <a href="https://docs.kalshi.com/api-reference/historical/get-historical-market">historical</a> market records.
+      A result is final only when the market is <code>finalized</code>; a determined or disputed result is not yet
+      a payout (<a href="https://docs.kalshi.com/getting_started/market_lifecycle">Market Lifecycle</a>).
+      If a lookup is unavailable or deferred, the result stays blank and the status is marked unverified.
     </p>
     <div class="evbar" id="lifecycleBar"></div>
     <div id="outcomes"></div>
@@ -345,7 +342,8 @@ function setMore(btn, rendered, qualifying, expanded, noun) {
 }
 
 function render() {
-  const all = KDL.feedAlerts().filter(catFilter);
+  const feed = KD.lifecycleAttach(KDL.feedAlerts(), state.lifeIdx);
+  const all = feed.filter(catFilter);
   // T70: one definition on every surface. See KDL.modelPick — membership is the archive's frozen
   // high_roi screen, not the heuristic score (which used to give this page 47 picks while the
   // dashboard showed 49 and the category dock 46, over the same 61 alerts: D-02).
@@ -357,15 +355,14 @@ function render() {
   const modelRows = state.showAllModel ? shownModel : shownModel.slice(-CHAT_CAP);
   KDL.renderFeed(KD.$("#feedAll"), allRows, { catLabels: KD.CAT_LABEL });
   KDL.renderFeed(KD.$("#feedModel"), modelRows, { catLabels: KD.CAT_LABEL, showWhy: true });
-  renderEvidenceBar(all.length, shownAll.length);
-  renderOutcomes();
+  renderEvidenceBar();
+  renderOutcomes(feed);
   KD.$("#allCount").textContent = chatCount(allRows.length, shownAll.length, all.length);
   KD.$("#modelCount").textContent = chatCount(modelRows.length, shownModel.length, model.length);
   setMore(KD.$("#btnAllMore"), allRows.length, shownAll.length, state.showAll, "alert");
   setMore(KD.$("#btnModelMore"), modelRows.length, shownModel.length, state.showAllModel, "pick");
-  renderDropNote(all.length);
-  const f = KDL.feedAlerts();
-  const up = f.filter((a) => a.dir === "up").length, down = f.length - up;
+  renderDropNote(feed.length);
+  const up = feed.filter((a) => a.dir === "up").length, down = feed.length - up;
   KD.$("#counts").textContent = `▲ ${up} · ▼ ${down}`;
 }
 
@@ -380,23 +377,23 @@ function renderDropNote(held) {
   if (!archiveTotal || archiveTotal <= held) { box.innerHTML = ""; return; }
   const dropped = archiveTotal - held;
   box.innerHTML =
-    `<div class="notice warn"><b>${dropped} archived swing${dropped === 1 ? "" : "s"} are not in this
-     page's copy.</b> The browser keeps the newest ${held} in memory (a ${FEED_MAX}-row ring buffer),
-     so the oldest ${dropped} of the archive's ${archiveTotal} in-scope swings are not shown here.
-     The committed archive on disk still holds every one of them
-     (<code>data/live/alerts_archive.json</code>).</div>`;
+    `<div class="notice warn">This page holds ${held} swings across all topics (up to ${KDL.FEED_MAX}).
+     The in-scope archive contains ${archiveTotal}, so at least ${dropped} are not in the chats.
+     <a href="data/live/alerts_archive.json">Open the complete dated archive</a>.</div>`;
 }
 
 // Counts come from data/live/alerts.json -> counts.evidence (computed by
-// scripts/alert_evidence.py over BOTH feeds served, not just what is on screen), so the ratio
-// is published even when a category tab or the "traded only" box hides rows.
-function renderEvidenceBar(total, shown) {
+// scripts/alert_evidence.py over the in-scope archive), not the rows on screen. Filtering
+// a chat or trimming the published feed does not change this denominator.
+function renderEvidenceBar() {
   const box = KD.$("#evBar");
   if (!box) return;
   const c = (state.feedCounts || {}).evidence;
   if (!c) { box.innerHTML = `<span class="kchip">evidence counts not published in this feed</span>`; return; }
   const chip = (label, n, cls) => `<span class="kchip"${cls ? ` style="${cls}"` : ""}>${label}: <b>${n}</b></span>`;
-  box.innerHTML = chip("swings served", total)
+  const archiveTotal = ["traded_ge_floor", "traded_below_floor", "quote_only", "counter_reset",
+    "candle_unquantified", "unknown_no_observations"].reduce((n, key) => n + (c[key] || 0), 0);
+  box.innerHTML = chip("swings in scope (archive)", archiveTotal)
     + chip("traded", c.traded_ge_floor || 0, "color:#7ce8bb")
     + chip("thin", c.traded_below_floor || 0, "color:#ffd88a")
     + chip("no trades", c.quote_only || 0, "color:#ffb3a7")
@@ -406,30 +403,17 @@ function renderEvidenceBar(total, shown) {
     + `<span class="kchip">traded floor: ${c.floor_contracts ?? "—"} contracts (project rule, not a Kalshi field)</span>`;
 }
 
-/* T71 — "track the live event until it resolves, and how (yes/no)".
- *
- * The join is deliberately narrow. It reads the collector's snapshot `open_markets` and
- * `settled_markets` and nothing else; `status`, `result`, `settlement_ts` and
- * `settlement_value_dollars` are official fields (GET /markets). Two rules keep it honest:
- *   - determined is not finalized. Kalshi sets `result` when a market is determined and pays when
- *     it is finalized (https://docs.kalshi.com/getting_started/market_lifecycle), so a determined
- *     market is shown as "result set · not paid yet" and is NOT counted in the yes/no outcome count.
- *   - absence is not evidence. The snapshot is a ranked window, so an alerted ticker that is not in
- *     it is "not in snapshot" — never "unresolved" and never "open" (D-03).
- * The move-vs-outcome count is descriptive of the demo sample on hand; it is not a hit rate that
- * anyone should trade (D-04).
- */
-function renderOutcomes() {
+// Join the collector's ranked records and per-ticker follow-ups. Only a finalized result
+// counts as settled. "Move vs outcome" is descriptive of this demo sample, not a hit rate.
+function renderOutcomes(feed) {
   const bar = KD.$("#lifecycleBar");
   const box = KD.$("#outcomes");
   if (!bar || !box) return;
-  const feed = KDL.feedAlerts();
   if (!state.snap || !state.lifeIdx || !state.lifeIdx.size) {
     bar.innerHTML = `<span class="kchip">lifecycle: <b>no snapshot loaded</b></span>`;
     box.innerHTML = KD.empty("No committed snapshot is available, so no lifecycle can be read. The page does not guess one.");
     return;
   }
-  KD.lifecycleAttach(feed, state.lifeIdx);
   const t = KD.lifecycleTally(feed);
 
   const chip = (label, n, color) =>
@@ -445,6 +429,7 @@ function renderOutcomes() {
     + (t.paused ? chip("paused by the exchange", t.paused, "") : "")
     + chip("closed · no result", t.awaiting_result, "")
     + chip("still open", t.open, "")
+    + (t.unverified ? chip("status unverified", t.unverified, "#ffd88a") : "")
     + chip("not in snapshot", t.not_listed, "")
     + (t.comparable
       ? `<span class="kchip">move agreed with the outcome: <b>${t.agree}</b> of ${t.comparable}` +
@@ -455,7 +440,7 @@ function renderOutcomes() {
   const seen = new Map();
   for (const a of feed) if (a.ticker && !seen.has(a.ticker)) seen.set(a.ticker, a);
   const rows = Array.from(seen.values())
-    .filter((a) => a.lifecycle && ["settled", "settled_scalar", "determined", "disputed", "amended", "awaiting_result"].includes(a.lifecycle.state))
+    .filter((a) => a.lifecycle && ["settled", "settled_scalar", "determined", "disputed", "amended", "awaiting_result", "unverified"].includes(a.lifecycle.state))
     .sort((x, y) => Date.parse(y.lifecycle.settlement_ts || y.to_time || 0) - Date.parse(x.lifecycle.settlement_ts || x.to_time || 0))
     .map((a) => {
       const l = a.lifecycle;
@@ -469,15 +454,17 @@ function renderOutcomes() {
         life: KD.lifecycleChip(l),
         result: l.result ? KD.resultBadge(l.result) : '<span class="na">—</span>',
         when: l.settlement_ts ? KD.esc(String(l.settlement_ts).replace("T", " ").replace("Z", " UTC")) : '<span class="na">—</span>',
+        observed: l.observed_at ? KD.esc(String(l.observed_at)) : '<span class="na">—</span>',
         value: l.settlement_value_dollars === null || l.settlement_value_dollars === undefined
           ? '<span class="na">—</span>' : KD.money(l.settlement_value_dollars, 4),
       };
     });
   box.innerHTML = KD.table([
     { key: "ticker", label: "Market" }, { key: "title", label: "Event" }, { key: "move", label: "Alert move" },
-    { key: "life", label: "Lifecycle" }, { key: "result", label: "Resolved" },
+    { key: "life", label: "Lifecycle" }, { key: "result", label: "Reported result" },
     { key: "when", label: "Settlement time" }, { key: "value", label: "Settlement value", num: true },
-  ], rows, { empty: "No alerted market has reached a result yet. Alerts are tracked here until the market's own status and result fields change; nothing is inferred in the meantime." });
+    { key: "observed", label: "Last verified (UTC)" },
+  ], rows, { empty: "No closed, determined, finalized or unverified tracked contracts to show." });
 }
 
 function statusChip(st) {
@@ -504,12 +491,27 @@ async function pickWatchlist() {
   KDL.setWatch(rows.slice(0, n).map((r) => r.ticker));
 }
 
+async function loadFeedCounts() {
+  try {
+    const doc = await KD.json("data/live/alerts.json");
+    state.feedCounts = doc.counts || null;
+  } catch { /* keep the last published counts, if any */ }
+}
+
+async function refreshCollector() {
+  try {
+    const latest = await KD.json("data/live/markets.json");
+    if (!latest?.collected_at || latest.collected_at <= (state.snap?.collected_at || "")) return;
+    state.snap = latest;
+    state.lifeIdx = KD.marketIndex(latest);
+    await Promise.all([KDL.loadCollectorAlerts(), loadFeedCounts()]);
+    render();
+  } catch { /* A failed read does not replace the last dated snapshot. */ }
+}
+
 async function boot() {
   // Collector layer first so the chats have history even before/without live REST.
-  try {
-    const doc = await (await fetch("data/live/alerts.json", { cache: "no-store" })).json();
-    state.feedCounts = doc.counts || null;
-  } catch { state.feedCounts = null; }
+  await loadFeedCounts();
   state.snap = await KDL.loadSnapshot();
   state.lifeIdx = KD.marketIndex(state.snap);   // T71: status/result per market, for the lifecycle join
   KDL.ingest((state.snap?.open_markets || []).concat(state.snap?.settled_markets || []), "collector", { silent: true });
@@ -517,6 +519,8 @@ async function boot() {
   await pickWatchlist();
   KDL.onAlert(() => render());
   loadLeads();
+  // Pick up new collector alerts and outcomes while the chat is open, even in snapshot-only mode.
+  window.setInterval(refreshCollector, 60000);
   // the category tabs filter both chats; they filter the lead table the same way
   KD.$("#catTabs").addEventListener("click", () => setTimeout(renderLeads, 0));
   KDL.onStatus(statusChip);

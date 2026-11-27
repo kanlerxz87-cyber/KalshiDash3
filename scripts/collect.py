@@ -1236,6 +1236,7 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
     # does NOT write alerts (one writer, one schema); it only probes CORS headers.
     watch = {r["ticker"] for r in rows["open"]}
     archived_tickers: set = set()
+    archive = []
     try:
         archive = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
         archived_tickers = {a["ticker"] for a in archive if a.get("ticker")}
@@ -1361,6 +1362,27 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "result can be yes, no, scalar, or empty. Nothing is coerced to yes/no.",
         ],
     }
+    # Settlement follow-up is additive: it does not change either ranked slice or its counts.
+    # A new swing from this collection is already covered by its ranked row where available;
+    # the next pass follows it via the archive even if it has dropped from both slices.
+    def previous_doc(name):
+        try:
+            doc = json.loads((LIVE / name).read_text())
+        except (OSError, json.JSONDecodeError):
+            return {}
+        return doc if isinstance(doc, dict) else {}
+
+    from track_lifecycle import track
+
+    tracked_topics = {c["id"] for c in cats["categories"]}
+    paper = previous_doc("simulation.json").get("open_positions") or []
+    payload["alert_lifecycle"] = track(
+        payload, [a for a in archive if a.get("category_id") in tracked_topics],
+        [p for p in paper if p.get("category_id") in tracked_topics],
+        previous_doc("markets.json").get("alert_lifecycle") or {}, get, utcnow,
+    )
+    followups = payload["alert_lifecycle"]
+    print(f"  lifecycle: {len(followups['rows'])} tracked markets, {followups['lookup_requests']} extra requests")
     LIVE.mkdir(parents=True, exist_ok=True)
     (LIVE / "markets.json").write_text(json.dumps(payload, indent=1))
     (LIVE / "price_history.json").write_text(

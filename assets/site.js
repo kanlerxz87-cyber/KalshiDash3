@@ -110,10 +110,19 @@ const KD = (() => {
   const RESULT_BEARING = new Set(["determined", "disputed", "amended"]);
   const TERMINAL_STATUS = new Set(["finalized", "settled", "determined", "disputed", "amended", "closed", "expired"]);
 
+  async function findings() {
+    const base = await json("data/findings.json");
+    const release = await json("data/release_findings.json").catch(() => null);
+    return { ...base, flagged: [...(release?.flagged || []), ...(base.flagged || [])] };
+  }
+
   function marketIndex(doc) {
     const m = new Map();
-    const rows = ((doc && doc.open_markets) || []).concat((doc && doc.settled_markets) || []);
-    for (const r of rows) if (r && r.ticker) m.set(r.ticker, r);
+    for (const r of (doc?.alert_lifecycle?.rows || [])) if (r?.ticker) m.set(r.ticker, r);
+    // Current ranked rows take precedence; tracking fills the gaps without changing the ranking.
+    for (const r of (doc?.open_markets || []).concat(doc?.settled_markets || [])) {
+      if (r?.ticker) m.set(r.ticker, { ...r, observed_at: doc.collected_at || null });
+    }
     return m;
   }
 
@@ -127,7 +136,10 @@ const KD = (() => {
       settlement_ts: row.settlement_ts || null,
       settlement_value_dollars: row.settlement_value_dollars ?? null,
       source: row.source || null,
+      observed_at: row.observed_at || null,
+      reason: row.reason || null,
     };
+    if (!status) return { ...base, state: "unverified", result: null };
     const isResult = result === "yes" || result === "no" || result === "scalar";
     if (isResult) {
       if (status === "finalized" || status === "settled") {
@@ -156,6 +168,7 @@ const KD = (() => {
     not_open: ["dim", "not open yet"],
     open: ["dim", "still open"],
     not_listed: ["dim", "not in snapshot"],
+    unverified: ["warn", "status unverified"],
   };
   const LIFECYCLE_TIP = {
     settled: "Finalized: Kalshi's own result field says how this market resolved",
@@ -167,7 +180,8 @@ const KD = (() => {
     paused: "Temporarily deactivated by the exchange — trading is paused but the market has not closed",
     not_open: "Created but not yet open for trading",
     open: "Still trading at the time of the snapshot in which this was last seen",
-    not_listed: "Not in the collector's ranked snapshot. That window is not the whole exchange, so absence is not evidence of anything",
+    not_listed: "No ranked or followed record for this market; absence is not evidence of an outcome",
+    unverified: "The collector has not confirmed the market's current status; no result is assumed",
   };
 
   function lifecycleChip(life) {
@@ -176,7 +190,8 @@ const KD = (() => {
     let text = spec[1];
     if (life.state === "settled" && life.result) text += " " + String(life.result).toUpperCase();
     const when = life.settlement_ts ? ` (${String(life.settlement_ts).replace("T", " ").replace("Z", " UTC")})` : "";
-    return `<span class="badge ${spec[0]}" title="${esc((LIFECYCLE_TIP[life.state] || "") + when)}">${esc(text)}</span>`;
+    const reason = life.reason ? ` (${life.reason})` : "";
+    return `<span class="badge ${spec[0]}" title="${esc((LIFECYCLE_TIP[life.state] || "") + when + reason)}">${esc(text)}</span>`;
   }
 
   // Attach the lifecycle of the market each alert fired on. Never invents one: an alert whose
@@ -203,7 +218,7 @@ const KD = (() => {
       alerts: (alerts || []).length, tickers: tickers.size, open: 0, settled: 0,
       settled_yes: 0, settled_no: 0, settled_scalar: 0, determined: 0,
       disputed: 0, amended: 0, paused: 0, not_open: 0,
-      awaiting_result: 0, not_listed: 0, agree: 0, disagree: 0, comparable: 0,
+      awaiting_result: 0, not_listed: 0, unverified: 0, agree: 0, disagree: 0, comparable: 0,
     };
     for (const a of tickers.values()) {
       const l = a.lifecycle;
@@ -219,6 +234,7 @@ const KD = (() => {
       if (l.state === "not_open") t.not_open += 1;
       if (l.state === "awaiting_result") t.awaiting_result += 1;
       if (l.state === "not_listed") t.not_listed += 1;
+      if (l.state === "unverified") t.unverified += 1;
       if (l.state === "open") t.open += 1;
       const d = Number(a.delta ?? (Number(a.to) - Number(a.from)));
       if (l.state === "settled" && (l.result === "yes" || l.result === "no") && Number.isFinite(d) && d !== 0) {
@@ -361,5 +377,5 @@ const KD = (() => {
   }
 
   return { $, $$, esc, num, money, cents, pct, ago, json, CAT_LABEL, isQaRow, basisBadge, resultBadge, statusBadge, srcLink, table, empty, snapshotBanner, nav, cadence,
-    marketIndex, lifecycleOf, lifecycleChip, lifecycleAttach, lifecycleTally, LIFECYCLE_SPEC, LIFECYCLE_TIP };
+    findings, marketIndex, lifecycleOf, lifecycleChip, lifecycleAttach, lifecycleTally, LIFECYCLE_SPEC, LIFECYCLE_TIP };
 })();
