@@ -1495,6 +1495,19 @@
    ]
   },
   {
+    "id": "F-104",
+    "severity": "low",
+    "item": "The executive summary's living requirements table typed a volatile count — \"the sample is one settled alert\" (true on 2026-11-22) — while the alert chats page, rendering the same committed data, showed \"settled: 0 … move vs outcome: no settled alert yet\"",
+    "why": "The number of alerted markets with a finalized yes/no result changes every time the collector's ranked snapshot window rotates: a settled market leaves the 200-row settled window and reads \"not in snapshot\" (D-03), and new alerts arrive. On the snapshot collected 2026-11-27T17:15:51Z the served feed covers 43 distinct tickers — 15 still open, 28 not in snapshot, 0 settled — so the typed \"one settled alert\" contradicted the page that actually computes the count. This is the same defect class as F-73 (typed cadence) and D-01 (typed ledger counts): a typed copy of a dynamic value drifts. Verified by rendering alerts.html in jsdom against the committed data (lifecycle bar: \"alerted markets: 43, settled: 0, resolved YES: 0, resolved NO: 0, still open: 15, not in snapshot: 28, move vs outcome: no settled alert yet\") and by recomputing the join independently from data/live/alerts.json + data/live/markets.json with the same narrow rule assets/site.js uses (finalized status + yes/no result).",
+    "action": "Fixed in executive-summary.html: the sentence no longer types a sample size. It keeps the D-04 design disclosure (the move-agrees-with-outcome figure is a bare count, never a rate, because the settled sample is small and changes as markets resolve) and points at the alert chats page, which renders the current count live from the committed snapshot. Pinned by a data-driven regression in scripts/tests/test_pages_dom.js section M: it recomputes the settled-alert sample from the committed alerts + markets with the page's own join and refuses any typed \"N settled alert\" that disagrees, and requires the bare-count disclosure to remain. Mutation-checked: with the old sentence restored the suite fails (\"types a settled-alert sample of 1 but the committed data has 0\"); with the fix it passes (0 typed sample sizes). The historical D-04 ledger entry is unchanged — it is the append-only record of what was true when it was written.",
+    "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/executive-summary.html",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_pages_dom.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
+      "https://docs.kalshi.com/getting_started/market_lifecycle"
+    ]
+  },{
    "id": "F-105",
    "severity": "medium",
    "item": "The two alert chats and the chat dock counted rows they were not showing: the header said \"154 in view\" while the feed held 120",
@@ -1508,21 +1521,6 @@
       "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
       "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
-  }
-,
-  {
-    "id": "F-104",
-    "severity": "low",
-    "item": "The executive summary's living requirements table typed a volatile count — \"the sample is one settled alert\" (true on 2026-11-22) — while the alert chats page, rendering the same committed data, showed \"settled: 0 … move vs outcome: no settled alert yet\"",
-    "why": "The number of alerted markets with a finalized yes/no result changes every time the collector's ranked snapshot window rotates: a settled market leaves the 200-row settled window and reads \"not in snapshot\" (D-03), and new alerts arrive. On the snapshot collected 2026-11-27T17:15:51Z the served feed covers 43 distinct tickers — 15 still open, 28 not in snapshot, 0 settled — so the typed \"one settled alert\" contradicted the page that actually computes the count. This is the same defect class as F-73 (typed cadence) and D-01 (typed ledger counts): a typed copy of a dynamic value drifts. Verified by rendering alerts.html in jsdom against the committed data (lifecycle bar: \"alerted markets: 43, settled: 0, resolved YES: 0, resolved NO: 0, still open: 15, not in snapshot: 28, move vs outcome: no settled alert yet\") and by recomputing the join independently from data/live/alerts.json + data/live/markets.json with the same narrow rule assets/site.js uses (finalized status + yes/no result).",
-    "action": "Fixed in executive-summary.html: the sentence no longer types a sample size. It keeps the D-04 design disclosure (the move-agrees-with-outcome figure is a bare count, never a rate, because the settled sample is small and changes as markets resolve) and points at the alert chats page, which renders the current count live from the committed snapshot. Pinned by a data-driven regression in scripts/tests/test_pages_dom.js section M: it recomputes the settled-alert sample from the committed alerts + markets with the page's own join and refuses any typed \"N settled alert\" that disagrees, and requires the bare-count disclosure to remain. Mutation-checked: with the old sentence restored the suite fails (\"types a settled-alert sample of 1 but the committed data has 0\"); with the fix it passes (0 typed sample sizes). The historical D-04 ledger entry is unchanged — it is the append-only record of what was true when it was written.",
-    "sources": [
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/executive-summary.html",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_pages_dom.js",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
-      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/markets.json",
-      "https://docs.kalshi.com/getting_started/market_lifecycle"
-    ]
   }
  ]
 }
