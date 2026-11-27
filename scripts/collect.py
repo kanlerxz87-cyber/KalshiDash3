@@ -53,6 +53,7 @@ HISTORICAL_BACKFILL_PER_SEED = HISTORICAL_PER_SEED
 HISTORICAL_PAGE = 1000     # documented maximum for GET /historical/markets?limit
 SAFETY_SCAN_CAP = 25000    # paging safety stop per status; truncation is published, never hidden
 OFFICIAL_VOLUME_SWEEP_TOP_K = 12  # top traded official series per topic queried directly (E9D9-3)
+CITED_SERIES_READ_LIMIT = 25  # archived series read fresh per pass when the scan no longer covers them (A8D3)
 
 # The brief limits this dashboard to listed topics. Two corrections are applied to the
 # keyword fallback only — a series that is explicitly a seed can never be excluded, because
@@ -395,6 +396,37 @@ def fetch_series_index(getter=None):
     except RuntimeError as e:
         print(f"  ! /series unavailable ({e}); continuing without it", file=sys.stderr)
         return {}
+
+
+def carry_forward_series(ledger: dict, previous: dict, cited) -> int:
+    """Keep a VERIFIED series record for a series the current scan no longer covers (A8D3).
+
+    Why this exists: the ledger below is built from rows in the CURRENT open/settled window, so a
+    resolved event's series leaves it as its markets age out of the scan - while the archived
+    >= $0.10 swings still cite that series and `scripts/tests/validate_alerts.py` re-checks their
+    topic against this ledger. On 2026-11-27 that gap stopped the collector committing at all:
+    every relay pass from 18:29Z to 19:38Z failed with "archive:KXAAAGASD-26NOV21-3.6600@...:
+    assigned topic 'gas' but GET /series categories [] accept []" and the published snapshot
+    stayed frozen at 18:00:57Z.
+
+    A FRESH answer always wins: this fills only a series the previous snapshot recorded categories
+    for and the current snapshot does not. Nothing is inferred - the carried record is exactly the
+    one `GET /series` already returned, with the same source URL - and the count is published in
+    `counts.series_ledger_carried_forward` so a reader can see the ledger is partly carried.
+    """
+    carried = 0
+    for t in sorted({str(x or "").upper() for x in cited}):
+        if not t:
+            continue
+        current = ledger.get(t) or {}
+        if current.get("categories"):
+            continue
+        prior = previous.get(t) or {}
+        if not prior.get("categories"):
+            continue
+        ledger[t] = dict(prior)
+        carried += 1
+    return carried
 
 
 def official_discovery(cats, series_index: dict | None = None, getter=None) -> tuple[dict[str, dict], list[dict]]:
@@ -1065,6 +1097,29 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
 
     for t in sorted({series_of(m) for st2 in ("open", "settled") for m in raw[st2]}):
         record_series(t)
+    # A8D3: every series an archived swing cites keeps a verified record, even after its markets
+    # leave the scan window. A bounded number of series the ledger has never seen are read fresh
+    # (one GET /series/{ticker} each, the same documented endpoint record_series uses); the rest
+    # keep the record the previous snapshot already verified.
+    previous_ledger: dict = {}
+    cited_series: set = set()
+    try:
+        previous_ledger = json.loads((LIVE / "markets.json").read_text()).get("series_index") or {}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        previous_ledger = {}
+    try:
+        archived = json.loads((LIVE / "alerts_archive.json").read_text()).get("alerts") or []
+        cited_series = {(str(a.get("ticker") or "").upper().split("-")[0])
+                        for a in archived if a.get("ticker")}
+    except (OSError, json.JSONDecodeError, AttributeError):
+        cited_series = set()
+    unseen_cited = sorted(t for t in cited_series if t and t not in ledger)
+    for t in unseen_cited[:CITED_SERIES_READ_LIMIT]:
+        record_series(t)
+    carried_forward = carry_forward_series(ledger, previous_ledger, cited_series)
+    if unseen_cited or carried_forward:
+        print(f"  series ledger: {len(unseen_cited[:CITED_SERIES_READ_LIMIT])} archived series read fresh, "
+              f"{carried_forward} kept from the previous snapshot (no longer in the current scan)")
     no_answer = sorted(t for t, v in ledger.items() if not v["categories"])
     print(f"  series ledger: {len(ledger)} series, {len(no_answer)} without an official categories answer")
 
@@ -1266,6 +1321,9 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
             "category_never_in_scope_official": sorted(CATEGORY_NEVER_IN_SCOPE),
             "excluded_series_reasons": dict(EXCLUDE_KEYWORD_SERIES),
             "seed_markets_found": len(seeded["open"]) + len(seeded["settled"]),
+            # A8D3: verified series records kept from the previous snapshot because the current
+            # scan no longer covers them (their events resolved and left the window).
+            "series_ledger_carried_forward": carried_forward,
             # Scan completeness, published: what the ranking below could see at all.
             "open_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("open")),
             "settled_paging_truncated_at_safety_cap": bool(raw.get("_truncated", {}).get("settled")),
