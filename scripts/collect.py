@@ -1214,6 +1214,13 @@ def build(include_orderbooks: int = 4, candlestick_points: int = 0):
         watch |= archived_tickers
     except (OSError, json.JSONDecodeError, AttributeError):
         pass  # first run: no archive yet, so open rows alone define the watch set
+    # F-107: the category ledger must outlive the scan window just like the chart
+    # history. Archived swings can retain a topic assigned from GET /series after
+    # their entire series leaves raw[open/settled]. Re-fetch that official record;
+    # never infer a category from the ticker or relax the downstream validator.
+    # record_series deduplicates against the scan ledger (one call per series).
+    for st in sorted({series_of({"ticker": t}) for t in archived_tickers}):
+        record_series(st)
     hist = {k: v for k, v in hist.items() if k in watch}
     # Restore what an earlier, prunier run already deleted: archive-cited tickers with no
     # observations left at all are rebuilt from their own official candles (see the docstring).
