@@ -44,10 +44,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.95,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -93,10 +93,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.81,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -142,10 +142,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.8,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -191,10 +191,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.33,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -240,10 +240,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.187,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -289,10 +289,10 @@
     "decided_at": "2026-11-27T20:35:03Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.185,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -338,7 +338,7 @@
     "decided_at": "2026-11-27T20:20:04Z"
    },
    "evidence_reversion": {
-    "observed_after": 1,
+    "observed_after": 2,
     "min_distance_from_from_price": 0.22,
     "gave_back_half": false,
     "still_open": false
@@ -1564,8 +1564,8 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.96,
-    "gave_back_half": false,
+    "min_distance_from_from_price": 0.0,
+    "gave_back_half": true,
     "still_open": false
    }
   },
@@ -3279,7 +3279,7 @@
    },
    "evidence_reversion": {
     "observed_after": 3,
-    "min_distance_from_from_price": 0.97,
+    "min_distance_from_from_price": 0.95,
     "gave_back_half": false,
     "still_open": false
    }
