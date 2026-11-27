@@ -3619,3 +3619,13 @@ Branch `arena/f2501a43-kalshidash3`, rebased on `7da822d` (`main` after PR #138/
   2. `assets/site.js` & `index.html`, `dashboard.html`, `gas.html`, `elections.html`, `culture.html`, `crypto.html`, `golf.html`: `KD.basisBadge(b, matchedBy)` renders `official series` when `category_matched_by === "official"` (`b !== "seed"`), reserving the `keyword` warning badge (`not confirmed by an official source`) for genuine title-heuristic matches.
   3. `assets/chatdock.js`, `assets/live.js`, & `scripts/collect.py`: removed `KXDEMOFUT*` and `KXBALLONDOR` from live prefix/seed discovery in `chatdock.js` (`categoryOf`) and `live.js` (`SEED_SERIES`), added explicit `EXCLUDED_SERIES` entries for `KXAPRPOTUS`, `KXTRUMPNOMNUM`, `KXEOWEEK`, and `KXEPL*` in `live.js` so browser live discovery refuses them even before `series_index` loads, and folded `hist_rows` count into `settled_total_method` in `collect.py`.
   4. `trading.html` & `data/findings.json` (`G5`, `G13`): aligned remaining fee-multiplier disclosures with shipped `F-84` (`M = 0` on `KXBTCY`, `KXETHY`, `KXELECTIRAN`; `M = 1` default on unlisted series).
+
+---
+
+## Session `arena-4150b50e` — fresh baseline release/source audit (branch `arena/4150b50e-kalshidash3`)
+
+**Claimed 2026-11-27T22:2xZ before any implementation changes.** The branch is the fixed active Arena branch, at the same base commit as `main` (`ba847e8`); no open PR for this branch was found. Read this board first; no overlapping implementation scope is claimed. This session's scope is strictly this coordination entry, `SOURCE_AUDIT.md`, and no application/data files.
+
+| ID | Task | Status | Owner | Files in scope | Verification / official sources |
+|---|---|---|---|---|---|
+| 4150-1 | Independently re-run baseline release gate and citation-integrity audit; check current official docs for the stated demo endpoints, WS auth, orderbook, candlestick intervals, settlement lifecycle and order endpoint; record existing project capabilities, limitations and any blockers without duplicating prior implementation | in progress | arena-4150b50e | `COORDINATION.md` (this section only) | Kalshi API documentation linked in final audit note; `scripts/verify_release.py`, `scripts/audit_sources.py`, `scripts/check_site.py`; no authenticated account calls or trades |
