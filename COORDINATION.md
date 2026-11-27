@@ -9,7 +9,15 @@ Claimed 2026-11-27 before implementation after reading this task board and confi
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| 699E-1 | Audit HTML page-level landmarks, document metadata, headings, form-control names, link/button names, images and tab order; record specific measurable findings and low-risk recommendations | in progress | arena-699eb329 | `COORDINATION.md` (this section only), `UX_AUDIT.md` (new) | read-only local scan of the 21 checked HTML pages; `python3 scripts/check_site.py`; no market-data or external claims |
+| 699E-1 | Audit HTML page-level landmarks, document metadata, headings, form-control names, link/button names, images and tab order; record specific measurable findings and low-risk recommendations | done | arena-699eb329 | `COORDINATION.md` (this section only), `UX_AUDIT.md` (new) | read-only local scan of the 21 checked HTML pages; `python3 scripts/check_site.py`; no market-data or external claims |
+
+### 699E-1 close-out — static UX/accessibility audit (2026-11-27)
+
+- **Overlap handled:** PRs #170 and #171 were independently active on baseline/source/release verification when checked. Before continuing, this session narrowed its claim to the non-overlapping accessibility/interaction audit; it made no application, data, navigation, or findings-ledger edits.
+- **Verification:** `python3 scripts/check_site.py` passed (21 pages; HTML and internal links). `python3 scripts/verify_release.py` passed after installing the test-only `jsdom@26` dependency (no package files changed). A read-only jsdom pass found 21/21 pages with document language, viewport, title, one H1 and main landmark, and no duplicate IDs, heuristic-unnamed links/buttons/controls, image-alt omissions, broken local fragment targets, unsafe `_blank` links, or positive tabindex values.
+- **Measured inventory:** 344 links, 36 native/button controls, four canvases, no images, six polite live-log feeds (four in page markup and two injected by the shared dock). CSS has one reduced-motion rule; smooth-scroll and two live-desk/message animations are not covered by it.
+- **Findings recorded, not silently changed:** `UX_AUDIT.md` logs UX-1 (chart canvas text alternative), UX-2 (programmatic selected/current state for filters and navigation), and UX-3 (comprehensive reduced-motion and user control/batched live announcements). The report explicitly says this is not a WCAG conformance assessment and lists untested assistive technology, contrast, focus-order, reflow and browser behavior.
+- **No external or market-data claims:** this task's evidence is the checked-in HTML/CSS/JS and local automated inspection only. Existing release source/audit reports remain the authority for Kalshi facts.
 
 
 ## Session `arena-72ae7bca` — independent source-provenance audit and release integration
