@@ -555,6 +555,13 @@ window.KDL = (() => {
       let doc = null;
       try { doc = await (await fetch(base + path, { cache: "no-store" })).json(); } catch { doc = null; }
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
+      // F-104: the feed is a ring buffer capped at FEED_MAX, so once the append-only archive
+      // grows past it the oldest swings are dropped from the browser's copy. The pages used to
+      // report the ring buffer's size as the archive's size. Remember the archive's own size so
+      // the pages can say that rows were dropped instead of silently claiming they are all there.
+      // Only the IN-SCOPE rows are counted: the out-of-scope ones are withheld on purpose and
+      // are disclosed separately, so they must not be mixed in with "dropped by the cap".
+      let inScope = 0;
       for (const a of entries) {
         if (!a || !a.ticker || num(a.delta) === null) continue;
         // F-76 scope gate (2026-11-22): the append-only archive keeps every swing, including the
@@ -567,6 +574,7 @@ window.KDL = (() => {
           S.withheldScope = (S.withheldScope || 0) + 1;
           continue;
         }
+        inScope++;
         const full = collectorAlertFromEntry(a);
         if (known.has(full.id)) continue;
         known.add(full.id);
@@ -574,6 +582,7 @@ window.KDL = (() => {
         pushAlert(full);
         revived.push(full);
       }
+      S.archiveRows = Math.max(S.archiveRows || 0, inScope);
     }
     return revived;
   }
@@ -827,10 +836,11 @@ window.KDL = (() => {
   AT.load();
 
   return {
-    BASE, ALERT_THRESHOLD, MODEL, STRATS,   // BASE lets a page print the exact official URL it queried
+    BASE, ALERT_THRESHOLD, MODEL, STRATS, FEED_MAX,   // BASE lets a page print the exact official URL it queried
     probe, get, setWatch, start, stop, setPaused, fetchOrderbook,
     ingest, loadSnapshot, loadCollectorAlerts,
     feedAlerts, clearFeed, renderFeed, bubble, pushAlert, makeAlert,
+    archiveRows: () => S.archiveRows || 0,
     scoreMarket, scoreAlert, modelPick,
     AT,
     onRows: addRowsListener,

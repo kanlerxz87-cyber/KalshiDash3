@@ -1493,6 +1493,21 @@
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/verify_release.py",
     "https://docs.kalshi.com/api-reference/market/get-markets"
    ]
+  },
+  {
+   "id": "F-104",
+   "severity": "medium",
+   "item": "The two alert chats and the chat dock counted rows they were not showing: the header said \"154 in view\" while the feed held 120",
+   "why": "The chat header chip on alerts.html printed the size of the whole qualifying set (shownAll.length), while the feed itself was rendered from shownAll.slice(-120). Once the append-only swing archive grew past 120 in-scope rows, the two numbers diverged and the page did not say so. Measured on the committed feed collected 2026-11-27T17:15Z: data/live/alerts.json reports counts.all_events = 154 and counts.high_roi = 123; the all-events chip read \"154 in view\" and the model chip read \"123 in view\", but the DOM held 120 and 120 rows respectively - so 34 alerts and 3 model picks were unreachable with nothing on the page disclosing it. The always-on dock on every page had the same defect with its own cap: kdCountAll read \"154\" while kdChatAll rendered 80 rows, and kdCountModel read \"123\" while kdChatModel rendered 80. This is the class of defect the project already refuses elsewhere - F-37 and F-90 (a stored count labelled as a found count), F-83 and F-94 (a row presented as the largest when the data does not support it), S-02 (two pages labelling the trimmed count as the found count). For a trader the count next to a chat is a claim about what they have seen; a count larger than the list makes the reader believe they have seen every swing in the archive when they have not.",
+   "action": "Fixed. Numbered F-104: the F-100 id was taken by a concurrent session's liquidity-ladder finding (PR #138, now on main), so this one takes the next free id. The chip now states what the feed holds, in one of three honest shapes: \"N in view\" when nothing is held back, \"N newest of M\" when the render cap is biting, and \"N of M qualify\" when the traded-only filter is hiding rows. The cap itself stays, because the archive grows without bound and the page must stay responsive, but each chat now carries a control that opens the rows the cap holds back (\"Show 34 older alerts\"), and once expanded the chip states the full count. The dock's counters use the same rule (\"80 of 154\"). The second half of the defect is also closed: the browser's alert feed is a ring buffer capped at FEED_MAX = 400, so once the archive passes 400 in-scope swings the oldest would have been dropped silently; the engine now reports the archive's own in-scope size and alerts.html states how many archived swings are not in this page's copy, naming the committed archive that still holds them. Regression: scripts/tests/test_chat_counts.js (mutation-checked - it fails on the pre-fix tree with \"the all-events chip states 154 shown and the feed holds 120 rows\" and passes after).",
+   "sources": [
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/alerts.html",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/chatdock.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/assets/engine.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/test_chat_counts.js",
+      "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/alerts.json",
+      "https://docs.kalshi.com/api-reference/market/get-markets"
+   ]
   }
 ,
   {

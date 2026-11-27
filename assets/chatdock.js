@@ -494,8 +494,10 @@ const KDCHAT = (() => {
     const inCat = (a) => !cat || a.category === cat;
     const box = document.getElementById("kdChatAll");
     const mbox = document.getElementById("kdChatModel");
+    let shownAll = 0, shownModel = 0;
     if (box) {
       const rows = all.filter(inCat).slice(-MAX_ROWS);
+      shownAll = rows.length;
       box.innerHTML = rows.length
         ? rows.map(rowHTML).join("")
         : '<div class="cd-empty">No ≥ $0.10 swing yet. Alerts appear as soon as two readings differ by $0.10 or more.</div>';
@@ -503,16 +505,22 @@ const KDCHAT = (() => {
     }
     if (mbox) {
       const rows = model.filter(inCat).slice(-MAX_ROWS);
+      shownModel = rows.length;
       mbox.innerHTML = rows.length
         ? rows.map(rowHTML).join("")
         : '<div class="cd-empty">No swing has passed the experimental screen yet (a fee-schedule seed series with positive reported 24-hour volume — not an ROI prediction).</div>';
       if (nearBottom(mbox)) mbox.scrollTop = mbox.scrollHeight;
     }
-    // Counts are the rows HELD (the whole qualifying set); each list shows its newest MAX_ROWS.
+    // F-104 (2026-11-27): the counter used to print the whole held set while the list showed only
+    // its newest MAX_ROWS, so the dock claimed 154 alerts while holding 80 of them. The counter
+    // now states what the list holds; the full record is on the alerts page, which says the same
+    // thing and opens the rest.
+    const heldAll = all.filter(inCat).length;
+    const heldModel = model.filter(inCat).length;
     const cAll = document.getElementById("kdCountAll");
-    if (cAll) cAll.textContent = String(all.length);
+    if (cAll) cAll.textContent = dockCount(shownAll, heldAll);
     const cModel = document.getElementById("kdCountModel");
-    if (cModel) cModel.textContent = String(model.length);
+    if (cModel) cModel.textContent = dockCount(shownModel, heldModel);
     const badge = document.getElementById("kdChip");
     if (badge) {
       badge.className = "kd-chip " + (S.liveOn ? "live" : S.blocked ? "warn" : "");
@@ -533,6 +541,14 @@ const KDCHAT = (() => {
 
   function nearBottom(el) {
     return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+  }
+
+  // F-104: a counter must describe the list next to it. "154" over a list of 80 rows was a
+  // count the reader could not check; "80 of 154" is one they can, and it names the limit.
+  function dockCount(shown, held) {
+    if (!held) return "0";
+    if (shown >= held) return String(held);
+    return `${shown} of ${held}`;
   }
 
   function shell() {
