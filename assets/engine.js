@@ -555,7 +555,7 @@ window.KDL = (() => {
       let doc = null;
       try { doc = await (await fetch(base + path, { cache: "no-store" })).json(); } catch { doc = null; }
       const entries = doc ? (doc.alerts || doc.all_events || []) : [];
-      // F-104: the feed is a ring buffer capped at FEED_MAX, so once the append-only archive
+      // F-105: the feed is a ring buffer capped at FEED_MAX, so once the append-only archive
       // grows past it the oldest swings are dropped from the browser's copy. The pages used to
       // report the ring buffer's size as the archive's size. Remember the archive's own size so
       // the pages can say that rows were dropped instead of silently claiming they are all there.

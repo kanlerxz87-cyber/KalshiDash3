@@ -511,7 +511,7 @@ const KDCHAT = (() => {
         : '<div class="cd-empty">No swing has passed the experimental screen yet (a fee-schedule seed series with positive reported 24-hour volume — not an ROI prediction).</div>';
       if (nearBottom(mbox)) mbox.scrollTop = mbox.scrollHeight;
     }
-    // F-104 (2026-11-27): the counter used to print the whole held set while the list showed only
+    // F-105 (2026-11-27): the counter used to print the whole held set while the list showed only
     // its newest MAX_ROWS, so the dock claimed 154 alerts while holding 80 of them. The counter
     // now states what the list holds; the full record is on the alerts page, which says the same
     // thing and opens the rest.
@@ -543,7 +543,7 @@ const KDCHAT = (() => {
     return el.scrollHeight - el.scrollTop - el.clientHeight < 60;
   }
 
-  // F-104: a counter must describe the list next to it. "154" over a list of 80 rows was a
+  // F-105: a counter must describe the list next to it. "154" over a list of 80 rows was a
   // count the reader could not check; "80 of 154" is one they can, and it names the limit.
   function dockCount(shown, held) {
     if (!held) return "0";

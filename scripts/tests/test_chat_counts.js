@@ -1,4 +1,4 @@
-/* KalshiDash3 — regression test for the chat counters (defect F-104).
+/* KalshiDash3 — regression test for the chat counters (defect F-105).
  *
  * The two scrolling chats on alerts.html, and the always-on dock on every page, each print a
  * count next to a list. The count used to be the size of the whole held set while the list held

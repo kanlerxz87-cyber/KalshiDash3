@@ -22,7 +22,7 @@
   .chat-links { margin-top:4px; display:flex; gap:10px; flex-wrap:wrap; }
   .chat-links a { font-size:11.5px; }
   .chat-empty { color:var(--mut); font-size:13px; margin:auto; text-align:center; padding:20px; }
-  /* F-104: the footer that names the rows the render cap holds back, and the control that opens
+  /* F-105: the footer that names the rows the render cap holds back, and the control that opens
      them. Without it the header chip said "154 in view" while the feed held 120. */
   .chat .chatfoot { border-top:1px solid var(--line); padding:7px 12px; display:flex; justify-content:center; }
   .chat .chatfoot .linkbtn { background:none; border:1px solid var(--line); color:var(--mut); font:11.5px ui-monospace,monospace;
@@ -305,7 +305,7 @@ function tradedFilter(a) {
   return a.evidence_state === "traded_ge_floor" || a.evidence_state === "traded_below_floor";
 }
 
-// F-104 (2026-11-27): the header chip used to report the whole qualifying set ("154 in view")
+// F-105 (2026-11-27): the header chip used to report the whole qualifying set ("154 in view")
 // while the feed rendered only the newest 120 rows, so 34 alerts — and 3 model picks — were
 // unreachable with nothing on the page saying so. The same class of defect the project already
 // refuses elsewhere (F-37 "settled markets in scope", F-83/F-94 an untraded row presented as the
@@ -369,7 +369,7 @@ function render() {
   KD.$("#counts").textContent = `▲ ${up} · ▼ ${down}`;
 }
 
-// F-104, second half: the browser's alert feed is a ring buffer capped at FEED_MAX (400). Once the
+// F-105, second half: the browser's alert feed is a ring buffer capped at FEED_MAX (400). Once the
 // append-only archive grows past it, the oldest swings are no longer in this page's copy. The
 // archive on disk still has them; the page says so instead of quietly counting a smaller set as
 // if it were the whole record.
@@ -555,7 +555,7 @@ KD.$("#btnExport").addEventListener("click", () => {
 });
 KD.$("#interval").addEventListener("change", () => { if (state.started) KDL.start(Number(KD.$("#interval").value)); });
 KD.$("#tradedOnly").addEventListener("change", (e) => { state.tradedOnly = e.target.checked; render(); });
-// F-104: open the rows the render cap holds back, and close them again. The chip and the button
+// F-105: open the rows the render cap holds back, and close them again. The chip and the button
 // label both follow the state, so the page can never claim a count the feed does not hold.
 KD.$("#btnAllMore").addEventListener("click", () => { state.showAll = !state.showAll; render(); });
 KD.$("#btnModelMore").addEventListener("click", () => { state.showAllModel = !state.showAllModel; render(); });

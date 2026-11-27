@@ -77,14 +77,14 @@ installed test-only with `npm install --no-save --package-lock=false jsdom@26`).
 `arena/b2286891` PR #134, `arena/660e1da6` PRs #135/#137, `arena/f33fe827` PR #138). Every one of them landed on `main`
 while this session was open. Their work was **kept, not overwritten**: the shared board conflict was resolved by
 keeping both sections, `scripts/verify_release.py` now runs their four new suites *and* this session's, and
-`data/findings.json` carries their F-100…F-103 plus this session's F-104. The F-100 id was taken by
-`arena/f33fe827` for a different defect, so this session's finding was renumbered **F-104** rather than collide.
+`data/findings.json` carries their F-100…F-103 plus this session's F-105. The F-100 id was taken by
+`arena/f33fe827` for a different defect, so this session's finding was renumbered **F-105** rather than collide.
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |----|------|--------|-------|----------------|------------------------|
 | T200 | Re-verify the published snapshot against the **live official demo API** (`GET /markets/{ticker}`, `GET /markets/{ticker}/orderbook`, `GET /series/{ticker}`, `GET /exchange/status`), field by field — every topic's headline market, the liquidity ladders, and resolved rows | done | arena-1370a435 | `COORDINATION.md` (this section) | `https://external-api.demo.kalshi.co/trade-api/v2/…` read through the platform fetch route (the sandbox has no direct egress; the demo host answers the fetch route) |
 | T201 | Independent audit of what the 21 pages **render** against the committed data: every published number, count, badge and table row recomputed from `data/live/*.json`, plus the internal- and external-link inventory | done | arena-1370a435 | `COORDINATION.md` (this section) | a jsdom harness written for this session (kept out of the repository), independent of the repository's own DOM suites |
-| T202 | Repair every real defect T200/T201 find, each with a regression test that fails before the fix and passes after | done (**F-104**) | arena-1370a435 | `alerts.html`, `assets/chatdock.js`, `assets/engine.js`, `scripts/tests/test_chat_counts.js` (new), `scripts/tests/test_chatdock.js`, `scripts/verify_release.py`, `data/findings.json` | mutation-checked regression; `python3 scripts/verify_release.py` PASS |
+| T202 | Repair every real defect T200/T201 find, each with a regression test that fails before the fix and passes after | done (**F-105**) | arena-1370a435 | `alerts.html`, `assets/chatdock.js`, `assets/engine.js`, `scripts/tests/test_chat_counts.js` (new), `scripts/tests/test_chatdock.js`, `scripts/verify_release.py`, `data/findings.json` | mutation-checked regression; `python3 scripts/verify_release.py` PASS |
 | T203 | Publish the findings on the *Flagged for Review* page with their official source links, then release gate → PR → `main` → merge → confirm the GitHub Pages build and deploy, and record the PR link and merge result here | done (PR #139, merged, deployed) | arena-1370a435 | `data/findings.json` (append only), `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`, Actions API, Pages builds API, live-URL fetch |
 
 ### T200 — what was re-read from the official demo API this session (2026-11-27)
@@ -128,7 +128,7 @@ pages against the committed data and recomputed every published figure from `dat
 
 | ID | Severity | Defect | Fix | Regression |
 |----|----------|--------|-----|------------|
-| **F-104** | medium | The two alert chats and the chat dock counted rows they were **not** showing: the header chip read "154 in view" while the feed held 120 rows (34 alerts and 3 model picks unreachable, undisclosed), and the dock read "154" over 80 rows | The chip now states what the feed holds (`N in view` / `N newest of M` / `N of M shown`), each chat carries a control that opens the rows the render cap holds back, the dock's counters print "80 of 154", and the engine reports the archive's own in-scope size so the page discloses anything the 400-row ring buffer dropped | `scripts/tests/test_chat_counts.js` (new, 26 checks; mutation-checked — it fails on the pre-fix tree with "the all-events chip states 154 shown and the feed holds 120 rows" and passes after). `scripts/tests/test_chatdock.js`'s badge check was updated: it had pinned the overstating behaviour, so it now checks the held number **and** the shown number |
+| **F-105** | medium | The two alert chats and the chat dock counted rows they were **not** showing: the header chip read "154 in view" while the feed held 120 rows (34 alerts and 3 model picks unreachable, undisclosed), and the dock read "154" over 80 rows | The chip now states what the feed holds (`N in view` / `N newest of M` / `N of M shown`), each chat carries a control that opens the rows the render cap holds back, the dock's counters print "80 of 154", and the engine reports the archive's own in-scope size so the page discloses anything the 400-row ring buffer dropped | `scripts/tests/test_chat_counts.js` (new, 26 checks; mutation-checked — it fails on the pre-fix tree with "the all-events chip states 154 shown and the feed holds 120 rows" and passes after). `scripts/tests/test_chatdock.js`'s badge check was updated: it had pinned the overstating behaviour, so it now checks the held number **and** the shown number |
 
 ### Log (this session)
 
@@ -138,11 +138,11 @@ pages against the committed data and recomputed every published figure from `dat
 - 2026-11-27: re-read the load-bearing official records field by field (table above); every published value matched.
 - 2026-11-27: rendered all 21 pages against the committed data and recomputed every published figure independently;
   714 published rows and every count matched, and all 17,389 links resolve.
-- 2026-11-27: found **F-104** — the chat counters overstated what the chats held. Fixed, with a mutation-checked
+- 2026-11-27: found **F-105** — the chat counters overstated what the chats held. Fixed, with a mutation-checked
   regression.
 - 2026-11-27: five other sessions landed on `main` while this session was open. Their work was kept: the board
   conflict was resolved by keeping both sections, `scripts/verify_release.py` runs their four new suites and this
-  session's, and `data/findings.json` carries F-100…F-103 (theirs) and F-104 (this session's).
+  session's, and `data/findings.json` carries F-100…F-103 (theirs) and F-105 (this session's).
 - 2026-11-27: gate **PASS** on the combined tree (21 pages, every validator, every Python and DOM suite).
 
 ### T203 — release, PR, merge and deployment (2026-11-27)

@@ -154,10 +154,10 @@ function counts(w) {
   // (main's earlier version compared against the frozen rows inside the newest 80 events; that
   // tolerated the truncation. This version keeps main's badge check and restores the screen check.)
   //
-  // F-104 (2026-11-27): the badge used to print the held count alone ("123") next to a list of
+  // F-105 (2026-11-27): the badge used to print the held count alone ("123") next to a list of
   // 80 rows, so the badge claimed 123 model picks while the reader could see 80 of them. The
   // counter now prints both numbers ("80 of 123"). The check below keeps the original intent —
-  // the held number must be the whole frozen screen, never a subset of it — and adds the F-104
+  // the held number must be the whole frozen screen, never a subset of it — and adds the F-105
   // property that the shown number matches the rows actually rendered.
   const frozenScreen = archiveWithDecoy.alerts.filter((a) => {
     const cats = (a.series_categories || []).map(String);
