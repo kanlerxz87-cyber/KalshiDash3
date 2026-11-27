@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T01:30:09Z",
- "runtime_seconds": 42.0,
+ "collected_at": "2026-11-27T02:15:09Z",
+ "runtime_seconds": 98.4,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -37,7 +37,7 @@
   "orderbooks": 483,
   "orderbooks_requested": 483,
   "alerts": 0,
-  "markets_with_momentum": 122,
+  "markets_with_momentum": 0,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
@@ -59,7 +59,7 @@
  "picks": [],
  "near_misses": [
   {
-   "ticker": "KXDEMOFUTHOURLY-26NOV27H02-UP",
+   "ticker": "KXDEMOFUTHOURLY-26NOV27H03-UP",
    "eligible": false,
    "fails": [
     "spread 99.0c > 10c cap",
@@ -77,8 +77,8 @@
    "ask": 1.0,
    "spread": 0.99,
    "depth": 10.0,
-   "vol24": 3735.0,
-   "ttc_hours": 0.4975,
+   "vol24": 1475.0,
+   "ttc_hours": 0.7475,
    "momentum": null,
    "series_ticker": "KXDEMOFUTHOURLY",
    "fee_multiplier": {
@@ -95,17 +95,17 @@
     "roi": -0.6439361134074835
    },
    "score": -0.6439361134074835,
-   "dollars_traded_estimate": 1566.25,
-   "title": "Demo BTC at or above 60611.93 USD",
+   "dollars_traded_estimate": 778.75,
+   "title": "Demo BTC at or above 60644.68 USD",
    "category_id": "crypto",
    "category_basis": "keyword",
-   "close_time": "2026-11-27T02:00:00Z",
-   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H02",
+   "close_time": "2026-11-27T03:00:00Z",
+   "event_ticker": "KXDEMOFUTHOURLY-26NOV27H03",
    "status": "active",
    "result": null,
-   "volume_fp": 4475.0,
-   "volume_24h_fp": 3735.0,
-   "open_interest_fp": 85.0,
+   "volume_fp": 2225.0,
+   "volume_24h_fp": 1475.0,
+   "open_interest_fp": 35.0,
    "catalysts": [],
    "book": {
     "depth_at_bid": 10.0,
@@ -113,7 +113,7 @@
     "bid_price": 0.01,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H02-UP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDEMOFUTHOURLY-26NOV27H03-UP"
   }
  ],
  "unscoreable": [
@@ -138,8 +138,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.2475,
-   "momentum": 0.0,
+   "ttc_hours": 3.4975,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -189,8 +189,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.2475,
-   "momentum": 0.0,
+   "ttc_hours": 3.4975,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -240,8 +240,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.2475,
-   "momentum": 0.0,
+   "ttc_hours": 3.4975,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -291,8 +291,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.2475,
-   "momentum": 0.0,
+   "ttc_hours": 3.4975,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -342,8 +342,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 4.2475,
-   "momentum": 0.0,
+   "ttc_hours": 3.4975,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -393,8 +393,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 3.9975,
-   "momentum": 0.0,
+   "ttc_hours": 3.2475,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -444,8 +444,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 3.9975,
-   "momentum": 0.0,
+   "ttc_hours": 3.2475,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -495,8 +495,8 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 3.9975,
-   "momentum": 0.0,
+   "ttc_hours": 3.2475,
+   "momentum": null,
    "series_ticker": "KXCRYPTOLEAD15M",
    "fee_multiplier": {
     "taker": 1,
@@ -529,17 +529,18 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 206,
+  "candles_used": 199,
   "signals": 0,
   "hits": 0,
   "misses": 0,
   "baseline_always_yes_bets": 6,
-  "baseline_always_yes_hits": 6,
+  "baseline_always_yes_hits": 5,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
    "candle without a price": 18,
-   "no side passed the replay gates": 6
+   "no side passed the replay gates": 6,
+   "no candles in the 2h before close": 35
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -548,7 +549,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 1.0
+  "baseline_always_yes_hit_rate": 0.8333
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
