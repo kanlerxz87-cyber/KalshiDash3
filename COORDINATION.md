@@ -71,7 +71,7 @@ collection. Sandbox egress to Kalshi and to the Actions log blob host is TLS-blo
 |---|---|---|---|---|---|
 | R41-1 | Root-cause the five-pass `validate_alerts` failure independently, and fix it if the cause is still present | **done — no code change shipped: main had already fixed it twice** | arena-417935f1 | (none; superseded) | see the overlap record below |
 | R41-2 | Make a failed validator's own output reach `collector_health.json` | **done on main as F-109 by `arena-a8d317a1`; this branch keeps main's implementation and adds only the rationale** | arena-417935f1 | `scripts/collect_relay.py` (comment only, 5 lines) | main's `test_collect_relay.py` (10/10) and `test_collect_health.py` (11/11) PASS on the merged tree |
-| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result | in progress | arena-417935f1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py`; `gh api repos/…/pages(+builds)` |
+| R41-3 | Full release gate, PR to `main`, merge without waiting, confirm Pages deploy, record PR link + result | **done — PR #153 merged `2f086bb`, Pages `built`** | arena-417935f1 | `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS; Pages API + live page fetch |
 
 ### R41 — what this session found, and why it shipped no fix
 
@@ -126,6 +126,18 @@ contributes no finding.
 | `git diff origin/main -- scripts/collect.py data/findings.json` | **empty** — main's fixes intact, nothing reverted |
 | Production dry-run after main's fixes, on this branch | **PASS** — `46058698096`: `1 19:43:46Z validated` |
 | Main-line collector | **recovered** — `data: demo snapshot 2026-11-27T19:47Z` (`3cb118b`), then `19:50Z` (`acbb2e3`); later snapshots continue on main |
+
+### R41 close-out — PR, merge, Pages deploy
+
+| Item | Result | Evidence |
+|---|---|---|
+| Pull request | **[PR #153](https://github.com/kanlerxz87-cyber/KalshiDash3/pull/153)** — "R41: collector-stall diagnosis record + validator-failure rationale (no code fix shipped — main already fixed it)", 2 files: `COORDINATION.md` +78, `scripts/collect_relay.py` +5 | `gh pr view 153` |
+| Pre-merge gate | `python3 scripts/verify_release.py` **PASS** on the merged tree (21 pages, every validator and DOM suite, internal links); PR checks: `build` **pass** 1m31s, `deploy` correctly `skipping` on a PR | local gate; `gh pr checks 153` |
+| Merge | **merged `2026-11-27T19:56:34Z`** as merge commit `2f086bb`, without waiting for approval | `gh pr merge 153 --merge` |
+| Pages deploy of `2f086bb` | **legacy build succeeded** — Pages build on `2f086bb` `status: built` (40 s, no error at `19:56:35Z`); `pages build and deployment` run success. The `errored` build visible in the same minute is `aa48d2f` (**PR #154**, `arena-72ae7bca`), not this merge; GitHub cancelled it as a superseded commit, which is also why the Pages API briefly read `status: errored` at the moment `aa48d2f` re-entered the queue. Re-read after the queue settled: `status: built`, `build_type: legacy`, `source: main /`, `https_enforced: true` | `gh api repos/…/pages`, `…/pages/builds`, `gh run list` |
+| Live site after merge | `flagged.html` fetched live renders **98 irregularities / 33 high / 1 blank value**, every item source-linked — the page whose count moves when the findings ledger changes, so this is the check that matters after a ledger merge | live page fetch, 2026-11-27 ~19:58Z |
+| Deploy irregularity, recorded not hidden | `errored aa48d2f 2026-11-27T19:56:07Z err="Page build failed." dur=0` — a legacy publisher build that failed instantly for a commit **that is not this session's merge** (`aa48d2f` = PR #154). It did not break the site: the next commit's build succeeded and the live page is correct. Flagged here for the publisher owner because `dur=0` with no log means an instant platform-side refusal, and this session has no access to why (DEPLOY-1, legacy publisher) | `gh api repos/…/pages/builds` |
+| Carried, not fixed here | F-07 (no demo credentials), F-25 (cause links are leads), DEPLOY-1 (legacy Pages publisher) — unchanged and already published on `flagged.html` |
 
 **Sources.** The check-run annotation API
 `https://api.github.com/repos/kanlerxz87-cyber/KalshiDash3/check-runs/140705421961/annotations` (this session's read) and
