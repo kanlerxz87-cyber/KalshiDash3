@@ -15,11 +15,13 @@
      confirmable is on <a href="flagged.html">Flagged for Review</a> rather than softened into an estimate.</p>
 
   <section id="audit-2026-11-22" aria-labelledby="auditTitle">
-    <h2 id="auditTitle">Current release audit · 22 November 2026</h2>
+    <h2 id="auditTitle">Current release audit · 27 November 2026</h2>
     <div class="notice warn"><b>Useful for research, not a verified trading edge.</b>
-      The dashboard and offline tests run without credentials. Account balances, authenticated execution,
-      uninterrupted tick streaming and profitable ROI are not verified by this release.
-      Existing historical verification records below are not a claim that every external value was re-fetched today.</div>
+      The offline release gate passed against the committed demo snapshot collected 2026-11-27T17:15:51Z.
+      This audit rechecked the official demo endpoints, orderbook, candlestick, settlement, order and WebSocket documentation,
+      but did not re-fetch market rows from the live API or authenticate an account. Account balances, authenticated execution,
+      uninterrupted tick streaming and profitable ROI are therefore not verified by this release. Read the snapshot timestamp
+      on the <a href="index.html">dashboard</a>; the historical verification records below retain their own check dates.</div>
     <div class="tw"><table>
       <thead><tr><th>Decision area</th><th>Current finding</th><th>Official reference / review evidence</th></tr></thead>
       <tbody>
