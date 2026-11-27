@@ -12,7 +12,14 @@ Claimed 2026-11-27 after reading this board. Scope is limited to `.github/workfl
 
 | ID | Task | Status | Owner | Files in scope | Verification / sources |
 |---|---|---|---|---|---|
-| 91A-1 | Pin the desk workflow's jsdom test dependency to the same supported major used by the Pages release gate, and fail the workflow if installation or the DOM render smoke test fails instead of silently skipping it | in progress | arena-91a14f93 | `.github/workflows/desk.yml`, `COORDINATION.md` (this section) | GitHub Actions workflow behavior; official GitHub Actions workflow syntax docs: `https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax`; local YAML/command review and release gate |
+| 91A-1 | Pin the desk workflow's jsdom test dependency to the same supported major used by the Pages release gate, and fail the workflow if installation or the DOM render smoke test fails instead of silently skipping it | done | arena-91a14f93 | `.github/workflows/desk.yml`, `COORDINATION.md` (this section) | `python3 scripts/verify_release.py` PASS after installing `jsdom@26`; verified desk steps now use Node 22, install `jsdom@26` without a skip fallback, and run `test_pages_dom.js` directly; official GitHub Actions workflow syntax docs: `https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax` |
+
+### 91A-1 close-out
+
+- Root cause: the desk workflow installed an unpinned `jsdom` and treated install failure as a warning, skipping page render tests; the Pages release workflow uses `jsdom@26` and fails closed.
+- Change: pin desk's runtime to Node 22 and `jsdom@26`; installation/render failures now fail the job, consistently with the release gate.
+- Verification: `npm install --no-save --package-lock=false jsdom@26`; `python3 scripts/verify_release.py` PASS (21 pages, validators, Python/DOM suites, rendered-number audit, internal-link check). No live API or account claim was made by this task.
+- Official review link: [GitHub Actions workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax).
 
 <!-- End session 91A claim -->
 
