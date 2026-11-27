@@ -123,7 +123,11 @@ function inlineAssets(html) {
 }
 
 async function loadPage(file, mode, opts = {}) {
-  const html = inlineAssets(fs.readFileSync(path.join(ROOT, file), "utf8"));
+  let source = fs.readFileSync(path.join(ROOT, file), "utf8");
+  // The dock has its own suite. Load it in the lifecycle fixture too, where we need to
+  // compare it with the full alert chats. It waits for DOMContentLoaded on inline load.
+  if (opts.includeDock) source = source.replace('src="assets/chatdock.js" defer', 'src="assets/chatdock.js"');
+  const html = inlineAssets(source);
   const state = { calls: [], blocked: 0, badBookQuery: null, candleDoc: opts.candleDoc || null, fixtures: opts.fixtures || {}, closed: false };
   const errors = [];
   const dom = new JSDOM(html, {
@@ -811,7 +815,7 @@ function commonAsserts(label, r) {
       open_markets: [{ ticker: "KXAAAGASM-TEST-OPEN", category_id: "gas", status: "active", last_price_dollars: 0.42 }],
       alert_lifecycle: { rows: followed } };
     const file = "data/live/markets.json";
-    const r = await loadPage("alerts.html", "snapshot", { fixtures: {
+    const r = await loadPage("alerts.html", "snapshot", { includeDock: true, fixtures: {
       [file]: snapshot,
       "data/live/alerts_archive.json": { alerts: datedRows },
       "data/live/alerts.json": { all_events: datedRows, high_roi: datedRows },
@@ -824,7 +828,7 @@ function commonAsserts(label, r) {
     check(selector(final.ticker)?.querySelector("a")?.getAttribute("href") === historical && selector(final.ticker)?.textContent.includes(prior),
       "rank-excluded settlement row cites its exact historical source and verification time");
     check(selector(unknown.ticker)?.querySelector("td:nth-child(5)")?.textContent === "—", "unverified result cell is blank");
-    check(/settled NO/.test(r.doc.querySelector("#kdChatAll").textContent) && /settled NO/.test(r.doc.querySelector("#kdChatModel").textContent),
+    check(/settled NO/.test(r.doc.querySelector("#kdChatAll")?.textContent || "") && /settled NO/.test(r.doc.querySelector("#kdChatModel")?.textContent || ""),
       "both dock feeds show the rank-excluded final result");
     check(/result set · not paid yet/.test(r.doc.querySelector("#feedAll").textContent), "the full chat shows the initial determination");
 

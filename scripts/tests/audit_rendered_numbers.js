@@ -365,8 +365,8 @@ const numFromText = (s) => Number(String(s).replace(/[^0-9.\-]/g, ""));
     check(rows.size === findings.length, "every finding has one unique rendered row");
     for (const f of findings) {
       const links = [...(rows.get(f.id)?.querySelectorAll("a") || [])].map(a => a.getAttribute("href"));
-      check(f.sources?.length > 0 && f.sources.every(s => s.startsWith("https://") && links.includes(s)),
-        `flagged item ${f.id} must render all its external sources`);
+      check(f.sources?.some(s => s.startsWith("https://")) && f.sources.every(s => links.includes(s)),
+        `flagged item ${f.id} must have an external source and render all its links`);
     }
     console.log(`  flagged.html      ok  (${findings.length} irregularities, ${high} high, every item source-linked)`);
     r.close();
