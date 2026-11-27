@@ -1620,6 +1620,22 @@
     "https://docs.github.com/en/actions/how-tos/monitor-workflows/view-workflow-run-history",
     "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/data/live/collector_health.json"
    ]
+  },
+  {
+   "id": "F-110",
+   "severity": "low",
+   "item": "Non-blocking hardening suggestion: validate_alerts.py's category_assigned_from check skips verification entirely when the series is absent from series_index (counted as unverifiable); verifying against the archive row's own recorded series_categories first would still catch a contradicted or ambiguous assignment in that case",
+   "why": "Independently reproduced and verified by session arena-b1cc1b1f while the stall was live. The integrated fixes (F-107 / PR #151 collector-side retention; F-108 / PR #152 validator treats unknown as unknown) unblock the collector and are correct: an absent series is unknown, not a contradiction. One residual edge remains: when collect.py record_series stores categories=null because GET /series failed transiently (PR #151's own test_failed_official_lookup_stays_unknown_never_inferred pins that null case), the ledger entry exists but is empty, so the assignment is skipped rather than checked. build_alerts.py assigns a restored topic from the row's OWN series_categories first (recorded with their source URL at assignment time); those official readings are permanent. A row-first check (row series_categories, then snapshot fallback, then unknown) would still refuse a provable contradiction in that edge while never failing on a genuine unknown. This is a suggestion, not a defect: the current behavior is safe and the collector is healthy.",
+   "action": "No code change made by this session (the merged F-108 fix is kept verbatim; this session's earlier row-first prototype was reverted as a duplicate of the converged merged work). Proposed as a future hardening: read a.get('series_categories') before _official() in the category_assigned_from loop, keep the unverifiable_series counter for rows with no reading anywhere, and keep refusing ambiguous/contradicted assignments. Verified premise live 2026-11-27: GET /series/KXAAAGASD returns categories ['Economics'], identical to the archive rows' recorded series_categories. Full release gate PASS on the merged tree.",
+   "status": "open (suggestion; owner decision needed)",
+   "sources": [
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/151",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/pull/152",
+    "https://external-api.demo.kalshi.co/trade-api/v2/series/KXAAAGASD",
+    "https://docs.kalshi.com/api-reference/market/get-series-list",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/tests/validate_alerts.py",
+    "https://github.com/kanlerxz87-cyber/KalshiDash3/blob/main/scripts/build_alerts.py"
+   ]
   }
- ]
+]
 }
