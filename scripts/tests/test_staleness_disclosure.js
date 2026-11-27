@@ -55,7 +55,9 @@ const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html")).sort();
  * read from data/live/catalysts.json and printed without the age of that file.
  * Delete an entry the moment the request is closed — the assertion then becomes binding again. */
 const PENDING_REQUESTS = {
-  "executive-summary.html": "R93-R1 (owner: c4409c73) — prints reviewed/total from data/live/catalysts.json without its age",
+  // R93-R1 CLOSED 2026-11-27: the owner session (c4409c73) added the age to the coverage sentence
+  // ("Review file <generated_at> (<ago>)" with a "Review timestamp unverified" fallback), so the
+  // page now discloses the age for real and this assertion is binding again with no exemptions.
 };
 
 /* ---------- 1. every page that shows snapshot numbers discloses their age ---------- */
