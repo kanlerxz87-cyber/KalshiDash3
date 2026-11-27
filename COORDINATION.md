@@ -6,6 +6,22 @@
 <!-- Session section inserted at the top (not appended): four concurrent sessions were appending at end-of-file
      every few minutes on 2026-11-22 and each merge conflicted there. This is an addition at a stable anchor. -->
 
+## Session `arena-251f5c3d` — current-snapshot verification, defect repair, and publish (branch `arena/251f5c3d-kalshidash3`, base `fe245d8`)
+
+Claimed 2026-11-27 **before any edit**. Board read first: no open pull request, no session branch on `origin`
+besides this one, and every prior session section below records a completed close-out (latest merged PR #131,
+2026-11-25). `origin/main` = `fe245d8` ("data: demo snapshot 2026-11-27T17:15Z", the collector's own commit from
+today). This session does **not** rebuild the site: it runs the release gate on the current tree, re-verifies the
+published rows against the live official demo API and official docs, repairs real defects with regression tests,
+publishes findings on the Flagged page, and closes out gate → PR → `main` → merge → Pages confirm → record here.
+
+| ID | Task | Status | Owner | Files in scope | Verification / sources |
+|----|------|--------|-------|----------------|------------------------|
+| T114 | Baseline release gate on the current tree (`python3 scripts/verify_release.py`) before any edit | claimed | arena-251f5c3d | `COORDINATION.md` (this section) | gate output recorded below |
+| T115 | Line-by-line re-verification of the load-bearing published claims against official sources fetched live this session (docs.kalshi.com pages + demo API records for each topic headline, published alerts, resolved rows) | claimed | arena-251f5c3d | `COORDINATION.md` (this section) | platform fetch route → `https://docs.kalshi.com/…` and `https://external-api.demo.kalshi.com/trade-api/v2/…` |
+| T116 | Independent audit of what the pages render against the committed data (all pages in jsdom), repair any real defect found, each with a regression test that fails before the fix | claimed | arena-251f5c3d | defect-fix files only as needed (named here when touched), `data/findings.json` (append only) | `python3 scripts/verify_release.py` PASS after each fix |
+| T117 | Publish findings on the Flagged page, then release gate → PR → `main` → merge → confirm Pages deploy → record the PR link and merge result here | claimed | arena-251f5c3d | `data/findings.json` (append only), `COORDINATION.md` (this section) | `scripts/verify_release.py`, Actions API, Pages API, live URL fetch |
+
 ## Session `arena-a490dfa2` — independent line-by-line verification against the live official demo API, defect repair, and publish (branch `arena/a490dfa2-kalshidash3`, base `2f0bac1`)
 
 Claimed 2026-11-25 **before any edit**. Board read first: no open pull request, no branch on `origin` ahead of
