@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-27T23:21:15Z",
- "runtime_seconds": 110.1,
+ "collected_at": "2026-11-28T00:06:13Z",
+ "runtime_seconds": 47.0,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,24 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 592,
+  "open_in_scope": 626,
   "open_excluded_category_conflict": 17,
   "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
   "near_misses": 0,
-  "unscoreable": 592,
-  "orderbooks": 592,
-  "orderbooks_requested": 592,
+  "unscoreable": 626,
+  "orderbooks": 626,
+  "orderbooks_requested": 626,
   "alerts": 0,
-  "markets_with_momentum": 42,
+  "markets_with_momentum": 43,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 592,
-  "returned": 592,
+  "requested": 626,
+  "returned": 626,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -62,7 +62,7 @@
  "near_misses": [],
  "unscoreable": [
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280015-XRP",
+   "ticker": "KXART-CHR3810DEC26-750000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -82,9 +82,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 5.895833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -93,14 +93,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $750000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280015",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -113,10 +113,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280015-XRP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-750000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280015-SOL",
+   "ticker": "KXART-CHR3810DEC26-2000000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -136,9 +136,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 5.895833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -147,14 +147,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $2000000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280015",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -167,10 +167,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280015-SOL"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-2000000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280015-HYPE",
+   "ticker": "KXART-CHR3810DEC26-1750000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -190,9 +190,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 5.895833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -201,14 +201,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $1750000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280015",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -221,10 +221,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280015-HYPE"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-1750000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280015-ETH",
+   "ticker": "KXART-CHR3810DEC26-1500000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -244,9 +244,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 5.895833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -255,14 +255,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $1500000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280015",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -275,10 +275,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280015-ETH"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-1500000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280015-BTC",
+   "ticker": "KXART-CHR3810DEC26-1250000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -298,9 +298,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 5.895833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -309,14 +309,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:00AM EST to 12:15AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $1250000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:15:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280015",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -329,10 +329,10 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280015-BTC"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-1250000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280030-XRP",
+   "ticker": "KXART-CHR3810DEC26-1000000",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
@@ -352,9 +352,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.145833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 326.8963888888889,
+   "momentum": null,
+   "series_ticker": "KXART",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -363,14 +363,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:15AM EST to 12:30AM EST?",
-   "category_id": "crypto",
+   "title": "Will the realized auction sale price of The Book of Miracles (lot 38) by Hans Burgkmair the Younger, Heinrich Vogtherr the Younger and workshops, as reported by Artnet, be above $1000000 during Christie\u2019s London Valuable Books and Manuscripts (sale 24547), beginning December 10, 2026 at 7:00 a.m. ET?",
+   "category_id": "culture",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Entertainment"
    ],
-   "close_time": "2026-11-28T05:30:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280030",
+   "close_time": "2026-12-11T15:00:00Z",
+   "event_ticker": "KXART-CHR3810DEC26",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -383,15 +383,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280030-XRP"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXART-CHR3810DEC26-1000000"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280030-SOL",
+   "ticker": "KXDPRESDELEGATE-28US100-WMOO",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 581 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -406,9 +407,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.145833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 13947.879722222222,
+   "momentum": null,
+   "series_ticker": "KXDPRESDELEGATE",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -417,14 +418,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:15AM EST to 12:30AM EST?",
-   "category_id": "crypto",
+   "title": "Will Wes Moore win at least 100 pledged Democratic delegates before July 1, 2028?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Elections"
    ],
-   "close_time": "2026-11-28T05:30:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280030",
+   "close_time": "2028-07-01T03:59:00Z",
+   "event_ticker": "KXDPRESDELEGATE-28US100",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -437,15 +438,16 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280030-SOL"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPRESDELEGATE-28US100-WMOO"
   },
   {
-   "ticker": "KXCRYPTOLEAD15M-26NOV280030-HYPE",
+   "ticker": "KXDPRESDELEGATE-28US100-RWAR",
    "eligible": false,
    "fails": [
     "depth 0 < 50 contracts at the touch",
     "24h volume 0.0 < 100 contracts",
     "no buyable side",
+    "closes in 581 d > 90 d horizon",
     "topic not confirmed by the fee schedule (keyword match only)"
    ],
    "reasons": [
@@ -460,9 +462,9 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 6.145833333333333,
-   "momentum": 0.0,
-   "series_ticker": "KXCRYPTOLEAD15M",
+   "ttc_hours": 13947.879722222222,
+   "momentum": null,
+   "series_ticker": "KXDPRESDELEGATE",
    "fee_multiplier": {
     "taker": 1,
     "maker": 0,
@@ -471,14 +473,14 @@
    "entry": null,
    "score": null,
    "dollars_traded_estimate": 0.0,
-   "title": "Which of these cryptocurrencies will have the highest return from Nov 28 - 12:15AM EST to 12:30AM EST?",
-   "category_id": "crypto",
+   "title": "Will Raphael Warnock win at least 100 pledged Democratic delegates before July 1, 2028?",
+   "category_id": "elections",
    "category_basis": "keyword",
    "series_categories": [
-    "Crypto"
+    "Elections"
    ],
-   "close_time": "2026-11-28T05:30:00Z",
-   "event_ticker": "KXCRYPTOLEAD15M-26NOV280030",
+   "close_time": "2028-07-01T03:59:00Z",
+   "event_ticker": "KXDPRESDELEGATE-28US100",
    "status": "active",
    "result": null,
    "volume_fp": 0.0,
@@ -491,24 +493,24 @@
     "bid_price": null,
     "ask_price": null
    },
-   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXCRYPTOLEAD15M-26NOV280030-HYPE"
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPRESDELEGATE-28US100-RWAR"
   }
  ],
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 143,
+  "candles_used": 162,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 10,
-  "baseline_always_yes_hits": 6,
+  "baseline_always_yes_bets": 8,
+  "baseline_always_yes_hits": 8,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "no candles in the 2h before close": 38,
-   "candle without a price": 14,
-   "no side passed the replay gates": 10
+   "candle without a price": 16,
+   "no side passed the replay gates": 8,
+   "no candles in the 2h before close": 1
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -517,7 +519,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.6
+  "baseline_always_yes_hit_rate": 1.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
