@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-28T00:51:15Z",
- "runtime_seconds": 62.9,
+ "collected_at": "2026-11-28T01:23:32Z",
+ "runtime_seconds": 89.3,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -53,10 +53,10 @@
   "docs": "https://docs.kalshi.com/api-reference/market/get-multiple-market-orderbooks"
  },
  "historical_cutoff": {
-  "market_positions_last_updated_ts": "2026-09-28T00:00:00Z",
-  "market_settled_ts": "2026-09-28T00:00:00Z",
-  "orders_updated_ts": "2026-11-13T00:00:00Z",
-  "trades_created_ts": "2026-09-28T00:00:00Z"
+  "market_positions_last_updated_ts": "2026-09-29T00:00:00Z",
+  "market_settled_ts": "2026-09-29T00:00:00Z",
+  "orders_updated_ts": "2026-11-14T00:00:00Z",
+  "trades_created_ts": "2026-09-29T00:00:00Z"
  },
  "picks": [],
  "near_misses": [],
@@ -82,7 +82,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -136,7 +136,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -190,7 +190,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -244,7 +244,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -298,7 +298,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -352,7 +352,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 326.1458333333333,
+   "ttc_hours": 325.60777777777776,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -407,7 +407,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13947.129166666668,
+   "ttc_hours": 13946.59111111111,
    "momentum": null,
    "series_ticker": "KXDPRESDELCOUNT",
    "fee_multiplier": {
@@ -462,7 +462,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13947.129166666668,
+   "ttc_hours": 13946.59111111111,
    "momentum": null,
    "series_ticker": "KXDPRESDELCOUNT",
    "fee_multiplier": {
@@ -499,18 +499,18 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 156,
+  "candles_used": 125,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 10,
-  "baseline_always_yes_hits": 8,
+  "baseline_always_yes_bets": 7,
+  "baseline_always_yes_hits": 7,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 14,
-   "no side passed the replay gates": 10,
-   "no candles in the 2h before close": 26
+   "candle without a price": 17,
+   "no side passed the replay gates": 7,
+   "no candles in the 2h before close": 25
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
   "not_measured": [
@@ -519,7 +519,7 @@
    "any production market: this is the demo environment"
   ],
   "hit_rate": null,
-  "baseline_always_yes_hit_rate": 0.8
+  "baseline_always_yes_hit_rate": 1.0
  },
  "disclaimers": [
   "Demo environment with mock funds. Kalshi states demo prices and behaviour may not reflect real markets: https://docs.kalshi.com/getting_started/demo_env",
