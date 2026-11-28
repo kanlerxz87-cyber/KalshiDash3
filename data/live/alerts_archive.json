@@ -2,6 +2,70 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXETHD-26NOV2722-T1664.99",
+   "event_ticker": "KXETHD-26NOV2722",
+   "title": "Ethereum price at Nov 27, 2026 at 10pm EST?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T02:37:04Z",
+   "to_time": "2026-11-28T02:52:06Z",
+   "from_price": 0.6,
+   "to_price": 0.22,
+   "delta": -0.38,
+   "direction": "down",
+   "volume_24h_fp": 205.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2722-T1664.99",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.18,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T02:52:07Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 105.0,
+    "est_dollars": 23.1,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 100.0,
+    "volume_to": 205.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.22,
+     "to_yes_bid": 0.0,
+     "to_yes_ask": 0.18,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "outside_quote",
+     "spread_dollars": 0.18,
+     "outside_by_dollars": 0.04,
+     "why": "the printed price 0.22 is above the recorded yes_ask (0.18 / 0.00 bid) \u2014 the last-traded price of the interval is 0.04 outside the two-sided quote recorded in the same read, so it is not a price a reader could have traded at that quote; this does not claim why the two differ"
+    },
+    "why": "105 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T02:52:07Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXETHD-26NOV2721-T1664.99",
    "event_ticker": "KXETHD-26NOV2721",
    "title": "Ethereum price at Nov 27, 2026 at 9pm EST?",
