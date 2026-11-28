@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-28T15:09:29Z",
- "snapshot_collected_at": "2026-11-28T15:09:28Z",
+ "generated_at": "2026-11-28T15:24:29Z",
+ "snapshot_collected_at": "2026-11-28T15:24:28Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 234,
+  "archive_total": 235,
   "reviewed": 57,
-  "not_reviewed": 177,
+  "not_reviewed": 178,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
   "best_quote_did_not_move": 19,
@@ -18,6 +18,27 @@
   "withheld_category_conflict": 20
  },
  "alerts": [
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-CSMI",
+   "to_time": "2026-11-28T15:24:28Z",
+   "from_time": "2026-11-28T15:09:28Z",
+   "from_price": 0.003,
+   "to_price": 0.19,
+   "delta": 0.187,
+   "direction": "up",
+   "category_id": "golf",
+   "title": "BMW Australian PGA Championship: Cameron Smith wins",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-CSMI",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If Cameron Smith wins the BMW Australian PGA Championship, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-CSMI",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "reviewed_at": null
+  },
   {
    "ticker": "KXDPWORLDTOUR-BMAPC26-CSMI",
    "to_time": "2026-11-28T15:09:28Z",
