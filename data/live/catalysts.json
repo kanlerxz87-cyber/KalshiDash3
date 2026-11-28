@@ -1,15 +1,15 @@
 {
  "schema": 1,
- "generated_at": "2026-11-28T03:07:05Z",
- "snapshot_collected_at": "2026-11-28T03:07:05Z",
+ "generated_at": "2026-11-28T03:22:03Z",
+ "snapshot_collected_at": "2026-11-28T03:22:02Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
  "method": "Each source below was fetched and READ in the session that wrote this file; the values are copied out of the response, not inferred. `scripts/catalysts.py` only ever renders a link that appears in this ledger, and it recomputes every comparison from the numbers stored here, so a page cannot quote a figure that was not fetched. Anything not reviewed is reported as `not_reviewed`, never as 'no news'.",
  "counts": {
-  "archive_total": 170,
+  "archive_total": 171,
   "reviewed": 57,
-  "not_reviewed": 113,
+  "not_reviewed": 114,
   "external_move_coincides": 0,
   "no_external_move_supporting": 3,
   "best_quote_did_not_move": 19,
@@ -18,6 +18,27 @@
   "withheld_category_conflict": 20
  },
  "alerts": [
+  {
+   "ticker": "KXETHD-26NOV2723-T1664.99",
+   "to_time": "2026-11-28T03:22:02Z",
+   "from_time": "2026-11-28T03:07:04Z",
+   "from_price": 0.4,
+   "to_price": 0.28,
+   "delta": -0.12,
+   "direction": "down",
+   "category_id": "crypto",
+   "title": "Ethereum price at Nov 27, 2026 at 11pm EST?",
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2723-T1664.99",
+   "market_status": "active",
+   "result_as_returned": null,
+   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' Ethereum Real-Time Index (ERTI) before 11 PM EST is above 1664.99 at 11 PM EST on Nov 27, 2026, then the market resolves to Yes.",
+   "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2723-T1664.99",
+   "links": [],
+   "state": "not_reviewed",
+   "relation": null,
+   "note": "No review entry for this swing, so nothing is asserted about it. Not the same as 'no news existed': nobody in this project has read the reference for this market at this minute yet.",
+   "reviewed_at": null
+  },
   {
    "ticker": "KXETHD-26NOV2722-T1664.99",
    "to_time": "2026-11-28T02:52:06Z",
