@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-28T01:23:32Z",
- "runtime_seconds": 89.3,
+ "collected_at": "2026-11-28T01:32:29Z",
+ "runtime_seconds": 99.7,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -82,7 +82,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -136,7 +136,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -190,7 +190,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -244,7 +244,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -298,7 +298,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -352,7 +352,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 325.60777777777776,
+   "ttc_hours": 325.4586111111111,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
@@ -407,7 +407,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13946.59111111111,
+   "ttc_hours": 13946.441944444445,
    "momentum": null,
    "series_ticker": "KXDPRESDELCOUNT",
    "fee_multiplier": {
@@ -462,7 +462,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 13946.59111111111,
+   "ttc_hours": 13946.441944444445,
    "momentum": null,
    "series_ticker": "KXDPRESDELCOUNT",
    "fee_multiplier": {
@@ -499,17 +499,17 @@
  "alerts": [],
  "validation": {
   "markets_tested": 24,
-  "candles_used": 125,
+  "candles_used": 102,
   "signals": 0,
   "hits": 0,
   "misses": 0,
-  "baseline_always_yes_bets": 7,
-  "baseline_always_yes_hits": 7,
+  "baseline_always_yes_bets": 6,
+  "baseline_always_yes_hits": 6,
   "pnl_per_100_contracts": 0.0,
   "by_category": {},
   "skipped": {
-   "candle without a price": 17,
-   "no side passed the replay gates": 7,
+   "candle without a price": 18,
+   "no side passed the replay gates": 6,
    "no candles in the 2h before close": 25
   },
   "method": "For each settled market: take the last 1-minute candle ending at or before close_time; form q from that candle's yes_bid/yes_ask close (mid) and price close (last), with the micro weight folded into mid; buy the side the screen prefers at that candle's price; settle at $1 for the winning side, $0 for the losing side, per https://docs.kalshi.com/getting_started/market_settlement. Taker fee applied with the general formula from https://kalshi.com/docs/kalshi-fee-schedule.pdf.",
