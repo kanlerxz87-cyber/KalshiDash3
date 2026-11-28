@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-28T08:08:16Z",
- "snapshot_collected_at": "2026-11-28T08:08:16Z",
+ "generated_at": "2026-11-28T08:23:16Z",
+ "snapshot_collected_at": "2026-11-28T08:23:16Z",
  "threshold_dollars": 0.1,
  "rules_status": "experimental-mirror-of-dashboard",
  "high_roi_rule": {
@@ -11,15 +11,15 @@
   "decided_at": "detection time \u2014 build_alerts.py applies this screen to the snapshot it is reading and the archive is append-only, so the flag is a record of that moment and is never relabelled later. validate_alerts.py therefore checks each flag against the volume_24h_fp / category_basis stored with the alert, and reports disagreement with the current snapshot as drift (volume_24h_fp legitimately changes between collections) instead of failing the collector \u2014 see F-39 and scripts/tests/test_alerts.py HighRoiFreezeTests."
  },
  "counts": {
-  "all_events": 191,
+  "all_events": 192,
   "high_roi": 133,
-  "archive_total": 211,
+  "archive_total": 212,
   "new_this_run": 1,
   "withheld_category_conflict": 0,
   "withheld_reasons": {},
   "evidence": {
    "traded_ge_floor": 33,
-   "traded_below_floor": 100,
+   "traded_below_floor": 101,
    "quote_only": 0,
    "counter_reset": 0,
    "candle_unquantified": 5,
@@ -30,9 +30,9 @@
   },
   "quote_check": {
    "inside_quote": 159,
-   "outside_quote": 31,
+   "outside_quote": 32,
    "unknown_quote": 1,
-   "rows": 191
+   "rows": 192
   },
   "withheld_out_of_scope": 20,
   "withheld_out_of_scope_reasons": {
@@ -40,6 +40,70 @@
   }
  },
  "all_events": [
+  {
+   "ticker": "KXBTCD-26NOV2804-T59799.99",
+   "event_ticker": "KXBTCD-26NOV2804",
+   "title": "Bitcoin price on Nov 28, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T08:08:15Z",
+   "to_time": "2026-11-28T08:23:15Z",
+   "from_price": 0.28,
+   "to_price": 0.14,
+   "delta": -0.14,
+   "direction": "down",
+   "volume_24h_fp": 5.0,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2804-T59799.99",
+   "to_yes_bid": 0.0,
+   "to_yes_ask": 0.12,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T08:23:16Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_below_floor",
+    "contracts_traded": 41.0,
+    "est_dollars": 5.74,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 4.0,
+    "volume_to": 45.0,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.14,
+     "to_yes_bid": 0.0,
+     "to_yes_ask": 0.12,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "outside_quote",
+     "spread_dollars": 0.12,
+     "outside_by_dollars": 0.02,
+     "why": "the printed price 0.14 is above the recorded yes_ask (0.12 / 0.00 bid) \u2014 the last-traded price of the interval is 0.02 outside the two-sided quote recorded in the same read, so it is not a price a reader could have traded at that quote; this does not claim why the two differ"
+    },
+    "why": "41 contracts traded in the interval, below this project's 100-contract floor for calling a swing a market move",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T08:23:16Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
   {
    "ticker": "KXBTCY-27JAN0100-B97500",
    "event_ticker": "KXBTCY-27JAN0100",
@@ -98,10 +162,10 @@
     "decided_at": "2026-11-28T08:08:16Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -226,7 +290,7 @@
     "decided_at": "2026-11-28T07:38:16Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
@@ -12345,10 +12409,10 @@
     "decided_at": "2026-11-28T08:08:16Z"
    },
    "evidence_reversion": {
-    "observed_after": 0,
-    "min_distance_from_from_price": null,
-    "gave_back_half": null,
-    "still_open": true
+    "observed_after": 1,
+    "min_distance_from_from_price": 0.96,
+    "gave_back_half": false,
+    "still_open": false
    }
   },
   {
@@ -12409,7 +12473,7 @@
     "decided_at": "2026-11-28T07:38:16Z"
    },
    "evidence_reversion": {
-    "observed_after": 2,
+    "observed_after": 3,
     "min_distance_from_from_price": 0.0,
     "gave_back_half": true,
     "still_open": false
