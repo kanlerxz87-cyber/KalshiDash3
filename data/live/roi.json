@@ -3,8 +3,8 @@
  "kind": "live-desk scan (ROI picks + swing alerts + validation)",
  "environment": "demo",
  "base_url": "https://external-api.demo.kalshi.co/trade-api/v2",
- "collected_at": "2026-11-28T04:23:22Z",
- "runtime_seconds": 48.2,
+ "collected_at": "2026-11-28T05:08:16Z",
+ "runtime_seconds": 36.6,
  "model": {
   "id": "roi-screen-v1",
   "file": "data/roi_model.json",
@@ -29,24 +29,24 @@
  },
  "counts": {
   "open_scanned": 20000,
-  "open_in_scope": 681,
+  "open_in_scope": 690,
   "open_excluded_category_conflict": 47,
   "open_excluded_off_topic_or_qa": 0,
   "eligible": 0,
   "picks": 0,
-  "near_misses": 0,
-  "unscoreable": 681,
-  "orderbooks": 681,
-  "orderbooks_requested": 681,
+  "near_misses": 4,
+  "unscoreable": 686,
+  "orderbooks": 690,
+  "orderbooks_requested": 690,
   "alerts": 0,
-  "markets_with_momentum": 42,
+  "markets_with_momentum": 38,
   "markets_with_catalyst_url": 0,
   "scoring_errors": 0
  },
  "scoring_errors": [],
  "orderbook_fetch": {
-  "requested": 681,
-  "returned": 681,
+  "requested": 690,
+  "returned": 690,
   "unexpected_tickers": 0,
   "failed_chunks": 0,
   "endpoint": "GET /markets/orderbooks?tickers=A&tickers=B (1-100 tickers, repeated)",
@@ -59,7 +59,246 @@
   "trades_created_ts": "2026-09-29T00:00:00Z"
  },
  "picks": [],
- "near_misses": [],
+ "near_misses": [
+  {
+   "ticker": "KXBTC15M-26NOV280015-15",
+   "eligible": false,
+   "fails": [
+    "NO entry 99.0c above 95c ceiling",
+    "net ROI -0.80% not above 0% floor",
+    "closes in 7 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.017271812080536915,
+   "mid": 0.02,
+   "micro": 0.017919463087248323,
+   "last": 0.01,
+   "bid": 0.01,
+   "ask": 0.03,
+   "spread": 0.019999999999999997,
+   "depth": 149.0,
+   "vol24": 1166.18,
+   "ttc_hours": 0.11222222222222222,
+   "momentum": null,
+   "series_ticker": "KXBTC15M",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "NO",
+    "entry": 0.99,
+    "fee_unit": 0.0006930000000000006,
+    "cost": 0.990693,
+    "ev": -0.00796481208053701,
+    "roi": -0.008039636981927811
+   },
+   "score": -0.008039636981927811,
+   "dollars_traded_estimate": 18.12,
+   "title": "BTC price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "close_time": "2026-11-28T05:15:00Z",
+   "event_ticker": "KXBTC15M-26NOV280015",
+   "status": "active",
+   "result": null,
+   "volume_fp": 1811.85,
+   "volume_24h_fp": 1166.18,
+   "open_interest_fp": 1088.29,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 59.0,
+    "depth_at_ask": 90.0,
+    "bid_price": 0.01,
+    "ask_price": 0.020000000000000018
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTC15M-26NOV280015-15"
+  },
+  {
+   "ticker": "KXDOGE15M-26NOV280015-15",
+   "eligible": false,
+   "fails": [
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -60.02% not above 0% floor",
+    "closes in 7 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.04250000000000001,
+   "mid": 0.05,
+   "micro": 0.0,
+   "last": 0.1,
+   "bid": 0.0,
+   "ask": 0.1,
+   "spread": 0.1,
+   "depth": 99.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.11222222222222222,
+   "momentum": null,
+   "series_ticker": "KXDOGE15M",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.1,
+    "fee_unit": 0.006300000000000001,
+    "cost": 0.1063,
+    "ev": -0.0638,
+    "roi": -0.6001881467544684
+   },
+   "score": -0.6001881467544684,
+   "dollars_traded_estimate": 0.1,
+   "title": "DOGE price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "close_time": "2026-11-28T05:15:00Z",
+   "event_ticker": "KXDOGE15M-26NOV280015",
+   "status": "active",
+   "result": null,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 1.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 99.0,
+    "bid_price": null,
+    "ask_price": 0.09999999999999998
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDOGE15M-26NOV280015-15"
+  },
+  {
+   "ticker": "KXXRP15M-26NOV280015-15",
+   "eligible": false,
+   "fails": [
+    "24h volume 0.0 < 100 contracts",
+    "net ROI -78.83% not above 0% floor",
+    "closes in 7 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.022500000000000003,
+   "mid": 0.05,
+   "micro": 0.0,
+   "last": 0.0,
+   "bid": 0.0,
+   "ask": 0.1,
+   "spread": 0.1,
+   "depth": 100.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.11222222222222222,
+   "momentum": null,
+   "series_ticker": "KXXRP15M",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.1,
+    "fee_unit": 0.006300000000000001,
+    "cost": 0.1063,
+    "ev": -0.0838,
+    "roi": -0.7883349012229539
+   },
+   "score": -0.7883349012229539,
+   "dollars_traded_estimate": 0.0,
+   "title": "XRP price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "close_time": "2026-11-28T05:15:00Z",
+   "event_ticker": "KXXRP15M-26NOV280015",
+   "status": "active",
+   "result": null,
+   "volume_fp": 0.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 0.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 100.0,
+    "bid_price": null,
+    "ask_price": 0.09999999999999998
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXXRP15M-26NOV280015-15"
+  },
+  {
+   "ticker": "KXETH15M-26NOV280015-15",
+   "eligible": false,
+   "fails": [
+    "depth 39 < 50 contracts at the touch",
+    "24h volume 0.0 < 100 contracts",
+    "YES entry 2.0c below 5c floor",
+    "net ROI -53.21% not above 0% floor",
+    "closes in 7 min < 15 min floor",
+    "topic not confirmed by the fee schedule (keyword match only)"
+   ],
+   "reasons": [],
+   "q": 0.01,
+   "mid": 0.01,
+   "micro": 0.0,
+   "last": 0.02,
+   "bid": 0.0,
+   "ask": 0.02,
+   "spread": 0.02,
+   "depth": 39.0,
+   "vol24": 0.0,
+   "ttc_hours": 0.11222222222222222,
+   "momentum": null,
+   "series_ticker": "KXETH15M",
+   "fee_multiplier": {
+    "taker": 1,
+    "maker": 0,
+    "listed": false
+   },
+   "entry": {
+    "side": "YES",
+    "entry": 0.02,
+    "fee_unit": 0.0013720000000000002,
+    "cost": 0.021372000000000002,
+    "ev": -0.011372000000000002,
+    "roi": -0.5320980722440577
+   },
+   "score": -0.5320980722440577,
+   "dollars_traded_estimate": 0.02,
+   "title": "ETH price up in next 15 mins?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "close_time": "2026-11-28T05:15:00Z",
+   "event_ticker": "KXETH15M-26NOV280015",
+   "status": "active",
+   "result": null,
+   "volume_fp": 1.0,
+   "volume_24h_fp": 0.0,
+   "open_interest_fp": 1.0,
+   "catalysts": [],
+   "book": {
+    "depth_at_bid": 0.0,
+    "depth_at_ask": 39.0,
+    "bid_price": null,
+    "ask_price": 0.020000000000000018
+   },
+   "source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETH15M-26NOV280015-15"
+  }
+ ],
  "unscoreable": [
   {
    "ticker": "KXARTISTSTREAMSY-MICHAE26DEC31-55.0M",
@@ -82,7 +321,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -136,7 +375,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -190,7 +429,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -244,7 +483,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -298,7 +537,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -352,7 +591,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 850.6105555555556,
+   "ttc_hours": 849.8622222222223,
    "momentum": null,
    "series_ticker": "KXARTISTSTREAMSY",
    "fee_multiplier": {
@@ -407,7 +646,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 17050.610555555555,
+   "ttc_hours": 17049.862222222222,
    "momentum": null,
    "series_ticker": "KXSENATENOM",
    "fee_multiplier": {
@@ -461,7 +700,7 @@
    "spread": 0.0,
    "depth": 0,
    "vol24": 0.0,
-   "ttc_hours": 322.61055555555555,
+   "ttc_hours": 321.8622222222222,
    "momentum": null,
    "series_ticker": "KXART",
    "fee_multiplier": {
