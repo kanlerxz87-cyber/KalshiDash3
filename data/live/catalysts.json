@@ -1,7 +1,7 @@
 {
  "schema": 1,
- "generated_at": "2026-11-28T00:50:03Z",
- "snapshot_collected_at": "2026-11-28T00:50:02Z",
+ "generated_at": "2026-11-28T01:05:03Z",
+ "snapshot_collected_at": "2026-11-28T01:05:02Z",
  "ledger": "data/catalyst_review.json",
  "ledger_reviewed_by": "arena-d34a9f0d",
  "threshold_dollars": 0.1,
@@ -31,7 +31,7 @@
    "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2720-T1659.99",
    "market_status": "active",
    "result_as_returned": null,
-   "settlement_reference_text": "If the simple average of the sixty seconds of CF Benchmarks' Ethereum Real-Time Index (ERTI) before 8 PM EST is above 1659.99 at 8 PM EST on Nov 27, 2026, then the market resolves to Yes.",
+   "settlement_reference_text": null,
    "settlement_reference_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXETHD-26NOV2720-T1659.99",
    "links": [],
    "state": "not_reviewed",
