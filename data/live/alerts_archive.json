@@ -2,6 +2,262 @@
  "schema": 1,
  "alerts": [
   {
+   "ticker": "KXBTCY-27JAN0100-B87500",
+   "event_ticker": "KXBTCY-27JAN0100",
+   "title": "BTC price  on Jan 1, 2027?",
+   "category_id": "crypto",
+   "category_basis": "seed",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T11:08:15Z",
+   "to_time": "2026-11-28T11:23:15Z",
+   "from_price": 0.99,
+   "to_price": 0.02,
+   "delta": -0.97,
+   "direction": "down",
+   "volume_24h_fp": 16075.45,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCY-27JAN0100-B87500",
+   "to_yes_bid": 0.01,
+   "to_yes_ask": 0.99,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T11:23:16Z",
+   "high_roi": true,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 116.97,
+    "est_dollars": 2.34,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 59551627.33,
+    "volume_to": 59551744.3,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.02,
+     "to_yes_bid": 0.01,
+     "to_yes_ask": 0.99,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "inside_quote",
+     "spread_dollars": 0.98,
+     "outside_by_dollars": 0.0,
+     "why": "the printed price 0.02 is inside the quote recorded at the same read (yes_bid 0.01 / yes_ask 0.99)"
+    },
+    "why": "116.97 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T11:23:16Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-ANOR",
+   "event_ticker": "KXDPWORLDTOUR-BMAPC26",
+   "title": "BMW Australian PGA Championship: Alex Noren wins",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T11:08:15Z",
+   "to_time": "2026-11-28T11:23:15Z",
+   "from_price": 0.049,
+   "to_price": 0.24,
+   "delta": 0.191,
+   "direction": "up",
+   "volume_24h_fp": 69884.8,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-ANOR",
+   "to_yes_bid": 0.23,
+   "to_yes_ask": 0.24,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T11:23:16Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 15121.62,
+    "est_dollars": 3629.19,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 93250.6,
+    "volume_to": 108372.22,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.24,
+     "to_yes_bid": 0.23,
+     "to_yes_ask": 0.24,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "inside_quote",
+     "spread_dollars": 0.01,
+     "outside_by_dollars": 0.0,
+     "why": "the printed price 0.24 is inside the quote recorded at the same read (yes_bid 0.23 / yes_ask 0.24)"
+    },
+    "why": "15121.6 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T11:23:16Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXDPWORLDTOUR-BMAPC26-NVON",
+   "event_ticker": "KXDPWORLDTOUR-BMAPC26",
+   "title": "BMW Australian PGA Championship: Nicolai von Dellingshausen wins",
+   "category_id": "golf",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Sports"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T11:08:15Z",
+   "to_time": "2026-11-28T11:23:15Z",
+   "from_price": 0.37,
+   "to_price": 0.5,
+   "delta": 0.13,
+   "direction": "up",
+   "volume_24h_fp": 20441.05,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXDPWORLDTOUR-BMAPC26-NVON",
+   "to_yes_bid": 0.49,
+   "to_yes_ask": 0.5,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T11:23:16Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 106.83,
+    "est_dollars": 53.41,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 33575.47,
+    "volume_to": 33682.3,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.5,
+     "to_yes_bid": 0.49,
+     "to_yes_ask": 0.5,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "inside_quote",
+     "spread_dollars": 0.01,
+     "outside_by_dollars": 0.0,
+     "why": "the printed price 0.50 is inside the quote recorded at the same read (yes_bid 0.49 / yes_ask 0.50)"
+    },
+    "why": "106.83 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T11:23:16Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
+   "ticker": "KXBTCD-26NOV2817-T59749.99",
+   "event_ticker": "KXBTCD-26NOV2817",
+   "title": "Bitcoin price on Nov 28, 2026?",
+   "category_id": "crypto",
+   "category_basis": "keyword",
+   "series_categories": [
+    "Crypto"
+   ],
+   "status": "active",
+   "from_time": "2026-11-28T11:08:15Z",
+   "to_time": "2026-11-28T11:23:15Z",
+   "from_price": 0.39,
+   "to_price": 0.52,
+   "delta": 0.13,
+   "direction": "up",
+   "volume_24h_fp": 275.07,
+   "market_source": "https://external-api.demo.kalshi.co/trade-api/v2/markets/KXBTCD-26NOV2817-T59749.99",
+   "to_yes_bid": 0.51,
+   "to_yes_ask": 0.52,
+   "cause_link": null,
+   "cause_status": "unverified: no official cause source collected",
+   "first_seen_at": "2026-11-28T11:23:16Z",
+   "high_roi": false,
+   "evidence": {
+    "state": "traded_ge_floor",
+    "contracts_traded": 137.72,
+    "est_dollars": 71.61,
+    "est_dollars_is_an_estimate": true,
+    "volume_from": 152.72,
+    "volume_to": 290.44,
+    "policy_floor_contracts": 100.0,
+    "policy_floor_is_a_kalshi_field": false,
+    "quote": {
+     "to_last_price": 0.52,
+     "to_yes_bid": 0.51,
+     "to_yes_ask": 0.52,
+     "quote_source": "alert.to_yes_bid / alert.to_yes_ask (GET /markets at the to_time read)",
+     "sources": {
+      "quote": "https://docs.kalshi.com/getting_started/orderbook_responses",
+      "fields": "https://docs.kalshi.com/api-reference/market/get-markets"
+     },
+     "state": "inside_quote",
+     "spread_dollars": 0.01,
+     "outside_by_dollars": 0.0,
+     "why": "the printed price 0.52 is inside the quote recorded at the same read (yes_bid 0.51 / yes_ask 0.52)"
+    },
+    "why": "137.72 contracts traded in the interval, at or above this project's 100-contract floor",
+    "sources": {
+     "fields": "https://docs.kalshi.com/api-reference/market/get-markets",
+     "candles": "https://docs.kalshi.com/api-reference/market/get-market-candlesticks",
+     "lifecycle": "https://docs.kalshi.com/getting_started/market_lifecycle",
+     "demo": "https://docs.kalshi.com/getting_started/demo_env",
+     "quote": "https://docs.kalshi.com/getting_started/orderbook_responses"
+    },
+    "decided_at": "2026-11-28T11:23:16Z"
+   },
+   "evidence_reversion": {
+    "observed_after": 0,
+    "min_distance_from_from_price": null,
+    "gave_back_half": null,
+    "still_open": true
+   }
+  },
+  {
    "ticker": "KXBTCD-26NOV2806-T59199.99",
    "event_ticker": "KXBTCD-26NOV2806",
    "title": "Bitcoin price on Nov 28, 2026?",
